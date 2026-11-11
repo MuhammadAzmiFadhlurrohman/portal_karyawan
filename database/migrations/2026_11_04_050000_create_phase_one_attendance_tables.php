@@ -68,9 +68,9 @@ return new class extends Migration
             $table->string('model_version', 64)->default('insightface-buffalo_l-onnx-1.0');
             $table->unsignedTinyInteger('poses_count')->default(3);
             $table->decimal('quality_score', 5, 4)->default(0.9200);
-            $table->timestamp('consent_at');
+            $table->timestamp('consent_at')->nullable();
             $table->string('consent_ip', 45)->nullable();
-            $table->timestamp('enrolled_at');
+            $table->timestamp('enrolled_at')->nullable();
             $table->timestamps();
         });
 

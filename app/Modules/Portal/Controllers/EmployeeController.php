@@ -408,3 +408,4 @@ class EmployeeController extends Controller
         return 'KR' . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
     }
 }
+

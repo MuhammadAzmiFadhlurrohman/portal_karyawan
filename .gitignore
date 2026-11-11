@@ -24,3 +24,7 @@ Homestead.yaml
 Thumbs.db
 __pycache__/
 *.pyc
+
+# Legacy database dumps
+attendance_db.sql
+gomsn.sql
