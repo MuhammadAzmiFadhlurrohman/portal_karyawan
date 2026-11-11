@@ -1,0 +1,816 @@
+<x-layouts.app title="Data Karyawan — Manajemen SDM">
+    <div x-data="{
+        isCreateOpen: false,
+        isEditOpen: false,
+        isDeleteOpen: false,
+        isResetOpen: false,
+        selectedEmployee: null,
+        editForm: {
+            id: '',
+            name: '',
+            employee_code: '',
+            username: '',
+            email: '',
+            phone: '',
+            nik: '',
+            division: '',
+            position: '',
+            supervisor_id: '',
+            role: '',
+            join_date: '',
+            bank: '',
+            no_rekening: '',
+            atas_nama: '',
+            potongan_alpa: '',
+            is_active: true
+        },
+        deleteTarget: { id: '', name: '', code: '' },
+        resetTarget: { id: '', name: '', code: '' },
+        openEdit(emp) {
+            this.selectedEmployee = emp;
+            this.editForm = {
+                id: emp.id,
+                name: emp.name || '',
+                employee_code: emp.employee_code || '',
+                username: emp.username || '',
+                email: emp.email || '',
+                phone: emp.phone || '',
+                nik: emp.nik || '',
+                division: emp.division || '',
+                position: emp.position || '',
+                supervisor_id: emp.supervisor_id || '',
+                role: (emp.roles && emp.roles.length > 0) ? emp.roles[0].name : 'karyawan',
+                join_date: emp.join_date ? emp.join_date.substring(0, 10) : '',
+                bank: emp.bank || '',
+                no_rekening: emp.no_rekening || '',
+                atas_nama: emp.atas_nama || '',
+                potongan_alpa: emp.potongan_alpa || '',
+                is_active: Boolean(emp.is_active)
+            };
+            this.isEditOpen = true;
+        },
+        openDelete(emp) {
+            this.deleteTarget = { id: emp.id, name: emp.name, code: emp.employee_code };
+            this.isDeleteOpen = true;
+        },
+        openReset(emp) {
+            this.resetTarget = { id: emp.id, name: emp.name, code: emp.employee_code };
+            this.isResetOpen = true;
+        }
+    }" class="space-y-6 w-full pb-16">
+
+        <!-- Top Welcome/Header Card (Sculpted Metallic Ocean Teal) -->
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
+             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+            
+            <!-- Gloss Highlights (Top & Bottom Rims) -->
+            <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
+
+            <!-- Ambient Cyan Fluid Wave Glow on Right -->
+            <svg class="absolute right-0 top-0 bottom-0 h-full w-2/3 pointer-events-none opacity-40" viewBox="0 0 350 70" fill="none" preserveAspectRatio="none">
+                <path d="M 0 70 C 90 20 180 60 350 10 L 350 70 Z" fill="url(#empWaveGrad)"/>
+                <path d="M 50 70 C 130 15 220 50 350 20" stroke="rgba(94, 234, 212, 0.4)" stroke-width="1.5" fill="none"/>
+                <defs>
+                    <linearGradient id="empWaveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.1"/>
+                        <stop offset="70%" stop-color="#2dd4bf" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#5eead4" stop-opacity="0.35"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- Left: Icon + Title & Subtitle -->
+            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+                <div class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                    <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
+                            <span>Manajemen Data Karyawan</span>
+                        </h1>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                            {{ $totalEmployees }} Total Personel
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-[13px] text-teal-100/80 mt-1 leading-snug">
+                        Kelola data kepegawaian, jabatan, divisi, atasan langsung, role RBAC, dan rekening payroll PT MSN.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Action Button (+ Tambah Karyawan) -->
+            <div class="relative z-10 flex items-center gap-2 shrink-0">
+                <button @click="isCreateOpen = true"
+                        type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-teal-400 to-[#18C4C4] hover:from-teal-300 hover:to-[#22d3d3] text-slate-900 font-bold text-xs shadow-lg hover:shadow-cyan-500/30 transition-all active:scale-95 cursor-pointer border border-white/40">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Tambah Karyawan</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Alert Messages -->
+        @if (session('status'))
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-2.5">
+                    <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="font-medium">{{ session('status') }}</span>
+                </div>
+                <button type="button" @click="$el.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700 text-base font-bold">&times;</button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-2.5">
+                    <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="font-medium">{{ session('error') }}</span>
+                </div>
+                <button type="button" @click="$el.parentElement.remove()" class="text-rose-500 hover:text-rose-700 text-base font-bold">&times;</button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs shadow-xs">
+                <p class="font-bold flex items-center gap-2 mb-1">
+                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Terdapat beberapa kesalahan pengisian form:
+                </p>
+                <ul class="list-disc list-inside space-y-0.5 ml-2">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- KPI Metric Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+                <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Karyawan</span>
+                    <span class="text-base">👥</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="font-heading text-2xl font-bold text-slate-800">{{ $totalEmployees }}</span>
+                    <span class="text-xs text-slate-400">Terdaftar</span>
+                </div>
+                <div class="mt-1 text-[11px] text-slate-500">
+                    Database aktif PT MSN
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+                <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Karyawan Aktif</span>
+                    <span class="text-base">🟢</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="font-heading text-2xl font-bold text-emerald-700">{{ $activeEmployees }}</span>
+                    <span class="text-xs text-emerald-700 font-medium">Bisa Login</span>
+                </div>
+                <div class="mt-1 text-[11px] text-slate-500">
+                    Akses sistem aktif
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+                <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Karyawan Nonaktif</span>
+                    <span class="text-base">⏸️</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="font-heading text-2xl font-bold text-rose-700">{{ $inactiveEmployees }}</span>
+                    <span class="text-xs text-rose-700 font-medium">Terkunci</span>
+                </div>
+                <div class="mt-1 text-[11px] text-slate-500">
+                    Non-aktif / resigned
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+                <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Divisi Teknik</span>
+                    <span class="text-base">🛠️</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                    <span class="font-heading text-2xl font-bold text-teal-700">{{ $divisionCounts['Teknik'] ?? 0 }}</span>
+                    <span class="text-xs text-slate-400">Personel</span>
+                </div>
+                <div class="mt-1 text-[11px] text-slate-500">
+                    NOC: {{ $divisionCounts['NOC'] ?? 0 }} · Umum: {{ $divisionCounts['Umum'] ?? 0 }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
+            <form method="GET" action="{{ route('portal.employees.index') }}" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                <!-- Search Input -->
+                <div class="sm:col-span-4 relative">
+                    <input type="text" 
+                           name="search" 
+                           value="{{ $currentFilters['search'] }}" 
+                           placeholder="Cari nama, NIK, kode (KR...), email, HP..."
+                           class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+
+                <!-- Division Select -->
+                <div class="sm:col-span-3">
+                    <select name="division" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
+                        <option value="">Semua Divisi</option>
+                        @foreach ($divisions as $div)
+                            <option value="{{ $div }}" {{ $currentFilters['division'] === $div ? 'selected' : '' }}>
+                                Divisi {{ $div }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Role Select -->
+                <div class="sm:col-span-2">
+                    <select name="role" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
+                        <option value="">Semua Role</option>
+                        @foreach ($roles as $r)
+                            <option value="{{ $r->name }}" {{ $currentFilters['role'] === $r->name ? 'selected' : '' }}>
+                                {{ ucfirst(str_replace('_', ' ', $r->name)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Status Select -->
+                <div class="sm:col-span-2">
+                    <select name="status" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
+                        <option value="active" {{ $currentFilters['status'] === 'active' ? 'selected' : '' }}>Status: Aktif</option>
+                        <option value="inactive" {{ $currentFilters['status'] === 'inactive' ? 'selected' : '' }}>Status: Nonaktif</option>
+                        <option value="all" {{ $currentFilters['status'] === 'all' ? 'selected' : '' }}>Semua Status</option>
+                    </select>
+                </div>
+
+                <!-- Submit & Reset Buttons -->
+                <div class="sm:col-span-1 flex items-center gap-1.5">
+                    <button type="submit" 
+                            title="Terapkan Filter"
+                            class="flex-1 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center shadow-xs transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                    </button>
+                    @if ($currentFilters['search'] || $currentFilters['division'] || $currentFilters['role'] || $currentFilters['status'] !== 'active')
+                        <a href="{{ route('portal.employees.index') }}" 
+                           title="Reset Filter"
+                           class="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 text-xs transition">
+                            ✕
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+        <!-- Employee Table Card -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead>
+                        <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70 border-b border-slate-200/80">
+                            <th class="py-3 px-4">Karyawan</th>
+                            <th class="py-3 px-3">Kontak &amp; Akun</th>
+                            <th class="py-3 px-3">Penempatan</th>
+                            <th class="py-3 px-3">Role &amp; Akses</th>
+                            <th class="py-3 px-3">Status</th>
+                            <th class="py-3 pr-4 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($employees as $emp)
+                            <tr class="hover:bg-slate-50/70 transition-colors">
+                                <!-- Profile & Name -->
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        @if ($emp->foto)
+                                            <img src="{{ asset('storage/' . $emp->foto) }}" 
+                                                 alt="{{ $emp->name }}" 
+                                                 class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0 shadow-2xs">
+                                        @else
+                                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                                                {{ substr($emp->name, 0, 1) }}
+                                            </div>
+                                        @endif
+                                        <div class="min-w-0">
+                                            <span class="font-bold text-slate-900 block text-xs truncate max-w-[180px]">{{ $emp->name }}</span>
+                                            <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-400 font-mono">
+                                                <span class="text-teal-700 font-semibold">{{ $emp->employee_code }}</span>
+                                                @if ($emp->nik)
+                                                    <span>· NIK: {{ $emp->nik }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Contact & Username -->
+                                <td class="py-3 px-3">
+                                    <div class="text-slate-700">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-[11px] font-mono text-slate-500">{{ $emp->phone }}</span>
+                                        </div>
+                                        <div class="text-[11px] text-slate-400 truncate max-w-[160px]">{{ $emp->email }}</div>
+                                        <div class="text-[10px] text-teal-800 font-mono font-medium mt-0.5">@<span>{{ $emp->username }}</span></div>
+                                    </div>
+                                </td>
+
+                                <!-- Division, Position & Supervisor -->
+                                <td class="py-3 px-3">
+                                    <div>
+                                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/80">
+                                            {{ $emp->division ?: 'Non-Divisi' }}
+                                        </span>
+                                        <span class="block text-slate-700 font-semibold text-xs mt-1">{{ $emp->position ?: '-' }}</span>
+                                        <span class="block text-[11px] text-slate-400 mt-0.5">
+                                            Atasan: {{ $emp->supervisor ? $emp->supervisor->name : '-' }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Role -->
+                                <td class="py-3 px-3">
+                                    @php
+                                        $primaryRole = $emp->getRoleNames()->first() ?? 'karyawan';
+                                        $roleColor = match ($primaryRole) {
+                                            'super_admin', 'admin' => 'bg-rose-50 text-rose-700 border-rose-200',
+                                            'ceo' => 'bg-purple-50 text-purple-700 border-purple-200',
+                                            'hrd' => 'bg-blue-50 text-blue-700 border-blue-200',
+                                            'finance' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                            'atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                            default => 'bg-teal-50 text-teal-700 border-teal-200',
+                                        };
+                                    @endphp
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $roleColor }}">
+                                        {{ strtoupper(str_replace('_', ' ', $primaryRole)) }}
+                                    </span>
+                                </td>
+
+                                <!-- Status Aktif -->
+                                <td class="py-3 px-3">
+                                    @if ($emp->is_active)
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            Aktif
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                            Nonaktif
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="py-3 pr-4 text-right">
+                                    <div class="inline-flex items-center gap-1.5">
+                                        <!-- Edit Button -->
+                                        <button @click="openEdit({{ $emp->toJson() }})"
+                                                type="button" 
+                                                title="Ubah Data Karyawan"
+                                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                        </button>
+
+                                        <!-- Reset Password Button -->
+                                        <button @click="openReset({{ $emp->toJson() }})"
+                                                type="button" 
+                                                title="Reset Password Akun"
+                                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 transition cursor-pointer">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                        </button>
+
+                                        <!-- Delete / Deactivate Button -->
+                                        @if ($emp->id !== auth()->id())
+                                            <button @click="openDelete({{ $emp->toJson() }})"
+                                                    type="button" 
+                                                    title="Hapus / Nonaktifkan"
+                                                    class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 transition cursor-pointer">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-12 text-center text-slate-400">
+                                    <div class="max-w-sm mx-auto">
+                                        <span class="text-3xl block mb-2">🔍</span>
+                                        <p class="font-bold text-slate-700 text-sm">Tidak ada karyawan yang sesuai filter</p>
+                                        <p class="text-xs text-slate-400 mt-0.5">Coba ubah kata kunci pencarian atau reset filter.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            @if ($employees->hasPages())
+                <div class="px-4 py-3 border-t border-slate-200/80 bg-slate-50/50">
+                    {{ $employees->links() }}
+                </div>
+            @endif
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- MODAL 1: TAMBAH KARYAWAN                                      -->
+        <!-- ============================================================== -->
+        <div x-show="isCreateOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+            <div @click.outside="isCreateOpen = false" 
+                 class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden my-auto">
+                
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between"
+                     style="background: linear-gradient(90deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+                    <div>
+                        <h3 class="font-heading font-bold text-base text-white">Tambah Data Karyawan Baru</h3>
+                        <p class="text-[11px] text-teal-200/80">Masukkan informasi personal, penempatan kerja, dan akun login</p>
+                    </div>
+                    <button @click="isCreateOpen = false" type="button" class="text-white/70 hover:text-white text-lg font-bold p-1">&times;</button>
+                </div>
+
+                <!-- Modal Body (Form) -->
+                <form method="POST" action="{{ route('portal.employees.store') }}" enctype="multipart/form-data" class="overflow-y-auto p-6 space-y-4 text-xs">
+                    @csrf
+
+                    <!-- Section: Profil Utama -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            1. Informasi Pribadi &amp; Kontak
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Nama Lengkap <span class="text-rose-500">*</span></label>
+                                <input type="text" name="name" required placeholder="Contoh: Budi Santoso" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">NIK (KTP)</label>
+                                <input type="text" name="nik" placeholder="16 digit NIK" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Email Perusahaan <span class="text-rose-500">*</span></label>
+                                <input type="email" name="email" required placeholder="budi@msn.co.id" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">No. WhatsApp / HP <span class="text-rose-500">*</span></label>
+                                <input type="text" name="phone" required placeholder="081234567890" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Akun & Hak Akses -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            2. Kredensial &amp; Role Sistem
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Kode Karyawan</label>
+                                <input type="text" name="employee_code" placeholder="Auto jika kosong" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
+                                <span class="text-[10px] text-slate-400 mt-0.5 block">Format: KR000xx</span>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Username</label>
+                                <input type="text" name="username" placeholder="Auto jika kosong" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Role Sistem <span class="text-rose-500">*</span></label>
+                                <select name="role" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    @foreach ($roles as $r)
+                                        <option value="{{ $r->name }}" {{ $r->name === 'karyawan' ? 'selected' : '' }}>
+                                            {{ ucfirst(str_replace('_', ' ', $r->name)) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="block text-slate-700 font-semibold mb-1">Password Awal Akun</label>
+                                <input type="text" name="password" placeholder="Kosongkan untuk default: msn12345" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                <span class="text-[10px] text-slate-400 mt-0.5 block">Karyawan akan diminta mengganti password saat pertama kali masuk jika menggunakan password default.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Organisasi & Penempatan -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            3. Penempatan Kerja &amp; Struktur Organisasi
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Divisi</label>
+                                <select name="division" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Pilih Divisi...</option>
+                                    @foreach ($divisions as $div)
+                                        <option value="{{ $div }}">{{ $div }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Jabatan / Posisi</label>
+                                <input type="text" name="position" placeholder="Teknisi Lapangan, NOC..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Atasan Langsung</label>
+                                <select name="supervisor_id" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Tidak Ada / Direksi</option>
+                                    @foreach ($supervisors as $spv)
+                                        <option value="{{ $spv->id }}">{{ $spv->name }} ({{ $spv->division }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Tanggal Bergabung</label>
+                                <input type="date" name="join_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Foto Profil</label>
+                                <input type="file" name="foto" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                            </div>
+                            <div class="flex items-center gap-2 pt-5">
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500">
+                                    <span class="text-slate-800 font-semibold text-xs">Akun Aktif Langsung</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Data Rekening Payroll -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            4. Informasi Payroll (Rekening Bank)
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Nama Bank</label>
+                                <select name="bank" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Pilih Bank...</option>
+                                    @foreach ($banks as $b)
+                                        <option value="{{ $b }}">{{ $b }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Nomor Rekening</label>
+                                <input type="text" name="no_rekening" placeholder="Contoh: 1234567890" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Atas Nama Rekening</label>
+                                <input type="text" name="atas_nama" placeholder="Sesuai buku tabungan" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                        <button @click="isCreateOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold shadow-xs transition">
+                            Simpan Karyawan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- MODAL 2: EDIT DATA KARYAWAN                                   -->
+        <!-- ============================================================== -->
+        <div x-show="isEditOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+            <div @click.outside="isEditOpen = false" 
+                 class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden my-auto">
+                
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between"
+                     style="background: linear-gradient(90deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+                    <div>
+                        <h3 class="font-heading font-bold text-base text-white">Ubah Data Karyawan</h3>
+                        <p class="text-[11px] text-teal-200/80" x-text="editForm.name + ' (' + editForm.employee_code + ')'"></p>
+                    </div>
+                    <button @click="isEditOpen = false" type="button" class="text-white/70 hover:text-white text-lg font-bold p-1">&times;</button>
+                </div>
+
+                <!-- Modal Body (Form) -->
+                <form :action="'{{ url('/portal/employees') }}/' + editForm.id" method="POST" enctype="multipart/form-data" class="overflow-y-auto p-6 space-y-4 text-xs">
+                    @csrf
+                    @method('PUT')
+
+                    <!-- Section: Profil Utama -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            1. Informasi Pribadi &amp; Kontak
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Nama Lengkap <span class="text-rose-500">*</span></label>
+                                <input type="text" name="name" x-model="editForm.name" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">NIK (KTP)</label>
+                                <input type="text" name="nik" x-model="editForm.nik" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Email Perusahaan <span class="text-rose-500">*</span></label>
+                                <input type="email" name="email" x-model="editForm.email" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">No. WhatsApp / HP <span class="text-rose-500">*</span></label>
+                                <input type="text" name="phone" x-model="editForm.phone" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Akun & Hak Akses -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            2. Kredensial &amp; Role Sistem
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Kode Karyawan <span class="text-rose-500">*</span></label>
+                                <input type="text" name="employee_code" x-model="editForm.employee_code" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Username <span class="text-rose-500">*</span></label>
+                                <input type="text" name="username" x-model="editForm.username" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Role Sistem <span class="text-rose-500">*</span></label>
+                                <select name="role" x-model="editForm.role" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    @foreach ($roles as $r)
+                                        <option value="{{ $r->name }}">{{ ucfirst(str_replace('_', ' ', $r->name)) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="sm:col-span-3">
+                                <label class="block text-slate-700 font-semibold mb-1">Ganti Password (Opsional)</label>
+                                <input type="text" name="password" placeholder="Biarkan kosong jika tidak ingin mengubah password" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Organisasi & Penempatan -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            3. Penempatan Kerja &amp; Struktur Organisasi
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Divisi</label>
+                                <select name="division" x-model="editForm.division" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Pilih Divisi...</option>
+                                    @foreach ($divisions as $div)
+                                        <option value="{{ $div }}">{{ $div }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Jabatan / Posisi</label>
+                                <input type="text" name="position" x-model="editForm.position" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Atasan Langsung</label>
+                                <select name="supervisor_id" x-model="editForm.supervisor_id" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Tidak Ada / Direksi</option>
+                                    @foreach ($supervisors as $spv)
+                                        <option value="{{ $spv->id }}">{{ $spv->name }} ({{ $spv->division }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Tanggal Bergabung</label>
+                                <input type="date" name="join_date" x-model="editForm.join_date" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Ganti Foto Profil</label>
+                                <input type="file" name="foto" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                            </div>
+                            <div class="flex items-center gap-2 pt-5">
+                                <label class="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="is_active" value="1" :checked="editForm.is_active" class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500">
+                                    <span class="text-slate-800 font-semibold text-xs">Status Akun Aktif</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Data Rekening Payroll -->
+                    <div>
+                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
+                            4. Informasi Payroll (Rekening Bank)
+                        </span>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Nama Bank</label>
+                                <select name="bank" x-model="editForm.bank" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                                    <option value="">Pilih Bank...</option>
+                                    @foreach ($banks as $b)
+                                        <option value="{{ $b }}">{{ $b }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Nomor Rekening</label>
+                                <input type="text" name="no_rekening" x-model="editForm.no_rekening" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-slate-700 font-semibold mb-1">Atas Nama Rekening</label>
+                                <input type="text" name="atas_nama" x-model="editForm.atas_nama" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                        <button @click="isEditOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold shadow-xs transition">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- MODAL 3: RESET PASSWORD CONFIRMATION                          -->
+        <!-- ============================================================== -->
+        <div x-show="isResetOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div @click.outside="isResetOpen = false" 
+                 class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                    🔑
+                </div>
+                <h3 class="font-heading font-bold text-base text-slate-900">Reset Password Karyawan?</h3>
+                <p class="text-xs text-slate-500 mt-1">
+                    Password akun untuk <strong x-text="resetTarget.name"></strong> (<span class="font-mono text-teal-700" x-text="resetTarget.code"></span>) akan direset ke password acak sementara. Karyawan akan diwajibkan mengganti password baru saat login berikutnya.
+                </p>
+
+                <form :action="'{{ url('/portal/employees') }}/' + resetTarget.id + '/reset-password'" method="POST" class="mt-5 flex items-center justify-center gap-2.5">
+                    @csrf
+                    <button @click="isResetOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 text-xs transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition">
+                        Ya, Reset Password
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- MODAL 4: HAPUS / NONAKTIFKAN KARYAWAN                         -->
+        <!-- ============================================================== -->
+        <div x-show="isDeleteOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <div @click.outside="isDeleteOpen = false" 
+                 class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+                    ⚠️
+                </div>
+                <h3 class="font-heading font-bold text-base text-slate-900">Hapus / Nonaktifkan Karyawan?</h3>
+                <p class="text-xs text-slate-500 mt-1">
+                    Anda yakin ingin menghapus data <strong x-text="deleteTarget.name"></strong> (<span class="font-mono text-teal-700" x-text="deleteTarget.code"></span>)? Akun ini akan dinonaktifkan dari sistem dan dipindahkan ke arsip (soft delete).
+                </p>
+
+                <form :action="'{{ url('/portal/employees') }}/' + deleteTarget.id" method="POST" class="mt-5 flex items-center justify-center gap-2.5">
+                    @csrf
+                    @method('DELETE')
+                    <button @click="isDeleteOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 text-xs transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition">
+                        Ya, Hapus Karyawan
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</x-layouts.app>

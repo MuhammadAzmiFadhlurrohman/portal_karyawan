@@ -14,6 +14,7 @@ use App\Modules\Gomsn\Controllers\OvertimeController;
 use App\Modules\Gomsn\Controllers\PengajuanController;
 use App\Modules\Gomsn\Controllers\TaskController;
 use App\Modules\Portal\Controllers\AuthController;
+use App\Modules\Portal\Controllers\EmployeeController;
 use App\Modules\Portal\Controllers\PortalHubController;
 use App\Modules\Ticketing\Controllers\ChronologyController;
 use App\Modules\Ticketing\Controllers\HandoverController;
@@ -49,6 +50,13 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/portal/settings', [PortalHubController::class, 'updateSystemSetting'])->name('portal.settings.update');
 
     Route::get('/portal/audit-logs', [PortalHubController::class, 'auditLogs'])->name('portal.audit');
+
+    // Manajemen Karyawan (§6, Admin / HRD)
+    Route::get('/portal/employees', [EmployeeController::class, 'index'])->name('portal.employees.index');
+    Route::post('/portal/employees', [EmployeeController::class, 'store'])->name('portal.employees.store');
+    Route::put('/portal/employees/{user}', [EmployeeController::class, 'update'])->name('portal.employees.update');
+    Route::delete('/portal/employees/{user}', [EmployeeController::class, 'destroy'])->name('portal.employees.destroy');
+    Route::post('/portal/employees/{user}/reset-password', [EmployeeController::class, 'resetPassword'])->name('portal.employees.reset-password');
 
     // Fase 1: Modul Absensi Inti — Biometrik Wajah, Geofencing & Jadwal Shift (§5.1, §5.2, §5.9)
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
