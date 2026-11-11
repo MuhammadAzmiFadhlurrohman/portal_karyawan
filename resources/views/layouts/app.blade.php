@@ -555,32 +555,35 @@
         <!-- Right Main Panel -->
         <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
             <!-- Mobile Fixed Header (Sculpted Metallic Teal Bar - Always Pinned on Scroll) -->
-            <div class="md:hidden fixed top-0 inset-x-0 z-40 pt-2 px-3 pb-1.5 bg-slate-50/95 backdrop-blur-md select-none">
-                <div class="relative h-[48px] w-full rounded-[22px] overflow-hidden flex items-center justify-between px-3.5 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
+            <div class="md:hidden fixed top-0 inset-x-0 z-50 pt-2 px-3 pb-1.5 bg-slate-50/95 backdrop-blur-md select-none">
+                <div class="relative h-[48px] w-full rounded-[22px] flex items-center justify-between px-3.5 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
                      style="background: linear-gradient(100deg, #07383c 0%, #0c4d53 28%, #105c64 52%, #0a4449 82%, #063135 100%);">
                     
-                    <!-- Specular Highlights (Top & Bottom Gloss Rims) -->
-                    <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/80 to-transparent pointer-events-none"></div>
-                    <div class="absolute inset-x-3 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/45 to-transparent pointer-events-none"></div>
-                    <div class="absolute inset-0 bg-gradient-to-b from-white/[0.10] via-transparent to-black/[0.20] pointer-events-none"></div>
+                    <!-- Decorative Background & Highlights Layer (Clipped to Pill Corners) -->
+                    <div class="absolute inset-0 rounded-[22px] overflow-hidden pointer-events-none">
+                        <!-- Specular Highlights (Top & Bottom Gloss Rims) -->
+                        <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/80 to-transparent"></div>
+                        <div class="absolute inset-x-3 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/45 to-transparent"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-white/[0.10] via-transparent to-black/[0.20]"></div>
 
-                    <!-- Sculpted Aerodynamic Wave SVG on Right Pocket -->
-                    <svg class="absolute right-0 top-0 h-full w-[170px] pointer-events-none" viewBox="0 0 170 48" fill="none" preserveAspectRatio="none">
-                        <path d="M 45 0 C 35 14 18 28 0 38 L 0 48 L 170 48 L 170 0 Z" fill="url(#mobilePocketGrad)" opacity="0.88"/>
-                        <path d="M 45 0 C 35 14 18 28 0 38 L 0 48" stroke="url(#mobileHighlightStroke)" stroke-width="2" stroke-linecap="round"/>
-                        <defs>
-                            <linearGradient id="mobilePocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#042023"/>
-                                <stop offset="50%" stop-color="#072d31"/>
-                                <stop offset="100%" stop-color="#051f22"/>
-                            </linearGradient>
-                            <linearGradient id="mobileHighlightStroke" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#5eead4" stop-opacity="0.9"/>
-                                <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1"/>
-                                <stop offset="100%" stop-color="#0d9488" stop-opacity="0.4"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                        <!-- Sculpted Aerodynamic Wave SVG on Right Pocket -->
+                        <svg class="absolute right-0 top-0 h-full w-[170px]" viewBox="0 0 170 48" fill="none" preserveAspectRatio="none">
+                            <path d="M 45 0 C 35 14 18 28 0 38 L 0 48 L 170 48 L 170 0 Z" fill="url(#mobilePocketGrad)" opacity="0.88"/>
+                            <path d="M 45 0 C 35 14 18 28 0 38 L 0 48" stroke="url(#mobileHighlightStroke)" stroke-width="2" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="mobilePocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#042023"/>
+                                    <stop offset="50%" stop-color="#072d31"/>
+                                    <stop offset="100%" stop-color="#051f22"/>
+                                </linearGradient>
+                                <linearGradient id="mobileHighlightStroke" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.9"/>
+                                    <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1"/>
+                                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.4"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
 
                     <!-- Left: White GoMSN Logo -->
                     <a href="{{ route('portal.hub') }}" class="relative z-10 flex items-center group py-0.5" title="GoMSN Portal">
@@ -591,25 +594,33 @@
                     </a>
 
                     <!-- Right: Actions inside sculpted bezel (Bell + Solid White Ringed Avatar + Chevron) -->
-                    <div class="relative z-10 flex items-center gap-2" x-data="{ mobileUserMenuOpen: false }">
+                    <div class="relative z-10 flex items-center gap-2">
                         <!-- Notification Bell with Red Dot -->
-                        <button class="relative p-1 text-white/90 hover:text-white transition-colors cursor-pointer" title="Notifikasi Sistem">
+                        <button type="button" class="relative p-1 text-white/90 hover:text-white transition-colors cursor-pointer" title="Notifikasi Sistem">
                             <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
                             <span class="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-[#ef4444] shadow-[0_0_6px_#ef4444]"></span>
                         </button>
 
-                        <!-- Avatar with Solid White Ring + Chevron Down -->
-                        <div class="relative">
+                        <!-- Avatar with Solid White Ring + Chevron Down (Dropdown Menu) -->
+                        <div class="relative" x-data="{ mobileUserMenuOpen: false }" @click.outside="mobileUserMenuOpen = false">
                             <button @click="mobileUserMenuOpen = !mobileUserMenuOpen"
-                                    @click.outside="mobileUserMenuOpen = false"
                                     type="button"
-                                    class="flex items-center gap-1 cursor-pointer focus:outline-none">
+                                    aria-haspopup="true"
+                                    :aria-expanded="mobileUserMenuOpen"
+                                    class="flex items-center gap-1 cursor-pointer focus:outline-none select-none">
                                 <!-- Avatar circle with solid 2px white border ring -->
-                                <div class="w-[30px] h-[30px] rounded-full border-2 border-white bg-[#0a3e42] text-white flex items-center justify-center font-bold text-xs shadow-md shrink-0">
-                                    {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                                </div>
+                                @if (auth()->user()->foto)
+                                    <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
+                                         alt="{{ auth()->user()->name }}" 
+                                         class="w-[30px] h-[30px] rounded-full border-2 border-white object-cover shadow-md shrink-0">
+                                @else
+                                    <div class="w-[30px] h-[30px] rounded-full border-2 border-white bg-[#0a3e42] text-white flex items-center justify-center font-bold text-xs shadow-md shrink-0">
+                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                    </div>
+                                @endif
+
                                 <!-- Pure White Down Chevron -->
                                 <svg class="w-3.5 h-3.5 text-white transition-transform duration-200"
                                      :class="mobileUserMenuOpen ? 'rotate-180' : ''"
@@ -622,18 +633,24 @@
                             <div x-show="mobileUserMenuOpen"
                                  x-cloak
                                  x-transition:enter="transition ease-out duration-150"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:enter-start="opacity-0 translate-y-1 scale-95"
+                                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                                  x-transition:leave="transition ease-in duration-100"
-                                 x-transition:leave-start="opacity-100 scale-100"
-                                 x-transition:leave-end="opacity-0 scale-95"
-                                 class="absolute right-0 mt-2.5 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-1.5 z-50 divide-y divide-slate-100">
+                                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                 x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                                 class="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-1.5 z-50 divide-y divide-slate-100 select-auto">
                                 
                                 <!-- Header Ringkasan Akun -->
                                 <div class="px-4 py-3 flex items-center gap-3">
-                                    <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                                    </div>
+                                    @if (auth()->user()->foto)
+                                        <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
+                                             alt="{{ auth()->user()->name }}" 
+                                             class="h-9 w-9 rounded-xl object-cover border border-slate-200 shadow-xs shrink-0">
+                                    @else
+                                        <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        </div>
+                                    @endif
                                     <div class="min-w-0">
                                         <p class="text-xs font-bold text-slate-900 truncate">{{ auth()->user()->name }}</p>
                                         <p class="text-[10px] text-teal-700 font-mono font-medium truncate">{{ auth()->user()->employee_code }}</p>
