@@ -76,58 +76,58 @@
         <!-- Card Tambah User Baru (Hanya Muncul untuk Admin / Atasan Teknisi) -->
         @if ($canManage)
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div class="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between text-slate-800 font-bold text-xs">
-                    <div class="flex items-center gap-2">
-                        <div class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2.5 text-slate-800 font-bold text-xs sm:text-sm">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60 shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                         </div>
                         <span>Tambah User Baru ke ODP {{ $odp->nama_odp }}</span>
                     </div>
 
                     <div class="text-[11px] font-semibold text-slate-500">
-                        Kapasitas Port: <span class="font-extrabold text-teal-600">{{ $customers->total() }} / {{ $odp->port_max }}</span>
+                        Kapasitas Port Terisi: <span class="font-extrabold text-teal-600 font-mono">{{ $customers->total() }} / {{ $odp->port_max }}</span>
                     </div>
                 </div>
 
-                <form action="{{ route('gomsn.network.customers.store', $odp) }}" method="POST" class="p-3.5">
+                <form action="{{ route('gomsn.network.customers.store', $odp) }}" method="POST" class="p-4 sm:p-5">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-end">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4">
                         <!-- Nomor Internet -->
-                        <div class="md:col-span-3">
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
-                                <span class="font-bold text-slate-400">#</span>
-                                Nomor Internet
+                        <div class="w-full sm:w-56 shrink-0">
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                                <span class="font-mono text-slate-400 font-bold">#</span>
+                                <span>Nomor Internet</span>
                             </label>
                             <input type="text" name="nomor_internet" required placeholder="Contoh: 123456" 
-                                   class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all shadow-2xs">
                         </div>
 
                         <!-- Nama User -->
-                        <div class="md:col-span-4">
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                Nama User
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span>Nama Lengkap User</span>
                             </label>
-                            <input type="text" name="nama_user" required placeholder="Nama lengkap" 
-                                   class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
+                            <input type="text" name="nama_user" required placeholder="Nama lengkap pelanggan" 
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all shadow-2xs">
                         </div>
 
                         <!-- Keterangan -->
-                        <div class="md:col-span-3">
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                Keterangan
+                        <div class="flex-1 min-w-[160px]">
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                <span>Keterangan</span>
                             </label>
-                            <input type="text" name="keterangan" placeholder="Opsional" 
-                                   class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
+                            <input type="text" name="keterangan" placeholder="Opsional (cth: ONT ZTE, drop core)" 
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all shadow-2xs">
                         </div>
 
-                        <!-- Tombol Tambah -->
-                        <div class="md:col-span-2">
+                        <!-- Tombol Tambah User -->
+                        <div class="w-full sm:w-auto shrink-0">
                             <button type="submit" 
                                     style="background: linear-gradient(135deg, #10b981 0%, #0d9488 100%) !important; color: #ffffff !important;"
-                                    class="w-full py-1.5 px-3 rounded-lg text-white font-bold text-xs shadow-2xs hover:shadow transition-all flex items-center justify-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                 <span>Tambah User</span>
                             </button>
                         </div>

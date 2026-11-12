@@ -91,31 +91,36 @@
         <!-- Card Tambah PON Baru (Hanya Muncul untuk Admin / Atasan Teknisi) -->
         @if ($canManage)
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div class="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 text-slate-800 font-bold text-xs">
-                    <div class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <div class="flex items-center gap-2.5 text-slate-800 font-bold text-xs sm:text-sm">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-200/60 shadow-2xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        </div>
+                        <span>Tambah PON Baru pada {{ $selectedOlt->nama_olt }}</span>
                     </div>
-                    <span>Tambah PON Baru pada {{ $selectedOlt->nama_olt }}</span>
+                    <span class="text-[11px] font-medium text-slate-400 hidden sm:inline">Kelola alokasi splitter &amp; distribusi port</span>
                 </div>
 
-                <form action="{{ route('gomsn.network.pons.store', $selectedOlt) }}" method="POST" class="p-3.5">
+                <form action="{{ route('gomsn.network.pons.store', $selectedOlt) }}" method="POST" class="p-4 sm:p-5">
                     @csrf
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end">
-                        <div class="sm:col-span-7">
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                                Nama PON
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-4">
+                        <!-- Nama PON -->
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                <span>Nama PON</span>
                             </label>
-                            <input type="text" name="nama_pon" required placeholder="Contoh: PON-001" 
-                                   class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all">
+                            <input type="text" name="nama_pon" required placeholder="Contoh: PON-001 atau PON 5 / MS SUFIA" 
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all shadow-2xs">
                         </div>
 
-                        <div class="sm:col-span-3">
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center gap-1">
-                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                Port Maks
+                        <!-- Port Maks -->
+                        <div class="w-full sm:w-48 shrink-0">
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span>Kapasitas Port</span>
                             </label>
-                            <select name="port_max" required class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all bg-white">
+                            <select name="port_max" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all bg-white shadow-2xs">
                                 <option value="2">2 Port</option>
                                 <option value="4">4 Port</option>
                                 <option value="8" selected>8 Port</option>
@@ -125,11 +130,12 @@
                             </select>
                         </div>
 
-                        <div class="sm:col-span-2">
+                        <!-- Tombol Tambah -->
+                        <div class="w-full sm:w-auto shrink-0">
                             <button type="submit" 
                                     style="background: linear-gradient(135deg, #10b981 0%, #0d9488 100%) !important; color: #ffffff !important;"
-                                    class="w-full py-1.5 px-3 rounded-lg text-white font-bold text-xs shadow-2xs hover:shadow transition-all flex items-center justify-center gap-1.5">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                 <span>Tambah PON</span>
                             </button>
                         </div>
