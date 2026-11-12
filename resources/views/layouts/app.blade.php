@@ -641,17 +641,17 @@
 
                                 <!-- Avatar circle with solid 2px white border ring -->
                                 <div class="relative w-[30px] h-[30px] shrink-0">
-                                    @if (auth()->user()->foto)
-                                        <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
+                                    @if (auth()->user()->avatar_url)
+                                        <img src="{{ auth()->user()->avatar_url }}" 
                                              alt="" 
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                              class="w-[30px] h-[30px] rounded-full border-2 border-white object-cover shadow-md">
-                                        <div style="display: none;" class="w-[30px] h-[30px] rounded-full border-2 border-white bg-[#0a3e42] text-white items-center justify-center font-bold text-xs shadow-md">
-                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        <div style="display: none;" class="w-[30px] h-[30px] rounded-full border-2 border-white bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-[11px] shadow-md shrink-0">
+                                            {{ auth()->user()->initials }}
                                         </div>
                                     @else
-                                        <div class="w-[30px] h-[30px] rounded-full border-2 border-white bg-[#0a3e42] text-white flex items-center justify-center font-bold text-xs shadow-md shrink-0">
-                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        <div class="w-[30px] h-[30px] rounded-full border-2 border-white bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-[11px] shadow-md shrink-0">
+                                            {{ auth()->user()->initials }}
                                         </div>
                                     @endif
                                 </div>
@@ -677,17 +677,17 @@
                                 
                                 <!-- Header Ringkasan Akun -->
                                 <div class="px-4 py-3 flex items-center gap-3">
-                                    @if (auth()->user()->foto)
-                                        <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
+                                    @if (auth()->user()->avatar_url)
+                                        <img src="{{ auth()->user()->avatar_url }}" 
                                              alt="" 
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                              class="h-9 w-9 rounded-xl object-cover border border-slate-200 shadow-xs shrink-0">
                                         <div style="display: none;" class="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                            {{ auth()->user()->initials }}
                                         </div>
                                     @else
                                         <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                            {{ auth()->user()->initials }}
                                         </div>
                                     @endif
                                     <div class="min-w-0">
@@ -821,17 +821,17 @@
                                 class="flex items-center gap-2.5 pl-1.5 pr-3 py-1 rounded-2xl bg-slate-50/90 hover:bg-white border border-slate-200/80 hover:border-teal-300 hover:shadow-xs transition-all duration-200 cursor-pointer group focus:outline-none">
                             <!-- Avatar with online indicator ring -->
                             <div class="relative shrink-0">
-                                @if (auth()->user()->foto)
-                                    <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
+                                @if (auth()->user()->avatar_url)
+                                    <img src="{{ auth()->user()->avatar_url }}" 
                                          alt="" 
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                         onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                          class="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-2xs ring-2 ring-white">
                                     <div style="display: none;" class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold text-xs shadow-2xs ring-2 ring-white shrink-0">
-                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        {{ auth()->user()->initials }}
                                     </div>
                                 @else
                                     <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-xs shadow-2xs ring-2 ring-white">
-                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        {{ auth()->user()->initials }}
                                     </div>
                                 @endif
                                 <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
@@ -868,17 +868,17 @@
                             
                             <!-- Header Ringkasan Akun -->
                             <div class="px-4 py-3 flex items-center gap-3">
-                                @if (auth()->user()->foto)
-                                    <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
+                                @if (auth()->user()->avatar_url)
+                                    <img src="{{ auth()->user()->avatar_url }}" 
                                          alt="" 
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                         onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                          class="h-10 w-10 rounded-xl object-cover border border-slate-200 shadow-xs shrink-0">
                                     <div style="display: none;" class="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        {{ auth()->user()->initials }}
                                     </div>
                                 @else
                                     <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        {{ auth()->user()->initials }}
                                     </div>
                                 @endif
                                 <div class="min-w-0">
@@ -1188,11 +1188,14 @@
              x-transition:leave-start="translate-y-0"
              x-transition:leave-end="translate-y-full"
              :style="isDragging ? 'transform: translateY(' + Math.max(0, sheetTranslateY) + 'px) !important; transition: none !important;' : (sheetTranslateY > 0 ? 'transform: translateY(0px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);' : '')"
-             style="background-color: #FFFFFF; background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 1px); background-size: 24px 24px;"
-             class="relative w-full max-w-xl mx-auto max-h-[88vh] rounded-t-[32px] shadow-[0_-16px_50px_rgba(0,0,0,0.22)] flex flex-col z-10 border-t border-slate-200 overflow-hidden">
+             class="relative w-full max-w-xl mx-auto max-h-[88vh] bg-white rounded-t-[32px] shadow-[0_-16px_50px_rgba(0,0,0,0.35)] flex flex-col z-20 border-t border-slate-200 overflow-hidden">
             
+            <!-- Crisp Solid White Background with Subtle Micro-Dot Texture -->
+            <div class="absolute inset-0 pointer-events-none opacity-40 z-0" 
+                 style="background-color: #FFFFFF; background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 20px 20px;"></div>
+
             <!-- Pull Handle Bar Indicator (Tarik ke bawah dari garis ini untuk menutup menu) -->
-            <div class="pt-3 pb-1.5 cursor-grab active:cursor-grabbing flex flex-col items-center justify-center select-none touch-none group"
+            <div class="pt-3 pb-1.5 cursor-grab active:cursor-grabbing flex flex-col items-center justify-center select-none touch-none group relative z-10"
                  @touchstart.passive="startDrag($event)"
                  @touchmove="onDrag($event)"
                  @touchend="endDrag()"
@@ -1203,25 +1206,17 @@
             </div>
 
             <!-- Sheet Header (Executive Profile & Close - Draggable from Header too) -->
-            <div class="px-5 py-3 border-b border-slate-200/70 flex items-center justify-between bg-white/95 backdrop-blur-md select-none touch-none cursor-grab active:cursor-grabbing"
+            <div class="px-5 py-3 border-b border-slate-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md select-none touch-none cursor-grab active:cursor-grabbing relative z-10"
                  @touchstart.passive="startDrag($event)"
                  @touchmove="onDrag($event)"
                  @touchend="endDrag()"
                  @mousedown="startDrag($event)">
                 <div class="flex items-center gap-3 min-w-0 pointer-events-none">
-                    @if (auth()->user()->foto)
-                        <img src="{{ asset('storage/' . auth()->user()->foto) }}" 
-                             alt="{{ auth()->user()->name }}" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                             class="h-10 w-10 rounded-2xl object-cover border border-slate-200 shadow-xs shrink-0">
-                        <div style="display: none;" class="h-10 w-10 rounded-2xl text-white items-center justify-center font-bold text-sm shrink-0 shadow-md ring-2 ring-teal-500/20"
-                             style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;">
-                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                        </div>
+                    @if (auth()->user()->avatar_url)
+                        <img src="{{ auth()->user()->avatar_url }}" alt="" class="h-10 w-10 rounded-2xl object-cover shadow-md ring-2 ring-teal-500/20 shrink-0">
                     @else
-                        <div class="h-10 w-10 rounded-2xl text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-md ring-2 ring-teal-500/20"
-                             style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;">
-                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                        <div class="h-10 w-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-md ring-2 ring-teal-500/20 shrink-0">
+                            {{ auth()->user()->initials }}
                         </div>
                     @endif
                     <div class="min-w-0">
@@ -1248,7 +1243,7 @@
             </div>
 
             <!-- Modern Search Bar Inside Bottom Sheet -->
-            <div class="px-5 py-2.5 bg-white/90 backdrop-blur-md border-b border-slate-200/60">
+            <div class="px-5 py-2.5 bg-white/95 backdrop-blur-md border-b border-slate-200/70 relative z-10">
                 <div class="relative flex items-center">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-700">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -1256,7 +1251,7 @@
                     <input type="text" 
                            x-model="sheetSearch" 
                            placeholder="Cari layanan (absen, lembur, kasbon, tiket)..."
-                           class="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-slate-200/90 bg-slate-50/70 shadow-2xs focus:bg-white focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 transition text-slate-800 placeholder:text-slate-400">
+                           class="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-slate-200/90 bg-slate-50/80 shadow-2xs focus:bg-white focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 transition text-slate-800 placeholder:text-slate-400">
                     <button type="button" 
                             x-show="sheetSearch" 
                             @click="sheetSearch = ''" 
@@ -1267,7 +1262,7 @@
             </div>
 
             <!-- Scrollable Content of Menus -->
-            <div class="p-5 overflow-y-auto space-y-5 flex-1 max-h-[calc(88vh-140px)]">
+            <div class="p-5 overflow-y-auto space-y-5 flex-1 max-h-[calc(88vh-140px)] relative z-10">
                 
                 <!-- KATEGORI 1: PENGAJUAN & OPERASIONAL -->
                 <div x-show="!sheetSearch || 'pengajuan kasbon dana beli persetujuan atasan lembur overtime stok barang inventaris'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
@@ -1279,7 +1274,7 @@
                         <span class="text-[10px] text-slate-400 font-medium">Layanan</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5">
-                        <a href="{{ route('gomsn.pengajuan.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('gomsn.pengajuan.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             </div>
@@ -1290,7 +1285,7 @@
                         </a>
 
                         @if ($navIsAtasan)
-                        <a href="{{ route('gomsn.pengajuan.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                        <a href="{{ route('gomsn.pengajuan.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1301,13 +1296,13 @@
                                 </div>
                             </div>
                             @if ($navPendingAtasanCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shrink-0 animate-pulse">
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
                                 {{ $navPendingAtasanCount }}
                             </span>
                             @endif
                         </a>
 
-                        <a href="{{ route('attendance.corrections.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                        <a href="{{ route('attendance.corrections.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -1318,14 +1313,14 @@
                                 </div>
                             </div>
                             @if ($navPendingKoreksiCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shrink-0 animate-pulse">
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
                                 {{ $navPendingKoreksiCount }}
                             </span>
                             @endif
                         </a>
                         @endif
 
-                        <a href="{{ route('gomsn.overtime.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-blue-400 hover:bg-blue-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                        <a href="{{ route('gomsn.overtime.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-blue-400 hover:bg-blue-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1336,26 +1331,26 @@
                                 </div>
                             </div>
                             @if ($navPendingLemburCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shrink-0 animate-pulse">
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
                                 {{ $navPendingLemburCount }}
                             </span>
                             @endif
                         </a>
 
                         @if ($navIsFinance)
-                        <a href="{{ route('gomsn.inventory.index') }}" class="col-span-2 p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                        <a href="{{ route('gomsn.inventory.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                 </div>
                                 <div class="min-w-0">
-                                    <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-emerald-800 leading-snug">Stok Barang Gudang</span>
-                                    <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Inventaris, Material &amp; Sparepart</span>
+                                    <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-emerald-800 leading-snug">Stok Barang</span>
+                                    <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Gudang &amp; Material</span>
                                 </div>
                             </div>
                             @if ($navLowStockCount > 0)
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs shrink-0 animate-pulse">
-                                {{ $navLowStockCount }} Perlu Restok
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
+                                {{ $navLowStockCount }}
                             </span>
                             @endif
                         </a>
@@ -1363,34 +1358,28 @@
                     </div>
                 </div>
 
-                <!-- KATEGORI 2: ABSENSI & WAKTU KERJA -->
+                <!-- KATEGORI 2: ABSENSI & CUTI -->
                 <div x-show="!sheetSearch || 'absen presensi jadwal kerja shift cuti izin tukar koreksi peringkat disiplin leaderboard laporan'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-[#155E63] to-[#18C4C4]"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Absensi &amp; Waktu Kerja</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Absensi &amp; Cuti</span>
                         </div>
-                        <span class="text-[10px] text-slate-400 font-medium">Presensi Terpadu</span>
+                        <span class="text-[10px] text-slate-400 font-medium">Layanan</span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
-                        <!-- Featured Clock-In Card (Full Width) -->
-                        <a href="{{ route('attendance.index') }}" class="col-span-2 p-3 rounded-2xl bg-gradient-to-r from-teal-50/90 via-emerald-50/50 to-white border border-teal-300 hover:border-[#155E63] hover:shadow-md active:scale-[0.99] transition-all flex items-center justify-between group shadow-2xs">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl bg-[#155E63] text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <span class="font-extrabold text-xs text-slate-900 block truncate group-hover:text-[#155E63] leading-snug">Presensi &amp; Absensi Harian</span>
-                                    <span class="text-[10px] text-teal-800/80 block truncate mt-0.5 leading-tight">Absen Masuk, Pulang &amp; Verifikasi Wajah</span>
-                                </div>
+                        <a href="{{ route('attendance.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                             </div>
-                            <span class="px-2.5 py-1 rounded-xl bg-white text-[11px] font-bold text-[#155E63] border border-teal-200 group-hover:bg-[#155E63] group-hover:text-white transition shrink-0 shadow-2xs">
-                                Buka &rarr;
-                            </span>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Absen</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Biometrik &amp; GPS</span>
+                            </div>
                         </a>
 
-                        <a href="{{ route('attendance.history') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-cyan-400 hover:bg-cyan-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('attendance.history') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-cyan-400 hover:bg-cyan-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-cyan-50 border border-cyan-100 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
@@ -1400,38 +1389,8 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('attendance.schedules') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-indigo-400 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
-                            <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            </div>
-                            <div class="min-w-0">
-                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-indigo-800 leading-snug">Jadwal Kerja</span>
-                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Kalender Shift</span>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('attendance.leaves') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
-                            <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                            </div>
-                            <div class="min-w-0">
-                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-emerald-800 leading-snug">Cuti &amp; Izin</span>
-                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Saldo &amp; Pengajuan</span>
-                            </div>
-                        </a>
-
-                        <a href="{{ route('attendance.deductions') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            </div>
-                            <div class="min-w-0">
-                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-amber-800 leading-snug">Keuangan Absen</span>
-                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Potongan &amp; Denda</span>
-                            </div>
-                        </a>
-
                         @if ($canViewReports)
-                        <a href="{{ route('attendance.reports') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('attendance.reports') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             </div>
@@ -1442,13 +1401,53 @@
                         </a>
                         @endif
 
-                        <a href="{{ route('attendance.leaderboard') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-purple-400 hover:bg-purple-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('attendance.schedules') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-indigo-800 leading-snug">Jadwal Kerja</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Kalender Shift</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('attendance.leaves') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-emerald-800 leading-snug">Cuti &amp; Izin</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Saldo &amp; Pengajuan</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('attendance.deductions') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-amber-800 leading-snug">Keuangan Absen</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Potongan &amp; Denda</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('attendance.leaderboard') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-purple-400 hover:bg-purple-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                             </div>
                             <div class="min-w-0">
                                 <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-purple-800 leading-snug">Leaderboard</span>
                                 <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Peringkat Disiplin</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('attendance.swaps') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Tukar Shift</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Pengajuan Jadwal</span>
                             </div>
                         </a>
                     </div>
@@ -1464,7 +1463,7 @@
                         <span class="text-[10px] text-slate-400 font-medium">Operasional</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5">
-                        <a href="{{ route('tickets.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-rose-400 hover:bg-rose-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('tickets.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-rose-400 hover:bg-rose-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
                             </div>
@@ -1474,7 +1473,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('gomsn.tasks.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-sky-400 hover:bg-sky-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('gomsn.tasks.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-sky-400 hover:bg-sky-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-sky-50 border border-sky-100 text-sky-600 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                             </div>
@@ -1484,7 +1483,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('gomsn.analytics.kpi') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-indigo-400 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('gomsn.analytics.kpi') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
@@ -1495,7 +1494,7 @@
                         </a>
 
                         @hasrole(['admin', 'super_admin'])
-                        <a href="{{ route('portal.sessions') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('portal.sessions') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 group-hover:bg-slate-700 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             </div>
@@ -1518,7 +1517,7 @@
                         <span class="text-[10px] text-slate-400 font-medium">Sistem</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5">
-                        <a href="{{ route('portal.profile') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('portal.profile') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </div>
@@ -1529,7 +1528,7 @@
                         </a>
 
                         @can('portal.settings.manage')
-                        <a href="{{ route('portal.settings') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('portal.settings') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 group-hover:bg-slate-700 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             </div>
@@ -1541,7 +1540,7 @@
                         @endcan
 
                         @can('portal.audit.view')
-                        <a href="{{ route('portal.audit') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('portal.audit') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-slate-400 hover:bg-slate-50 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 group-hover:bg-slate-700 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             </div>
@@ -1553,7 +1552,7 @@
                         @endcan
 
                         @if (auth()->user() && (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage')))
-                        <a href="{{ route('portal.employees.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white/95 hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                        <a href="{{ route('portal.employees.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             </div>
@@ -1566,7 +1565,7 @@
 
                         <form method="POST" action="{{ route('logout') }}" class="col-span-2 sm:col-span-1">
                             @csrf
-                            <button type="submit" class="w-full p-3 rounded-2xl border border-rose-200/90 bg-white/95 hover:bg-rose-50/80 hover:border-rose-300 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs text-left cursor-pointer">
+                            <button type="submit" class="w-full p-3 rounded-2xl border border-rose-200/90 bg-white hover:bg-rose-50/80 hover:border-rose-300 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs text-left cursor-pointer">
                                 <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                 </div>

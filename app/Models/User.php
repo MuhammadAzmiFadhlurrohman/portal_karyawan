@@ -148,6 +148,52 @@ class User extends Authenticatable
     }
 
     /**
+     * Get avatar URL if the photo physically exists on disk.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (empty($this->foto)) {
+            return null;
+        }
+
+        $cleanPath = ltrim($this->foto, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        }
+
+        try {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
+                return asset('storage/' . $cleanPath);
+            }
+            if (file_exists(public_path('storage/' . $cleanPath))) {
+                return asset('storage/' . $cleanPath);
+            }
+        } catch (\Throwable $e) {
+            // fallback gracefully
+        }
+
+        return null;
+    }
+
+    /**
+     * Get user initials (1-2 uppercase letters) for avatar fallback.
+     */
+    public function getInitialsAttribute(): string
+    {
+        $name = trim($this->name ?? '');
+        if ($name === '') {
+            return 'U';
+        }
+
+        $parts = preg_split('/\s+/', $name);
+        if (count($parts) >= 2) {
+            return strtoupper(mb_substr($parts[0], 0, 1) . mb_substr($parts[1], 0, 1));
+        }
+
+        return strtoupper(mb_substr($name, 0, 1));
+    }
+
+    /**
      * Resolve effective approver taking into account active delegations (§4.3).
      */
     public function resolveEffectiveApprover(string $module = 'all', ?CarbonInterface $date = null): ?self

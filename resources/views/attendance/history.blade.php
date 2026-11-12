@@ -65,14 +65,17 @@
             <!-- Right: Profile Info Card -->
             <div class="relative z-10 flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2 text-white shrink-0 shadow-xs self-start sm:self-auto">
                 <div class="relative shrink-0">
-                    @if ($targetUser->foto)
-                        <img src="/storage/{{ $targetUser->foto }}" 
-                             alt="{{ $targetUser->name }}" 
+                    @if ($targetUser->avatar_url)
+                        <img src="{{ $targetUser->avatar_url }}" 
+                             alt="" 
                              class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cyan-400/40 shadow-sm" 
-                             onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($targetUser->name) }}&background=155E63&color=fff&size=128';">
+                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                        <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
+                            {{ $targetUser->initials }}
+                        </div>
                     @else
-                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#155E63] to-[#0c4349] border-2 border-cyan-400/40 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm">
-                            {{ strtoupper(substr($targetUser->name, 0, 2)) }}
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
+                            {{ $targetUser->initials }}
                         </div>
                     @endif
                 </div>

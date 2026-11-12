@@ -199,14 +199,17 @@
                             <td class="py-4 px-4 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
                                     <div class="relative shrink-0">
-                                        @if ($user->foto)
-                                            <img src="/storage/{{ $user->foto }}" 
-                                                 alt="{{ $user->name }}" 
+                                        @if ($user->avatar_url)
+                                            <img src="{{ $user->avatar_url }}" 
+                                                 alt="" 
                                                  class="w-10 h-10 rounded-2xl object-cover border border-slate-200 shadow-2xs" 
-                                                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=0D9488&color=fff&size=100';">
+                                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                            <div style="display: none;" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                                                {{ $user->initials }}
+                                            </div>
                                         @else
-                                            <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs">
-                                                {{ strtoupper(substr($user->name, 0, 2)) }}
+                                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                                                {{ $user->initials }}
                                             </div>
                                         @endif
                                     </div>
