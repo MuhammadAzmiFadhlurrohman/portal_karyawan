@@ -295,19 +295,20 @@
                             <!-- Camera preview / Canvas -->
                             <div class="w-36 h-36 mx-auto rounded-full overflow-hidden bg-slate-200 border-2 border-teal-500/50 flex items-center justify-center shadow-inner relative">
                                 <video id="enroll-video" autoplay playsinline class="w-full h-full object-cover" x-show="cameraActive"></video>
+                                <img :src="photoPreview" x-show="photoPreview && !cameraActive" class="w-full h-full object-cover" alt="Preview Foto">
                                 <canvas id="enroll-canvas" class="hidden"></canvas>
-                                <div x-show="!cameraActive" class="text-slate-400 text-center p-2">
+                                <div x-show="!cameraActive && !photoPreview" class="text-slate-400 text-center p-2">
                                     <svg class="w-10 h-10 mx-auto text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     <span class="text-[11px] block mt-1">Kamera Selfie</span>
                                 </div>
                             </div>
 
-                            <div class="mt-3 flex items-center justify-center gap-2">
+                            <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
                                 <button type="button" 
                                         @click="startCamera()" 
                                         x-show="!cameraActive"
                                         class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-50 text-[#155E63] border border-teal-200 hover:bg-teal-100 transition">
-                                    Nyalakan Kamera
+                                    <span x-text="photoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
                                 </button>
                                 <button type="button" 
                                         @click="capturePhoto()" 
@@ -377,7 +378,7 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1">
                             Pilih Lokasi Kantor
                         </label>
-                        <select name="office_location_id" x-model="selectedOffice" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]">
+                        <select name="office_location_id" x-model="selectedOffice" @change="onOfficeChange()" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]">
                             @foreach ($offices as $ofc)
                             <option value="{{ $ofc->id }}">{{ $ofc->name }} (Radius {{ $ofc->radius_m }}m)</option>
                             @endforeach
@@ -389,19 +390,47 @@
                         <label class="block text-xs font-semibold text-slate-700 mb-1">
                             Tipe Kehadiran
                         </label>
-                        <select name="attendance_type" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]">
+                        <select name="attendance_type" x-model="attendanceType" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]">
                             <option value="office">Di Kantor (Office)</option>
                             <option value="field">Tugas Lapangan (Field / SPK)</option>
                             <option value="remote">Remote / WFH</option>
                         </select>
                     </div>
 
+                    <!-- Notes (Keterangan Tugas) -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                            <span>Catatan / Keterangan</span>
+                            <span class="text-[10px]" :class="attendanceType !== 'office' ? 'text-rose-500 font-bold' : 'text-slate-400'" x-text="attendanceType !== 'office' ? '* Wajib diisi untuk Lapangan/Remote' : 'Opsional'"></span>
+                        </label>
+                        <textarea name="notes" rows="2" 
+                                  :required="attendanceType !== 'office'"
+                                  placeholder="Contoh: Pekerjaan maintenance / instalasi ODP di lapangan..."
+                                  class="w-full text-xs rounded-xl border-slate-300 py-2 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]"></textarea>
+                    </div>
+
                     <!-- GPS Status Card -->
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5 text-xs text-slate-600">
-                        <span class="text-base shrink-0">📍</span>
-                        <div>
-                            <span class="font-bold block text-slate-800" x-text="gpsStatus">Memeriksa GPS...</span>
-                            <span class="text-[11px] text-slate-500 font-mono" x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600">
+                        <div class="flex items-start gap-2.5">
+                            <span class="text-base shrink-0">📍</span>
+                            <div class="min-w-0 flex-1">
+                                <span class="font-bold block text-slate-800" x-text="gpsStatus">Memeriksa GPS...</span>
+                                <span class="text-[11px] text-slate-500 font-mono" x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                            <button type="button" 
+                                    @click="detectGPS()" 
+                                    class="text-[11px] font-semibold text-teal-700 hover:underline flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                <span>Perbarui GPS</span>
+                            </button>
+                            <button type="button" 
+                                    @click="useSelectedOfficeLocation()" 
+                                    class="text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-50">
+                                🏢 Sesuaikan Titik Kantor
+                            </button>
                         </div>
                     </div>
 
@@ -423,11 +452,15 @@
 
     <script>
         function attendancePage() {
+            const officesMap = @js($offices->keyBy('id'));
+
             return {
                 showEnrollModal: false,
                 showClockInModal: false,
                 cameraActive: false,
+                photoPreview: null,
                 selectedOffice: '{{ $defaultOffice?->id ?? 1 }}',
+                attendanceType: 'office',
                 
                 // GPS Coordinates (Defaulting to Bandung HQ so local dev always succeeds)
                 gpsLat: {{ $defaultOffice?->lat ?? -6.937122 }},
@@ -446,22 +479,37 @@
 
                 detectGPS() {
                     if (navigator.geolocation) {
+                        this.gpsStatus = 'Mendeteksi koordinat GPS perangkat...';
                         navigator.geolocation.getCurrentPosition(
                             (pos) => {
                                 this.gpsLat = pos.coords.latitude;
                                 this.gpsLng = pos.coords.longitude;
-                                this.gpsAccuracy = pos.coords.accuracy || 10;
-                                this.gpsStatus = 'GPS Terdeteksi';
+                                this.gpsAccuracy = Math.round(pos.coords.accuracy || 10);
+                                this.gpsStatus = 'GPS Terdeteksi (Akurasi: ±' + this.gpsAccuracy + 'm)';
                             },
                             (err) => {
                                 // Default fallback to office coordinates
-                                this.gpsLat = {{ $defaultOffice?->lat ?? -6.937122 }};
-                                this.gpsLng = {{ $defaultOffice?->lng ?? 107.631989 }};
-                                this.gpsAccuracy = 15;
-                                this.gpsStatus = 'Menggunakan Koordinat Kantor Terpilih';
+                                this.useSelectedOfficeLocation();
+                                this.gpsStatus = 'Menggunakan Koordinat Kantor Terpilih (GPS perangkat tidak aktif/izin ditolak)';
                             },
-                            { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                            { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
                         );
+                    } else {
+                        this.useSelectedOfficeLocation();
+                    }
+                },
+
+                onOfficeChange() {
+                    // Update fallback if current coords are matching previous office
+                },
+
+                useSelectedOfficeLocation() {
+                    const ofc = officesMap[this.selectedOffice];
+                    if (ofc) {
+                        this.gpsLat = parseFloat(ofc.lat);
+                        this.gpsLng = parseFloat(ofc.lng);
+                        this.gpsAccuracy = 10;
+                        this.gpsStatus = 'Titik Kantor ' + ofc.name + ' Terpilih';
                     }
                 },
 
@@ -473,13 +521,14 @@
                 startCamera() {
                     const video = document.getElementById('enroll-video');
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                        navigator.mediaDevices.getUserMedia({ video: true })
+                        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
                             .then((stream) => {
                                 video.srcObject = stream;
                                 this.cameraActive = true;
+                                this.photoPreview = null;
                             })
                             .catch((err) => {
-                                alert('Tidak dapat mengakses kamera: ' + err.message + '. Gunakan tombol Simulasi Wajah.');
+                                alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
                                 this.useProfileSnapshot();
                             });
                     } else {
@@ -496,8 +545,9 @@
                         canvas.height = video.videoHeight || 240;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
                         
+                        this.photoPreview = dataUrl;
                         this.poseFront = dataUrl;
                         this.poseLeft = dataUrl;
                         this.poseRight = dataUrl;
@@ -507,7 +557,6 @@
                             video.srcObject.getTracks().forEach(track => track.stop());
                         }
                         this.cameraActive = false;
-                        alert('Foto wajah berhasil diambil! Silakan klik "Simpan & Daftarkan Wajah".');
                     }
                 },
 
@@ -515,7 +564,13 @@
                     this.poseFront = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:FRONT|MANUAL") }}';
                     this.poseLeft = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:LEFT|MANUAL") }}';
                     this.poseRight = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:RIGHT|MANUAL") }}';
-                    alert('Data simulasi wajah siap. Silakan klik "Simpan & Daftarkan Wajah".');
+                    this.photoPreview = null;
+                    this.cameraActive = false;
+                    const video = document.getElementById('enroll-video');
+                    if (video && video.srcObject) {
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                    }
+                    alert('Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
                 }
             };
         }

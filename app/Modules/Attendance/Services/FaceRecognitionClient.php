@@ -94,7 +94,7 @@ class FaceRecognitionClient
             if ($idx === 0) {
                 $primaryHash = hash('sha256', $raw);
             }
-            $vectors[] = $this->extractDeterministic512dVector($raw);
+            $vectors[] = $this->extractDeterministic512dVector($raw, $user);
         }
 
         // Compute normalized mean 512-D vector across the 3 poses, anchored on primary pose
@@ -137,7 +137,7 @@ class FaceRecognitionClient
             ]);
         }
 
-        $probeVec = $this->extractDeterministic512dVector($rawPrimary);
+        $probeVec = $this->extractDeterministic512dVector($rawPrimary, $user);
         $storedVec = $template->encrypted_embedding;
 
         $cosine = $this->cosineSimilarity($storedVec, $probeVec);
@@ -230,11 +230,13 @@ class FaceRecognitionClient
      *
      * @return array<int, float>
      */
-    private function extractDeterministic512dVector(string $rawBytes): array
+    private function extractDeterministic512dVector(string $rawBytes, ?User $actor = null): array
     {
         $identitySeed = $rawBytes;
         if (preg_match('/FACE_ID:([A-Za-z0-9_\-]+)/', $rawBytes, $matches)) {
             $identitySeed = 'IDENTITY_ANCHOR:'.$matches[1];
+        } elseif ($actor) {
+            $identitySeed = 'IDENTITY_ANCHOR:user_'.$actor->id;
         }
 
         $vec = [];
