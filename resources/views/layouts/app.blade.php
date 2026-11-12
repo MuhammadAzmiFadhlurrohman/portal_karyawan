@@ -1270,9 +1270,9 @@
              :style="isDragging ? 'transform: translateY(' + Math.max(0, sheetTranslateY) + 'px) !important; transition: none !important;' : (sheetTranslateY > 0 ? 'transform: translateY(0px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);' : '')"
              class="relative w-full max-w-xl mx-auto max-h-[88vh] bg-white rounded-t-[32px] shadow-[0_-16px_50px_rgba(0,0,0,0.35)] flex flex-col z-20 border-t border-slate-200 overflow-hidden">
             
-            <!-- Crisp Solid White Background with Subtle Micro-Dot Texture -->
-            <div class="absolute inset-0 pointer-events-none opacity-40 z-0" 
-                 style="background-color: #FFFFFF; background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 20px 20px;"></div>
+            <!-- Crisp Solid White Background with Ultra-Soft Micro-Dot Texture -->
+            <div class="absolute inset-0 pointer-events-none z-0" 
+                 style="background-color: #FFFFFF; background-image: radial-gradient(rgba(148, 163, 184, 0.16) 0.8px, transparent 0.8px); background-size: 18px 18px;"></div>
 
             <!-- Pull Handle Bar Indicator (Tarik ke bawah dari garis ini untuk menutup menu) -->
             <div class="pt-3 pb-1.5 cursor-grab active:cursor-grabbing flex flex-col items-center justify-center select-none touch-none group relative z-10"

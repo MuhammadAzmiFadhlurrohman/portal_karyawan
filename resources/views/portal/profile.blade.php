@@ -58,8 +58,8 @@
                 <!-- Decorative Glow & Pattern -->
                 <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-teal-400/15 blur-2xl pointer-events-none"></div>
                 <div class="absolute -bottom-20 left-1/4 w-72 h-72 rounded-full bg-emerald-400/10 blur-3xl pointer-events-none"></div>
-                <div class="absolute inset-0 opacity-15 pointer-events-none"
-                     style="background-image: radial-gradient(rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                <div class="absolute inset-0 opacity-10 pointer-events-none"
+                     style="background-image: radial-gradient(rgba(255,255,255,0.25) 0.8px, transparent 0.8px); background-size: 18px 18px;"></div>
 
                 <!-- Top Bar inside Banner: Status Pills & Admin Action -->
                 <div class="relative z-10 px-4 sm:px-7 pt-4 sm:pt-5 flex items-center justify-between gap-2 flex-wrap">
