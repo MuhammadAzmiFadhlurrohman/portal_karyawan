@@ -10,6 +10,7 @@ use App\Modules\Attendance\Controllers\ShiftSwapController;
 use App\Modules\Gomsn\Controllers\ChatbotController;
 use App\Modules\Gomsn\Controllers\InventoryController;
 use App\Modules\Gomsn\Controllers\KpiReportController;
+use App\Modules\Gomsn\Controllers\NetworkOdpController;
 use App\Modules\Gomsn\Controllers\OvertimeController;
 use App\Modules\Gomsn\Controllers\PengajuanController;
 use App\Modules\Gomsn\Controllers\TaskController;
@@ -194,6 +195,23 @@ Route::middleware('auth')->group(function (): void {
     // Analitik MTTR & KPI Teknisi (§7.7, §11.1)
     Route::get('/gomsn/analytics/kpi', [KpiReportController::class, 'index'])->name('gomsn.analytics.kpi');
     Route::get('/gomsn/tickets/{tiket}/berita-acara', [KpiReportController::class, 'beritaAcara'])->name('gomsn.tickets.berita-acara');
+
+    // Manajemen Jaringan: OLT, PON & ODP (NOC & Teknis)
+    Route::get('/gomsn/network', [NetworkOdpController::class, 'index'])->name('gomsn.network.index');
+    Route::post('/gomsn/network/olts/{olt}/pons', [NetworkOdpController::class, 'storePon'])->name('gomsn.network.pons.store');
+    Route::put('/gomsn/network/pons/{pon}', [NetworkOdpController::class, 'updatePon'])->name('gomsn.network.pons.update');
+    Route::delete('/gomsn/network/pons/{pon}', [NetworkOdpController::class, 'destroyPon'])->name('gomsn.network.pons.destroy');
+
+    Route::get('/gomsn/network/olts/{olt}/pons/{pon}', [NetworkOdpController::class, 'showPon'])->name('gomsn.network.pons.show');
+    Route::post('/gomsn/network/pons/{pon}/odps', [NetworkOdpController::class, 'storeOdp'])->name('gomsn.network.odps.store');
+    Route::put('/gomsn/network/odps/{odp}', [NetworkOdpController::class, 'updateOdp'])->name('gomsn.network.odps.update');
+    Route::delete('/gomsn/network/odps/{odp}', [NetworkOdpController::class, 'destroyOdp'])->name('gomsn.network.odps.destroy');
+
+    Route::get('/gomsn/network/olts/{olt}/pons/{pon}/odps/{odp}', [NetworkOdpController::class, 'showOdp'])->name('gomsn.network.odps.show');
+    Route::post('/gomsn/network/odps/{odp}/customers', [NetworkOdpController::class, 'storeCustomer'])->name('gomsn.network.customers.store');
+    Route::put('/gomsn/network/customers/{customer}', [NetworkOdpController::class, 'updateCustomer'])->name('gomsn.network.customers.update');
+    Route::delete('/gomsn/network/customers/{customer}', [NetworkOdpController::class, 'destroyCustomer'])->name('gomsn.network.customers.destroy');
+    Route::get('/gomsn/network/odps/{odp}/histories', [NetworkOdpController::class, 'histories'])->name('gomsn.network.odps.histories');
 
     // Chatbot Asisten API (§5.8)
     Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('api.chatbot.ask');

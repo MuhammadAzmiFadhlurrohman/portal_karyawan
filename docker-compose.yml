@@ -31,3 +31,4 @@ services:
 networks:
   gomsn2-network:
     driver: bridge
+

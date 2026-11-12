@@ -430,7 +430,7 @@
 
                 <!-- Bagian 3: Pekerjaan & Tiketing (Dropdown with Soft Animation) -->
                 @php
-                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.tasks.*') || request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
+                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.tasks.*') || request()->routeIs('gomsn.network.*') || request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
                 @endphp
                 <div x-data="{ openTiketing: {{ $isTiketingActive ? 'true' : 'false' }} }">
                     <button type="button" 
@@ -471,6 +471,16 @@
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                             <span>Tugas Lapangan</span>
                             @if (request()->routeIs('gomsn.tasks.*'))
+                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                            @endif
+                        </a>
+
+                        <a href="{{ route('gomsn.network.index') }}"
+                           @if (request()->routeIs('gomsn.network.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.network.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <span>OLT, PON & ODP</span>
+                            @if (request()->routeIs('gomsn.network.*'))
                             <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
