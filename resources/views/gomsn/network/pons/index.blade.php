@@ -2,7 +2,7 @@
     <div class="space-y-6 max-w-7xl mx-auto pb-12">
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching GoMSN Dashboard) -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-5 sm:py-5 sm:px-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 select-none"
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 select-none"
              style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
@@ -10,51 +10,56 @@
             <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
 
             <!-- Left: Glowing Icon + Title + Role Access Badge -->
-            <div class="relative z-10 flex items-center gap-4 min-w-0">
-                <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
-                    <svg class="w-7 h-7 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                    <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                     </svg>
                 </div>
 
                 <div class="min-w-0">
-                    <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <h1 class="font-heading text-lg sm:text-xl font-bold text-white tracking-tight leading-snug">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
                             Infrastruktur Jaringan FTTH
                         </h1>
                         @if ($canManage)
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
                                 Akses Penuh: Admin & Atasan
                             </span>
                         @else
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
                                 Mode Monitoring (Read-Only)
                             </span>
                         @endif
                     </div>
-                    <p class="text-xs text-cyan-100/80">
-                        Manajemen & Pemetaan Terpadu OLT, Distribusi PON, Titik ODP, dan Port Pelanggan PT MSN
+                    <p class="text-xs sm:text-[13px] mt-0.5 leading-snug truncate" style="color: rgba(204, 251, 241, 0.95) !important;">
+                        Manajemen &amp; Pemetaan Terpadu OLT, Distribusi PON, Titik ODP, dan Port Pelanggan PT MSN
                     </p>
                 </div>
             </div>
 
-            <!-- Right: Mini KPI Chips -->
+            <!-- Right: Unified Stats KPI Pill (Matching Roster Shift style) -->
             <div class="relative z-10 flex flex-wrap items-center gap-2.5">
-                <div class="px-3.5 py-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-center min-w-[70px]">
-                    <div class="text-[10px] font-semibold text-cyan-200/80 uppercase tracking-wider">OLT</div>
-                    <div class="text-base font-extrabold text-white">{{ $totalOlts }}</div>
-                </div>
-                <div class="px-3.5 py-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-center min-w-[70px]">
-                    <div class="text-[10px] font-semibold text-cyan-200/80 uppercase tracking-wider">PON</div>
-                    <div class="text-base font-extrabold text-white">{{ $totalPons }}</div>
-                </div>
-                <div class="px-3.5 py-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-center min-w-[70px]">
-                    <div class="text-[10px] font-semibold text-cyan-200/80 uppercase tracking-wider">ODP</div>
-                    <div class="text-base font-extrabold text-white">{{ $totalOdps }}</div>
-                </div>
-                <div class="px-3.5 py-2 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-center min-w-[70px]">
-                    <div class="text-[10px] font-semibold text-cyan-200/80 uppercase tracking-wider">Pelanggan</div>
-                    <div class="text-base font-extrabold text-emerald-300">{{ number_format($totalCustomers) }}</div>
+                <div class="flex items-center gap-3 bg-black/25 backdrop-blur-md border border-white/15 px-4 py-2 rounded-xl text-xs font-semibold text-white shadow-xs">
+                    <span class="flex items-center gap-1.5" title="Total OLT">
+                        <span class="text-teal-200/80 text-[10px] uppercase font-bold tracking-wider">OLT</span>
+                        <span class="font-extrabold text-white">{{ $totalOlts }}</span>
+                    </span>
+                    <span class="text-white/20">|</span>
+                    <span class="flex items-center gap-1.5" title="Total PON">
+                        <span class="text-teal-200/80 text-[10px] uppercase font-bold tracking-wider">PON</span>
+                        <span class="font-extrabold text-white">{{ $totalPons }}</span>
+                    </span>
+                    <span class="text-white/20">|</span>
+                    <span class="flex items-center gap-1.5" title="Total ODP">
+                        <span class="text-teal-200/80 text-[10px] uppercase font-bold tracking-wider">ODP</span>
+                        <span class="font-extrabold text-white">{{ $totalOdps }}</span>
+                    </span>
+                    <span class="text-white/20">|</span>
+                    <span class="flex items-center gap-1.5 text-emerald-300" title="Total Pelanggan Terdaftar">
+                        <span class="text-teal-200/80 text-[10px] uppercase font-bold tracking-wider">Pelanggan</span>
+                        <span class="font-extrabold text-emerald-300">{{ number_format($totalCustomers) }}</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -139,92 +144,150 @@
             </div>
         @endif
 
-        <!-- Tabel Daftar PON -->
+        <!-- Tabel Daftar PON (Desain Rapi & Proporsional 5 Kolom) -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <!-- Gradient Table Header -->
-            <div style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" class="px-5 py-2.5 text-white">
-                <div class="grid grid-cols-12 items-center text-[11px] font-bold tracking-wider uppercase">
-                    <div class="col-span-6 flex items-center gap-2">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        <span>NAMA PON</span>
-                    </div>
-                    <div class="col-span-3 text-center flex items-center justify-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        <span>PORT</span>
-                    </div>
-                    <div class="col-span-3 text-right flex items-center justify-end gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span>AKSI</span>
-                    </div>
-                </div>
-            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" 
+                            class="text-[11px] font-bold tracking-wider uppercase text-white select-none">
+                            <th class="py-3 px-4 w-14 text-center">#</th>
+                            <th class="py-3 px-4 min-w-[240px]">
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                                    <span>NAMA PON</span>
+                                </div>
+                            </th>
+                            <th class="py-3 px-4 w-72 text-center">
+                                <div class="flex items-center justify-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    <span>KAPASITAS &amp; UTILISASI PORT</span>
+                                </div>
+                            </th>
+                            <th class="py-3 px-4 w-36 text-center">STATUS</th>
+                            <th class="py-3 px-4 w-52 text-center">
+                                <div class="flex items-center justify-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span>AKSI</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($pons as $pon)
+                            @php
+                                $usage = $pon->odps_count ?? 0;
+                                $max = $pon->port_max ?: 8;
+                                $pct = min(100, round(($usage / $max) * 100));
+                                $barBg = $pct >= 90 ? 'background-color: #ef4444;' : ($pct >= 60 ? 'background-color: #f59e0b;' : 'background-color: #10b981;');
+                                $textClass = $pct >= 90 ? 'text-rose-600' : ($pct >= 60 ? 'text-amber-600' : 'text-emerald-600');
+                                
+                                if ($usage == 0) {
+                                    $badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+                                    $badgeText = 'Kosong';
+                                } elseif ($pct >= 90) {
+                                    $badgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+                                    $badgeText = 'Penuh';
+                                } elseif ($pct >= 60) {
+                                    $badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                                    $badgeText = 'Hampir Penuh';
+                                } else {
+                                    $badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                                    $badgeText = 'Tersedia';
+                                }
+                            @endphp
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <!-- Nomor Urut -->
+                                <td class="py-3 px-4 text-center text-slate-400 font-mono font-semibold">
+                                    {{ $pons->firstItem() ? $pons->firstItem() + $loop->index : $loop->iteration }}
+                                </td>
 
-            <!-- Table Rows -->
-            <div class="divide-y divide-slate-100">
-                @forelse ($pons as $pon)
-                    @php
-                        $usage = $pon->odps_count ?? 0;
-                        $max = $pon->port_max ?: 8;
-                        $pct = min(100, round(($usage / $max) * 100));
-                        $barColor = $pct >= 90 ? 'background-color: #ef4444;' : ($pct >= 60 ? 'background-color: #f59e0b;' : 'background-color: #10b981;');
-                        $textClass = $pct >= 90 ? 'text-rose-600' : ($pct >= 60 ? 'text-amber-600' : 'text-emerald-600');
-                    @endphp
-                    <div class="px-5 py-2.5 grid grid-cols-12 items-center hover:bg-slate-50/80 transition-colors">
-                        <!-- Nama PON -->
-                        <div class="col-span-6 font-bold text-slate-800 text-xs tracking-tight uppercase">
-                            {{ $pon->nama_pon }}
-                        </div>
+                                <!-- Nama PON & Metadata -->
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 shrink-0">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-slate-800 text-xs tracking-tight uppercase">
+                                                {{ $pon->nama_pon }}
+                                            </div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">
+                                                {{ $selectedOlt->nama_olt }} &bull; <span class="font-medium text-slate-500">{{ $usage }} ODP terhubung</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
 
-                        <!-- Progress Bar Port -->
-                        <div class="col-span-3 flex flex-col items-center justify-center">
-                            <span class="text-[11px] font-extrabold font-mono {{ $textClass }} leading-none mb-1">
-                                {{ $usage }}/{{ $max }}
-                            </span>
-                            <div class="w-14 h-1 bg-slate-200/80 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full transition-all" style="width: {{ $pct }}%; {{ $barColor }}"></div>
-                            </div>
-                        </div>
+                                <!-- Progress Bar Kapasitas Port -->
+                                <td class="py-3 px-4">
+                                    <div class="w-full max-w-[220px] mx-auto">
+                                        <div class="flex items-center justify-between text-[11px] font-semibold mb-1">
+                                            <span class="font-mono {{ $textClass }}">{{ $usage }} / {{ $max }} Port</span>
+                                            <span class="font-mono text-slate-500 text-[10px]">{{ $pct }}%</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+                                            <div class="h-full rounded-full transition-all" style="width: {{ $pct }}%; {{ $barBg }}"></div>
+                                        </div>
+                                    </div>
+                                </td>
 
-                        <!-- Aksi Buttons -->
-                        <div class="col-span-3 flex items-center justify-end gap-1.5">
-                            <!-- Lihat (Semua user bisa lihat) -->
-                            <a href="{{ route('gomsn.network.pons.show', ['olt' => $selectedOlt->id, 'pon' => $pon->id]) }}" 
-                               style="background: #0f4c5c !important; color: #ffffff !important;"
-                               class="px-2.5 py-1 rounded-lg text-white text-[11px] font-semibold shadow-2xs hover:opacity-90 transition-all flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                <span>Lihat</span>
-                            </a>
+                                <!-- Status Badge -->
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $badgeClass }}">
+                                        {{ $badgeText }}
+                                    </span>
+                                </td>
 
-                            @if ($canManage)
-                                <!-- Edit Trigger -->
-                                <button type="button" 
-                                        onclick="openEditPonModal({{ $pon->id }}, '{{ addslashes($pon->nama_pon) }}', {{ $pon->port_max }})"
-                                        style="background: #f59e0b !important; color: #ffffff !important;"
-                                        class="px-2.5 py-1 rounded-lg text-white text-[11px] font-semibold shadow-2xs hover:opacity-90 transition-all flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    <span>Edit</span>
-                                </button>
+                                <!-- Aksi Buttons -->
+                                <td class="py-3 px-4 text-center">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <!-- Lihat (Semua user bisa lihat) -->
+                                        <a href="{{ route('gomsn.network.pons.show', ['olt' => $selectedOlt->id, 'pon' => $pon->id]) }}" 
+                                           style="background: #0f4c5c !important; color: #ffffff !important;"
+                                           class="px-2.5 py-1 rounded-lg text-white text-[11px] font-semibold shadow-2xs hover:opacity-90 transition-all flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat</span>
+                                        </a>
 
-                                <!-- Hapus -->
-                                <form action="{{ route('gomsn.network.pons.destroy', $pon) }}" method="POST" 
-                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus PON {{ addslashes($pon->nama_pon) }}? Semua ODP terkait juga akan terhapus!');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" 
-                                            style="background: #ef4444 !important; color: #ffffff !important;"
-                                            class="px-2.5 py-1 rounded-lg text-white text-[11px] font-semibold shadow-2xs hover:opacity-90 transition-all flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        <span>Hapus</span>
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
-                    </div>
-                @empty
-                    <div class="p-8 text-center text-slate-500 text-sm">
-                        Belum ada PON terdaftar di {{ $selectedOlt->nama_olt }}.
-                    </div>
-                @endforelse
+                                        @if ($canManage)
+                                            <!-- Edit Trigger -->
+                                            <button type="button" 
+                                                    onclick="openEditPonModal({{ $pon->id }}, '{{ addslashes($pon->nama_pon) }}', {{ $pon->port_max }})"
+                                                    style="background: #f59e0b !important; color: #ffffff !important;"
+                                                    class="px-2.5 py-1 rounded-lg text-white text-[11px] font-semibold shadow-2xs hover:opacity-90 transition-all flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                <span>Edit</span>
+                                            </button>
+
+                                            <!-- Hapus -->
+                                            <form action="{{ route('gomsn.network.pons.destroy', $pon) }}" method="POST" 
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus PON {{ addslashes($pon->nama_pon) }}? Semua ODP terkait juga akan terhapus!');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        style="background: #ef4444 !important; color: #ffffff !important;"
+                                                        class="px-2.5 py-1 rounded-lg text-white text-[11px] font-semibold shadow-2xs hover:opacity-90 transition-all flex items-center gap-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-12 text-center text-slate-400 text-xs">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
+                                        <span>Belum ada PON terdaftar di {{ $selectedOlt->nama_olt }}. Silakan tambahkan melalui form di atas.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
             @if ($pons->hasPages())
