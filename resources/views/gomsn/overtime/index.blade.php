@@ -163,10 +163,10 @@
                 </div>
 
                 <!-- Action Buttons: Filter & Excel Export -->
-                <div class="flex items-center gap-2.5 self-end shrink-0">
+                <div class="flex items-center gap-2.5 w-full sm:w-auto sm:self-end pt-1 sm:pt-0">
                     <!-- Tombol Filter Gradient -->
                     <button type="submit" 
-                            class="py-2.5 px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
+                            class="flex-1 sm:flex-initial py-2.5 px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
                             style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -177,7 +177,7 @@
                     <!-- Tombol Export Excel Hijau (Sesuai Gambar 1) -->
                     <a href="{{ route('gomsn.overtime.index', array_merge(request()->query(), ['export' => 'excel', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun])) }}" 
                        title="Export Data ke Excel/CSV"
-                       class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center cursor-pointer">
+                       class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center shrink-0 cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -186,7 +186,7 @@
                     <!-- Tombol Buat Pengajuan Lembur (HRD Bisa Ajukan untuk Dirinya Sendiri) -->
                     @if ($isHrd || ! $isAtasan)
                     <a href="{{ route('gomsn.overtime.create') }}" 
-                       class="py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer whitespace-nowrap">
+                       class="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer whitespace-nowrap">
                         <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -340,24 +340,26 @@
         <div class="space-y-5">
             <!-- Header Navigasi Kembali & Keterangan Karyawan -->
             @if ($selectedUserId)
-            <div class="flex items-center justify-between flex-wrap gap-3">
-                <div class="flex items-center gap-3">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
                     <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'view_mode' => $viewMode]) }}" 
-                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer shadow-xs">
+                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer shadow-xs self-start">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
                         <span>Kembali ke Daftar</span>
                     </a>
                     <div>
-                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                            <span>{{ $detailEmployee ? $detailEmployee->name : 'Karyawan' }}</span>
-                            <span class="text-xs font-mono font-medium text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
+                                {{ $detailEmployee ? $detailEmployee->name : 'Karyawan' }}
+                            </h2>
+                            <span class="text-[11px] font-mono font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full">
                                 {{ $detailEmployee->employee_code ?? 'MSN' }}
                             </span>
-                        </h2>
-                        <p class="text-[11px] text-slate-400">
-                            Divisi: {{ $detailEmployee->division ?? 'Teknik' }} · Periode: {{ $bulanNames[$selectedBulan] ?? 'November' }} {{ $selectedTahun }}
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-0.5">
+                            Divisi: <span class="font-medium text-slate-700">{{ $detailEmployee->division ?? 'Teknik' }}</span> &bull; Periode: <span class="font-medium text-slate-700">{{ $bulanNames[$selectedBulan] ?? 'November' }} {{ $selectedTahun }}</span>
                         </p>
                     </div>
                 </div>
@@ -365,16 +367,16 @@
             @endif
 
             <!-- 2 Kartu Summary Atas (Persis Gambar 2) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <!-- Card 1: TOTAL LEMBUR (Mint / Emerald) -->
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 flex items-center gap-4 border-t-2 border-emerald-500">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4 border-t-2 border-emerald-500">
+                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 tracking-wider uppercase block">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block">
                             TOTAL LEMBUR
                         </span>
                         <span class="text-xl sm:text-2xl font-extrabold text-slate-900 block mt-0.5">
@@ -384,14 +386,14 @@
                 </div>
 
                 <!-- Card 2: RINCIAN PENGAJUAN (Soft Blue) -->
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 flex items-center gap-4 border-t-2 border-blue-500">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4 border-t-2 border-blue-500">
+                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                         </svg>
                     </div>
                     <div>
-                        <span class="text-[11px] font-bold text-slate-400 tracking-wider uppercase block">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block">
                             RINCIAN PENGAJUAN
                         </span>
                         <div class="mt-1">
@@ -403,8 +405,128 @@
                 </div>
             </div>
 
-            <!-- Tabel Rincian Lembur (Persis Gambar 2) -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            <!-- 1. MOBILE VIEW: Overtime Request Cards (sm:hidden) -->
+            <div class="sm:hidden space-y-3">
+                @forelse ($lemburList as $idx => $item)
+                    @php
+                        $hours = floor($item->durasi_menit / 60);
+                        $mins = $item->durasi_menit % 60;
+                        $durasiStr = "{$hours} jam " . sprintf('%02d mnt', $mins);
+                        $uangLembur = round(($item->durasi_menit / 60) * 5000);
+                    @endphp
+                    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-4 space-y-3">
+                        <!-- Top Header: Tanggal & Uang Lembur Badge -->
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200/80 text-[#155E63] flex flex-col items-center justify-center font-bold text-xs shrink-0">
+                                    <span class="leading-none text-sm font-extrabold">{{ \Carbon\Carbon::parse($item->tanggal)->format('d') }}</span>
+                                    <span class="text-[9px] uppercase tracking-wider text-teal-600 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('M') }}</span>
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="text-xs font-bold text-slate-800 block truncate">
+                                        {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, j F Y') }}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-mono block">
+                                        {{ $item->nomor_lembur }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="text-xs font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-xl inline-block">
+                                    Rp {{ number_format($uangLembur, 0, ',', '.') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Time & Duration Pill -->
+                        <div class="flex items-center justify-between bg-slate-50/90 border border-slate-100 rounded-xl px-3 py-2 text-xs">
+                            <div class="flex items-center gap-1.5 text-slate-600">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="font-medium text-slate-800">
+                                    {{ \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') }} &ndash; {{ \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') }}
+                                </span>
+                            </div>
+                            <span class="font-bold text-slate-700 bg-white border border-slate-200/80 px-2 py-0.5 rounded-lg text-[11px]">
+                                {{ $durasiStr }}
+                            </span>
+                        </div>
+
+                        <!-- Alasan Section -->
+                        <div class="text-xs">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Alasan Lembur:</span>
+                            <p class="text-slate-700 bg-slate-50/60 p-2.5 rounded-xl border border-slate-100/90 text-xs leading-relaxed break-words">
+                                {{ $item->alasan }}
+                            </p>
+                        </div>
+
+                        <!-- Status & Action Footer -->
+                        <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+                            <!-- Status Badge -->
+                            <div>
+                                @if ($item->status === 'paid')
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Selesai Dibayar</span>
+                                    </span>
+                                @elseif ($item->status === 'approved_atasan')
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                        Disetujui Atasan
+                                    </span>
+                                @elseif ($item->status === 'rejected')
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                        Ditolak
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                        Menunggu Approval
+                                    </span>
+                                @endif
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex items-center gap-1.5 ml-auto">
+                                <!-- Finance Pay Button -->
+                                @if ($isFinance && $item->status === 'approved_atasan')
+                                    <button type="button" 
+                                            @click="openPayModal({{ $item->id }}, '{{ $item->nomor_lembur }}', '{{ $item->user->name }}', {{ $uangLembur }})"
+                                            class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                                        Bayar Lembur
+                                    </button>
+                                @endif
+
+                                <!-- HRD / Atasan Approval Button -->
+                                @if (($isHrd || $isSuperAdmin || $isAtasan) && $item->status === 'pending' && $item->user_id !== auth()->id())
+                                    <form method="POST" action="{{ route('gomsn.overtime.approve', $item->id) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition cursor-pointer" 
+                                                onclick="return confirm('Setujui pengajuan lembur ini?')">
+                                            Setujui
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('gomsn.overtime.reject', $item->id) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition cursor-pointer" 
+                                                onclick="return confirm('Tolak pengajuan lembur ini?')">
+                                            Tolak
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-8 text-center bg-white rounded-2xl border border-slate-200/80 text-slate-400 text-xs">
+                        Tidak ada data rincian lembur untuk karyawan ini pada periode yang dipilih.
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- 2. DESKTOP VIEW: Tabel Rincian Lembur (hidden sm:block) -->
+            <div class="hidden sm:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -517,6 +639,12 @@
                     </table>
                 </div>
             </div>
+
+            @if ($lemburList->hasPages())
+                <div class="pt-2">
+                    {{ $lemburList->links() }}
+                </div>
+            @endif
         </div>
         @endif
 
