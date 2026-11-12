@@ -325,7 +325,7 @@ class PortalHubController extends Controller
 
     public function profile(Request $request): View
     {
-        $user = $request->user()->load(['supervisor']);
+        $user = $request->user()->load(['supervisor', 'faceTemplates']);
 
         return view('portal.profile', [
             'user' => $user,
@@ -341,6 +341,7 @@ class PortalHubController extends Controller
             'bank' => ['nullable', 'string', 'max:100'],
             'no_rekening' => ['nullable', 'string', 'max:50'],
             'atas_nama' => ['nullable', 'string', 'max:100'],
+            'foto' => ['nullable', 'image', 'max:5120'],
             'current_password' => ['nullable', 'required_with:new_password', 'current_password'],
             'new_password' => ['nullable', 'min:8', 'confirmed'],
         ]);
@@ -351,6 +352,13 @@ class PortalHubController extends Controller
             'no_rekening' => $validated['no_rekening'] ?? null,
             'atas_nama' => $validated['atas_nama'] ?? null,
         ];
+
+        if ($request->hasFile('foto')) {
+            if ($user->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->foto)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->foto);
+            }
+            $userData['foto'] = $request->file('foto')->store('avatars', 'public');
+        }
 
         if (! empty($validated['new_password'])) {
             $userData['password'] = \Illuminate\Support\Facades\Hash::make($validated['new_password']);
