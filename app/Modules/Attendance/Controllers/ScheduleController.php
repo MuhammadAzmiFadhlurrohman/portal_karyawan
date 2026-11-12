@@ -20,6 +20,18 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ScheduleController extends Controller
 {
     /**
+     * Determine if a user can manage / generate schedules.
+     */
+    protected function canManageSchedule(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasRole(['super_admin', 'admin', 'hrd'])
+            || $user->can('attendance.schedule.generate');
+    }
+    /**
      * Display schedule pages:
      * - Screen 1: Monthly schedule overview list (default)
      * - Screen 2: Generate monthly schedule form (?view=generate)
@@ -46,7 +58,7 @@ class ScheduleController extends Controller
 
         /** @var User $actor */
         $actor = $request->user();
-        $canManageSchedule = $actor?->can('attendance.schedule.generate') ?? false;
+        $canManageSchedule = $this->canManageSchedule($actor);
 
         // -------------------------------------------------------------------------
         // Screen Personal: Jadwal Kerja Karyawan & Tukar / Backup Shift
@@ -127,7 +139,7 @@ class ScheduleController extends Controller
                 'shifts' => $shifts,
                 'offices' => $offices,
                 'allDivisions' => $allDivisions,
-                'canManageSchedule' => $request->user()?->can('attendance.schedule.generate') ?? false,
+                'canManageSchedule' => $this->canManageSchedule($request->user()),
             ]);
         }
 
@@ -169,7 +181,7 @@ class ScheduleController extends Controller
                 'shifts' => $shifts,
                 'offices' => $offices,
                 'conflicts' => $userConflicts,
-                'canManageSchedule' => $request->user()?->can('attendance.schedule.generate') ?? false,
+                'canManageSchedule' => $this->canManageSchedule($request->user()),
             ]);
         }
 
@@ -227,7 +239,7 @@ class ScheduleController extends Controller
                 'holidays' => $holidays,
                 'conflicts' => $conflicts,
                 'allDivisions' => $allDivisions,
-                'canManageSchedule' => $request->user()?->can('attendance.schedule.generate') ?? false,
+                'canManageSchedule' => $this->canManageSchedule($request->user()),
             ]);
         }
 
@@ -241,7 +253,7 @@ class ScheduleController extends Controller
             'summaries' => $summaries,
             'shifts' => $shifts,
             'offices' => $offices,
-            'canManageSchedule' => $request->user()?->can('attendance.schedule.generate') ?? false,
+            'canManageSchedule' => $this->canManageSchedule($request->user()),
         ]);
     }
 
@@ -252,7 +264,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor && $actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $validated = $request->validate([
             'year' => ['required', 'integer', 'min:2025', 'max:2035'],
@@ -307,7 +319,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor && $actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $validated = $request->validate([
             'year' => ['required', 'integer', 'min:2020', 'max:2035'],
@@ -339,7 +351,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor && $actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $validated = $request->validate([
             'date' => ['required', 'date'],
@@ -363,7 +375,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor && $actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $scheduleService->deleteHoliday($holiday, $actor->id);
 
@@ -421,7 +433,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor && $actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $request->validate([
             'file' => ['required', 'file', 'max:10240'],
@@ -445,7 +457,7 @@ class ScheduleController extends Controller
      */
     public function previewGenerate(Request $request, ScheduleService $scheduleService): RedirectResponse
     {
-        abort_unless($request->user()?->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($request->user()), 403);
 
         $validated = $request->validate([
             'year' => ['required', 'integer', 'min:2025', 'max:2035'],
@@ -484,7 +496,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $validated = $request->validate([
             'year' => ['required', 'integer', 'min:2025', 'max:2035'],
@@ -522,7 +534,7 @@ class ScheduleController extends Controller
     {
         /** @var User $actor */
         $actor = $request->user();
-        abort_unless($actor && $actor->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($actor), 403);
 
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
@@ -590,7 +602,7 @@ class ScheduleController extends Controller
 
     public function storeOffice(Request $request): RedirectResponse
     {
-        abort_unless($request->user()?->can('attendance.schedule.generate'), 403);
+        abort_unless($this->canManageSchedule($request->user()), 403);
 
         $validated = $request->validate([
             'code' => ['required', 'string', 'max:32'],

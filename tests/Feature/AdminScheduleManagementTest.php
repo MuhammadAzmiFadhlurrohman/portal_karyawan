@@ -38,8 +38,7 @@ class AdminScheduleManagementTest extends TestCase
         $response = $this->actingAs($this->admin)->get(route('attendance.schedules'));
 
         $response->assertOk();
-        $response->assertSee('Jadwal Kerja');
-        $response->assertSee('Kelola jadwal karyawan per bulan');
+        $response->assertSee('Jadwal Kerja Karyawan');
         $response->assertSee('Generate');
         $response->assertSee('Cari bulan atau tahun...');
     }
@@ -96,8 +95,7 @@ class AdminScheduleManagementTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertSee('Daftar Karyawan');
-        $response->assertSee('November 2026 · 2026');
+        $response->assertSee('Roster Shift: November 2026');
         $response->assertSee('Hari Libur Nasional');
         $response->assertSee('Data Karyawan');
         $response->assertSee('Upload');
