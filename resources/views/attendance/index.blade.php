@@ -381,58 +381,58 @@
                 <form method="POST" action="{{ route('attendance.enroll') }}" @submit="handleEnrollSubmit($event)" class="p-5 space-y-4">
                     @csrf
                     
-                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/40 via-slate-50/60 to-teal-50/30 p-4 text-center space-y-3 shadow-inner">
-                        <!-- Camera preview / Canvas -->
-                        <div class="relative w-36 h-36 mx-auto">
-                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center shadow-lg relative">
+                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/40 via-slate-50/60 to-teal-50/30 p-5 text-center space-y-3.5 shadow-inner">
+                        <!-- Camera preview / Canvas (Lebih Besar) -->
+                        <div class="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto">
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center shadow-lg relative">
                                 <video id="enroll-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="cameraActive"></video>
                                 <img :src="photoPreview" x-show="photoPreview && !cameraActive" class="w-full h-full object-cover" alt="Preview Foto">
                                 <canvas id="enroll-canvas" class="hidden"></canvas>
                                 <div x-show="!cameraActive && !photoPreview" class="text-slate-400 text-center p-2">
-                                    <svg class="w-11 h-11 mx-auto text-teal-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                    <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
+                                    <svg class="w-12 h-12 mx-auto text-teal-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span class="text-xs block mt-1.5 font-medium text-slate-300">Kamera Selfie</span>
                                 </div>
                             </div>
-                            <span x-show="cameraActive" class="absolute top-1.5 right-1.5 flex h-3.5 w-3.5">
+                            <span x-show="cameraActive" class="absolute top-2.5 right-2.5 flex h-4 w-4">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
                             </span>
                         </div>
 
                         <div>
                             <template x-if="photoPreview">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
-                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                                     <span>Foto Wajah Siap Didaftarkan</span>
                                 </span>
                             </template>
                             <template x-if="!photoPreview && cameraActive">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                                     <span>Posisikan wajah Anda tepat di tengah</span>
                                 </span>
                             </template>
                             <template x-if="!photoPreview && !cameraActive">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
-                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
+                                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Wajib ambil foto selfie wajah</span>
                                 </span>
                             </template>
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-center gap-2 pt-0.5">
+                        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
                             <button type="button" 
                                     @click="startCamera()" 
                                     x-show="!cameraActive"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-xs transition cursor-pointer">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 <span x-text="photoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
                             </button>
                             <button type="button" 
                                     @click="capturePhoto()" 
                                     x-show="cameraActive"
-                                    class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98] transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                                 <span>Ambil Foto Sekarang</span>
                             </button>
                         </div>
@@ -505,61 +505,61 @@
                     <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
 
                     <!-- Camera & Face Verification Scanner Card -->
-                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/45 via-slate-50/50 to-teal-50/30 p-4 text-center space-y-3 relative overflow-hidden shadow-inner">
-                        <!-- Circular Biometric Viewport -->
-                        <div class="relative w-36 h-36 sm:w-40 sm:h-40 mx-auto">
-                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center relative shadow-md">
+                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/45 via-slate-50/50 to-teal-50/30 p-5 text-center space-y-3.5 relative overflow-hidden shadow-inner">
+                        <!-- Circular Biometric Viewport (Lebih Besar) -->
+                        <div class="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto">
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center relative shadow-md">
                                 <video id="clockin-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="clockInCameraActive"></video>
                                 <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
                                 <canvas id="clockin-canvas" class="hidden"></canvas>
                                 <div x-show="!clockInCameraActive && !clockInPhotoPreview" class="text-slate-400 text-center p-2">
-                                    <svg class="w-11 h-11 mx-auto text-teal-400/75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                    <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
+                                    <svg class="w-12 h-12 mx-auto text-teal-400/75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span class="text-xs block mt-1.5 font-medium text-slate-300">Kamera Selfie</span>
                                 </div>
                             </div>
                             <!-- Active Camera Live Indicator Dot -->
-                            <span x-show="clockInCameraActive" class="absolute top-1.5 right-1.5 flex h-3.5 w-3.5">
+                            <span x-show="clockInCameraActive" class="absolute top-2.5 right-2.5 flex h-4 w-4">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
                             </span>
                         </div>
 
                         <!-- Face Verification Status Badge -->
                         <div>
                             <template x-if="clockInPhotoPreview">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
-                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
+                                    <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                                     <span>Foto Wajah Siap Diverifikasi</span>
                                 </span>
                             </template>
                             <template x-if="!clockInPhotoPreview && clockInCameraActive">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                                     <span>Posisikan wajah Anda tepat di tengah</span>
                                 </span>
                             </template>
                             <template x-if="!clockInPhotoPreview && !clockInCameraActive">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
-                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
+                                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Wajib ambil foto selfie wajah</span>
                                 </span>
                             </template>
                         </div>
 
-                        <!-- Camera Action Buttons (Tanpa Tombol Gunakan Simulasi) -->
-                        <div class="flex flex-wrap items-center justify-center gap-2 pt-0.5">
+                        <!-- Camera Action Buttons (Lebih Besar) -->
+                        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
                             <button type="button" 
                                     @click="startClockInCamera()" 
                                     x-show="!clockInCameraActive"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-xs transition cursor-pointer">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 <span x-text="clockInPhotoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
                             </button>
                             <button type="button" 
                                     @click="captureClockInPhoto()" 
                                     x-show="clockInCameraActive"
-                                    class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98] transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                                 <span>Ambil Foto Sekarang</span>
                             </button>
                         </div>
