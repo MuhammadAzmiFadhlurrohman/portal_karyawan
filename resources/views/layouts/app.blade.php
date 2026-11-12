@@ -1589,7 +1589,7 @@
                         </a>
                         @endif
 
-                        <form method="POST" action="{{ route('logout') }}" class="col-span-2 sm:col-span-1">
+                        <form method="POST" action="{{ route('logout') }}" class="col-span-1">
                             @csrf
                             <button type="submit" class="w-full p-3 rounded-2xl border border-rose-200/90 bg-white hover:bg-rose-50/80 hover:border-rose-300 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs text-left cursor-pointer">
                                 <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
