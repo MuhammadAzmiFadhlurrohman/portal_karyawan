@@ -282,10 +282,10 @@
                                                 $shiftTitle = 'Libur';
                                                 $shiftName = 'Libur';
                                             } else {
-                                                $startTime = substr($sched->shift->start_time, 0, 5);
-                                                $endTime = substr($sched->shift->end_time, 0, 5);
-                                                $shiftTitle = $sched->shift->name;
-                                                $shiftName = $sched->shift->name . ' (' . $startTime . '–' . $endTime . ')';
+                                                $startTime = $sched->effective_start_time ?? substr((string)$sched->shift->start_time, 0, 5);
+                                                $endTime = $sched->effective_end_time ?? substr((string)$sched->shift->end_time, 0, 5);
+                                                $shiftTitle = $sched->isCustomHours() ? 'Custom Jam Kerja' : $sched->shift->name;
+                                                $shiftName = ($sched->isCustomHours() ? 'Custom' : $sched->shift->name) . ' (' . $startTime . '–' . $endTime . ')';
                                                 $workHours = $startTime . ' – ' . $endTime;
                                             }
                                         } elseif ($holiday || $dateObj->isWeekend()) {
@@ -1525,7 +1525,106 @@
         {{-- ========================================================================= --}}
         @if ($viewMode === 'user')
             <div class="space-y-6" x-data="{
+                showCustomModal: false,
+                customDay: null,
+                customDateStr: '',
+                customDateFull: '',
+                customStartTime: '08:00',
+                customEndTime: '17:00',
+                isSavingCustom: false,
+
+                openCustomModal(day, dateStr, defaultStart, defaultEnd, dateFull) {
+                    this.customDay = day;
+                    this.customDateStr = dateStr;
+                    this.customDateFull = dateFull || '';
+                    this.customStartTime = defaultStart && defaultStart !== '-' ? defaultStart : '08:00';
+                    this.customEndTime = defaultEnd && defaultEnd !== '-' ? defaultEnd : '17:00';
+                    this.showCustomModal = true;
+                },
+
+                saveCustomHours() {
+                    if (!this.customStartTime || !this.customEndTime) {
+                        alert('Jam masuk dan jam pulang wajib diisi');
+                        return;
+                    }
+                    this.isSavingCustom = true;
+                    fetch('{{ route('attendance.schedules.cell') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: {{ $targetUser->id }},
+                            date: this.customDateStr,
+                            shift_id: 'custom',
+                            custom_start_time: this.customStartTime,
+                            custom_end_time: this.customEndTime
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isSavingCustom = false;
+                        if (data.success) {
+                            this.showCustomModal = false;
+                            const day = this.customDay;
+                            const dayFormatted = (day < 10 ? '0' + day : day);
+                            triggerToast('Jadwal tgl ' + dayFormatted + ' diatur ke jam: ' + data.start_time + ' – ' + data.end_time);
+
+                            // Sync desktop & mobile selects to custom
+                            const dSelect = document.getElementById('desktop-select-day-' + day);
+                            if (dSelect) dSelect.value = 'custom';
+                            const mSelect = document.getElementById('mobile-select-day-' + day);
+                            if (mSelect) mSelect.value = 'custom';
+
+                            // Update hours display in desktop & mobile
+                            const hoursEl = document.getElementById('hours-day-' + day);
+                            if (hoursEl) {
+                                hoursEl.innerHTML = `<span class=\"text-teal-700 font-bold flex items-center gap-1.5\"><span>${data.start_time} – ${data.end_time}</span><span class=\"text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-sans font-bold\">Custom</span></span>`;
+                            }
+                            const mHoursEl = document.getElementById('mobile-hours-day-' + day);
+                            if (mHoursEl) {
+                                mHoursEl.innerHTML = `<span class=\"text-teal-700 font-bold\">${data.start_time} – ${data.end_time} (Custom)</span>`;
+                            }
+
+                            // Update mobile badge
+                            const mBadge = document.getElementById('mobile-badge-day-' + day);
+                            if (mBadge) {
+                                mBadge.textContent = 'CUST';
+                                mBadge.className = 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-teal-100 text-teal-800 border border-teal-200';
+                            }
+
+                            // Update custom button stored attributes
+                            const cBtn = document.getElementById('custom-btn-day-' + day);
+                            if (cBtn) {
+                                cBtn.setAttribute('data-start', data.start_time);
+                                cBtn.setAttribute('data-end', data.end_time);
+                            }
+                            const mcBtn = document.getElementById('mobile-custom-btn-day-' + day);
+                            if (mcBtn) {
+                                mcBtn.setAttribute('data-start', data.start_time);
+                                mcBtn.setAttribute('data-end', data.end_time);
+                            }
+                        } else {
+                            alert(data.message || 'Gagal menyimpan jam custom');
+                        }
+                    })
+                    .catch(err => {
+                        this.isSavingCustom = false;
+                        alert('Terjadi kesalahan saat menyimpan jam custom');
+                    });
+                },
+
                 saveShift(day, dateStr, shiftId) {
+                    if (shiftId === 'custom') {
+                        const cBtn = document.getElementById('custom-btn-day-' + day);
+                        const curStart = cBtn ? cBtn.getAttribute('data-start') : '08:00';
+                        const curEnd = cBtn ? cBtn.getAttribute('data-end') : '17:00';
+                        this.openCustomModal(day, dateStr, curStart, curEnd);
+                        return;
+                    }
+
                     fetch('{{ route('attendance.schedules.cell') }}', {
                         method: 'POST',
                         headers: {
@@ -1536,7 +1635,9 @@
                         body: JSON.stringify({
                             user_id: {{ $targetUser->id }},
                             date: dateStr,
-                            shift_id: shiftId
+                            shift_id: shiftId,
+                            custom_start_time: null,
+                            custom_end_time: null
                         })
                     })
                     .then(res => res.json())
@@ -1562,7 +1663,10 @@
 
                             // Update mobile badge
                             const mBadge = document.getElementById('mobile-badge-day-' + day);
-                            if (mBadge) mBadge.textContent = data.shift.code;
+                            if (mBadge) {
+                                mBadge.textContent = data.shift.code;
+                                mBadge.className = data.shift.is_day_off ? 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-rose-100 text-rose-700 border border-rose-200' : 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-sky-100 text-sky-700 border border-sky-200';
+                            }
                         } else {
                             alert(data.message || 'Gagal menyimpan perubahan shift');
                         }
@@ -1695,15 +1799,18 @@
 
                             $schedule = $userSchedules->get($d);
                             $assignedShift = $schedule?->shift;
+                            $hasCustomHours = $schedule && $schedule->isCustomHours();
 
                             if (!$assignedShift) {
                                 $assignedShift = $isDayOffByDefault ? $offShiftModel : $pagiShiftModel;
                             }
 
-                            $isRowRed = $isDayOffByDefault || ($assignedShift && $assignedShift->is_day_off);
+                            $isRowRed = ! $hasCustomHours && ($isDayOffByDefault || ($assignedShift && $assignedShift->is_day_off));
                             
                             $keteranganText = 'Hari Kerja Reguler';
-                            if ($holiday) {
+                            if ($hasCustomHours) {
+                                $keteranganText = 'Custom: ' . $schedule->effective_start_time . '–' . $schedule->effective_end_time;
+                            } elseif ($holiday) {
                                 $keteranganText = 'Libur Nasional: ' . $holiday->name;
                             } elseif ($isWeekend) {
                                 $keteranganText = 'Libur Akhir Pekan';
@@ -1713,7 +1820,7 @@
                                 $keteranganText = 'Libur';
                             }
                         @endphp
-                        <div class="rounded-2xl border p-3.5 transition-all shadow-2xs {{ $isRowRed ? 'bg-rose-50/40 border-rose-200/80' : 'bg-white border-slate-200/80' }}"
+                        <div class="rounded-2xl border p-3.5 transition-all shadow-2xs {{ $isRowRed ? 'bg-rose-50/40 border-rose-200/80' : ($hasCustomHours ? 'bg-teal-50/30 border-teal-200/90' : 'bg-white border-slate-200/80') }}"
                              id="mobile-card-day-{{ $d }}">
                             <!-- Top row: Date badge + Day Name + Keterangan Pill -->
                             <div class="flex items-center justify-between gap-2">
@@ -1731,30 +1838,48 @@
                                                 <span class="text-amber-500 text-xs">⭐</span>
                                             @endif
                                         </div>
-                                        <span class="text-[11px] font-medium {{ $isRowRed ? 'text-rose-600/90' : 'text-slate-500' }} block truncate" id="mobile-desc-day-{{ $d }}">
+                                        <span class="text-[11px] font-medium {{ $isRowRed ? 'text-rose-600/90' : ($hasCustomHours ? 'text-teal-700 font-semibold' : 'text-slate-500') }} block truncate" id="mobile-desc-day-{{ $d }}">
                                             {{ $keteranganText }}
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Shift Short Badge -->
-                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 {{ $isRowRed ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-sky-100 text-sky-700 border border-sky-200' }}" id="mobile-badge-day-{{ $d }}">
-                                    {{ $assignedShift?->code ?? '-' }}
+                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 {{ $isRowRed ? 'bg-rose-100 text-rose-700 border border-rose-200' : ($hasCustomHours ? 'bg-teal-100 text-teal-800 border border-teal-200' : 'bg-sky-100 text-sky-700 border border-sky-200') }}" id="mobile-badge-day-{{ $d }}">
+                                    {{ $hasCustomHours ? 'CUST' : ($assignedShift?->code ?? '-') }}
                                 </span>
                             </div>
 
-                            <!-- Middle: Shift Select Dropdown (Touch-friendly) -->
+                            <!-- Middle: Shift Select Dropdown & Quick Custom Button (Touch-friendly) -->
                             <div class="pt-2">
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Shift Kerja:</label>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Shift Kerja:</label>
+                                    <button type="button"
+                                            id="mobile-custom-btn-day-{{ $d }}"
+                                            data-start="{{ $schedule?->effective_start_time ?? '08:00' }}"
+                                            data-end="{{ $schedule?->effective_end_time ?? '17:00' }}"
+                                            @click="openCustomModal({{ $d }}, '{{ $currentDate->toDateString() }}', $el.getAttribute('data-start'), $el.getAttribute('data-end'), '{{ sprintf('%02d', $d) }} {{ $monthName }} {{ $year }}')"
+                                            class="inline-flex items-center gap-1 text-[11px] font-bold text-[#155E63] hover:underline cursor-pointer">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>⚙️ Atur Jam Sendiri</span>
+                                    </button>
+                                </div>
                                 <div class="relative">
                                     <select id="mobile-select-day-{{ $d }}"
                                             @change="saveShift({{ $d }}, '{{ $currentDate->toDateString() }}', $event.target.value)"
                                             class="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2 pr-8 text-xs font-semibold text-slate-800 shadow-2xs focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] cursor-pointer">
-                                        @foreach ($shifts as $s)
-                                            <option value="{{ $s->id }}" {{ ($assignedShift && $assignedShift->id === $s->id) ? 'selected' : '' }}>
-                                                {{ $s->name }} ({{ $s->code }}) {{ $s->is_day_off ? '— Libur' : '• ' . substr((string)$s->start_time, 0, 5) . '–' . substr((string)$s->end_time, 0, 5) }}
+                                        <optgroup label="Shift Terdaftar">
+                                            @foreach ($shifts->where('code', '!=', 'CUST') as $s)
+                                                <option value="{{ $s->id }}" {{ (! $hasCustomHours && $assignedShift && $assignedShift->id === $s->id) ? 'selected' : '' }}>
+                                                    {{ $s->name }} ({{ $s->code }}) {{ $s->is_day_off ? '— Libur' : '• ' . substr((string)$s->start_time, 0, 5) . '–' . substr((string)$s->end_time, 0, 5) }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                        <optgroup label="Pengaturan Khusus Admin">
+                                            <option value="custom" {{ $hasCustomHours ? 'selected' : '' }}>
+                                                ⏱️ Atur Jam Sendiri (Custom Jam)
                                             </option>
-                                        @endforeach
+                                        </optgroup>
                                     </select>
                                     <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                                 </div>
@@ -1767,7 +1892,9 @@
                                     <span>Jam Kerja:</span>
                                 </span>
                                 <span class="font-mono font-bold text-slate-700 text-xs" id="mobile-hours-day-{{ $d }}">
-                                    @if ($assignedShift && ! $assignedShift->is_day_off && $assignedShift->start_time && $assignedShift->end_time)
+                                    @if ($hasCustomHours)
+                                        <span class="text-teal-700 font-bold">{{ $schedule->effective_start_time }} – {{ $schedule->effective_end_time }} (Custom)</span>
+                                    @elseif ($assignedShift && ! $assignedShift->is_day_off && $assignedShift->start_time && $assignedShift->end_time)
                                         {{ substr((string)$assignedShift->start_time, 0, 5) }} – {{ substr((string)$assignedShift->end_time, 0, 5) }}
                                     @else
                                         — Libur
@@ -1801,14 +1928,15 @@
 
                                         $schedule = $userSchedules->get($d);
                                         $assignedShift = $schedule?->shift;
+                                        $hasCustomHours = $schedule && $schedule->isCustomHours();
 
                                         if (!$assignedShift) {
                                             $assignedShift = $isDayOffByDefault ? $offShiftModel : $pagiShiftModel;
                                         }
 
-                                        $isRowRed = $isDayOffByDefault || ($assignedShift && $assignedShift->is_day_off);
+                                        $isRowRed = ! $hasCustomHours && ($isDayOffByDefault || ($assignedShift && $assignedShift->is_day_off));
                                     @endphp
-                                    <tr class="transition-colors {{ $isRowRed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70' }}"
+                                    <tr class="transition-colors {{ $isRowRed ? 'bg-rose-50/40 hover:bg-rose-50/70' : ($hasCustomHours ? 'bg-teal-50/30 hover:bg-teal-50/60' : 'hover:bg-slate-50/70') }}"
                                         id="desktop-row-day-{{ $d }}">
                                         <!-- Tanggal -->
                                         <td class="py-3 px-5 font-mono font-medium text-slate-700 whitespace-nowrap">
@@ -1825,25 +1953,50 @@
                                             {{ $dayNamesIndoFull[$currentDate->dayOfWeek] }}
                                         </td>
 
-                                        <!-- Shift Dropdown (AJAX Auto Save) -->
+                                        <!-- Shift Dropdown & Atur Jam Button (AJAX Auto Save) -->
                                         <td class="py-2.5 px-4">
-                                            <div class="relative max-w-xs">
-                                                <select id="desktop-select-day-{{ $d }}"
-                                                        @change="saveShift({{ $d }}, '{{ $currentDate->toDateString() }}', $event.target.value)"
-                                                        class="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-1.5 pr-8 text-xs text-slate-800 font-semibold focus:outline-hidden focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] shadow-2xs cursor-pointer">
-                                                    @foreach ($shifts as $s)
-                                                        <option value="{{ $s->id }}" {{ ($assignedShift && $assignedShift->id === $s->id) ? 'selected' : '' }}>
-                                                            {{ $s->name }} ({{ $s->code }})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                            <div class="flex items-center gap-2 max-w-sm">
+                                                <div class="relative flex-1">
+                                                    <select id="desktop-select-day-{{ $d }}"
+                                                            @change="saveShift({{ $d }}, '{{ $currentDate->toDateString() }}', $event.target.value)"
+                                                            class="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-1.5 pr-8 text-xs text-slate-800 font-semibold focus:outline-hidden focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] shadow-2xs cursor-pointer">
+                                                        <optgroup label="Shift Terdaftar">
+                                                            @foreach ($shifts->where('code', '!=', 'CUST') as $s)
+                                                                <option value="{{ $s->id }}" {{ (! $hasCustomHours && $assignedShift && $assignedShift->id === $s->id) ? 'selected' : '' }}>
+                                                                    {{ $s->name }} ({{ $s->code }})
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+                                                        <optgroup label="Pengaturan Khusus Admin">
+                                                            <option value="custom" {{ $hasCustomHours ? 'selected' : '' }}>
+                                                                ⏱️ Atur Jam Sendiri (Custom)
+                                                            </option>
+                                                        </optgroup>
+                                                    </select>
+                                                    <svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                                </div>
+
+                                                <button type="button"
+                                                        id="custom-btn-day-{{ $d }}"
+                                                        data-start="{{ $schedule?->effective_start_time ?? '08:00' }}"
+                                                        data-end="{{ $schedule?->effective_end_time ?? '17:00' }}"
+                                                        @click="openCustomModal({{ $d }}, '{{ $currentDate->toDateString() }}', $el.getAttribute('data-start'), $el.getAttribute('data-end'), '{{ sprintf('%02d', $d) }} {{ $monthName }} {{ $year }}')"
+                                                        title="Atur jam masuk &amp; pulang custom khusus admin"
+                                                        class="px-2.5 py-1.5 rounded-xl border border-teal-200 bg-teal-50 hover:bg-teal-100 text-[#155E63] text-xs font-bold transition flex items-center gap-1 shrink-0 shadow-2xs cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    <span>Atur Jam</span>
+                                                </button>
                                             </div>
                                         </td>
 
                                         <!-- Jam Kerja -->
                                         <td class="py-3 px-4 font-mono text-slate-600" id="hours-day-{{ $d }}">
-                                            @if ($assignedShift && ! $assignedShift->is_day_off && $assignedShift->start_time && $assignedShift->end_time)
+                                            @if ($hasCustomHours)
+                                                <span class="text-teal-700 font-bold flex items-center gap-1.5">
+                                                    <span>{{ $schedule->effective_start_time }} – {{ $schedule->effective_end_time }}</span>
+                                                    <span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-sans font-bold">Custom</span>
+                                                </span>
+                                            @elseif ($assignedShift && ! $assignedShift->is_day_off && $assignedShift->start_time && $assignedShift->end_time)
                                                 {{ substr((string)$assignedShift->start_time, 0, 5) }} – {{ substr((string)$assignedShift->end_time, 0, 5) }}
                                             @else
                                                 -
@@ -1852,7 +2005,12 @@
 
                                         <!-- Keterangan -->
                                         <td class="py-3 px-5 text-xs">
-                                            @if ($holiday)
+                                            @if ($hasCustomHours)
+                                                <span class="inline-flex items-center gap-1 font-semibold text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-lg">
+                                                    <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    <span>Custom Jam Kerja</span>
+                                                </span>
+                                            @elseif ($holiday)
                                                 <span class="inline-flex items-center gap-1 font-semibold text-rose-700">
                                                     <span>Libur Nasional:</span>
                                                     <span>{{ $holiday->name }}</span>
@@ -1871,6 +2029,94 @@
                                 @endfor
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Modal Custom Jam Kerja (Khusus Admin) -->
+                <div x-cloak x-show="showCustomModal"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
+                    
+                    <div @click.away="showCustomModal = false"
+                         class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+                        
+                        <!-- Header -->
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#155E63] shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-heading font-extrabold text-slate-900 text-base leading-tight">
+                                        Atur Jam Kerja Custom
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">
+                                        <span x-text="customDateFull ? customDateFull + ' • {{ $targetUser->name }}' : 'Tanggal ' + (customDay < 10 ? '0' + customDay : customDay) + ' • {{ $targetUser->name }}'"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" @click="showCustomModal = false" class="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition cursor-pointer">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Banner Info -->
+                        <div class="rounded-2xl bg-teal-50/70 border border-teal-200/80 p-3 text-[11px] text-[#155E63] flex items-center gap-2">
+                            <svg class="w-4 h-4 shrink-0 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Atur jam masuk &amp; pulang bebas di luar pilihan shift standar (Khusus Admin).</span>
+                        </div>
+
+                        <!-- Inputs: Jam Masuk & Jam Pulang -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Jam Masuk</label>
+                                <input type="time"
+                                       x-model="customStartTime"
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm font-mono font-bold text-slate-800 focus:bg-white focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] transition shadow-2xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Jam Pulang</label>
+                                <input type="time"
+                                       x-model="customEndTime"
+                                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm font-mono font-bold text-slate-800 focus:bg-white focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] transition shadow-2xs">
+                            </div>
+                        </div>
+
+                        <!-- Quick Preset Pills -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Preset Jam Cepat:</label>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button type="button" @click="customStartTime = '08:00'; customEndTime = '17:00'" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-[#155E63] transition cursor-pointer">08:00 – 17:00</button>
+                                <button type="button" @click="customStartTime = '08:30'; customEndTime = '17:30'" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-[#155E63] transition cursor-pointer">08:30 – 17:30</button>
+                                <button type="button" @click="customStartTime = '09:00'; customEndTime = '18:00'" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-[#155E63] transition cursor-pointer">09:00 – 18:00</button>
+                                <button type="button" @click="customStartTime = '07:30'; customEndTime = '16:30'" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-[#155E63] transition cursor-pointer">07:30 – 16:30</button>
+                                <button type="button" @click="customStartTime = '10:00'; customEndTime = '19:00'" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-teal-100 text-slate-700 hover:text-[#155E63] transition cursor-pointer">10:00 – 19:00</button>
+                            </div>
+                        </div>
+
+                        <!-- Footer Actions -->
+                        <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                            <button type="button"
+                                    @click="showCustomModal = false"
+                                    class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                Batal
+                            </button>
+                            <button type="button"
+                                    @click="saveCustomHours()"
+                                    :disabled="isSavingCustom"
+                                    class="btn-primary !py-2 !px-4 text-xs font-bold shadow-md shadow-teal-900/20 inline-flex items-center gap-1.5 cursor-pointer">
+                                <svg x-show="!isSavingCustom" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                <span x-text="isSavingCustom ? 'Menyimpan...' : 'Simpan Jam Custom'"></span>
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>

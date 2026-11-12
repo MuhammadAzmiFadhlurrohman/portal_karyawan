@@ -292,7 +292,7 @@ class AttendanceService
             ->first();
 
         $shift = $schedule ? $schedule->shift : Shift::query()->where('code', 'P')->first();
-        $lateMinutes = $this->calculateLateMinutes($officeTime, $shift, $attendanceType);
+        $lateMinutes = $this->calculateLateMinutes($officeTime, $shift, $attendanceType, $schedule);
 
         if ($status !== 'pending_review' && $lateMinutes > 0) {
             $status = 'late';
@@ -541,14 +541,22 @@ class AttendanceService
         return (int) Cache::get($this->failureCacheKey($userId), 0);
     }
 
-    private function calculateLateMinutes(Carbon $officeTime, ?Shift $shift, string $attendanceType): int
+    private function calculateLateMinutes(Carbon $officeTime, ?Shift $shift, string $attendanceType, ?MonthlySchedule $schedule = null): int
     {
-        if ($attendanceType === 'remote' || ! $shift || $shift->is_day_off || ! $shift->start_time) {
+        if ($attendanceType === 'remote' || ! $shift || $shift->is_day_off) {
             return 0;
         }
 
-        $shiftStart = Carbon::parse($officeTime->toDateString().' '.$shift->start_time, 'Asia/Jakarta');
-        $toleranceDeadline = $shiftStart->copy()->addMinutes($shift->late_tolerance_minutes);
+        $startTimeStr = ($schedule && ! empty($schedule->custom_start_time))
+            ? (string) $schedule->custom_start_time
+            : (string) ($shift->start_time ?? '');
+
+        if ($startTimeStr === '') {
+            return 0;
+        }
+
+        $shiftStart = Carbon::parse($officeTime->toDateString().' '.$startTimeStr, 'Asia/Jakarta');
+        $toleranceDeadline = $shiftStart->copy()->addMinutes($shift->late_tolerance_minutes ?? 15);
 
         if ($officeTime->lessThanOrEqualTo($toleranceDeadline)) {
             return 0;

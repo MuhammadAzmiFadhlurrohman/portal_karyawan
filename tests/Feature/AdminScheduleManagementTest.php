@@ -176,6 +176,36 @@ class AdminScheduleManagementTest extends TestCase
         );
     }
 
+    public function test_admin_can_set_custom_working_hours_outside_predefined_shifts(): void
+    {
+        $user = User::where('username', 'teknisi1')->firstOrFail();
+
+        $response = $this->actingAs($this->admin)->postJson(route('attendance.schedules.cell'), [
+            'user_id' => $user->id,
+            'date' => '2026-11-06',
+            'custom_start_time' => '09:30',
+            'custom_end_time' => '18:30',
+            'reason' => 'Pengaturan jam kerja khusus proyek',
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+            'is_custom' => true,
+            'start_time' => '09:30',
+            'end_time' => '18:30',
+        ]);
+
+        $sched = MonthlySchedule::query()
+            ->where('user_id', $user->id)
+            ->whereDate('date', '2026-11-06')
+            ->firstOrFail();
+
+        $this->assertTrue($sched->isCustomHours());
+        $this->assertSame('09:30', $sched->effective_start_time);
+        $this->assertSame('18:30', $sched->effective_end_time);
+    }
+
     public function test_admin_can_delete_month_schedules(): void
     {
         // Seed schedule

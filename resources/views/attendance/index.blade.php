@@ -34,9 +34,10 @@
 
         @php
             $shift = $todaySchedule?->shift ?? \App\Models\Shift::where('code', 'P')->first() ?? \App\Models\Shift::first();
-            $shiftName = $shift?->name ?? 'Shift Pagi';
-            $shiftStart = $shift?->start_time ? \Carbon\Carbon::parse($shift->start_time)->format('H:i') : '08:15';
-            $shiftEnd = $shift?->end_time ? \Carbon\Carbon::parse($shift->end_time)->format('H:i') : '17:00';
+            $hasCustomHours = $todaySchedule && $todaySchedule->isCustomHours();
+            $shiftName = $hasCustomHours ? 'Custom Jam Kerja' : ($shift?->name ?? 'Shift Pagi');
+            $shiftStart = $todaySchedule?->effective_start_time ?? ($shift?->start_time ? \Carbon\Carbon::parse($shift->start_time)->format('H:i') : '08:15');
+            $shiftEnd = $todaySchedule?->effective_end_time ?? ($shift?->end_time ? \Carbon\Carbon::parse($shift->end_time)->format('H:i') : '17:00');
             $isWorkday = ! in_array(now('Asia/Jakarta')->dayOfWeek, [0, 6]);
             $defaultOffice = $offices->first();
         @endphp

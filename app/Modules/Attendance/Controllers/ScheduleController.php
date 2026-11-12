@@ -107,9 +107,15 @@ class ScheduleController extends Controller
                 ->groupBy('user_id')
                 ->map(function ($schedules) {
                     return $schedules->mapWithKeys(function ($s) {
-                        $label = $s->shift
-                            ? ($s->shift->code === 'L' ? 'Libur' : $s->shift->name . ' (' . substr($s->shift->start_time, 0, 5) . '–' . substr($s->shift->end_time, 0, 5) . ')')
-                            : 'Libur';
+                        $isLibur = $s->shift && ($s->shift->code === 'L' || $s->shift->is_day_off);
+                        if ($isLibur) {
+                            $label = 'Libur';
+                        } else {
+                            $startTime = $s->effective_start_time ?? ($s->shift?->start_time ? substr((string)$s->shift->start_time, 0, 5) : '08:15');
+                            $endTime = $s->effective_end_time ?? ($s->shift?->end_time ? substr((string)$s->shift->end_time, 0, 5) : '17:00');
+                            $title = $s->isCustomHours() ? 'Custom' : ($s->shift?->name ?? 'Pagi');
+                            $label = $title . ' (' . $startTime . '–' . $endTime . ')';
+                        }
                         return [$s->date->format('Y-m-d') => $label];
                     });
                 });
@@ -556,12 +562,42 @@ class ScheduleController extends Controller
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
             'date' => ['required', 'date'],
-            'shift_id' => ['required', 'exists:shifts,id'],
+            'shift_id' => ['nullable'],
+            'custom_start_time' => ['nullable', 'string', 'max:8'],
+            'custom_end_time' => ['nullable', 'string', 'max:8'],
             'office_location_id' => ['nullable', 'exists:office_locations,id'],
             'reason' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $reason = $validated['reason'] ?: 'Pembaruan jadwal kerja melalui Kalender Shift Admin';
+        $customStart = ! empty($validated['custom_start_time']) ? trim($validated['custom_start_time']) : null;
+        $customEnd = ! empty($validated['custom_end_time']) ? trim($validated['custom_end_time']) : null;
+
+        // Normalize H:i -> H:i:00
+        if ($customStart && strlen($customStart) === 5) {
+            $customStart .= ':00';
+        }
+        if ($customEnd && strlen($customEnd) === 5) {
+            $customEnd .= ':00';
+        }
+
+        $shiftIdInput = $validated['shift_id'] ?? null;
+        if ($customStart && $customEnd) {
+            $custShift = Shift::query()->where('code', 'CUST')->first();
+            $shift = $custShift ?? (Shift::query()->where('code', 'P')->first() ?? Shift::first());
+        } elseif ($shiftIdInput && $shiftIdInput !== 'custom') {
+            $shift = Shift::findOrFail($shiftIdInput);
+            // When standard shift is chosen without custom hours, clear custom times
+            $customStart = null;
+            $customEnd = null;
+        } else {
+            $shift = Shift::query()->where('code', 'P')->first() ?? Shift::first();
+        }
+
+        $reason = $validated['reason'] ?: (
+            ($customStart && $customEnd)
+                ? "Atur jam custom ({$customStart}–{$customEnd})"
+                : 'Pembaruan jadwal kerja melalui Kalender Shift Admin'
+        );
 
         $existing = MonthlySchedule::query()
             ->where('user_id', $validated['user_id'])
@@ -569,11 +605,12 @@ class ScheduleController extends Controller
             ->first();
 
         $oldShiftId = $existing?->shift_id;
-        $shift = Shift::findOrFail($validated['shift_id']);
 
         if ($existing) {
             $existing->update([
                 'shift_id' => $shift->id,
+                'custom_start_time' => $customStart,
+                'custom_end_time' => $customEnd,
                 'office_location_id' => $validated['office_location_id'] ?? $existing->office_location_id,
                 'updated_by' => $actor->id,
             ]);
@@ -583,6 +620,8 @@ class ScheduleController extends Controller
                 'user_id' => $validated['user_id'],
                 'date' => Carbon::parse($validated['date'])->toDateString(),
                 'shift_id' => $shift->id,
+                'custom_start_time' => $customStart,
+                'custom_end_time' => $customEnd,
                 'office_location_id' => $validated['office_location_id'] ?? OfficeLocation::where('is_active', true)->first()?->id,
                 'updated_by' => $actor->id,
                 'created_by' => $actor->id,
@@ -593,23 +632,40 @@ class ScheduleController extends Controller
             action: 'schedule.cell_updated',
             auditable: $schedule,
             oldValues: ['shift_id' => $oldShiftId],
-            newValues: ['shift_id' => (int) $validated['shift_id'], 'date' => $validated['date']],
+            newValues: [
+                'shift_id' => (int) $shift->id,
+                'custom_start_time' => $customStart,
+                'custom_end_time' => $customEnd,
+                'date' => $validated['date']
+            ],
             reason: $reason,
             actorId: $actor->id
         );
 
         if ($request->expectsJson() || $request->ajax()) {
+            $effectiveStart = $schedule->effective_start_time;
+            $effectiveEnd = $schedule->effective_end_time;
+            $isCustom = $schedule->isCustomHours();
+
             return response()->json([
                 'success' => true,
-                'message' => 'Perubahan jadwal shift berhasil disimpan.',
+                'message' => $isCustom
+                    ? "Jadwal kerja tgl " . Carbon::parse($validated['date'])->format('d/m') . " diset ke jam custom {$effectiveStart} – {$effectiveEnd}."
+                    : 'Perubahan jadwal shift berhasil disimpan.',
+                'is_custom' => $isCustom,
+                'start_time' => $effectiveStart,
+                'end_time' => $effectiveEnd,
+                'hours_label' => $isCustom
+                    ? "{$effectiveStart} – {$effectiveEnd}"
+                    : ($shift->is_day_off ? '— Libur' : ($effectiveStart ? "{$effectiveStart} – {$effectiveEnd}" : '—')),
                 'shift' => [
                     'id' => $shift->id,
-                    'code' => $shift->code,
-                    'name' => $shift->name,
-                    'color' => $shift->color,
-                    'start_time' => $shift->start_time ? substr((string) $shift->start_time, 0, 5) : null,
-                    'end_time' => $shift->end_time ? substr((string) $shift->end_time, 0, 5) : null,
-                    'is_day_off' => $shift->is_day_off,
+                    'code' => $isCustom ? 'CUST' : $shift->code,
+                    'name' => $isCustom ? 'Custom Jam Kerja' : $shift->name,
+                    'color' => $isCustom ? '#0D9488' : $shift->color,
+                    'start_time' => $effectiveStart,
+                    'end_time' => $effectiveEnd,
+                    'is_day_off' => $isCustom ? false : $shift->is_day_off,
                 ],
             ]);
         }
