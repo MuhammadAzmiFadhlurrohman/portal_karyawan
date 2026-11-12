@@ -1268,76 +1268,113 @@
              x-transition:leave-start="translate-y-0"
              x-transition:leave-end="translate-y-full"
              :style="isDragging ? 'transform: translateY(' + Math.max(0, sheetTranslateY) + 'px) !important; transition: none !important;' : (sheetTranslateY > 0 ? 'transform: translateY(0px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);' : '')"
-             class="relative w-full max-w-xl mx-auto max-h-[88vh] bg-white rounded-t-[32px] shadow-[0_-16px_50px_rgba(0,0,0,0.35)] flex flex-col z-20 border-t border-slate-200 overflow-hidden">
+             class="relative w-full max-w-xl mx-auto max-h-[88vh] bg-white rounded-t-[30px] shadow-[0_-16px_50px_rgba(0,0,0,0.35)] flex flex-col z-20 overflow-hidden">
             
-            <!-- Crisp Solid White Background with Ultra-Soft Micro-Dot Texture -->
+            <!-- Crisp Solid White Background with Ultra-Soft Micro-Dot Texture (Body Area) -->
             <div class="absolute inset-0 pointer-events-none z-0" 
-                 style="background-color: #FFFFFF; background-image: radial-gradient(rgba(148, 163, 184, 0.16) 0.8px, transparent 0.8px); background-size: 18px 18px;"></div>
+                 style="background-color: #FFFFFF; background-image: radial-gradient(rgba(148, 163, 184, 0.14) 0.75px, transparent 0.75px); background-size: 20px 20px;"></div>
 
-            <!-- Pull Handle Bar Indicator (Tarik ke bawah dari garis ini untuk menutup menu) -->
-            <div class="pt-3 pb-1.5 cursor-grab active:cursor-grabbing flex flex-col items-center justify-center select-none touch-none group relative z-10"
-                 @touchstart.passive="startDrag($event)"
-                 @touchmove="onDrag($event)"
-                 @touchend="endDrag()"
-                 @mousedown="startDrag($event)"
-                 @click="bottomSheetOpen = false"
-                 title="Tarik ke bawah dari garis ini untuk menutup menu">
-                <div class="w-12 h-1.5 bg-slate-300 group-hover:bg-teal-600 group-active:bg-teal-700 rounded-full transition-colors shadow-2xs"></div>
-            </div>
+            <!-- Unified Theme-Green Top Header (Pull Handle + User Identity + Search Bar) -->
+            <div class="relative z-10 select-none touch-none overflow-hidden shadow-md"
+                 style="background: linear-gradient(135deg, #052629 0%, #0b464b 50%, #0f6368 100%);">
+                
+                <!-- Decorative Specular Rim & Subtle Wave Accent -->
+                <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
+                <svg class="absolute right-0 top-0 h-full w-56 opacity-15 pointer-events-none" viewBox="0 0 220 140" fill="none" preserveAspectRatio="none">
+                    <path d="M220 0C155 25 130 95 45 140H220V0Z" fill="url(#sheetHeaderWave)"/>
+                    <defs>
+                        <linearGradient id="sheetHeaderWave" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#5eead4"/>
+                            <stop offset="100%" stop-color="#0d9488" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
 
-            <!-- Sheet Header (Executive Profile & Close - Draggable from Header too) -->
-            <div class="px-5 py-3 border-b border-slate-200/80 flex items-center justify-between bg-white/95 backdrop-blur-md select-none touch-none cursor-grab active:cursor-grabbing relative z-10"
-                 @touchstart.passive="startDrag($event)"
-                 @touchmove="onDrag($event)"
-                 @touchend="endDrag()"
-                 @mousedown="startDrag($event)">
-                <div class="flex items-center gap-3 min-w-0 pointer-events-none">
-                    @if (auth()->user()->avatar_url)
-                        <img src="{{ auth()->user()->avatar_url }}" alt="" class="h-10 w-10 rounded-2xl object-cover shadow-md ring-2 ring-teal-500/20 shrink-0">
-                    @else
-                        <div class="h-10 w-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-md ring-2 ring-teal-500/20 shrink-0">
-                            {{ auth()->user()->initials }}
-                        </div>
-                    @endif
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-1.5">
-                            <h3 class="font-extrabold text-sm text-slate-900 leading-tight truncate">Semua Layanan Portal</h3>
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-100 text-[#155E63] shrink-0">GOMSN</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1.5">
-                            <span class="font-semibold text-slate-700 truncate">{{ auth()->user()->name }}</span>
-                            <span class="text-slate-300">•</span>
-                            <span class="text-[10px] font-medium text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded-full border border-teal-200/60 truncate">
-                                {{ auth()->user()->division ?: (auth()->user()->getRoleNames()->first() ? ucfirst(auth()->user()->getRoleNames()->first()) : 'MSN') }}
-                            </span>
-                        </p>
-                    </div>
+                <!-- 1. Pull Handle Bar Indicator -->
+                <div class="pt-2.5 pb-1 cursor-grab active:cursor-grabbing flex flex-col items-center justify-center group relative z-10"
+                     @touchstart.passive="startDrag($event)"
+                     @touchmove="onDrag($event)"
+                     @touchend="endDrag()"
+                     @mousedown="startDrag($event)"
+                     @click="bottomSheetOpen = false"
+                     title="Tarik ke bawah dari garis ini untuk menutup menu">
+                    <div class="w-11 h-1.5 bg-white/30 group-hover:bg-white/60 group-active:bg-[#5eead4] rounded-full transition-colors"></div>
                 </div>
-                <button type="button" 
-                        @click.stop="bottomSheetOpen = false" 
-                        @mousedown.stop 
-                        @touchstart.stop 
-                        class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-base leading-none transition active:scale-95 cursor-pointer shadow-2xs">
-                    &times;
-                </button>
-            </div>
 
-            <!-- Modern Search Bar Inside Bottom Sheet -->
-            <div class="px-5 py-2.5 bg-white/95 backdrop-blur-md border-b border-slate-200/70 relative z-10">
-                <div class="relative flex items-center">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-700">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <!-- 2. Sheet Header (Executive Profile & Close Button) -->
+                <div class="px-5 pt-2 pb-3.5 flex items-center justify-between gap-3 cursor-grab active:cursor-grabbing relative z-10"
+                     @touchstart.passive="startDrag($event)"
+                     @touchmove="onDrag($event)"
+                     @touchend="endDrag()"
+                     @mousedown="startDrag($event)">
+                    
+                    <div class="flex items-center gap-3.5 min-w-0 pointer-events-none">
+                        <!-- Avatar with Online Indicator -->
+                        <div class="relative shrink-0">
+                            @if (auth()->user()->avatar_url)
+                                <img src="{{ auth()->user()->avatar_url }}" 
+                                     alt="" 
+                                     onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+                                     class="h-11 w-11 rounded-2xl object-cover shadow-md ring-2 ring-white/25 shrink-0">
+                                <div style="display: none;" class="h-11 w-11 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold text-sm shadow-md ring-2 ring-white/25 shrink-0">
+                                    {{ auth()->user()->initials }}
+                                </div>
+                            @else
+                                <div class="h-11 w-11 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-sm shadow-md ring-2 ring-white/25 shrink-0">
+                                    {{ auth()->user()->initials }}
+                                </div>
+                            @endif
+                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 ring-2 ring-[#073337]"></span>
+                        </div>
+
+                        <!-- Title & User Info -->
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-extrabold text-[15px] text-white tracking-tight leading-snug truncate">Semua Layanan Portal</h3>
+                                <span class="text-[9px] font-extrabold tracking-wider px-2 py-0.5 rounded-md bg-[#18C4C4]/20 text-[#5eead4] border border-[#5eead4]/35 shrink-0">
+                                    GOMSN
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-1 min-w-0">
+                                <span class="text-xs font-semibold text-teal-50/95 truncate">{{ auth()->user()->name }}</span>
+                                <span class="text-teal-300/50 text-xs">•</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wide text-teal-100 bg-white/12 px-2 py-0.5 rounded-md border border-white/15 shrink-0">
+                                    {{ auth()->user()->division ?: (auth()->user()->getRoleNames()->first() ? ucfirst(auth()->user()->getRoleNames()->first()) : 'MSN') }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <input type="text" 
-                           x-model="sheetSearch" 
-                           placeholder="Cari layanan (absen, lembur, kasbon, tiket)..."
-                           class="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-slate-200/90 bg-slate-50/80 shadow-2xs focus:bg-white focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 transition text-slate-800 placeholder:text-slate-400">
+
+                    <!-- Close Button -->
                     <button type="button" 
-                            x-show="sheetSearch" 
-                            @click="sheetSearch = ''" 
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
-                        &times;
+                            @click.stop="bottomSheetOpen = false" 
+                            @mousedown.stop 
+                            @touchstart.stop 
+                            aria-label="Tutup Menu"
+                            class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-white flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 shadow-2xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
                     </button>
+                </div>
+
+                <!-- 3. Integrated Search Bar Inside Theme Header -->
+                <div class="px-5 pb-3.5 relative z-10">
+                    <div class="relative flex items-center">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-200/80">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <input type="text" 
+                               x-model="sheetSearch" 
+                               placeholder="Cari layanan (absen, lembur, kasbon, tiket)..."
+                               class="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-white/15 bg-white/12 backdrop-blur-xs focus:bg-white focus:border-white focus:ring-2 focus:ring-[#5eead4]/40 transition text-white focus:text-slate-800 placeholder:text-teal-100/65 focus:placeholder:text-slate-400">
+                        <button type="button" 
+                                x-show="sheetSearch" 
+                                @click="sheetSearch = ''" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-200 hover:text-white text-xs cursor-pointer">
+                            &times;
+                        </button>
+                    </div>
                 </div>
             </div>
 
