@@ -20,28 +20,28 @@
             <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-teal-400/20 blur-3xl pointer-events-none"></div>
             <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-emerald-400/15 blur-3xl pointer-events-none"></div>
 
-            <!-- DESKTOP ORGANIC CURVED WAVE (RIGHT EDGE) WITH WIDE SWEEPING S-CURVE -->
-            <div class="hidden lg:block absolute -right-[2px] top-0 bottom-0 h-full w-36 lg:w-44 xl:w-52 z-30 pointer-events-none"
+            <!-- DESKTOP ORGANIC CURVED WAVE (RIGHT EDGE) WITH SLEEK S-CURVE -->
+            <div class="hidden lg:block absolute -right-[2px] top-0 bottom-0 h-full w-28 lg:w-36 xl:w-44 z-30 pointer-events-none"
                  style="background-color: #FFFFFF; 
                         background-image: radial-gradient(rgba(148, 163, 184, 0.45) 1.2px, transparent 1.2px); 
                         background-size: 22px 22px; 
                         background-position: calc(100% - 2px) top;
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 1000' preserveAspectRatio='none'%3E%3Cpath d='M 30,0 C 95,180 110,340 70,500 C 20,660 10,790 45,910 C 55,950 40,980 25,1000 L 165,1000 L 165,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 1000' preserveAspectRatio='none'%3E%3Cpath d='M 30,0 C 95,180 110,340 70,500 C 20,660 10,790 45,910 C 55,950 40,980 25,1000 L 165,1000 L 165,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 40,0 C 70,160 72,320 50,500 C 28,680 30,840 44,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 40,0 C 70,160 72,320 50,500 C 28,680 30,840 44,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
                         -webkit-mask-size: 100% 100%;
                         mask-size: 100% 100%;
                         -webkit-mask-repeat: no-repeat;
                         mask-repeat: no-repeat;">
             </div>
 
-            <!-- MOBILE HORIZONTAL WAVE (BOTTOM EDGE) WITH DRAMATIC VISIBLE CREST -->
+            <!-- MOBILE HORIZONTAL WAVE (BOTTOM EDGE) WITH PRECISE ORGANIC CREST & TROUGH -->
             <div class="lg:hidden absolute -bottom-[1px] left-0 right-0 w-full h-14 sm:h-18 pointer-events-none z-30"
                  style="background-color: #FFFFFF; 
                         background-image: radial-gradient(rgba(148, 163, 184, 0.45) 1.2px, transparent 1.2px); 
                         background-size: 22px 22px; 
                         background-position: left calc(100% - 1px);
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,55 C 160,70 380,18 640,6 C 810,0 920,18 1000,28 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,55 C 160,70 380,18 640,6 C 810,0 920,18 1000,28 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,55 C 80,30 160,10 260,10 C 380,10 500,85 680,85 C 820,85 920,40 1000,32 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,55 C 80,30 160,10 260,10 C 380,10 500,85 680,85 C 820,85 920,40 1000,32 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
                         -webkit-mask-size: 100% 100%;
                         mask-size: 100% 100%;
                         -webkit-mask-repeat: no-repeat;
