@@ -690,6 +690,7 @@
                                         <span>Halaman Profile</span>
                                     </a>
 
+                                    @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
                                     <a href="{{ route('portal.sessions') }}" 
                                        class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors">
                                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -697,6 +698,7 @@
                                         </svg>
                                         <span>Perangkat &amp; Sesi Login</span>
                                     </a>
+                                    @endif
 
                                     @if (auth()->user() && (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage')))
                                     <a href="{{ route('portal.employees.index') }}" 
@@ -871,6 +873,7 @@
                                     <span>Halaman Profile</span>
                                 </a>
 
+                                @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
                                 <a href="{{ route('portal.sessions') }}" 
                                    class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors">
                                     <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -878,6 +881,7 @@
                                     </svg>
                                     <span>Perangkat &amp; Sesi Login</span>
                                 </a>
+                                @endif
                             </div>
 
                             <!-- Logout Form & Button -->

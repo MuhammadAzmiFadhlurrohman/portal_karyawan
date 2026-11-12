@@ -21,6 +21,7 @@
                     </div>
                 </div>
 
+                @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
                 <div class="flex items-center gap-2 pt-2 sm:pt-0">
                     <a href="{{ route('portal.sessions') }}" class="btn-secondary !text-xs !py-2 !px-3.5 flex items-center gap-1.5">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -29,6 +30,7 @@
                         <span>Sesi &amp; Perangkat</span>
                     </a>
                 </div>
+                @endif
             </div>
         </div>
 

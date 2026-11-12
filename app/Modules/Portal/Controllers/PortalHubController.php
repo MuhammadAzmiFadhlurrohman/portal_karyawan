@@ -197,15 +197,15 @@ class PortalHubController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $canManageAll = $user->can('portal.sessions.manage');
+
+        if (! $user->hasRole(['super_admin', 'admin']) && ! $user->can('portal.sessions.manage')) {
+            abort(403, 'Akses manajemen perangkat dan sesi login hanya dikhususkan untuk Administrator.');
+        }
+
+        $canManageAll = true;
 
         $sessionsQuery = UserSession::query()->with(['user', 'device'])->latest('last_activity_at');
         $devicesQuery = UserDevice::query()->with(['user', 'approver'])->latest('updated_at');
-
-        if (! $canManageAll) {
-            $sessionsQuery->where('user_id', $user->id);
-            $devicesQuery->where('user_id', $user->id);
-        }
 
         $delegations = ApprovalDelegation::query()
             ->with(['delegator', 'delegate'])
