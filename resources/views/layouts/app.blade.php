@@ -707,6 +707,14 @@
                                         <span>Halaman Profile</span>
                                     </a>
 
+                                    <a href="{{ route('gomsn.network.index') }}" 
+                                       class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                        </svg>
+                                        <span>Jaringan OLT, PON &amp; ODP</span>
+                                    </a>
+
                                     @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
                                     <a href="{{ route('portal.sessions') }}" 
                                        class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors">
@@ -896,6 +904,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                     </svg>
                                     <span>Halaman Profile</span>
+                                </a>
+
+                                <a href="{{ route('gomsn.network.index') }}" 
+                                   class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                                    <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                    <span>Jaringan OLT, PON &amp; ODP</span>
                                 </a>
 
                                 @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
@@ -1454,7 +1470,7 @@
                 </div>
 
                 <!-- KATEGORI 3: PEKERJAAN & LAPANGAN -->
-                <div x-show="!sheetSearch || 'tiket noc gangguan tugas lapangan kpi laporan teknisi perangkat sesi'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
+                <div x-show="!sheetSearch || 'tiket noc gangguan tugas lapangan kpi laporan teknisi perangkat sesi olt pon odp jaringan fiber pelanggan'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-rose-500 to-pink-500"></span>
@@ -1463,6 +1479,16 @@
                         <span class="text-[10px] text-slate-400 font-medium">Operasional</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2.5">
+                        <a href="{{ route('gomsn.network.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">OLT, PON &amp; ODP</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Jaringan &amp; Pelanggan</span>
+                            </div>
+                        </a>
+
                         <a href="{{ route('tickets.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-rose-400 hover:bg-rose-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>

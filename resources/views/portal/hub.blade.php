@@ -559,7 +559,7 @@
             <span class="text-xs text-slate-400 font-medium">Akses langsung fitur operasional harian</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             <!-- Card 1: Presensi Biometrik -->
             <a href="{{ route('attendance.index') }}" class="group bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs hover:shadow-md hover:border-teal-500 transition-all flex flex-col justify-between">
                 <div>
@@ -626,7 +626,29 @@
                 </div>
             </a>
 
-            <!-- Card 4: Leaderboard Disiplin -->
+            <!-- Card 4: Jaringan OLT, PON & ODP -->
+            <a href="{{ route('gomsn.network.index') }}" class="group bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs hover:shadow-md hover:border-teal-500 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
+                            INFRASTRUKTUR NOC
+                        </span>
+                        <span class="text-emerald-600 font-bold text-xs">Aktif</span>
+                    </div>
+                    <h3 class="font-heading font-bold text-sm text-slate-900 mt-2 group-hover:text-teal-700 transition-colors">
+                        OLT, PON &amp; ODP
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Peta topologi fiber, distribusi port splitter ODP &amp; nomor internet pelanggan.
+                    </p>
+                </div>
+                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs text-teal-700 font-semibold">
+                    <span>Buka Jaringan</span>
+                    <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                </div>
+            </a>
+
+            <!-- Card 5: Leaderboard Disiplin -->
             <a href="{{ route('attendance.leaderboard') }}" class="group bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs hover:shadow-md hover:border-emerald-500 transition-all flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-2">
