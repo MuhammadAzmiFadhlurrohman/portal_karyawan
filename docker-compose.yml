@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gomsn2-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - gomsn2-network
+
+  web:
+    image: nginx:alpine
+    container_name: gomsn2-web
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - gomsn2-network
+
+networks:
+  gomsn2-network:
+    driver: bridge
