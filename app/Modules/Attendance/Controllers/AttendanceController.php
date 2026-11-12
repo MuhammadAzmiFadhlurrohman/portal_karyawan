@@ -5,11 +5,15 @@ namespace App\Modules\Attendance\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
+use App\Models\Leave;
 use App\Models\MonthlySchedule;
+use App\Models\NationalHoliday;
 use App\Models\OfficeLocation;
 use App\Models\User;
 use App\Modules\Attendance\Services\AttendanceService;
 use App\Modules\Attendance\Services\FaceRecognitionClient;
+use App\Services\SystemSettingService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -111,6 +115,7 @@ class AttendanceController extends Controller
             ->keyBy(fn ($c) => $c->date->toDateString());
 
         $monthAll = Attendance::query()
+            ->with(['shift', 'officeLocation'])
             ->where('user_id', $targetUser->id)
             ->whereYear('date', $year)
             ->whereMonth('date', $month)
@@ -122,6 +127,137 @@ class AttendanceController extends Controller
         $totalMenitTerlambat = $monthAll->sum('late_minutes');
         $totalMenitKerja = $monthAll->sum('work_duration_minutes');
         $totalJamKerja = round($totalMenitKerja / 60, 1);
+
+        // Build complete daily records (01 .. daysInMonth) for mobile card accordion & table
+        $daysInMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->daysInMonth;
+        $today = $now->copy()->startOfDay();
+        $startOfMonthStr = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->toDateString();
+        $endOfMonthStr = Carbon::createFromDate($year, $month, $daysInMonth, 'Asia/Jakarta')->toDateString();
+
+        $attendancesByDay = $monthAll->keyBy(fn (Attendance $a): int => Carbon::parse($a->date)->day);
+
+        $schedulesByDay = MonthlySchedule::query()
+            ->with('shift')
+            ->where('user_id', $targetUser->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(fn (MonthlySchedule $s): int => $s->date->day);
+
+        $holidaysByDay = NationalHoliday::query()
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(fn (NationalHoliday $h): int => $h->date->day);
+
+        $approvedLeaves = Leave::query()
+            ->where('user_id', $targetUser->id)
+            ->where('status', 'approved')
+            ->whereDate('start_date', '<=', $endOfMonthStr)
+            ->whereDate('end_date', '>=', $startOfMonthStr)
+            ->get();
+
+        $defaultAlpaFee = SystemSettingService::getFloat('attendance.default_alpa_fee', 10000.0);
+        $lateFeePerMinute = SystemSettingService::getFloat('attendance.late_fee_per_minute', 250.0);
+        $dailyMaxLateFee = SystemSettingService::getFloat('attendance.daily_max_late_fee', 50000.0);
+        $userAlpaRate = ($targetUser->potongan_alpa !== null && (float) $targetUser->potongan_alpa > 0)
+            ? (float) $targetUser->potongan_alpa
+            : 10000.0;
+
+        $dayNamesShort = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+        $alpaCounter = 0;
+        $dailyRecords = [];
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dateObj = Carbon::createFromDate($year, $month, $day, 'Asia/Jakarta')->startOfDay();
+            $dateStr = $dateObj->toDateString();
+            $isFuture = $dateObj->gt($today);
+            $att = $attendancesByDay->get($day);
+            $sched = $schedulesByDay->get($day);
+            $holiday = $holidaysByDay->get($day);
+            $leave = $approvedLeaves->first(fn (Leave $l) => $dateObj->betweenIncluded($l->start_date->copy()->startOfDay(), $l->end_date->copy()->startOfDay()));
+            $corr = $corrections->get($dateStr);
+
+            $shiftObj = $att?->shift ?? $sched?->shift;
+            $isScheduledHoliday = ($sched && $sched->shift && ($sched->shift->code === 'L' || str_contains(strtolower($sched->shift->name), 'libur')));
+            $isCalendarHoliday = ($holiday !== null || (! $sched && $dateObj->isWeekend()));
+
+            $status = 'holiday';
+            $lateMinutes = (int) ($att?->late_minutes ?? 0);
+
+            if ($att) {
+                if ($att->status === 'absent') {
+                    $status = 'absent';
+                } elseif (in_array($att->status, ['leave', 'cuti', 'izin', 'sakit'], true)) {
+                    $status = 'leave';
+                } elseif ($att->status === 'late' || $lateMinutes > 0) {
+                    $status = 'late';
+                } else {
+                    $status = 'present';
+                }
+            } elseif ($leave) {
+                $status = 'leave';
+            } elseif ($isScheduledHoliday || $isCalendarHoliday) {
+                $status = 'holiday';
+            } elseif (! $isFuture) {
+                $status = 'absent';
+            } else {
+                $status = 'upcoming';
+            }
+
+            $alpaIndex = null;
+            $deductionAmount = 0.0;
+            if ($status === 'absent') {
+                $alpaCounter++;
+                $alpaIndex = $alpaCounter;
+                $deductionAmount = $userAlpaRate;
+            } elseif ($status === 'late' && $lateMinutes > 0 && $att?->attendance_type !== 'remote') {
+                $deductionAmount = min($dailyMaxLateFee, round($lateMinutes * $lateFeePerMinute, 0));
+            }
+
+            $clockInShort = $att?->clock_in_at ? Carbon::parse($att->clock_in_at)->timezone('Asia/Jakarta')->format('H:i') : null;
+            $clockOutShort = $att?->clock_out_at ? Carbon::parse($att->clock_out_at)->timezone('Asia/Jakarta')->format('H:i') : null;
+            $clockInFull = $att?->clock_in_at ? Carbon::parse($att->clock_in_at)->timezone('Asia/Jakarta')->format('H:i:s') : null;
+            $clockOutFull = $att?->clock_out_at ? Carbon::parse($att->clock_out_at)->timezone('Asia/Jakarta')->format('H:i:s') : null;
+
+            $durationText = null;
+            if ($att && $att->work_duration_minutes) {
+                $hrs = (int) floor($att->work_duration_minutes / 60);
+                $mns = (int) ($att->work_duration_minutes % 60);
+                $durationText = "{$hrs}j {$mns}m";
+            }
+
+            $shiftStart = $shiftObj?->start_time ? substr((string) $shiftObj->start_time, 0, 5) : '08:15';
+            $shiftEnd = $shiftObj?->end_time ? substr((string) $shiftObj->end_time, 0, 5) : '17:00';
+            $shiftLabel = $shiftObj ? "{$shiftObj->name} ({$shiftStart} - {$shiftEnd})" : "Shift Kerja ({$shiftStart} - {$shiftEnd})";
+
+            $dailyRecords[] = [
+                'day' => $day,
+                'day_num' => sprintf('%02d', $day),
+                'day_short' => $dayNamesShort[$dateObj->dayOfWeek],
+                'date' => $dateStr,
+                'date_formatted' => $dateObj->translatedFormat('l, d F Y'),
+                'is_today' => $dateObj->isSameDay($today),
+                'is_future' => $isFuture,
+                'status' => $status,
+                'clock_in' => $clockInShort,
+                'clock_out' => $clockOutShort,
+                'clock_in_full' => $clockInFull,
+                'clock_out_full' => $clockOutFull,
+                'duration_text' => $durationText,
+                'late_minutes' => $lateMinutes,
+                'alpa_index' => $alpaIndex,
+                'deduction_amount' => $deductionAmount,
+                'notes' => $att?->notes ?? ($leave ? "Cuti / Izin ({$leave->leave_type})" : ($holiday?->name ?? null)),
+                'shift_name' => $shiftObj?->name ?? ($status === 'holiday' ? 'Libur' : 'Shift Pagi'),
+                'shift_hours' => $status === 'holiday' ? '-' : "{$shiftStart} - {$shiftEnd}",
+                'shift_label' => $shiftLabel,
+                'office_name' => $att?->officeLocation?->name ?? 'Kantor Pusat',
+                'default_clock_in' => $clockInShort ?? $shiftStart,
+                'default_clock_out' => $clockOutShort ?? $shiftEnd,
+                'correction' => $corr,
+            ];
+        }
 
         $allEmployees = collect();
         if ($canViewOthers) {
@@ -140,6 +276,7 @@ class AttendanceController extends Controller
             'month' => $month,
             'statusFilter' => $statusFilter,
             'attendances' => $attendances,
+            'dailyRecords' => $dailyRecords,
             'corrections' => $corrections,
             'stats' => [
                 'total_hadir' => $totalHadir,
