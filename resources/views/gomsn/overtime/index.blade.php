@@ -311,11 +311,12 @@
                         </div>
                     </div>
 
-                    <!-- Footer: Tombol Outline Lihat Detail (Persis Gambar 1) -->
+                    <!-- Footer: Tombol Berwarna Lihat Detail -->
                     <div class="pt-2">
                         <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $stat['user']->id]) }}" 
-                           class="w-full py-2 px-3 rounded-xl border border-slate-200/90 text-slate-700 hover:text-teal-800 hover:border-teal-300 hover:bg-teal-50/50 text-xs font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer group-hover:border-teal-400 group-hover:text-teal-700 shadow-2xs">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                           style="background: linear-gradient(135deg, #093c40 0%, #155E63 55%, #0d9488 100%) !important; color: #ffffff !important;"
+                           class="w-full py-2.5 px-3 rounded-xl text-white hover:opacity-95 active:scale-[0.99] text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
