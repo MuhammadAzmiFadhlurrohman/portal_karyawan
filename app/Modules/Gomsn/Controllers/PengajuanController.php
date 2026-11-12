@@ -171,7 +171,7 @@ class PengajuanController extends Controller
             'approved' => (clone $query)->whereIn('status', ['dicairkan', 'menunggu_bukti', 'selesai'])->count(),
             'rejected' => (clone $query)->where('status', 'ditolak')->count(),
             'pending' => (clone $query)->whereIn('status', ['menunggu_finance', 'menunggu_atasan', 'menunggu_executive'])->count(),
-            'total_dana' => (clone $query)->whereIn('status', ['dicairkan', 'menunggu_bukti', 'selesai'])->sum('total_nominal'),
+            'total_dana' => (clone $query)->whereIn('status', ['dicairkan', 'menunggu_bukti', 'selesai'])->sum('nominal_total'),
         ];
 
         $divisions = User::whereNotNull('division')
