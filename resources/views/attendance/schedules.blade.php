@@ -152,15 +152,20 @@
 
                 @if ($canManageSchedule)
                     <!-- Admin Navigation Switch -->
-                    <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
-                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#155E63] text-white shadow-xs">
+                    <div class="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
+                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#155E63] text-white shadow-xs whitespace-nowrap">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             <span>Jadwal Saya</span>
                         </span>
+                        <a href="{{ route('attendance.schedules', ['view' => 'user']) }}" 
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>📅 Kalender & Custom Jadwal</span>
+                        </a>
                         <a href="{{ route('attendance.schedules', ['view' => 'list']) }}" 
-                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors">
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors whitespace-nowrap">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            <span>Kelola Jadwal Karyawan (Admin)</span>
+                            <span>Kelola Periode Bulan</span>
                         </a>
                     </div>
                 @endif
@@ -706,15 +711,20 @@
             <div class="space-y-5">
                 @if ($canManageSchedule)
                     <!-- Admin Navigation Switch -->
-                    <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
+                    <div class="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
                         <a href="{{ route('attendance.schedules', ['view' => 'my']) }}" 
-                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors">
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors whitespace-nowrap">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             <span>Jadwal Saya</span>
                         </a>
-                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#155E63] text-white shadow-xs">
+                        <a href="{{ route('attendance.schedules', ['view' => 'user']) }}" 
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>📅 Kalender & Custom Jadwal</span>
+                        </a>
+                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#155E63] text-white shadow-xs whitespace-nowrap">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                            <span>Kelola Jadwal Karyawan (Admin)</span>
+                            <span>Kelola Periode Bulan</span>
                         </span>
                     </div>
                 @endif
@@ -1450,70 +1460,274 @@
         {{-- VIEW MODE 4: KALENDER JADWAL KARYAWAN DETAIL (SCREEN 5)                   --}}
         {{-- ========================================================================= --}}
         @if ($viewMode === 'user')
-            <div class="space-y-6">
-                <!-- Top Header -->
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month]) }}"
-                           class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 flex items-center justify-center shrink-0 shadow-xs">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                            </svg>
+            <div class="space-y-6" x-data="{
+                saveShift(day, dateStr, shiftId) {
+                    fetch('{{ route('attendance.schedules.cell') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: {{ $targetUser->id }},
+                            date: dateStr,
+                            shift_id: shiftId
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            const dayFormatted = (day < 10 ? '0' + day : day);
+                            triggerToast('Jadwal tgl ' + dayFormatted + ' diubah ke ' + data.shift.name + ' (' + data.shift.code + ')');
+                            
+                            // Sync desktop & mobile selects
+                            const dSelect = document.getElementById('desktop-select-day-' + day);
+                            if (dSelect && dSelect.value != shiftId) dSelect.value = shiftId;
+                            const mSelect = document.getElementById('mobile-select-day-' + day);
+                            if (mSelect && mSelect.value != shiftId) mSelect.value = shiftId;
+
+                            // Update hours display
+                            const hoursText = data.shift.is_day_off ? '-' : (data.shift.start_time.substring(0, 5) + ' – ' + data.shift.end_time.substring(0, 5));
+                            const mobileHoursText = data.shift.is_day_off ? '— Libur' : (data.shift.start_time.substring(0, 5) + ' – ' + data.shift.end_time.substring(0, 5));
+                            
+                            const hoursEl = document.getElementById('hours-day-' + day);
+                            if (hoursEl) hoursEl.textContent = hoursText;
+                            const mHoursEl = document.getElementById('mobile-hours-day-' + day);
+                            if (mHoursEl) mHoursEl.textContent = mobileHoursText;
+
+                            // Update mobile badge
+                            const mBadge = document.getElementById('mobile-badge-day-' + day);
+                            if (mBadge) mBadge.textContent = data.shift.code;
+                        } else {
+                            alert(data.message || 'Gagal menyimpan perubahan shift');
+                        }
+                    })
+                    .catch(err => {
+                        alert('Terjadi kesalahan saat menyimpan perubahan shift');
+                    });
+                }
+            }">
+                @if ($canManageSchedule)
+                    <!-- Admin Navigation Switch -->
+                    <div class="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
+                        <a href="{{ route('attendance.schedules', ['view' => 'my']) }}" 
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <span>Jadwal Saya</span>
                         </a>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h1 class="font-heading text-lg font-bold text-slate-900 tracking-tight">
-                                    {{ $targetUser->name }} ({{ $targetUser->employee_code ?: 'KR'.$targetUser->id }})
-                                </h1>
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 text-[#155E63] border border-teal-200">
-                                    {{ $monthName }} {{ $year }}
-                                </span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-0.5">Divisi: {{ $targetUser->division ?: 'Operasional' }}</p>
+                        <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#155E63] text-white shadow-xs whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>📅 Kalender & Custom Jadwal</span>
+                        </span>
+                        <a href="{{ route('attendance.schedules', ['view' => 'list']) }}" 
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#155E63] hover:bg-teal-50 transition-colors whitespace-nowrap">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            <span>Kelola Periode Bulan</span>
+                        </a>
+                    </div>
+                @endif
+
+                <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal) -->
+                <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_6px_24px_rgba(2,43,58,0.3)] p-4 sm:py-5 sm:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 select-none"
+                     style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
+                    
+                    <!-- Gloss Highlights (Top & Bottom Rims) -->
+                    <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
+                    <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
+
+                    <!-- Left: Glowing Icon + User Info -->
+                    <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+                        <div class="w-11 h-11 rounded-2xl bg-white/12 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                            <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h1 class="font-heading text-base sm:text-lg font-extrabold text-white tracking-tight leading-snug flex items-center gap-2">
+                                <span>Custom Jadwal Kerja</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-200 border border-teal-300/30">Admin Mode</span>
+                            </h1>
+                            <p class="text-[11px] sm:text-xs text-teal-100/85 mt-0.5 leading-snug truncate">
+                                {{ strtoupper($targetUser->name) }} &bull; {{ $targetUser->employee_code ?: 'KR'.$targetUser->id }} &bull; Divisi: {{ $targetUser->division ?: 'Operasional' }}
+                            </p>
                         </div>
                     </div>
 
-                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month]) }}"
-                       class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold self-start sm:self-auto">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span>Kembali ke Daftar</span>
-                    </a>
+                    <!-- Right: Quick Selector Form (Employee, Month, Year) -->
+                    <form method="GET" action="{{ route('attendance.schedules') }}" class="relative z-10 w-full md:w-auto flex flex-wrap items-center gap-2">
+                        <input type="hidden" name="view" value="user">
+                        
+                        <!-- Employee Selector -->
+                        @if (isset($activeUsers) && $activeUsers->isNotEmpty())
+                            <div class="relative flex-1 sm:flex-initial min-w-[160px]">
+                                <select name="user_id" onchange="this.form.submit()" class="w-full appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
+                                    @foreach ($activeUsers as $u)
+                                        <option value="{{ $u->id }}" class="bg-slate-800 text-white" {{ $targetUser->id == $u->id ? 'selected' : '' }}>
+                                            {{ $u->name }} ({{ $u->employee_code ?: 'KR'.$u->id }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <svg class="w-3 h-3 text-cyan-300 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        @endif
+
+                        <!-- Month Selector -->
+                        <div class="relative w-32 shrink-0">
+                            <select name="month" onchange="this.form.submit()" class="w-full appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
+                                @foreach ($monthNames as $num => $name)
+                                    <option value="{{ $num }}" class="bg-slate-800 text-white" {{ $month == $num ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                            </select>
+                            <svg class="w-3 h-3 text-cyan-300 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+
+                        <!-- Year Selector -->
+                        <div class="relative w-24 shrink-0">
+                            <select name="year" onchange="this.form.submit()" class="w-full appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
+                                @for ($y = 2025; $y <= 2030; $y++)
+                                    <option value="{{ $y }}" class="bg-slate-800 text-white" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                @endfor
+                            </select>
+                            <svg class="w-3 h-3 text-cyan-300 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+
+                        <button type="submit" class="btn-primary !py-2 !px-3.5 text-xs font-bold shadow-md shadow-teal-900/30 inline-flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <span>Tampilkan</span>
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Shift Legend Pills Bar -->
-                <div class="rounded-2xl bg-white border border-slate-200/80 p-3.5 shadow-xs flex flex-wrap items-center gap-3">
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Keterangan Shift:</span>
+                <div class="rounded-2xl bg-white border border-slate-200/80 p-3.5 shadow-xs flex flex-wrap items-center gap-2.5">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Shift Tersedia:</span>
                     @foreach ($shifts as $s)
                         <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                            <span class="w-2.5 h-2.5 rounded-full" style="background-color: {{ $s->color ?: '#3B82F6' }}"></span>
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: {{ $s->color ?: '#3B82F6' }}"></span>
                             <span class="font-bold font-mono text-slate-800">{{ $s->code }}</span>
                             <span class="text-slate-500 font-medium">({{ $s->name }})</span>
                         </div>
                     @endforeach
                 </div>
 
-                <!-- Day by Day Table -->
-                <div class="rounded-3xl bg-white border border-slate-200/80 shadow-xs overflow-hidden">
+                @php
+                    $dayNamesIndoShort = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+                    $dayNamesIndoFull = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    $offShiftModel = $shifts->firstWhere('code', 'L') ?? $shifts->firstWhere('is_day_off', true);
+                    $pagiShiftModel = $shifts->firstWhere('code', 'P');
+                @endphp
+
+                <!-- 1. MOBILE VIEW: Daily Touch-Friendly Cards (sm:hidden) -->
+                <div class="sm:hidden space-y-3">
+                    @for ($d = 1; $d <= $daysInMonth; $d++)
+                        @php
+                            $currentDate = \Carbon\Carbon::createFromDate($year, $month, $d, 'Asia/Jakarta');
+                            $isWeekend = $currentDate->isWeekend();
+                            $holiday = $holidays->get($d);
+                            $isDayOffByDefault = $isWeekend || $holiday !== null;
+
+                            $schedule = $userSchedules->get($d);
+                            $assignedShift = $schedule?->shift;
+
+                            if (!$assignedShift) {
+                                $assignedShift = $isDayOffByDefault ? $offShiftModel : $pagiShiftModel;
+                            }
+
+                            $isRowRed = $isDayOffByDefault || ($assignedShift && $assignedShift->is_day_off);
+                            
+                            $keteranganText = 'Hari Kerja Reguler';
+                            if ($holiday) {
+                                $keteranganText = 'Libur Nasional: ' . $holiday->name;
+                            } elseif ($isWeekend) {
+                                $keteranganText = 'Libur Akhir Pekan';
+                            } elseif ($assignedShift && $assignedShift->is_piket) {
+                                $keteranganText = 'Piket Operasional';
+                            } elseif ($assignedShift && $assignedShift->is_day_off) {
+                                $keteranganText = 'Libur';
+                            }
+                        @endphp
+                        <div class="rounded-2xl border p-3.5 transition-all shadow-2xs {{ $isRowRed ? 'bg-rose-50/40 border-rose-200/80' : 'bg-white border-slate-200/80' }}"
+                             id="mobile-card-day-{{ $d }}">
+                            <!-- Top row: Date badge + Day Name + Keterangan Pill -->
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0 {{ $isRowRed ? 'bg-rose-100/90 text-rose-700 border border-rose-200' : 'bg-teal-50 text-[#155E63] border border-teal-200/70' }}">
+                                        <span class="font-extrabold text-sm leading-none">{{ sprintf('%02d', $d) }}</span>
+                                        <span class="text-[9px] font-bold uppercase tracking-wider mt-0.5 {{ $isRowRed ? 'text-rose-500' : 'text-teal-600' }}">{{ $dayNamesIndoShort[$currentDate->dayOfWeek] }}</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="text-xs font-bold {{ $isRowRed ? 'text-rose-700' : 'text-slate-800' }}">
+                                                {{ $dayNamesIndoFull[$currentDate->dayOfWeek] }}, {{ sprintf('%02d', $d) }} {{ substr($monthName, 0, 3) }}
+                                            </span>
+                                            @if ($isRowRed)
+                                                <span class="text-amber-500 text-xs">⭐</span>
+                                            @endif
+                                        </div>
+                                        <span class="text-[11px] font-medium {{ $isRowRed ? 'text-rose-600/90' : 'text-slate-500' }} block truncate" id="mobile-desc-day-{{ $d }}">
+                                            {{ $keteranganText }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Shift Short Badge -->
+                                <span class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 {{ $isRowRed ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-sky-100 text-sky-700 border border-sky-200' }}" id="mobile-badge-day-{{ $d }}">
+                                    {{ $assignedShift?->code ?? '-' }}
+                                </span>
+                            </div>
+
+                            <!-- Middle: Shift Select Dropdown (Touch-friendly) -->
+                            <div class="pt-2">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Shift Kerja:</label>
+                                <div class="relative">
+                                    <select id="mobile-select-day-{{ $d }}"
+                                            @change="saveShift({{ $d }}, '{{ $currentDate->toDateString() }}', $event.target.value)"
+                                            class="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2 pr-8 text-xs font-semibold text-slate-800 shadow-2xs focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] cursor-pointer">
+                                        @foreach ($shifts as $s)
+                                            <option value="{{ $s->id }}" {{ ($assignedShift && $assignedShift->id === $s->id) ? 'selected' : '' }}>
+                                                {{ $s->name }} ({{ $s->code }}) {{ $s->is_day_off ? '— Libur' : '• ' . substr((string)$s->start_time, 0, 5) . '–' . substr((string)$s->end_time, 0, 5) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </div>
+
+                            <!-- Bottom row: Working hours indicator -->
+                            <div class="flex items-center justify-between text-xs pt-1.5 border-t border-slate-100/80">
+                                <span class="text-slate-400 text-[11px] font-medium flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Jam Kerja:</span>
+                                </span>
+                                <span class="font-mono font-bold text-slate-700 text-xs" id="mobile-hours-day-{{ $d }}">
+                                    @if ($assignedShift && ! $assignedShift->is_day_off && $assignedShift->start_time && $assignedShift->end_time)
+                                        {{ substr((string)$assignedShift->start_time, 0, 5) }} – {{ substr((string)$assignedShift->end_time, 0, 5) }}
+                                    @else
+                                        — Libur
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+                    @endfor
+                </div>
+
+                <!-- 2. DESKTOP VIEW: Clean 5-Column Table (hidden sm:block) -->
+                <div class="hidden sm:block rounded-3xl bg-white border border-slate-200/80 shadow-xs overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-50/75 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                                 <tr>
-                                    <th class="py-3 px-4 w-32">Tanggal</th>
+                                    <th class="py-3 px-5 w-36">Tanggal</th>
                                     <th class="py-3 px-4 w-28">Hari</th>
-                                    <th class="py-3 px-4 min-w-[220px]">Shift</th>
+                                    <th class="py-3 px-4 min-w-[200px]">Shift</th>
                                     <th class="py-3 px-4 w-36">Jam Kerja</th>
-                                    <th class="py-3 px-4">Keterangan</th>
+                                    <th class="py-3 px-5">Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @php
-                                    $dayNamesIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                                    $offShiftModel = $shifts->firstWhere('code', 'L') ?? $shifts->firstWhere('is_day_off', true);
-                                    $pagiShiftModel = $shifts->firstWhere('code', 'P');
-                                @endphp
-
                                 @for ($d = 1; $d <= $daysInMonth; $d++)
                                     @php
                                         $currentDate = \Carbon\Carbon::createFromDate($year, $month, $d, 'Asia/Jakarta');
@@ -1524,17 +1738,16 @@
                                         $schedule = $userSchedules->get($d);
                                         $assignedShift = $schedule?->shift;
 
-                                        // Fallback default display if not yet saved in DB
                                         if (!$assignedShift) {
                                             $assignedShift = $isDayOffByDefault ? $offShiftModel : $pagiShiftModel;
                                         }
 
                                         $isRowRed = $isDayOffByDefault || ($assignedShift && $assignedShift->is_day_off);
                                     @endphp
-                                    <tr class="transition-colors {{ $isRowRed ? 'bg-rose-50/60 hover:bg-rose-50/90' : 'hover:bg-slate-50/70' }}"
-                                        id="row-day-{{ $d }}">
+                                    <tr class="transition-colors {{ $isRowRed ? 'bg-rose-50/40 hover:bg-rose-50/70' : 'hover:bg-slate-50/70' }}"
+                                        id="desktop-row-day-{{ $d }}">
                                         <!-- Tanggal -->
-                                        <td class="py-3 px-4 font-mono font-medium text-slate-700 whitespace-nowrap">
+                                        <td class="py-3 px-5 font-mono font-medium text-slate-700 whitespace-nowrap">
                                             <div class="flex items-center gap-1.5">
                                                 <span>{{ sprintf('%02d', $d) }} {{ substr($monthName, 0, 3) }} {{ $year }}</span>
                                                 @if ($isRowRed)
@@ -1545,48 +1758,22 @@
 
                                         <!-- Hari -->
                                         <td class="py-3 px-4 font-semibold {{ $isWeekend ? 'text-rose-600' : 'text-slate-800' }}">
-                                            {{ $dayNamesIndo[$currentDate->dayOfWeek] }}
+                                            {{ $dayNamesIndoFull[$currentDate->dayOfWeek] }}
                                         </td>
 
                                         <!-- Shift Dropdown (AJAX Auto Save) -->
                                         <td class="py-2.5 px-4">
-                                            <div class="flex items-center gap-2">
-                                                <select @change="
-                                                            const shiftId = $el.value;
-                                                            fetch('{{ route('attendance.schedules.cell') }}', {
-                                                                method: 'POST',
-                                                                headers: {
-                                                                    'Content-Type': 'application/json',
-                                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                                    'Accept': 'application/json'
-                                                                },
-                                                                body: JSON.stringify({
-                                                                    user_id: {{ $targetUser->id }},
-                                                                    date: '{{ $currentDate->toDateString() }}',
-                                                                    shift_id: shiftId
-                                                                })
-                                                            })
-                                                            .then(res => res.json())
-                                                            .then(data => {
-                                                                if (data.success) {
-                                                                    triggerToast('Jadwal ' + '{{ sprintf('%02d', $d) }} {{ substr($monthName, 0, 3) }}' + ' berhasil diubah menjadi ' + data.shift.code);
-                                                                    const hoursEl = document.getElementById('hours-day-{{ $d }}');
-                                                                    if (hoursEl) {
-                                                                        hoursEl.textContent = data.shift.is_day_off ? '-' : (data.shift.start_time + ' – ' + data.shift.end_time);
-                                                                    }
-                                                                }
-                                                            })
-                                                            .catch(err => {
-                                                                alert('Gagal menyimpan perubahan shift');
-                                                            });
-                                                        "
-                                                        class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 font-semibold focus:outline-hidden focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] shadow-2xs">
+                                            <div class="relative max-w-xs">
+                                                <select id="desktop-select-day-{{ $d }}"
+                                                        @change="saveShift({{ $d }}, '{{ $currentDate->toDateString() }}', $event.target.value)"
+                                                        class="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-1.5 pr-8 text-xs text-slate-800 font-semibold focus:outline-hidden focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] shadow-2xs cursor-pointer">
                                                     @foreach ($shifts as $s)
                                                         <option value="{{ $s->id }}" {{ ($assignedShift && $assignedShift->id === $s->id) ? 'selected' : '' }}>
                                                             {{ $s->name }} ({{ $s->code }})
                                                         </option>
                                                     @endforeach
                                                 </select>
+                                                <svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                                             </div>
                                         </td>
 
@@ -1600,7 +1787,7 @@
                                         </td>
 
                                         <!-- Keterangan -->
-                                        <td class="py-3 px-4 text-xs">
+                                        <td class="py-3 px-5 text-xs">
                                             @if ($holiday)
                                                 <span class="inline-flex items-center gap-1 font-semibold text-rose-700">
                                                     <span>Libur Nasional:</span>
@@ -1609,7 +1796,7 @@
                                             @elseif ($isWeekend)
                                                 <span class="text-rose-600 font-medium">Libur Akhir Pekan</span>
                                             @elseif ($assignedShift && $assignedShift->is_piket)
-                                                <span class="text-amber-700 font-semibold">Piket Operasional (Locked)</span>
+                                                <span class="text-amber-700 font-semibold">Piket Operasional</span>
                                             @elseif ($assignedShift && $assignedShift->is_day_off)
                                                 <span class="text-rose-600 font-medium">Libur</span>
                                             @else

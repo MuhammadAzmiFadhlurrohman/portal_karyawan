@@ -60,6 +60,11 @@ class ScheduleController extends Controller
         $actor = $request->user();
         $canManageSchedule = $this->canManageSchedule($actor);
 
+        // Jika role Admin membuka Jadwal Kerja tanpa parameter view, arahkan langsung ke Kalender & Custom Jadwal
+        if (! $view && $canManageSchedule) {
+            $view = 'user';
+        }
+
         // -------------------------------------------------------------------------
         // Screen Personal: Jadwal Kerja Karyawan & Tukar / Backup Shift
         // -------------------------------------------------------------------------
@@ -144,11 +149,14 @@ class ScheduleController extends Controller
         }
 
         // -------------------------------------------------------------------------
-        // Screen 5: Kalender Jadwal Detail Karyawan
+        // Screen 5: Kalender Jadwal Detail Karyawan (Custom Jadwal)
         // -------------------------------------------------------------------------
         if ($view === 'user') {
-            $userId = (int) $request->input('user_id');
-            $targetUser = User::query()->findOrFail($userId);
+            $activeUsers = User::query()->where('is_active', true)->orderBy('name')->get();
+            $userId = (int) $request->input('user_id', 0);
+            $targetUser = $userId > 0
+                ? (User::query()->find($userId) ?? $actor)
+                : ($activeUsers->firstWhere('id', $actor->id) ?? $activeUsers->first() ?? $actor);
 
             $daysInMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->daysInMonth;
 
@@ -172,16 +180,18 @@ class ScheduleController extends Controller
             return view('attendance.schedules', [
                 'viewMode' => 'user',
                 'targetUser' => $targetUser,
+                'activeUsers' => $activeUsers,
                 'year' => $year,
                 'month' => $month,
                 'monthName' => $monthNames[$month] ?? "Bulan {$month}",
+                'monthNames' => $monthNames,
                 'daysInMonth' => $daysInMonth,
                 'userSchedules' => $userSchedules,
                 'holidays' => $holidays,
                 'shifts' => $shifts,
                 'offices' => $offices,
                 'conflicts' => $userConflicts,
-                'canManageSchedule' => $this->canManageSchedule($request->user()),
+                'canManageSchedule' => $canManageSchedule,
             ]);
         }
 
