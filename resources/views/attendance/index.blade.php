@@ -162,7 +162,7 @@
             <!-- Pill Utama: [Map Pin Biru] "0m dari Kantor" [Centang Hijau] [>] -->
             <button type="button"
                     @click="showLocationDetail = !showLocationDetail"
-                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-slate-200/80 shadow-[0_4px_16px_rgba(15,23,42,0.10)] hover:shadow-[0_6px_20px_rgba(15,23,42,0.14)] active:scale-[0.98] transition-all cursor-pointer">
+                    class="h-10 sm:h-11 md:h-12 inline-flex items-center gap-2 px-3.5 sm:px-4 rounded-full bg-white border border-slate-200/80 shadow-[0_4px_16px_rgba(15,23,42,0.10)] hover:shadow-[0_6px_20px_rgba(15,23,42,0.14)] active:scale-[0.98] transition-all cursor-pointer">
                 
                 <!-- Blue Map + Location Pin Icon (Persis Gambar Referensi) -->
                 <svg class="w-4 h-4 text-[#2563EB] shrink-0" :class="gpsLoading ? 'animate-pulse' : ''" viewBox="0 0 24 24" fill="currentColor">

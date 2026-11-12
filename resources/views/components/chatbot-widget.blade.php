@@ -1,17 +1,17 @@
 <div id="chatbot-widget-container" 
-     class="fixed bottom-[88px] right-4 md:bottom-6 md:right-6 z-40 font-sans transition-all duration-300"
+     class="fixed bottom-[68px] right-3.5 sm:right-6 md:bottom-6 md:right-6 z-40 font-sans transition-all duration-300"
      :class="{ 'opacity-0 pointer-events-none scale-75': typeof bottomSheetOpen !== 'undefined' && bottomSheetOpen }"
      x-data="chatbotWidget()">
     <!-- Floating Trigger Button -->
     <button @click="toggleChat()" 
             type="button"
-            class="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-full bg-gradient-to-tr from-[#155E63] to-[#18C4C4] text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-200 cursor-pointer"
+            class="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-full bg-gradient-to-tr from-[#155E63] to-[#18C4C4] text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-200 cursor-pointer"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
-        <svg x-show="!isOpen" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg x-show="!isOpen" class="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
         </svg>
-        <svg x-show="isOpen" class="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;">
+        <svg x-show="isOpen" class="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
         </svg>
     </button>
@@ -24,7 +24,7 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-         class="fixed inset-x-3 bottom-[88px] sm:inset-x-auto sm:right-4 md:right-6 md:bottom-20 sm:w-[400px] max-h-[580px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden mb-2 z-50"
+         class="fixed inset-x-3 bottom-[114px] sm:inset-x-auto sm:right-6 md:right-6 md:bottom-20 sm:w-[400px] max-h-[580px] bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden mb-2 z-50"
          style="display: none;">
         
         <!-- Header -->
