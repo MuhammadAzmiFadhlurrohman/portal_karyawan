@@ -106,74 +106,98 @@
             </div>
         </div>
 
-        <!-- CARD 2: Jadwal & Deteksi Lokasi Otomatis (2-Column Grid di Desktop, Stacked di Mobile) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <!-- Jadwal Hari Ini -->
-            <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between">
-                <div class="flex items-center gap-3.5 sm:gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#155E63] shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase block">JADWAL HARI INI</span>
-                        <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-tight mt-0.5">{{ $shiftName }}</h3>
-                        <span class="text-xs text-slate-500 font-mono block mt-0.5">{{ $shiftStart }} - {{ $shiftEnd }}</span>
-                    </div>
+        <!-- CARD 2: Jadwal Hari Ini -->
+        <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between">
+            <div class="flex items-center gap-3.5 sm:gap-4">
+                <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#155E63] shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
                 </div>
                 <div>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isWorkday ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                        <span class="w-2 h-2 rounded-full {{ $isWorkday ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
-                        <span>{{ $isWorkday ? 'Hari Kerja' : 'Hari Libur' }}</span>
-                    </span>
+                    <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase block">JADWAL HARI INI</span>
+                    <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-tight mt-0.5">{{ $shiftName }}</h3>
+                    <span class="text-xs text-slate-500 font-mono block mt-0.5">{{ $shiftStart }} - {{ $shiftEnd }}</span>
                 </div>
             </div>
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isWorkday ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                    <span class="w-2 h-2 rounded-full {{ $isWorkday ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                    <span>{{ $isWorkday ? 'Hari Kerja' : 'Hari Libur' }}</span>
+                </span>
+            </div>
+        </div>
 
-            <!-- Deteksi Lokasi & Geotagging Otomatis (Langsung di Halaman Absen) -->
-            <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between gap-3">
-                <div class="flex items-start sm:items-center gap-3.5 min-w-0">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-colors"
-                         :class="gpsLoading ? 'bg-cyan-50 border-cyan-200 text-cyan-600' : (gpsError ? 'bg-rose-50 border-rose-200 text-rose-600' : (isWithinOfficeRadius ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-amber-50 border-amber-200 text-amber-600'))">
-                        <svg x-show="gpsLoading" class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                        <svg x-show="!gpsLoading" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
+        <!-- FLOATING COMPACT LOCATION PILL (Di Atas Kiri Navigasi Bar Mobile sesuai Referensi) -->
+        <div class="fixed bottom-[68px] left-3.5 sm:left-6 md:bottom-6 md:left-[280px] z-30 select-none"
+             @click.outside="showLocationDetail = false">
+            
+            <!-- Mini Popover Detail Lokasi saat Pill Diklik -->
+            <div x-show="showLocationDetail"
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                 class="mb-2 w-64 sm:w-72 rounded-2xl bg-white border border-slate-200/90 shadow-[0_10px_30px_rgba(15,23,42,0.14)] p-3.5 text-left">
+                <div class="flex items-start justify-between gap-2">
                     <div class="min-w-0">
-                        <div class="flex flex-wrap items-center gap-1.5">
-                            <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase">LOKASI OTOMATIS</span>
-                            <span class="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-bold border"
-                                  :class="gpsLoading ? 'bg-cyan-50 text-cyan-700 border-cyan-200' : (gpsError ? 'bg-rose-50 text-rose-700 border-rose-200' : (isWithinOfficeRadius ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'))"
-                                  x-text="gpsLoading ? 'Mendeteksi...' : (gpsError ? 'GPS Belum Aktif' : (isWithinOfficeRadius ? 'Dalam Radius Kantor' : 'Di Luar Radius'))">
-                            </span>
-                        </div>
-                        <h3 class="text-xs sm:text-sm font-bold text-slate-800 leading-snug mt-0.5 truncate" x-text="gpsStatus">
-                            Mendeteksi lokasi terdekat...
-                        </h3>
-                        <div class="flex flex-wrap items-center gap-2 mt-0.5 text-[11px] text-slate-500 font-mono">
-                            <span x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
-                            <template x-if="detectedDistanceM !== null && !gpsError">
-                                <span class="font-sans font-semibold text-teal-700" x-text="'· Jarak ±' + detectedDistanceM + 'm'"></span>
-                            </template>
-                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 block">Deteksi Lokasi Otomatis</span>
+                        <p class="text-xs font-bold text-slate-800 mt-0.5 leading-snug" x-text="gpsStatus"></p>
+                        <p class="text-[11px] font-mono text-slate-500 mt-1" x-text="Number(gpsLat).toFixed(6) + ', ' + Number(gpsLng).toFixed(6)"></p>
                     </div>
+                    <button type="button"
+                            @click.stop="detectGPS()"
+                            class="p-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#155E63] border border-teal-200/70 transition cursor-pointer shrink-0"
+                            title="Perbarui GPS">
+                        <svg class="w-4 h-4" :class="gpsLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </button>
                 </div>
-
-                <button type="button" 
-                        @click="detectGPS()" 
-                        title="Perbarui Deteksi GPS"
-                        class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-200 text-[#155E63] text-xs font-bold inline-flex items-center gap-1.5 shrink-0 transition cursor-pointer shadow-2xs">
-                    <svg class="w-4 h-4" :class="gpsLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                    <span class="hidden sm:inline">Perbarui</span>
-                </button>
             </div>
+
+            <!-- Pill Utama: [Map Pin Biru] "0m dari Kantor" [Centang Hijau] [>] -->
+            <button type="button"
+                    @click="showLocationDetail = !showLocationDetail"
+                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-slate-200/80 shadow-[0_4px_16px_rgba(15,23,42,0.10)] hover:shadow-[0_6px_20px_rgba(15,23,42,0.14)] active:scale-[0.98] transition-all cursor-pointer">
+                
+                <!-- Blue Map + Location Pin Icon (Persis Gambar Referensi) -->
+                <svg class="w-4 h-4 text-[#2563EB] shrink-0" :class="gpsLoading ? 'animate-pulse' : ''" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 11 6 11s6-6.5 6-11c0-3.314-2.686-6-6-6zm0 8.2a2.2 2.2 0 110-4.4 2.2 2.2 0 010 4.4z"/>
+                    <path d="M3.5 9.5L8 7.8v11.7l-4.5 1.7a.7.7 0 01-.95-.65V10.15a.7.7 0 01.45-.65zm17 0l-4.5-1.7v11.7l4.5 1.7a.7.7 0 00.95-.65V10.15a.7.7 0 00-.45-.65z" opacity="0.85"/>
+                </svg>
+
+                <!-- Teks Jarak dari Kantor -->
+                <span class="text-xs font-medium tracking-tight whitespace-nowrap"
+                      :class="gpsLoading ? 'text-slate-600' : (isWithinOfficeRadius ? 'text-[#0f8a5f]' : 'text-amber-600')"
+                      x-text="gpsLoading ? 'Mendeteksi...' : ((detectedDistanceM !== null ? detectedDistanceM : 0) + 'm dari Kantor')">
+                    0m dari Kantor
+                </span>
+
+                <!-- Kotak Centang Hijau (Dalam Radius) / Indikator Status -->
+                <template x-if="!gpsLoading && isWithinOfficeRadius">
+                    <span class="w-4 h-4 rounded-[3px] bg-[#22c55e] border border-slate-800 flex items-center justify-center shrink-0 shadow-2xs">
+                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </span>
+                </template>
+                <template x-if="!gpsLoading && !isWithinOfficeRadius">
+                    <span class="w-4 h-4 rounded-[3px] bg-amber-500 border border-slate-800 flex items-center justify-center shrink-0 text-[10px] font-extrabold text-white leading-none">
+                        !
+                    </span>
+                </template>
+
+                <!-- Chevron Kanan (>) -->
+                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200"
+                     :class="showLocationDetail ? '-rotate-90' : ''"
+                     fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
         </div>
 
         <!-- CARD 3: Status Absen Hari Ini (Themed) -->
@@ -596,6 +620,7 @@
             return {
                 showEnrollModal: false,
                 showClockInModal: false,
+                showLocationDetail: false,
                 cameraActive: false,
                 photoPreview: null,
                 selectedOffice: '{{ $defaultOffice?->id ?? 1 }}',
@@ -614,7 +639,7 @@
                 gpsLoading: true,
                 gpsError: false,
                 isWithinOfficeRadius: true,
-                detectedDistanceM: null,
+                detectedDistanceM: 0,
                 gpsStatus: 'Mendeteksi titik koordinat GPS perangkat...',
 
                 // Face poses (Captured from real camera)
