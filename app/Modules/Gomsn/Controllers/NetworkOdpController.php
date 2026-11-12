@@ -16,6 +16,27 @@ use Illuminate\View\View;
 class NetworkOdpController extends Controller
 {
     /**
+     * Check if user is authorized to perform CUD (Create, Update, Delete)
+     */
+    protected function canManageNetwork(): bool
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasRole(['admin', 'super_admin', 'atasan', 'atasan_teknik', 'manager_teknisi'])
+            || $user->can('gomsn.network.manage');
+    }
+
+    protected function authorizeNetworkManager(): void
+    {
+        if (! $this->canManageNetwork()) {
+            abort(403, 'Akses Ditolak: Hanya Admin dan Atasan Teknisi yang memiliki wewenang menambah, mengubah, atau menghapus data jaringan OLT, PON & ODP.');
+        }
+    }
+
+    /**
      * Level 1: Daftar PON berdasarkan OLT yang dipilih.
      */
     public function index(Request $request): View
@@ -59,7 +80,16 @@ class NetworkOdpController extends Controller
             $pon->calculated_usage = $pon->odps_count;
         }
 
-        return view('gomsn.network.pons.index', compact('olts', 'selectedOlt', 'pons'));
+        // Global KPI Stats for Page Header
+        $totalOlts = $olts->count();
+        $totalPons = Pon::count();
+        $totalOdps = Odp::count();
+        $totalCustomers = OdpCustomer::where('status', 'aktif')->count();
+        $canManage = $this->canManageNetwork();
+
+        return view('gomsn.network.pons.index', compact(
+            'olts', 'selectedOlt', 'pons', 'totalOlts', 'totalPons', 'totalOdps', 'totalCustomers', 'canManage'
+        ));
     }
 
     /**
@@ -67,6 +97,8 @@ class NetworkOdpController extends Controller
      */
     public function storePon(Request $request, Olt $olt): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $validated = $request->validate([
             'nama_pon' => ['required', 'string', 'max:150'],
             'port_max' => ['required', 'integer', 'in:2,4,8,16,24,32'],
@@ -87,6 +119,8 @@ class NetworkOdpController extends Controller
      */
     public function updatePon(Request $request, Pon $pon): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $validated = $request->validate([
             'nama_pon' => ['required', 'string', 'max:150'],
             'port_max' => ['required', 'integer', 'in:2,4,8,16,24,32'],
@@ -105,6 +139,8 @@ class NetworkOdpController extends Controller
      */
     public function destroyPon(Pon $pon): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $oltId = $pon->olt_id;
         $namaPon = $pon->nama_pon;
         $pon->delete();
@@ -127,8 +163,9 @@ class NetworkOdpController extends Controller
         }
 
         $odps = $query->orderBy('id', 'asc')->paginate(25)->withQueryString();
+        $canManage = $this->canManageNetwork();
 
-        return view('gomsn.network.odps.index', compact('olt', 'pon', 'odps'));
+        return view('gomsn.network.odps.index', compact('olt', 'pon', 'odps', 'canManage'));
     }
 
     /**
@@ -136,6 +173,8 @@ class NetworkOdpController extends Controller
      */
     public function storeOdp(Request $request, Pon $pon): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $validated = $request->validate([
             'nama_odp' => ['required', 'string', 'max:150'],
             'port_max' => ['required', 'integer', 'in:4,8,16,20,24,32'],
@@ -162,6 +201,8 @@ class NetworkOdpController extends Controller
      */
     public function updateOdp(Request $request, Odp $odp): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $validated = $request->validate([
             'nama_odp' => ['required', 'string', 'max:150'],
             'port_max' => ['required', 'integer', 'in:4,8,16,20,24,32'],
@@ -184,6 +225,8 @@ class NetworkOdpController extends Controller
      */
     public function destroyOdp(Odp $odp): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $pon = $odp->pon;
         $namaOdp = $odp->nama_odp;
         $odp->delete();
@@ -214,8 +257,9 @@ class NetworkOdpController extends Controller
 
         $customers = $query->orderBy('id', 'asc')->paginate(30)->withQueryString();
         $histories = $odp->histories()->take(40)->get();
+        $canManage = $this->canManageNetwork();
 
-        return view('gomsn.network.customers.index', compact('olt', 'pon', 'odp', 'customers', 'histories'));
+        return view('gomsn.network.customers.index', compact('olt', 'pon', 'odp', 'customers', 'histories', 'canManage'));
     }
 
     /**
@@ -223,6 +267,8 @@ class NetworkOdpController extends Controller
      */
     public function storeCustomer(Request $request, Odp $odp): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $validated = $request->validate([
             'nomor_internet' => ['required', 'string', 'max:100'],
             'nama_user' => ['required', 'string', 'max:255'],
@@ -271,6 +317,8 @@ class NetworkOdpController extends Controller
      */
     public function updateCustomer(Request $request, OdpCustomer $customer): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $validated = $request->validate([
             'nomor_internet' => ['required', 'string', 'max:100'],
             'nama_user' => ['required', 'string', 'max:255'],
@@ -308,6 +356,8 @@ class NetworkOdpController extends Controller
      */
     public function destroyCustomer(OdpCustomer $customer): RedirectResponse
     {
+        $this->authorizeNetworkManager();
+
         $odp = $customer->odp;
         $namaUser = $customer->nama_user;
         $nomor = $customer->nomor_internet;
@@ -347,4 +397,3 @@ class NetworkOdpController extends Controller
         ]);
     }
 }
-

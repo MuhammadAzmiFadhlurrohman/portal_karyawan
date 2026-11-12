@@ -15,7 +15,8 @@ class NetworkOdpModuleTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected User $user;
+    protected User $adminUser;
+    protected User $staffUser;
     protected Olt $olt;
     protected Pon $pon;
     protected Odp $odp;
@@ -25,14 +26,24 @@ class NetworkOdpModuleTest extends TestCase
         parent::setUp();
 
         Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'atasan_teknik', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'teknisi', 'guard_name' => 'web']);
 
-        $this->user = User::factory()->create([
+        $this->adminUser = User::factory()->create([
             'email' => 'admin.network@test.local',
             'employee_code' => 'KRNET01',
             'password_changed_at' => Carbon::now(),
             'is_active' => true,
         ]);
-        $this->user->assignRole('super_admin');
+        $this->adminUser->assignRole('super_admin');
+
+        $this->staffUser = User::factory()->create([
+            'email' => 'staff.teknisi@test.local',
+            'employee_code' => 'KRSTAFF01',
+            'password_changed_at' => Carbon::now(),
+            'is_active' => true,
+        ]);
+        $this->staffUser->assignRole('teknisi');
 
         $this->olt = Olt::create([
             'nama_olt' => 'OLT MSN',
@@ -60,16 +71,27 @@ class NetworkOdpModuleTest extends TestCase
 
     public function test_can_view_network_pon_index(): void
     {
-        $response = $this->actingAs($this->user)->get(route('gomsn.network.index', ['olt_id' => $this->olt->id]));
+        $response = $this->actingAs($this->adminUser)->get(route('gomsn.network.index', ['olt_id' => $this->olt->id]));
 
         $response->assertStatus(200);
+        $response->assertSee('Infrastruktur Jaringan FTTH');
         $response->assertSee('Tambah PON Baru');
         $response->assertSee('PON 3 / MS SUFIA');
     }
 
-    public function test_can_create_and_manage_pon(): void
+    public function test_staff_cannot_create_pon_gets_403(): void
     {
-        $response = $this->actingAs($this->user)->post(route('gomsn.network.pons.store', $this->olt), [
+        $response = $this->actingAs($this->staffUser)->post(route('gomsn.network.pons.store', $this->olt), [
+            'nama_pon' => 'PON ILLEGAL',
+            'port_max' => 8,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_create_and_manage_pon(): void
+    {
+        $response = $this->actingAs($this->adminUser)->post(route('gomsn.network.pons.store', $this->olt), [
             'nama_pon' => 'PON TEST UNIT',
             'port_max' => 8,
         ]);
@@ -82,9 +104,9 @@ class NetworkOdpModuleTest extends TestCase
         ]);
     }
 
-    public function test_can_view_and_manage_odp(): void
+    public function test_admin_can_view_and_manage_odp(): void
     {
-        $response = $this->actingAs($this->user)->get(route('gomsn.network.pons.show', [
+        $response = $this->actingAs($this->adminUser)->get(route('gomsn.network.pons.show', [
             'olt' => $this->olt->id,
             'pon' => $this->pon->id,
         ]));
@@ -94,7 +116,7 @@ class NetworkOdpModuleTest extends TestCase
         $response->assertSee('JEMBATAN TOL');
 
         // Add ODP
-        $addResponse = $this->actingAs($this->user)->post(route('gomsn.network.odps.store', $this->pon), [
+        $addResponse = $this->actingAs($this->adminUser)->post(route('gomsn.network.odps.store', $this->pon), [
             'nama_odp' => 'ODP TEST UNIT',
             'port_max' => 8,
             'latitude' => -6.91234,
@@ -108,9 +130,19 @@ class NetworkOdpModuleTest extends TestCase
         ]);
     }
 
-    public function test_can_add_customer_and_record_history(): void
+    public function test_staff_cannot_create_odp_gets_403(): void
     {
-        $response = $this->actingAs($this->user)->get(route('gomsn.network.odps.show', [
+        $response = $this->actingAs($this->staffUser)->post(route('gomsn.network.odps.store', $this->pon), [
+            'nama_odp' => 'ODP ILLEGAL',
+            'port_max' => 8,
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_add_customer_and_record_history(): void
+    {
+        $response = $this->actingAs($this->adminUser)->get(route('gomsn.network.odps.show', [
             'olt' => $this->olt->id,
             'pon' => $this->pon->id,
             'odp' => $this->odp->id,
@@ -120,7 +152,7 @@ class NetworkOdpModuleTest extends TestCase
         $response->assertSee('Tambah User Baru');
 
         // Add customer
-        $addCust = $this->actingAs($this->user)->post(route('gomsn.network.customers.store', $this->odp), [
+        $addCust = $this->actingAs($this->adminUser)->post(route('gomsn.network.customers.store', $this->odp), [
             'nomor_internet' => 'TEST-NET-999',
             'nama_user' => 'Customer Test Unit',
             'keterangan' => 'Unit testing connection',
@@ -138,5 +170,25 @@ class NetworkOdpModuleTest extends TestCase
             'nomor_internet' => 'TEST-NET-999',
             'aksi' => 'tambah',
         ]);
+    }
+
+    public function test_staff_can_view_but_cannot_add_customer(): void
+    {
+        $response = $this->actingAs($this->staffUser)->get(route('gomsn.network.odps.show', [
+            'olt' => $this->olt->id,
+            'pon' => $this->pon->id,
+            'odp' => $this->odp->id,
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Mode Monitoring');
+        $response->assertDontSee('Tambah User Baru ke ODP');
+
+        $addCust = $this->actingAs($this->staffUser)->post(route('gomsn.network.customers.store', $this->odp), [
+            'nomor_internet' => 'ILLEGAL-999',
+            'nama_user' => 'Customer Illegal',
+        ]);
+
+        $addCust->assertStatus(403);
     }
 }
