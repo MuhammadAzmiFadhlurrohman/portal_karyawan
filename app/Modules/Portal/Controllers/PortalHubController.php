@@ -325,7 +325,7 @@ class PortalHubController extends Controller
 
     public function profile(Request $request): View
     {
-        $user = $request->user()->load(['supervisor', 'faceTemplates']);
+        $user = $request->user()->load(['supervisor', 'faceTemplate']);
 
         return view('portal.profile', [
             'user' => $user,

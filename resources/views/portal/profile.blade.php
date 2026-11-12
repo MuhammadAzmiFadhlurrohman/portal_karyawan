@@ -1,7 +1,7 @@
 <x-layouts.app title="Profil Saya - Portal MSN">
     @php
         $roleName = $user->getRoleNames()->first() ? strtoupper(str_replace('_', ' ', $user->getRoleNames()->first())) : 'STAFF';
-        $hasFaceRegistered = $user->faceTemplates && $user->faceTemplates->where('is_active', true)->isNotEmpty();
+        $hasFaceRegistered = (bool) ($user->faceTemplate && $user->faceTemplate->is_active);
         $joinDateFormatted = $user->join_date ? \Carbon\Carbon::parse($user->join_date)->translatedFormat('d F Y') : 'Belum diatur';
         $tenureText = $user->join_date ? \Carbon\Carbon::parse($user->join_date)->diffForHumans(null, true) : '-';
     @endphp
