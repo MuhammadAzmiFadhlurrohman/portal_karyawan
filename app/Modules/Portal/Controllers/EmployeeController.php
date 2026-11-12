@@ -4,6 +4,7 @@ namespace App\Modules\Portal\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Modules\Attendance\Services\AttendanceService;
 use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class EmployeeController extends Controller
         $role = $request->string('role')->toString();
         $status = $request->string('status', 'active')->toString();
 
-        $query = User::query()->with(['roles', 'supervisor']);
+        $query = User::query()->with(['roles', 'supervisor', 'faceTemplate']);
 
         if (! empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -387,6 +388,23 @@ class EmployeeController extends Controller
         );
 
         return back()->with('status', "Password untuk '{$user->name}' berhasil direset menjadi: {$defaultPassword} (Pengguna wajib mengganti password saat login).");
+    }
+
+    /**
+     * Reset employee biometric face registration so they can re-enroll on /attendance
+     */
+    public function resetFace(Request $request, User $user, AttendanceService $attendanceService): RedirectResponse
+    {
+        $this->authorizeAdmin($request);
+
+        $reason = trim($request->string('reason')->toString());
+        if ($reason === '') {
+            $reason = 'Reset pendaftaran wajah absen oleh Admin melalui halaman Data Karyawan';
+        }
+
+        $attendanceService->resetUserFace($user, $reason, $request->user()->id);
+
+        return back()->with('status', "Pendaftaran wajah absen untuk '{$user->name}' ({$user->employee_code}) berhasil direset. Karyawan dapat melakukan registrasi wajah ulang di halaman Absen.");
     }
 
     /**

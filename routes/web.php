@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/portal/employees/{user}', [EmployeeController::class, 'update'])->name('portal.employees.update');
     Route::delete('/portal/employees/{user}', [EmployeeController::class, 'destroy'])->name('portal.employees.destroy');
     Route::post('/portal/employees/{user}/reset-password', [EmployeeController::class, 'resetPassword'])->name('portal.employees.reset-password');
+    Route::post('/portal/employees/{user}/reset-face', [EmployeeController::class, 'resetFace'])->name('portal.employees.reset-face');
 
     // Fase 1: Modul Absensi Inti — Biometrik Wajah, Geofencing & Jadwal Shift (§5.1, §5.2, §5.9)
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
