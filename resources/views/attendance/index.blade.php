@@ -42,16 +42,18 @@
         @endphp
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+        <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_8px_28px_rgba(2,43,58,0.28)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 sm:gap-4 select-none"
+             style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
             
-            <!-- Gloss Highlights (Top & Bottom Rims) -->
+            <!-- Ambient Glow Orbs & Gloss Highlights -->
+            <div class="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-teal-400/15 blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-14 -left-10 w-44 h-44 rounded-full bg-cyan-400/10 blur-2xl pointer-events-none"></div>
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
             <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
 
             <!-- Left: Glowing Attendance Icon + Page Name -->
-            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
-                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+            <div class="relative z-10 flex items-start sm:items-center gap-3.5 min-w-0">
+                <div class="w-11 h-11 rounded-2xl bg-white/12 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                     <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -59,70 +61,82 @@
                 </div>
 
                 <div class="min-w-0">
-                    <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
-                        <span>Presensi &amp; Absensi Karyawan</span>
+                    <h1 class="font-heading text-base sm:text-lg font-extrabold text-white tracking-tight leading-snug">
+                        Presensi &amp; Absensi Karyawan
                     </h1>
-                    <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                        Pencatatan kehadiran kerja biometrik wajah &amp; verifikasi GPS kantor secara real-time.
+                    <p class="text-[11px] sm:text-xs text-teal-100/85 mt-0.5 leading-relaxed">
+                        Verifikasi kehadiran biometrik wajah &amp; titik GPS secara real-time
                     </p>
                 </div>
             </div>
 
-            <!-- Right: Profile Info Card (Geser ke Kanan) -->
-            <div class="relative z-10 flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2 text-white shrink-0 shadow-xs self-start sm:self-auto">
-                <div class="relative shrink-0">
-                    @if ($user->avatar_url)
-                        <img src="{{ $user->avatar_url }}" 
-                             alt="" 
-                             class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cyan-400/40 shadow-sm" 
-                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                        <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                            {{ $user->initials }}
-                        </div>
-                    @else
-                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                            {{ $user->initials }}
-                        </div>
-                    @endif
-                </div>
-
-                <div class="text-left leading-tight min-w-0">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-xs sm:text-sm text-white tracking-tight truncate max-w-[140px] sm:max-w-[200px]">
-                            {{ strtoupper($user->name) }}
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>{{ $user->is_active ? 'Aktif' : 'Non-Aktif' }}</span>
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-[11px] text-teal-200/85">
-                        <span class="font-mono text-cyan-200">NIK: {{ $user->employee_code }}</span>
-                        @if ($user->division)
-                            <span class="truncate">· Divisi: {{ $user->division }}</span>
+            <!-- Right: Employee Identity Card (Full Width on Mobile, Compact on Desktop) -->
+            <div class="relative z-10 w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-3.5 py-2.5 text-white shrink-0 shadow-xs">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="relative shrink-0">
+                        @if ($user->avatar_url)
+                            <img src="{{ $user->avatar_url }}" 
+                                 alt="" 
+                                 class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-cyan-300/50 shadow-sm" 
+                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                            <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-300/50 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
+                                {{ $user->initials }}
+                            </div>
+                        @else
+                            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-300/50 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
+                                {{ $user->initials }}
+                            </div>
                         @endif
                     </div>
+
+                    <div class="text-left leading-tight min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-xs sm:text-sm text-white tracking-tight truncate max-w-[160px] sm:max-w-[200px]">
+                                {{ strtoupper($user->name) }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-1 text-[10px] sm:text-[11px] text-teal-100/90">
+                            <span class="font-mono font-semibold text-cyan-200">{{ $user->employee_code }}</span>
+                            @if ($user->division)
+                                <span class="text-white/40">&bull;</span>
+                                <span class="truncate">{{ $user->division }}</span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
+
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-400/35 shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>{{ $user->is_active ? 'Aktif' : 'Non-Aktif' }}</span>
+                </span>
             </div>
         </div>
 
         <!-- CARD 2: Jadwal Hari Ini -->
-        <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between">
-            <div class="flex items-center gap-3.5 sm:gap-4">
-                <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#155E63] shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <div class="rounded-3xl bg-white border border-slate-200/80 shadow-[0_4px_20px_rgb(15,23,42,0.03)] p-4 sm:p-5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200/70 flex items-center justify-center text-[#155E63] shrink-0 shadow-2xs">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                <div>
-                    <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase block">JADWAL HARI INI</span>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-tight mt-0.5">{{ $shiftName }}</h3>
-                    <span class="text-xs text-slate-500 font-mono block mt-0.5">{{ $shiftStart }} - {{ $shiftEnd }}</span>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-extrabold text-[#155E63] tracking-wider uppercase">Jadwal Hari Ini</span>
+                        <span class="text-[10px] text-slate-400 hidden sm:inline">&bull; {{ now('Asia/Jakarta')->translatedFormat('l, d M Y') }}</span>
+                    </div>
+                    <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight mt-0.5 truncate">{{ $shiftName }}</h3>
+                    <div class="inline-flex items-center gap-1.5 mt-1 text-xs font-mono font-semibold text-slate-600">
+                        <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>{{ $shiftStart }} - {{ $shiftEnd }} WIB</span>
+                    </div>
                 </div>
             </div>
-            <div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isWorkday ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                    <span class="w-2 h-2 rounded-full {{ $isWorkday ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+            <div class="shrink-0">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold {{ $isWorkday ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                    <span class="w-2 h-2 rounded-full {{ $isWorkday ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400' }}"></span>
                     <span>{{ $isWorkday ? 'Hari Kerja' : 'Hari Libur' }}</span>
                 </span>
             </div>
@@ -200,71 +214,131 @@
             </button>
         </div>
 
-        <!-- CARD 3: Status Absen Hari Ini (Themed) -->
-        <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-5 sm:p-6 space-y-6">
-            <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
-                <div class="w-8 h-8 rounded-lg bg-teal-50 text-[#155E63] flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        <!-- CARD 3: Status Absen Hari Ini (Themed & Elevated) -->
+        <div class="rounded-3xl bg-white border border-slate-200/80 shadow-[0_8px_30px_rgb(15,23,42,0.04)] p-5 sm:p-6 space-y-5">
+            <!-- Header Bar -->
+            <div class="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-teal-50 text-[#155E63] border border-teal-100 flex items-center justify-center shrink-0">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-slate-900 leading-tight">Status Absen Hari Ini</h3>
+                        <p class="text-[11px] text-slate-400">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y') }}</p>
+                    </div>
                 </div>
-                <h3 class="text-sm font-bold text-slate-800">Status Absen Hari Ini</h3>
+
+                @if (! $todayAttendance)
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Belum Absen
+                    </span>
+                @elseif (! $todayAttendance->clock_out_at)
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Sedang Bekerja
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-[#155E63] border border-teal-200/80">
+                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Lengkap
+                    </span>
+                @endif
             </div>
 
-            <!-- Center Visual & Status Text -->
-            <div class="py-4 flex flex-col items-center justify-center text-center space-y-3">
+            <!-- Center Visual & Status Hero Box -->
+            <div class="rounded-2xl bg-gradient-to-b from-slate-50/80 via-teal-50/25 to-slate-50/50 border border-slate-100 py-6 px-4 flex flex-col items-center justify-center text-center space-y-3">
                 @if (! $todayAttendance)
-                    <div class="w-20 h-20 rounded-full bg-slate-100/90 flex items-center justify-center text-slate-400">
+                    <div class="w-20 h-20 rounded-full bg-white border-2 border-slate-200 ring-8 ring-slate-100/80 flex items-center justify-center text-slate-400 shadow-xs">
                         <svg class="w-9 h-9 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-500 font-medium">
-                        Belum melakukan absen masuk hari ini
-                    </p>
+                    <div class="space-y-1">
+                        <p class="text-sm sm:text-base font-extrabold text-slate-800">Belum Absen Masuk</p>
+                        <p class="text-xs text-slate-500 max-w-xs mx-auto">
+                            Silakan lakukan verifikasi wajah untuk mencatat kehadiran masuk Anda hari ini.
+                        </p>
+                    </div>
                 @elseif (! $todayAttendance->clock_out_at)
-                    <div class="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-emerald-600">
-                        <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <div class="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-300 ring-8 ring-emerald-50/80 flex items-center justify-center text-emerald-600 shadow-xs">
+                        <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
                     </div>
-                    <div class="space-y-0.5">
-                        <p class="text-sm font-bold text-emerald-800">Sudah Absen Masuk</p>
+                    <div class="space-y-1">
+                        <p class="text-sm sm:text-base font-extrabold text-emerald-800">Sudah Absen Masuk</p>
                         <p class="text-xs text-slate-500">
-                            Pukul <strong class="text-slate-700 font-mono">{{ \Carbon\Carbon::parse($todayAttendance->clock_in_at)->format('H:i') }}</strong> · Siap untuk Absen Pulang
+                            Tercatat pukul <strong class="text-slate-800 font-mono">{{ \Carbon\Carbon::parse($todayAttendance->clock_in_at)->format('H:i') }} WIB</strong> &middot; Selamat bekerja!
                         </p>
                     </div>
                 @else
-                    <div class="w-20 h-20 rounded-full bg-teal-50 border-2 border-teal-200 flex items-center justify-center text-[#155E63]">
-                        <svg class="w-10 h-10 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <div class="w-20 h-20 rounded-full bg-teal-50 border-2 border-teal-300 ring-8 ring-teal-50/70 flex items-center justify-center text-[#155E63] shadow-xs">
+                        <svg class="w-10 h-10 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <div class="space-y-0.5">
-                        <p class="text-sm font-bold text-[#155E63]">Absensi Selesai Hari Ini</p>
+                    <div class="space-y-1">
+                        <p class="text-sm sm:text-base font-extrabold text-[#155E63]">Absensi Selesai Hari Ini</p>
                         <p class="text-xs text-slate-500">
-                            Masuk: <strong class="font-mono text-slate-700">{{ \Carbon\Carbon::parse($todayAttendance->clock_in_at)->format('H:i') }}</strong> · 
-                            Pulang: <strong class="font-mono text-slate-700">{{ \Carbon\Carbon::parse($todayAttendance->clock_out_at)->format('H:i') }}</strong>
+                            Terima kasih, catatan kehadiran kerja Anda hari ini telah lengkap.
                         </p>
                     </div>
                 @endif
             </div>
 
+            <!-- 2-Column Check-In & Check-Out Time Summary Boxes -->
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Box Jam Masuk -->
+                <div class="rounded-2xl p-3.5 border {{ $todayAttendance?->clock_in_at ? 'bg-emerald-50/40 border-emerald-200/80' : 'bg-slate-50/70 border-slate-200/70' }} flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl {{ $todayAttendance?->clock_in_at ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200/70 text-slate-400' }} flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] font-bold uppercase tracking-wider {{ $todayAttendance?->clock_in_at ? 'text-emerald-700' : 'text-slate-400' }} block">Absen Masuk</span>
+                        <span class="text-sm sm:text-base font-extrabold font-mono text-slate-900 block leading-tight mt-0.5">
+                            {{ $todayAttendance?->clock_in_at ? \Carbon\Carbon::parse($todayAttendance->clock_in_at)->format('H:i') : '--:--' }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Box Jam Pulang -->
+                <div class="rounded-2xl p-3.5 border {{ $todayAttendance?->clock_out_at ? 'bg-teal-50/50 border-teal-200/80' : 'bg-slate-50/70 border-slate-200/70' }} flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl {{ $todayAttendance?->clock_out_at ? 'bg-teal-100 text-[#155E63]' : 'bg-slate-200/70 text-slate-400' }} flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] font-bold uppercase tracking-wider {{ $todayAttendance?->clock_out_at ? 'text-[#155E63]' : 'text-slate-400' }} block">Absen Pulang</span>
+                        <span class="text-sm sm:text-base font-extrabold font-mono text-slate-900 block leading-tight mt-0.5">
+                            {{ $todayAttendance?->clock_out_at ? \Carbon\Carbon::parse($todayAttendance->clock_out_at)->format('H:i') : '--:--' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Main Dynamic Button -->
-            <div>
+            <div class="space-y-3">
                 @if (! $faceTemplate)
                     <!-- JIKA BELUM DAFTAR WAJAH -> TOMBOL DAFTAR -->
                     <button type="button"
                             @click="openEnrollModal()"
-                            style="background: #155E63 !important;"
-                            class="w-full py-3.5 px-6 rounded-xl hover:bg-[#0c4349] text-white font-semibold text-sm shadow-md shadow-teal-900/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                            style="background: linear-gradient(135deg, #093c40 0%, #155E63 60%, #0d9488 100%) !important;"
+                            class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-teal-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span>Daftarkan Wajah</span>
+                        <span>Daftarkan Wajah Sekarang</span>
                     </button>
-                    <p class="text-center text-[11px] text-slate-400 mt-2">
+                    <p class="text-center text-[11px] text-slate-400">
                         Anda wajib mendaftarkan wajah sekali sebelum dapat melakukan absensi.
                     </p>
                 @else
@@ -272,12 +346,12 @@
                     @if (! $todayAttendance)
                         <button type="button"
                                 @click="openClockInModal()"
-                                style="background: #0D8252 !important;"
-                                class="w-full py-3.5 px-6 rounded-xl hover:opacity-95 text-white font-semibold text-sm shadow-md shadow-emerald-900/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                                style="background: linear-gradient(135deg, #065f46 0%, #0D8252 55%, #10b981 100%) !important;"
+                                class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-emerald-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                             </svg>
-                            <span>Absen Masuk</span>
+                            <span>Absen Masuk Sekarang</span>
                         </button>
                     @elseif (! $todayAttendance->clock_out_at)
                         <form method="POST" action="{{ route('attendance.clock-out') }}" onsubmit="return confirm('Apakah Anda yakin ingin melakukan absen pulang?')">
@@ -286,23 +360,23 @@
                             <input type="hidden" name="lng" :value="gpsLng">
                             <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
                             <button type="submit"
-                                    style="background: #D97706 !important;"
-                                    class="w-full py-3.5 px-6 rounded-xl hover:opacity-95 text-white font-semibold text-sm shadow-md shadow-amber-900/20 transition flex items-center justify-center gap-2 cursor-pointer">
+                                    style="background: linear-gradient(135deg, #b45309 0%, #D97706 60%, #f59e0b 100%) !important;"
+                                    class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-amber-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                                 </svg>
-                                <span>Absen Pulang</span>
+                                <span>Absen Pulang Sekarang</span>
                             </button>
                         </form>
                     @else
-                        <button type="button"
-                                disabled
-                                class="w-full py-3.5 px-6 rounded-xl bg-slate-200 text-slate-500 font-semibold text-sm flex items-center justify-center gap-2 cursor-not-allowed">
-                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span>Absensi Selesai Hari Ini</span>
-                        </button>
+                        <div class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 text-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 select-none shadow-2xs">
+                            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </span>
+                            <span>Presensi Hari Ini Telah Selesai</span>
+                        </div>
                     @endif
                 @endif
             </div>
