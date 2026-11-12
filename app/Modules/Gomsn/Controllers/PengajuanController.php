@@ -29,6 +29,10 @@ class PengajuanController extends Controller
             return false;
         }
 
+        if ($user->hasRole('hrd') && ! $user->hasRole(['super_admin', 'admin', 'atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi'])) {
+            return false;
+        }
+
         return $user->can('gomsn.pengajuan.approve_atasan')
             || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']);
     }

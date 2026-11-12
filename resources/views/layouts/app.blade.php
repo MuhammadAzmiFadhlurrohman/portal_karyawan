@@ -165,19 +165,22 @@
                 <!-- Bagian 1: Pengajuan & Lembur (Non-Dropdown / Selalu Terbuka) -->
                 @php
                     $navUser = auth()->user();
-                    $navIsAtasan = $navUser && ($navUser->can('gomsn.pengajuan.approve_atasan') || $navUser->can('gomsn.lembur.approve') || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin', 'hrd']));
+                    $navIsHrdOnly = $navUser && $navUser->hasRole('hrd') && ! $navUser->hasRole(['super_admin', 'admin']);
+                    $navCanApprovePengajuan = $navUser && ! $navIsHrdOnly && ($navUser->can('gomsn.pengajuan.approve_atasan') || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
+                    $navIsAtasan = $navUser && ($navCanApprovePengajuan || $navUser->can('gomsn.lembur.approve') || $navUser->hasRole(['hrd']));
                     $navIsFinance = $navUser && ($navUser->hasRole(['finance', 'admin', 'super_admin']) || $navUser->can('gomsn.pengajuan.approve_finance'));
                     $navPendingAtasanCount = 0;
                     $navPendingLemburCount = 0;
                     $navPendingKoreksiCount = 0;
                     $navLowStockCount = 0;
-                    if ($navIsAtasan) {
+                    if ($navCanApprovePengajuan) {
                         $navQ = \App\Models\Pengajuan::where('status', 'menunggu_atasan')->where('user_id', '!=', $navUser->id);
                         if (! $navUser->hasRole(['super_admin', 'admin'])) {
                             $navQ->where('atasan_id', $navUser->id);
                         }
                         $navPendingAtasanCount = $navQ->count();
-
+                    }
+                    if ($navIsAtasan) {
                         $navLQ = \App\Models\Lembur::where('status', 'pending')->where('user_id', '!=', $navUser->id);
                         if (! $navUser->hasRole(['super_admin', 'admin', 'hrd'])) {
                             $navLQ->where(function ($q) use ($navUser) {
@@ -223,14 +226,14 @@
                            @if (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            <span>{{ $navIsAtasan ? 'Pengajuan Saya' : 'Pengajuan' }}</span>
+                            <span>{{ $navCanApprovePengajuan ? 'Pengajuan Saya' : 'Pengajuan' }}</span>
                             @if (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create'))
                             <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
 
-                        <!-- 2. Persetujuan Karyawan (Khusus Atasan) -->
-                        @if ($navIsAtasan)
+                        <!-- 2. Persetujuan Karyawan (Khusus Atasan — Tidak Muncul di Role HRD) -->
+                        @if ($navCanApprovePengajuan)
                         <a href="{{ route('gomsn.pengajuan.approvals') }}"
                            @if (request()->routeIs('gomsn.pengajuan.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -244,8 +247,10 @@
                             </span>
                             @endif
                         </a>
+                        @endif
 
                         <!-- 3. Pengajuan Absen (Khusus Atasan / HRD) -->
+                        @if ($navIsAtasan)
                         <a href="{{ route('attendance.corrections.approvals') }}"
                            @if (request()->routeIs('attendance.corrections.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -1041,7 +1046,7 @@
             </a>
 
             <!-- 2. PENGAJUAN -->
-            <a href="{{ $navIsAtasan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index') }}" 
+            <a href="{{ $navCanApprovePengajuan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index') }}" 
                @click="currentTab = 'pengajuan'"
                class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10">
                 <div class="relative">
@@ -1300,7 +1305,7 @@
                             </div>
                         </a>
 
-                        @if ($navIsAtasan)
+                        @if ($navCanApprovePengajuan)
                         <a href="{{ route('gomsn.pengajuan.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
@@ -1317,7 +1322,9 @@
                             </span>
                             @endif
                         </a>
+                        @endif
 
+                        @if ($navIsAtasan)
                         <a href="{{ route('attendance.corrections.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
