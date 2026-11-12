@@ -99,7 +99,7 @@
         <!-- Tabel Daftar ODP -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <!-- Gradient Table Header -->
-            <div class="bg-gradient-to-r from-[#0f4c5c] via-[#007f8c] to-[#0d9488] px-6 py-4 text-white">
+            <div style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" class="px-6 py-4 text-white">
                 <div class="grid grid-cols-12 items-center text-xs font-bold tracking-wider uppercase">
                     <div class="col-span-6 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
@@ -262,3 +262,4 @@
         }
     </script>
 </x-app-layout>
+

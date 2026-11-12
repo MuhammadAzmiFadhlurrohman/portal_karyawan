@@ -36,3 +36,4 @@ class Olt extends Model
         return $this->hasManyThrough(Odp::class, Pon::class, 'olt_id', 'pon_id');
     }
 }
+

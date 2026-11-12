@@ -10,10 +10,13 @@
             </div>
 
             <!-- OLT Tab Switcher -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
                 @foreach ($olts as $olt)
                     <a href="{{ route('gomsn.network.index', ['olt_id' => $olt->id]) }}" 
-                       class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all {{ $olt->id === $selectedOlt->id ? 'bg-gradient-to-r from-[#0f4c5c] to-[#0d9488] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80' }}">
+                       @if ($olt->id === $selectedOlt->id)
+                           style="background: linear-gradient(135deg, #0f4c5c 0%, #0d9488 100%) !important; color: #ffffff !important;"
+                       @endif
+                       class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs {{ $olt->id === $selectedOlt->id ? 'shadow-md border border-teal-400/30' : 'bg-slate-100 text-slate-700 hover:bg-slate-200/90' }}">
                         {{ $olt->nama_olt }}
                     </a>
                 @endforeach
@@ -70,7 +73,7 @@
         <!-- Tabel Daftar PON -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <!-- Gradient Table Header -->
-            <div class="bg-gradient-to-r from-[#0f4c5c] via-[#007f8c] to-[#0d9488] px-6 py-4 text-white">
+            <div style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" class="px-6 py-4 text-white">
                 <div class="grid grid-cols-12 items-center text-xs font-bold tracking-wider uppercase">
                     <div class="col-span-6 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -210,3 +213,4 @@
         }
     </script>
 </x-app-layout>
+

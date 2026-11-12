@@ -101,7 +101,7 @@
         <!-- Tabel Daftar Pelanggan -->
         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <!-- Gradient Table Header -->
-            <div class="bg-gradient-to-r from-[#0f4c5c] via-[#007f8c] to-[#0d9488] px-6 py-4 text-white overflow-x-auto">
+            <div style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" class="px-6 py-4 text-white overflow-x-auto">
                 <div class="grid grid-cols-12 items-center text-xs font-bold tracking-wider uppercase min-w-[760px]">
                     <div class="col-span-3">PELANGGAN</div>
                     <div class="col-span-2">LAYANAN</div>
@@ -347,3 +347,4 @@
         }
     </script>
 </x-app-layout>
+

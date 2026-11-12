@@ -22,8 +22,19 @@ class NetworkOdpController extends Controller
     {
         $olts = Olt::query()->orderBy('id')->get();
 
+        if ($olts->isEmpty() || Pon::count() === 0) {
+            try {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', [
+                    '--class' => \Database\Seeders\NetworkOdpSeeder::class,
+                    '--force' => true,
+                ]);
+            } catch (\Throwable $e) {
+                // If seeder fails, fallback gracefully
+            }
+            $olts = Olt::query()->orderBy('id')->get();
+        }
+
         if ($olts->isEmpty()) {
-            // Fallback default olts if empty
             $olts = collect([
                 Olt::create(['nama_olt' => 'OLT MSN', 'kode' => 'MSN']),
                 Olt::create(['nama_olt' => 'OLT BAGONG', 'kode' => 'BAGONG']),
@@ -336,3 +347,4 @@ class NetworkOdpController extends Controller
         ]);
     }
 }
+

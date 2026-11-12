@@ -30,3 +30,4 @@ class OdpCustomer extends Model
         return $this->belongsTo(Odp::class, 'odp_id');
     }
 }
+

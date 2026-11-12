@@ -47,3 +47,4 @@ class Pon extends Model
         $this->save();
     }
 }
+

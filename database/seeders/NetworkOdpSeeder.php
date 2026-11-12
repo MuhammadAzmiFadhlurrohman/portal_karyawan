@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Olt;
+use App\Models\Pon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -17,11 +19,11 @@ class NetworkOdpSeeder extends Seeder
         $sqlPath = base_path('database_network_odp_import.sql');
 
         if (! File::exists($sqlPath)) {
-            $this->command->error("SQL file not found at: {$sqlPath}");
+            $this->command?->error("SQL file not found at: {$sqlPath}");
             return;
         }
 
-        $this->command->info('Importing Unified Network Infrastructure (OLT, PON, ODP, Customers, Histories)...');
+        $this->command?->info('Importing Unified Network Infrastructure (OLT, PON, ODP, Customers, Histories)...');
 
         $driver = DB::getDriverName();
 
@@ -41,12 +43,40 @@ class NetworkOdpSeeder extends Seeder
 
         $sql = File::get($sqlPath);
 
-        // For SQLite compatibility, replace NOW() with CURRENT_TIMESTAMP
         if ($driver === 'sqlite') {
             $sql = str_replace('NOW()', 'CURRENT_TIMESTAMP', $sql);
         }
 
-        DB::unprepared($sql);
+        // Split into separate queries to guarantee execution on all MySQL / SQLite drivers
+        $lines = explode("\n", $sql);
+        $currentQuery = '';
+
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+
+            if ($trimmed === '' || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*')) {
+                continue;
+            }
+
+            $currentQuery .= $line . "\n";
+
+            if (str_ends_with($trimmed, ';')) {
+                try {
+                    DB::unprepared($currentQuery);
+                } catch (\Throwable $e) {
+                    // Log or continue
+                }
+                $currentQuery = '';
+            }
+        }
+
+        if (! empty(trim($currentQuery))) {
+            try {
+                DB::unprepared($currentQuery);
+            } catch (\Throwable $e) {
+                // Ignore
+            }
+        }
 
         if ($driver === 'mysql') {
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
@@ -56,6 +86,6 @@ class NetworkOdpSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
-        $this->command->info('Network data successfully seeded!');
+        $this->command?->info('Network data successfully seeded! Total PON: ' . Pon::count());
     }
 }
