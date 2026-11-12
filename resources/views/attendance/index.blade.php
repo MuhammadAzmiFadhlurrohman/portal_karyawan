@@ -308,45 +308,6 @@
             </div>
         </div>
 
-        <!-- RIWAYAT ABSENSI TERAKHIR (Collapsible) -->
-        <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs overflow-hidden" x-data="{ openHistory: false }">
-            <button type="button" 
-                    @click="openHistory = !openHistory" 
-                    class="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer">
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span class="text-xs font-semibold text-slate-700">Riwayat Kehadiran Terakhir</span>
-                </div>
-                <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="openHistory ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div x-show="openHistory" x-cloak class="border-t border-slate-100 p-4">
-                <div class="divide-y divide-slate-100 text-xs">
-                    @forelse ($recentAttendances as $att)
-                    <div class="py-2.5 flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-slate-800">{{ \Carbon\Carbon::parse($att->date)->format('d M Y') }}</span>
-                            <span class="text-[11px] text-slate-500 block">
-                                Masuk: {{ $att->clock_in_at ? \Carbon\Carbon::parse($att->clock_in_at)->format('H:i') : '-' }} · 
-                                Pulang: {{ $att->clock_out_at ? \Carbon\Carbon::parse($att->clock_out_at)->format('H:i') : '-' }}
-                            </span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold {{ $att->status === 'present' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                            {{ strtoupper($att->status) }}
-                        </span>
-                    </div>
-                    @empty
-                    <p class="py-3 text-center text-slate-400 text-xs">Belum ada catatan absensi sebelumnya.</p>
-                    @endforelse
-                </div>
-                <div class="pt-3.5 mt-2 text-center border-t border-slate-100">
-                    <a href="{{ route('attendance.history') }}" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#155E63] hover:underline">
-                        <span>Lihat Semua Riwayat Absen</span>
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-
         <!-- MODAL 1: DAFTARKAN WAJAH (Biometric Enrollment - Tanpa Simulasi) -->
         <div x-show="showEnrollModal" 
              x-cloak 
