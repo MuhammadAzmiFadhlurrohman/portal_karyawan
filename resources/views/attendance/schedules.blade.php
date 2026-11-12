@@ -1524,158 +1524,7 @@
         {{-- VIEW MODE 4: KALENDER JADWAL KARYAWAN DETAIL (SCREEN 5)                   --}}
         {{-- ========================================================================= --}}
         @if ($viewMode === 'user')
-            <div class="space-y-6" x-data="{
-                showCustomModal: false,
-                customDay: null,
-                customDateStr: '',
-                customDateFull: '',
-                customStartTime: '08:00',
-                customEndTime: '17:00',
-                isSavingCustom: false,
-
-                openCustomModal(day, dateStr, defaultStart, defaultEnd, dateFull) {
-                    this.customDay = day;
-                    this.customDateStr = dateStr;
-                    this.customDateFull = dateFull || '';
-                    this.customStartTime = defaultStart && defaultStart !== '-' ? defaultStart : '08:00';
-                    this.customEndTime = defaultEnd && defaultEnd !== '-' ? defaultEnd : '17:00';
-                    this.showCustomModal = true;
-                },
-
-                saveCustomHours() {
-                    if (!this.customStartTime || !this.customEndTime) {
-                        alert('Jam masuk dan jam pulang wajib diisi');
-                        return;
-                    }
-                    this.isSavingCustom = true;
-                    fetch('{{ route('attendance.schedules.cell') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            user_id: {{ $targetUser->id }},
-                            date: this.customDateStr,
-                            shift_id: 'custom',
-                            custom_start_time: this.customStartTime,
-                            custom_end_time: this.customEndTime
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        this.isSavingCustom = false;
-                        if (data.success) {
-                            this.showCustomModal = false;
-                            const day = this.customDay;
-                            const dayFormatted = (day < 10 ? '0' + day : day);
-                            triggerToast('Jadwal tgl ' + dayFormatted + ' diatur ke jam: ' + data.start_time + ' – ' + data.end_time);
-
-                            // Sync desktop & mobile selects to custom
-                            const dSelect = document.getElementById('desktop-select-day-' + day);
-                            if (dSelect) dSelect.value = 'custom';
-                            const mSelect = document.getElementById('mobile-select-day-' + day);
-                            if (mSelect) mSelect.value = 'custom';
-
-                            // Update hours display in desktop & mobile
-                            const hoursEl = document.getElementById('hours-day-' + day);
-                            if (hoursEl) {
-                                hoursEl.innerHTML = `<span class=\"text-teal-700 font-bold flex items-center gap-1.5\"><span>${data.start_time} – ${data.end_time}</span><span class=\"text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-sans font-bold\">Custom</span></span>`;
-                            }
-                            const mHoursEl = document.getElementById('mobile-hours-day-' + day);
-                            if (mHoursEl) {
-                                mHoursEl.innerHTML = `<span class=\"text-teal-700 font-bold\">${data.start_time} – ${data.end_time} (Custom)</span>`;
-                            }
-
-                            // Update mobile badge
-                            const mBadge = document.getElementById('mobile-badge-day-' + day);
-                            if (mBadge) {
-                                mBadge.textContent = 'CUST';
-                                mBadge.className = 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-teal-100 text-teal-800 border border-teal-200';
-                            }
-
-                            // Update custom button stored attributes
-                            const cBtn = document.getElementById('custom-btn-day-' + day);
-                            if (cBtn) {
-                                cBtn.setAttribute('data-start', data.start_time);
-                                cBtn.setAttribute('data-end', data.end_time);
-                            }
-                            const mcBtn = document.getElementById('mobile-custom-btn-day-' + day);
-                            if (mcBtn) {
-                                mcBtn.setAttribute('data-start', data.start_time);
-                                mcBtn.setAttribute('data-end', data.end_time);
-                            }
-                        } else {
-                            alert(data.message || 'Gagal menyimpan jam custom');
-                        }
-                    })
-                    .catch(err => {
-                        this.isSavingCustom = false;
-                        alert('Terjadi kesalahan saat menyimpan jam custom');
-                    });
-                },
-
-                saveShift(day, dateStr, shiftId) {
-                    if (shiftId === 'custom') {
-                        const cBtn = document.getElementById('custom-btn-day-' + day);
-                        const curStart = cBtn ? cBtn.getAttribute('data-start') : '08:00';
-                        const curEnd = cBtn ? cBtn.getAttribute('data-end') : '17:00';
-                        this.openCustomModal(day, dateStr, curStart, curEnd);
-                        return;
-                    }
-
-                    fetch('{{ route('attendance.schedules.cell') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            user_id: {{ $targetUser->id }},
-                            date: dateStr,
-                            shift_id: shiftId,
-                            custom_start_time: null,
-                            custom_end_time: null
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            const dayFormatted = (day < 10 ? '0' + day : day);
-                            triggerToast('Jadwal tgl ' + dayFormatted + ' diubah ke ' + data.shift.name + ' (' + data.shift.code + ')');
-                            
-                            // Sync desktop & mobile selects
-                            const dSelect = document.getElementById('desktop-select-day-' + day);
-                            if (dSelect && dSelect.value != shiftId) dSelect.value = shiftId;
-                            const mSelect = document.getElementById('mobile-select-day-' + day);
-                            if (mSelect && mSelect.value != shiftId) mSelect.value = shiftId;
-
-                            // Update hours display
-                            const hoursText = data.shift.is_day_off ? '-' : (data.shift.start_time.substring(0, 5) + ' – ' + data.shift.end_time.substring(0, 5));
-                            const mobileHoursText = data.shift.is_day_off ? '— Libur' : (data.shift.start_time.substring(0, 5) + ' – ' + data.shift.end_time.substring(0, 5));
-                            
-                            const hoursEl = document.getElementById('hours-day-' + day);
-                            if (hoursEl) hoursEl.textContent = hoursText;
-                            const mHoursEl = document.getElementById('mobile-hours-day-' + day);
-                            if (mHoursEl) mHoursEl.textContent = mobileHoursText;
-
-                            // Update mobile badge
-                            const mBadge = document.getElementById('mobile-badge-day-' + day);
-                            if (mBadge) {
-                                mBadge.textContent = data.shift.code;
-                                mBadge.className = data.shift.is_day_off ? 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-rose-100 text-rose-700 border border-rose-200' : 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-sky-100 text-sky-700 border border-sky-200';
-                            }
-                        } else {
-                            alert(data.message || 'Gagal menyimpan perubahan shift');
-                        }
-                    })
-                    .catch(err => {
-                        alert('Terjadi kesalahan saat menyimpan perubahan shift');
-                    });
-                }
-            }">
+            <div class="space-y-6" x-data="userScheduleManager({{ $targetUser->id }})">
                 @if ($canManageSchedule)
                     <!-- Admin Navigation Switch -->
                     <div class="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
@@ -2121,6 +1970,167 @@
                 </div>
             </div>
         @endif
+
+    </div>
+
+    @push('scripts')
+    <script>
+        function userScheduleManager(targetUserId) {
+            return {
+                showCustomModal: false,
+                customDay: null,
+                customDateStr: '',
+                customDateFull: '',
+                customStartTime: '08:00',
+                customEndTime: '17:00',
+                isSavingCustom: false,
+
+                openCustomModal(day, dateStr, defaultStart, defaultEnd, dateFull) {
+                    this.customDay = day;
+                    this.customDateStr = dateStr;
+                    this.customDateFull = dateFull || '';
+                    this.customStartTime = (defaultStart && defaultStart !== '-') ? defaultStart : '08:00';
+                    this.customEndTime = (defaultEnd && defaultEnd !== '-') ? defaultEnd : '17:00';
+                    this.showCustomModal = true;
+                },
+
+                saveCustomHours() {
+                    if (!this.customStartTime || !this.customEndTime) {
+                        alert('Jam masuk dan jam pulang wajib diisi');
+                        return;
+                    }
+                    this.isSavingCustom = true;
+                    fetch('{{ route('attendance.schedules.cell') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: targetUserId,
+                            date: this.customDateStr,
+                            shift_id: 'custom',
+                            custom_start_time: this.customStartTime,
+                            custom_end_time: this.customEndTime
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isSavingCustom = false;
+                        if (data.success) {
+                            this.showCustomModal = false;
+                            const day = this.customDay;
+                            const dayFormatted = (day < 10 ? '0' + day : day);
+                            triggerToast('Jadwal tgl ' + dayFormatted + ' diatur ke jam: ' + data.start_time + ' – ' + data.end_time);
+
+                            // Sync desktop & mobile selects to custom
+                            const dSelect = document.getElementById('desktop-select-day-' + day);
+                            if (dSelect) dSelect.value = 'custom';
+                            const mSelect = document.getElementById('mobile-select-day-' + day);
+                            if (mSelect) mSelect.value = 'custom';
+
+                            // Update hours display in desktop & mobile
+                            const hoursEl = document.getElementById('hours-day-' + day);
+                            if (hoursEl) {
+                                hoursEl.innerHTML = '<span class="text-teal-700 font-bold flex items-center gap-1.5"><span>' + data.start_time + ' – ' + data.end_time + '</span><span class="text-[10px] px-1.5 py-0.5 rounded bg-teal-100 text-teal-800 font-sans font-bold">Custom</span></span>';
+                            }
+                            const mHoursEl = document.getElementById('mobile-hours-day-' + day);
+                            if (mHoursEl) {
+                                mHoursEl.innerHTML = '<span class="text-teal-700 font-bold">' + data.start_time + ' – ' + data.end_time + ' (Custom)</span>';
+                            }
+
+                            // Update mobile badge
+                            const mBadge = document.getElementById('mobile-badge-day-' + day);
+                            if (mBadge) {
+                                mBadge.textContent = 'CUST';
+                                mBadge.className = 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-teal-100 text-teal-800 border border-teal-200';
+                            }
+
+                            // Update custom button stored attributes
+                            const cBtn = document.getElementById('custom-btn-day-' + day);
+                            if (cBtn) {
+                                cBtn.setAttribute('data-start', data.start_time);
+                                cBtn.setAttribute('data-end', data.end_time);
+                            }
+                            const mcBtn = document.getElementById('mobile-custom-btn-day-' + day);
+                            if (mcBtn) {
+                                mcBtn.setAttribute('data-start', data.start_time);
+                                mcBtn.setAttribute('data-end', data.end_time);
+                            }
+                        } else {
+                            alert(data.message || 'Gagal menyimpan jam custom');
+                        }
+                    })
+                    .catch(err => {
+                        this.isSavingCustom = false;
+                        alert('Terjadi kesalahan saat menyimpan jam custom');
+                    });
+                },
+
+                saveShift(day, dateStr, shiftId) {
+                    if (shiftId === 'custom') {
+                        const cBtn = document.getElementById('custom-btn-day-' + day);
+                        const curStart = cBtn ? cBtn.getAttribute('data-start') : '08:00';
+                        const curEnd = cBtn ? cBtn.getAttribute('data-end') : '17:00';
+                        this.openCustomModal(day, dateStr, curStart, curEnd);
+                        return;
+                    }
+
+                    fetch('{{ route('attendance.schedules.cell') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: targetUserId,
+                            date: dateStr,
+                            shift_id: shiftId,
+                            custom_start_time: null,
+                            custom_end_time: null
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            const dayFormatted = (day < 10 ? '0' + day : day);
+                            triggerToast('Jadwal tgl ' + dayFormatted + ' diubah ke ' + data.shift.name + ' (' + data.shift.code + ')');
+
+                            // Sync desktop & mobile selects
+                            const dSelect = document.getElementById('desktop-select-day-' + day);
+                            if (dSelect && dSelect.value != shiftId) dSelect.value = shiftId;
+                            const mSelect = document.getElementById('mobile-select-day-' + day);
+                            if (mSelect && mSelect.value != shiftId) mSelect.value = shiftId;
+
+                            // Update hours display
+                            const hoursText = data.shift.is_day_off ? '-' : (data.shift.start_time.substring(0, 5) + ' – ' + data.shift.end_time.substring(0, 5));
+                            const mobileHoursText = data.shift.is_day_off ? '— Libur' : (data.shift.start_time.substring(0, 5) + ' – ' + data.shift.end_time.substring(0, 5));
+
+                            const hoursEl = document.getElementById('hours-day-' + day);
+                            if (hoursEl) hoursEl.textContent = hoursText;
+                            const mHoursEl = document.getElementById('mobile-hours-day-' + day);
+                            if (mHoursEl) mHoursEl.textContent = mobileHoursText;
+
+                            // Update mobile badge
+                            const mBadge = document.getElementById('mobile-badge-day-' + day);
+                            if (mBadge) {
+                                mBadge.textContent = data.shift.code;
+                                mBadge.className = data.shift.is_day_off ? 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-rose-100 text-rose-700 border border-rose-200' : 'px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase shrink-0 bg-sky-100 text-sky-700 border border-sky-200';
+                            }
+                        } else {
+                            alert(data.message || 'Gagal menyimpan perubahan shift');
+                        }
+                    })
+                    .catch(err => {
+                        alert('Terjadi kesalahan saat menyimpan perubahan shift');
+                    });
+                }
+            };
+        }
+    </script>
+    @endpush
 
     </div>
 </x-layouts.app>
