@@ -171,7 +171,7 @@ class EmployeeController extends Controller
             'atas_nama' => ['nullable', 'string', 'max:100'],
             'potongan_alpa' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
-            'foto' => ['nullable', 'image', 'max:2048'],
+            'foto' => ['nullable', 'image', 'max:5120'],
         ]);
 
         // Auto-generate employee code if not provided
@@ -271,7 +271,7 @@ class EmployeeController extends Controller
             'atas_nama' => ['nullable', 'string', 'max:100'],
             'potongan_alpa' => ['nullable', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
-            'foto' => ['nullable', 'image', 'max:2048'],
+            'foto' => ['nullable', 'image', 'max:5120'],
         ]);
 
         $userData = [
@@ -387,6 +387,41 @@ class EmployeeController extends Controller
         );
 
         return back()->with('status', "Password untuk '{$user->name}' berhasil direset menjadi: {$defaultPassword} (Pengguna wajib mengganti password saat login).");
+    }
+
+    /**
+     * Stream user avatar photo directly from Storage::disk('public')
+     */
+    public function avatar(User $user)
+    {
+        if (empty($user->foto)) {
+            abort(404);
+        }
+
+        $cleanPath = ltrim($user->foto, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        }
+
+        if (Storage::disk('public')->exists($cleanPath)) {
+            return response()->file(Storage::disk('public')->path($cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        if (file_exists(public_path('storage/' . $cleanPath))) {
+            return response()->file(public_path('storage/' . $cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        if (file_exists(public_path($cleanPath))) {
+            return response()->file(public_path($cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        abort(404);
     }
 
     /**

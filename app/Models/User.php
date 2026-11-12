@@ -149,6 +149,7 @@ class User extends Authenticatable
 
     /**
      * Get avatar URL if the photo physically exists on disk.
+     * Served via authenticated Laravel route so it works reliably in Docker/VPS even without storage:link.
      */
     public function getAvatarUrlAttribute(): ?string
     {
@@ -162,11 +163,15 @@ class User extends Authenticatable
         }
 
         try {
-            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)) {
-                return asset('storage/' . $cleanPath);
-            }
-            if (file_exists(public_path('storage/' . $cleanPath))) {
-                return asset('storage/' . $cleanPath);
+            if (
+                \Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)
+                || file_exists(public_path('storage/' . $cleanPath))
+                || file_exists(public_path($cleanPath))
+            ) {
+                return route('portal.user.avatar', [
+                    'user' => $this->id,
+                    'v' => substr(md5($this->foto . ($this->updated_at?->timestamp ?? '')), 0, 8),
+                ]);
             }
         } catch (\Throwable $e) {
             // fallback gracefully

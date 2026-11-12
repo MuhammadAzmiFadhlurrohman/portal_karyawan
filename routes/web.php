@@ -52,7 +52,8 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/portal/audit-logs', [PortalHubController::class, 'auditLogs'])->name('portal.audit');
 
-    // Manajemen Karyawan (§6, Admin / HRD)
+    // Manajemen Karyawan (§6, Admin / HRD) & Avatar Streaming
+    Route::get('/portal/users/{user}/avatar', [EmployeeController::class, 'avatar'])->name('portal.user.avatar');
     Route::get('/portal/employees', [EmployeeController::class, 'index'])->name('portal.employees.index');
     Route::post('/portal/employees', [EmployeeController::class, 'store'])->name('portal.employees.store');
     Route::put('/portal/employees/{user}', [EmployeeController::class, 'update'])->name('portal.employees.update');

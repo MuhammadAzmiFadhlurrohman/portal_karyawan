@@ -5,9 +5,19 @@
             <div class="h-28 sm:h-32 w-full" style="background: linear-gradient(135deg, #155E63 0%, #17555B 45%, #1F2937 100%) !important;"></div>
             <div class="px-6 pb-6 pt-0 relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-12 sm:-mt-14">
                 <div class="flex items-end gap-4">
-                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#1F2937] text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md border-4 border-white shrink-0">
-                        {{ substr($user->name ?? 'U', 0, 1) }}
-                    </div>
+                    @if ($user->avatar_url)
+                        <img src="{{ $user->avatar_url }}"
+                             alt="{{ $user->name }}"
+                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+                             class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover shadow-md border-4 border-white shrink-0 bg-white">
+                        <div style="display: none;" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#1F2937] text-white items-center justify-center font-bold text-2xl sm:text-3xl shadow-md border-4 border-white shrink-0">
+                            {{ $user->initials }}
+                        </div>
+                    @else
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#1F2937] text-white flex items-center justify-center font-bold text-2xl sm:text-3xl shadow-md border-4 border-white shrink-0">
+                            {{ $user->initials }}
+                        </div>
+                    @endif
                     <div class="min-w-0 pb-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">{{ $user->name }}</h1>

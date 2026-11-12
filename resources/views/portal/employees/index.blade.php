@@ -296,13 +296,17 @@
                                 <!-- Profile & Name -->
                                 <td class="py-3 px-4">
                                     <div class="flex items-center gap-3">
-                                        @if ($emp->foto)
-                                            <img src="{{ asset('storage/' . $emp->foto) }}" 
+                                        @if ($emp->avatar_url)
+                                            <img src="{{ $emp->avatar_url }}" 
                                                  alt="{{ $emp->name }}" 
+                                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                                  class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0 shadow-2xs">
+                                            <div style="display: none;" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                                                {{ $emp->initials }}
+                                            </div>
                                         @else
                                             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                                                {{ substr($emp->name, 0, 1) }}
+                                                {{ $emp->initials }}
                                             </div>
                                         @endif
                                         <div class="min-w-0">
