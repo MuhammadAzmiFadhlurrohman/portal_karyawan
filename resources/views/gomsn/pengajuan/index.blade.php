@@ -278,11 +278,11 @@
                                 <span>Refresh</span>
                             </a>
 
-                            <button type="submit" name="export" value="csv" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
+                            <button type="submit" name="export" value="excel" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
-                                <span>Export</span>
+                                <span>Export Excel</span>
                             </button>
                         </div>
 
@@ -574,14 +574,22 @@
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
                     @endif
-                    <select name="jenis" onchange="this.form.submit()" class="w-full sm:w-44 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                    <select name="jenis" onchange="this.form.submit()" class="w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
                         <option value="">Semua Jenis</option>
                         <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
                         <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
                         <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok Gudang</option>
+                        <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
                     </select>
 
-                    <select name="status" onchange="this.form.submit()" class="w-full sm:w-48 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                    <select name="divisi" onchange="this.form.submit()" class="w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                        <option value="">Semua Divisi</option>
+                        @foreach (($divisions ?? collect()) as $div)
+                            <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                        @endforeach
+                    </select>
+
+                    <select name="status" onchange="this.form.submit()" class="w-full sm:w-44 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
                         <option value="">Semua Status</option>
                         <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                         <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
@@ -592,6 +600,13 @@
                         <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
                         <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                     </select>
+
+                    <button type="submit" name="export" value="excel" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Export Excel</span>
+                    </button>
                 </form>
 
                 <span class="text-xs font-semibold text-slate-500">

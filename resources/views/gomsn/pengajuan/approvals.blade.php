@@ -127,15 +127,26 @@
         <!-- Filter & Search Card (Responsive Grid on Mobile & Desktop) -->
         <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-2xs space-y-3">
             <form method="GET" action="{{ route('gomsn.pengajuan.approvals') }}" class="space-y-3">
-                <!-- Row 1: Dropdown Semua Jenis, Bulan, Tahun, Tombol Filter & Refresh -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap items-center gap-2.5">
+                <!-- Row 1: Dropdown Semua Jenis, Semua Divisi, Bulan, Tahun, Tombol Filter, Refresh & Export Excel -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2.5">
                     <!-- Dropdown Jenis -->
-                    <div class="col-span-2 sm:col-span-1 lg:w-44">
+                    <div class="col-span-1 lg:w-40">
                         <select name="jenis" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
                             <option value="">Semua Jenis</option>
                             <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
                             <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
                             <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok Gudang</option>
+                            <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown Divisi -->
+                    <div class="col-span-1 lg:w-40">
+                        <select name="divisi" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
+                            <option value="">Semua Divisi</option>
+                            @foreach (($divisions ?? collect()) as $div)
+                                <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -170,8 +181,8 @@
                         </select>
                     </div>
 
-                    <!-- Action Buttons (Filter & Refresh) -->
-                    <div class="col-span-2 sm:col-span-3 lg:w-auto flex items-center gap-2">
+                    <!-- Action Buttons (Filter, Refresh & Export Excel) -->
+                    <div class="col-span-2 sm:col-span-4 lg:w-auto flex flex-wrap items-center gap-2">
                         <button type="submit" 
                                 style="background-color: #2563EB !important; color: #ffffff !important;"
                                 class="flex-1 lg:flex-initial justify-center hover:opacity-90 text-white font-bold text-xs px-4 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
@@ -189,6 +200,16 @@
                             </svg>
                             <span>Refresh</span>
                         </a>
+
+                        <button type="submit"
+                                name="export"
+                                value="excel"
+                                class="flex-1 lg:flex-initial justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <span>Export Excel</span>
+                        </button>
                     </div>
                 </div>
 

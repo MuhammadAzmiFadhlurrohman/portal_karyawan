@@ -140,33 +140,10 @@ class PengajuanController extends Controller
             $query->where('jenis', strtoupper($request->input('jenis')));
         }
 
-        // CSV Export handler
-        if ($request->input('export') === 'csv' || $request->input('export') === '1') {
+        // Excel / CSV Export handler
+        if (in_array($request->input('export'), ['excel', 'csv', '1'], true)) {
             $exportItems = (clone $query)->orderBy('created_at', 'desc')->get();
-            $headers = [
-                'Content-Type' => 'text/csv; charset=UTF-8',
-                'Content-Disposition' => 'attachment; filename="pengajuan_export_' . date('Ymd_His') . '.csv"',
-            ];
-            $callback = function () use ($exportItems) {
-                $file = fopen('php://output', 'w');
-                fputcsv($file, ['ID Pengajuan', 'Nomor Pengajuan', 'Tanggal', 'Jenis', 'Karyawan', 'Divisi', 'Status', 'Total Nominal (Rp)', 'Keperluan']);
-                foreach ($exportItems as $item) {
-                    fputcsv($file, [
-                        $item->id,
-                        $item->nomor_pengajuan,
-                        $item->created_at->format('Y-m-d H:i:s'),
-                        $item->jenis,
-                        $item->user?->name ?? '-',
-                        $item->user?->division ?? '-',
-                        $item->status,
-                        $item->total_nominal,
-                        $item->keperluan,
-                    ]);
-                }
-                fclose($file);
-            };
-
-            return response()->stream($callback, 200, $headers);
+            return $this->streamExcelExport($exportItems, 'Data_Pengajuan_Karyawan');
         }
 
         // Calculate metrics for Finance dashboard
@@ -178,11 +155,7 @@ class PengajuanController extends Controller
             'total_dana' => (clone $query)->whereIn('status', ['dicairkan', 'menunggu_bukti', 'selesai'])->sum('nominal_total'),
         ];
 
-        $divisions = User::whereNotNull('division')
-            ->where('division', '!=', '')
-            ->distinct()
-            ->orderBy('division')
-            ->pluck('division');
+        $divisions = $this->getAvailableDivisions();
 
         $pengajuanList = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
         $hasOverdue = $this->pengajuanService->hasOverdueRealization($user);
@@ -213,7 +186,7 @@ class PengajuanController extends Controller
      * Halaman khusus Atasan untuk menyetujui pengajuan dari karyawan bawahan (§8.1).
      * Hanya menampilkan pengajuan yang ditujukan kepada atasan yang sedang login.
      */
-    public function approvals(Request $request): View
+    public function approvals(Request $request): View|StreamedResponse
     {
         $user = $request->user();
         if (! $this->isAtasanUser($user)) {
@@ -266,12 +239,21 @@ class PengajuanController extends Controller
             $query->where('jenis', strtoupper($request->input('jenis')));
         }
 
-        if ($request->filled('month')) {
-            $query->whereMonth('created_at', (int) $request->input('month'));
+        if ($request->filled('divisi')) {
+            $divisi = $request->input('divisi');
+            $query->whereHas('user', function ($q) use ($divisi) {
+                $q->where('division', $divisi);
+            });
         }
 
-        if ($request->filled('year')) {
-            $query->whereYear('created_at', (int) $request->input('year'));
+        if ($request->filled('month') || $request->filled('bulan')) {
+            $mVal = (int) ($request->input('month') ?: $request->input('bulan'));
+            $query->whereMonth('created_at', $mVal);
+        }
+
+        if ($request->filled('year') || $request->filled('tahun')) {
+            $yVal = (int) ($request->input('year') ?: $request->input('tahun'));
+            $query->whereYear('created_at', $yVal);
         }
 
         $statusFilter = $request->input('status', 'all');
@@ -287,7 +269,13 @@ class PengajuanController extends Controller
             }
         }
 
-        $pengajuanList = $query->orderBy('created_at', 'desc')->paginate(15);
+        if (in_array($request->input('export'), ['excel', 'csv', '1'], true)) {
+            $exportItems = (clone $query)->orderBy('created_at', 'desc')->get();
+            return $this->streamExcelExport($exportItems, 'Persetujuan_Pengajuan_Karyawan');
+        }
+
+        $divisions = $this->getAvailableDivisions();
+        $pengajuanList = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return view('gomsn.pengajuan.approvals', compact(
             'pengajuanList',
@@ -296,8 +284,88 @@ class PengajuanController extends Controller
             'pendingCount',
             'approvedCount',
             'rejectedCount',
-            'totalDana'
+            'totalDana',
+            'divisions'
         ));
+    }
+
+    /**
+     * Get distinct divisions list for filter dropdown.
+     */
+    protected function getAvailableDivisions()
+    {
+        $dbDivisions = User::whereNotNull('division')
+            ->where('division', '!=', '')
+            ->distinct()
+            ->orderBy('division')
+            ->pluck('division')
+            ->toArray();
+
+        $defaults = ['NOC', 'Teknik', 'Umum', 'Finance & Akuntansi', 'HRD & Human Capital'];
+
+        return collect(array_unique(array_merge($defaults, $dbDivisions)))->sort()->values();
+    }
+
+    /**
+     * Stream Excel (.xls) export for Pengajuan Karyawan.
+     */
+    protected function streamExcelExport($exportItems, string $filenamePrefix = 'Data_Pengajuan_Karyawan'): StreamedResponse
+    {
+        $filename = $filenamePrefix . '_' . date('Ymd_His') . '.xls';
+        $headers = [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'max-age=0',
+        ];
+
+        $callback = function () use ($exportItems) {
+            echo "\xEF\xBB\xBF";
+            echo '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+            echo '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>';
+            echo '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:12px;">';
+            echo '<thead><tr style="background-color:#155E63;color:#ffffff;font-weight:bold;">';
+            echo '<th>No</th>';
+            echo '<th>ID Pengajuan</th>';
+            echo '<th>Nomor Pengajuan</th>';
+            echo '<th>Tanggal Pengajuan</th>';
+            echo '<th>Nama Karyawan</th>';
+            echo '<th>NIK</th>';
+            echo '<th>Divisi</th>';
+            echo '<th>Jenis Pengajuan</th>';
+            echo '<th>Keperluan</th>';
+            echo '<th>Status</th>';
+            echo '<th>Total Nominal (Rp)</th>';
+            echo '</tr></thead><tbody>';
+
+            $totalSum = 0;
+            foreach ($exportItems as $idx => $item) {
+                $nominal = (float) ($item->total_nominal ?? $item->nominal_total ?? 0);
+                if ($item->jenis !== 'STOK') {
+                    $totalSum += $nominal;
+                }
+                echo '<tr>';
+                echo '<td align="center">' . ($idx + 1) . '</td>';
+                echo '<td align="center">#' . $item->id . '</td>';
+                echo '<td>' . e($item->nomor_pengajuan) . '</td>';
+                echo '<td>' . $item->created_at->format('d/m/Y H:i') . '</td>';
+                echo '<td>' . e($item->user?->name ?? '-') . '</td>';
+                echo '<td>' . e($item->user?->employee_code ?? '-') . '</td>';
+                echo '<td>' . e($item->user?->division ?? '-') . '</td>';
+                echo '<td align="center">' . e($item->jenis) . '</td>';
+                echo '<td>' . e($item->keperluan ?? '-') . '</td>';
+                echo '<td>' . e(strtoupper(str_replace('_', ' ', $item->status))) . '</td>';
+                echo '<td align="right">' . number_format($nominal, 0, ',', '.') . '</td>';
+                echo '</tr>';
+            }
+
+            echo '<tr style="background-color:#F1F5F9;font-weight:bold;">';
+            echo '<td colspan="10" align="right">TOTAL NOMINAL</td>';
+            echo '<td align="right">Rp ' . number_format($totalSum, 0, ',', '.') . '</td>';
+            echo '</tr>';
+            echo '</tbody></table></body></html>';
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
