@@ -1,39 +1,29 @@
 <x-layouts.app title="Masuk ke Akun — GoMSN">
     <div class="min-h-screen w-full flex flex-col lg:flex-row select-none overflow-x-hidden" 
-         style="background-color: #F8FAFC; background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px); background-size: 20px 20px;"
-         x-data="{ 
-        showPw: false,
-        moreRolesOpen: false,
-        quickLogin(identifier, password) {
-            const idField = document.getElementById('identifier');
-            const pwField = document.getElementById('password');
-            if (idField && pwField) {
-                idField.value = identifier;
-                pwField.value = password;
-                idField.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50/50');
-                pwField.classList.add('ring-2', 'ring-teal-500', 'bg-teal-50/50');
-                setTimeout(() => {
-                    idField.classList.remove('ring-2', 'ring-teal-500', 'bg-teal-50/50');
-                    pwField.classList.remove('ring-2', 'ring-teal-500', 'bg-teal-50/50');
-                }, 400);
-            }
-        }
-    }">
+         style="background-color: #F8FAFC; background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 1px); background-size: 24px 24px;"
+         x-data="{ showPw: false }">
         <!-- ============================================================== -->
         <!-- LEFT PANEL (DESKTOP) / TOP BANNER (MOBILE) - THEMA SIDEBAR TEAL (50%) -->
         <!-- ============================================================== -->
-        <div class="w-full lg:w-1/2 shrink-0 relative flex flex-col justify-between py-10 px-6 sm:px-10 lg:py-16 text-center text-white z-10"
+        <div class="w-full lg:w-1/2 shrink-0 relative flex flex-col justify-between py-10 px-6 sm:px-10 lg:py-16 text-center text-white z-10 overflow-hidden"
              style="background: linear-gradient(165deg, #072d31 0%, #0c4349 20%, #155E63 50%, #17555B 80%, #1F2937 100%);">
             
             <!-- Specular Gloss Highlight Rims -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/60 to-transparent pointer-events-none"></div>
             <div class="absolute inset-y-0 left-0 w-[1px] bg-gradient-to-b from-white/10 via-white/5 to-transparent pointer-events-none"></div>
 
+            <!-- Subtle Micro-texture & Ambient Glow on Green Panel -->
+            <div class="absolute inset-0 pointer-events-none opacity-[0.18]"
+                 style="background-image: radial-gradient(rgba(94, 234, 212, 0.4) 1px, transparent 1px), linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+                        background-size: 24px 24px, 48px 48px, 48px 48px;"></div>
+            <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-teal-400/15 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-emerald-400/10 blur-3xl pointer-events-none"></div>
+
             <!-- DESKTOP ORGANIC CURVED WAVE (RIGHT EDGE) COVERED IN FULL DOT GRID -->
             <div class="hidden lg:block absolute -right-[2px] top-0 bottom-0 h-full w-24 xl:w-32 z-30 pointer-events-none"
                  style="background-color: #F8FAFC; 
-                        background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px); 
-                        background-size: 20px 20px; 
+                        background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 1px); 
+                        background-size: 24px 24px; 
                         background-position: calc(100% - 2px) top;
                         -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 1000' preserveAspectRatio='none'%3E%3Cpath d='M 0 0 C 18 200, 55 340, 20 500 C -10 660, 48 800, 0 1000 L 130 1000 L 130 0 Z' fill='black' /%3E%3C/svg%3E&quot;);
                         mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 1000' preserveAspectRatio='none'%3E%3Cpath d='M 0 0 C 18 200, 55 340, 20 500 C -10 660, 48 800, 0 1000 L 130 1000 L 130 0 Z' fill='black' /%3E%3C/svg%3E&quot;);
@@ -46,8 +36,8 @@
             <!-- MOBILE HORIZONTAL WAVE (BOTTOM EDGE) COVERED IN FULL DOT GRID -->
             <div class="lg:hidden absolute -bottom-[2px] left-0 right-0 w-full h-14 sm:h-20 pointer-events-none z-30"
                  style="background-color: #F8FAFC; 
-                        background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px); 
-                        background-size: 20px 20px; 
+                        background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 1px); 
+                        background-size: 24px 24px; 
                         background-position: left calc(100% - 2px);
                         -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 120' preserveAspectRatio='none'%3E%3Cpath d='M 0 68 C 180 96, 480 42, 740 78 C 880 96, 950 68, 1000 72 L 1000 130 L 0 130 Z' fill='black' /%3E%3C/svg%3E&quot;);
                         mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 120' preserveAspectRatio='none'%3E%3Cpath d='M 0 68 C 180 96, 480 42, 740 78 C 880 96, 950 68, 1000 72 L 1000 130 L 0 130 Z' fill='black' /%3E%3C/svg%3E&quot;);
@@ -94,10 +84,10 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- RIGHT PANEL: LOGIN FORM & FAST DEMO ACCOUNT ACCESS (50%)       -->
+        <!-- RIGHT PANEL: LOGIN FORM (50%)                                  -->
         <!-- ============================================================== -->
         <div class="w-full lg:w-1/2 flex-1 flex flex-col justify-center items-center py-8 px-4 sm:px-8 lg:p-12 relative min-h-[500px] -mt-[1px] lg:mt-0"
-             style="background-color: #F8FAFC; background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px); background-size: 20px 20px; background-position: left top;">
+             style="background-color: #F8FAFC; background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 1px); background-size: 24px 24px; background-position: left top;">
             
             <div class="w-full max-w-md mx-auto relative z-10">
                 
@@ -162,8 +152,8 @@
                                 type="text"
                                 required
                                 autofocus
-                                value="{{ old('identifier', 'KR24521') }}"
-                                placeholder="Ipin Aripin / KR24521"
+                                value="{{ old('identifier') }}"
+                                placeholder="Masukkan email, username, atau NIK"
                                 class="w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition-all"
                             >
                         </div>
@@ -185,8 +175,8 @@
                                 name="password"
                                 :type="showPw ? 'text' : 'password'"
                                 required
-                                value="MsnPortal#2026"
-                                placeholder="Kata sandi"
+                                value=""
+                                placeholder="Masukkan kata sandi"
                                 class="w-full pl-10 pr-11 py-2.5 sm:py-3 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition-all font-mono"
                             >
                             <!-- Show / Hide Password Eye Icon -->
@@ -208,15 +198,12 @@
                         </div>
                     </div>
 
-                    <!-- Checkbox Ingat Saya & Hint Password -->
+                    <!-- Checkbox Ingat Saya -->
                     <div class="flex items-center justify-between text-xs text-slate-600 select-none pt-0.5">
                         <label class="inline-flex items-center gap-2 cursor-pointer font-medium">
                             <input type="checkbox" name="remember" checked class="w-4 h-4 rounded border-slate-300 text-[#155E63] focus:ring-teal-600">
                             <span>Ingat saya di perangkat ini (30 Hari)</span>
                         </label>
-                        <span class="font-mono text-[11px] text-slate-400 hidden sm:inline" title="Kata sandi akun uji coba">
-                            Pass: <strong class="text-slate-600 font-semibold">MsnPortal#2026</strong>
-                        </span>
                     </div>
 
                     <!-- Tombol Masuk ke Dashboard (Gradient Tema Sidebar) -->
@@ -229,96 +216,6 @@
                         <span>Masuk ke Dashboard</span>
                     </button>
                 </form>
-
-                <!-- Divider AKSES CEPAT DEMO AKUN -->
-                <div class="relative my-6 flex items-center justify-center">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-slate-200"></div>
-                    </div>
-                    <span class="relative bg-[#F8FAFC] px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        AKSES CEPAT DEMO AKUN
-                    </span>
-                </div>
-
-                <!-- 3 Quick Demo Cards (Persis Gambar Mockup) -->
-                <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
-                    <!-- Card 1: Admin NOC / IT -->
-                    <button type="button" 
-                            @click="quickLogin('KR00010', 'MsnPortal#2026')"
-                            class="p-3 rounded-xl bg-white border border-slate-200/90 hover:border-teal-500 hover:shadow-md transition text-center cursor-pointer group flex flex-col items-center justify-center shadow-2xs">
-                        <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                            </svg>
-                        </div>
-                        <span class="block text-[11px] font-bold text-slate-800 group-hover:text-teal-700 leading-tight">Admin NOC</span>
-                        <span class="block text-[9px] text-slate-400 font-medium mt-0.5">Full System</span>
-                    </button>
-
-                    <!-- Card 2: HelpDesk NOC -->
-                    <button type="button" 
-                            @click="quickLogin('KR31444', 'MsnPortal#2026')"
-                            class="p-3 rounded-xl bg-white border border-slate-200/90 hover:border-teal-500 hover:shadow-md transition text-center cursor-pointer group flex flex-col items-center justify-center shadow-2xs">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/>
-                            </svg>
-                        </div>
-                        <span class="block text-[11px] font-bold text-slate-800 group-hover:text-teal-700 leading-tight">HelpDesk NOC</span>
-                        <span class="block text-[9px] text-slate-400 font-medium mt-0.5">Tiket &amp; Dispatch</span>
-                    </button>
-
-                    <!-- Card 3: Tim Teknis (Ipin Aripin) -->
-                    <button type="button" 
-                            @click="quickLogin('KR24521', 'MsnPortal#2026')"
-                            class="p-3 rounded-xl bg-white border border-slate-200/90 hover:border-teal-500 hover:shadow-md transition text-center cursor-pointer group flex flex-col items-center justify-center shadow-2xs">
-                        <div class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </div>
-                        <span class="block text-[11px] font-bold text-slate-800 group-hover:text-teal-700 leading-tight">Tim Teknis</span>
-                        <span class="block text-[9px] text-slate-400 font-medium mt-0.5">Lapangan &amp; JC</span>
-                    </button>
-                </div>
-
-                <!-- Expander untuk 7 Role Lainnya (Finance, HRD, Atasan Umum, CEO, dll) -->
-                <div class="mt-3 text-center">
-                    <button type="button" 
-                            @click="moreRolesOpen = !moreRolesOpen"
-                            class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal-700 hover:text-teal-900 transition cursor-pointer">
-                        <span x-text="moreRolesOpen ? 'Tutup Pilihan Role' : 'Pilihan Role Lainnya (HRD, Finance, CEO...)'"></span>
-                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="moreRolesOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-
-                    <div x-show="moreRolesOpen" x-cloak class="mt-2.5 grid grid-cols-2 gap-2 text-left pt-2 border-t border-slate-100">
-                        @php
-                            $extraPersonas = [
-                                ['id' => 'KR6465', 'label' => 'Finance', 'name' => 'Karmelia D.', 'divisi' => 'Finance', 'icon' => '💳'],
-                                ['id' => 'KR48567', 'label' => 'HRD', 'name' => 'Amelia Agustina', 'divisi' => 'HRD', 'icon' => '👥'],
-                                ['id' => 'KR00071', 'label' => 'CEO', 'name' => 'YUDIANA ARIFIN', 'divisi' => 'Direksi', 'icon' => '🏛️'],
-                                ['id' => 'KR59446', 'label' => 'Atasan NOC', 'name' => 'Bagus Joko P.', 'divisi' => 'NOC', 'icon' => '📡'],
-                                ['id' => 'KR64654', 'label' => 'Atasan Umum', 'name' => 'Ida', 'divisi' => 'Umum', 'icon' => '📋'],
-                                ['id' => 'KR20268', 'label' => 'Karyawan Teknik', 'name' => 'Christian Perdi', 'divisi' => 'Teknik', 'icon' => '👷'],
-                                ['id' => 'KR51462', 'label' => 'Karyawan Umum', 'name' => 'Depi Sopandi', 'divisi' => 'Umum', 'icon' => '📦'],
-                            ];
-                        @endphp
-                        @foreach ($extraPersonas as $ep)
-                        <button type="button"
-                                @click="quickLogin('{{ $ep['id'] }}', 'MsnPortal#2026')"
-                                class="p-2 rounded-lg bg-white border border-slate-200 hover:border-teal-400 hover:bg-teal-50/50 transition cursor-pointer flex items-center justify-between text-xs shadow-2xs">
-                            <div class="flex items-center gap-1.5 min-w-0">
-                                <span>{{ $ep['icon'] }}</span>
-                                <span class="font-bold text-slate-800 text-[11px] truncate">{{ $ep['label'] }}</span>
-                            </div>
-                            <span class="text-[9px] font-mono text-slate-400">{{ $ep['id'] }}</span>
-                        </button>
-                        @endforeach
-                    </div>
-                </div>
 
             </div>
         </div>
