@@ -166,8 +166,8 @@
                 @endif
 
                 <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-                <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+                <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_6px_24px_rgba(2,43,58,0.3)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 sm:gap-4 select-none"
+                     style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -175,43 +175,43 @@
 
                     <!-- Left: Glowing Calendar Icon + User Info -->
                     <div class="relative z-10 flex items-center gap-3.5 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                        <div class="w-11 h-11 rounded-2xl bg-white/12 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                             <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                         </div>
                         <div class="min-w-0">
-                            <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
-                                <span>Jadwal Kerja Saya</span>
+                            <h1 class="font-heading text-base sm:text-lg font-extrabold text-white tracking-tight leading-snug truncate">
+                                Jadwal Kerja Saya
                             </h1>
-                            <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                                {{ strtoupper($actor->name) }} · NIK: {{ $actor->employee_code ?? 'KR92590' }} · Divisi: {{ $actor->division ?: 'Operasional' }}
+                            <p class="text-[11px] sm:text-xs text-teal-100/85 mt-0.5 leading-snug truncate">
+                                {{ strtoupper($actor->name) }} &bull; {{ $actor->employee_code ?? 'KR92590' }} &bull; {{ $actor->division ?: 'Operasional' }}
                             </p>
                         </div>
                     </div>
 
                     <!-- Right: Filter Form (Year, Month, Tampilkan) -->
-                    <form method="GET" action="{{ route('attendance.schedules') }}" class="relative z-10 flex items-center gap-2 flex-wrap">
+                    <form method="GET" action="{{ route('attendance.schedules') }}" class="relative z-10 w-full sm:w-auto flex items-center gap-2">
                         <input type="hidden" name="view" value="my">
-                        <div class="relative">
-                            <select name="year" class="appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-1.5 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
+                        <div class="relative w-24 sm:w-auto shrink-0">
+                            <select name="year" class="w-full appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
                                 @for ($y = 2025; $y <= 2030; $y++)
                                     <option value="{{ $y }}" class="bg-slate-800 text-white" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                                 @endfor
                             </select>
-                            <svg class="w-3 h-3 text-cyan-300 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            <svg class="w-3 h-3 text-cyan-300 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
 
-                        <div class="relative">
-                            <select name="month" class="appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-1.5 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
+                        <div class="relative flex-1 sm:flex-initial">
+                            <select name="month" class="w-full appearance-none bg-black/25 backdrop-blur-md border border-white/15 rounded-xl px-3 py-2 pr-7 text-xs font-semibold text-white focus:outline-none focus:ring-1 focus:ring-cyan-400 transition cursor-pointer">
                                 @foreach ($monthNames as $num => $name)
                                     <option value="{{ $num }}" class="bg-slate-800 text-white" {{ $month == $num ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                             </select>
-                            <svg class="w-3 h-3 text-cyan-300 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            <svg class="w-3 h-3 text-cyan-300 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
 
-                        <button type="submit" class="btn-primary !py-1.5 !px-3.5 text-xs font-bold shadow-md shadow-teal-900/30 flex items-center gap-1.5 cursor-pointer">
+                        <button type="submit" class="btn-primary !py-2 !px-3.5 text-xs font-bold shadow-md shadow-teal-900/30 inline-flex items-center justify-center gap-1.5 shrink-0 cursor-pointer">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                             </svg>
@@ -221,15 +221,17 @@
                 </div>
 
                 <!-- 2. Subheader Bar (Month Title + Tombol Permintaan) -->
-                <div class="flex items-center justify-between pt-1">
-                    <div class="flex items-center gap-2 text-slate-800 font-bold text-sm">
-                        <svg class="w-4 h-4 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
+                <div class="flex items-center justify-between pt-0.5 px-0.5">
+                    <div class="flex items-center gap-2 text-slate-800 font-extrabold text-sm">
+                        <div class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-200/70 text-[#155E63] flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
                         <span>{{ $monthName }} {{ $year }}</span>
                     </div>
 
-                    <a href="{{ route('attendance.swaps') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-teal-200 bg-teal-50/70 hover:bg-teal-100 text-[#155E63] text-xs font-semibold transition-all shadow-2xs">
+                    <a href="{{ route('attendance.swaps') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-teal-200 bg-teal-50/80 hover:bg-teal-100 text-[#155E63] text-xs font-bold transition-all shadow-2xs">
                         <svg class="w-3.5 h-3.5 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
@@ -237,15 +239,15 @@
                     </a>
                 </div>
 
-                <!-- 3. Table of Daily Schedules (Image 1 & 2) -->
-                <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs overflow-hidden">
+                <!-- 3. Responsive Daily Schedules List -->
+                <div class="rounded-3xl bg-white border border-slate-200/80 shadow-xs overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="border-b border-slate-100 bg-slate-50/70 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                                    <th class="py-3 px-5">TANGGAL &amp; SHIFT</th>
-                                    <th class="py-3 px-5">JAM KERJA</th>
-                                    <th class="py-3 px-5 text-right sm:pr-8">AKSI</th>
+                                <tr class="border-b border-slate-100 bg-slate-50/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <th class="py-3 px-4 sm:px-5">TANGGAL &amp; SHIFT</th>
+                                    <th class="hidden sm:table-cell py-3 px-5">JAM KERJA</th>
+                                    <th class="py-3 px-4 sm:px-5 text-right sm:pr-7 w-16 sm:w-24">AKSI</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -257,64 +259,80 @@
                                         $dateString = $dateObj->toDateString();
                                         $dayNum = sprintf('%02d', $day);
                                         $dayNamesIndo = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB'];
+                                        $dayNamesFull = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
                                         $dayNameStr = $dayNamesIndo[$dateObj->dayOfWeek];
+                                        $dayNameLong = $dayNamesFull[$dateObj->dayOfWeek];
 
                                         $sched = $mySchedules->get($day);
                                         $holiday = $holidays->get($day);
 
                                         $isLibur = false;
+                                        $shiftTitle = '';
                                         $shiftName = '';
                                         $workHours = '—';
 
                                         if ($sched && $sched->shift) {
                                             if ($sched->shift->code === 'L' || str_contains(strtolower($sched->shift->name), 'libur')) {
                                                 $isLibur = true;
+                                                $shiftTitle = 'Libur';
                                                 $shiftName = 'Libur';
                                             } else {
                                                 $startTime = substr($sched->shift->start_time, 0, 5);
                                                 $endTime = substr($sched->shift->end_time, 0, 5);
+                                                $shiftTitle = $sched->shift->name;
                                                 $shiftName = $sched->shift->name . ' (' . $startTime . '–' . $endTime . ')';
-                                                $workHours = $startTime . ' → ' . $endTime;
+                                                $workHours = $startTime . ' – ' . $endTime;
                                             }
                                         } elseif ($holiday || $dateObj->isWeekend()) {
                                             $isLibur = true;
-                                            $shiftName = $holiday ? $holiday->name : 'Libur';
+                                            $shiftTitle = $holiday ? $holiday->name : 'Libur';
+                                            $shiftName = $shiftTitle;
                                         } else {
+                                            $shiftTitle = 'Shift Pagi';
                                             $shiftName = 'Pagi (08:15–17:00)';
-                                            $workHours = '08:15 → 17:00';
+                                            $workHours = '08:15 – 17:00';
                                         }
                                     @endphp
-                                    <tr class="hover:bg-slate-50/70 transition-colors {{ $isToday ? 'bg-teal-50/25' : '' }}">
+                                    <tr class="hover:bg-slate-50/70 transition-colors {{ $isToday ? 'bg-teal-50/30' : '' }}">
                                         <!-- Tanggal & Shift -->
-                                        <td class="py-3.5 px-5">
-                                            <div class="flex items-center gap-3.5">
+                                        <td class="py-3 sm:py-3.5 px-3.5 sm:px-5">
+                                            <div class="flex items-center gap-3 sm:gap-3.5">
                                                 <!-- Date Card Badge -->
-                                                <div class="w-13 h-13 rounded-2xl flex flex-col items-center justify-center shrink-0 transition-all {{ $isToday ? 'bg-[#155E63] text-white shadow-sm shadow-teal-900/30 ring-2 ring-teal-400/40' : 'bg-slate-50 border border-slate-200/90 text-slate-800' }}">
-                                                    <span class="font-heading font-extrabold text-base leading-tight">{{ $dayNum }}</span>
-                                                    <span class="text-[10px] font-bold tracking-wider uppercase {{ $isToday ? 'text-teal-100' : 'text-slate-400' }}">{{ $dayNameStr }}</span>
+                                                <div class="w-12 h-12 sm:w-13 sm:h-13 rounded-2xl flex flex-col items-center justify-center shrink-0 transition-all {{ $isToday ? 'bg-[#155E63] text-white shadow-sm shadow-teal-900/30 ring-2 ring-teal-400/40' : ($isLibur ? 'bg-rose-50/60 border border-rose-200/70 text-rose-700' : 'bg-slate-50 border border-slate-200/90 text-slate-800') }}">
+                                                    <span class="font-heading font-extrabold text-sm sm:text-base leading-tight">{{ $dayNum }}</span>
+                                                    <span class="text-[10px] font-bold tracking-wider uppercase {{ $isToday ? 'text-teal-100' : ($isLibur ? 'text-rose-400' : 'text-slate-400') }}">{{ $dayNameStr }}</span>
                                                 </div>
 
-                                                <div class="space-y-1">
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="text-xs font-semibold text-slate-800">{{ $monthName }} {{ $year }}</span>
+                                                <div class="min-w-0 flex-1 space-y-1">
+                                                    <!-- Date Label Row -->
+                                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                                        <span class="text-xs font-bold text-slate-800 truncate">
+                                                            {{ $dayNameLong }}, {{ $dayNum }} {{ substr($monthName, 0, 3) }} {{ $year }}
+                                                        </span>
                                                         @if ($isToday)
-                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#155E63] text-white text-[10px] font-bold tracking-wide">
+                                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-[#155E63] text-white text-[10px] font-bold tracking-wide shrink-0">
                                                                 Hari Ini
                                                             </span>
                                                         @endif
                                                     </div>
 
-                                                    <!-- Shift Badge -->
-                                                    <div>
+                                                    <!-- Shift Badge + Mobile Inline Work Hours (No Double Wrapping!) -->
+                                                    <div class="flex flex-wrap items-center gap-1.5">
                                                         @if ($isLibur)
-                                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 border border-rose-200/80 text-rose-600">
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 border border-rose-200/80 text-rose-600 whitespace-nowrap">
                                                                 <span>⭐</span>
-                                                                <span>Libur</span>
+                                                                <span>{{ $shiftTitle }}</span>
                                                             </span>
                                                         @else
-                                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 border border-sky-200/80 text-sky-700">
+                                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 border border-sky-200/80 text-sky-700 whitespace-nowrap">
                                                                 <span>🌅</span>
-                                                                <span>{{ $shiftName }}</span>
+                                                                <span>{{ $shiftTitle }}</span>
+                                                            </span>
+                                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100/90 border border-slate-200/70 text-[11px] font-mono font-semibold text-slate-600 whitespace-nowrap">
+                                                                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                                </svg>
+                                                                <span>{{ $workHours }}</span>
                                                             </span>
                                                         @endif
                                                     </div>
@@ -322,17 +340,17 @@
                                             </div>
                                         </td>
 
-                                        <!-- Jam Kerja -->
-                                        <td class="py-3.5 px-5 text-xs font-medium text-slate-600 font-mono">
+                                        <!-- Jam Kerja (Desktop Column) -->
+                                        <td class="hidden sm:table-cell py-3.5 px-5 text-xs font-semibold text-slate-600 font-mono whitespace-nowrap">
                                             {{ $workHours }}
                                         </td>
 
                                         <!-- Aksi Button -->
-                                        <td class="py-3.5 px-5 text-right sm:pr-8">
+                                        <td class="py-3 sm:py-3.5 px-3.5 sm:px-5 text-right sm:pr-7">
                                             @if ($isFuture)
                                                 <button type="button"
                                                         @click="openPilihAksi('{{ $dateString }}', '{{ $dayNum }} {{ $monthName }} {{ $year }}', '{{ $shiftName }}')"
-                                                        class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#155E63] hover:bg-[#0c4349] text-white shadow-xs hover:shadow-md transition-all cursor-pointer transform hover:scale-105 active:scale-95"
+                                                        class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#155E63] hover:bg-[#0c4349] text-white shadow-xs hover:shadow-md transition-all cursor-pointer transform hover:scale-105 active:scale-95"
                                                         title="Tukar atau Backup Shift">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
@@ -341,7 +359,7 @@
                                             @else
                                                 <button type="button"
                                                         disabled
-                                                        class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200/60"
+                                                        class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200/60"
                                                         title="Tanggal lampau tidak dapat ditukar">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
