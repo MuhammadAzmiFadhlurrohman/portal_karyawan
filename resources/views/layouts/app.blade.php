@@ -1339,17 +1339,17 @@
                 <!-- 3. Integrated Search Bar Inside Theme Header -->
                 <div class="px-5 pb-3.5 relative z-10">
                     <div class="relative flex items-center">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-teal-200/80">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </div>
                         <input type="text" 
                                x-model="sheetSearch" 
                                placeholder="Cari layanan (absen, lembur, kasbon, tiket)..."
-                               class="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-white/15 bg-white/12 backdrop-blur-xs focus:bg-white focus:border-white focus:ring-2 focus:ring-[#5eead4]/40 transition text-white focus:text-slate-800 placeholder:text-teal-100/65 focus:placeholder:text-slate-400">
+                               class="peer w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-white/20 bg-white/12 focus:bg-white focus:border-white focus:ring-2 focus:ring-[#5eead4]/40 transition text-white focus:text-slate-800 placeholder:text-teal-100/70 focus:placeholder:text-slate-400">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10 text-teal-100 peer-focus:text-[#155E63] transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
                         <button type="button" 
                                 x-show="sheetSearch" 
                                 @click="sheetSearch = ''" 
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-teal-200 hover:text-white text-xs cursor-pointer">
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center z-10 text-teal-200 hover:text-white peer-focus:text-slate-400 peer-focus:hover:text-slate-700 text-xs cursor-pointer">
                             &times;
                         </button>
                     </div>
