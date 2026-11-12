@@ -143,7 +143,7 @@
         </div>
 
         <!-- FLOATING COMPACT LOCATION PILL (Di Atas Kiri Navigasi Bar Mobile sesuai Referensi) -->
-        <div class="fixed bottom-[68px] left-3.5 sm:left-6 md:bottom-6 md:left-[280px] z-30 select-none"
+        <div class="fixed bottom-[65px] left-3.5 sm:left-6 md:bottom-[22px] md:left-[280px] z-30 select-none"
              @click.outside="showLocationDetail = false">
             
             <!-- Mini Popover Detail Lokasi saat Pill Diklik -->
@@ -325,6 +325,7 @@
             </div>
 
             <!-- Main Dynamic Button -->
+            @if (! $faceTemplate || ! $todayAttendance || ! $todayAttendance->clock_out_at)
             <div class="space-y-3">
                 @if (! $faceTemplate)
                     <!-- JIKA BELUM DAFTAR WAJAH -> TOMBOL DAFTAR -->
@@ -368,18 +369,10 @@
                                 <span>Absen Pulang Sekarang</span>
                             </button>
                         </form>
-                    @else
-                        <div class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 text-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 select-none shadow-2xs">
-                            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </span>
-                            <span>Presensi Hari Ini Telah Selesai</span>
-                        </div>
                     @endif
                 @endif
             </div>
+            @endif
         </div>
 
         <!-- MODAL 1: DAFTARKAN WAJAH (Biometric Enrollment - Tanpa Simulasi) -->
