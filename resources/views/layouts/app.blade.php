@@ -1586,5 +1586,57 @@
     <!-- Floating Chatbot Asisten PT MSN (§5.8) -->
     <x-chatbot-widget />
     @endauth
+
+    <!-- SweetAlert2 Toast Global Notifier (Ujung Kanan Atas) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function triggerToast(icon, message) {
+                if (!message) return;
+                const fire = () => {
+                    if (window.Toast) {
+                        window.Toast.fire({
+                            icon: icon,
+                            title: message
+                        });
+                    } else if (window.Swal) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 4500,
+                            timerProgressBar: true,
+                            padding: '0.75rem 1.25rem',
+                            customClass: {
+                                popup: 'rounded-2xl shadow-2xl border border-slate-100 text-xs sm:text-sm font-sans select-none',
+                                title: 'font-semibold text-slate-800 text-xs sm:text-sm',
+                            },
+                            icon: icon,
+                            title: message
+                        });
+                    }
+                };
+
+                if (window.Toast || window.Swal) {
+                    fire();
+                } else {
+                    setTimeout(fire, 200);
+                }
+            }
+
+            @if (session('success'))
+                triggerToast('success', {!! json_encode(session('success')) !!});
+            @elseif (session('status'))
+                triggerToast('success', {!! json_encode(session('status')) !!});
+            @elseif (session('message'))
+                triggerToast('info', {!! json_encode(session('message')) !!});
+            @elseif (session('warning'))
+                triggerToast('warning', {!! json_encode(session('warning')) !!});
+            @elseif (session('error'))
+                triggerToast('error', {!! json_encode(session('error')) !!});
+            @elseif (isset($errors) && $errors->any())
+                triggerToast('error', {!! json_encode($errors->first()) !!});
+            @endif
+        });
+    </script>
 </body>
 </html>

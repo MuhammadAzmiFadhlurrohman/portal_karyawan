@@ -129,9 +129,12 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DeUPnr0P.js",
+    "file": "assets/app-DghcbAvV.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "css": [
+      "assets/app-U0Zsyrl3.css"
+    ]
   }
 }

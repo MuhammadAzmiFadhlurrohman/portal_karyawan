@@ -602,11 +602,19 @@
                                 this.photoPreview = null;
                             })
                             .catch((err) => {
-                                alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                if (window.showToast) {
+                                    window.showToast('warning', 'Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                } else {
+                                    alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                }
                                 this.useProfileSnapshot();
                             });
                     } else {
-                        alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        if (window.showToast) {
+                            window.showToast('warning', 'Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        } else {
+                            alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        }
                         this.useProfileSnapshot();
                     }
                 },
@@ -645,7 +653,11 @@
                         video.srcObject.getTracks().forEach(track => track.stop());
                         video.srcObject = null;
                     }
-                    alert('Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
+                    if (window.showToast) {
+                        window.showToast('success', 'Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
+                    } else {
+                        alert('Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
+                    }
                 },
 
                 // Clock-in Face Verification Modal controls
@@ -672,11 +684,19 @@
                                 this.clockInPhotoPreview = null;
                             })
                             .catch((err) => {
-                                alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                if (window.showToast) {
+                                    window.showToast('warning', 'Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                } else {
+                                    alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                }
                                 this.useClockInSimulation();
                             });
                     } else {
-                        alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        if (window.showToast) {
+                            window.showToast('warning', 'Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        } else {
+                            alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        }
                         this.useClockInSimulation();
                     }
                 },
@@ -713,13 +733,21 @@
                     this.clockInPrimaryImage = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:FRONT|MANUAL") }}';
                     this.clockInChallengeImage = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:CHALLENGE|MANUAL") }}';
                     this.clockInPhotoPreview = null;
-                    alert('Simulasi data biometrik wajah terpasang. Siap untuk absen masuk.');
+                    if (window.showToast) {
+                        window.showToast('success', 'Simulasi data biometrik wajah terpasang. Siap untuk absen masuk.');
+                    } else {
+                        alert('Simulasi data biometrik wajah terpasang. Siap untuk absen masuk.');
+                    }
                 },
 
                 handleClockInSubmit(e) {
                     if (!this.clockInPrimaryImage) {
                         e.preventDefault();
-                        alert('Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.');
+                        if (window.showToast) {
+                            window.showToast('warning', 'Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.');
+                        } else {
+                            alert('Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.');
+                        }
                         if (!this.clockInCameraActive) {
                             this.startClockInCamera();
                         }

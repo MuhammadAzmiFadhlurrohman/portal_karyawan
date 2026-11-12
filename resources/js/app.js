@@ -2,8 +2,39 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import collapse from '@alpinejs/collapse';
 import Chart from 'chart.js/auto';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 window.Chart = Chart;
+window.Swal = Swal;
+
+// Global SweetAlert Toast di ujung kanan atas (top-end)
+const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 4000,
+    timerProgressBar: true,
+    padding: '0.75rem 1.25rem',
+    customClass: {
+        popup: 'rounded-2xl shadow-2xl border border-slate-100 text-xs sm:text-sm font-sans select-none',
+        title: 'font-semibold text-slate-800 text-xs sm:text-sm',
+    },
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    }
+});
+
+window.Toast = Toast;
+
+// Helper Global untuk memanggil SweetAlert Toast dari mana saja
+window.showToast = (icon, message, title = '') => {
+    return Toast.fire({
+        icon: icon, // 'success', 'error', 'warning', 'info'
+        title: title ? `<strong>${title}</strong><br><span class="text-xs font-normal text-slate-600">${message}</span>` : message
+    });
+};
 
 Alpine.plugin(collapse);
 
