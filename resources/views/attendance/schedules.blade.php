@@ -811,7 +811,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+                            <div class="flex items-center gap-2 pt-2.5 sm:pt-0 border-t sm:border-0 border-slate-100 w-full sm:w-auto justify-between sm:justify-end shrink-0">
                                 <!-- Status Badge -->
                                 @if ($item['is_ongoing'])
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -1288,7 +1288,71 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    {{-- Mobile View: Employee Schedule Cards --}}
+                    <div class="sm:hidden divide-y divide-slate-100">
+                        @forelse ($users as $idx => $u)
+                            @php
+                                $hasSched = $schedulesByUser->has($u->id) && $schedulesByUser->get($u->id)->isNotEmpty();
+                            @endphp
+                            <div x-show="!searchQuery || '{{ addslashes(strtolower($u->name.' '.$u->employee_code.' '.$u->division)) }}'.includes(searchQuery.toLowerCase())"
+                                 class="p-4 hover:bg-slate-50/70 transition-colors">
+                                <div class="flex items-start justify-between gap-3 mb-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#155E63] to-[#0c4349] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs uppercase">
+                                            {{ substr($u->name, 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <span class="font-heading font-bold text-slate-900 block text-sm">{{ $u->name }}</span>
+                                            <div class="flex items-center gap-1.5 mt-0.5">
+                                                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold text-rose-600 bg-rose-50 border border-rose-200">
+                                                    {{ $u->employee_code ?: 'KR'.$u->id }}
+                                                </span>
+                                                <span class="text-xs text-slate-500 font-medium">• {{ $u->division ?: 'Umum' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if ($hasSched)
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">
+                                            <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            Terdaftar
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 shrink-0">
+                                            <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                            </svg>
+                                            Belum Ada
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-slate-100 mt-2 text-xs">
+                                    <span class="text-slate-500 flex items-center gap-1.5 font-mono text-[11px]">
+                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                        </svg>
+                                        {{ $u->phone ?: '08' . rand(1000000000, 9999999999) }}
+                                    </span>
+                                    <a href="{{ route('attendance.schedules', ['view' => 'user', 'user_id' => $u->id, 'year' => $year, 'month' => $month]) }}"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#155E63] border border-teal-200 text-xs font-bold transition-all shadow-xs">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span>Kelola Jadwal</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="p-8 text-center text-slate-400 italic text-xs">
+                                Tidak ada karyawan yang ditemukan.
+                            </div>
+                        @endforelse
+                    </div>
+
+                    {{-- Desktop View: Table --}}
+                    <div class="hidden sm:block overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-50/75 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
                                 <tr>

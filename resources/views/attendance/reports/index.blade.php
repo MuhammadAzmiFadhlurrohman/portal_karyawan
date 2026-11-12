@@ -163,8 +163,125 @@
                 </div>
             </div>
 
-            <!-- Tabel Data Kehadiran -->
-            <div class="overflow-x-auto">
+            <!-- 1. MOBILE VIEW: Attendance Report Cards (sm:hidden) -->
+            <div class="sm:hidden divide-y divide-slate-100">
+                @forelse ($rows as $idx => $row)
+                    @php
+                        $user = $row['user'];
+                        $att = $row['attendance'];
+                        $isAbsent = ($row['status'] === 'absent');
+                    @endphp
+                    <div class="p-4 space-y-3 bg-white"
+                         x-show="!search || '{{ strtolower(addslashes($user->name . ' ' . $user->employee_code . ' ' . ($user->division ?? ''))) }}'.includes(search.toLowerCase())">
+                        
+                        <!-- Top Row: Avatar + Name + Status Dropdown -->
+                        <div class="flex items-start justify-between gap-2.5">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                @if ($user->avatar_url)
+                                    <img src="{{ $user->avatar_url }}" alt="" class="w-10 h-10 rounded-2xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div style="display: none;" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                                        {{ $user->initials }}
+                                    </div>
+                                @else
+                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                                        {{ $user->initials }}
+                                    </div>
+                                @endif
+                                <div class="min-w-0">
+                                    <span class="font-bold text-slate-900 text-xs block leading-tight truncate">{{ $user->name }}</span>
+                                    <span class="text-[10px] text-slate-400 font-mono mt-0.5 block">{{ $user->employee_code }} &bull; {{ $user->division ?: 'Umum' }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Status Dropdown (Quick Update) -->
+                            <div class="shrink-0">
+                                <select @change="quickUpdateStatus({{ $user->id }}, $event.target.value)"
+                                        class="text-xs font-bold rounded-full px-2.5 py-1 border shadow-2xs cursor-pointer outline-none appearance-none pr-5 text-center
+                                        {{ $row['status'] === 'present' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 
+                                          ($row['status'] === 'late' ? 'bg-amber-50 text-amber-700 border-amber-300' : 
+                                          ($row['status'] === 'absent' ? 'bg-rose-50 text-rose-700 border-rose-300' : 
+                                          ($row['status'] === 'leave' ? 'bg-teal-50 text-teal-700 border-teal-300' : 
+                                          ($row['status'] === 'sick' ? 'bg-yellow-50 text-yellow-800 border-yellow-300' : 'bg-blue-50 text-blue-700 border-blue-300')))) }}">
+                                    <option value="present" @selected($row['status'] === 'present')>✓ Hadir</option>
+                                    <option value="late" @selected($row['status'] === 'late')>⏰ Terlambat</option>
+                                    <option value="absent" @selected($row['status'] === 'absent')>✕ Alpa</option>
+                                    <option value="leave" @selected($row['status'] === 'leave')>🌴 Cuti</option>
+                                    <option value="sick" @selected($row['status'] === 'sick')>🤒 Sakit</option>
+                                    <option value="permission" @selected($row['status'] === 'permission')>📝 Izin</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Clock In / Out & Duration Box -->
+                        <div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-2.5 text-[11px] shadow-2xs">
+                            @if (! $isAbsent && $row['clock_in'])
+                                <div class="grid grid-cols-3 gap-2 text-center">
+                                    <div class="border-r border-slate-200/70 pr-2">
+                                        <span class="text-[10px] text-slate-400 block font-medium">Masuk</span>
+                                        <span class="font-mono font-bold text-slate-800 text-xs">{{ $row['clock_in'] }}</span>
+                                    </div>
+                                    <div class="border-r border-slate-200/70 pr-2">
+                                        <span class="text-[10px] text-slate-400 block font-medium">Pulang</span>
+                                        <span class="font-mono font-medium text-slate-700 text-xs">{{ $row['clock_out'] ?: '-' }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 block font-medium">Total</span>
+                                        <span class="font-bold text-blue-600 text-xs">{{ $row['duration'] ?: '-' }}</span>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="flex items-center justify-between text-rose-600 font-bold text-xs py-0.5">
+                                    <span class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                        <span>Status: Tidak Absen</span>
+                                    </span>
+                                    <span class="text-[10px] font-mono text-slate-400 font-normal">-</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Meta Row: Photo Thumbnail + Location / Maps + Edit Button -->
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 text-xs">
+                            <!-- Photo Thumbnail / Status -->
+                            <div class="flex items-center gap-2">
+                                @if ($row['photo_path'])
+                                    <button type="button" 
+                                            @click="openPhotoModal('/storage/{{ $row['photo_path'] }}', '{{ addslashes($user->name) }}')"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition cursor-pointer">
+                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <span>Foto</span>
+                                    </button>
+                                @endif
+
+                                @if ($row['distance'])
+                                    @if ($row['map_url'])
+                                        <a href="{{ $row['map_url'] }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline">
+                                            <span>📍 {{ $row['distance'] }}</span>
+                                        </a>
+                                    @else
+                                        <span class="text-[11px] text-slate-500">📍 {{ $row['distance'] }}</span>
+                                    @endif
+                                @endif
+                            </div>
+
+                            <!-- Edit Action Button -->
+                            <button type="button" 
+                                    @click="openEditModal({{ json_encode($row) }})" 
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition shadow-2xs cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                <span>Edit</span>
+                            </button>
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-8 text-center text-slate-400 text-xs">
+                        Tidak ada data kehadiran untuk tanggal ini.
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- 2. DESKTOP VIEW: Tabel Data Kehadiran (hidden sm:block) -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="text-slate-400 font-bold uppercase tracking-wider text-[11px] bg-slate-50/70 border-b border-slate-100">

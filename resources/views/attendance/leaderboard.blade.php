@@ -20,11 +20,11 @@
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
-                <form method="POST" action="{{ route('attendance.leaderboard.opt-out') }}">
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <form method="POST" action="{{ route('attendance.leaderboard.opt-out') }}" class="flex-1 sm:flex-initial">
                     @csrf
                     <button type="submit" 
-                            class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition cursor-pointer shadow-2xs">
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition cursor-pointer shadow-2xs">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
                         </svg>
@@ -33,7 +33,7 @@
                 </form>
 
                 <a href="{{ route('attendance.leaderboard.export', ['period_type' => $periodType, 'year' => $year, 'period_value' => $periodValue]) }}"
-                   class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition active:scale-[0.98]">
+                   class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition active:scale-[0.98]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
@@ -47,18 +47,18 @@
             <!-- Glow background decor -->
             <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative z-10">
                 <!-- Left: Rank Info -->
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <div class="flex items-center gap-3.5 sm:gap-4">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.504-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.004 0H9.496m5.004 0a3.75 3.75 0 003.75-3.75V5.25a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v3.75c0 .621-.504 1.125-1.125 1.125h-.872m-5.004 0c-.621 0-1.125-.504-1.125-1.125V5.25a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v6a3.75 3.75 0 003.75 3.75z"/>
                         </svg>
                     </div>
                     <div>
                         <p class="text-[10px] font-bold uppercase tracking-wider text-teal-300 font-mono">PERINGKAT ANDA</p>
                         <div class="flex items-baseline gap-2 mt-0.5">
-                            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                            <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
                                 #{{ $myRanking['rank'] ?? '-' }}
                             </h2>
                             <span class="text-xs text-slate-300 font-medium">
@@ -69,8 +69,8 @@
                 </div>
 
                 <!-- Right: Stats & Motivation Pill -->
-                <div class="flex flex-wrap items-center gap-4 sm:gap-6">
-                    <div class="flex items-center gap-4 text-xs font-medium text-slate-300 border-l border-white/15 pl-4 sm:pl-6">
+                <div class="flex flex-wrap items-center justify-between sm:justify-start gap-3 sm:gap-6 pt-3 sm:pt-0 border-t sm:border-t-0 sm:border-l border-white/15 sm:pl-6">
+                    <div class="flex items-center gap-4 text-xs font-medium text-slate-300">
                         <div>
                             <span class="block text-slate-400 text-[11px]">Hadir</span>
                             <span class="font-bold text-white text-sm">{{ $myRanking['attended_days'] ?? 0 }} hari</span>
@@ -82,7 +82,7 @@
                         </div>
                     </div>
 
-                    <div class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-slate-800 text-xs font-bold shadow-sm select-none">
+                    <div class="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white text-slate-800 text-xs font-bold shadow-sm select-none">
                         <span>🚀</span>
                         <span>Terus semangat!</span>
                     </div>
@@ -164,8 +164,135 @@
                 </span>
             </div>
 
-            <!-- Table Content -->
-            <div class="overflow-x-auto">
+            <!-- 1. MOBILE VIEW: Leaderboard Cards (sm:hidden) -->
+            <div class="sm:hidden divide-y divide-slate-100">
+                @forelse ($rankings as $row)
+                    @php
+                        $lateMins = (int) $row['total_late_minutes'];
+                        $hours = intdiv($lateMins, 60);
+                        $mins = $lateMins % 60;
+                        $lateFormatted = $hours > 0 ? "{$hours}j {$mins}m" : "{$mins}m";
+                        $isMe = ($row['user_id'] === $user->id);
+                    @endphp
+                    <div class="p-4 space-y-3 {{ $isMe ? 'bg-teal-50/40' : 'bg-white' }}">
+                        <!-- Top Row: Rank Badge + Avatar + Name + Division -->
+                        <div class="flex items-center justify-between gap-2.5">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <!-- Rank Medal / Number -->
+                                <div class="shrink-0">
+                                    @if ($row['rank'] === 1)
+                                        <div class="w-7 h-7 flex items-center justify-center">
+                                            <svg class="w-6 h-6 drop-shadow-2xs" viewBox="0 0 36 36" fill="none">
+                                                <path d="M12 4L6 18h6l3-8-3-6z" fill="#DC2626"/>
+                                                <path d="M24 4l6 18h-6l-3-8 3-6z" fill="#B91C1C"/>
+                                                <circle cx="18" cy="22" r="11" fill="#F59E0B" stroke="#D97706" stroke-width="2"/>
+                                                <circle cx="18" cy="22" r="8.5" fill="#FBBF24"/>
+                                                <text x="18" y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#78350F">1</text>
+                                            </svg>
+                                        </div>
+                                    @elseif ($row['rank'] === 2)
+                                        <div class="w-7 h-7 flex items-center justify-center">
+                                            <svg class="w-6 h-6 drop-shadow-2xs" viewBox="0 0 36 36" fill="none">
+                                                <path d="M12 4L6 18h6l3-8-3-6z" fill="#0284C7"/>
+                                                <path d="M24 4l6 18h-6l-3-8 3-6z" fill="#0369A1"/>
+                                                <circle cx="18" cy="22" r="11" fill="#94A3B8" stroke="#64748B" stroke-width="2"/>
+                                                <circle cx="18" cy="22" r="8.5" fill="#CBD5E1"/>
+                                                <text x="18" y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#1E293B">2</text>
+                                            </svg>
+                                        </div>
+                                    @elseif ($row['rank'] === 3)
+                                        <div class="w-7 h-7 flex items-center justify-center">
+                                            <svg class="w-6 h-6 drop-shadow-2xs" viewBox="0 0 36 36" fill="none">
+                                                <path d="M12 4L6 18h6l3-8-3-6z" fill="#16A34A"/>
+                                                <path d="M24 4l6 18h-6l-3-8 3-6z" fill="#15803D"/>
+                                                <circle cx="18" cy="22" r="11" fill="#D97706" stroke="#B45309" stroke-width="2"/>
+                                                <circle cx="18" cy="22" r="8.5" fill="#F59E0B"/>
+                                                <text x="18" y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#451A03">3</text>
+                                            </svg>
+                                        </div>
+                                    @else
+                                        <div class="w-6 h-6 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-600 font-bold text-xs font-mono">
+                                            {{ $row['rank'] }}
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Photo / Avatar -->
+                                @if (!empty($row['foto']))
+                                    <img src="{{ asset('storage/' . $row['foto']) }}" 
+                                         alt="{{ $row['display_name'] }}" 
+                                         class="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0">
+                                @else
+                                    <div class="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 font-bold text-xs flex items-center justify-center shrink-0 border border-violet-200/60 uppercase">
+                                        {{ mb_substr($row['display_name'], 0, 1) }}
+                                    </div>
+                                @endif
+
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="text-xs font-bold text-slate-900 truncate">
+                                            {{ $row['display_name'] }}
+                                        </span>
+                                        @if ($isMe)
+                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-teal-100 text-teal-800 font-mono shrink-0">Anda</span>
+                                        @endif
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-400 block">
+                                        {{ $row['employee_code'] }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Division Badge -->
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60 shrink-0">
+                                {{ $row['division'] }}
+                            </span>
+                        </div>
+
+                        <!-- Progress Bar & Hadir Info -->
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-between text-xs font-semibold">
+                                <span class="text-slate-500 text-[11px]">Kehadiran:</span>
+                                <span class="text-slate-800 font-mono text-xs">
+                                    {{ round($row['present_pct']) }}% <span class="text-slate-400 font-normal">({{ $row['attended_days'] }}/{{ $row['effective_workdays'] }} hari)</span>
+                                </span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div class="bg-teal-500 h-2 rounded-full transition-all duration-300" 
+                                     style="width: {{ min(100, max(0, $row['present_pct'])) }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Status Pill -->
+                        <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="text-slate-400 text-[11px]">Ketepatan Waktu:</span>
+                            @if ($lateMins === 0)
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold">
+                                    <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    <span>Tepat waktu</span>
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-semibold">
+                                    <svg class="w-3 h-3 text-amber-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>Terlambat {{ $lateFormatted }}</span>
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-12 text-center text-slate-400 p-4">
+                        <p class="text-sm font-semibold text-slate-600">Belum ada data peringkat</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Data peringkat kehadiran belum tersedia untuk periode ini.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- 2. DESKTOP VIEW: Table Content (hidden sm:block) -->
+            <div class="hidden sm:block overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="border-b border-slate-100 bg-slate-50/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">

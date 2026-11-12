@@ -1,26 +1,26 @@
 <x-app-layout>
     <div class="w-full space-y-6">
         <!-- Top Breadcrumbs & Heading -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="flex items-center gap-3">
                 <a href="{{ route('gomsn.overtime.index') }}" 
-                   class="h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center shadow-xs transition">
+                   class="h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center shadow-xs transition shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-xl font-heading font-bold text-[#1E3A8A] tracking-tight">
+                    <h1 class="text-lg sm:text-xl font-heading font-bold text-[#1E3A8A] tracking-tight">
                         Form Pengajuan Lembur
                     </h1>
-                    <p class="text-xs text-slate-500">
+                    <p class="text-[11px] sm:text-xs text-slate-500">
                         Pastikan Anda telah melakukan absensi hadir sebelum mengajukan jam kerja lembur.
                     </p>
                 </div>
             </div>
-            <a href="{{ route('gomsn.overtime.index') }}" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
+            <a href="{{ route('gomsn.overtime.index') }}" class="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-blue-600 hover:text-blue-800 font-semibold shadow-2xs">
                 <span>Daftar Lembur</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
 
@@ -37,7 +37,7 @@
         @endif
 
         <!-- Overtime Form Card (Pixel-aligned with User Mockup) -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8"
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8"
              x-data="overtimeForm()"
              x-init="init()">
             <form method="POST" action="{{ route('gomsn.overtime.store') }}" class="space-y-6">
