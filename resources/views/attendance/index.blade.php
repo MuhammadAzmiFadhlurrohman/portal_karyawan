@@ -275,56 +275,75 @@
             </div>
         </div>
 
-        <!-- MODAL 1: DAFTARKAN WAJAH (Simple & Responsive) -->
+        <!-- MODAL 1: DAFTARKAN WAJAH (Biometric Enrollment) -->
         <div x-show="showEnrollModal" 
              x-cloak 
-             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.outside="closeEnrollModal()">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="font-heading font-bold text-base text-[#155E63] flex items-center gap-2">
-                        <span>📸</span>
-                        <span>Pendaftaran Wajah Karyawan</span>
-                    </h3>
-                    <button type="button" @click="closeEnrollModal()" class="text-slate-400 hover:text-slate-600 text-lg">
-                        &times;
+             x-transition.opacity.duration.200ms
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-[0_24px_60px_rgba(15,23,42,0.25)] max-w-md w-full overflow-hidden" @click.outside="closeEnrollModal()">
+                
+                <!-- Modal Header -->
+                <div class="px-5 py-4 bg-gradient-to-r from-[#093c40] via-[#155E63] to-[#0d9488] text-white flex items-center justify-between relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5 text-teal-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-sm sm:text-base text-white leading-tight">
+                                Pendaftaran Wajah Karyawan
+                            </h3>
+                            <p class="text-[11px] text-teal-100/85 font-normal mt-0.5">
+                                Enkripsi Biometrik Presensi GoMSN
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" @click="closeEnrollModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white flex items-center justify-center transition cursor-pointer relative z-10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
-                <form method="POST" action="{{ route('attendance.enroll') }}" class="space-y-4">
+                <form method="POST" action="{{ route('attendance.enroll') }}" class="p-5 space-y-4">
                     @csrf
                     
-                    <div class="space-y-2">
-                        <div class="rounded-xl border border-dashed border-slate-300 p-4 bg-slate-50 text-center">
-                            <!-- Camera preview / Canvas -->
-                            <div class="w-36 h-36 mx-auto rounded-full overflow-hidden bg-slate-200 border-2 border-teal-500/50 flex items-center justify-center shadow-inner relative">
-                                <video id="enroll-video" autoplay playsinline class="w-full h-full object-cover" x-show="cameraActive"></video>
+                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/40 via-slate-50/60 to-teal-50/30 p-4 text-center space-y-3 shadow-inner">
+                        <!-- Camera preview / Canvas -->
+                        <div class="relative w-36 h-36 mx-auto">
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center shadow-lg relative">
+                                <video id="enroll-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="cameraActive"></video>
                                 <img :src="photoPreview" x-show="photoPreview && !cameraActive" class="w-full h-full object-cover" alt="Preview Foto">
                                 <canvas id="enroll-canvas" class="hidden"></canvas>
                                 <div x-show="!cameraActive && !photoPreview" class="text-slate-400 text-center p-2">
-                                    <svg class="w-10 h-10 mx-auto text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                    <span class="text-[11px] block mt-1">Kamera Selfie</span>
+                                    <svg class="w-11 h-11 mx-auto text-teal-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
-                                <button type="button" 
-                                        @click="startCamera()" 
-                                        x-show="!cameraActive"
-                                        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-50 text-[#155E63] border border-teal-200 hover:bg-teal-100 transition">
-                                    <span x-text="photoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
-                                </button>
-                                <button type="button" 
-                                        @click="capturePhoto()" 
-                                        x-show="cameraActive"
-                                        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition">
-                                    Ambil Foto
-                                </button>
-                                <button type="button" 
-                                        @click="useProfileSnapshot()" 
-                                        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition">
-                                    Gunakan Simulasi Wajah
-                                </button>
-                            </div>
+                        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+                            <button type="button" 
+                                    @click="startCamera()" 
+                                    x-show="!cameraActive"
+                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
+                                <span x-text="photoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
+                            </button>
+                            <button type="button" 
+                                    @click="capturePhoto()" 
+                                    x-show="cameraActive"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                <span>Ambil Foto</span>
+                            </button>
+                            <button type="button" 
+                                    @click="useProfileSnapshot()" 
+                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white/90 text-slate-600 border border-slate-200/90 hover:bg-slate-100 hover:text-slate-800 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                <span>Gunakan Simulasi</span>
+                            </button>
                         </div>
 
                         <!-- Hidden Poses inputs -->
@@ -334,18 +353,20 @@
                     </div>
 
                     <!-- Consent Checkbox (UU PDP) -->
-                    <label class="flex items-start gap-2.5 rounded-xl bg-teal-50/70 border border-teal-200/60 p-3 text-xs text-teal-900 cursor-pointer">
-                        <input type="checkbox" name="consent" value="1" required checked class="mt-0.5 rounded border-teal-300 text-[#155E63] focus:ring-teal-500">
-                        <span class="text-[11px] leading-tight">
-                            <strong>Persetujuan Biometrik (UU PDP No. 27/2022):</strong> Saya menyetujui pemrosesan enkripsi wajah khusus untuk verifikasi absensi PT Media Solusi Network.
+                    <label class="flex items-start gap-2.5 rounded-2xl bg-teal-50/70 border border-teal-200/70 p-3.5 text-xs text-teal-950 cursor-pointer">
+                        <input type="checkbox" name="consent" value="1" required checked class="mt-0.5 w-4 h-4 rounded border-teal-300 text-[#155E63] focus:ring-teal-500">
+                        <span class="text-[11px] leading-relaxed text-slate-700">
+                            <strong class="text-teal-900">Persetujuan Biometrik (UU PDP No. 27/2022):</strong> Saya menyetujui pemrosesan enkripsi wajah khusus untuk verifikasi absensi PT Media Solusi Network.
                         </span>
                     </label>
 
-                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button type="button" @click="closeEnrollModal()" class="btn-secondary !px-3.5 !py-2 text-xs">
+                    <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                        <button type="button" @click="closeEnrollModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition cursor-pointer">
                             Batal
                         </button>
-                        <button type="submit" class="btn-primary !px-5 !py-2 text-xs">
+                        <button type="submit" 
+                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                class="px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_16px_rgba(21,94,99,0.28)] hover:brightness-105 transition cursor-pointer">
                             Simpan &amp; Daftarkan Wajah
                         </button>
                     </div>
@@ -356,19 +377,34 @@
         <!-- MODAL 2: ABSEN MASUK (Camera Face Verification & Location) -->
         <div x-show="showClockInModal" 
              x-cloak 
-             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.outside="closeClockInModal()">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="font-heading font-bold text-base text-[#155E63] flex items-center gap-2">
-                        <span>⏰</span>
-                        <span>Verifikasi Wajah &amp; Absen Masuk</span>
-                    </h3>
-                    <button type="button" @click="closeClockInModal()" class="text-slate-400 hover:text-slate-600 text-lg">
-                        &times;
+             x-transition.opacity.duration.200ms
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-[0_24px_60px_rgba(15,23,42,0.25)] max-w-md w-full overflow-hidden my-auto" @click.outside="closeClockInModal()">
+                
+                <!-- Sleek Gradient Header -->
+                <div class="px-5 py-3.5 bg-gradient-to-r from-[#093c40] via-[#155E63] to-[#0d9488] text-white flex items-center justify-between relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5 text-teal-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-sm sm:text-base text-white leading-tight">
+                                Verifikasi Wajah &amp; Absen Masuk
+                            </h3>
+                            <p class="text-[11px] text-teal-100/85 font-normal mt-0.5">
+                                Konfirmasi kehadiran biometrik &amp; titik GPS
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" @click="closeClockInModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white flex items-center justify-center transition cursor-pointer relative z-10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
-                <form method="POST" action="{{ route('attendance.clock-in') }}" @submit="handleClockInSubmit($event)" class="space-y-4">
+                <form method="POST" action="{{ route('attendance.clock-in') }}" @submit="handleClockInSubmit($event)" class="p-4 sm:p-5 space-y-3.5">
                     @csrf
                     
                     <!-- Hidden GPS Coordinates -->
@@ -376,39 +412,50 @@
                     <input type="hidden" name="lng" :value="gpsLng">
                     <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
 
-                    <!-- Camera & Face Verification Preview -->
-                    <div class="rounded-xl border border-dashed border-teal-300 p-3.5 bg-teal-50/40 text-center space-y-2.5">
-                        <div class="w-32 h-32 mx-auto rounded-full overflow-hidden bg-slate-900 border-2 border-[#155E63] flex items-center justify-center relative shadow-inner">
-                            <video id="clockin-video" autoplay playsinline class="w-full h-full object-cover" x-show="clockInCameraActive"></video>
-                            <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
-                            <canvas id="clockin-canvas" class="hidden"></canvas>
-                            <div x-show="!clockInCameraActive && !clockInPhotoPreview" class="text-slate-400 text-center p-2">
-                                <svg class="w-10 h-10 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
+                    <!-- Camera & Face Verification Scanner Card -->
+                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/45 via-slate-50/50 to-teal-50/30 p-3.5 text-center space-y-2.5 relative overflow-hidden shadow-inner">
+                        <!-- Circular Biometric Viewport -->
+                        <div class="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto">
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center relative shadow-md">
+                                <video id="clockin-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="clockInCameraActive"></video>
+                                <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
+                                <canvas id="clockin-canvas" class="hidden"></canvas>
+                                <div x-show="!clockInCameraActive && !clockInPhotoPreview" class="text-slate-400 text-center p-2">
+                                    <svg class="w-10 h-10 mx-auto text-teal-400/75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
+                                </div>
                             </div>
+                            <!-- Active Camera Live Indicator Dot -->
+                            <span x-show="clockInCameraActive" class="absolute top-1.5 right-1.5 flex h-3.5 w-3.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+                            </span>
                         </div>
 
                         <!-- Face Verification Status Badge -->
                         <div>
                             <template x-if="clockInPhotoPreview">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
                                     <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                                     <span>Foto Wajah Siap Diverifikasi</span>
                                 </span>
                             </template>
                             <template x-if="!clockInPhotoPreview && clockInCameraActive">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-cyan-100 text-cyan-800 animate-pulse">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
                                     <span>Posisikan wajah Anda tepat di tengah</span>
                                 </span>
                             </template>
                             <template x-if="!clockInPhotoPreview && !clockInCameraActive && clockInPrimaryImage">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-sky-100/90 text-sky-800 border border-sky-200 shadow-2xs">
+                                    <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span>Biometrik Terpasang (Simulasi Wajah)</span>
                                 </span>
                             </template>
                             <template x-if="!clockInPhotoPreview && !clockInCameraActive && !clockInPrimaryImage">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200">
-                                    📸 Wajib ambil foto selfie wajah
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
+                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <span>Wajib ambil foto selfie wajah</span>
                                 </span>
                             </template>
                         </div>
@@ -418,19 +465,22 @@
                             <button type="button" 
                                     @click="startClockInCamera()" 
                                     x-show="!clockInCameraActive"
-                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-xs transition">
+                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 <span x-text="clockInPhotoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
                             </button>
                             <button type="button" 
                                     @click="captureClockInPhoto()" 
                                     x-show="clockInCameraActive"
-                                    class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition">
-                                📸 Ambil Foto Sekarang
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98] transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                <span>Ambil Foto Sekarang</span>
                             </button>
                             <button type="button" 
                                     @click="useClockInSimulation()" 
-                                    class="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 transition">
-                                Gunakan Simulasi
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white/90 text-slate-600 border border-slate-200/90 hover:bg-slate-100 hover:text-slate-800 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                <span>Gunakan Simulasi</span>
                             </button>
                         </div>
 
@@ -439,75 +489,93 @@
                         <input type="hidden" name="challenge_image" :value="clockInChallengeImage">
                     </div>
 
-                    <!-- Office Location -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            Pilih Lokasi Kantor
-                        </label>
-                        <select name="office_location_id" x-model="selectedOffice" @change="onOfficeChange()" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]">
-                            @foreach ($offices as $ofc)
-                            <option value="{{ $ofc->id }}">{{ $ofc->name }} (Radius {{ $ofc->radius_m }}m)</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <!-- Office Location & Attendance Type Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Office Location -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                                Pilih Lokasi Kantor
+                            </label>
+                            <div class="relative">
+                                <select name="office_location_id" x-model="selectedOffice" @change="onOfficeChange()" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
+                                    @foreach ($offices as $ofc)
+                                    <option value="{{ $ofc->id }}">{{ $ofc->name }} (Radius {{ $ofc->radius_m }}m)</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
-                    <!-- Attendance Type -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">
-                            Tipe Kehadiran
-                        </label>
-                        <select name="attendance_type" x-model="attendanceType" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]">
-                            <option value="office">Di Kantor (Office)</option>
-                            <option value="field">Tugas Lapangan (Field / SPK)</option>
-                            <option value="remote">Remote / WFH</option>
-                        </select>
+                        <!-- Attendance Type -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                                Tipe Kehadiran
+                            </label>
+                            <div class="relative">
+                                <select name="attendance_type" x-model="attendanceType" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
+                                    <option value="office">Di Kantor (Office)</option>
+                                    <option value="field">Tugas Lapangan (Field / SPK)</option>
+                                    <option value="remote">Remote / WFH</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Notes (Keterangan Tugas) -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
                             <span>Catatan / Keterangan</span>
-                            <span class="text-[10px]" :class="attendanceType !== 'office' ? 'text-rose-500 font-bold' : 'text-slate-400'" x-text="attendanceType !== 'office' ? '* Wajib diisi untuk Lapangan/Remote' : 'Opsional'"></span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full" :class="attendanceType !== 'office' ? 'bg-rose-50 text-rose-600 font-bold border border-rose-200' : 'bg-slate-100 text-slate-500 font-medium'" x-text="attendanceType !== 'office' ? 'Wajib Diisi' : 'Opsional'"></span>
                         </label>
                         <textarea name="notes" rows="2" 
                                   :required="attendanceType !== 'office'"
                                   placeholder="Contoh: Pekerjaan maintenance / instalasi ODP di lapangan..."
-                                  class="w-full text-xs rounded-xl border-slate-300 py-2 px-3 focus:outline-none focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63]"></textarea>
+                                  class="w-full text-xs text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 px-3.5 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition resize-none"></textarea>
                     </div>
 
-                    <!-- GPS Status Card -->
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600">
+                    <!-- GPS Geotagging Status Card -->
+                    <div class="p-3 bg-slate-50/90 border border-slate-200/90 rounded-2xl space-y-2.5 text-xs text-slate-600 shadow-2xs">
                         <div class="flex items-start gap-2.5">
-                            <span class="text-base shrink-0">📍</span>
+                            <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200/70 text-[#155E63] flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
                             <div class="min-w-0 flex-1">
-                                <span class="font-bold block text-slate-800" x-text="gpsStatus">Memeriksa GPS...</span>
-                                <span class="text-[11px] text-slate-500 font-mono" x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
+                                <span class="font-bold block text-slate-800 leading-snug text-[11px] sm:text-xs" x-text="gpsStatus">Memeriksa GPS...</span>
+                                <div class="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-white border border-slate-200/80 text-[11px] text-slate-600 font-mono">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                    <span x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-200/70">
                             <button type="button" 
                                     @click="detectGPS()" 
-                                    class="text-[11px] font-semibold text-teal-700 hover:underline flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    class="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#155E63] hover:text-teal-800 transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 <span>Perbarui GPS</span>
                             </button>
                             <button type="button" 
                                     @click="useSelectedOfficeLocation()" 
-                                    class="text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-50">
-                                🏢 Sesuaikan Titik Kantor
+                                    class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-700 hover:text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200/90 hover:bg-slate-100 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                <span>Sesuaikan Titik Kantor</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button type="button" @click="closeClockInModal()" class="btn-secondary !px-3.5 !py-2 text-xs">
+                    <!-- Footer Actions -->
+                    <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                        <button type="button" @click="closeClockInModal()" class="px-4 py-2.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition cursor-pointer">
                             Batal
                         </button>
                         <button type="submit" 
-                                style="background: #0D8252 !important;"
-                                class="btn-primary !px-5 !py-2 text-xs">
-                            Verifikasi Wajah &amp; Absen Masuk
+                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_18px_rgba(21,94,99,0.28)] hover:brightness-105 active:scale-[0.99] transition cursor-pointer">
+                            <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Verifikasi Wajah &amp; Absen Masuk</span>
                         </button>
                     </div>
                 </form>
