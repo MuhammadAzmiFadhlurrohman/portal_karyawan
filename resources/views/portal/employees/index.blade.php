@@ -467,163 +467,186 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- MODAL 1: TAMBAH KARYAWAN                                      -->
+        <!-- MODAL 1: TAMBAH KARYAWAN (LEBIH BESAR, RAPI & TERSTRUKTUR)     -->
         <!-- ============================================================== -->
         <div x-show="isCreateOpen" 
              x-cloak 
-             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+             x-transition.opacity.duration.200ms
+             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/65 backdrop-blur-xs overflow-y-auto">
             <div @click.outside="isCreateOpen = false" 
-                 class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden my-auto">
+                 class="bg-white rounded-3xl shadow-[0_24px_60px_rgba(15,23,42,0.28)] border border-slate-200/90 max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 
                 <!-- Modal Header -->
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 40%, #0a525f 100%);">
-                    <div>
-                        <h3 class="font-heading font-bold text-base text-white">Tambah Data Karyawan Baru</h3>
-                        <p class="text-[11px] text-teal-200/80">Masukkan informasi personal, penempatan kerja, dan akun login</p>
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0"
+                     style="background: linear-gradient(90deg, #022836 0%, #053b47 45%, #0a525f 100%);">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base sm:text-lg text-white leading-tight">Tambah Data Karyawan Baru</h3>
+                            <p class="text-xs text-teal-200/85 mt-0.5">Masukkan informasi personal, penempatan kerja, dan akun login</p>
+                        </div>
                     </div>
-                    <button @click="isCreateOpen = false" type="button" class="text-white/70 hover:text-white text-lg font-bold p-1">&times;</button>
+                    <button @click="isCreateOpen = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/85 hover:text-white flex items-center justify-center transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <!-- Modal Body (Form) -->
-                <form method="POST" action="{{ route('portal.employees.store') }}" enctype="multipart/form-data" class="overflow-y-auto p-6 space-y-4 text-xs">
+                <form method="POST" action="{{ route('portal.employees.store') }}" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0">
                     @csrf
 
-                    <!-- Section: Profil Utama -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            1. Informasi Pribadi &amp; Kontak
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Nama Lengkap <span class="text-rose-500">*</span></label>
-                                <input type="text" name="name" required placeholder="Contoh: Budi Santoso" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                    <div class="overflow-y-auto p-5 sm:p-6 space-y-4 flex-1 text-xs sm:text-[13px]">
+                        <!-- Section 1: Profil Utama -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Pribadi &amp; Kontak</span>
                             </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">NIK (KTP)</label>
-                                <input type="text" name="nik" placeholder="16 digit NIK" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Lengkap <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="name" required placeholder="Contoh: Budi Santoso" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">NIK (KTP)</label>
+                                    <input type="text" name="nik" placeholder="16 digit NIK" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Email Perusahaan <span class="text-rose-500">*</span></label>
+                                    <input type="email" name="email" required placeholder="budi@msn.co.id" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">No. WhatsApp / HP <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="phone" required placeholder="081234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Email Perusahaan <span class="text-rose-500">*</span></label>
-                                <input type="email" name="email" required placeholder="budi@msn.co.id" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <!-- Section 2: Akun & Hak Akses -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Kredensial &amp; Role Sistem</span>
                             </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">No. WhatsApp / HP <span class="text-rose-500">*</span></label>
-                                <input type="text" name="phone" required placeholder="081234567890" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Kode Karyawan</label>
+                                    <input type="text" name="employee_code" placeholder="Auto (KR000xx)" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Username</label>
+                                    <input type="text" name="username" placeholder="Auto jika kosong" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Role Sistem <span class="text-rose-500">*</span></label>
+                                    <select name="role" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        @foreach ($roles as $r)
+                                            <option value="{{ $r->name }}" {{ $r->name === 'karyawan' ? 'selected' : '' }}>
+                                                {{ ucfirst(str_replace('_', ' ', $r->name)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Password Awal Akun</label>
+                                    <input type="text" name="password" placeholder="Default: msn12345" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Organisasi & Penempatan -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">3</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Penempatan Kerja &amp; Struktur Organisasi</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Divisi</label>
+                                    <select name="division" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="">Pilih Divisi...</option>
+                                        @foreach ($divisions as $div)
+                                            <option value="{{ $div }}">{{ $div }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jabatan / Posisi</label>
+                                    <input type="text" name="position" placeholder="Teknisi Lapangan, NOC..." class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Atasan Langsung</label>
+                                    <select name="supervisor_id" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="">Tidak Ada / Direksi</option>
+                                        @foreach ($supervisors as $spv)
+                                            <option value="{{ $spv->id }}">{{ $spv->name }} ({{ $spv->division }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Tanggal Bergabung</label>
+                                    <input type="date" name="join_date" value="{{ date('Y-m-d') }}" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Upload Foto Profil & Status Akun Aktif -->
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1">
+                                <div class="sm:col-span-7">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Foto Profil Karyawan (Maks. 5MB)</label>
+                                    <div class="px-3.5 py-2 rounded-xl bg-white border border-dashed border-teal-300 flex items-center">
+                                        <input type="file" name="foto" accept="image/*" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#155E63] hover:file:bg-teal-100 cursor-pointer">
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-5 flex flex-col justify-end">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Status Akun</label>
+                                    <label class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 hover:border-teal-400 flex items-center gap-2.5 cursor-pointer shadow-2xs transition h-[42px]">
+                                        <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500">
+                                        <span class="text-slate-800 font-bold text-xs">Akun Aktif Langsung</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Data Rekening Payroll -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">4</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Payroll (Rekening Bank)</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Bank</label>
+                                    <select name="bank" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="">Pilih Bank...</option>
+                                        @foreach ($banks as $b)
+                                            <option value="{{ $b }}">{{ $b }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nomor Rekening</label>
+                                    <input type="text" name="no_rekening" placeholder="Contoh: 1234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Atas Nama Rekening</label>
+                                    <input type="text" name="atas_nama" placeholder="Sesuai buku tabungan" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section: Akun & Hak Akses -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            2. Kredensial &amp; Role Sistem
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Kode Karyawan</label>
-                                <input type="text" name="employee_code" placeholder="Auto jika kosong" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
-                                <span class="text-[10px] text-slate-400 mt-0.5 block">Format: KR000xx</span>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Username</label>
-                                <input type="text" name="username" placeholder="Auto jika kosong" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Role Sistem <span class="text-rose-500">*</span></label>
-                                <select name="role" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    @foreach ($roles as $r)
-                                        <option value="{{ $r->name }}" {{ $r->name === 'karyawan' ? 'selected' : '' }}>
-                                            {{ ucfirst(str_replace('_', ' ', $r->name)) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label class="block text-slate-700 font-semibold mb-1">Password Awal Akun</label>
-                                <input type="text" name="password" placeholder="Kosongkan untuk default: msn12345" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                <span class="text-[10px] text-slate-400 mt-0.5 block">Karyawan akan diminta mengganti password saat pertama kali masuk jika menggunakan password default.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section: Organisasi & Penempatan -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            3. Penempatan Kerja &amp; Struktur Organisasi
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Divisi</label>
-                                <select name="division" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    <option value="">Pilih Divisi...</option>
-                                    @foreach ($divisions as $div)
-                                        <option value="{{ $div }}">{{ $div }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Jabatan / Posisi</label>
-                                <input type="text" name="position" placeholder="Teknisi Lapangan, NOC..." class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Atasan Langsung</label>
-                                <select name="supervisor_id" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    <option value="">Tidak Ada / Direksi</option>
-                                    @foreach ($supervisors as $spv)
-                                        <option value="{{ $spv->id }}">{{ $spv->name }} ({{ $spv->division }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Tanggal Bergabung</label>
-                                <input type="date" name="join_date" value="{{ date('Y-m-d') }}" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Foto Profil</label>
-                                <input type="file" name="foto" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
-                            </div>
-                            <div class="flex items-center gap-2 pt-5">
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500">
-                                    <span class="text-slate-800 font-semibold text-xs">Akun Aktif Langsung</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section: Data Rekening Payroll -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            4. Informasi Payroll (Rekening Bank)
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Nama Bank</label>
-                                <select name="bank" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    <option value="">Pilih Bank...</option>
-                                    @foreach ($banks as $b)
-                                        <option value="{{ $b }}">{{ $b }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Nomor Rekening</label>
-                                <input type="text" name="no_rekening" placeholder="Contoh: 1234567890" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Atas Nama Rekening</label>
-                                <input type="text" name="atas_nama" placeholder="Sesuai buku tabungan" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal Actions -->
-                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
-                        <button @click="isCreateOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
+                    <!-- Sticky Modal Footer -->
+                    <div class="px-6 py-4 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-end gap-3 shrink-0">
+                        <button @click="isCreateOpen = false" type="button" class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-100 transition cursor-pointer">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold shadow-xs transition">
+                        <button type="submit" 
+                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                class="px-6 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md hover:brightness-105 transition cursor-pointer">
                             Simpan Karyawan
                         </button>
                     </div>
@@ -632,160 +655,185 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- MODAL 2: EDIT DATA KARYAWAN                                   -->
+        <!-- MODAL 2: EDIT DATA KARYAWAN (LEBIH BESAR, RAPI & TERSTRUKTUR)   -->
         <!-- ============================================================== -->
         <div x-show="isEditOpen" 
              x-cloak 
-             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+             x-transition.opacity.duration.200ms
+             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/65 backdrop-blur-xs overflow-y-auto">
             <div @click.outside="isEditOpen = false" 
-                 class="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden my-auto">
+                 class="bg-white rounded-3xl shadow-[0_24px_60px_rgba(15,23,42,0.28)] border border-slate-200/90 max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden my-auto">
                 
                 <!-- Modal Header -->
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 40%, #0a525f 100%);">
-                    <div>
-                        <h3 class="font-heading font-bold text-base text-white">Ubah Data Karyawan</h3>
-                        <p class="text-[11px] text-teal-200/80" x-text="editForm.name + ' (' + editForm.employee_code + ')'"></p>
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0"
+                     style="background: linear-gradient(90deg, #022836 0%, #053b47 45%, #0a525f 100%);">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base sm:text-lg text-white leading-tight">Ubah Data Karyawan</h3>
+                            <p class="text-xs text-teal-200/90 font-mono mt-0.5" x-text="editForm.name + ' (' + editForm.employee_code + ')'"></p>
+                        </div>
                     </div>
-                    <button @click="isEditOpen = false" type="button" class="text-white/70 hover:text-white text-lg font-bold p-1">&times;</button>
+                    <button @click="isEditOpen = false" type="button" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/85 hover:text-white flex items-center justify-center transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <!-- Modal Body (Form) -->
-                <form :action="'{{ url('/portal/employees') }}/' + editForm.id" method="POST" enctype="multipart/form-data" class="overflow-y-auto p-6 space-y-4 text-xs">
+                <form :action="'{{ url('/portal/employees') }}/' + editForm.id" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0">
                     @csrf
                     @method('PUT')
 
-                    <!-- Section: Profil Utama -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            1. Informasi Pribadi &amp; Kontak
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Nama Lengkap <span class="text-rose-500">*</span></label>
-                                <input type="text" name="name" x-model="editForm.name" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                    <div class="overflow-y-auto p-5 sm:p-6 space-y-4 flex-1 text-xs sm:text-[13px]">
+                        <!-- Section 1: Profil Utama -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Pribadi &amp; Kontak</span>
                             </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">NIK (KTP)</label>
-                                <input type="text" name="nik" x-model="editForm.nik" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Lengkap <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="name" x-model="editForm.name" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">NIK (KTP)</label>
+                                    <input type="text" name="nik" x-model="editForm.nik" placeholder="16 digit NIK" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Email Perusahaan <span class="text-rose-500">*</span></label>
+                                    <input type="email" name="email" x-model="editForm.email" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">No. WhatsApp / HP <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="phone" x-model="editForm.phone" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Email Perusahaan <span class="text-rose-500">*</span></label>
-                                <input type="email" name="email" x-model="editForm.email" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                        </div>
+
+                        <!-- Section 2: Akun & Hak Akses -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Kredensial &amp; Role Sistem</span>
                             </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">No. WhatsApp / HP <span class="text-rose-500">*</span></label>
-                                <input type="text" name="phone" x-model="editForm.phone" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Kode Karyawan <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="employee_code" x-model="editForm.employee_code" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Username <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="username" x-model="editForm.username" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Role Sistem <span class="text-rose-500">*</span></label>
+                                    <select name="role" x-model="editForm.role" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        @foreach ($roles as $r)
+                                            <option value="{{ $r->name }}">{{ ucfirst(str_replace('_', ' ', $r->name)) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Ganti Password (Opsional)</label>
+                                    <input type="text" name="password" placeholder="Kosongkan jika tetap" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Organisasi & Penempatan -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">3</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Penempatan Kerja &amp; Struktur Organisasi</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Divisi</label>
+                                    <select name="division" x-model="editForm.division" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="">Pilih Divisi...</option>
+                                        @foreach ($divisions as $div)
+                                            <option value="{{ $div }}">{{ $div }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jabatan / Posisi</label>
+                                    <input type="text" name="position" x-model="editForm.position" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Atasan Langsung</label>
+                                    <select name="supervisor_id" x-model="editForm.supervisor_id" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="">Tidak Ada / Direksi</option>
+                                        @foreach ($supervisors as $spv)
+                                            <option value="{{ $spv->id }}">{{ $spv->name }} ({{ $spv->division }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Tanggal Bergabung</label>
+                                    <input type="date" name="join_date" x-model="editForm.join_date" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Ganti Foto Profil & Status Akun Aktif -->
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1">
+                                <div class="sm:col-span-7">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Ganti Foto Profil (Maks. 5MB)</label>
+                                    <div class="px-3.5 py-2 rounded-xl bg-white border border-dashed border-teal-300 flex items-center">
+                                        <input type="file" name="foto" accept="image/*" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#155E63] hover:file:bg-teal-100 cursor-pointer">
+                                    </div>
+                                </div>
+                                <div class="sm:col-span-5 flex flex-col justify-end">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Status Akun</label>
+                                    <label class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 hover:border-teal-400 flex items-center gap-2.5 cursor-pointer shadow-2xs transition h-[42px]">
+                                        <input type="checkbox" name="is_active" value="1" :checked="editForm.is_active" class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500">
+                                        <span class="text-slate-800 font-bold text-xs">Status Akun Aktif</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Data Rekening Payroll -->
+                        <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
+                            <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
+                                <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">4</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Payroll (Rekening Bank)</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Bank</label>
+                                    <select name="bank" x-model="editForm.bank" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="">Pilih Bank...</option>
+                                        @foreach ($banks as $b)
+                                            <option value="{{ $b }}">{{ $b }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nomor Rekening</label>
+                                    <input type="text" name="no_rekening" x-model="editForm.no_rekening" placeholder="Contoh: 1234567890" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Atas Nama Rekening</label>
+                                    <input type="text" name="atas_nama" x-model="editForm.atas_nama" placeholder="Sesuai buku tabungan" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Section: Akun & Hak Akses -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            2. Kredensial &amp; Role Sistem
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Kode Karyawan <span class="text-rose-500">*</span></label>
-                                <input type="text" name="employee_code" x-model="editForm.employee_code" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Username <span class="text-rose-500">*</span></label>
-                                <input type="text" name="username" x-model="editForm.username" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Role Sistem <span class="text-rose-500">*</span></label>
-                                <select name="role" x-model="editForm.role" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    @foreach ($roles as $r)
-                                        <option value="{{ $r->name }}">{{ ucfirst(str_replace('_', ' ', $r->name)) }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label class="block text-slate-700 font-semibold mb-1">Ganti Password (Opsional)</label>
-                                <input type="text" name="password" placeholder="Biarkan kosong jika tidak ingin mengubah password" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section: Organisasi & Penempatan -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            3. Penempatan Kerja &amp; Struktur Organisasi
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Divisi</label>
-                                <select name="division" x-model="editForm.division" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    <option value="">Pilih Divisi...</option>
-                                    @foreach ($divisions as $div)
-                                        <option value="{{ $div }}">{{ $div }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Jabatan / Posisi</label>
-                                <input type="text" name="position" x-model="editForm.position" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Atasan Langsung</label>
-                                <select name="supervisor_id" x-model="editForm.supervisor_id" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    <option value="">Tidak Ada / Direksi</option>
-                                    @foreach ($supervisors as $spv)
-                                        <option value="{{ $spv->id }}">{{ $spv->name }} ({{ $spv->division }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Tanggal Bergabung</label>
-                                <input type="date" name="join_date" x-model="editForm.join_date" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Ganti Foto Profil</label>
-                                <input type="file" name="foto" accept="image/*" class="w-full text-[11px] text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
-                            </div>
-                            <div class="flex items-center gap-2 pt-5">
-                                <label class="inline-flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_active" value="1" :checked="editForm.is_active" class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500">
-                                    <span class="text-slate-800 font-semibold text-xs">Status Akun Aktif</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section: Data Rekening Payroll -->
-                    <div>
-                        <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block mb-2 pb-1 border-b border-slate-100">
-                            4. Informasi Payroll (Rekening Bank)
-                        </span>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Nama Bank</label>
-                                <select name="bank" x-model="editForm.bank" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                                    <option value="">Pilih Bank...</option>
-                                    @foreach ($banks as $b)
-                                        <option value="{{ $b }}">{{ $b }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Nomor Rekening</label>
-                                <input type="text" name="no_rekening" x-model="editForm.no_rekening" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 font-mono">
-                            </div>
-                            <div>
-                                <label class="block text-slate-700 font-semibold mb-1">Atas Nama Rekening</label>
-                                <input type="text" name="atas_nama" x-model="editForm.atas_nama" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal Actions -->
-                    <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
-                        <button @click="isEditOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
+                    <!-- Sticky Modal Footer -->
+                    <div class="px-6 py-4 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-end gap-3 shrink-0">
+                        <button @click="isEditOpen = false" type="button" class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-100 transition cursor-pointer">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold shadow-xs transition">
+                        <button type="submit" 
+                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                class="px-6 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md hover:brightness-105 transition cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>
