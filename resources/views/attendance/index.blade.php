@@ -61,11 +61,11 @@
                 </div>
 
                 <div class="min-w-0">
-                    <h1 class="font-heading text-base sm:text-lg font-extrabold text-white tracking-tight leading-snug">
+                    <h1 class="font-heading text-base sm:text-lg font-extrabold text-white tracking-tight leading-snug truncate">
                         Presensi &amp; Absensi Karyawan
                     </h1>
-                    <p class="text-[11px] sm:text-xs text-teal-100/85 mt-0.5 leading-relaxed">
-                        Verifikasi kehadiran biometrik wajah &amp; titik GPS secara real-time
+                    <p class="text-[11px] sm:text-xs text-teal-100/85 mt-0.5 truncate">
+                        Absensi biometrik wajah &amp; lokasi GPS
                     </p>
                 </div>
             </div>
