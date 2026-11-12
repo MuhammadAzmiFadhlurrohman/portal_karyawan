@@ -11,6 +11,19 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <title>{{ $title ?? 'Portal Karyawan Terpadu' }} — PT MSN</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        @view-transition {
+            navigation: auto;
+        }
+        #desktop-sidebar {
+            view-transition-name: desktop-sidebar;
+        }
+        ::view-transition-old(desktop-sidebar),
+        ::view-transition-new(desktop-sidebar) {
+            animation: none;
+            mix-blend-mode: normal;
+        }
+    </style>
 </head>
 <body class="min-h-full bg-[#F8FAFC] text-slate-900 font-sans antialiased" x-data="{ bottomSheetOpen: false }">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-[#155E63] focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white">
@@ -71,7 +84,8 @@
     <!-- Authenticated Enterprise Shell (Dual-Panel Layout) -->
     <div class="min-h-screen flex flex-row">
         <!-- Left Sidebar Navigation (Desktop Only: hidden on mobile, md:flex) -->
-        <aside style="background: linear-gradient(180deg, #022836 0%, #053b47 22%, #094d5a 50%, #0c5a68 75%, #031e26 100%) !important;"
+        <aside id="desktop-sidebar"
+               style="background: linear-gradient(180deg, #022836 0%, #053b47 22%, #094d5a 50%, #0c5a68 75%, #031e26 100%) !important;"
                class="hidden md:flex md:sticky top-0 inset-y-0 left-0 z-40 w-64 text-white flex-col justify-between h-screen shadow-2xl shrink-0 border-r border-[#14b8a6]/25 relative overflow-hidden select-none">
             
             <!-- Ambient Sculpted Waves & Elegant Fluid Lines (matching Page Header Theme) -->
@@ -137,7 +151,7 @@
             <div class="p-4 sm:p-5 pb-3.5 border-b border-cyan-400/20 relative z-10">
                 <div class="flex items-center justify-center w-full">
                     <a href="{{ route('portal.hub') }}" class="flex items-center justify-center group py-0.5 mx-auto">
-                        <img src="{{ asset('assets/logo/logo1.png') }}?v={{ time() }}" 
+                        <img src="{{ asset('assets/logo/logo1.png') }}" 
                              alt="PT Media Solusi Network" 
                              style="filter: brightness(0) invert(1) !important;"
                              class="h-8 sm:h-8.5 w-auto max-w-[160px] object-contain group-hover:scale-105 transition-transform duration-200 mx-auto">
@@ -147,7 +161,10 @@
 
 
             <!-- Sidebar Scrollable Nav Menu -->
-            <nav class="flex-1 overflow-y-auto px-3 py-3.5 space-y-4 sidebar-scroll text-sm relative z-10">
+            <nav id="desktop-sidebar-nav"
+                 @scroll.passive="sessionStorage.setItem('gomsn_sb_scroll', $el.scrollTop)"
+                 @click="if ($event.target.closest('a')) sessionStorage.setItem('gomsn_sb_scroll', $el.scrollTop)"
+                 class="flex-1 overflow-y-auto px-3 py-3.5 space-y-4 sidebar-scroll text-sm relative z-10">
                 
                 <!-- Portal Hub Utama -->
                 <div>
@@ -303,14 +320,16 @@
                     </div>
                 </div>
 
-                <!-- Bagian 2: Absensi & Cuti (Dropdown with Soft Animation) -->
+                <!-- Bagian 2: Absensi & Cuti (Dropdown with Persistent State) -->
                 @php
                     $sidebarUser = auth()->user();
                     $canViewReports = $sidebarUser && ($sidebarUser->hasRole(['super_admin', 'admin', 'hrd']) || $sidebarUser->can('attendance.employee.manage'));
+                    $isAbsensiActive = request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals');
+                    $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
                 @endphp
-                <div x-data="{ openAbsensi: {{ request()->routeIs('attendance.*') ? 'true' : 'false' }} }">
+                <div x-data="{ openAbsensi: {{ $isAbsensiActive ? 'true' : "sessionStorage.getItem('gomsn_sb_absensi') === '1'" }} }">
                     <button type="button" 
-                            @click="openAbsensi = !openAbsensi"
+                            @click="openAbsensi = !openAbsensi; sessionStorage.setItem('gomsn_sb_absensi', openAbsensi ? '1' : '0')"
                             class="w-full pt-2.5 pb-1.5 px-3 flex items-center justify-between text-white/90 hover:text-white transition group cursor-pointer select-none rounded-xl hover:bg-white/10">
                         <div class="flex items-center gap-2 flex-1">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
@@ -319,10 +338,10 @@
                             <div class="h-px flex-1 bg-white/15"></div>
                         </div>
                         <div class="flex items-center gap-1.5 ml-2">
-                            @if (request()->routeIs('attendance.*'))
+                            @if ($isAbsensiActive)
                                 <span class="w-1.5 h-1.5 rounded-full bg-[#18C4C4] shadow-xs"></span>
                             @endif
-                            <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-300 ease-out" 
+                            <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-200 ease-out" 
                                  :class="openAbsensi ? 'rotate-180' : ''" 
                                  fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -330,9 +349,9 @@
                         </div>
                     </button>
 
-                    <div x-show="openAbsensi" x-collapse.duration.300ms class="space-y-1 mt-1">
+                    <div id="sb-menu-absensi" x-show="openAbsensi" style="{{ $isAbsensiActive ? '' : 'display: none;' }}" class="space-y-1 mt-1">
                         <a href="{{ route('attendance.index') }}"
-                           @if (request()->routeIs('attendance.index')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.index')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.index') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                             <span>Absen</span>
@@ -343,20 +362,20 @@
 
                         @if ($canViewReports)
                         <!-- Riwayat & Laporan Absensi (Dropdown Sub-Menu untuk Admin/HRD) -->
-                        <div x-data="{ openRiwayat: {{ request()->routeIs('attendance.history', 'attendance.reports*') ? 'true' : 'false' }} }" class="space-y-1">
+                        <div x-data="{ openRiwayat: {{ $isRiwayatActive ? 'true' : "sessionStorage.getItem('gomsn_sb_riwayat') === '1'" }} }" class="space-y-1">
                             <button type="button" 
-                                    @click="openRiwayat = !openRiwayat"
-                                    @if (request()->routeIs('attendance.history', 'attendance.reports*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                                    class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer {{ request()->routeIs('attendance.history', 'attendance.reports*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                                    @click="openRiwayat = !openRiwayat; sessionStorage.setItem('gomsn_sb_riwayat', openRiwayat ? '1' : '0')"
+                                    @if ($isRiwayatActive) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                                    class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer {{ $isRiwayatActive ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                                 <div class="flex items-center gap-3 min-w-0">
                                     <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span class="truncate">Riwayat &amp; Laporan</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    @if (request()->routeIs('attendance.history', 'attendance.reports*'))
+                                    @if ($isRiwayatActive)
                                     <span class="w-1.5 h-1.5 rounded-full bg-white shadow-xs"></span>
                                     @endif
-                                    <svg class="w-3.5 h-3.5 shrink-0 text-white/80 transition-transform duration-300 ease-out" 
+                                    <svg class="w-3.5 h-3.5 shrink-0 text-white/80 transition-transform duration-200 ease-out" 
                                          :class="openRiwayat ? 'rotate-180' : ''" 
                                          fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -364,14 +383,16 @@
                                 </div>
                             </button>
 
-                            <div x-show="openRiwayat" x-collapse.duration.250ms class="pl-4 pr-1 space-y-1 pt-0.5">
+                            <div id="sb-menu-riwayat" x-show="openRiwayat" style="{{ $isRiwayatActive ? '' : 'display: none;' }}" class="pl-4 pr-1 space-y-1 pt-0.5">
                                 <a href="{{ route('attendance.history') }}" 
+                                   @if (request()->routeIs('attendance.history')) data-sidebar-active="true" @endif
                                    class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all duration-150 {{ request()->routeIs('attendance.history') ? 'bg-white/20 text-white font-bold shadow-2xs' : 'text-teal-100 hover:text-white hover:bg-white/10' }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('attendance.history') ? 'bg-white' : 'bg-teal-300' }}"></span>
                                     <span>Riwayat Absen Saya</span>
                                 </a>
 
                                 <a href="{{ route('attendance.reports') }}" 
+                                   @if (request()->routeIs('attendance.reports*')) data-sidebar-active="true" @endif
                                    class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-all duration-150 {{ request()->routeIs('attendance.reports*') ? 'bg-white/20 text-white font-bold shadow-2xs' : 'text-teal-100 hover:text-white hover:bg-white/10' }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ request()->routeIs('attendance.reports*') ? 'bg-white' : 'bg-teal-300' }}"></span>
                                     <span>Laporan Absensi Karyawan</span>
@@ -380,7 +401,7 @@
                         </div>
                         @else
                         <a href="{{ route('attendance.history') }}"
-                           @if (request()->routeIs('attendance.history')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.history')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.history') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>Riwayat Absen</span>
@@ -391,7 +412,7 @@
                         @endif
 
                         <a href="{{ route('attendance.schedules') }}"
-                           @if (request()->routeIs('attendance.schedules', 'attendance.swaps*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.schedules', 'attendance.swaps*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.schedules', 'attendance.swaps*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>Jadwal Kerja</span>
@@ -401,7 +422,7 @@
                         </a>
 
                         <a href="{{ route('attendance.leaves') }}"
-                           @if (request()->routeIs('attendance.leaves')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.leaves')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaves') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                             <span>Cuti &amp; Izin</span>
@@ -411,7 +432,7 @@
                         </a>
 
                         <a href="{{ route('attendance.deductions') }}"
-                           @if (request()->routeIs('attendance.deductions')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.deductions')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.deductions') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>Keuangan Absen</span>
@@ -421,7 +442,7 @@
                         </a>
 
                         <a href="{{ route('attendance.leaderboard') }}"
-                           @if (request()->routeIs('attendance.leaderboard')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.leaderboard')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaderboard') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                             <span>Leaderboard</span>
@@ -433,13 +454,13 @@
                 </div>
 
 
-                <!-- Bagian 3: Pekerjaan & Tiketing (Dropdown with Soft Animation) -->
+                <!-- Bagian 3: Pekerjaan & Tiketing (Dropdown with Persistent State) -->
                 @php
-                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.tasks.*') || request()->routeIs('gomsn.network.*') || request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
+                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.tasks.*') || request()->routeIs('gomsn.network.*') || request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
                 @endphp
-                <div x-data="{ openTiketing: {{ $isTiketingActive ? 'true' : 'false' }} }">
+                <div x-data="{ openTiketing: {{ $isTiketingActive ? 'true' : "sessionStorage.getItem('gomsn_sb_tiketing') === '1'" }} }">
                     <button type="button" 
-                            @click="openTiketing = !openTiketing"
+                            @click="openTiketing = !openTiketing; sessionStorage.setItem('gomsn_sb_tiketing', openTiketing ? '1' : '0')"
                             class="w-full pt-2.5 pb-1.5 px-3 flex items-center justify-between text-white/90 hover:text-white transition group cursor-pointer select-none rounded-xl hover:bg-white/10">
                         <div class="flex items-center gap-2 flex-1">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
@@ -451,7 +472,7 @@
                             @if ($isTiketingActive)
                                 <span class="w-1.5 h-1.5 rounded-full bg-[#18C4C4] shadow-xs"></span>
                             @endif
-                            <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-300 ease-out" 
+                            <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-200 ease-out" 
                                  :class="openTiketing ? 'rotate-180' : ''" 
                                  fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -459,9 +480,9 @@
                         </div>
                     </button>
 
-                    <div x-show="openTiketing" x-collapse.duration.300ms class="space-y-1 mt-1">
+                    <div id="sb-menu-tiketing" x-show="openTiketing" style="{{ $isTiketingActive ? '' : 'display: none;' }}" class="space-y-1 mt-1">
                         <a href="{{ route('tickets.index') }}"
-                           @if (request()->routeIs('tickets.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('tickets.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('tickets.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
                             <span>Tiket Gangguan</span>
@@ -471,7 +492,7 @@
                         </a>
 
                         <a href="{{ route('gomsn.tasks.index') }}"
-                           @if (request()->routeIs('gomsn.tasks.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('gomsn.tasks.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.tasks.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                             <span>Tugas Lapangan</span>
@@ -481,7 +502,7 @@
                         </a>
 
                         <a href="{{ route('gomsn.network.index') }}"
-                           @if (request()->routeIs('gomsn.network.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('gomsn.network.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.network.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                             <span>OLT, PON & ODP</span>
@@ -491,7 +512,7 @@
                         </a>
 
                         <a href="{{ route('gomsn.analytics.kpi') }}"
-                           @if (request()->routeIs('gomsn.analytics.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('gomsn.analytics.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.analytics.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>Laporan KPI</span>
@@ -502,7 +523,7 @@
 
                         @hasrole(['admin', 'super_admin'])
                         <a href="{{ route('portal.sessions') }}"
-                           @if (request()->routeIs('portal.sessions')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('portal.sessions')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('portal.sessions') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             <span>Perangkat Saya</span>
@@ -514,7 +535,7 @@
 
                         @if (auth()->user() && (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage')))
                         <a href="{{ route('portal.employees.index') }}"
-                           @if (request()->routeIs('portal.employees.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('portal.employees.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('portal.employees.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             <span>Data Karyawan</span>
@@ -526,7 +547,7 @@
 
                         @can('portal.settings.manage')
                         <a href="{{ route('portal.settings') }}"
-                           @if (request()->routeIs('portal.settings')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('portal.settings')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('portal.settings') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             <span>Radius Absen</span>
@@ -538,7 +559,7 @@
 
                         @can('portal.audit.view')
                         <a href="{{ route('portal.audit') }}"
-                           @if (request()->routeIs('portal.audit')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('portal.audit')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('portal.audit') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             <span>Audit Log</span>
@@ -550,6 +571,44 @@
                     </div>
                 </div>
             </nav>
+
+            <!-- Instant Synchronous Sidebar State & Scroll Restoration (Zero Jump / Zero Refresh) -->
+            <script>
+                (function () {
+                    try {
+                        var nav = document.getElementById('desktop-sidebar-nav');
+                        if (!nav) return;
+
+                        @if ($isAbsensiActive)
+                            sessionStorage.setItem('gomsn_sb_absensi', '1');
+                        @endif
+                        @if ($isRiwayatActive)
+                            sessionStorage.setItem('gomsn_sb_riwayat', '1');
+                        @endif
+                        @if ($isTiketingActive)
+                            sessionStorage.setItem('gomsn_sb_tiketing', '1');
+                        @endif
+
+                        var elAbsensi = document.getElementById('sb-menu-absensi');
+                        if (elAbsensi && sessionStorage.getItem('gomsn_sb_absensi') === '1') {
+                            elAbsensi.style.display = '';
+                        }
+                        var elRiwayat = document.getElementById('sb-menu-riwayat');
+                        if (elRiwayat && sessionStorage.getItem('gomsn_sb_riwayat') === '1') {
+                            elRiwayat.style.display = '';
+                        }
+                        var elTiketing = document.getElementById('sb-menu-tiketing');
+                        if (elTiketing && sessionStorage.getItem('gomsn_sb_tiketing') === '1') {
+                            elTiketing.style.display = '';
+                        }
+
+                        var savedScroll = sessionStorage.getItem('gomsn_sb_scroll');
+                        if (savedScroll !== null) {
+                            nav.scrollTop = parseInt(savedScroll, 10) || 0;
+                        }
+                    } catch (e) {}
+                })();
+            </script>
 
             <!-- Sidebar User Profile Footer (Blended Metallic Ocean Teal) -->
             <div class="p-3.5 border-t border-cyan-400/20 backdrop-blur-md relative z-10" style="background: linear-gradient(180deg, rgba(3, 30, 38, 0.90) 0%, rgba(2, 20, 26, 0.98) 100%) !important;">
@@ -614,7 +673,7 @@
 
                     <!-- Left: White GoMSN Logo -->
                     <a href="{{ route('portal.hub') }}" class="relative z-10 flex items-center group py-0.5" title="GoMSN Portal">
-                        <img src="{{ asset('assets/logo/logo1.png') }}?v={{ time() }}" 
+                        <img src="{{ asset('assets/logo/logo1.png') }}" 
                              alt="GoMSN" 
                              style="filter: brightness(0) invert(1) !important;"
                              class="h-6 sm:h-7 w-auto max-w-[130px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
