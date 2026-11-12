@@ -679,16 +679,8 @@
                              class="h-6 sm:h-7 w-auto max-w-[130px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
                     </a>
 
-                    <!-- Right: Actions inside sculpted bezel (Bell + Solid White Ringed Avatar + Chevron) -->
+                    <!-- Right: Actions inside sculpted bezel (Solid White Ringed Avatar + Chevron) -->
                     <div class="relative z-10 flex items-center gap-2">
-                        <!-- Notification Bell with Red Dot -->
-                        <button type="button" class="relative p-1 text-white/90 hover:text-white transition-colors cursor-pointer" title="Notifikasi Sistem">
-                            <svg class="w-[19px] h-[19px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                            </svg>
-                            <span class="absolute top-0.5 right-0.5 h-2 w-2 rounded-full bg-[#ef4444] shadow-[0_0_6px_#ef4444]"></span>
-                        </button>
-
                         <!-- Avatar with Solid White Ring + Name & Division + Chevron Down (Dropdown Menu) -->
                         <div class="relative" x-data="{ mobileUserMenuOpen: false }" @click.outside="mobileUserMenuOpen = false">
                             <button @click="mobileUserMenuOpen = !mobileUserMenuOpen"
@@ -698,23 +690,23 @@
                                     class="flex items-center gap-2 cursor-pointer focus:outline-none select-none pl-1">
                                 
                                 <!-- User Name & Division Beside Profile (User Request 1) -->
-                                <div class="text-right leading-tight max-w-[85px] sm:max-w-[140px] min-w-0">
+                                <div class="text-right leading-tight max-w-[105px] sm:max-w-[150px] min-w-0">
                                     <span class="block text-xs font-bold text-white truncate drop-shadow-xs">{{ auth()->user()->name }}</span>
                                     <span class="block text-[10px] text-teal-200/90 font-medium truncate">{{ auth()->user()->division ?: (auth()->user()->employee_code ?: 'MSN') }}</span>
                                 </div>
 
                                 <!-- Avatar circle with solid 2px white border ring -->
-                                <div class="relative w-[30px] h-[30px] shrink-0">
+                                <div class="relative w-[35px] h-[35px] shrink-0">
                                     @if (auth()->user()->avatar_url)
                                         <img src="{{ auth()->user()->avatar_url }}" 
                                              alt="" 
                                              onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
-                                             class="w-[30px] h-[30px] rounded-full border-2 border-white object-cover shadow-md">
-                                        <div style="display: none;" class="w-[30px] h-[30px] rounded-full border-2 border-white bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-[11px] shadow-md shrink-0">
+                                             class="w-[35px] h-[35px] rounded-full border-2 border-white object-cover shadow-md">
+                                        <div style="display: none;" class="w-[35px] h-[35px] rounded-full border-2 border-white bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-xs shadow-md shrink-0">
                                             {{ auth()->user()->initials }}
                                         </div>
                                     @else
-                                        <div class="w-[30px] h-[30px] rounded-full border-2 border-white bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-[11px] shadow-md shrink-0">
+                                        <div class="w-[35px] h-[35px] rounded-full border-2 border-white bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-md shrink-0">
                                             {{ auth()->user()->initials }}
                                         </div>
                                     @endif
@@ -866,20 +858,6 @@
                         <span class="text-slate-800 font-bold">Shift Pagi</span>
                         <span class="text-slate-400 font-normal">·</span>
                         <span class="text-teal-700 font-mono text-[11px]">WIB</span>
-                    </div>
-
-                    <!-- Notification Bell (Glass Card Button) -->
-                    <div class="relative">
-                        <button class="w-9 h-9 rounded-xl border border-slate-200/80 bg-slate-50/90 hover:bg-white text-slate-600 hover:text-slate-900 flex items-center justify-center transition-all shadow-2xs relative active:scale-95 cursor-pointer" 
-                                title="Notifikasi Sistem">
-                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                            </svg>
-                            <span class="absolute top-2 right-2 flex h-2 w-2">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                            </span>
-                        </button>
                     </div>
 
                     <!-- Divider -->
