@@ -149,57 +149,60 @@
                     <thead>
                         <tr style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" 
                             class="text-[11px] font-bold tracking-wider uppercase text-white select-none whitespace-nowrap">
-                            <th class="py-3 px-3.5 w-12 text-center">#</th>
-                            <th class="py-3 px-4 min-w-[200px]">PELANGGAN</th>
-                            <th class="py-3 px-4 min-w-[140px]">LAYANAN</th>
-                            <th class="py-3 px-4 min-w-[180px]">ALAMAT</th>
-                            <th class="py-3 px-4 min-w-[110px]">NOMOR / BW</th>
-                            <th class="py-3 px-3 text-center w-20">OLT</th>
-                            <th class="py-3 px-4 min-w-[130px]">NOTE (PORT)</th>
-                            <th class="py-3 px-4 min-w-[140px]">KETERANGAN</th>
-                            <th class="py-3 px-3 text-center w-24">AKSI</th>
+                            <th class="hidden md:table-cell py-3 px-3.5 w-12 text-center">#</th>
+                            <th class="py-3 pl-4 pr-2 sm:px-4">PELANGGAN</th>
+                            <th class="hidden lg:table-cell py-3 px-4 min-w-[140px]">LAYANAN</th>
+                            <th class="hidden xl:table-cell py-3 px-4 min-w-[180px]">ALAMAT</th>
+                            <th class="hidden md:table-cell py-3 px-4 min-w-[110px]">NOMOR / BW</th>
+                            <th class="hidden lg:table-cell py-3 px-3 text-center w-20">OLT</th>
+                            <th class="py-3 px-2 sm:px-4 text-center sm:text-left">PORT / NOTE</th>
+                            <th class="hidden xl:table-cell py-3 px-4 min-w-[140px]">KETERANGAN</th>
+                            <th class="py-3 pl-2 pr-4 sm:px-3 text-right sm:text-center w-24">AKSI</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($customers as $c)
                             <tr class="hover:bg-slate-50/80 transition-colors">
                                 <!-- Nomor Urut -->
-                                <td class="py-3 px-3.5 text-center text-slate-400 font-mono font-semibold">
+                                <td class="hidden md:table-cell py-3.5 px-3.5 text-center text-slate-400 font-mono font-semibold">
                                     {{ $customers->firstItem() ? $customers->firstItem() + $loop->index : $loop->iteration }}
                                 </td>
 
                                 <!-- Pelanggan: Nomor Internet, Nama, Status Badge -->
-                                <td class="py-3 px-4">
+                                <td class="py-3.5 pl-4 pr-2 sm:px-4">
                                     <div class="flex flex-col gap-0.5">
                                         <span class="text-[10px] text-slate-400 font-mono font-medium">{{ $c->nomor_internet }}</span>
-                                        <span class="font-bold text-slate-800 text-xs tracking-tight">{{ $c->nama_user }}</span>
-                                        <div>
+                                        <span class="font-extrabold text-slate-900 text-[13px] sm:text-xs tracking-tight leading-snug">{{ $c->nama_user }}</span>
+                                        <div class="flex flex-wrap items-center gap-1 mt-0.5">
                                             <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-extrabold uppercase bg-emerald-50 text-emerald-600 border border-emerald-200/60">
                                                 {{ $c->status ?? 'AKTIF' }}
                                             </span>
+                                            @if ($c->nomor)
+                                                <span class="md:hidden text-[10px] font-mono text-slate-500">&bull; {{ $c->nomor }}</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </td>
 
                                 <!-- Layanan -->
-                                <td class="py-3 px-4 text-slate-700 font-medium">
+                                <td class="hidden lg:table-cell py-3.5 px-4 text-slate-700 font-medium">
                                     {{ $c->layanan ?: 'BROADBAND FREE' }}
                                 </td>
 
                                 <!-- Alamat -->
-                                <td class="py-3 px-4 text-slate-600">
+                                <td class="hidden xl:table-cell py-3.5 px-4 text-slate-600">
                                     <div class="max-w-[220px] truncate" title="{{ $c->alamat }}">
                                         {{ $c->alamat ?: '-' }}
                                     </div>
                                 </td>
 
                                 <!-- Nomor / Bandwidth -->
-                                <td class="py-3 px-4 text-slate-700 font-mono text-xs">
+                                <td class="hidden md:table-cell py-3.5 px-4 text-slate-700 font-mono text-xs">
                                     {{ $c->nomor ?: '-' }}
                                 </td>
 
                                 <!-- OLT Badge -->
-                                <td class="py-3 px-3 text-center">
+                                <td class="hidden lg:table-cell py-3.5 px-3 text-center">
                                     <span style="background: #2563eb !important; color: #ffffff !important;" 
                                           class="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase shadow-2xs">
                                         {{ $c->olt_name ?: $olt->kode ?: 'MSN' }}
@@ -207,38 +210,38 @@
                                 </td>
 
                                 <!-- Note ZTE/Port (styled red text like original) -->
-                                <td class="py-3 px-4 text-rose-600 font-mono text-[11px] font-semibold break-words">
+                                <td class="py-3.5 px-2 sm:px-4 text-center sm:text-left text-rose-600 font-mono text-[11px] font-semibold break-words">
                                     {{ $c->note ?: '-' }}
                                 </td>
 
                                 <!-- Keterangan -->
-                                <td class="py-3 px-4 text-slate-500 text-[11px]">
+                                <td class="hidden xl:table-cell py-3.5 px-4 text-slate-500 text-[11px]">
                                     <div class="max-w-[180px] truncate" title="{{ $c->keterangan }}">
                                         {{ $c->keterangan ?: '-' }}
                                     </div>
                                 </td>
 
                                 <!-- Aksi Buttons -->
-                                <td class="py-3 px-3 text-center">
+                                <td class="py-3.5 pl-2 pr-4 sm:px-3 text-right sm:text-center">
                                     @if ($canManage)
-                                        <div class="flex items-center justify-center gap-1.5">
+                                        <div class="flex items-center justify-end sm:justify-center gap-1.5">
                                             <!-- Edit -->
                                             <button type="button" 
                                                     onclick="openEditCustomerModal({{ $c->id }}, '{{ addslashes($c->nomor_internet) }}', '{{ addslashes($c->nama_user) }}', '{{ addslashes($c->keterangan ?? '') }}', '{{ addslashes($c->layanan ?? '') }}', '{{ addslashes($c->alamat ?? '') }}', '{{ addslashes($c->nomor ?? '') }}', '{{ addslashes($c->note ?? '') }}')"
-                                                    style="background: #f59e0b !important; color: #ffffff !important;"
-                                                    class="p-1.5 rounded-lg shadow-2xs hover:opacity-90 transition-all text-white" title="Edit Pelanggan">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                    style="background: #f59e0b !important; color: #1e293b !important;"
+                                                    class="w-9 h-9 sm:w-8 sm:h-8 rounded-xl shadow-[0_4px_10px_rgba(245,158,11,0.22)] hover:brightness-105 active:scale-95 transition-all inline-flex items-center justify-center shrink-0 cursor-pointer" title="Edit Pelanggan">
+                                                <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                             </button>
 
                                             <!-- Hapus -->
-                                            <form action="{{ route('gomsn.network.customers.destroy', $c) }}" method="POST"
+                                            <form action="{{ route('gomsn.network.customers.destroy', $c) }}" method="POST" class="inline-flex"
                                                   onsubmit="return confirm('Apakah Anda yakin ingin menghapus pelanggan {{ addslashes($c->nama_user) }} dari ODP ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
                                                         style="background: #ef4444 !important; color: #ffffff !important;"
-                                                        class="p-1.5 rounded-lg shadow-2xs hover:opacity-90 transition-all text-white" title="Hapus Pelanggan">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                        class="w-9 h-9 sm:w-8 sm:h-8 rounded-xl shadow-[0_4px_10px_rgba(239,68,68,0.25)] hover:brightness-105 active:scale-95 transition-all text-white inline-flex items-center justify-center shrink-0 cursor-pointer" title="Hapus Pelanggan">
+                                                    <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                                                 </button>
                                             </form>
                                         </div>
