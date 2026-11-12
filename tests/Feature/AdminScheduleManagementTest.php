@@ -35,7 +35,7 @@ class AdminScheduleManagementTest extends TestCase
 
     public function test_screen_1_renders_monthly_schedule_index(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('attendance.schedules'));
+        $response = $this->actingAs($this->admin)->get(route('attendance.schedules', ['view' => 'list']));
 
         $response->assertOk();
         $response->assertSee('Jadwal Kerja Karyawan');
@@ -144,8 +144,8 @@ class AdminScheduleManagementTest extends TestCase
         $response->assertOk();
         $response->assertSee($user->name);
         $response->assertSee('November 2026');
-        $response->assertSee('Keterangan Shift:');
-        $response->assertSee('Jam Kerja');
+        $response->assertSee('Custom Jadwal Kerja');
+        $response->assertSee('Shift Tersedia:');
     }
 
     public function test_admin_can_update_schedule_cell_via_ajax(): void

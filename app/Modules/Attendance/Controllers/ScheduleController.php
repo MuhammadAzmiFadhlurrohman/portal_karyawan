@@ -21,6 +21,7 @@ class ScheduleController extends Controller
 {
     /**
      * Determine if a user can manage / generate schedules.
+     * Hanya role Admin (admin & super_admin) yang berhak mengatur/mengelola jadwal kerja.
      */
     protected function canManageSchedule(?User $user): bool
     {
@@ -28,8 +29,7 @@ class ScheduleController extends Controller
             return false;
         }
 
-        return $user->hasRole(['super_admin', 'admin', 'hrd'])
-            || $user->can('attendance.schedule.generate');
+        return $user->hasRole(['super_admin', 'admin']);
     }
     /**
      * Display schedule pages:
@@ -60,6 +60,11 @@ class ScheduleController extends Controller
         $actor = $request->user();
         $canManageSchedule = $this->canManageSchedule($actor);
 
+        // Jika bukan admin yang berhak mengelola, selalu tampilkan jadwal sendiri (personal)
+        if (! $canManageSchedule) {
+            $view = 'personal';
+        }
+
         // Jika role Admin membuka Jadwal Kerja tanpa parameter view, arahkan langsung ke Kalender & Custom Jadwal
         if (! $view && $canManageSchedule) {
             $view = 'user';
@@ -68,7 +73,7 @@ class ScheduleController extends Controller
         // -------------------------------------------------------------------------
         // Screen Personal: Jadwal Kerja Karyawan & Tukar / Backup Shift
         // -------------------------------------------------------------------------
-        if ($view === 'my' || $view === 'personal' || (! $canManageSchedule && ! in_array($view, ['generate', 'month', 'user'], true))) {
+        if ($view === 'my' || $view === 'personal') {
             $daysInMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->daysInMonth;
             $today = Carbon::now('Asia/Jakarta')->startOfDay();
 
@@ -397,6 +402,8 @@ class ScheduleController extends Controller
      */
     public function downloadTemplate(Request $request): StreamedResponse
     {
+        abort_unless($this->canManageSchedule($request->user()), 403);
+
         $year = (int) $request->input('year', now('Asia/Jakarta')->year);
         $month = (int) $request->input('month', now('Asia/Jakarta')->month);
         $division = $request->input('division');

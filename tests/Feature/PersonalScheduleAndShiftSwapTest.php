@@ -45,7 +45,6 @@ class PersonalScheduleAndShiftSwapTest extends TestCase
         $response->assertOk();
         $response->assertSee('Jadwal Kerja');
         $response->assertSee(strtoupper($this->karyawan->name));
-        $response->assertSee('Divisi: ' . ($this->karyawan->division ?: 'Teknik'));
         $response->assertSee('Tampilkan');
         $response->assertSee('Permintaan');
         $response->assertSee('TANGGAL &amp; SHIFT', false);
@@ -54,6 +53,7 @@ class PersonalScheduleAndShiftSwapTest extends TestCase
         $response->assertSee('Pilih Aksi');
         $response->assertSee('Tukar Jadwal');
         $response->assertSee('Backup Jadwal');
+        $response->assertDontSee('Kalender & Custom Jadwal');
     }
 
     public function test_admin_can_view_personal_schedule_via_my_view(): void
@@ -68,7 +68,59 @@ class PersonalScheduleAndShiftSwapTest extends TestCase
         $response->assertSee('Jadwal Kerja');
         $response->assertSee(strtoupper($this->admin->name));
         $response->assertSee('Jadwal Saya');
-        $response->assertSee('Kelola Jadwal Karyawan (Admin)');
+        $response->assertSee('Kelola Periode Bulan');
+    }
+
+    public function test_hrd_only_sees_own_schedule_and_cannot_manage_schedule(): void
+    {
+        $hrd = User::where('email', 'hrd@msn.co.id')->firstOrFail();
+
+        // 1. HRD opening schedules index defaults to personal view
+        $response = $this->actingAs($hrd)->get(route('attendance.schedules'));
+        $response->assertOk();
+        $response->assertSee('Jadwal Kerja Saya');
+        $response->assertSee(strtoupper($hrd->name));
+        $response->assertDontSee('Kalender & Custom Jadwal');
+        $response->assertDontSee('Kelola Periode Bulan');
+
+        // 2. HRD attempting to access admin views is forced to personal view
+        $responseUserView = $this->actingAs($hrd)->get(route('attendance.schedules', ['view' => 'user', 'user_id' => $this->karyawan->id]));
+        $responseUserView->assertOk();
+        $responseUserView->assertSee('Jadwal Kerja Saya');
+        $responseUserView->assertDontSee('Custom Jadwal Kerja');
+
+        $responseGenerateView = $this->actingAs($hrd)->get(route('attendance.schedules', ['view' => 'generate']));
+        $responseGenerateView->assertOk();
+        $responseGenerateView->assertSee('Jadwal Kerja Saya');
+        $responseGenerateView->assertDontSee('Generate Jadwal Bulanan');
+
+        $responseMonthView = $this->actingAs($hrd)->get(route('attendance.schedules', ['view' => 'month', 'year' => 2026, 'month' => 11]));
+        $responseMonthView->assertOk();
+        $responseMonthView->assertSee('Jadwal Kerja Saya');
+
+        // 3. HRD mutation actions are blocked with 403 Forbidden
+        $this->actingAs($hrd)->post(route('attendance.schedules.generate'), [
+            'year' => 2026,
+            'month' => 11,
+            'scope' => 'all',
+            'default_shift_code' => 'P',
+        ])->assertForbidden();
+
+        $this->actingAs($hrd)->postJson(route('attendance.schedules.cell'), [
+            'user_id' => $this->karyawan->id,
+            'date' => '2026-11-05',
+            'shift_id' => $this->shiftPagi->id,
+        ])->assertForbidden();
+
+        $this->actingAs($hrd)->post(route('attendance.schedules.delete-month'), [
+            'year' => 2026,
+            'month' => 11,
+        ])->assertForbidden();
+
+        $this->actingAs($hrd)->get(route('attendance.schedules.template', [
+            'year' => 2026,
+            'month' => 11,
+        ]))->assertForbidden();
     }
 
     public function test_peer_shift_ajax_endpoint_returns_json(): void

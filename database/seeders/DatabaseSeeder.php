@@ -71,7 +71,6 @@ class DatabaseSeeder extends Seeder
             ],
             'hrd' => [
                 'attendance.employee.manage',
-                'attendance.schedule.generate',
                 'attendance.leave.approve',
                 'attendance.correction.approve',
                 'attendance.deduction.lock_period',
