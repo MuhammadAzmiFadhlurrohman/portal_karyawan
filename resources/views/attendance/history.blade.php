@@ -62,43 +62,6 @@
                     </p>
                 </div>
             </div>
-
-            <!-- Right: Profile Info Card -->
-            <div class="relative z-10 flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2 text-white shrink-0 shadow-xs self-start sm:self-auto">
-                <div class="relative shrink-0">
-                    @if ($targetUser->avatar_url)
-                        <img src="{{ $targetUser->avatar_url }}" 
-                             alt="" 
-                             class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cyan-400/40 shadow-sm" 
-                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                        <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                            {{ $targetUser->initials }}
-                        </div>
-                    @else
-                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                            {{ $targetUser->initials }}
-                        </div>
-                    @endif
-                </div>
-
-                <div class="text-left leading-tight min-w-0">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-xs sm:text-sm text-white tracking-tight truncate max-w-[140px] sm:max-w-[180px]">
-                            {{ strtoupper($targetUser->name) }}
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>{{ $targetUser->is_active ? 'Aktif' : 'Non-Aktif' }}</span>
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-[11px] text-teal-200/85">
-                        <span class="font-mono text-cyan-200">NIK: {{ $targetUser->employee_code }}</span>
-                        @if ($targetUser->division)
-                            <span class="truncate">· Divisi: {{ $targetUser->division }}</span>
-                        @endif
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Filter Period Toolbar -->
