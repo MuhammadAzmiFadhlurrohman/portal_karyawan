@@ -276,13 +276,13 @@
         <div x-show="showEnrollModal" 
              x-cloak 
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.outside="showEnrollModal = false">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.outside="closeEnrollModal()">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 class="font-heading font-bold text-base text-[#155E63] flex items-center gap-2">
                         <span>📸</span>
                         <span>Pendaftaran Wajah Karyawan</span>
                     </h3>
-                    <button type="button" @click="showEnrollModal = false" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <button type="button" @click="closeEnrollModal()" class="text-slate-400 hover:text-slate-600 text-lg">
                         &times;
                     </button>
                 </div>
@@ -339,7 +339,7 @@
                     </label>
 
                     <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button type="button" @click="showEnrollModal = false" class="btn-secondary !px-3.5 !py-2 text-xs">
+                        <button type="button" @click="closeEnrollModal()" class="btn-secondary !px-3.5 !py-2 text-xs">
                             Batal
                         </button>
                         <button type="submit" class="btn-primary !px-5 !py-2 text-xs">
@@ -350,28 +350,91 @@
             </div>
         </div>
 
-        <!-- MODAL 2: ABSEN MASUK (Simple Location & Confirmation) -->
+        <!-- MODAL 2: ABSEN MASUK (Camera Face Verification & Location) -->
         <div x-show="showClockInModal" 
              x-cloak 
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.outside="showClockInModal = false">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-4" @click.outside="closeClockInModal()">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h3 class="font-heading font-bold text-base text-[#155E63] flex items-center gap-2">
                         <span>⏰</span>
-                        <span>Konfirmasi Absen Masuk</span>
+                        <span>Verifikasi Wajah &amp; Absen Masuk</span>
                     </h3>
-                    <button type="button" @click="showClockInModal = false" class="text-slate-400 hover:text-slate-600 text-lg">
+                    <button type="button" @click="closeClockInModal()" class="text-slate-400 hover:text-slate-600 text-lg">
                         &times;
                     </button>
                 </div>
 
-                <form method="POST" action="{{ route('attendance.clock-in') }}" class="space-y-4">
+                <form method="POST" action="{{ route('attendance.clock-in') }}" @submit="handleClockInSubmit($event)" class="space-y-4">
                     @csrf
                     
                     <!-- Hidden GPS Coordinates -->
                     <input type="hidden" name="lat" :value="gpsLat">
                     <input type="hidden" name="lng" :value="gpsLng">
                     <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
+
+                    <!-- Camera & Face Verification Preview -->
+                    <div class="rounded-xl border border-dashed border-teal-300 p-3.5 bg-teal-50/40 text-center space-y-2.5">
+                        <div class="w-32 h-32 mx-auto rounded-full overflow-hidden bg-slate-900 border-2 border-[#155E63] flex items-center justify-center relative shadow-inner">
+                            <video id="clockin-video" autoplay playsinline class="w-full h-full object-cover" x-show="clockInCameraActive"></video>
+                            <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
+                            <canvas id="clockin-canvas" class="hidden"></canvas>
+                            <div x-show="!clockInCameraActive && !clockInPhotoPreview" class="text-slate-400 text-center p-2">
+                                <svg class="w-10 h-10 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
+                            </div>
+                        </div>
+
+                        <!-- Face Verification Status Badge -->
+                        <div>
+                            <template x-if="clockInPhotoPreview">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                    <span>Foto Wajah Siap Diverifikasi</span>
+                                </span>
+                            </template>
+                            <template x-if="!clockInPhotoPreview && clockInCameraActive">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-cyan-100 text-cyan-800 animate-pulse">
+                                    <span>Posisikan wajah Anda tepat di tengah</span>
+                                </span>
+                            </template>
+                            <template x-if="!clockInPhotoPreview && !clockInCameraActive && clockInPrimaryImage">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                                    <span>Biometrik Terpasang (Simulasi Wajah)</span>
+                                </span>
+                            </template>
+                            <template x-if="!clockInPhotoPreview && !clockInCameraActive && !clockInPrimaryImage">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200">
+                                    📸 Wajib ambil foto selfie wajah
+                                </span>
+                            </template>
+                        </div>
+
+                        <!-- Camera Action Buttons -->
+                        <div class="flex flex-wrap items-center justify-center gap-2 pt-0.5">
+                            <button type="button" 
+                                    @click="startClockInCamera()" 
+                                    x-show="!clockInCameraActive"
+                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-xs transition">
+                                <span x-text="clockInPhotoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
+                            </button>
+                            <button type="button" 
+                                    @click="captureClockInPhoto()" 
+                                    x-show="clockInCameraActive"
+                                    class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition">
+                                📸 Ambil Foto Sekarang
+                            </button>
+                            <button type="button" 
+                                    @click="useClockInSimulation()" 
+                                    class="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 transition">
+                                Gunakan Simulasi
+                            </button>
+                        </div>
+
+                        <!-- Hidden Image Inputs -->
+                        <input type="hidden" name="primary_image" :value="clockInPrimaryImage">
+                        <input type="hidden" name="challenge_image" :value="clockInChallengeImage">
+                    </div>
 
                     <!-- Office Location -->
                     <div>
@@ -435,13 +498,13 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button type="button" @click="showClockInModal = false" class="btn-secondary !px-3.5 !py-2 text-xs">
+                        <button type="button" @click="closeClockInModal()" class="btn-secondary !px-3.5 !py-2 text-xs">
                             Batal
                         </button>
                         <button type="submit" 
                                 style="background: #0D8252 !important;"
                                 class="btn-primary !px-5 !py-2 text-xs">
-                            Absen Masuk Sekarang
+                            Verifikasi Wajah &amp; Absen Masuk
                         </button>
                     </div>
                 </form>
@@ -462,6 +525,12 @@
                 selectedOffice: '{{ $defaultOffice?->id ?? 1 }}',
                 attendanceType: 'office',
                 
+                // Clock-in Camera states
+                clockInCameraActive: false,
+                clockInPhotoPreview: null,
+                clockInPrimaryImage: '',
+                clockInChallengeImage: '',
+
                 // GPS Coordinates (Defaulting to Bandung HQ so local dev always succeeds)
                 gpsLat: {{ $defaultOffice?->lat ?? -6.937122 }},
                 gpsLng: {{ $defaultOffice?->lng ?? 107.631989 }},
@@ -488,7 +557,6 @@
                                 this.gpsStatus = 'GPS Terdeteksi (Akurasi: ±' + this.gpsAccuracy + 'm)';
                             },
                             (err) => {
-                                // Default fallback to office coordinates
                                 this.useSelectedOfficeLocation();
                                 this.gpsStatus = 'Menggunakan Koordinat Kantor Terpilih (GPS perangkat tidak aktif/izin ditolak)';
                             },
@@ -513,9 +581,15 @@
                     }
                 },
 
-                openClockInModal() {
-                    this.detectGPS();
-                    this.showClockInModal = true;
+                // Enrollment Modal controls
+                closeEnrollModal() {
+                    const video = document.getElementById('enroll-video');
+                    if (video && video.srcObject) {
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                    }
+                    this.cameraActive = false;
+                    this.showEnrollModal = false;
                 },
 
                 startCamera() {
@@ -552,9 +626,9 @@
                         this.poseLeft = dataUrl;
                         this.poseRight = dataUrl;
 
-                        // Stop video stream
                         if (video.srcObject) {
                             video.srcObject.getTracks().forEach(track => track.stop());
+                            video.srcObject = null;
                         }
                         this.cameraActive = false;
                     }
@@ -569,8 +643,89 @@
                     const video = document.getElementById('enroll-video');
                     if (video && video.srcObject) {
                         video.srcObject.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
                     }
                     alert('Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
+                },
+
+                // Clock-in Face Verification Modal controls
+                openClockInModal() {
+                    this.detectGPS();
+                    this.showClockInModal = true;
+                    this.$nextTick(() => {
+                        this.startClockInCamera();
+                    });
+                },
+
+                closeClockInModal() {
+                    this.stopClockInCamera();
+                    this.showClockInModal = false;
+                },
+
+                startClockInCamera() {
+                    const video = document.getElementById('clockin-video');
+                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
+                            .then((stream) => {
+                                video.srcObject = stream;
+                                this.clockInCameraActive = true;
+                                this.clockInPhotoPreview = null;
+                            })
+                            .catch((err) => {
+                                alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                this.useClockInSimulation();
+                            });
+                    } else {
+                        alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                        this.useClockInSimulation();
+                    }
+                },
+
+                captureClockInPhoto() {
+                    const video = document.getElementById('clockin-video');
+                    const canvas = document.getElementById('clockin-canvas');
+                    if (video && canvas) {
+                        canvas.width = video.videoWidth || 320;
+                        canvas.height = video.videoHeight || 240;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                        this.clockInPhotoPreview = dataUrl;
+                        this.clockInPrimaryImage = dataUrl;
+                        this.clockInChallengeImage = '{{ base64_encode("FACE_ID:user_".$user->id."|CHALLENGE_AUTO") }}';
+
+                        this.stopClockInCamera();
+                    }
+                },
+
+                stopClockInCamera() {
+                    const video = document.getElementById('clockin-video');
+                    if (video && video.srcObject) {
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                    }
+                    this.clockInCameraActive = false;
+                },
+
+                useClockInSimulation() {
+                    this.stopClockInCamera();
+                    this.clockInPrimaryImage = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:FRONT|MANUAL") }}';
+                    this.clockInChallengeImage = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:CHALLENGE|MANUAL") }}';
+                    this.clockInPhotoPreview = null;
+                    alert('Simulasi data biometrik wajah terpasang. Siap untuk absen masuk.');
+                },
+
+                handleClockInSubmit(e) {
+                    if (!this.clockInPrimaryImage) {
+                        e.preventDefault();
+                        alert('Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.');
+                        if (!this.clockInCameraActive) {
+                            this.startClockInCamera();
+                        }
+                        return false;
+                    }
+                    this.stopClockInCamera();
                 }
             };
         }

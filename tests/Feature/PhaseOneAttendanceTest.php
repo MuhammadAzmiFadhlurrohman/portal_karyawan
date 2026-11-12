@@ -228,6 +228,44 @@ class PhaseOneAttendanceTest extends TestCase
         $this->assertTrue(AuditLog::query()->where('action', 'notification.shift_reminder.clock_in')->exists());
     }
 
+    public function test_clock_in_via_controller_requires_face_photo_and_verifies_face(): void
+    {
+        $user = User::where('username', 'teknisi1')->firstOrFail();
+        $office = OfficeLocation::where('code', 'BDG-HQ')->firstOrFail();
+        $service = app(AttendanceService::class);
+
+        $this->enrollDefaultFace($user, $service);
+
+        // 1. Clock in without face photo is rejected
+        $response = $this->actingAs($user)->post(route('attendance.clock-in'), [
+            'office_location_id' => $office->id,
+            'attendance_type' => 'office',
+            'lat' => $office->lat,
+            'lng' => $office->lng,
+            'gps_accuracy' => 5.0,
+            'primary_image' => '',
+        ]);
+        $response->assertSessionHasErrors(['primary_image']);
+
+        // 2. Clock in with matching face photo succeeds
+        $response = $this->actingAs($user)->post(route('attendance.clock-in'), [
+            'office_location_id' => $office->id,
+            'attendance_type' => 'office',
+            'lat' => $office->lat,
+            'lng' => $office->lng,
+            'gps_accuracy' => 5.0,
+            'primary_image' => base64_encode('FACE_ID:user_'.$user->id.'|SELFIE_CLOCK_IN'),
+        ]);
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('attendances', [
+            'user_id' => $user->id,
+            'office_location_id' => $office->id,
+            'source' => 'face',
+        ]);
+    }
+
     private function enrollDefaultFace(User $user, AttendanceService $service): FaceTemplate
     {
         return $service->enrollUserFace(

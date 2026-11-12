@@ -13,6 +13,7 @@ use App\Modules\Attendance\Services\FaceRecognitionClient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AttendanceController extends Controller
@@ -248,13 +249,16 @@ class AttendanceController extends Controller
             'ticket_reference' => ['nullable', 'string', 'max:64'],
         ]);
 
+        if (empty($validated['primary_image']) && ! ($validated['use_manual_fallback'] ?? false)) {
+            throw ValidationException::withMessages([
+                'primary_image' => 'Foto wajah wajib diambil untuk verifikasi kesesuaian dengan pendaftaran biometrik Anda.',
+            ]);
+        }
+
         if (empty($validated['attempt_token']) && ! ($validated['use_manual_fallback'] ?? false)) {
-            $sample = base64_encode('FACE_ID:user_'.$user->id.'|SAMPLE_AUTO');
+            $sample = ! empty($validated['primary_image']) ? $validated['primary_image'] : base64_encode('FACE_ID:user_'.$user->id.'|SAMPLE_AUTO');
             $attemptToken = $attendanceService->issueAttemptToken($user, $sample);
             $validated['attempt_token'] = $attemptToken->token;
-            if (empty($validated['primary_image'])) {
-                $validated['primary_image'] = base64_encode('FACE_ID:user_'.$user->id.'|PRIMARY_AUTO');
-            }
             if (empty($validated['challenge_image'])) {
                 $validated['challenge_image'] = base64_encode('FACE_ID:user_'.$user->id.'|CHALLENGE_AUTO');
             }
@@ -264,7 +268,7 @@ class AttendanceController extends Controller
 
         return back()->with(
             'status',
-            'Clock-In berhasil dicatat (Status: '.strtoupper($attendance->status).", Jarak: {$attendance->distance_m_in}m, Terlambat: {$attendance->late_minutes} menit)."
+            'Clock-In berhasil diverifikasi wajah & dicatat (Status: '.strtoupper($attendance->status).", Jarak: {$attendance->distance_m_in}m, Terlambat: {$attendance->late_minutes} menit)."
         );
     }
 
