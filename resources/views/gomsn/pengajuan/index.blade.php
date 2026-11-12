@@ -161,56 +161,56 @@
             <!-- ========================================== -->
 
             <!-- 1. 4 KPI Summary Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <!-- Card 1: Total Pengajuan -->
-                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-500 block mb-1">Total Pengajuan</span>
-                        <span class="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['total'] }}</span>
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Pengajuan</span>
+                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['total'] }}</span>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
                         </svg>
                     </div>
                 </div>
 
                 <!-- Card 2: Disetujui -->
-                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-500 block mb-1">Disetujui</span>
-                        <span class="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['approved'] }}</span>
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Disetujui</span>
+                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['approved'] }}</span>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                     </div>
                 </div>
 
                 <!-- Card 3: Ditolak -->
-                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-500 block mb-1">Ditolak</span>
-                        <span class="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['rejected'] }}</span>
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Ditolak</span>
+                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['rejected'] }}</span>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                         </svg>
                     </div>
                 </div>
 
                 <!-- Card 4: Total Dana -->
-                <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-500 block mb-1">Total Dana</span>
-                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Dana</span>
+                        <span class="text-sm sm:text-xl font-heading font-extrabold text-slate-900 block truncate">
                             Rp {{ number_format($financeMetrics['total_dana'], 0, ',', '.') }}
                         </span>
                     </div>
-                    <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
-                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
                             <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
                         </svg>
@@ -218,87 +218,86 @@
                 </div>
             </div>
 
-            <!-- 2. Filter Bar Toolbar & Live Date/Time -->
-            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
-                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex flex-wrap items-center gap-2.5">
+            <!-- 2. Filter Bar Toolbar & Search Combined -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-2.5">
                     @if(request('search'))
                         <input type="hidden" name="search" value="{{ request('search') }}">
                     @endif
 
-                    <!-- Dropdown Semua Jenis -->
-                    <select name="jenis" class="text-xs rounded-xl border-slate-300 py-1.5 px-3 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium text-slate-700">
-                        <option value="">Semua Jenis</option>
-                        <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok</option>
-                        <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Dana</option>
-                        <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Beli</option>
-                        <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
-                    </select>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2">
+                        <!-- Dropdown Semua Jenis -->
+                        <select name="jenis" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
+                            <option value="">Semua Jenis</option>
+                            <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok</option>
+                            <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Dana</option>
+                            <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Beli</option>
+                            <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
+                        </select>
 
-                    <!-- Dropdown Semua Divisi -->
-                    <select name="divisi" class="text-xs rounded-xl border-slate-300 py-1.5 px-3 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium text-slate-700">
-                        <option value="">Semua Divisi</option>
-                        @foreach ($divisions as $div)
-                            <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
-                        @endforeach
-                    </select>
+                        <!-- Dropdown Semua Divisi -->
+                        <select name="divisi" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
+                            <option value="">Semua Divisi</option>
+                            @foreach ($divisions as $div)
+                                <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                            @endforeach
+                        </select>
 
-                    <!-- Dropdown Bulan -->
-                    @php
-                        $months = [
-                            '1' => 'Jan', '2' => 'Feb', '3' => 'Mar', '4' => 'Apr',
-                            '5' => 'Mei', '6' => 'Jun', '7' => 'Jul', '8' => 'Agu',
-                            '9' => 'Sep', '10' => 'Okt', '11' => 'Nov', '12' => 'Des'
-                        ];
-                    @endphp
-                    <select name="bulan" class="text-xs rounded-xl border-slate-300 py-1.5 px-3 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium text-slate-700">
-                        <option value="">Semua Bulan</option>
-                        @foreach ($months as $mNum => $mLabel)
-                            <option value="{{ $mNum }}" {{ (string) request('bulan') === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
-                        @endforeach
-                    </select>
+                        <!-- Dropdown Bulan -->
+                        @php
+                            $months = [
+                                '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
+                                '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
+                                '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+                            ];
+                        @endphp
+                        <select name="bulan" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
+                            <option value="">Semua Bulan</option>
+                            @foreach ($months as $mNum => $mLabel)
+                                <option value="{{ $mNum }}" {{ (string) request('bulan') === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
+                            @endforeach
+                        </select>
 
-                    <!-- Dropdown Tahun -->
-                    <select name="tahun" class="text-xs rounded-xl border-slate-300 py-1.5 px-3 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium text-slate-700">
-                        <option value="">Semua Tahun</option>
-                        @for ($y = date('Y') + 1; $y >= 2024; $y--)
-                            <option value="{{ $y }}" {{ (int) request('tahun') === $y ? 'selected' : '' }}>{{ $y }}</option>
-                        @endfor
-                    </select>
+                        <!-- Dropdown Tahun -->
+                        <select name="tahun" class="w-full lg:w-28 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
+                            <option value="">Semua Tahun</option>
+                            @for ($y = date('Y') + 1; $y >= 2024; $y--)
+                                <option value="{{ $y }}" {{ (int) request('tahun') === $y ? 'selected' : '' }}>{{ $y }}</option>
+                            @endfor
+                        </select>
 
-                    <!-- Tombol Tampilkan -->
-                    <button type="submit" class="bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition">
-                        <span>&darr;</span>
-                        <span>Tampilkan</span>
-                    </button>
+                        <!-- Tombol Filter / Refresh / Export -->
+                        <div class="col-span-2 sm:col-span-4 lg:col-auto flex flex-wrap items-center gap-2">
+                            <button type="submit" class="flex-1 sm:flex-initial bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                                <span>Tampilkan</span>
+                            </button>
 
-                    <!-- Tombol Refresh -->
-                    <a href="{{ route('gomsn.pengajuan.index') }}" class="bg-slate-500 hover:bg-slate-600 text-white text-xs font-semibold px-3 py-1.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition">
-                        <span>&#x21bb;</span>
-                        <span>Refresh</span>
-                    </a>
+                            <a href="{{ route('gomsn.pengajuan.index') }}" class="flex-1 sm:flex-initial bg-slate-600 hover:bg-slate-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                <span>Refresh</span>
+                            </a>
 
-                    <!-- Tombol Export -->
-                    <button type="submit" name="export" value="csv" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <span>Export</span>
-                    </button>
+                            <button type="submit" name="export" value="csv" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+
+                        <div class="hidden xl:flex items-center gap-1.5 text-xs text-slate-500 font-medium ml-auto shrink-0">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                            </svg>
+                            <span x-text="timeString">Senin, {{ date('d F Y') }} WIB</span>
+                        </div>
+                    </div>
                 </form>
 
-                <!-- Live Indonesian Date Time -->
-                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium shrink-0">
-                    <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
-                    </svg>
-                    <span x-text="timeString">Senin, {{ date('d F Y') }} WIB</span>
-                </div>
-            </div>
-
-            <!-- 3. Search Bar -->
-            <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-2xs">
-                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex items-center gap-2">
+                <!-- Search Form -->
+                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex items-center gap-2 pt-2 border-t border-slate-100">
                     @if(request('jenis')) <input type="hidden" name="jenis" value="{{ request('jenis') }}"> @endif
                     @if(request('divisi')) <input type="hidden" name="divisi" value="{{ request('divisi') }}"> @endif
                     @if(request('bulan')) <input type="hidden" name="bulan" value="{{ request('bulan') }}"> @endif
@@ -306,32 +305,42 @@
 
                     <div class="relative flex-1">
                         <input type="text" name="search" value="{{ request('search') }}" 
-                               placeholder="Cari ID / Username / Jenis"
-                               class="w-full text-xs rounded-xl border-slate-300 py-2 px-3.5 focus:ring-blue-500 focus:border-blue-500 placeholder-slate-400">
+                               placeholder="Cari ID / Nomor Pengajuan / Nama Karyawan / Keperluan..."
+                               class="w-full text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3.5 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400">
                     </div>
-                    <button type="submit" class="bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition shrink-0">
+                    <button type="submit" style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;" class="hover:opacity-90 text-white text-xs font-bold px-4 py-2 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition shrink-0 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <span>Cari</span>
                     </button>
                 </form>
             </div>
 
-            <!-- 4. Table List Sesuai Mockup -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs min-w-[700px]">
-                        <thead>
-                            <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-800 font-bold text-xs">
-                                <th class="py-3.5 px-4 font-bold">ID Pengajuan</th>
-                                <th class="py-3.5 px-4 font-bold">Tanggal</th>
-                                <th class="py-3.5 px-4 font-bold">Jenis</th>
-                                <th class="py-3.5 px-4 font-bold">Karyawan</th>
-                                <th class="py-3.5 px-4 font-bold">Status</th>
-                                <th class="py-3.5 px-4 font-bold text-center w-28">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @forelse ($pengajuanList as $item)
+            <!-- 3. Card Grid Daftar Pengajuan (Finance) -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-4 sm:px-5 py-3.5 flex items-center justify-between text-white">
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <span class="text-[#18C4C4] font-extrabold">#</span>
+                        <span>Daftar Pengajuan Karyawan</span>
+                    </div>
+                    <span class="text-xs font-semibold text-teal-100/90 bg-white/10 px-2.5 py-1 rounded-full">
+                        Total: {{ $pengajuanList->total() }} data
+                    </span>
+                </div>
+
+                <div class="p-3.5 sm:p-5 bg-slate-50/50">
+                    @if ($pengajuanList->isEmpty())
+                        <div class="bg-white rounded-2xl border border-dashed border-slate-200 py-12 px-4 text-center">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-bold text-slate-700">Tidak Ada Data Pengajuan</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Belum ada data pengajuan karyawan yang sesuai dengan filter.</p>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
+                            @foreach ($pengajuanList as $item)
                                 @php
                                     $isApproved = in_array($item->status, ['dicairkan', 'menunggu_bukti', 'selesai']);
                                     $isRejected = ($item->status === 'ditolak');
@@ -373,79 +382,110 @@
                                         })->values()->all(),
                                     ];
                                 @endphp
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="py-3.5 px-4 font-semibold text-slate-800">
-                                        <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="font-bold text-teal-700 hover:text-teal-900 hover:underline text-left cursor-pointer">
-                                            {{ $item->id }}
-                                        </button>
-                                        <span class="block text-[10px] text-slate-400 font-mono">{{ $item->nomor_pengajuan }}</span>
-                                    </td>
-                                    <td class="py-3.5 px-4 text-slate-700 whitespace-nowrap">
-                                        {{ $item->created_at->format('d M Y - H:i') }} WIB
-                                    </td>
-                                    <td class="py-3.5 px-4">
-                                        @if ($item->jenis === 'STOK')
-                                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold bg-[#f59e0b] text-white">Stok</span>
-                                        @elseif ($item->jenis === 'DANA')
-                                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold bg-[#10b981] text-white">Dana</span>
-                                        @elseif ($item->jenis === 'BELI')
-                                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold bg-[#2563eb] text-white">Beli</span>
-                                        @else
-                                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold bg-[#06b6d4] text-white">Permintaan</span>
+
+                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-teal-300/80 transition-all duration-200 flex flex-col justify-between p-4 gap-3">
+                                    <!-- Top Row: ID & Badges -->
+                                    <div>
+                                        <div class="flex items-start justify-between gap-2 mb-3">
+                                            <div class="min-w-0">
+                                                <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center gap-1.5 text-left group cursor-pointer">
+                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-teal-900 bg-teal-50 border border-teal-200/70 px-2 py-0.5 rounded-lg">#{{ $item->id }}</span>
+                                                    <span class="text-[11px] font-mono font-semibold text-slate-500 truncate">{{ $item->nomor_pengajuan }}</span>
+                                                </button>
+                                                <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
+                                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                                                    </svg>
+                                                    <span>{{ $item->created_at->format('d M Y, H:i') }} WIB</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
+                                                @if ($item->jenis === 'STOK')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">Stok</span>
+                                                @elseif ($item->jenis === 'DANA')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white">Dana</span>
+                                                @elseif ($item->jenis === 'BELI')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">Beli</span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white">Permintaan</span>
+                                                @endif
+
+                                                @if ($isApproved)
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                        Disetujui
+                                                    </span>
+                                                @elseif ($isRejected)
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                        Ditolak
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                        Menunggu
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <!-- Applicant & Nominal Box -->
+                                        <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20">
+                                                    {{ strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-xs font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
+                                                        {{ $item->user?->name ?? 'Karyawan MSN' }}
+                                                    </button>
+                                                    <span class="text-[11px] text-slate-500 block truncate">
+                                                        {{ $item->user?->employee_code ?? '-' }} &bull; {{ $item->user?->division ?? 'Umum' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-right shrink-0">
+                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Nilai</span>
+                                                @if ($item->jenis === 'STOK')
+                                                    <span class="text-xs font-extrabold text-amber-600">Stok Gudang</span>
+                                                @else
+                                                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                        Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        @if ($item->keperluan)
+                                            <p class="text-xs text-slate-600 line-clamp-2 mt-2.5 leading-relaxed" title="{{ $item->keperluan }}">
+                                                <span class="font-semibold text-slate-500">Keperluan:</span> {{ $item->keperluan }}
+                                            </p>
                                         @endif
-                                    </td>
-                                    <td class="py-3.5 px-4">
-                                        <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-teal-700 hover:text-teal-900 font-semibold hover:underline cursor-pointer text-left">
-                                            {{ $item->user?->name ?? 'Karyawan MSN' }}
-                                        </button>
-                                        @if ($item->user?->division)
-                                            <span class="block text-[10px] text-slate-400">{{ $item->user->division }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="py-3.5 px-4">
-                                        @if ($isApproved)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#dcfce7] text-[#15803d] border border-emerald-300">
-                                                <span>&#x2705;</span>
-                                                <span>Disetujui</span>
-                                            </span>
-                                        @elseif ($isRejected)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#fee2e2] text-[#b91c1c] border border-rose-300">
-                                                <span>&#x274C;</span>
-                                                <span>Ditolak</span>
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-[#fef3c7] text-[#b45309] border border-amber-300">
-                                                <span>&#x23F3;</span>
-                                                <span>Menunggu</span>
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="py-3.5 px-4 text-center">
-                                        <button type="button" 
+                                    </div>
+
+                                    <!-- Bottom Actions -->
+                                    <div class="pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2">
+                                        <button type="button"
                                                 @click="openModalWith({{ json_encode($modalData) }})"
                                                 style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
-                                                class="hover:opacity-90 text-white font-bold text-xs px-4 py-1.5 rounded-lg shadow-sm transition inline-flex items-center justify-center gap-1.5 min-w-[76px] cursor-pointer">
+                                                class="w-full sm:w-auto hover:opacity-90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
                                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
-                                            <span>Detail</span>
+                                            <span>Lihat Detail</span>
                                         </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-12 text-center text-slate-400">
-                                        Tidak ada data pengajuan karyawan untuk ditampilkan.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 @if ($pengajuanList->hasPages())
-                <div class="p-4 border-t border-slate-200 bg-slate-50/50">
+                <div class="p-4 border-t border-slate-200 bg-white">
                     {{ $pengajuanList->links() }}
                 </div>
                 @endif
@@ -466,7 +506,7 @@
                     @endif
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex flex-wrap items-center gap-2">
                     @if ($isAtasan)
                     <a href="{{ route('gomsn.pengajuan.approvals') }}" class="btn-secondary min-h-[38px] inline-flex items-center gap-2 text-xs">
                         <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -495,13 +535,13 @@
             <div class="flex items-center gap-2 border-b border-slate-200 pb-2 text-xs font-semibold overflow-x-auto">
                 @if ($isAtasan)
                 <a href="{{ route('gomsn.pengajuan.index', ['tab' => 'my']) }}" 
-                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 {{ $tab === 'my' ? 'bg-[#18C4C4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 {{ $tab === 'my' ? 'bg-[#18C4C4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     <span>Pengajuan Saya (Mandiri)</span>
                 </a>
 
                 <a href="{{ route('gomsn.pengajuan.approvals') }}" 
-                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 text-slate-600 hover:bg-slate-100">
+                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 text-slate-600 hover:bg-slate-100">
                     <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span>Persetujuan Karyawan</span>
                     @if ($pendingApprovalsCount > 0)
@@ -514,13 +554,13 @@
 
                 @if ($isSuperAdmin)
                 <a href="{{ route('gomsn.pengajuan.index', ['tab' => 'all']) }}" 
-                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 {{ $tab === 'all' ? 'bg-[#18C4C4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 {{ $tab === 'all' ? 'bg-[#18C4C4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                     <span>Semua Pengajuan</span>
                 </a>
 
                 <a href="{{ route('gomsn.pengajuan.index', ['tab' => 'my']) }}" 
-                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 {{ $tab === 'my' ? 'bg-[#18C4C4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
+                   class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 {{ $tab === 'my' ? 'bg-[#18C4C4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100' }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     <span>Pengajuan Saya Sendiri</span>
                 </a>
@@ -528,192 +568,213 @@
             </div>
             @endif
 
-
             <!-- Filter Bar Standar -->
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
-                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex flex-wrap items-center gap-3">
-                    <div>
-                        <select name="jenis" onchange="this.form.submit()" class="text-xs rounded-lg border-slate-300 focus:ring-blue-500 focus:border-blue-500 py-1.5">
-                            <option value="">Semua Jenis</option>
-                            <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>💵 Kasbon Dana</option>
-                            <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>🛒 Pengadaan (Beli)</option>
-                            <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>📦 Stok Gudang</option>
-                        </select>
-                    </div>
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                    @if(request('tab'))
+                        <input type="hidden" name="tab" value="{{ request('tab') }}">
+                    @endif
+                    <select name="jenis" onchange="this.form.submit()" class="w-full sm:w-44 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                        <option value="">Semua Jenis</option>
+                        <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
+                        <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
+                        <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok Gudang</option>
+                    </select>
 
-                    <div>
-                        <select name="status" onchange="this.form.submit()" class="text-xs rounded-lg border-slate-300 focus:ring-blue-500 focus:border-blue-500 py-1.5">
-                            <option value="">Semua Status</option>
-                            <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                            <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
-                            <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
-                            <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive (> Rp5jt)</option>
-                            <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
-                            <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
-                            <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
-                            <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                        </select>
-                    </div>
+                    <select name="status" onchange="this.form.submit()" class="w-full sm:w-48 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                        <option value="">Semua Status</option>
+                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
+                        <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
+                        <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
+                        <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
+                        <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
+                        <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                        <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                    </select>
                 </form>
 
-                <span class="text-xs text-slate-500">
-                    Menampilkan {{ $pengajuanList->total() }} data pengajuan
+                <span class="text-xs font-semibold text-slate-500">
+                    Menampilkan <strong class="text-slate-800">{{ $pengajuanList->total() }}</strong> data pengajuan
                 </span>
             </div>
 
-            <!-- Table List Standar -->
-            <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
-                                <th class="py-3 px-4">No. Pengajuan</th>
-                                <th class="py-3 px-4">Pemohon</th>
-                                <th class="py-3 px-4">Jenis</th>
-                                <th class="py-3 px-4">Keperluan</th>
-                                <th class="py-3 px-4">Total Pengajuan</th>
-                                <th class="py-3 px-4">Status Alur</th>
-                                <th class="py-3 px-4 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            @forelse ($pengajuanList as $item)
-                            @php
-                                $modalData = [
-                                    'id' => $item->id,
-                                    'nomor' => $item->nomor_pengajuan,
-                                    'created_at' => $item->created_at->format('d M Y - H:i') . ' WIB',
-                                    'userName' => $item->user?->name ?? 'Karyawan MSN',
-                                    'userEmployeeCode' => $item->user?->employee_code ?? '',
-                                    'userDivision' => $item->user?->division ?? '-',
-                                    'atasanName' => $item->atasan?->name ?? ($item->user?->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum']) ? 'Pengajuan Mandiri' : 'Atasan Langsung'),
-                                    'jenis' => strtolower($item->jenis),
-                                    'keperluan' => $item->keperluan ?? '-',
-                                    'totalFormatted' => ($item->jenis === 'STOK' ? 'Stok Gudang' : 'Rp' . number_format((float) $item->total_nominal, 0, ',', '.')),
-                                    'totalNominal' => (float) $item->total_nominal,
-                                    'status' => $item->status,
-                                    'buktiTransferPath' => $item->bukti_transfer_path,
-                                    'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
-                                    'disburseUrl' => route('gomsn.pengajuan.disburse', $item->id),
-                                    'realizeUrl' => route('gomsn.pengajuan.realize', $item->id),
-                                    'userId' => $item->user_id,
-                                    'isOwner' => ($item->user_id === auth()->id()),
-                                    'nominalRealisasi' => (float) ($item->nominal_realisasi ?? $item->total_nominal),
-                                    'nominalRealisasiFormatted' => $item->nominal_realisasi !== null ? ('Rp' . number_format((float) $item->nominal_realisasi, 0, ',', '.')) : null,
-                                    'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
-                                    'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
-                                    'buktiRealisasiPath' => $item->bukti_realisasi_path,
-                                    'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
-                                    'realisasiNotes' => $item->realisasi_notes,
-                                    'details' => $item->details->map(function ($d) use ($item) {
-                                        return [
-                                            'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                            'qty' => $d->qty,
-                                            'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                            'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                            'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                        ];
-                                    })->values()->all(),
-                                ];
-                            @endphp
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-4 font-mono font-medium text-blue-900">
-                                    <button type="button" 
-                                            @click="openModalWith({{ json_encode($modalData) }})"
-                                            class="hover:underline font-bold text-teal-700 hover:text-teal-900 text-left cursor-pointer">
-                                        {{ $item->nomor_pengajuan }}
-                                    </button>
-                                    <span class="block text-[10px] text-slate-400 font-sans mt-0.5">
-                                        {{ $item->created_at->format('d M Y H:i') }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    <span class="font-semibold text-slate-800">{{ $item->user->name }}</span>
-                                    <span class="block text-[10px] text-slate-500">{{ $item->user->employee_code }}</span>
-                                </td>
-                                <td class="py-3 px-4">
-                                    @php
-                                        $jBadge = match($item->jenis) {
-                                            'STOK' => 'bg-amber-100 text-amber-800 border border-amber-300',
-                                            'BELI' => 'bg-indigo-100 text-indigo-800 border border-indigo-300',
-                                            'PERMINTAAN', 'BARANG' => 'bg-cyan-100 text-cyan-800 border border-cyan-300',
-                                            default => 'bg-emerald-100 text-emerald-800 border border-emerald-300',
-                                        };
-                                        $jText = match($item->jenis) {
-                                            'STOK' => '📦 STOK',
-                                            'BELI' => '🛒 BELI',
-                                            'PERMINTAAN', 'BARANG' => '📄 PERMINTAAN',
-                                            default => '💵 DANA',
-                                        };
-                                    @endphp
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold {{ $jBadge }}">
-                                        {{ $jText }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 max-w-xs truncate text-slate-700" title="{{ $item->keperluan }}">
-                                    {{ $item->keperluan }}
-                                </td>
-                                <td class="py-3 px-4 font-semibold text-slate-900">
-                                    @if ($item->jenis === 'STOK')
-                                        <span class="text-xs text-emerald-700 font-medium">Stok Gudang</span>
-                                    @elseif ($item->jenis === 'PERMINTAAN' || $item->jenis === 'BARANG')
-                                        <span class="text-xs text-cyan-700 font-medium">Permintaan Barang</span>
-                                    @else
-                                        Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
-                                    @endif
-                                </td>
-                                <td class="py-3 px-4">
-                                    @php
-                                        $badge = match($item->status) {
-                                            'draft' => 'bg-slate-100 text-slate-700',
-                                            'menunggu_atasan' => 'bg-amber-100 text-amber-800 animate-pulse',
-                                            'menunggu_finance' => 'bg-blue-100 text-blue-800',
-                                            'menunggu_executive' => 'bg-purple-100 text-purple-800',
-                                            'dicairkan' => 'bg-cyan-100 text-cyan-800',
-                                            'menunggu_bukti' => 'bg-orange-100 text-orange-800',
-                                            'selesai' => 'bg-emerald-100 text-emerald-800',
-                                            'ditolak' => 'bg-red-100 text-red-800',
-                                            default => 'bg-slate-100 text-slate-700'
-                                        };
-                                    @endphp
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $badge }}">
-                                        {{ strtoupper(str_replace('_', ' ', $item->status)) }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center gap-1.5">
+            <!-- Card Grid List Standar -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-4 sm:px-5 py-3.5 flex items-center justify-between text-white">
+                    <div class="flex items-center gap-2 font-bold text-sm">
+                        <span class="text-[#18C4C4] font-extrabold">#</span>
+                        <span>Daftar Pengajuan</span>
+                    </div>
+                    <span class="text-xs font-semibold text-teal-100/90 bg-white/10 px-2.5 py-1 rounded-full">
+                        Total: {{ $pengajuanList->total() }} data
+                    </span>
+                </div>
+
+                <div class="p-3.5 sm:p-5 bg-slate-50/50">
+                    @if ($pengajuanList->isEmpty())
+                        <div class="bg-white rounded-2xl border border-dashed border-slate-200 py-12 px-4 text-center">
+                            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <p class="text-sm font-bold text-slate-700">Belum Ada Riwayat Pengajuan</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Silakan klik tombol "Buat Pengajuan Baru" untuk mengajukan kasbon atau barang.</p>
+                        </div>
+                    @else
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
+                            @foreach ($pengajuanList as $item)
+                                @php
+                                    $modalData = [
+                                        'id' => $item->id,
+                                        'nomor' => $item->nomor_pengajuan,
+                                        'created_at' => $item->created_at->format('d M Y - H:i') . ' WIB',
+                                        'userName' => $item->user?->name ?? 'Karyawan MSN',
+                                        'userEmployeeCode' => $item->user?->employee_code ?? '',
+                                        'userDivision' => $item->user?->division ?? '-',
+                                        'atasanName' => $item->atasan?->name ?? ($item->user?->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum']) ? 'Pengajuan Mandiri' : 'Atasan Langsung'),
+                                        'jenis' => strtolower($item->jenis),
+                                        'keperluan' => $item->keperluan ?? '-',
+                                        'totalFormatted' => ($item->jenis === 'STOK' ? 'Stok Gudang' : 'Rp' . number_format((float) $item->total_nominal, 0, ',', '.')),
+                                        'totalNominal' => (float) $item->total_nominal,
+                                        'status' => $item->status,
+                                        'buktiTransferPath' => $item->bukti_transfer_path,
+                                        'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
+                                        'disburseUrl' => route('gomsn.pengajuan.disburse', $item->id),
+                                        'realizeUrl' => route('gomsn.pengajuan.realize', $item->id),
+                                        'userId' => $item->user_id,
+                                        'isOwner' => ($item->user_id === auth()->id()),
+                                        'nominalRealisasi' => (float) ($item->nominal_realisasi ?? $item->total_nominal),
+                                        'nominalRealisasiFormatted' => $item->nominal_realisasi !== null ? ('Rp' . number_format((float) $item->nominal_realisasi, 0, ',', '.')) : null,
+                                        'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
+                                        'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
+                                        'buktiRealisasiPath' => $item->bukti_realisasi_path,
+                                        'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
+                                        'realisasiNotes' => $item->realisasi_notes,
+                                        'details' => $item->details->map(function ($d) use ($item) {
+                                            return [
+                                                'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
+                                                'qty' => $d->qty,
+                                                'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
+                                                'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
+                                                'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
+                                            ];
+                                        })->values()->all(),
+                                    ];
+
+                                    $badge = match($item->status) {
+                                        'draft' => 'bg-slate-100 text-slate-700 border-slate-200',
+                                        'menunggu_atasan' => 'bg-amber-50 text-amber-800 border-amber-200',
+                                        'menunggu_finance' => 'bg-blue-50 text-blue-800 border-blue-200',
+                                        'menunggu_executive' => 'bg-purple-50 text-purple-800 border-purple-200',
+                                        'dicairkan' => 'bg-cyan-50 text-cyan-800 border-cyan-200',
+                                        'menunggu_bukti' => 'bg-orange-50 text-orange-800 border-orange-200',
+                                        'selesai' => 'bg-emerald-50 text-emerald-800 border-emerald-200',
+                                        'ditolak' => 'bg-rose-50 text-rose-800 border-rose-200',
+                                        default => 'bg-slate-100 text-slate-700 border-slate-200'
+                                    };
+                                @endphp
+
+                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-teal-300/80 transition-all duration-200 flex flex-col justify-between p-4 gap-3">
+                                    <div>
+                                        <!-- Top Row: Nomor & Badges -->
+                                        <div class="flex items-start justify-between gap-2 mb-3">
+                                            <div class="min-w-0">
+                                                <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center gap-1.5 text-left group cursor-pointer">
+                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-teal-900 bg-teal-50 border border-teal-200/70 px-2 py-0.5 rounded-lg">#{{ $item->id }}</span>
+                                                    <span class="text-[11px] font-mono font-semibold text-slate-500 truncate">{{ $item->nomor_pengajuan }}</span>
+                                                </button>
+                                                <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
+                                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                                                    </svg>
+                                                    <span>{{ $item->created_at->format('d M Y, H:i') }} WIB</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
+                                                @if ($item->jenis === 'STOK')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">Stok</span>
+                                                @elseif ($item->jenis === 'DANA')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white">Dana</span>
+                                                @elseif ($item->jenis === 'BELI')
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">Beli</span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white">Permintaan</span>
+                                                @endif
+
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $badge }}">
+                                                    {{ strtoupper(str_replace('_', ' ', $item->status)) }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Applicant & Nominal Box -->
+                                        <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2.5 min-w-0">
+                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20">
+                                                    {{ strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-xs font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
+                                                        {{ $item->user?->name ?? 'Karyawan MSN' }}
+                                                    </button>
+                                                    <span class="text-[11px] text-slate-500 block truncate">
+                                                        {{ $item->user?->employee_code ?? '-' }} &bull; {{ $item->user?->division ?? 'Umum' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-right shrink-0">
+                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Nilai</span>
+                                                @if ($item->jenis === 'STOK')
+                                                    <span class="text-xs font-extrabold text-amber-600">Stok Gudang</span>
+                                                @elseif ($item->jenis === 'PERMINTAAN' || $item->jenis === 'BARANG')
+                                                    <span class="text-xs font-extrabold text-cyan-700">Permintaan Barang</span>
+                                                @else
+                                                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                        Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        @if ($item->keperluan)
+                                            <p class="text-xs text-slate-600 line-clamp-2 mt-2.5 leading-relaxed" title="{{ $item->keperluan }}">
+                                                <span class="font-semibold text-slate-500">Keperluan:</span> {{ $item->keperluan }}
+                                            </p>
+                                        @endif
+                                    </div>
+
+                                    <!-- Bottom Actions -->
+                                    <div class="pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2">
+                                        @if ($item->user_id === auth()->id() && in_array($item->status, ['draft', 'menunggu_atasan']) && ! $item->approvals()->where('action', 'approved')->exists())
+                                            <a href="{{ route('gomsn.pengajuan.edit', $item->id) }}" class="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-2xs transition" title="Edit Pengajuan">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                                <span>Edit</span>
+                                            </a>
+                                        @endif
+
                                         <button type="button" 
                                                 @click="openModalWith({{ json_encode($modalData) }})"
                                                 style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
-                                                class="hover:opacity-90 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg shadow-2xs transition inline-flex items-center justify-center gap-1 cursor-pointer">
+                                                class="flex-1 sm:flex-initial hover:opacity-90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
                                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
                                             <span>Detail</span>
                                         </button>
-                                        @if ($item->user_id === auth()->id() && in_array($item->status, ['draft', 'menunggu_atasan']) && ! $item->approvals()->where('action', 'approved')->exists())
-                                        <a href="{{ route('gomsn.pengajuan.edit', $item->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-2xs transition" title="Edit Pengajuan">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                            <span>Edit</span>
-                                        </a>
-                                        @endif
                                     </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="7" class="py-8 text-center text-slate-400">
-                                    Belum ada riwayat pengajuan dana atau barang.
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 @if ($pengajuanList->hasPages())
-                <div class="p-4 border-t border-slate-200">
+                <div class="p-4 border-t border-slate-200 bg-white">
                     {{ $pengajuanList->links() }}
                 </div>
                 @endif
