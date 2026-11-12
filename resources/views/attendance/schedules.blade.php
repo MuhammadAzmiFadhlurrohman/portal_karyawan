@@ -1129,19 +1129,17 @@
                             </svg>
                             <span>Print</span>
                         </button>
-                    </div>
-                </div>
 
                         <!-- Print Divisi Dropdown -->
                         <div x-data="{ openDivPrint: false }" class="relative">
                             <button type="button"
                                     @click="openDivPrint = !openDivPrint"
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold shadow-xs">
-                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition cursor-pointer">
+                                <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                                 </svg>
                                 <span>Print Divisi</span>
-                                <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <svg class="w-3 h-3 text-cyan-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
@@ -1279,7 +1277,7 @@
                                     @php
                                         $hasSched = $schedulesByUser->has($u->id) && $schedulesByUser->get($u->id)->isNotEmpty();
                                     @endphp
-                                    <tr x-show="!searchQuery || '{{ strtolower($u->name.' '.$u->employee_code.' '.$u->division) }}'.includes(searchQuery.toLowerCase())"
+                                    <tr x-show="!searchQuery || '{{ addslashes(strtolower($u->name.' '.$u->employee_code.' '.$u->division)) }}'.includes(searchQuery.toLowerCase())"
                                         class="hover:bg-slate-50/70 transition-colors">
                                         <td class="py-3 px-4 text-center font-mono text-slate-400 font-medium">
                                             {{ $idx + 1 }}
