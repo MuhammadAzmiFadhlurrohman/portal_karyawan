@@ -106,25 +106,73 @@
             </div>
         </div>
 
-        <!-- CARD 2: Jadwal Hari Ini (Themed) -->
-        <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between">
-            <div class="flex items-center gap-3.5 sm:gap-4">
-                <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#155E63] shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+        <!-- CARD 2: Jadwal & Deteksi Lokasi Otomatis (2-Column Grid di Desktop, Stacked di Mobile) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <!-- Jadwal Hari Ini -->
+            <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between">
+                <div class="flex items-center gap-3.5 sm:gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#155E63] shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase block">JADWAL HARI INI</span>
+                        <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-tight mt-0.5">{{ $shiftName }}</h3>
+                        <span class="text-xs text-slate-500 font-mono block mt-0.5">{{ $shiftStart }} - {{ $shiftEnd }}</span>
+                    </div>
                 </div>
                 <div>
-                    <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase block">JADWAL HARI INI</span>
-                    <h3 class="text-sm sm:text-base font-bold text-slate-800 leading-tight mt-0.5">{{ $shiftName }}</h3>
-                    <span class="text-xs text-slate-500 font-mono block mt-0.5">{{ $shiftStart }} - {{ $shiftEnd }}</span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isWorkday ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                        <span class="w-2 h-2 rounded-full {{ $isWorkday ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                        <span>{{ $isWorkday ? 'Hari Kerja' : 'Hari Libur' }}</span>
+                    </span>
                 </div>
             </div>
-            <div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $isWorkday ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
-                    <span class="w-2 h-2 rounded-full {{ $isWorkday ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
-                    <span>{{ $isWorkday ? 'Hari Kerja' : 'Hari Libur' }}</span>
-                </span>
+
+            <!-- Deteksi Lokasi & Geotagging Otomatis (Langsung di Halaman Absen) -->
+            <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs p-4 sm:p-5 flex items-center justify-between gap-3">
+                <div class="flex items-start sm:items-center gap-3.5 min-w-0">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-colors"
+                         :class="gpsLoading ? 'bg-cyan-50 border-cyan-200 text-cyan-600' : (gpsError ? 'bg-rose-50 border-rose-200 text-rose-600' : (isWithinOfficeRadius ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-amber-50 border-amber-200 text-amber-600'))">
+                        <svg x-show="gpsLoading" class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <svg x-show="!gpsLoading" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="text-[10px] font-bold text-teal-700/70 tracking-wider uppercase">LOKASI OTOMATIS</span>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-bold border"
+                                  :class="gpsLoading ? 'bg-cyan-50 text-cyan-700 border-cyan-200' : (gpsError ? 'bg-rose-50 text-rose-700 border-rose-200' : (isWithinOfficeRadius ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'))"
+                                  x-text="gpsLoading ? 'Mendeteksi...' : (gpsError ? 'GPS Belum Aktif' : (isWithinOfficeRadius ? 'Dalam Radius Kantor' : 'Di Luar Radius'))">
+                            </span>
+                        </div>
+                        <h3 class="text-xs sm:text-sm font-bold text-slate-800 leading-snug mt-0.5 truncate" x-text="gpsStatus">
+                            Mendeteksi lokasi terdekat...
+                        </h3>
+                        <div class="flex flex-wrap items-center gap-2 mt-0.5 text-[11px] text-slate-500 font-mono">
+                            <span x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
+                            <template x-if="detectedDistanceM !== null && !gpsError">
+                                <span class="font-sans font-semibold text-teal-700" x-text="'· Jarak ±' + detectedDistanceM + 'm'"></span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" 
+                        @click="detectGPS()" 
+                        title="Perbarui Deteksi GPS"
+                        class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50 hover:border-teal-200 text-[#155E63] text-xs font-bold inline-flex items-center gap-1.5 shrink-0 transition cursor-pointer shadow-2xs">
+                    <svg class="w-4 h-4" :class="gpsLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span class="hidden sm:inline">Perbarui</span>
+                </button>
             </div>
         </div>
 
@@ -183,7 +231,7 @@
                 @if (! $faceTemplate)
                     <!-- JIKA BELUM DAFTAR WAJAH -> TOMBOL DAFTAR -->
                     <button type="button"
-                            @click="showEnrollModal = true"
+                            @click="openEnrollModal()"
                             style="background: #155E63 !important;"
                             class="w-full py-3.5 px-6 rounded-xl hover:bg-[#0c4349] text-white font-semibold text-sm shadow-md shadow-teal-900/20 transition flex items-center justify-center gap-2 cursor-pointer">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -275,7 +323,7 @@
             </div>
         </div>
 
-        <!-- MODAL 1: DAFTARKAN WAJAH (Biometric Enrollment) -->
+        <!-- MODAL 1: DAFTARKAN WAJAH (Biometric Enrollment - Tanpa Simulasi) -->
         <div x-show="showEnrollModal" 
              x-cloak 
              x-transition.opacity.duration.200ms
@@ -306,7 +354,7 @@
                     </button>
                 </div>
 
-                <form method="POST" action="{{ route('attendance.enroll') }}" class="p-5 space-y-4">
+                <form method="POST" action="{{ route('attendance.enroll') }}" @submit="handleEnrollSubmit($event)" class="p-5 space-y-4">
                     @csrf
                     
                     <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/40 via-slate-50/60 to-teal-50/30 p-4 text-center space-y-3 shadow-inner">
@@ -321,28 +369,47 @@
                                     <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
                                 </div>
                             </div>
+                            <span x-show="cameraActive" class="absolute top-1.5 right-1.5 flex h-3.5 w-3.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white"></span>
+                            </span>
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+                        <div>
+                            <template x-if="photoPreview">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                                    <span>Foto Wajah Siap Didaftarkan</span>
+                                </span>
+                            </template>
+                            <template x-if="!photoPreview && cameraActive">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                                    <span>Posisikan wajah Anda tepat di tengah</span>
+                                </span>
+                            </template>
+                            <template x-if="!photoPreview && !cameraActive">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
+                                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <span>Wajib ambil foto selfie wajah</span>
+                                </span>
+                            </template>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-center gap-2 pt-0.5">
                             <button type="button" 
                                     @click="startCamera()" 
                                     x-show="!cameraActive"
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 <span x-text="photoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
                             </button>
                             <button type="button" 
                                     @click="capturePhoto()" 
                                     x-show="cameraActive"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm transition cursor-pointer">
+                                    class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98] transition cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                                <span>Ambil Foto</span>
-                            </button>
-                            <button type="button" 
-                                    @click="useProfileSnapshot()" 
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white/90 text-slate-600 border border-slate-200/90 hover:bg-slate-100 hover:text-slate-800 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                <span>Gunakan Simulasi</span>
+                                <span>Ambil Foto Sekarang</span>
                             </button>
                         </div>
 
@@ -374,7 +441,7 @@
             </div>
         </div>
 
-        <!-- MODAL 2: ABSEN MASUK (Camera Face Verification & Location) -->
+        <!-- MODAL 2: ABSEN MASUK (Camera Face Verification - Lokasi Otomatis dari Halaman) -->
         <div x-show="showClockInModal" 
              x-cloak 
              x-transition.opacity.duration.200ms
@@ -395,7 +462,7 @@
                                 Verifikasi Wajah &amp; Absen Masuk
                             </h3>
                             <p class="text-[11px] text-teal-100/85 font-normal mt-0.5">
-                                Konfirmasi kehadiran biometrik &amp; titik GPS
+                                Ambil foto selfie untuk konfirmasi kehadiran
                             </p>
                         </div>
                     </div>
@@ -407,21 +474,22 @@
                 <form method="POST" action="{{ route('attendance.clock-in') }}" @submit="handleClockInSubmit($event)" class="p-4 sm:p-5 space-y-3.5">
                     @csrf
                     
-                    <!-- Hidden GPS Coordinates -->
+                    <!-- Hidden Auto-Detected Location & GPS Coordinates -->
+                    <input type="hidden" name="office_location_id" :value="selectedOffice">
                     <input type="hidden" name="lat" :value="gpsLat">
                     <input type="hidden" name="lng" :value="gpsLng">
                     <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
 
                     <!-- Camera & Face Verification Scanner Card -->
-                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/45 via-slate-50/50 to-teal-50/30 p-3.5 text-center space-y-2.5 relative overflow-hidden shadow-inner">
+                    <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/45 via-slate-50/50 to-teal-50/30 p-4 text-center space-y-3 relative overflow-hidden shadow-inner">
                         <!-- Circular Biometric Viewport -->
-                        <div class="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto">
+                        <div class="relative w-36 h-36 sm:w-40 sm:h-40 mx-auto">
                             <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center relative shadow-md">
                                 <video id="clockin-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="clockInCameraActive"></video>
                                 <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
                                 <canvas id="clockin-canvas" class="hidden"></canvas>
                                 <div x-show="!clockInCameraActive && !clockInPhotoPreview" class="text-slate-400 text-center p-2">
-                                    <svg class="w-10 h-10 mx-auto text-teal-400/75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <svg class="w-11 h-11 mx-auto text-teal-400/75" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     <span class="text-[11px] block mt-1 font-medium text-slate-300">Kamera Selfie</span>
                                 </div>
                             </div>
@@ -446,13 +514,7 @@
                                     <span>Posisikan wajah Anda tepat di tengah</span>
                                 </span>
                             </template>
-                            <template x-if="!clockInPhotoPreview && !clockInCameraActive && clockInPrimaryImage">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-sky-100/90 text-sky-800 border border-sky-200 shadow-2xs">
-                                    <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span>Biometrik Terpasang (Simulasi Wajah)</span>
-                                </span>
-                            </template>
-                            <template x-if="!clockInPhotoPreview && !clockInCameraActive && !clockInPrimaryImage">
+                            <template x-if="!clockInPhotoPreview && !clockInCameraActive">
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
                                     <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Wajib ambil foto selfie wajah</span>
@@ -460,27 +522,21 @@
                             </template>
                         </div>
 
-                        <!-- Camera Action Buttons -->
+                        <!-- Camera Action Buttons (Tanpa Tombol Gunakan Simulasi) -->
                         <div class="flex flex-wrap items-center justify-center gap-2 pt-0.5">
                             <button type="button" 
                                     @click="startClockInCamera()" 
                                     x-show="!clockInCameraActive"
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#155E63] border border-teal-300 hover:bg-teal-50 shadow-2xs transition cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                                 <span x-text="clockInPhotoPreview ? 'Ulangi Ambil Foto' : 'Nyalakan Kamera'"></span>
                             </button>
                             <button type="button" 
                                     @click="captureClockInPhoto()" 
                                     x-show="clockInCameraActive"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98] transition cursor-pointer">
+                                    class="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm active:scale-[0.98] transition cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                                 <span>Ambil Foto Sekarang</span>
-                            </button>
-                            <button type="button" 
-                                    @click="useClockInSimulation()" 
-                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white/90 text-slate-600 border border-slate-200/90 hover:bg-slate-100 hover:text-slate-800 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                <span>Gunakan Simulasi</span>
                             </button>
                         </div>
 
@@ -489,34 +545,17 @@
                         <input type="hidden" name="challenge_image" :value="clockInChallengeImage">
                     </div>
 
-                    <!-- Office Location & Attendance Type Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <!-- Office Location -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                                Pilih Lokasi Kantor
-                            </label>
-                            <div class="relative">
-                                <select name="office_location_id" x-model="selectedOffice" @change="onOfficeChange()" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
-                                    @foreach ($offices as $ofc)
-                                    <option value="{{ $ofc->id }}">{{ $ofc->name }} (Radius {{ $ofc->radius_m }}m)</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Attendance Type -->
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                                Tipe Kehadiran
-                            </label>
-                            <div class="relative">
-                                <select name="attendance_type" x-model="attendanceType" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
-                                    <option value="office">Di Kantor (Office)</option>
-                                    <option value="field">Tugas Lapangan (Field / SPK)</option>
-                                    <option value="remote">Remote / WFH</option>
-                                </select>
-                            </div>
+                    <!-- Attendance Type -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                            Tipe Kehadiran
+                        </label>
+                        <div class="relative">
+                            <select name="attendance_type" x-model="attendanceType" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
+                                <option value="office">Di Kantor (Office)</option>
+                                <option value="field">Tugas Lapangan (Field / SPK)</option>
+                                <option value="remote">Remote / WFH</option>
+                            </select>
                         </div>
                     </div>
 
@@ -530,40 +569,6 @@
                                   :required="attendanceType !== 'office'"
                                   placeholder="Contoh: Pekerjaan maintenance / instalasi ODP di lapangan..."
                                   class="w-full text-xs text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 px-3.5 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition resize-none"></textarea>
-                    </div>
-
-                    <!-- GPS Geotagging Status Card -->
-                    <div class="p-3 bg-slate-50/90 border border-slate-200/90 rounded-2xl space-y-2.5 text-xs text-slate-600 shadow-2xs">
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200/70 text-[#155E63] flex items-center justify-center shrink-0 mt-0.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <span class="font-bold block text-slate-800 leading-snug text-[11px] sm:text-xs" x-text="gpsStatus">Memeriksa GPS...</span>
-                                <div class="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-white border border-slate-200/80 text-[11px] text-slate-600 font-mono">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                                    <span x-text="'Lat: ' + Number(gpsLat).toFixed(6) + ', Lng: ' + Number(gpsLng).toFixed(6)"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-2 border-t border-slate-200/70">
-                            <button type="button" 
-                                    @click="detectGPS()" 
-                                    class="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#155E63] hover:text-teal-800 transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                <span>Perbarui GPS</span>
-                            </button>
-                            <button type="button" 
-                                    @click="useSelectedOfficeLocation()" 
-                                    class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-700 hover:text-slate-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200/90 hover:bg-slate-100 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                <span>Sesuaikan Titik Kantor</span>
-                            </button>
-                        </div>
                     </div>
 
                     <!-- Footer Actions -->
@@ -602,57 +607,105 @@
                 clockInPrimaryImage: '',
                 clockInChallengeImage: '',
 
-                // GPS Coordinates (Defaulting to Bandung HQ so local dev always succeeds)
+                // Auto-Detected GPS & Office states
                 gpsLat: {{ $defaultOffice?->lat ?? -6.937122 }},
                 gpsLng: {{ $defaultOffice?->lng ?? 107.631989 }},
                 gpsAccuracy: 10,
-                gpsStatus: 'Lokasi Kantor Pusat Terverifikasi',
+                gpsLoading: true,
+                gpsError: false,
+                isWithinOfficeRadius: true,
+                detectedDistanceM: null,
+                gpsStatus: 'Mendeteksi titik koordinat GPS perangkat...',
 
-                // Face poses default simulation for instant enrollment
-                poseFront: '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:FRONT|FRAME:1") }}',
-                poseLeft: '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:LEFT|FRAME:2") }}',
-                poseRight: '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:RIGHT|FRAME:3") }}',
+                // Face poses (Captured from real camera)
+                poseFront: '',
+                poseLeft: '',
+                poseRight: '',
 
                 init() {
                     this.detectGPS();
                 },
 
+                // Haversine formula to compute distance in meters between 2 GPS points
+                calculateDistanceM(lat1, lon1, lat2, lon2) {
+                    const R = 6371000;
+                    const toRad = (deg) => (deg * Math.PI) / 180;
+                    const dLat = toRad(lat2 - lat1);
+                    const dLon = toRad(lon2 - lon1);
+                    const a =
+                        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    return R * c;
+                },
+
+                resolveNearestOffice(lat, lng) {
+                    let nearest = null;
+                    let minDist = Infinity;
+
+                    Object.values(officesMap).forEach((ofc) => {
+                        const d = this.calculateDistanceM(lat, lng, parseFloat(ofc.lat), parseFloat(ofc.lng));
+                        if (d < minDist) {
+                            minDist = d;
+                            nearest = ofc;
+                        }
+                    });
+
+                    if (nearest) {
+                        this.selectedOffice = String(nearest.id);
+                        this.detectedDistanceM = Math.round(minDist);
+                        this.isWithinOfficeRadius = minDist <= parseFloat(nearest.radius_m || 50);
+                        this.gpsStatus = nearest.name + ' (Radius ' + nearest.radius_m + 'm)';
+                    }
+                },
+
                 detectGPS() {
+                    this.gpsLoading = true;
+                    this.gpsError = false;
+                    this.gpsStatus = 'Mendeteksi koordinat GPS perangkat...';
+
                     if (navigator.geolocation) {
-                        this.gpsStatus = 'Mendeteksi koordinat GPS perangkat...';
                         navigator.geolocation.getCurrentPosition(
                             (pos) => {
                                 this.gpsLat = pos.coords.latitude;
                                 this.gpsLng = pos.coords.longitude;
                                 this.gpsAccuracy = Math.round(pos.coords.accuracy || 10);
-                                this.gpsStatus = 'GPS Terdeteksi (Akurasi: ±' + this.gpsAccuracy + 'm)';
+                                this.gpsLoading = false;
+                                this.gpsError = false;
+                                this.resolveNearestOffice(this.gpsLat, this.gpsLng);
                             },
                             (err) => {
-                                this.useSelectedOfficeLocation();
-                                this.gpsStatus = 'Menggunakan Koordinat Kantor Terpilih (GPS perangkat tidak aktif/izin ditolak)';
+                                this.gpsLoading = false;
+                                this.gpsError = true;
+                                const ofc = officesMap[this.selectedOffice] || Object.values(officesMap)[0];
+                                if (ofc) {
+                                    this.selectedOffice = String(ofc.id);
+                                    this.gpsLat = parseFloat(ofc.lat);
+                                    this.gpsLng = parseFloat(ofc.lng);
+                                    this.gpsAccuracy = 10;
+                                    this.gpsStatus = ofc.name + ' (Izin GPS belum aktif)';
+                                } else {
+                                    this.gpsStatus = 'Izin GPS perangkat belum diaktifkan';
+                                }
                             },
-                            { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+                            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
                         );
                     } else {
-                        this.useSelectedOfficeLocation();
-                    }
-                },
-
-                onOfficeChange() {
-                    // Update fallback if current coords are matching previous office
-                },
-
-                useSelectedOfficeLocation() {
-                    const ofc = officesMap[this.selectedOffice];
-                    if (ofc) {
-                        this.gpsLat = parseFloat(ofc.lat);
-                        this.gpsLng = parseFloat(ofc.lng);
-                        this.gpsAccuracy = 10;
-                        this.gpsStatus = 'Titik Kantor ' + ofc.name + ' Terpilih';
+                        this.gpsLoading = false;
+                        this.gpsError = true;
+                        this.gpsStatus = 'Browser tidak mendukung Geolocation GPS';
                     }
                 },
 
                 // Enrollment Modal controls
+                openEnrollModal() {
+                    this.showEnrollModal = true;
+                    this.$nextTick(() => {
+                        this.startCamera();
+                    });
+                },
+
                 closeEnrollModal() {
                     const video = document.getElementById('enroll-video');
                     if (video && video.srcObject) {
@@ -673,20 +726,19 @@
                                 this.photoPreview = null;
                             })
                             .catch((err) => {
+                                this.cameraActive = false;
                                 if (window.showToast) {
-                                    window.showToast('warning', 'Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                    window.showToast('error', 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
                                 } else {
-                                    alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                    alert('Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
                                 }
-                                this.useProfileSnapshot();
                             });
                     } else {
                         if (window.showToast) {
-                            window.showToast('warning', 'Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                            window.showToast('error', 'Browser tidak mendukung akses kamera.');
                         } else {
-                            alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                            alert('Browser tidak mendukung akses kamera.');
                         }
-                        this.useProfileSnapshot();
                     }
                 },
 
@@ -713,27 +765,23 @@
                     }
                 },
 
-                useProfileSnapshot() {
-                    this.poseFront = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:FRONT|MANUAL") }}';
-                    this.poseLeft = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:LEFT|MANUAL") }}';
-                    this.poseRight = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:RIGHT|MANUAL") }}';
-                    this.photoPreview = null;
-                    this.cameraActive = false;
-                    const video = document.getElementById('enroll-video');
-                    if (video && video.srcObject) {
-                        video.srcObject.getTracks().forEach(track => track.stop());
-                        video.srcObject = null;
-                    }
-                    if (window.showToast) {
-                        window.showToast('success', 'Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
-                    } else {
-                        alert('Data biometrik siap didaftarkan! Silakan klik tombol "Simpan & Daftarkan Wajah".');
+                handleEnrollSubmit(e) {
+                    if (!this.poseFront) {
+                        e.preventDefault();
+                        if (window.showToast) {
+                            window.showToast('warning', 'Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan.');
+                        } else {
+                            alert('Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan.');
+                        }
+                        if (!this.cameraActive) {
+                            this.startCamera();
+                        }
+                        return false;
                     }
                 },
 
                 // Clock-in Face Verification Modal controls
                 openClockInModal() {
-                    this.detectGPS();
                     this.showClockInModal = true;
                     this.$nextTick(() => {
                         this.startClockInCamera();
@@ -755,20 +803,19 @@
                                 this.clockInPhotoPreview = null;
                             })
                             .catch((err) => {
+                                this.clockInCameraActive = false;
                                 if (window.showToast) {
-                                    window.showToast('warning', 'Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                    window.showToast('error', 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
                                 } else {
-                                    alert('Tidak dapat mengakses kamera: ' + err.message + '. Anda dapat menggunakan tombol Simulasi Wajah.');
+                                    alert('Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
                                 }
-                                this.useClockInSimulation();
                             });
                     } else {
                         if (window.showToast) {
-                            window.showToast('warning', 'Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                            window.showToast('error', 'Browser tidak mendukung akses kamera.');
                         } else {
-                            alert('Browser tidak mendukung akses kamera. Menggunakan simulasi wajah.');
+                            alert('Browser tidak mendukung akses kamera.');
                         }
-                        this.useClockInSimulation();
                     }
                 },
 
@@ -797,18 +844,6 @@
                         video.srcObject = null;
                     }
                     this.clockInCameraActive = false;
-                },
-
-                useClockInSimulation() {
-                    this.stopClockInCamera();
-                    this.clockInPrimaryImage = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:FRONT|MANUAL") }}';
-                    this.clockInChallengeImage = '{{ base64_encode("FACE_ID:user_".$user->id."|POSE:CHALLENGE|MANUAL") }}';
-                    this.clockInPhotoPreview = null;
-                    if (window.showToast) {
-                        window.showToast('success', 'Simulasi data biometrik wajah terpasang. Siap untuk absen masuk.');
-                    } else {
-                        alert('Simulasi data biometrik wajah terpasang. Siap untuk absen masuk.');
-                    }
                 },
 
                 handleClockInSubmit(e) {
