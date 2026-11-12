@@ -3,9 +3,11 @@
 namespace App\Modules\Portal\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\User;
 use App\Modules\Attendance\Services\AttendanceService;
 use App\Services\AuditLogger;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,7 +101,41 @@ class EmployeeController extends Controller
             $query->where('is_active', false);
         }
 
+        $nowJakarta = now('Asia/Jakarta');
+        $month = (int) $request->input('month', $nowJakarta->month);
+        $year = (int) $request->input('year', $nowJakarta->year);
+
         $employees = $query->orderBy('name')->paginate(12)->withQueryString();
+
+        // Monthly attendance statistics per employee for HRD & Admin overview
+        $employeeIds = $employees->pluck('id')->all();
+        $monthlyAttendances = Attendance::query()
+            ->whereIn('user_id', $employeeIds)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->groupBy('user_id');
+
+        $attendanceStats = [];
+        foreach ($employeeIds as $id) {
+            $userAtts = $monthlyAttendances->get($id, collect());
+            $totalHadir = $userAtts->whereIn('status', ['present', 'late'])->count();
+            $tepatWaktu = $userAtts->where('status', 'present')->count();
+            $terlambat = $userAtts->where('status', 'late')->count();
+            $alpa = $userAtts->where('status', 'absent')->count();
+            $cuti = $userAtts->whereIn('status', ['leave', 'sick', 'special'])->count();
+            $totalMinutes = $userAtts->sum('work_duration_minutes');
+            $jamKerja = round($totalMinutes / 60, 1);
+
+            $attendanceStats[$id] = [
+                'total_hadir' => $totalHadir,
+                'tepat_waktu' => $tepatWaktu,
+                'terlambat' => $terlambat,
+                'alpa' => $alpa,
+                'cuti' => $cuti,
+                'jam_kerja' => $jamKerja,
+            ];
+        }
 
         // Statistics
         $totalEmployees = User::count();
@@ -130,6 +166,9 @@ class EmployeeController extends Controller
 
         return view('portal.employees.index', [
             'employees' => $employees,
+            'attendanceStats' => $attendanceStats,
+            'month' => $month,
+            'year' => $year,
             'totalEmployees' => $totalEmployees,
             'activeEmployees' => $activeEmployees,
             'inactiveEmployees' => $inactiveEmployees,
@@ -143,6 +182,8 @@ class EmployeeController extends Controller
                 'division' => $division,
                 'role' => $role,
                 'status' => $status,
+                'month' => $month,
+                'year' => $year,
             ],
         ]);
     }

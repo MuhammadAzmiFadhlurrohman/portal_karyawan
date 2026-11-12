@@ -23,8 +23,8 @@ class AttendanceReportController extends Controller
     public function index(Request $request, LeaveService $leaveService): View
     {
         $actor = $request->user();
-        if (! $actor->hasRole(['super_admin', 'admin', 'hrd']) && ! $actor->can('attendance.employee.manage')) {
-            abort(403, 'Akses terbatas untuk Admin dan HRD.');
+        if (! $actor || ! $actor->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'Akses laporan absensi hanya untuk Administrator.');
         }
 
         // Parse filter date (default: today)
@@ -169,8 +169,8 @@ class AttendanceReportController extends Controller
     public function updateRecord(Request $request, LeaveService $leaveService): RedirectResponse|JsonResponse
     {
         $actor = $request->user();
-        if (! $actor->hasRole(['super_admin', 'admin', 'hrd']) && ! $actor->can('attendance.employee.manage')) {
-            abort(403, 'Akses terbatas untuk Admin dan HRD.');
+        if (! $actor || ! $actor->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'Akses laporan absensi hanya untuk Administrator.');
         }
 
         $request->validate([
@@ -243,8 +243,8 @@ class AttendanceReportController extends Controller
     public function quickStatus(Request $request, LeaveService $leaveService): JsonResponse|RedirectResponse
     {
         $actor = $request->user();
-        if (! $actor->hasRole(['super_admin', 'admin', 'hrd']) && ! $actor->can('attendance.employee.manage')) {
-            abort(403, 'Akses terbatas untuk Admin dan HRD.');
+        if (! $actor || ! $actor->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'Akses laporan absensi hanya untuk Administrator.');
         }
 
         $request->validate([
@@ -294,8 +294,8 @@ class AttendanceReportController extends Controller
     public function exportCsv(Request $request, LeaveService $leaveService): StreamedResponse
     {
         $actor = $request->user();
-        if (! $actor->hasRole(['super_admin', 'admin', 'hrd']) && ! $actor->can('attendance.employee.manage')) {
-            abort(403, 'Akses terbatas.');
+        if (! $actor || ! $actor->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'Akses laporan absensi hanya untuk Administrator.');
         }
 
         $dateInput = $request->input('date', now('Asia/Jakarta')->toDateString());

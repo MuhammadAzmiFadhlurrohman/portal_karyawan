@@ -108,13 +108,16 @@ class DeductionAndCorrectionController extends Controller
 
     protected function authorizeApproval(User $user): void
     {
+        // Fitur penerimaan pengajuan absen hanya untuk Atasan dan Admin (bukan HRD)
+        if ($user->hasRole('hrd') && ! $user->hasRole(['super_admin', 'admin', 'atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi'])) {
+            abort(403, 'Penerimaan pengajuan absen hanya untuk Atasan dan Admin.');
+        }
+
         $canApprove = $user->can('attendance.correction.approve') 
             || $user->can('gomsn.pengajuan.approve_atasan')
-            || $user->can('attendance.leave.approve')
-            || $user->can('attendance.employee.manage')
-            || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin', 'hrd']);
+            || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']);
 
-        abort_unless($canApprove, 403, 'Akses khusus Atasan / HRD.');
+        abort_unless($canApprove, 403, 'Akses khusus Atasan dan Admin.');
     }
 
     public function approvals(Request $request): View
@@ -128,7 +131,7 @@ class DeductionAndCorrectionController extends Controller
         $query = AttendanceCorrection::query()
             ->with(['user', 'attendance.shift', 'attendance.officeLocation', 'supervisorApprover', 'hrdApprover', 'rejectedBy']);
 
-        if (! $user->hasRole(['super_admin', 'admin', 'hrd'])) {
+        if (! $user->hasRole(['super_admin', 'admin'])) {
             if ($user->division) {
                 $query->whereHas('user', fn ($q) => $q->where('division', $user->division));
             }

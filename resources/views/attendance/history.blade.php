@@ -58,10 +58,24 @@
                         </span>
                     </h1>
                     <p class="text-[11px] sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug">
-                        Rekap log kehadiran, durasi kerja &amp; koreksi absensi
+                        @if ($targetUser->id !== $currentUser->id)
+                            Karyawan: <span class="font-bold text-white">{{ $targetUser->name }}</span> ({{ $targetUser->employee_code ?? 'MSN' }}) · {{ $targetUser->division ?? 'Umum' }}
+                        @else
+                            Rekap log kehadiran, durasi kerja &amp; koreksi absensi
+                        @endif
                     </p>
                 </div>
             </div>
+
+            @if ($targetUser->id !== $currentUser->id)
+            <div class="relative z-10 shrink-0">
+                <a href="{{ route('portal.employees.index', ['month' => $month, 'year' => $year]) }}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-md shadow-xs transition">
+                    <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span>Data Karyawan</span>
+                </a>
+            </div>
+            @endif
         </div>
 
         <!-- Filter Period Toolbar -->

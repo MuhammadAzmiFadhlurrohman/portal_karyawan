@@ -568,37 +568,63 @@
             </div>
             @endif
 
-            <!-- Filter Bar Standar -->
+            <!-- Filter Bar Standar (Hanya Bulan dan Tahun untuk Karyawan Biasa / Non-Admin & Non-Finance) -->
             <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2.5 w-full sm:w-auto">
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
                     @endif
-                    <select name="jenis" onchange="this.form.submit()" class="w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
-                        <option value="">Semua Jenis</option>
-                        <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
-                        <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
-                        <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok Gudang</option>
-                        <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
-                    </select>
 
-                    <select name="divisi" onchange="this.form.submit()" class="w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
-                        <option value="">Semua Divisi</option>
-                        @foreach (($divisions ?? collect()) as $div)
-                            <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                    @if ($isSuperAdmin || $isFinance)
+                        <select name="jenis" onchange="this.form.submit()" class="w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                            <option value="">Semua Jenis</option>
+                            <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
+                            <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
+                            <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok Gudang</option>
+                            <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
+                        </select>
+
+                        <select name="divisi" onchange="this.form.submit()" class="w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                            <option value="">Semua Divisi</option>
+                            @foreach (($divisions ?? collect()) as $div)
+                                <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                            @endforeach
+                        </select>
+
+                        <select name="status" onchange="this.form.submit()" class="w-full sm:w-44 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                            <option value="">Semua Status</option>
+                            <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                            <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
+                            <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
+                            <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
+                            <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
+                            <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
+                            <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                    @endif
+
+                    <!-- Filter Bulan -->
+                    @php
+                        $monthsList = [
+                            '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
+                            '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
+                            '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+                        ];
+                    @endphp
+                    <select name="bulan" onchange="this.form.submit()" class="w-full sm:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                        <option value="">Semua Bulan</option>
+                        @foreach ($monthsList as $mNum => $mLabel)
+                            <option value="{{ $mNum }}" {{ (string) request('bulan') === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
                         @endforeach
                     </select>
 
-                    <select name="status" onchange="this.form.submit()" class="w-full sm:w-44 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
-                        <option value="">Semua Status</option>
-                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
-                        <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
-                        <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
-                        <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
-                        <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
-                        <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
-                        <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                    <!-- Filter Tahun -->
+                    <select name="tahun" onchange="this.form.submit()" class="w-full sm:w-28 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
+                        <option value="">Semua Tahun</option>
+                        @for ($y = date('Y') + 1; $y >= 2024; $y--)
+                            <option value="{{ $y }}" {{ (int) request('tahun', date('Y')) === $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
                     </select>
 
                     <button type="submit" name="export" value="excel" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">

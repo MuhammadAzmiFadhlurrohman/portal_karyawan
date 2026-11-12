@@ -223,13 +223,13 @@
 
         <!-- Filter & Search Toolbar -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs">
-            <form method="GET" action="{{ route('portal.employees.index') }}" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+            <form method="GET" action="{{ route('portal.employees.index') }}" class="grid grid-cols-2 sm:grid-cols-12 gap-2.5 sm:gap-3 items-center">
                 <!-- Search Input -->
-                <div class="sm:col-span-4 relative">
+                <div class="col-span-2 sm:col-span-3 relative">
                     <input type="text" 
                            name="search" 
                            value="{{ $currentFilters['search'] }}" 
-                           placeholder="Cari nama, NIK, kode (KR...), email, HP..."
+                           placeholder="Cari nama, NIK, kode..."
                            class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -237,31 +237,38 @@
                 </div>
 
                 <!-- Division Select -->
-                <div class="sm:col-span-3">
+                <div class="col-span-1 sm:col-span-2">
                     <select name="division" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
                         <option value="">Semua Divisi</option>
                         @foreach ($divisions as $div)
                             <option value="{{ $div }}" {{ $currentFilters['division'] === $div ? 'selected' : '' }}>
-                                Divisi {{ $div }}
+                                {{ $div }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Role Select -->
-                <div class="sm:col-span-2">
-                    <select name="role" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
-                        <option value="">Semua Role</option>
-                        @foreach ($roles as $r)
-                            <option value="{{ $r->name }}" {{ $currentFilters['role'] === $r->name ? 'selected' : '' }}>
-                                {{ ucfirst(str_replace('_', ' ', $r->name)) }}
-                            </option>
-                        @endforeach
+                <!-- Month Select (For Attendance Stats) -->
+                <div class="col-span-1 sm:col-span-2">
+                    <select name="month" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50 font-semibold text-slate-700">
+                        @for ($m = 1; $m <= 12; $m++)
+                            @php $d = \Carbon\Carbon::create(null, $m, 1); @endphp
+                            <option value="{{ $m }}" @selected($m === $month)>{{ $d->translatedFormat('F') }}</option>
+                        @endfor
+                    </select>
+                </div>
+
+                <!-- Year Select (For Attendance Stats) -->
+                <div class="col-span-1 sm:col-span-2">
+                    <select name="year" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50 font-mono font-semibold text-slate-700">
+                        @for ($y = now()->year - 2; $y <= now()->year + 1; $y++)
+                            <option value="{{ $y }}" @selected($y === $year)>{{ $y }}</option>
+                        @endfor
                     </select>
                 </div>
 
                 <!-- Status Select -->
-                <div class="sm:col-span-2">
+                <div class="col-span-1 sm:col-span-2">
                     <select name="status" class="w-full py-2 px-3 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-slate-50/50">
                         <option value="active" {{ $currentFilters['status'] === 'active' ? 'selected' : '' }}>Status: Aktif</option>
                         <option value="inactive" {{ $currentFilters['status'] === 'inactive' ? 'selected' : '' }}>Status: Nonaktif</option>
@@ -270,13 +277,13 @@
                 </div>
 
                 <!-- Submit & Reset Buttons -->
-                <div class="sm:col-span-1 flex items-center gap-1.5">
+                <div class="col-span-2 sm:col-span-1 flex items-center gap-1.5">
                     <button type="submit" 
                             title="Terapkan Filter"
                             class="flex-1 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center shadow-xs transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                     </button>
-                    @if ($currentFilters['search'] || $currentFilters['division'] || $currentFilters['role'] || $currentFilters['status'] !== 'active')
+                    @if ($currentFilters['search'] || $currentFilters['division'] || $currentFilters['role'] || $currentFilters['status'] !== 'active' || $month !== now('Asia/Jakarta')->month || $year !== now('Asia/Jakarta')->year)
                         <a href="{{ route('portal.employees.index') }}" 
                            title="Reset Filter"
                            class="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-100 text-xs transition">
@@ -287,8 +294,136 @@
             </form>
         </div>
 
-        <!-- Employee Table Card -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <!-- Mobile Card View (Matches Reference Design) -->
+        <div class="md:hidden space-y-3">
+            <div class="flex items-center justify-between px-1">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-teal-600"></span>
+                    <span class="text-[11px] font-bold text-slate-800 uppercase tracking-tight">
+                        DAFTAR KARYAWAN ({{ strtoupper(\Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y')) }})
+                    </span>
+                </div>
+                <span class="text-[11px] text-slate-500 font-medium">{{ $employees->total() }} Karyawan Terdata</span>
+            </div>
+
+            @forelse ($employees as $emp)
+                @php
+                    $mStats = $attendanceStats[$emp->id] ?? [
+                        'total_hadir' => 0,
+                        'tepat_waktu' => 0,
+                        'terlambat' => 0,
+                        'alpa' => 0,
+                        'cuti' => 0,
+                        'jam_kerja' => 0,
+                    ];
+                @endphp
+                <div class="bg-white rounded-2xl border-2 border-teal-500/50 p-4 shadow-xs space-y-3">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-xs shrink-0">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            </div>
+                            <span class="font-bold text-xs sm:text-sm text-slate-900 tracking-tight truncate">{{ strtoupper($emp->name) }}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            @if ($emp->is_active)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    Aktif
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                    Nonaktif
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span class="flex items-center gap-1.5 text-slate-400">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span>Periode</span>
+                            </span>
+                            <span class="font-semibold text-slate-800">{{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y') }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span class="flex items-center gap-1.5 text-slate-400">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Total Kehadiran</span>
+                            </span>
+                            <span class="font-bold text-slate-900">
+                                {{ $mStats['total_hadir'] }} hari
+                                <span class="text-[10px] font-normal text-slate-500">(Tepat: {{ $mStats['tepat_waktu'] }}, Telat: {{ $mStats['terlambat'] }})</span>
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span class="flex items-center gap-1.5 text-slate-400">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                <span>Divisi</span>
+                            </span>
+                            <span class="font-semibold text-slate-800">{{ $emp->division ?: '-' }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-slate-600">
+                            <span class="flex items-center gap-1.5 text-slate-400">
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <span>Lokasi</span>
+                            </span>
+                            <span class="font-semibold text-slate-800">Bandung</span>
+                        </div>
+                    </div>
+
+                    <!-- Full-Width "Lihat Detail" Button matching User Reference -->
+                    <a href="{{ route('attendance.history', ['user_id' => $emp->id, 'month' => $month, 'year' => $year]) }}"
+                       class="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <span>Lihat Detail</span>
+                    </a>
+
+                    <!-- Compact Admin Action Tools -->
+                    <div class="flex items-center justify-end gap-1 pt-1 border-t border-slate-100">
+                        <button @click="openEdit({{ $emp->toJson() }})"
+                                type="button" 
+                                title="Ubah Data Karyawan"
+                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-teal-50 hover:text-teal-700 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        </button>
+                        <button @click="openResetFace({{ $emp->toJson() }})"
+                                type="button" 
+                                title="Reset Wajah"
+                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-cyan-50 hover:text-cyan-700 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V6a2 2 0 012-2h2M4 16v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 005 0"/></svg>
+                        </button>
+                        <button @click="openReset({{ $emp->toJson() }})"
+                                type="button" 
+                                title="Reset Password"
+                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                        </button>
+                        @if ($emp->id !== auth()->id())
+                            <button @click="openDelete({{ $emp->toJson() }})"
+                                    type="button" 
+                                    title="Hapus / Nonaktifkan"
+                                    class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-700 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-8 text-center text-slate-400">
+                    <span class="text-3xl block mb-2">🔍</span>
+                    <p class="font-bold text-slate-700 text-sm">Tidak ada karyawan yang sesuai filter</p>
+                </div>
+            @endforelse
+        </div>
+
+        <!-- Employee Table Card (Desktop View) -->
+        <div class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead>
@@ -297,6 +432,7 @@
                             <th class="py-3 px-3">Kontak &amp; Akun</th>
                             <th class="py-3 px-3">Penempatan</th>
                             <th class="py-3 px-3">Role &amp; Akses</th>
+                            <th class="py-3 px-3">Statistik Absen ({{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('M Y') }})</th>
                             <th class="py-3 px-3">Status</th>
                             <th class="py-3 pr-4 text-right">Aksi</th>
                         </tr>
@@ -374,6 +510,43 @@
                                     </span>
                                 </td>
 
+                                <!-- Statistik Absen -->
+                                @php
+                                    $empStats = $attendanceStats[$emp->id] ?? [
+                                        'total_hadir' => 0,
+                                        'tepat_waktu' => 0,
+                                        'terlambat' => 0,
+                                        'alpa' => 0,
+                                        'cuti' => 0,
+                                        'jam_kerja' => 0,
+                                    ];
+                                @endphp
+                                <td class="py-3 px-3">
+                                    <div class="flex flex-col gap-1 min-w-[165px]">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200" title="Total Hadir">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                                Hadir: {{ $empStats['total_hadir'] }} hr
+                                            </span>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200" title="Tepat Waktu">
+                                                Tepat: {{ $empStats['tepat_waktu'] }}
+                                            </span>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold {{ $empStats['terlambat'] > 0 ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-slate-50 text-slate-500 border border-slate-200' }}" title="Terlambat">
+                                                Telat: {{ $empStats['terlambat'] }}
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-0.5">
+                                            <span>⏱️ {{ $empStats['jam_kerja'] }} Jam</span>
+                                            @if ($empStats['alpa'] > 0)
+                                                <span class="text-rose-600 font-bold">· Alpa: {{ $empStats['alpa'] }}</span>
+                                            @endif
+                                            @if ($empStats['cuti'] > 0)
+                                                <span class="text-blue-600 font-medium">· Cuti: {{ $empStats['cuti'] }}</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
                                 <!-- Status Aktif & Biometrik Wajah -->
                                 <td class="py-3 px-3">
                                     <div class="flex flex-col items-start gap-1">
@@ -405,6 +578,14 @@
                                 <!-- Actions -->
                                 <td class="py-3 pr-4 text-right">
                                     <div class="inline-flex items-center gap-1.5">
+                                        <!-- Lihat Detail Absen (Requirement) -->
+                                        <a href="{{ route('attendance.history', ['user_id' => $emp->id, 'month' => $month, 'year' => $year]) }}"
+                                           title="Lihat Detail Riwayat Absen {{ $emp->name }}"
+                                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 hover:border-teal-600 text-[11px] font-bold transition cursor-pointer shadow-2xs">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            <span>Lihat Detail</span>
+                                        </a>
+
                                         <!-- Edit Button -->
                                         <button @click="openEdit({{ $emp->toJson() }})"
                                                 type="button" 
@@ -445,7 +626,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center text-slate-400">
+                                <td colspan="7" class="py-12 text-center text-slate-400">
                                     <div class="max-w-sm mx-auto">
                                         <span class="text-3xl block mb-2">🔍</span>
                                         <p class="font-bold text-slate-700 text-sm">Tidak ada karyawan yang sesuai filter</p>

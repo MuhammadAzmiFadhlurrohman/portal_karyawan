@@ -61,18 +61,59 @@
             </div>
         </div>
 
-        <!-- Right: Glassy Translucent Date Card -->
-        <div class="hidden sm:flex relative z-10 items-center gap-3 px-3.5 py-2 rounded-xl bg-black/25 backdrop-blur-md border border-white/15 text-white shadow-xs shrink-0">
-            <svg class="w-5 h-5 text-cyan-300 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            <div class="text-left leading-tight">
-                <span class="block text-xs sm:text-sm font-bold text-white tracking-tight">
-                    {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
-                </span>
-                <span class="block text-[11px] text-teal-200/85 font-medium">
-                    {{ \Carbon\Carbon::now()->translatedFormat('l') }} · WIB
-                </span>
+        <!-- Right: Glassy Profile Info Card & Translucent Date -->
+        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+            <!-- Profile Identity Card -->
+            <a href="{{ route('portal.profile') }}" 
+               class="flex items-center gap-3 bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2 text-white shadow-xs transition group">
+                <div class="relative shrink-0">
+                    @if ($user->avatar_url)
+                        <img src="{{ $user->avatar_url }}" 
+                             alt="{{ $user->name }}" 
+                             class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cyan-400/40 shadow-sm group-hover:scale-105 transition-transform" 
+                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                        <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
+                            {{ $user->initials }}
+                        </div>
+                    @else
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
+                            {{ $user->initials }}
+                        </div>
+                    @endif
+                </div>
+
+                <div class="text-left leading-tight min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-xs sm:text-sm text-white tracking-tight truncate max-w-[130px] sm:max-w-[170px]">
+                            {{ strtoupper($user->name) }}
+                        </span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-[11px] text-teal-200/85 font-mono">
+                        <span class="text-cyan-200">NIK: {{ $user->employee_code ?? 'MSN' }}</span>
+                        @if ($user->division)
+                            <span class="truncate">· {{ $user->division }}</span>
+                        @endif
+                    </div>
+                </div>
+            </a>
+
+            <!-- Translucent Date Card -->
+            <div class="hidden md:flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-black/25 backdrop-blur-md border border-white/15 text-white shadow-xs">
+                <svg class="w-4 h-4 text-cyan-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <div class="text-left leading-tight">
+                    <span class="block text-xs font-bold text-white tracking-tight">
+                        {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+                    </span>
+                    <span class="block text-[10px] text-teal-200/85 font-medium">
+                        {{ \Carbon\Carbon::now()->translatedFormat('l') }} · WIB
+                    </span>
+                </div>
             </div>
         </div>
     </div>

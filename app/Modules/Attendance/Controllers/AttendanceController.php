@@ -73,7 +73,8 @@ class AttendanceController extends Controller
 
         $canViewOthers = $currentUser->can('attendance.leave.approve') 
             || $currentUser->can('attendance.schedule.generate')
-            || in_array(strtolower((string)$currentUser->role), ['admin', 'hrd', 'supervisor', 'ceo']);
+            || in_array(strtolower((string)$currentUser->role), ['admin', 'hrd', 'supervisor', 'ceo'])
+            || $currentUser->hasRole(['super_admin', 'admin', 'hrd', 'ceo', 'atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi']);
 
         $selectedUserId = (int) $request->input('user_id', $currentUser->id);
         if (!$canViewOthers) {

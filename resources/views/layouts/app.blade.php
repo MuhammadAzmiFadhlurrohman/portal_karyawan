@@ -184,7 +184,8 @@
                     $navUser = auth()->user();
                     $navIsHrdOnly = $navUser && $navUser->hasRole('hrd') && ! $navUser->hasRole(['super_admin', 'admin']);
                     $navCanApprovePengajuan = $navUser && ! $navIsHrdOnly && ($navUser->can('gomsn.pengajuan.approve_atasan') || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
-                    $navIsAtasan = $navUser && ($navCanApprovePengajuan || $navUser->can('gomsn.lembur.approve') || $navUser->hasRole(['hrd']));
+                    $navCanApproveKoreksi = $navUser && ! $navIsHrdOnly && ($navUser->can('attendance.correction.approve') || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
+                    $navIsAtasan = $navUser && ($navCanApprovePengajuan || $navUser->can('gomsn.lembur.approve'));
                     $navIsFinance = $navUser && ($navUser->hasRole(['finance', 'admin', 'super_admin']) || $navUser->can('gomsn.pengajuan.approve_finance'));
                     $navPendingAtasanCount = 0;
                     $navPendingLemburCount = 0;
@@ -210,9 +211,10 @@
                             });
                         }
                         $navPendingLemburCount = $navLQ->count();
-
+                    }
+                    if ($navCanApproveKoreksi) {
                         $navCQ = \App\Models\AttendanceCorrection::whereIn('status', ['pending_supervisor', 'pending_hrd'])->where('user_id', '!=', $navUser->id);
-                        if (! $navUser->hasRole(['super_admin', 'admin', 'hrd'])) {
+                        if (! $navUser->hasRole(['super_admin', 'admin'])) {
                             if (! empty($navUser->division)) {
                                 $navCQ->whereHas('user', function ($qu) use ($navUser) {
                                     $qu->whereRaw('LOWER(division) = ?', [strtolower($navUser->division)]);
@@ -266,8 +268,8 @@
                         </a>
                         @endif
 
-                        <!-- 3. Pengajuan Absen (Khusus Atasan / HRD) -->
-                        @if ($navIsAtasan)
+                        <!-- 3. Pengajuan Absen (Khusus Atasan & Admin — Tidak Muncul di Role HRD) -->
+                        @if ($navCanApproveKoreksi)
                         <a href="{{ route('attendance.corrections.approvals') }}"
                            @if (request()->routeIs('attendance.corrections.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -323,7 +325,8 @@
                 <!-- Bagian 2: Absensi & Cuti (Dropdown with Persistent State) -->
                 @php
                     $sidebarUser = auth()->user();
-                    $canViewReports = $sidebarUser && ($sidebarUser->hasRole(['super_admin', 'admin', 'hrd']) || $sidebarUser->can('attendance.employee.manage'));
+                    $canViewReports = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin']);
+                    $isHrdRole = $sidebarUser && $sidebarUser->hasRole('hrd') && ! $sidebarUser->hasRole(['super_admin', 'admin']);
                     $isAbsensiActive = request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals');
                     $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
                 @endphp
@@ -359,6 +362,19 @@
                             <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
+
+                        @if ($isHrdRole)
+                        <!-- Data Karyawan (Khusus HRD di Menu Absensi) -->
+                        <a href="{{ route('portal.employees.index') }}"
+                           @if (request()->routeIs('portal.employees.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('portal.employees.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span>Data Karyawan</span>
+                            @if (request()->routeIs('portal.employees.*'))
+                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                            @endif
+                        </a>
+                        @endif
 
                         @if ($canViewReports)
                         <!-- Riwayat & Laporan Absensi (Dropdown Sub-Menu untuk Admin/HRD) -->
@@ -1398,7 +1414,7 @@
                         </a>
                         @endif
 
-                        @if ($navIsAtasan)
+                        @if ($navCanApproveKoreksi)
                         <a href="{{ route('attendance.corrections.approvals') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
