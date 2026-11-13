@@ -120,7 +120,7 @@ class EmployeeAttendanceRecapController extends Controller
                 ->where('user_id', $emp->id)
                 ->where('status', 'approved')
                 ->whereYear('start_date', $year)
-                ->sum('days_count');
+                ->sum('working_days');
 
             $grandTotalPotongan = (float) ($monthlyReport['grand_total_deduction'] ?? 0.0);
             $alpaPotongan = (float) ($monthlyReport['total_alpa_deduction'] ?? 0.0);
@@ -217,7 +217,7 @@ class EmployeeAttendanceRecapController extends Controller
         $balance = $leaveService->getOrCreateBalance($user, $year);
         $sisaCuti = max(0, (int) ($balance->remaining_days ?? 0));
         $annualQuota = (int) ($balance->annual_quota ?? 12);
-        $cutiTerpakaiAnnual = (int) $leaves->sum('days_count');
+        $cutiTerpakaiAnnual = (int) $leaves->sum('working_days');
 
         $totalPotongan = (float) ($monthlyReport['grand_total_deduction'] ?? 0);
         $telatPotongan = (float) ($monthlyReport['total_late_deduction'] ?? 0);
