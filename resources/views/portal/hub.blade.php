@@ -274,181 +274,253 @@
         })();
     </script>
 
-    <!-- Section 1: KPI Summary Cards (Absen, Pengajuan, Lembur) -->
+    <!-- Section 1: KPI Summary Cards (Absen, Gaji, Cuti) Matching Reference -->
     <section class="mb-8 hub-anim-section hub-anim-d1" aria-labelledby="heading-stats-kpi">
         <h2 id="heading-stats-kpi" class="sr-only">Ringkasan Statistik Utama</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 hub-stagger">
-            <!-- Card 1: Absensi & Disiplin -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-5 flex flex-col justify-between">
+            
+            <!-- Card 1: Absensi Hari Ini -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-6 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="h-8 w-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-sm">
-                                📅
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-center gap-3">
+                            <span class="h-10 w-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-lg">
+                                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </span>
                             <div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Absensi &amp; Disiplin</h3>
-                                <span class="text-[11px] text-slate-400">Status Hari Ini &amp; Bulan Ini</span>
+                                <h3 class="text-sm font-bold text-slate-900 leading-tight">Absensi Hari Ini</h3>
+                                <span class="text-xs text-slate-500 font-medium">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y') }}</span>
                             </div>
                         </div>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200/60">
-                            {{ $stats['absensi']['month_rate'] }}% Hadir
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            Aktif
                         </span>
                     </div>
 
-                    <!-- Today Breakdown Pills Grid -->
-                    <div class="grid grid-cols-4 gap-2 my-3.5">
-                        <div class="rounded-xl bg-emerald-50/70 border border-emerald-100 p-2 text-center">
-                            <span class="block text-lg font-bold text-emerald-700 leading-tight">{{ $stats['absensi']['today_present'] }}</span>
-                            <span class="text-[10px] font-semibold text-emerald-800">Tepat</span>
+                    <!-- 4 Status Blocks -->
+                    <div class="grid grid-cols-4 gap-2.5 mb-5">
+                        <!-- Hadir -->
+                        <div class="rounded-2xl bg-[#ecfdf5] border border-emerald-100/80 py-3 px-1 text-center flex flex-col items-center justify-between min-h-[96px]">
+                            <span class="text-xl font-bold text-slate-900 leading-none">{{ $stats['absensi']['today_present'] }}</span>
+                            <span class="text-[11px] font-semibold text-slate-700 my-0.5">Hadir</span>
+                            <div class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            </div>
                         </div>
-                        <div class="rounded-xl bg-amber-50/70 border border-amber-100 p-2 text-center">
-                            <span class="block text-lg font-bold text-amber-700 leading-tight">{{ $stats['absensi']['today_late'] }}</span>
-                            <span class="text-[10px] font-semibold text-amber-800">Telat</span>
+
+                        <!-- Terlambat -->
+                        <div class="rounded-2xl bg-[#fffbeb] border border-amber-100/80 py-3 px-1 text-center flex flex-col items-center justify-between min-h-[96px]">
+                            <span class="text-xl font-bold text-slate-900 leading-none">{{ $stats['absensi']['today_late'] }}</span>
+                            <span class="text-[11px] font-semibold text-slate-700 my-0.5">Terlambat</span>
+                            <div class="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5 text-amber-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
                         </div>
-                        <div class="rounded-xl bg-blue-50/70 border border-blue-100 p-2 text-center">
-                            <span class="block text-lg font-bold text-blue-700 leading-tight">{{ $stats['absensi']['today_leave'] }}</span>
-                            <span class="text-[10px] font-semibold text-blue-800">Izin/Cuti</span>
+
+                        <!-- Izin -->
+                        <div class="rounded-2xl bg-[#eff6ff] border border-blue-100/80 py-3 px-1 text-center flex flex-col items-center justify-between min-h-[96px]">
+                            <span class="text-xl font-bold text-slate-900 leading-none">{{ $stats['absensi']['today_leave'] }}</span>
+                            <span class="text-[11px] font-semibold text-slate-700 my-0.5">Izin</span>
+                            <div class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5 text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
                         </div>
-                        <div class="rounded-xl bg-rose-50/70 border border-rose-100 p-2 text-center">
-                            <span class="block text-lg font-bold text-rose-700 leading-tight">{{ $stats['absensi']['today_absent'] }}</span>
-                            <span class="text-[10px] font-semibold text-rose-800">Alpa/Blm</span>
+
+                        <!-- Sakit -->
+                        <div class="rounded-2xl bg-[#fff1f2] border border-rose-100/80 py-3 px-1 text-center flex flex-col items-center justify-between min-h-[96px]">
+                            <span class="text-xl font-bold text-slate-900 leading-none">{{ $stats['absensi']['today_absent'] }}</span>
+                            <span class="text-[11px] font-semibold text-slate-700 my-0.5">Sakit</span>
+                            <div class="w-6 h-6 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center">
+                                <svg class="w-3.5 h-3.5 text-rose-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="text-xs text-slate-500 space-y-1">
+                    <!-- Details Row -->
+                    <div class="space-y-2 text-xs font-semibold text-slate-600 mb-4">
                         <div class="flex items-center justify-between">
-                            <span>Akumulasi Hadir Bulan Ini:</span>
-                            <strong class="text-slate-800 font-semibold">{{ $stats['absensi']['month_present_days'] }} Hari</strong>
+                            <span class="flex items-center gap-2 font-medium text-slate-600">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Total Hari Kerja
+                            </span>
+                            <strong class="text-slate-900 font-bold">{{ $metrics['monthly_attendance']['present_days'] ?? $stats['absensi']['month_present_days'] }} Hari</strong>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span>Total Keterlambatan:</span>
-                            <strong class="text-slate-800 font-semibold">{{ $stats['absensi']['month_late_minutes'] }} Menit</strong>
+                            <span class="flex items-center gap-2 font-medium text-slate-600">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                Total Jam Kerja
+                            </span>
+                            <strong class="text-slate-900 font-bold">{{ $metrics['monthly_attendance']['total_working_hours'] ?? ($stats['absensi']['month_present_days'] * 8) }} Jam</strong>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Pembaruan realtime</span>
-                    <a href="{{ route('attendance.index') }}" class="font-semibold text-teal-700 hover:text-teal-800 flex items-center gap-1 group">
-                        Lihat Absen
-                        <span class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+                <!-- Footer Link -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11.5px]">
+                    <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Data absensi diperbarui real-time
+                    </span>
+                    <a href="{{ route('attendance.index') }}" class="font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-teal-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Refresh
                     </a>
                 </div>
             </div>
 
-            <!-- Card 2: Pengajuan (Dana & Barang) -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-5 flex flex-col justify-between">
+            <!-- Card 2: Ringkasan Gaji & Tunjangan -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-6 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="h-8 w-8 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center font-bold text-sm">
-                                💳
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="h-10 w-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                             </span>
                             <div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Pengajuan Dana &amp; Barang</h3>
-                                <span class="text-[11px] text-slate-400">Periode {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
+                                <h3 class="text-sm font-bold text-slate-900 leading-tight">Ringkasan Gaji &amp; Tunjangan</h3>
+                                <span class="text-xs text-slate-500 font-medium">Periode {{ now('Asia/Jakarta')->translatedFormat('F Y') }}</span>
                             </div>
                         </div>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $stats['pengajuan']['pending'] > 0 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-50 text-slate-600' }}">
-                            {{ $stats['pengajuan']['pending'] }} Menunggu
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-50 text-slate-700 border border-slate-200">
+                            {{ now('Asia/Jakarta')->translatedFormat('M Y') }}
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                         </span>
                     </div>
 
-                    <div class="my-3">
-                        <span class="text-xs text-slate-400 block font-medium">Total Nominal Diajukan</span>
-                        <div class="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight mt-0.5">
-                            Rp {{ number_format($stats['pengajuan']['nominal_total'], 0, ',', '.') }}
+                    <!-- Gaji Pokok Headline -->
+                    <div class="mb-4">
+                        <span class="text-xs text-slate-500 font-semibold block">Gaji Pokok</span>
+                        <div class="text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                            Rp 7.500.000
                         </div>
                     </div>
 
-                    <!-- Pengajuan Status Count Grid -->
-                    <div class="grid grid-cols-3 gap-2 my-3">
-                        <div class="rounded-xl bg-slate-50 p-2 text-center border border-slate-100">
-                            <span class="block text-base font-bold text-slate-800 leading-tight">{{ $stats['pengajuan']['total'] }}</span>
-                            <span class="text-[10px] text-slate-500 font-medium">Total Diajukan</span>
+                    <!-- 3 Pill Blocks: Tunjangan, Insentif, Potongan -->
+                    <div class="grid grid-cols-3 gap-2.5 mb-5">
+                        <!-- Tunjangan -->
+                        <div class="rounded-2xl bg-[#f1f5f9] border border-slate-200/70 p-2.5 text-center flex flex-col items-center justify-between min-h-[92px]">
+                            <div class="w-6 h-6 rounded-lg bg-slate-200/80 text-slate-700 flex items-center justify-center mb-1">
+                                <svg class="w-3.5 h-3.5 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-600">Tunjangan</span>
+                            <span class="text-xs font-bold text-slate-900 mt-0.5 leading-tight">Rp 1.500.000</span>
                         </div>
-                        <div class="rounded-xl bg-emerald-50/70 p-2 text-center border border-emerald-100">
-                            <span class="block text-base font-bold text-emerald-700 leading-tight">{{ $stats['pengajuan']['approved'] }}</span>
-                            <span class="text-[10px] text-emerald-800 font-medium">Disetujui/Cair</span>
+
+                        <!-- Insentif -->
+                        <div class="rounded-2xl bg-[#ecfdf5] border border-emerald-100/80 p-2.5 text-center flex flex-col items-center justify-between min-h-[92px]">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1">
+                                <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+                            </div>
+                            <span class="text-[11px] font-semibold text-emerald-800">Insentif</span>
+                            <span class="text-xs font-bold text-emerald-700 mt-0.5 leading-tight">Rp 500.000</span>
                         </div>
-                        <div class="rounded-xl bg-rose-50/70 p-2 text-center border border-rose-100">
-                            <span class="block text-base font-bold text-rose-700 leading-tight">{{ $stats['pengajuan']['rejected'] }}</span>
-                            <span class="text-[10px] text-rose-800 font-medium">Ditolak</span>
+
+                        <!-- Potongan -->
+                        <div class="rounded-2xl bg-[#fff1f2] border border-rose-100/80 p-2.5 text-center flex flex-col items-center justify-between min-h-[92px]">
+                            <div class="w-6 h-6 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center mb-1">
+                                <svg class="w-3.5 h-3.5 text-rose-600 fill-rose-600" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                            <span class="text-[11px] font-semibold text-rose-800">Potongan</span>
+                            <span class="text-xs font-bold text-rose-700 mt-0.5 leading-tight">Rp 250.000</span>
                         </div>
                     </div>
 
-                    <div class="text-xs text-slate-500 flex items-center justify-between">
-                        <span>Nominal Disetujui/Cair:</span>
-                        <strong class="text-emerald-700 font-semibold font-mono">Rp {{ number_format($stats['pengajuan']['nominal_disetujui'], 0, ',', '.') }}</strong>
+                    <!-- Total Penghasilan -->
+                    <div class="flex items-center justify-between pt-1 mb-4">
+                        <span class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                            <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            Total Penghasilan
+                        </span>
+                        <strong class="text-emerald-700 font-extrabold text-base">Rp 8.750.000</strong>
                     </div>
                 </div>
 
-                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Realisasi: Rp {{ number_format($stats['pengajuan']['nominal_realisasi'], 0, ',', '.') }}</span>
-                    <a href="{{ route('gomsn.pengajuan.index') }}" class="font-semibold text-cyan-700 hover:text-cyan-800 flex items-center gap-1 group">
-                        Buka Pengajuan
-                        <span class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
-                    </a>
-                </div>
+                <!-- Footer Button CTA -->
+                <a href="{{ route('attendance.deductions') }}" class="w-full py-2.5 px-4 rounded-2xl bg-[#e6fffa] hover:bg-[#ccfbf1] text-teal-800 border border-teal-200/70 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+                    <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Lihat Detail Gaji
+                    <svg class="w-3.5 h-3.5 text-teal-700 ml-auto" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
             </div>
 
-            <!-- Card 3: Lembur (Overtime) -->
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-5 flex flex-col justify-between">
+            <!-- Card 3: Cuti & Perizinan -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-6 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <span class="h-8 w-8 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center font-bold text-sm">
-                                ⏱️
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <span class="h-10 w-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-lg">
+                                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                             </span>
                             <div>
-                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lembur (Overtime)</h3>
-                                <span class="text-[11px] text-slate-400">Total Akumulasi Kerja Tambahan</span>
+                                <h3 class="text-sm font-bold text-slate-900 leading-tight">Cuti &amp; Perizinan</h3>
+                                <span class="text-xs text-slate-500 font-medium">Ringkasan Pengajuan Anda</span>
                             </div>
                         </div>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $stats['lembur']['pending'] > 0 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-50 text-slate-600' }}">
-                            {{ $stats['lembur']['pending'] }} Menunggu
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-50 text-slate-700 border border-slate-200">
+                            Bulan Ini
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                         </span>
                     </div>
 
-                    <div class="my-3">
-                        <span class="text-xs text-slate-400 block font-medium">Total Durasi Lembur Disetujui</span>
-                        <div class="text-xl sm:text-2xl font-bold font-heading text-slate-900 tracking-tight mt-0.5 flex items-baseline gap-1.5">
-                            <span>{{ $stats['lembur']['total_hours'] }}</span>
-                            <span class="text-sm font-normal text-slate-500">Jam Kerja</span>
+                    <!-- Total Pengajuan Headline -->
+                    <div class="mb-4">
+                        <span class="text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Total Pengajuan
+                        </span>
+                        <div class="text-2xl font-black text-slate-900 tracking-tight mt-0.5 flex items-baseline gap-1.5">
+                            <span>{{ $metrics['leave_breakdown']['total'] ?? 0 }}</span>
+                            <span class="text-sm font-semibold text-slate-600">Pengajuan</span>
                         </div>
                     </div>
 
-                    <!-- Lembur Status Count Grid -->
-                    <div class="grid grid-cols-3 gap-2 my-3">
-                        <div class="rounded-xl bg-slate-50 p-2 text-center border border-slate-100">
-                            <span class="block text-base font-bold text-slate-800 leading-tight">{{ $stats['lembur']['total'] }}</span>
-                            <span class="text-[10px] text-slate-500 font-medium">Pengajuan</span>
+                    <!-- 3 Pill Blocks: Cuti, Izin, Work From Home -->
+                    <div class="grid grid-cols-3 gap-2.5 mb-5">
+                        <!-- Cuti -->
+                        <div class="rounded-2xl bg-[#ecfdf5] border border-emerald-100/80 p-2.5 text-center flex flex-col items-center justify-between min-h-[92px]">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1">
+                                <svg class="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-700">Cuti</span>
+                            <span class="text-[11px] font-bold text-slate-600 mt-0.5 leading-tight">{{ $metrics['leave_breakdown']['cuti'] ?? 0 }} Pengajuan</span>
                         </div>
-                        <div class="rounded-xl bg-emerald-50/70 p-2 text-center border border-emerald-100">
-                            <span class="block text-base font-bold text-emerald-700 leading-tight">{{ $stats['lembur']['approved'] }}</span>
-                            <span class="text-[10px] text-emerald-800 font-medium">Disetujui</span>
-                        </div>
-                        <div class="rounded-xl bg-blue-50/70 p-2 text-center border border-blue-100">
-                            <span class="block text-base font-bold text-blue-700 leading-tight">{{ $stats['lembur']['paid'] }}</span>
-                            <span class="text-[10px] text-blue-800 font-medium">Dibayar</span>
-                        </div>
-                    </div>
 
-                    <div class="text-xs text-slate-500 flex items-center justify-between">
-                        <span>Lembur Ditolak:</span>
-                        <strong class="text-slate-700 font-semibold">{{ $stats['lembur']['rejected'] }} Pengajuan</strong>
+                        <!-- Izin -->
+                        <div class="rounded-2xl bg-[#eff6ff] border border-blue-100/80 p-2.5 text-center flex flex-col items-center justify-between min-h-[92px]">
+                            <div class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-1">
+                                <svg class="w-3.5 h-3.5 text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-700">Izin</span>
+                            <span class="text-[11px] font-bold text-slate-600 mt-0.5 leading-tight">{{ $metrics['leave_breakdown']['izin'] ?? 0 }} Pengajuan</span>
+                        </div>
+
+                        <!-- Work From Home -->
+                        <div class="rounded-2xl bg-[#faf5ff] border border-purple-100/80 p-2.5 text-center flex flex-col items-center justify-between min-h-[92px]">
+                            <div class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center mb-1">
+                                <svg class="w-3.5 h-3.5 text-purple-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            </div>
+                            <span class="text-[10px] font-semibold text-slate-700 leading-tight">Work From Home</span>
+                            <span class="text-[11px] font-bold text-slate-600 mt-0.5 leading-tight">{{ $metrics['leave_breakdown']['wfh'] ?? 0 }} Pengajuan</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Kompensasi &amp; SPK</span>
-                    <a href="{{ route('gomsn.overtime.index') }}" class="font-semibold text-indigo-700 hover:text-indigo-800 flex items-center gap-1 group">
-                        Kelola Lembur
-                        <span class="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+                <!-- Footer Link -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <a href="{{ route('attendance.leaves') }}" class="w-full flex items-center justify-between font-bold text-slate-700 hover:text-teal-700 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            Lihat Semua Pengajuan
+                        </span>
+                        <svg class="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 </div>
             </div>
+
         </div>
     </section>
 

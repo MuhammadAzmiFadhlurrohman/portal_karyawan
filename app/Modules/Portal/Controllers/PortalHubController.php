@@ -76,6 +76,26 @@ class PortalHubController extends Controller
                 ->whereMonth('date', $month)
                 ->count());
 
+            // Leave breakdown for this month
+            $userLeavesThisMonth = Leave::query()
+                ->where('user_id', $user->id)
+                ->whereYear('start_date', $year)
+                ->whereMonth('start_date', $month)
+                ->get();
+            $cutiCount = $userLeavesThisMonth->where('leave_type', 'annual')->count();
+            $izinCount = $userLeavesThisMonth->where('leave_type', 'special')->count();
+            $wfhCount = 0; // WFH count in policy
+            $totalLeaveCount = $userLeavesThisMonth->count();
+
+            // Total working hours this month (present * standard 8 hrs + approved overtime hours)
+            $approvedOvertimeMins = (int) \App\Models\Lembur::query()
+                ->where('user_id', $user->id)
+                ->whereYear('tanggal', $year)
+                ->whereMonth('tanggal', $month)
+                ->whereIn('status', ['approved', 'paid'])
+                ->sum('durasi_menit');
+            $totalWorkingHours = ($presentDays * 8) + round($approvedOvertimeMins / 60);
+
             $pendingHrisApprovals = ShiftSwap::query()
                 ->where(function ($q) use ($user): void {
                     $q->where('target_user_id', $user->id)->where('status', 'pending_target');
@@ -103,6 +123,13 @@ class PortalHubController extends Controller
                     'present_days' => $presentDays,
                     'scheduled_days' => $scheduledDays,
                     'late_minutes' => $lateMinutes,
+                    'total_working_hours' => $totalWorkingHours,
+                ],
+                'leave_breakdown' => [
+                    'total' => $totalLeaveCount,
+                    'cuti' => $cutiCount,
+                    'izin' => $izinCount,
+                    'wfh' => $wfhCount,
                 ],
                 'leave_balance' => [
                     'annual_remaining' => $balance->remaining_days,
