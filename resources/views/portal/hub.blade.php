@@ -63,8 +63,9 @@
             .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:540px}
             .hh-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:16px 16px 16px;gap:0;min-height:540px}
             .hh-left{position:relative;z-index:3;padding:0;align-self:stretch;text-align:left;max-width:56%}
-            .hh-top-bar{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;z-index:4;margin-bottom:12px}
-            .hh-date{font-size:11px;padding:5px 12px;line-height:1.25;max-width:calc(100% - 40px);white-space:normal;display:inline-flex}
+            .hh-top-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;z-index:4;margin-bottom:12px}
+            .hh-date{font-size:10.5px;padding:4.5px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+            .hh-date svg{width:13px;height:13px;flex-shrink:0}
             .hh-mobile-dots{display:flex;align-items:center;justify-content:center;padding-top:4px;padding-right:2px}
             .hh-mobile-dots .dots-grid{display:grid;grid-template-columns:repeat(2,4.5px);gap:5.5px}
             .hh-mobile-dots span{width:4.5px;height:4.5px;border-radius:50%;background:#5eead4;opacity:.9;box-shadow:0 0 6px rgba(94,234,212,.7)}
