@@ -40,7 +40,7 @@
         .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.02);transform-origin:50% 100%;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5))}
         .hh-initials{position:absolute;right:0;bottom:-18px;width:300px;height:300px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:64px;font-weight:900;color:rgba(255,255,255,.95);z-index:2}
         .hh-initials.show{display:flex}
-        .hh-check{position:absolute;left:-45px;bottom:24px;z-index:3;display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:18px;background:rgba(4,24,28,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.3);box-shadow:0 12px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
+        .hh-check{position:absolute;right:30px;bottom:16px;z-index:4;display:flex;align-items:center;gap:12px;padding:9px 16px;border-radius:18px;background:rgba(4,24,28,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 12px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
         .hh-check .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.15)}
         .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#10b981;display:block;box-shadow:0 0 10px #10b981}
         .hh-check.no .ic{background:rgba(245,158,11,.15)}
@@ -57,7 +57,7 @@
             .hh-arc-overlay{width:330px;height:330px;bottom:-44px}
             .hh-photo{bottom:-40px;height:290px}
             .hh-photo img{transform:scale(1.02)}
-            .hh-check{left:-25px;bottom:18px}
+            .hh-check{right:16px;bottom:14px}
         }
         @media (max-width:767px){
             .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:auto}
@@ -126,20 +126,20 @@
         }
         
         /* Modern Clean KPI Card Styling matching exact reference */
-        .kpi-card{background:#ffffff;border:1px solid #f1f5f9;border-radius:28px;box-shadow:0 12px 32px -4px rgba(15,23,42,.05),0 4px 12px -2px rgba(15,23,42,.02);padding:24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box}
-        .kpi-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-        .kpi-hdr-left{display:flex;align-items:center;gap:12px}
-        .kpi-hdr-icon{width:42px;height:42px;border-radius:14px;background:#e6fcf5;color:#0ca678;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .kpi-hdr-title{font-size:14px;font-weight:700;color:#0f172a;line-height:1.2;margin:0}
-        .kpi-hdr-sub{font-size:11.5px;color:#64748b;margin-top:2px;display:block}
-        .kpi-badge-aktif{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:11.5px;font-weight:700;background:#ecfdf5;color:#059669;border:1px solid #d1fae5}
-        .kpi-badge-aktif span{width:7px;height:7px;border-radius:50%;background:#10b981}
-        .kpi-dropdown-btn{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:12px;font-size:11.5px;font-weight:600;background:#f8fafc;color:#334155;border:1px solid #e2e8f0}
+        .kpi-card{background:#ffffff;border:1px solid #f1f5f9;border-radius:24px;box-shadow:0 10px 25px -4px rgba(15,23,42,.04),0 2px 6px -1px rgba(15,23,42,.02);padding:20px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box}
+        .kpi-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+        .kpi-hdr-left{display:flex;align-items:center;gap:10px}
+        .kpi-hdr-icon{width:36px;height:36px;border-radius:12px;background:#e6fcf5;color:#0ca678;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .kpi-hdr-title{font-size:13.5px;font-weight:700;color:#0f172a;line-height:1.2;margin:0}
+        .kpi-hdr-sub{font-size:11px;color:#64748b;margin-top:2px;display:block}
+        .kpi-badge-aktif{display:inline-flex;align-items:center;gap:5px;padding:3.5px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#ecfdf5;color:#059669;border:1px solid #d1fae5}
+        .kpi-badge-aktif span{width:6.5px;height:6.5px;border-radius:50%;background:#10b981}
+        .kpi-dropdown-btn{display:inline-flex;align-items:center;gap:5px;padding:3.5px 10px;border-radius:10px;font-size:11px;font-weight:600;background:#f8fafc;color:#334155;border:1px solid #e2e8f0}
         
-        .kpi-box{border-radius:18px;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 6px 10px;text-align:center;box-sizing:border-box;min-height:96px}
-        .kpi-box-num{font-size:22px;font-weight:800;color:#0f172a;line-height:1}
-        .kpi-box-label{font-size:11px;font-weight:600;margin-top:4px;margin-bottom:6px;line-height:1.2}
-        .kpi-box-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+        .kpi-box{border-radius:14px;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;text-align:center;box-sizing:border-box;min-height:82px}
+        .kpi-box-num{font-size:18px;font-weight:800;color:#0f172a;line-height:1}
+        .kpi-box-label{font-size:10.5px;font-weight:600;margin-top:3px;margin-bottom:5px;line-height:1.2}
+        .kpi-box-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center}
         
         .kpi-box-mint{background:#ecfdf5!important;border-color:#a7f3d0!important}
         .kpi-box-mint .kpi-box-icon{background:#d1fae5;color:#059669}
@@ -165,12 +165,12 @@
         .kpi-box-purple .kpi-box-icon{background:#f3e8ff;color:#9333ea}
         .kpi-box-purple .kpi-box-label{color:#6b21a8}
 
-        .kpi-detail-row{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:#475569;margin-bottom:8px}
-        .kpi-detail-row svg{width:16px;height:16px;color:#94a3b8;flex-shrink:0}
+        .kpi-detail-row{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;font-weight:600;color:#475569;margin-bottom:6px}
+        .kpi-detail-row svg{width:15px;height:15px;color:#94a3b8;flex-shrink:0}
         .kpi-detail-row strong{color:#0f172a;font-weight:700}
 
-        .kpi-card-footer{padding-top:14px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;font-size:11.5px}
-        .kpi-btn-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 16px;border-radius:16px;background:#e6fcf5;color:#0ca678;border:1px solid #c3fae8;font-size:12px;font-weight:700;transition:all .15s ease;text-decoration:none}
+        .kpi-card-footer{padding-top:12px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;font-size:11px}
+        .kpi-btn-cta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 14px;border-radius:14px;background:#e6fcf5;color:#0ca678;border:1px solid #c3fae8;font-size:11.5px;font-weight:700;transition:all .15s ease;text-decoration:none}
         .kpi-btn-cta:hover{background:#c3fae8}
     </style>
     <div class="hh">
