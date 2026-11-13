@@ -66,5 +66,31 @@ class Lembur extends Model
     {
         return $this->belongsTo(User::class, 'paid_by');
     }
+
+    /**
+     * Hitung nominal uang lembur berdasarkan jenis lembur:
+     * 1. Lembur biasa = Rp 5.000 / jam
+     * 2. Piket Hari Libur = Rp 3.900 / jam
+     * 3. Piket Hari Kerja = Rp 15.000 FLAT / Tetap (tidak per jam)
+     */
+    public function getNominalAttribute(): int
+    {
+        $jenis = strtolower(trim((string) $this->jenis_lembur));
+        $durasiMenit = (int) ($this->durasi_menit ?? 0);
+        $jam = $durasiMenit / 60;
+
+        // 3. Piket Hari Kerja (Flat Rp 15.000)
+        if (str_contains($jenis, 'piket') && str_contains($jenis, 'kerja')) {
+            return 15000;
+        }
+
+        // 2. Piket Hari Libur (Rp 3.900 / jam)
+        if (str_contains($jenis, 'piket') && (str_contains($jenis, 'libur') || str_contains($jenis, 'minggu') || str_contains($jenis, 'merah'))) {
+            return (int) round($jam * 3900);
+        }
+
+        // 1. Lembur Biasa (Rp 5.000 / jam) - default
+        return (int) round($jam * 5000);
+    }
 }
 

@@ -142,7 +142,7 @@ class OvertimeController extends Controller
                 if (! $employeeUser) {
                     continue;
                 }
-                $totalNominal = $items->sum(fn ($i) => round(($i->durasi_menit / 60) * 5000));
+                $totalNominal = $items->sum(fn ($i) => (int) $i->nominal);
                 $employeeStats[] = [
                     'user' => $employeeUser,
                     'total_days' => $items->pluck('tanggal')->map(fn ($d) => Carbon::parse($d)->toDateString())->unique()->count(),
@@ -165,7 +165,7 @@ class OvertimeController extends Controller
             $query->where('user_id', $selectedUserId);
             $detailEmployee = \App\Models\User::find($selectedUserId);
             $allSelectedUserLemburs = (clone $query)->get();
-            $totalNominalLembur = $allSelectedUserLemburs->sum(fn ($i) => round(($i->durasi_menit / 60) * 5000));
+            $totalNominalLembur = $allSelectedUserLemburs->sum(fn ($i) => (int) $i->nominal);
             $totalCountLembur = $allSelectedUserLemburs->count();
         }
 
@@ -232,7 +232,7 @@ class OvertimeController extends Controller
                     $hours = floor($item->durasi_menit / 60);
                     $mins = $item->durasi_menit % 60;
                     $durasiStr = "{$hours} jam " . sprintf('%02d menit', $mins);
-                    $uangLembur = round(($item->durasi_menit / 60) * 5000);
+                    $uangLembur = (int) $item->nominal;
 
                     fputcsv($handle, [
                         $no++,

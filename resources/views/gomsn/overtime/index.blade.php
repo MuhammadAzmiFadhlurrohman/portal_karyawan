@@ -420,7 +420,7 @@
                         $hours = floor($item->durasi_menit / 60);
                         $mins = $item->durasi_menit % 60;
                         $durasiStr = "{$hours} jam " . sprintf('%02d mnt', $mins);
-                        $uangLembur = round(($item->durasi_menit / 60) * 5000);
+                        $uangLembur = (int) $item->nominal;
                     @endphp
                     <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-4 space-y-3">
                         <!-- Top Header: Tanggal & Uang Lembur Badge -->
@@ -555,7 +555,7 @@
                                 $hours = floor($item->durasi_menit / 60);
                                 $mins = $item->durasi_menit % 60;
                                 $durasiStr = "{$hours} jam " . sprintf('%02d menit', $mins);
-                                $uangLembur = round(($item->durasi_menit / 60) * 5000);
+                                $uangLembur = (int) $item->nominal;
                             @endphp
                             <tr class="hover:bg-slate-50/70 transition-colors">
                                 <!-- NO -->

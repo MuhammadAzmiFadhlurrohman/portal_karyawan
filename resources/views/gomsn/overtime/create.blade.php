@@ -149,17 +149,17 @@
                     <div class="max-w-md">
                         <select name="jenis_lembur"
                                 x-model="jenisLembur"
+                                @change="calculateEstimasi()"
                                 required
-                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-medium">
+                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold">
                             <option value="">-- Pilih Jenis Lembur --</option>
-                            <option value="Lembur Hari Kerja">Lembur Hari Kerja</option>
-                            <option value="Lembur Hari Libur / Tanggal Merah">Lembur Hari Libur / Tanggal Merah</option>
-                            <option value="Lembur Darurat / Penanganan Gangguan">Lembur Darurat / Penanganan Gangguan</option>
-                            <option value="Lembur Proyek / Tugas Lapangan">Lembur Proyek / Tugas Lapangan</option>
+                            <option value="Lembur">Lembur (Rp 5.000 / jam)</option>
+                            <option value="Piket Hari Libur">Piket Hari Libur (Rp 3.900 / jam)</option>
+                            <option value="Piket Hari Kerja">Piket Hari Kerja (Rp 15.000 Flat / Tetap)</option>
                         </select>
                     </div>
                     <p class="text-[11px] text-slate-500">
-                        Silakan pilih klasifikasi kegiatan lembur yang sesuai dengan penugasan.
+                        Tarif: <strong>Lembur</strong> Rp 5.000/jam &bull; <strong>Piket Libur</strong> Rp 3.900/jam &bull; <strong>Piket Hari Kerja</strong> Rp 15.000 flat/tetap.
                     </p>
                 </div>
 
@@ -172,6 +172,7 @@
                         <input type="time"
                                name="jam_mulai"
                                x-model="jamMulai"
+                               @change="calculateEstimasi()"
                                required
                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
                     </div>
@@ -182,8 +183,25 @@
                         <input type="time"
                                name="jam_selesai"
                                x-model="jamSelesai"
+                               @change="calculateEstimasi()"
                                required
                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
+                    </div>
+                </div>
+
+                <!-- Live Estimasi Uang Lembur Card -->
+                <div x-show="jenisLembur && jamMulai && jamSelesai" x-cloak class="p-4 bg-teal-50/80 border border-teal-200 rounded-2xl flex items-center justify-between gap-3 max-w-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                            Rp
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-teal-800 block">Estimasi Uang Lembur</span>
+                            <span class="text-[11px] text-slate-600 block mt-0.5" x-text="estimasiKeterangan"></span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-base sm:text-lg font-black text-teal-900 block" x-text="'Rp ' + Number(estimasiNominal).toLocaleString('id-ID')"></span>
                     </div>
                 </div>
 
@@ -247,6 +265,8 @@
                 attendanceChecked: false,
                 hasAttendance: false,
                 attendanceData: {},
+                estimasiNominal: 0,
+                estimasiKeterangan: '',
 
                 get canSubmit() {
                     return this.hasAttendance && 
@@ -256,10 +276,56 @@
                            this.alasan.trim().length > 0;
                 },
 
+                calculateEstimasi() {
+                    if (!this.jenisLembur) {
+                        this.estimasiNominal = 0;
+                        this.estimasiKeterangan = '';
+                        return;
+                    }
+
+                    const jenis = this.jenisLembur.toLowerCase();
+
+                    // 3. Piket Hari Kerja (Flat Rp 15.000)
+                    if (jenis.includes('piket') && jenis.includes('kerja')) {
+                        this.estimasiNominal = 15000;
+                        this.estimasiKeterangan = 'Tarif flat Rp 15.000 (tidak dihitung per jam)';
+                        return;
+                    }
+
+                    // Perhitungan berbasis jam jika jam_mulai dan jam_selesai terisi
+                    if (!this.jamMulai || !this.jamSelesai) {
+                        this.estimasiNominal = 0;
+                        this.estimasiKeterangan = 'Isi jam mulai & selesai untuk menghitung nominal';
+                        return;
+                    }
+
+                    const [hM, mM] = this.jamMulai.split(':').map(Number);
+                    const [hS, mS] = this.jamSelesai.split(':').map(Number);
+                    let diffMinutes = (hS * 60 + mS) - (hM * 60 + mM);
+                    if (diffMinutes < 0) {
+                        diffMinutes += 24 * 60; // Lintas hari
+                    }
+                    const hours = diffMinutes / 60;
+                    const hDisplay = Math.floor(diffMinutes / 60);
+                    const mDisplay = diffMinutes % 60;
+
+                    // 2. Piket Hari Libur (Rp 3.900 / jam)
+                    if (jenis.includes('piket') && (jenis.includes('libur') || jenis.includes('minggu') || jenis.includes('merah'))) {
+                        this.estimasiNominal = Math.round(hours * 3900);
+                        this.estimasiKeterangan = `${hDisplay} jam ${mDisplay} mnt x Rp 3.900/jam`;
+                        return;
+                    }
+
+                    // 1. Lembur Biasa (Rp 5.000 / jam)
+                    this.estimasiNominal = Math.round(hours * 5000);
+                    this.estimasiKeterangan = `${hDisplay} jam ${mDisplay} mnt x Rp 5.000/jam`;
+                },
+
                 init() {
                     if (this.tanggal) {
                         this.checkAttendance();
                     }
+                    this.calculateEstimasi();
                 },
 
                 async checkAttendance() {
