@@ -11,7 +11,7 @@
         .hh{position:relative;overflow:hidden;border-radius:24px;margin-bottom:24px;border:1px solid rgba(45,212,191,.15);box-shadow:0 10px 40px rgba(2,30,32,.35);background:radial-gradient(120% 140% at 0% 0%,#0b3a3d 0%,#07282b 45%,#051d20 100%);color:#fff;user-select:none}
         .hh-glow1{position:absolute;left:-90px;top:-90px;width:290px;height:290px;border-radius:50%;background:rgba(20,184,166,.12);filter:blur(60px);pointer-events:none}
         .hh-glow2{position:absolute;right:40px;bottom:0;width:320px;height:320px;border-radius:50%;background:rgba(52,211,153,.10);filter:blur(60px);pointer-events:none}
-        .hh-inner{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:32px 40px}
+        .hh-inner{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:36px 48px 0}.hh-left{padding-bottom:36px;align-self:center}
         .hh-left{min-width:0;flex:1}
         .hh-date{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(45,212,191,.10);border:1px solid rgba(94,234,212,.2);font-size:12px;font-weight:600;color:#99f6e4}
         .hh-hello{margin:20px 0 6px;font-size:12px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#5eead4}
@@ -25,30 +25,39 @@
         .hh-dot{width:6px;height:6px;border-radius:50%;background:#34d399}
         .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6,#0d9488);box-shadow:0 8px 20px rgba(13,148,136,.4)}
         .hh-cta:hover{filter:brightness(1.1)}
-        .hh-right{position:relative;flex:none;width:300px;height:340px;margin-right:24px}
-        .hh-ring{position:absolute;left:-12px;right:-12px;top:-12px;bottom:0;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.12)}
-        .hh-arch{position:absolute;left:12px;right:12px;top:32px;bottom:0;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 40%,#0f766e 100%)}
-        .hh-photo{position:absolute;left:12px;right:12px;top:32px;bottom:0;border-radius:999px 999px 0 0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
-        .hh-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+        .hh-right{position:relative;flex:none;width:400px;height:410px;margin-right:8px}
+        .hh-ring{position:absolute;left:-14px;right:-14px;top:0;bottom:0;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.12)}
+        .hh-arch{position:absolute;left:8px;right:8px;top:36px;bottom:0;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 40%,#0f766e 100%)}
+        .hh-photo{position:absolute;left:8px;right:8px;top:36px;bottom:0;border-radius:999px 999px 0 0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+        .hh-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transform:scale(1.22);transform-origin:50% 100%}
         .hh-initials{width:100%;height:100%;display:none;align-items:center;justify-content:center;font-size:72px;font-weight:800;color:rgba(255,255,255,.92)}
         .hh-initials.show{display:flex}
-        .hh-edit{position:absolute;top:0;right:-16px;z-index:3;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:600;color:#ccfbf1;text-decoration:none;backdrop-filter:blur(8px)}
-        .hh-edit:hover{background:rgba(0,0,0,.5)}
-        .hh-check{position:absolute;left:-56px;bottom:48px;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(7,40,43,.92);border:1px solid rgba(94,234,212,.2);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+        .hh-check{position:absolute;left:-30px;bottom:56px;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(7,40,43,.92);border:1px solid rgba(94,234,212,.2);box-shadow:0 12px 30px rgba(0,0,0,.4)}
         .hh-check .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.2)}
         .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#34d399;display:block}
         .hh-check.no .ic{background:rgba(245,158,11,.2)}
         .hh-check.no .ic i{background:#fbbf24}
         .hh-check b{display:block;font-size:12px;color:#fff}
         .hh-check small{display:block;font-size:10px;color:rgba(153,246,228,.7)}
+        @media (min-width:768px) and (max-width:1100px){
+            .hh-inner{padding:32px 28px 0}
+            .hh-right{width:320px;height:340px}
+        }
         @media (max-width:767px){
-            .hh-inner{flex-direction:column-reverse;align-items:stretch;padding:20px;gap:8px}
-            .hh-right{width:200px;height:230px;margin:0 auto}
-            .hh-photo,.hh-arch{top:24px}
-            .hh-edit{right:-24px}
-            .hh-check{left:-14px;bottom:28px}
+            .hh{border-radius:20px}
+            .hh-inner{flex-direction:column-reverse;align-items:stretch;padding:0;gap:0}
+            .hh-left{padding:4px 20px 24px;align-self:auto;text-align:center}
+            .hh-date{font-size:11px;padding:5px 12px}
+            .hh-hello{margin:14px 0 4px;font-size:11px}
+            .hh-name{font-size:clamp(32px,11vw,46px)}
+            .hh-sub{margin:10px auto 0;font-size:13px}
+            .hh-pills{justify-content:center}
+            .hh-cta{width:100%;justify-content:center;box-sizing:border-box}
+            .hh-right{width:100%;max-width:300px;height:290px;margin:0 auto}
+            .hh-ring{display:none}
+            .hh-arch,.hh-photo{top:24px;left:30px;right:30px}
+            .hh-check{left:50%;transform:translateX(-50%);bottom:10px;white-space:nowrap}
             .hh-initials{font-size:56px}
-            .hh-name{font-size:clamp(30px,10vw,44px)}
         }
     </style>
     <div class="hh">
@@ -98,10 +107,6 @@
                         <div class="hh-initials show">{{ $user->initials }}</div>
                     @endif
                 </div>
-                <a href="{{ route('portal.profile') }}" class="hh-edit">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                    Ganti foto
-                </a>
                 <div class="hh-check {{ $clockInTime ? '' : 'no' }}">
                     <span class="ic"><i></i></span>
                     <div>
