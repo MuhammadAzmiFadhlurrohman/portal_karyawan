@@ -1,5 +1,5 @@
 <x-layouts.app title="Dashboard Operasional &amp; Statistik">
-    <!-- Hero Welcome Banner (Dark Teal, with Employee Photo Arch) -->
+    <!-- Hero Welcome Banner (self-contained CSS so it never depends on compiled Tailwind) -->
     @php
         $nameParts = preg_split('/\s+/', trim($user->name), 2);
         $firstName = $nameParts[0] ?? $user->name;
@@ -7,113 +7,106 @@
         $clockInTime = $metrics['attendance_today']['clock_in_time'] ?? null;
         $scopeType = $stats['scope']['type'] ?? 'self';
     @endphp
-    <div class="mb-6 relative overflow-hidden rounded-3xl border border-teal-400/15 shadow-[0_10px_40px_rgba(2,30,32,0.35)] select-none"
-         style="background: radial-gradient(120% 140% at 0% 0%, #0b3a3d 0%, #07282b 45%, #051d20 100%);">
-
-        <!-- Ambient glows -->
-        <div class="absolute -left-24 -top-24 w-72 h-72 rounded-full bg-teal-500/10 blur-3xl pointer-events-none"></div>
-        <div class="absolute right-10 bottom-0 w-80 h-80 rounded-full bg-emerald-400/10 blur-3xl pointer-events-none"></div>
-        <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-300/40 to-transparent pointer-events-none"></div>
-
-        <div class="relative z-10 grid grid-cols-1 md:grid-cols-[1fr_auto] items-center gap-4 md:gap-8">
-            <!-- LEFT: Greeting -->
-            <div class="p-5 sm:p-8 md:pr-0 min-w-0 order-2 md:order-1">
-                <!-- Live date pill -->
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-400/10 border border-teal-300/15 text-[11px] sm:text-xs font-semibold text-teal-200">
-                    <svg class="w-3.5 h-3.5 text-teal-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span id="hub-live-clock" data-initial="{{ now('Asia/Jakarta')->translatedFormat('l, d F Y · H:i:s') }} WIB">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y · H:i:s') }} WIB</span>
+    <style>
+        .hh{position:relative;overflow:hidden;border-radius:24px;margin-bottom:24px;border:1px solid rgba(45,212,191,.15);box-shadow:0 10px 40px rgba(2,30,32,.35);background:radial-gradient(120% 140% at 0% 0%,#0b3a3d 0%,#07282b 45%,#051d20 100%);color:#fff;user-select:none}
+        .hh-glow1{position:absolute;left:-90px;top:-90px;width:290px;height:290px;border-radius:50%;background:rgba(20,184,166,.12);filter:blur(60px);pointer-events:none}
+        .hh-glow2{position:absolute;right:40px;bottom:0;width:320px;height:320px;border-radius:50%;background:rgba(52,211,153,.10);filter:blur(60px);pointer-events:none}
+        .hh-inner{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:32px 40px}
+        .hh-left{min-width:0;flex:1}
+        .hh-date{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(45,212,191,.10);border:1px solid rgba(94,234,212,.2);font-size:12px;font-weight:600;color:#99f6e4}
+        .hh-hello{margin:20px 0 6px;font-size:12px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#5eead4}
+        .hh-name{margin:0;font-weight:800;text-transform:uppercase;line-height:.98;letter-spacing:-.02em;font-size:clamp(34px,5vw,60px)}
+        .hh-name .a{display:block;color:#fff}
+        .hh-name .b{display:block;color:#14b8a6;background:linear-gradient(90deg,#5eead4,#10b981);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+        .hh-sub{margin:12px 0 0;font-size:14px;line-height:1.6;color:rgba(204,251,241,.75);max-width:440px}
+        .hh-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+        .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(0,0,0,.28);color:#ccfbf1;border:1px solid rgba(255,255,255,.12)}
+        .hh-pill.ok{background:rgba(52,211,153,.12);color:#6ee7b7;border-color:rgba(52,211,153,.3);font-weight:700}
+        .hh-dot{width:6px;height:6px;border-radius:50%;background:#34d399}
+        .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6,#0d9488);box-shadow:0 8px 20px rgba(13,148,136,.4)}
+        .hh-cta:hover{filter:brightness(1.1)}
+        .hh-right{position:relative;flex:none;width:300px;height:340px;margin-right:24px}
+        .hh-ring{position:absolute;left:-12px;right:-12px;top:-12px;bottom:0;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.12)}
+        .hh-arch{position:absolute;left:12px;right:12px;top:32px;bottom:0;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 40%,#0f766e 100%)}
+        .hh-photo{position:absolute;left:12px;right:12px;top:32px;bottom:0;border-radius:999px 999px 0 0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+        .hh-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+        .hh-initials{width:100%;height:100%;display:none;align-items:center;justify-content:center;font-size:72px;font-weight:800;color:rgba(255,255,255,.92)}
+        .hh-initials.show{display:flex}
+        .hh-edit{position:absolute;top:0;right:-16px;z-index:3;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:600;color:#ccfbf1;text-decoration:none;backdrop-filter:blur(8px)}
+        .hh-edit:hover{background:rgba(0,0,0,.5)}
+        .hh-check{position:absolute;left:-56px;bottom:48px;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(7,40,43,.92);border:1px solid rgba(94,234,212,.2);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+        .hh-check .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.2)}
+        .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#34d399;display:block}
+        .hh-check.no .ic{background:rgba(245,158,11,.2)}
+        .hh-check.no .ic i{background:#fbbf24}
+        .hh-check b{display:block;font-size:12px;color:#fff}
+        .hh-check small{display:block;font-size:10px;color:rgba(153,246,228,.7)}
+        @media (max-width:767px){
+            .hh-inner{flex-direction:column-reverse;align-items:stretch;padding:20px;gap:8px}
+            .hh-right{width:200px;height:230px;margin:0 auto}
+            .hh-photo,.hh-arch{top:24px}
+            .hh-edit{right:-24px}
+            .hh-check{left:-14px;bottom:28px}
+            .hh-initials{font-size:56px}
+            .hh-name{font-size:clamp(30px,10vw,44px)}
+        }
+    </style>
+    <div class="hh">
+        <div class="hh-glow1"></div>
+        <div class="hh-glow2"></div>
+        <div class="hh-inner">
+            <div class="hh-left">
+                <div class="hh-date">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span id="hub-live-clock">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y · H:i:s') }} WIB</span>
                 </div>
-
-                <p class="mt-4 sm:mt-5 text-[11px] sm:text-xs font-bold tracking-[0.25em] text-teal-300/90 uppercase flex items-center gap-1.5">
-                    Selamat Datang <span class="tracking-normal">👋</span>
-                </p>
-
-                <h1 class="font-heading mt-1.5 font-extrabold uppercase leading-[0.95] tracking-tight text-3xl sm:text-5xl lg:text-6xl">
-                    <span class="block text-white truncate">{{ $firstName }}</span>
+                <p class="hh-hello">Selamat Datang 👋</p>
+                <h1 class="hh-name">
+                    <span class="a">{{ $firstName }}</span>
                     @if ($restName !== '')
-                        <span class="block bg-gradient-to-r from-teal-300 to-emerald-500 bg-clip-text text-transparent pb-1 break-words">{{ $restName }}</span>
+                        <span class="b">{{ $restName }}</span>
                     @endif
                 </h1>
-
-                <p class="mt-3 text-xs sm:text-sm text-teal-100/70 leading-relaxed max-w-md">
-                    {{ $stats['scope']['subtitle'] }}
-                </p>
-
-                <!-- Info pills -->
-                <div class="mt-4 flex flex-wrap items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-400/10 text-emerald-300 border border-emerald-400/25">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $user->is_active ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400' }}"></span>
-                        {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
-                    </span>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-black/25 text-teal-100 border border-white/10">
-                        NIK: {{ $user->employee_code ?? 'MSN' }}
-                    </span>
+                <p class="hh-sub">{{ $stats['scope']['subtitle'] }}</p>
+                <div class="hh-pills">
+                    <span class="hh-pill ok"><span class="hh-dot" style="{{ $user->is_active ? '' : 'background:#fb7185' }}"></span>{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    <span class="hh-pill">NIK: {{ $user->employee_code ?? 'MSN' }}</span>
                     @if ($user->division)
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-black/25 text-teal-100 border border-white/10">
-                            {{ $user->division }}
-                        </span>
+                        <span class="hh-pill">{{ $user->division }}</span>
                     @endif
                 </div>
-
-                <!-- Scope badge as CTA -->
-                <div class="mt-5">
-                    <a href="{{ route('portal.profile') }}"
-                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-[13px] font-bold text-white shadow-lg shadow-teal-900/40 hover:brightness-110 transition"
-                       style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);">
-                        @if ($scopeType === 'company')
-                            🏢 {{ $stats['scope']['badge'] ?? 'Seluruh Perusahaan' }}
-                        @elseif ($scopeType === 'division')
-                            👥 {{ $stats['scope']['badge'] }}
-                        @else
-                            📊 Statistik Pribadi
-                        @endif
-                    </a>
-                </div>
+                <a href="{{ route('portal.profile') }}" class="hh-cta">
+                    @if ($scopeType === 'company')
+                        🏢 {{ $stats['scope']['badge'] ?? 'Seluruh Perusahaan' }}
+                    @elseif ($scopeType === 'division')
+                        👥 {{ $stats['scope']['badge'] }}
+                    @else
+                        📊 Statistik Pribadi
+                    @endif
+                </a>
             </div>
 
-            <!-- RIGHT: Photo Arch -->
-            <div class="order-1 md:order-2 relative flex justify-center md:justify-end px-5 pt-5 md:p-0">
-                <div class="relative w-44 h-52 sm:w-56 sm:h-64 md:w-72 md:h-[21rem] md:mr-10">
-                    <!-- Decorative ring -->
-                    <div class="absolute -inset-3 rounded-t-full border border-teal-300/10 pointer-events-none"></div>
-                    <span class="absolute -top-1 -left-3 w-2.5 h-2.5 rounded-full bg-violet-400 shadow-[0_0_12px_rgba(167,139,250,0.8)] hidden md:block"></span>
-
-                    <!-- Arch background -->
-                    <div class="absolute inset-x-3 bottom-0 top-8 rounded-t-full overflow-hidden"
-                         style="background: linear-gradient(180deg, #2dd4bf 0%, #14b8a6 40%, #0f766e 100%);">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    </div>
-
-                    <!-- Photo -->
-                    <div class="absolute inset-x-3 bottom-0 top-0 rounded-b-none overflow-hidden flex items-end justify-center" style="clip-path: inset(0 0 0 0 round 9999px 9999px 0 0);">
-                        @if ($user->avatar_url)
-                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
-                                 class="w-full h-full object-cover object-top"
-                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                            <div style="display:none;" class="w-full h-full items-center justify-center text-6xl font-extrabold text-white/90">{{ $user->initials }}</div>
-                        @else
-                            <div class="w-full h-full flex items-center justify-center text-6xl md:text-7xl font-extrabold text-white/90">{{ $user->initials }}</div>
-                        @endif
-                    </div>
-
-                    <!-- Ganti foto -->
-                    <a href="{{ route('portal.profile') }}"
-                       class="absolute -top-1 right-0 md:-right-4 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/30 hover:bg-black/45 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-teal-100 transition">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                        Ganti foto
-                    </a>
-
-                    <!-- Floating check-in card -->
-                    <div class="absolute -left-2 sm:-left-6 md:-left-14 bottom-8 md:bottom-12 z-20 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl bg-[#07282b]/90 backdrop-blur-md border border-teal-300/20 shadow-xl">
-                        <span class="w-6 h-6 rounded-full flex items-center justify-center {{ $clockInTime ? 'bg-emerald-500/20' : 'bg-amber-500/20' }}">
-                            <span class="w-2.5 h-2.5 rounded-full {{ $clockInTime ? 'bg-emerald-400' : 'bg-amber-400' }}"></span>
-                        </span>
-                        <div class="leading-tight">
-                            <span class="block text-[11px] sm:text-xs font-bold text-white">
-                                {{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Check-in' }}
-                            </span>
-                            <span class="block text-[10px] text-teal-200/70">{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada absen hari ini' }}</span>
-                        </div>
+            <div class="hh-right">
+                <div class="hh-ring"></div>
+                <div class="hh-arch"></div>
+                <div class="hh-photo">
+                    @if ($user->avatar_url)
+                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
+                             onerror="this.style.display='none'; this.nextElementSibling.classList.add('show');">
+                        <div class="hh-initials">{{ $user->initials }}</div>
+                    @else
+                        <div class="hh-initials show">{{ $user->initials }}</div>
+                    @endif
+                </div>
+                <a href="{{ route('portal.profile') }}" class="hh-edit">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                    Ganti foto
+                </a>
+                <div class="hh-check {{ $clockInTime ? '' : 'no' }}">
+                    <span class="ic"><i></i></span>
+                    <div>
+                        <b>{{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Check-in' }}</b>
+                        <small>{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada absen hari ini' }}</small>
                     </div>
                 </div>
             </div>
@@ -125,12 +118,11 @@
             if (!el) return;
             var days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
             var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-            function pad(n) { return String(n).padStart(2, '0'); }
             function tick() {
                 var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Jakarta', hour12: false, year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short' }).formatToParts(new Date());
                 var m = {}; parts.forEach(function (p) { m[p.type] = p.value; });
                 var dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(m.weekday);
-                el.textContent = days[dow] + ', ' + pad(m.day) + ' ' + months[parseInt(m.month, 10) - 1] + ' ' + m.year + ' · ' + m.hour + ':' + m.minute + ':' + m.second + ' WIB';
+                el.textContent = days[dow] + ', ' + String(m.day).padStart(2, '0') + ' ' + months[parseInt(m.month, 10) - 1] + ' ' + m.year + ' · ' + m.hour + ':' + m.minute + ':' + m.second + ' WIB';
             }
             tick(); setInterval(tick, 1000);
         })();
