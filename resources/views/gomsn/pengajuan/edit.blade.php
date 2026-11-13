@@ -116,99 +116,83 @@
                     <input type="hidden" name="jenis" :value="jenis">
 
                     <!-- 4 Sleek Selection Cards (Always 1 Single Row, 4 Columns across all screen sizes) -->
-                    <div class="grid grid-cols-4 gap-2 sm:gap-3">
+                    <div class="grid grid-cols-4 gap-2 sm:gap-3.5">
                         <!-- Card 1: Stok -->
                         <button type="button" @click="selectJenis('STOK')"
                                 :class="jenis === 'STOK'
-                                    ? 'border-[#0D9488] bg-gradient-to-b from-teal-50/90 via-cyan-50/30 to-white ring-2 ring-[#0D9488]/25 shadow-xs'
-                                    : 'border-slate-200/90 bg-slate-50/40 hover:bg-white hover:border-slate-300'"
-                                class="relative py-2.5 px-1 sm:py-3.5 sm:px-3 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[76px] sm:min-h-[88px]">
-                            <span x-show="jenis === 'STOK'" class="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                            </span>
-                            <div :class="jenis === 'STOK' ? 'bg-gradient-to-br from-[#0e6774] to-[#0D9488] text-white shadow-xs' : 'bg-white border border-slate-200/80 text-slate-500 group-hover:text-teal-700 group-hover:border-teal-200'"
-                                 class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all mb-1 sm:mb-1.5 shrink-0">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    ? 'border-2 border-[#0D9488] bg-teal-50/60 ring-2 ring-[#0D9488]/15 shadow-xs'
+                                    : 'border border-slate-200/90 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-2xs'"
+                                class="relative py-3 px-1.5 sm:py-4 sm:px-3 rounded-xl sm:rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[78px] sm:min-h-[88px]">
+                            <div :class="jenis === 'STOK' ? 'text-[#0D9488] scale-110' : 'text-slate-400 group-hover:text-teal-700'"
+                                 class="transition-all duration-150 mb-1.5 sm:mb-2 flex items-center justify-center">
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                 </svg>
                             </div>
-                            <span :class="jenis === 'STOK' ? 'text-teal-950 font-extrabold' : 'text-slate-800 font-bold'" class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
+                            <span :class="jenis === 'STOK' ? 'text-teal-950 font-extrabold' : 'text-slate-700 font-bold'"
+                                  class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
                                 Stok
                             </span>
-                            <span class="hidden sm:block text-[10px] md:text-[11px] text-slate-400 font-medium leading-tight mt-0.5 truncate w-full">
-                                Gudang
-                            </span>
                             <span class="sr-only">Stok Gudang</span>
+                            <div x-show="jenis === 'STOK'" class="absolute bottom-0 inset-x-3 sm:inset-x-5 h-1 bg-[#0D9488] rounded-t-full"></div>
                         </button>
 
                         <!-- Card 2: Beli -->
                         <button type="button" @click="selectJenis('BELI')"
                                 :class="jenis === 'BELI'
-                                    ? 'border-[#0D9488] bg-gradient-to-b from-teal-50/90 via-cyan-50/30 to-white ring-2 ring-[#0D9488]/25 shadow-xs'
-                                    : 'border-slate-200/90 bg-slate-50/40 hover:bg-white hover:border-slate-300'"
-                                class="relative py-2.5 px-1 sm:py-3.5 sm:px-3 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[76px] sm:min-h-[88px]">
-                            <span x-show="jenis === 'BELI'" class="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                            </span>
-                            <div :class="jenis === 'BELI' ? 'bg-gradient-to-br from-[#0e6774] to-[#0D9488] text-white shadow-xs' : 'bg-white border border-slate-200/80 text-slate-500 group-hover:text-teal-700 group-hover:border-teal-200'"
-                                 class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all mb-1 sm:mb-1.5 shrink-0">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    ? 'border-2 border-[#0D9488] bg-teal-50/60 ring-2 ring-[#0D9488]/15 shadow-xs'
+                                    : 'border border-slate-200/90 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-2xs'"
+                                class="relative py-3 px-1.5 sm:py-4 sm:px-3 rounded-xl sm:rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[78px] sm:min-h-[88px]">
+                            <div :class="jenis === 'BELI' ? 'text-[#0D9488] scale-110' : 'text-slate-400 group-hover:text-teal-700'"
+                                 class="transition-all duration-150 mb-1.5 sm:mb-2 flex items-center justify-center">
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
                             </div>
-                            <span :class="jenis === 'BELI' ? 'text-teal-950 font-extrabold' : 'text-slate-800 font-bold'" class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
+                            <span :class="jenis === 'BELI' ? 'text-teal-950 font-extrabold' : 'text-slate-700 font-bold'"
+                                  class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
                                 Beli
                             </span>
-                            <span class="hidden sm:block text-[10px] md:text-[11px] text-slate-400 font-medium leading-tight mt-0.5 truncate w-full">
-                                Pengadaan
-                            </span>
+                            <div x-show="jenis === 'BELI'" class="absolute bottom-0 inset-x-3 sm:inset-x-5 h-1 bg-[#0D9488] rounded-t-full"></div>
                         </button>
 
                         <!-- Card 3: Permintaan -->
                         <button type="button" @click="selectJenis('PERMINTAAN')"
                                 :class="jenis === 'PERMINTAAN'
-                                    ? 'border-[#0D9488] bg-gradient-to-b from-teal-50/90 via-cyan-50/30 to-white ring-2 ring-[#0D9488]/25 shadow-xs'
-                                    : 'border-slate-200/90 bg-slate-50/40 hover:bg-white hover:border-slate-300'"
-                                class="relative py-2.5 px-1 sm:py-3.5 sm:px-3 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[76px] sm:min-h-[88px]">
-                            <span x-show="jenis === 'PERMINTAAN'" class="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                            </span>
-                            <div :class="jenis === 'PERMINTAAN' ? 'bg-gradient-to-br from-[#0e6774] to-[#0D9488] text-white shadow-xs' : 'bg-white border border-slate-200/80 text-slate-500 group-hover:text-teal-700 group-hover:border-teal-200'"
-                                 class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all mb-1 sm:mb-1.5 shrink-0">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    ? 'border-2 border-[#0D9488] bg-teal-50/60 ring-2 ring-[#0D9488]/15 shadow-xs'
+                                    : 'border border-slate-200/90 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-2xs'"
+                                class="relative py-3 px-1.5 sm:py-4 sm:px-3 rounded-xl sm:rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[78px] sm:min-h-[88px]">
+                            <div :class="jenis === 'PERMINTAAN' ? 'text-[#0D9488] scale-110' : 'text-slate-400 group-hover:text-teal-700'"
+                                 class="transition-all duration-150 mb-1.5 sm:mb-2 flex items-center justify-center">
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
                                 </svg>
                             </div>
-                            <span :class="jenis === 'PERMINTAAN' ? 'text-teal-950 font-extrabold' : 'text-slate-800 font-bold'" class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
+                            <span :class="jenis === 'PERMINTAAN' ? 'text-teal-950 font-extrabold' : 'text-slate-800 font-bold'"
+                                  class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
                                 Permintaan
                             </span>
-                            <span class="hidden sm:block text-[10px] md:text-[11px] text-slate-400 font-medium leading-tight mt-0.5 truncate w-full">
-                                Permohonan
-                            </span>
+                            <div x-show="jenis === 'PERMINTAAN'" class="absolute bottom-0 inset-x-3 sm:inset-x-5 h-1 bg-[#0D9488] rounded-t-full"></div>
                         </button>
 
                         <!-- Card 4: Dana -->
                         <button type="button" @click="selectJenis('DANA')"
                                 :class="jenis === 'DANA'
-                                    ? 'border-[#0D9488] bg-gradient-to-b from-teal-50/90 via-cyan-50/30 to-white ring-2 ring-[#0D9488]/25 shadow-xs'
-                                    : 'border-slate-200/90 bg-slate-50/40 hover:bg-white hover:border-slate-300'"
-                                class="relative py-2.5 px-1 sm:py-3.5 sm:px-3 rounded-xl sm:rounded-2xl border flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[76px] sm:min-h-[88px]">
-                            <span x-show="jenis === 'DANA'" class="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-[#0D9488] text-white flex items-center justify-center shadow-2xs">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                            </span>
-                            <div :class="jenis === 'DANA' ? 'bg-gradient-to-br from-[#0e6774] to-[#0D9488] text-white shadow-xs' : 'bg-white border border-slate-200/80 text-slate-500 group-hover:text-teal-700 group-hover:border-teal-200'"
-                                 class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all mb-1 sm:mb-1.5 shrink-0">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    ? 'border-2 border-[#0D9488] bg-teal-50/60 ring-2 ring-[#0D9488]/15 shadow-xs'
+                                    : 'border border-slate-200/90 bg-white hover:border-slate-300 hover:bg-slate-50/60 shadow-2xs'"
+                                class="relative py-3 px-1.5 sm:py-4 sm:px-3 rounded-xl sm:rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-150 cursor-pointer group active:scale-[0.98] select-none min-h-[78px] sm:min-h-[88px]">
+                            <div :class="jenis === 'DANA' ? 'text-[#0D9488] scale-110' : 'text-slate-400 group-hover:text-teal-700'"
+                                 class="transition-all duration-150 mb-1.5 sm:mb-2 flex items-center justify-center">
+                                <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
                             </div>
-                            <span :class="jenis === 'DANA' ? 'text-teal-950 font-extrabold' : 'text-slate-800 font-bold'" class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
+                            <span :class="jenis === 'DANA' ? 'text-teal-950 font-extrabold' : 'text-slate-800 font-bold'"
+                                  class="text-[11px] sm:text-xs md:text-sm block tracking-tight leading-tight whitespace-nowrap truncate w-full px-0.5">
                                 Dana
                             </span>
-                            <span class="hidden sm:block text-[10px] md:text-[11px] text-slate-400 font-medium leading-tight mt-0.5 truncate w-full">
-                                Kasbon
-                            </span>
                             <span class="sr-only">Dana Kasbon</span>
+                            <div x-show="jenis === 'DANA'" class="absolute bottom-0 inset-x-3 sm:inset-x-5 h-1 bg-[#0D9488] rounded-t-full"></div>
                         </button>
                     </div>
                 </div>
