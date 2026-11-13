@@ -322,6 +322,7 @@
                         </a>
                         @endif
 
+                        @if (! $navIsHrdOnly)
                         <a href="{{ route('gomsn.overtime.index') }}"
                            @if (request()->routeIs('gomsn.overtime.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.overtime.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -337,6 +338,7 @@
                             <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
+                        @endif
 
                         <!-- 4. Stok Barang Kantor (Khusus Finance & Admin) -->
                         @if ($navIsFinance)
@@ -490,6 +492,7 @@
                             @endif
                         </a>
 
+                        @if (! $isHrdRole)
                         <a href="{{ route('attendance.leaderboard') }}"
                            @if (request()->routeIs('attendance.leaderboard')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaderboard') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -499,6 +502,7 @@
                             <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
+                        @endif
 
                         @if ($canViewEmployeeRecap)
                             @if ($isHrdRole)
@@ -520,9 +524,8 @@
                                 <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                                 @endif
                             </a>
-                            @endif
 
-                            <!-- Absen Karyawan (Khusus HRD / Admin) -->
+                            <!-- Absen Karyawan -->
                             <a href="{{ route('attendance.employee-recap') }}"
                                @if (request()->routeIs('attendance.employee-recap*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                                class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.employee-recap*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -532,47 +535,47 @@
                                 <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                                 @endif
                             </a>
+
+                            <!-- Lembur Karyawan -->
+                            <a href="{{ route('gomsn.overtime.index') }}"
+                               @if (request()->routeIs('gomsn.overtime.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                               class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.overtime.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Lembur Karyawan</span>
+                                </div>
+                                @if ($navPendingLemburCount > 0)
+                                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
+                                    {{ $navPendingLemburCount }}
+                                </span>
+                                @elseif (request()->routeIs('gomsn.overtime.*'))
+                                <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                                @endif
+                            </a>
+
+                            <!-- Leaderboard Disiplin Karyawan -->
+                            <a href="{{ route('attendance.leaderboard') }}"
+                               @if (request()->routeIs('attendance.leaderboard')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                               class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaderboard') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                <span>Leaderboard</span>
+                                @if (request()->routeIs('attendance.leaderboard'))
+                                <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                                @endif
+                            </a>
+                            @else
+                            <!-- Absen Karyawan (Khusus Admin Non-HRD) -->
+                            <a href="{{ route('attendance.employee-recap') }}"
+                               @if (request()->routeIs('attendance.employee-recap*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                               class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.employee-recap*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                <span>Absen Karyawan</span>
+                                @if (request()->routeIs('attendance.employee-recap*'))
+                                <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                                @endif
+                            </a>
+                            @endif
                         @endif
-
-                        <a href="{{ route('attendance.schedules') }}"
-                           @if (request()->routeIs('attendance.schedules', 'attendance.swaps*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.schedules', 'attendance.swaps*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>Jadwal Kerja</span>
-                            @if (request()->routeIs('attendance.schedules', 'attendance.swaps*'))
-                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
-                            @endif
-                        </a>
-
-                        <a href="{{ route('attendance.leaves') }}"
-                           @if (request()->routeIs('attendance.leaves')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaves') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                            <span>Cuti &amp; Izin</span>
-                            @if (request()->routeIs('attendance.leaves'))
-                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
-                            @endif
-                        </a>
-
-                        <a href="{{ route('attendance.deductions') }}"
-                           @if (request()->routeIs('attendance.deductions')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.deductions') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Keuangan Absen</span>
-                            @if (request()->routeIs('attendance.deductions'))
-                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
-                            @endif
-                        </a>
-
-                        <a href="{{ route('attendance.leaderboard') }}"
-                           @if (request()->routeIs('attendance.leaderboard')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaderboard') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                            <span>Leaderboard</span>
-                            @if (request()->routeIs('attendance.leaderboard'))
-                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
-                            @endif
-                        </a>
                     </div>
                 </div>
 
@@ -1644,6 +1647,7 @@
                             </div>
                         </a>
 
+                        @if (! $navIsHrd)
                         <a href="{{ route('attendance.leaderboard') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-purple-400 hover:bg-purple-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
@@ -1653,6 +1657,7 @@
                                 <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Peringkat Disiplin</span>
                             </div>
                         </a>
+                        @endif
 
                         <a href="{{ route('attendance.swaps') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
@@ -1692,7 +1697,7 @@
 
                 @if ($navIsHrd)
                 <!-- KATEGORI KHUSUS HRD: KELOLA KARYAWAN -->
-                <div x-show="!sheetSearch || 'karyawan absen karyawan data staff tim rekap potongan izin cuti'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
+                <div x-show="!sheetSearch || 'karyawan absen karyawan data staff tim rekap potongan lembur spk leaderboard peringkat disiplin'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-teal-500 to-emerald-500"></span>
@@ -1721,6 +1726,35 @@
                             <div class="min-w-0">
                                 <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Absen Karyawan</span>
                                 <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Rekap &amp; Potongan</span>
+                            </div>
+                        </a>
+
+                        <!-- Lembur Karyawan -->
+                        <a href="{{ route('gomsn.overtime.index') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Lembur Karyawan</span>
+                                    <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Pengajuan &amp; SPK</span>
+                                </div>
+                            </div>
+                            @if ($navPendingLemburCount > 0)
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
+                                {{ $navPendingLemburCount }}
+                            </span>
+                            @endif
+                        </a>
+
+                        <!-- Leaderboard Disiplin Karyawan -->
+                        <a href="{{ route('attendance.leaderboard') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Leaderboard</span>
+                                <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Peringkat Disiplin</span>
                             </div>
                         </a>
                     </div>
