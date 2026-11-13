@@ -60,36 +60,36 @@
             .hh-check{left:-25px;bottom:18px}
         }
         @media (max-width:767px){
-            .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:560px}
-            .hh-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:20px 18px 18px;gap:0;min-height:560px}
-            .hh-left{position:relative;z-index:3;padding:0;align-self:stretch;text-align:left;max-width:62%}
-            .hh-top-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;z-index:4}
-            .hh-date{font-size:11px;padding:5px 12px}
-            .hh-mobile-dots{display:flex;align-items:center;justify-content:center;padding-right:2px}
+            .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:540px}
+            .hh-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:16px 16px 16px;gap:0;min-height:540px}
+            .hh-left{position:relative;z-index:3;padding:0;align-self:stretch;text-align:left;max-width:56%}
+            .hh-top-bar{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;z-index:4;margin-bottom:12px}
+            .hh-date{font-size:11px;padding:5px 12px;line-height:1.25;max-width:calc(100% - 40px);white-space:normal;display:inline-flex}
+            .hh-mobile-dots{display:flex;align-items:center;justify-content:center;padding-top:4px;padding-right:2px}
             .hh-mobile-dots .dots-grid{display:grid;grid-template-columns:repeat(2,4.5px);gap:5.5px}
             .hh-mobile-dots span{width:4.5px;height:4.5px;border-radius:50%;background:#5eead4;opacity:.9;box-shadow:0 0 6px rgba(94,234,212,.7)}
-            .hh-hello-wrap{margin:48px 0 4px;gap:8px}
+            .hh-hello-wrap{margin:6px 0 4px;gap:8px}
             .hh-hello{font-size:11px;letter-spacing:.22em;color:#fff}
             .hh-hello-line{width:28px;height:2.5px}
-            .hh-name{font-size:clamp(26px,7.5vw,36px);line-height:1.02}
-            .hh-sub{margin:8px 0 0;font-size:11.5px;line-height:1.45}
+            .hh-name{font-size:clamp(25px,7.5vw,34px);line-height:1.05}
+            .hh-sub{margin:8px 0 0;font-size:11.5px;line-height:1.42;max-width:100%}
             .hh-pills{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:14px}
             .hh-pill{font-size:11px;padding:5px 12px;border-radius:999px;width:auto}
-            .hh-cta{display:inline-flex;width:auto;align-self:flex-start;margin-top:14px;padding:10px 18px;font-size:11.5px;border-radius:999px}
+            .hh-cta{display:inline-flex;width:auto;align-self:flex-start;margin-top:14px;padding:9px 18px;font-size:11.5px;border-radius:999px}
             .hh-cta svg:last-child{margin-left:6px}
             
             /* Right Arch & Employee cutout on Mobile right side */
-            .hh-right{position:absolute;right:0;top:0;bottom:0;width:58%;height:100%;margin:0;align-self:auto;display:flex;align-items:flex-end;justify-content:flex-end;pointer-events:none;z-index:2;overflow:hidden}
-            .hh-circle-layer{position:absolute;right:-18px;top:70px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 50%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.3)}
-            .hh-circle-ring{position:absolute;right:-32px;top:54px;bottom:0;left:auto;transform:none;width:220px;height:auto;border-radius:999px 999px 0 0;border:1.5px solid rgba(94,234,212,.35)}
-            .hh-arc-overlay{position:absolute;right:-48px;top:38px;bottom:0;left:auto;transform:none;width:250px;height:auto;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.18)}
-            .hh-flare{left:auto;right:180px;top:150px;width:6px;height:6px}
-            .hh-photo{position:absolute;right:-15px;left:auto;bottom:-20px;width:235px;height:440px;display:flex;align-items:flex-end;justify-content:center}
-            .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;transform:scale(1.08);transform-origin:50% 100%}
-            .hh-initials{position:absolute;right:-18px;top:70px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;font-size:62px}
+            .hh-right{position:absolute;right:0;top:0;bottom:75px;width:60%;height:auto;margin:0;align-self:auto;display:flex;align-items:flex-end;justify-content:flex-end;pointer-events:none;z-index:2;overflow:hidden}
+            .hh-circle-layer{position:absolute;right:-14px;top:65px;bottom:0;left:auto;transform:none;width:195px;height:auto;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 50%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.3)}
+            .hh-circle-ring{position:absolute;right:-28px;top:48px;bottom:0;left:auto;transform:none;width:225px;height:auto;border-radius:999px 999px 0 0;border:1.5px solid rgba(94,234,212,.35)}
+            .hh-arc-overlay{position:absolute;right:-44px;top:32px;bottom:0;left:auto;transform:none;width:255px;height:auto;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.18)}
+            .hh-flare{left:auto;right:185px;top:140px;width:6px;height:6px}
+            .hh-photo{position:absolute;right:-10px;left:auto;bottom:0;width:235px;height:420px;display:flex;align-items:flex-end;justify-content:center}
+            .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;transform:scale(1.1);transform-origin:50% 100%}
+            .hh-initials{position:absolute;right:-14px;top:65px;bottom:0;left:auto;transform:none;width:195px;height:auto;border-radius:999px 999px 0 0;font-size:62px}
             
             /* Check-in floating pill card pinned at full width on the bottom */
-            .hh-check{position:relative;left:auto;right:auto;bottom:auto;transform:none;margin:20px 0 0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:4}
+            .hh-check{position:relative;left:auto;right:auto;bottom:auto;transform:none;margin:18px 0 0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:4}
             .hh-check .ic{width:34px;height:34px}
             .hh-check .ic i{width:14px;height:14px}
             .hh-check b{font-size:12.5px}
