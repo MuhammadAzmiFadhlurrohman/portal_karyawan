@@ -67,37 +67,32 @@
             .hh-check{left:-8px;bottom:16px;padding:8px 13px;border-radius:14px}
             .hh-initials{font-size:52px}
         }
-        /* Slide-in Entrance Animations on Dashboard Load */
-        @keyframes hubHeroIn{0%{opacity:0;transform:translateY(18px) scale(.99)}100%{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes hubSlideLeft{0%{opacity:0;transform:translateX(-28px)}100%{opacity:1;transform:translateX(0)}}
-        @keyframes hubArchUp{0%{opacity:0;transform:translateY(44px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes hubPhotoUp{0%{opacity:0;transform:translateY(48px)}100%{opacity:1;transform:translateY(0)}}
-        @keyframes hubBadgePop{0%{opacity:0;transform:translate(-18px,14px) scale(.92)}100%{opacity:1;transform:translate(0,0) scale(1)}}
-        @keyframes hubCardUp{0%{opacity:0;transform:translateY(26px)}100%{opacity:1;transform:translateY(0)}}
-        .hh{animation:hubHeroIn .55s cubic-bezier(.22,1,.36,1) both}
-        .hh-date{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .06s both}
-        .hh-hello{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .12s both}
-        .hh-name{animation:hubSlideLeft .6s cubic-bezier(.22,1,.36,1) .18s both}
-        .hh-sub{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .24s both}
-        .hh-pills{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .30s both}
-        .hh-cta{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .36s both}
-        .hh-ring{animation:hubArchUp .65s cubic-bezier(.22,1,.36,1) .12s both;transform-origin:50% 100%}
-        .hh-arch{animation:hubArchUp .65s cubic-bezier(.22,1,.36,1) .16s both;transform-origin:50% 100%}
-        .hh-photo{animation:hubPhotoUp .75s cubic-bezier(.16,1,.3,1) .24s both}
-        .hh-check{animation:hubBadgePop .6s cubic-bezier(.22,1,.36,1) .42s both}
-        .hub-anim-section{animation:hubCardUp .6s cubic-bezier(.22,1,.36,1) both}
-        .hub-anim-d1{animation-delay:.18s}
-        .hub-anim-d2{animation-delay:.28s}
-        .hub-anim-d3{animation-delay:.38s}
-        .hub-anim-d4{animation-delay:.46s}
-        .hub-stagger > *{animation:hubCardUp .58s cubic-bezier(.22,1,.36,1) both}
-        .hub-stagger > *:nth-child(1){animation-delay:.16s}
-        .hub-stagger > *:nth-child(2){animation-delay:.24s}
-        .hub-stagger > *:nth-child(3){animation-delay:.32s}
-        .hub-stagger > *:nth-child(4){animation-delay:.40s}
-        .hub-stagger > *:nth-child(5){animation-delay:.48s}
+        /* Slide-in Entrance Animations on Dashboard Load (Zero Scrollbar / Zero Layout Shift) */
+        @keyframes hubSlideLeft{0%{opacity:0;transform:translate3d(-24px,0,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
+        @keyframes hubArchUp{0%{opacity:0;transform:translate3d(0,36px,0) scale(.96)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+        @keyframes hubPhotoUp{0%{opacity:0;transform:translate3d(0,40px,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
+        @keyframes hubBadgePop{0%{opacity:0;transform:translate3d(-16px,10px,0) scale(.94)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+        @keyframes hubCardSlide{0%{opacity:0;transform:translate3d(-16px,0,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
+        .hh-date{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .04s both;will-change:transform,opacity}
+        .hh-hello{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .09s both;will-change:transform,opacity}
+        .hh-name{animation:hubSlideLeft .52s cubic-bezier(.22,1,.36,1) .14s both;will-change:transform,opacity}
+        .hh-sub{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .19s both;will-change:transform,opacity}
+        .hh-pills{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .24s both;will-change:transform,opacity}
+        .hh-cta{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .29s both;will-change:transform,opacity}
+        .hh-ring{animation:hubArchUp .55s cubic-bezier(.22,1,.36,1) .08s both;transform-origin:50% 100%;will-change:transform,opacity}
+        .hh-arch{animation:hubArchUp .55s cubic-bezier(.22,1,.36,1) .12s both;transform-origin:50% 100%;will-change:transform,opacity}
+        .hh-photo{animation:hubPhotoUp .62s cubic-bezier(.16,1,.3,1) .18s both;will-change:transform,opacity}
+        .hh-check{animation:hubBadgePop .52s cubic-bezier(.22,1,.36,1) .32s both;will-change:transform,opacity}
+        .hub-anim-section{overflow-x:clip}
+        .hub-anim-d2{animation:hubCardSlide .5s cubic-bezier(.22,1,.36,1) .22s both}
+        .hub-stagger > *{animation:hubCardSlide .48s cubic-bezier(.22,1,.36,1) both}
+        .hub-stagger > *:nth-child(1){animation-delay:.12s}
+        .hub-stagger > *:nth-child(2){animation-delay:.18s}
+        .hub-stagger > *:nth-child(3){animation-delay:.24s}
+        .hub-stagger > *:nth-child(4){animation-delay:.30s}
+        .hub-stagger > *:nth-child(5){animation-delay:.36s}
         @media (prefers-reduced-motion:reduce){
-            .hh,.hh-date,.hh-hello,.hh-name,.hh-sub,.hh-pills,.hh-cta,.hh-ring,.hh-arch,.hh-photo,.hh-check,.hub-anim-section,.hub-stagger > *{animation:none!important}
+            .hh-date,.hh-hello,.hh-name,.hh-sub,.hh-pills,.hh-cta,.hh-ring,.hh-arch,.hh-photo,.hh-check,.hub-anim-d2,.hub-stagger > *{animation:none!important}
         }
     </style>
     <div class="hh">
