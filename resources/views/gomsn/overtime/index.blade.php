@@ -239,29 +239,29 @@
                 </span>
             </div>
 
-            <!-- CSS Rigid Guard untuk Kartu Karyawan (3 Kolom Compact & Rapi) -->
+            <!-- CSS Rigid Guard untuk Kartu Karyawan (3 Kolom Sempurna & Rapi) -->
             <style>
                 .emp-overtime-card {
                     display: flex !important;
                     flex-direction: row !important;
                     align-items: stretch !important;
-                    border-radius: 24px !important;
+                    border-radius: 22px !important;
                     background: #ffffff !important;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+                    box-shadow: 0 8px 24px rgba(0,0,0,0.05) !important;
                     border: 1px solid #f1f5f9 !important;
-                    padding: 14px !important;
+                    padding: 12px !important;
                     position: relative !important;
                     overflow: hidden !important;
-                    gap: 14px !important;
+                    gap: 12px !important;
                 }
                 .emp-overtime-photo-panel {
-                    width: 140px !important;
-                    min-width: 140px !important;
-                    max-width: 140px !important;
-                    height: 190px !important;
-                    min-height: 190px !important;
-                    max-height: 190px !important;
-                    border-radius: 20px 20px 65px 20px !important;
+                    width: 108px !important;
+                    min-width: 108px !important;
+                    max-width: 108px !important;
+                    height: 165px !important;
+                    min-height: 165px !important;
+                    max-height: 165px !important;
+                    border-radius: 18px 18px 45px 18px !important;
                     flex-shrink: 0 !important;
                     position: relative !important;
                     overflow: hidden !important;
@@ -272,45 +272,44 @@
                 }
                 .emp-overtime-photo-img {
                     width: 100% !important;
-                    height: 190px !important;
-                    max-height: 190px !important;
+                    height: 165px !important;
+                    max-height: 165px !important;
                     object-fit: contain !important;
                     object-position: center bottom !important;
                     display: block !important;
                     pointer-events: none !important;
-                    filter: drop-shadow(0 10px 16px rgba(0,0,0,0.32)) !important;
+                    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.32)) !important;
                 }
                 @media (max-width: 640px) {
                     .emp-overtime-card {
                         flex-direction: column !important;
                         padding: 12px !important;
-                        gap: 12px !important;
+                        gap: 10px !important;
                     }
                     .emp-overtime-photo-panel {
                         width: 100% !important;
                         min-width: 100% !important;
                         max-width: 100% !important;
-                        height: 190px !important;
-                        border-radius: 20px !important;
+                        height: 170px !important;
+                        border-radius: 18px !important;
                     }
                 }
             </style>
 
             <!-- Grid Kartu Karyawan (3 Kolom Sempurna) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 @forelse ($employeeStats as $stat)
                 @php
                     $cardUser = $stat['user'];
                     $cardAvatar = $cardUser->avatar_url ?? null;
                     $cardInitials = $cardUser->initials ?? strtoupper(substr($cardUser->name ?? 'K', 0, 2));
                 @endphp
-                <div class="emp-overtime-card hover:shadow-[0_16px_40px_rgba(0,0,0,0.09)] hover:-translate-y-0.5 transition-all duration-300 group">
+                <div class="emp-overtime-card hover:shadow-[0_14px_32px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group">
 
                     <!-- Background Soft Ambient Wave Kanan -->
-                    <svg class="absolute right-0 bottom-0 h-full w-2/5 pointer-events-none opacity-25" viewBox="0 0 200 200" fill="none" preserveAspectRatio="none">
+                    <svg class="absolute right-0 bottom-0 h-full w-2/5 pointer-events-none opacity-20" viewBox="0 0 200 200" fill="none" preserveAspectRatio="none">
                         <circle cx="170" cy="170" r="130" fill="#2dd4bf" filter="blur(50px)"/>
-                        <path d="M 40 200 C 110 130, 150 170, 200 110" stroke="#0d9488" stroke-width="1.5" stroke-opacity="0.3"/>
-                        <path d="M 80 200 C 140 150, 170 180, 200 140" stroke="#0d9488" stroke-width="1.5" stroke-opacity="0.2"/>
+                        <path d="M 40 200 C 110 130, 150 170, 200 110" stroke="#0d9488" stroke-width="1.5" stroke-opacity="0.25"/>
                     </svg>
 
                     <!-- KIRI: Panel Foto Profil Modern dengan Kurva Organik -->
@@ -318,7 +317,7 @@
                         
                         <!-- Glow & Curved Lines Abstract Dekoratif -->
                         <div class="absolute inset-0 pointer-events-none">
-                            <div class="absolute -top-8 -left-8 w-28 h-28 rounded-full bg-teal-300/20 blur-xl"></div>
+                            <div class="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-teal-300/20 blur-xl"></div>
                             <svg class="w-full h-full opacity-35" viewBox="0 0 200 240" fill="none" preserveAspectRatio="none">
                                 <circle cx="40" cy="190" r="110" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
                                 <circle cx="40" cy="190" r="140" stroke="rgba(94,234,212,0.3)" stroke-width="1.5"/>
@@ -327,7 +326,7 @@
                         </div>
 
                         <!-- Pill Badge Jumlah Pengajuan di Kiri Atas -->
-                        <div class="absolute top-2.5 left-2.5 z-10 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white shadow-xs"
+                        <div class="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold text-white shadow-xs"
                              style="background: rgba(3, 62, 57, 0.82); backdrop-filter: blur(8px); border: 1px solid rgba(94, 234, 212, 0.45);">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
                             <span>{{ $stat['total_count'] }} Pengajuan</span>
@@ -339,117 +338,96 @@
                                  class="emp-overtime-photo-img transition-transform duration-500 group-hover:scale-105"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="flex-col items-center justify-center text-white" style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">
-                                <div class="flex items-center justify-center text-white font-black shadow-md" style="width:62px; height:62px; border-radius:50%; font-size:22px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); text-shadow:0 2px 8px rgba(0,0,0,0.3); margin-bottom:20px;">
+                                <div class="flex items-center justify-center text-white font-black shadow-md" style="width:52px; height:52px; border-radius:50%; font-size:18px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); text-shadow:0 2px 6px rgba(0,0,0,0.3); margin-bottom:14px;">
                                     {{ $cardInitials }}
                                 </div>
                             </div>
                         @else
                             <div class="flex flex-col items-center justify-center text-white w-full h-full" style="align-items:center; justify-content:center;">
-                                <div class="flex items-center justify-center text-white font-black shadow-md" style="width:62px; height:62px; border-radius:50%; font-size:22px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); text-shadow:0 2px 8px rgba(0,0,0,0.3); margin-bottom:20px;">
+                                <div class="flex items-center justify-center text-white font-black shadow-md" style="width:52px; height:52px; border-radius:50%; font-size:18px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); text-shadow:0 2px 6px rgba(0,0,0,0.3); margin-bottom:14px;">
                                     {{ $cardInitials }}
                                 </div>
                             </div>
                         @endif
                     </div>
 
-                    <!-- KANAN: Data Lengkap Karyawan (Compact & Rapi) -->
-                    <div class="flex-1 min-w-0 flex flex-col justify-between h-full gap-2.5 relative z-10 py-0.5">
+                    <!-- KANAN: Data Lengkap Karyawan (Sangat Rapi, Lega & Tidak Ada Teks Terpotong) -->
+                    <div class="flex-1 min-w-0 flex flex-col justify-between h-full gap-2 relative z-10 py-0.5">
                         
-                        <!-- Baris 1: Nama Karyawan & Periode -->
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0 flex-1">
-                                <h3 class="font-black text-slate-900 text-sm sm:text-[15px] uppercase tracking-tight truncate leading-tight" title="{{ $cardUser->name }}">
-                                    {{ $cardUser->name }}
-                                </h3>
-                                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
-                                    <span class="inline-flex items-center px-2 py-0.2 rounded-full text-[10px] font-bold font-mono text-teal-800 bg-[#e0f4f2] border border-teal-200">
-                                        {{ $cardUser->employee_code ?: 'KR' . $cardUser->id }}
-                                    </span>
-                                    <span class="text-slate-300 text-xs">|</span>
-                                    <span class="text-[10.5px] font-semibold text-slate-500 truncate">
-                                        {{ $cardUser->division ?: 'Teknik' }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Periode Bulan & Tahun di Pojok Kanan Atas -->
-                            <div class="shrink-0 flex items-center gap-1.5">
-                                <div class="w-7 h-7 rounded-xl bg-[#e6f7f5] flex items-center justify-center text-teal-700">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <!-- Header: Periode, Nama Karyawan & Badge Divisi -->
+                        <div class="min-w-0">
+                            <!-- Periode Kalender di Atas Nama -->
+                            <div class="flex items-center justify-between gap-1 text-[10px] font-semibold text-teal-800">
+                                <span class="inline-flex items-center gap-1 truncate text-teal-700">
+                                    <svg class="w-3 h-3 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
                                         <line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
                                         <line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <circle cx="8" cy="14" r="0.75" fill="currentColor"/>
-                                        <circle cx="12" cy="14" r="0.75" fill="currentColor"/>
-                                        <circle cx="16" cy="14" r="0.75" fill="currentColor"/>
                                     </svg>
-                                </div>
-                                <div class="text-right leading-tight">
-                                    <div class="text-[10.5px] font-bold text-slate-700">{{ $bulanNames[$selectedBulan] ?? 'November' }}</div>
-                                    <div class="text-[10px] font-semibold text-slate-500">{{ $selectedTahun }}</div>
-                                </div>
+                                    {{ $bulanNames[$selectedBulan] ?? 'November' }} {{ $selectedTahun }}
+                                </span>
+                            </div>
+
+                            <!-- Nama Karyawan (Lebar 100% Penuh, Tidak Terpotong) -->
+                            <h3 class="font-black text-slate-900 text-sm uppercase tracking-tight truncate leading-snug mt-0.5" title="{{ $cardUser->name }}">
+                                {{ $cardUser->name }}
+                            </h3>
+
+                            <!-- Kode Karyawan & Divisi (Sejajar Rapi) -->
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-bold font-mono text-teal-800 bg-[#e0f4f2] border border-teal-200">
+                                    {{ $cardUser->employee_code ?: 'KR' . $cardUser->id }}
+                                </span>
+                                <span class="text-slate-300 text-[10px]">•</span>
+                                <span class="text-[10.5px] font-semibold text-slate-500 truncate">
+                                    {{ $cardUser->division ?: 'Teknik' }}
+                                </span>
                             </div>
                         </div>
 
-                        <!-- Baris 2: Total Lembur (Hari) & Lokasi (2 Kolom dengan Divider) -->
-                        <div class="flex items-center gap-2.5 py-0.5">
-                            <!-- Kolom Periode / Total Lembur -->
-                            <div class="flex items-center gap-2 min-w-0 flex-1">
-                                <div class="w-7 h-7 rounded-xl bg-[#e6f7f5] flex items-center justify-center text-teal-700 shrink-0">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <!-- Baris 2: Strip Info Periode/Lembur (Hari) & Lokasi (Tidak Pernah Terpotong) -->
+                        <div class="grid grid-cols-2 gap-1.5 py-1.5 px-2 rounded-xl bg-slate-50/90 border border-slate-100">
+                            <!-- Kolom Total Lembur -->
+                            <div class="min-w-0">
+                                <div class="text-[9px] font-medium text-slate-400 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
+                                    <span>Lembur</span>
                                 </div>
-                                <div class="min-w-0">
-                                    <div class="text-[9.5px] font-medium text-slate-400">Periode</div>
-                                    <div class="text-xs sm:text-[13px] font-black text-slate-800 truncate">{{ $stat['total_days'] }} hari</div>
-                                </div>
+                                <div class="text-[11.5px] font-black text-slate-800 truncate mt-0.5">{{ $stat['total_days'] }} hari</div>
                             </div>
 
-                            <!-- Vertical Divider -->
-                            <div class="h-6 w-px bg-slate-200 shrink-0"></div>
-
                             <!-- Kolom Lokasi -->
-                            <div class="flex items-center gap-2 min-w-0 flex-1">
-                                <div class="w-7 h-7 rounded-xl bg-[#e6f7f5] flex items-center justify-center text-teal-700 shrink-0">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                            <div class="min-w-0 pl-1.5 border-l border-slate-200">
+                                <div class="text-[9px] font-medium text-slate-400 flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                                         <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
                                     </svg>
+                                    <span>Lokasi</span>
                                 </div>
-                                <div class="min-w-0">
-                                    <div class="text-[9.5px] font-medium text-slate-400">Lokasi</div>
-                                    <div class="text-xs sm:text-[13px] font-black text-slate-800 truncate">{{ $cardUser->branch ?? $cardUser->location ?? 'Bandung' }}</div>
-                                </div>
+                                <div class="text-[11.5px] font-black text-slate-800 truncate mt-0.5">{{ $cardUser->branch ?? $cardUser->location ?? 'Bandung' }}</div>
                             </div>
                         </div>
 
-                        <!-- Baris 3: Total Uang & Tombol Lihat Detail (Tidak Akan Bertabrakan) -->
-                        <div class="rounded-2xl p-2 px-3 flex items-center justify-between gap-2"
+                        <!-- Baris 3: Total Uang & Tombol Detail (Lega, Rapi, Bebas Tabrakan) -->
+                        <div class="rounded-xl p-2 px-2.5 flex items-center justify-between gap-1.5"
                              style="background-color: #eaf6f4; border: 1px solid #d1ede8;">
                             <!-- Total Uang -->
-                            <div class="flex items-center gap-2 min-w-0">
-                                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-2xs"
-                                     style="background: #0d6e67; color: #ffffff;">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
-                                        <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-4.875 3a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="min-w-0">
-                                    <div class="text-[8.5px] font-bold text-teal-800 uppercase tracking-wider leading-none">TOTAL UANG</div>
-                                    <div class="text-xs sm:text-[13px] font-black text-teal-950 whitespace-nowrap leading-tight mt-0.5">
-                                        Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}
-                                    </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[8px] font-bold text-teal-800 uppercase tracking-wider leading-none">TOTAL UANG</div>
+                                <div class="text-[12.5px] font-black text-teal-950 truncate leading-tight mt-0.5">
+                                    Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}
                                 </div>
                             </div>
 
-                            <!-- Tombol Lihat Detail -->
+                            <!-- Tombol Detail -->
                             <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
-                               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-white text-[11px] font-bold shadow-xs hover:opacity-95 transition-all transform active:scale-95 shrink-0 whitespace-nowrap"
+                               class="px-2.5 py-1.5 rounded-full text-white text-[10.5px] font-bold shadow-2xs hover:opacity-95 transition-all transform active:scale-95 shrink-0 whitespace-nowrap flex items-center gap-1"
                                style="background: #04615c;">
-                                <span>Lihat Detail</span>
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <span>Detail</span>
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                                 </svg>
                             </a>
