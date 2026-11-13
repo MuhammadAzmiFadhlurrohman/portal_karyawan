@@ -67,6 +67,38 @@
             .hh-check{left:-8px;bottom:16px;padding:8px 13px;border-radius:14px}
             .hh-initials{font-size:52px}
         }
+        /* Slide-in Entrance Animations on Dashboard Load */
+        @keyframes hubHeroIn{0%{opacity:0;transform:translateY(18px) scale(.99)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes hubSlideLeft{0%{opacity:0;transform:translateX(-28px)}100%{opacity:1;transform:translateX(0)}}
+        @keyframes hubArchUp{0%{opacity:0;transform:translateY(44px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes hubPhotoUp{0%{opacity:0;transform:translateY(48px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes hubBadgePop{0%{opacity:0;transform:translate(-18px,14px) scale(.92)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+        @keyframes hubCardUp{0%{opacity:0;transform:translateY(26px)}100%{opacity:1;transform:translateY(0)}}
+        .hh{animation:hubHeroIn .55s cubic-bezier(.22,1,.36,1) both}
+        .hh-date{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .06s both}
+        .hh-hello{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .12s both}
+        .hh-name{animation:hubSlideLeft .6s cubic-bezier(.22,1,.36,1) .18s both}
+        .hh-sub{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .24s both}
+        .hh-pills{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .30s both}
+        .hh-cta{animation:hubSlideLeft .55s cubic-bezier(.22,1,.36,1) .36s both}
+        .hh-ring{animation:hubArchUp .65s cubic-bezier(.22,1,.36,1) .12s both;transform-origin:50% 100%}
+        .hh-arch{animation:hubArchUp .65s cubic-bezier(.22,1,.36,1) .16s both;transform-origin:50% 100%}
+        .hh-photo{animation:hubPhotoUp .75s cubic-bezier(.16,1,.3,1) .24s both}
+        .hh-check{animation:hubBadgePop .6s cubic-bezier(.22,1,.36,1) .42s both}
+        .hub-anim-section{animation:hubCardUp .6s cubic-bezier(.22,1,.36,1) both}
+        .hub-anim-d1{animation-delay:.18s}
+        .hub-anim-d2{animation-delay:.28s}
+        .hub-anim-d3{animation-delay:.38s}
+        .hub-anim-d4{animation-delay:.46s}
+        .hub-stagger > *{animation:hubCardUp .58s cubic-bezier(.22,1,.36,1) both}
+        .hub-stagger > *:nth-child(1){animation-delay:.16s}
+        .hub-stagger > *:nth-child(2){animation-delay:.24s}
+        .hub-stagger > *:nth-child(3){animation-delay:.32s}
+        .hub-stagger > *:nth-child(4){animation-delay:.40s}
+        .hub-stagger > *:nth-child(5){animation-delay:.48s}
+        @media (prefers-reduced-motion:reduce){
+            .hh,.hh-date,.hh-hello,.hh-name,.hh-sub,.hh-pills,.hh-cta,.hh-ring,.hh-arch,.hh-photo,.hh-check,.hub-anim-section,.hub-stagger > *{animation:none!important}
+        }
     </style>
     <div class="hh">
         <div class="hh-glow1"></div>
@@ -140,13 +172,23 @@
                 el.textContent = days[dow] + ', ' + String(m.day).padStart(2, '0') + ' ' + months[parseInt(m.month, 10) - 1] + ' ' + m.year + ' · ' + m.hour + ':' + m.minute + ':' + m.second + ' WIB';
             }
             tick(); setInterval(tick, 1000);
+            window.addEventListener('pageshow', function (e) {
+                if (e.persisted) {
+                    var nodes = document.querySelectorAll('.hh, .hh-date, .hh-hello, .hh-name, .hh-sub, .hh-pills, .hh-cta, .hh-ring, .hh-arch, .hh-photo, .hh-check, .hub-anim-section, .hub-stagger > *');
+                    nodes.forEach(function (n) {
+                        n.style.animation = 'none';
+                        void n.offsetHeight;
+                        n.style.animation = '';
+                    });
+                }
+            });
         })();
     </script>
 
     <!-- Section 1: KPI Summary Cards (Absen, Pengajuan, Lembur) -->
-    <section class="mb-8" aria-labelledby="heading-stats-kpi">
+    <section class="mb-8 hub-anim-section hub-anim-d1" aria-labelledby="heading-stats-kpi">
         <h2 id="heading-stats-kpi" class="sr-only">Ringkasan Statistik Utama</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 hub-stagger">
             <!-- Card 1: Absensi & Disiplin -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-shadow p-5 flex flex-col justify-between">
                 <div>
@@ -322,7 +364,7 @@
     </section>
 
     <!-- Section 2: Visualisasi Grafik Informatif (Interactive Charts) -->
-    <section class="mb-8" aria-labelledby="heading-charts">
+    <section class="mb-8 hub-anim-section hub-anim-d2" aria-labelledby="heading-charts">
         <div class="flex items-center justify-between mb-4">
             <div>
                 <h2 id="heading-charts" class="font-heading text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -444,8 +486,8 @@
     </section>
 
     <!-- Section 3: Aktivitas Terkini (Pengajuan & Lembur Realtime) -->
-    <section class="mb-8" aria-labelledby="heading-recent-activities">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <section class="mb-8 hub-anim-section hub-anim-d3" aria-labelledby="heading-recent-activities">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 hub-stagger">
             <!-- Table 1: Pengajuan Terbaru -->
             <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
                 <div>
@@ -616,7 +658,7 @@
     </section>
 
     <!-- Section 4: Quick Access Modul Utama -->
-    <section class="mb-8" aria-labelledby="heading-quick-access">
+    <section class="mb-8 hub-anim-section hub-anim-d4" aria-labelledby="heading-quick-access">
         <div class="flex items-center justify-between mb-3.5">
             <h2 id="heading-quick-access" class="font-heading text-base font-bold text-slate-800 flex items-center gap-2">
                 <span class="p-1 rounded-lg bg-teal-100 text-teal-800 text-xs">⚡</span>
@@ -625,7 +667,7 @@
             <span class="text-xs text-slate-400 font-medium">Akses langsung fitur operasional harian</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 hub-stagger">
             <!-- Card 1: Presensi Biometrik -->
             <a href="{{ route('attendance.index') }}" class="group bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs hover:shadow-md hover:border-teal-500 transition-all flex flex-col justify-between">
                 <div>
