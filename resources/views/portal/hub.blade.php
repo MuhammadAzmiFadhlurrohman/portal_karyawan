@@ -8,56 +8,63 @@
         $scopeType = $stats['scope']['type'] ?? 'self';
     @endphp
     <style>
-        .hh{position:relative;overflow:hidden;border-radius:24px;margin-bottom:24px;border:1px solid rgba(45,212,191,.15);box-shadow:0 10px 40px rgba(2,30,32,.35);background:radial-gradient(120% 140% at 0% 0%,#0b3a3d 0%,#07282b 45%,#051d20 100%);color:#fff;user-select:none}
-        .hh-glow1{position:absolute;left:-90px;top:-90px;width:290px;height:290px;border-radius:50%;background:rgba(20,184,166,.12);filter:blur(60px);pointer-events:none}
-        .hh-glow2{position:absolute;right:40px;bottom:0;width:320px;height:320px;border-radius:50%;background:rgba(52,211,153,.10);filter:blur(60px);pointer-events:none}
-        .hh-inner{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:36px 48px 0}.hh-left{padding-bottom:36px;align-self:center}
-        .hh-left{min-width:0;flex:1}
-        .hh-date{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(45,212,191,.10);border:1px solid rgba(94,234,212,.2);font-size:12px;font-weight:600;color:#99f6e4}
-        .hh-hello{margin:20px 0 6px;font-size:12px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:#5eead4}
-        .hh-name{margin:0;font-weight:800;text-transform:uppercase;line-height:.98;letter-spacing:-.02em;font-size:clamp(34px,5vw,60px)}
+        .hh{position:relative;overflow:hidden;border-radius:26px;margin-bottom:24px;border:1px solid rgba(45,212,191,.18);box-shadow:0 16px 40px -8px rgba(2,24,27,.45),inset 0 1px 0 rgba(94,234,212,.2);background:radial-gradient(90% 120% at 15% 15%,#0c3b3e 0%,#07272a 50%,#04191c 100%);color:#fff;user-select:none}
+        .hh-glow1{position:absolute;left:-90px;top:-90px;width:300px;height:300px;border-radius:50%;background:rgba(20,184,166,.14);filter:blur(65px);pointer-events:none}
+        .hh-glow2{position:absolute;right:40px;bottom:-20px;width:340px;height:340px;border-radius:50%;background:rgba(45,212,191,.12);filter:blur(65px);pointer-events:none}
+        .hh-inner{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding:0 48px;min-height:365px}
+        .hh-left{min-width:0;flex:1;padding:34px 0;align-self:center}
+        .hh-date{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(13,148,136,.18);border:1px solid rgba(45,212,191,.24);font-size:12px;font-weight:600;color:#99f6e4;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+        .hh-hello{margin:18px 0 6px;font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#5eead4}
+        .hh-name{margin:0;font-weight:800;text-transform:uppercase;line-height:.96;letter-spacing:-.025em;font-size:clamp(36px,4.6vw,58px)}
         .hh-name .a{display:block;color:#fff}
-        .hh-name .b{display:block;color:#14b8a6;background:linear-gradient(90deg,#5eead4,#10b981);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-        .hh-sub{margin:12px 0 0;font-size:14px;line-height:1.6;color:rgba(204,251,241,.75);max-width:440px}
-        .hh-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-        .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(0,0,0,.28);color:#ccfbf1;border:1px solid rgba(255,255,255,.12)}
-        .hh-pill.ok{background:rgba(52,211,153,.12);color:#6ee7b7;border-color:rgba(52,211,153,.3);font-weight:700}
-        .hh-dot{width:6px;height:6px;border-radius:50%;background:#34d399}
-        .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6,#0d9488);box-shadow:0 8px 20px rgba(13,148,136,.4)}
-        .hh-cta:hover{filter:brightness(1.1)}
-        .hh-right{position:relative;flex:none;width:400px;height:410px;margin-right:8px}
-        .hh-ring{position:absolute;left:-14px;right:-14px;top:0;bottom:0;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.12)}
-        .hh-arch{position:absolute;left:8px;right:8px;top:36px;bottom:0;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 40%,#0f766e 100%)}
-        .hh-photo{position:absolute;left:8px;right:8px;top:36px;bottom:0;border-radius:999px 999px 0 0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
-        .hh-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transform:scale(1.22);transform-origin:50% 100%}
-        .hh-initials{width:100%;height:100%;display:none;align-items:center;justify-content:center;font-size:72px;font-weight:800;color:rgba(255,255,255,.92)}
+        .hh-name .b{display:block;color:#14b8a6;background:linear-gradient(90deg,#2dd4bf 0%,#14b8a6 55%,#0d9488 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-bottom:2px}
+        .hh-sub{margin:12px 0 0;font-size:13.5px;line-height:1.55;color:rgba(204,251,241,.74);max-width:460px}
+        .hh-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}
+        .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5.5px 13px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(4,22,25,.55);color:#e2e8f0;border:1px solid rgba(255,255,255,.12)}
+        .hh-pill.ok{background:rgba(16,185,129,.14);color:#6ee7b7;border-color:rgba(52,211,153,.28);font-weight:700}
+        .hh-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399}
+        .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);box-shadow:0 8px 22px -4px rgba(13,148,136,.55),inset 0 1px 0 rgba(255,255,255,.22);transition:transform .15s ease,filter .15s ease}
+        .hh-cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+        .hh-right{position:relative;flex:none;width:380px;height:365px;margin-right:16px;align-self:flex-end}
+        .hh-ring{position:absolute;left:26px;right:26px;top:44px;bottom:0;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.16);pointer-events:none;z-index:1}
+        .hh-dot-p{position:absolute;top:68px;left:12px;width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 12px rgba(167,139,250,.85);pointer-events:none;z-index:1}
+        .hh-dot-c{position:absolute;bottom:126px;left:4px;width:6px;height:6px;border-radius:50%;background:#5eead4;box-shadow:0 0 10px rgba(94,234,212,.85);pointer-events:none;z-index:1}
+        .hh-arch{position:absolute;left:56px;right:56px;top:76px;bottom:0;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 45%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.22);z-index:1}
+        .hh-photo{position:absolute;left:0;right:0;top:0;bottom:0;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+        .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.14);transform-origin:50% 100%;filter:drop-shadow(0 12px 24px rgba(0,0,0,.42))}
+        .hh-initials{position:absolute;left:56px;right:56px;top:76px;bottom:0;border-radius:999px 999px 0 0;display:none;align-items:center;justify-content:center;font-size:68px;font-weight:800;color:rgba(255,255,255,.92);z-index:2}
         .hh-initials.show{display:flex}
-        .hh-check{position:absolute;left:-30px;bottom:56px;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(7,40,43,.92);border:1px solid rgba(94,234,212,.2);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+        .hh-check{position:absolute;left:-24px;bottom:38px;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:16px;background:rgba(6,34,38,.90);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(94,234,212,.22);box-shadow:0 12px 28px rgba(0,0,0,.45)}
         .hh-check .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.2)}
-        .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#34d399;display:block}
+        .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#34d399;display:block;box-shadow:0 0 8px #34d399}
         .hh-check.no .ic{background:rgba(245,158,11,.2)}
-        .hh-check.no .ic i{background:#fbbf24}
-        .hh-check b{display:block;font-size:12px;color:#fff}
-        .hh-check small{display:block;font-size:10px;color:rgba(153,246,228,.7)}
+        .hh-check.no .ic i{background:#fbbf24;box-shadow:0 0 8px #fbbf24}
+        .hh-check b{display:block;font-size:12px;color:#fff;letter-spacing:.01em}
+        .hh-check small{display:block;font-size:10.5px;color:rgba(153,246,228,.75);margin-top:1px}
         @media (min-width:768px) and (max-width:1100px){
-            .hh-inner{padding:32px 28px 0}
-            .hh-right{width:320px;height:340px}
+            .hh-inner{padding:0 28px;min-height:330px;gap:20px}
+            .hh-right{width:320px;height:325px;margin-right:0}
+            .hh-ring{left:20px;right:20px;top:38px}
+            .hh-arch,.hh-initials{left:46px;right:46px;top:66px}
         }
         @media (max-width:767px){
-            .hh{border-radius:20px}
-            .hh-inner{flex-direction:column-reverse;align-items:stretch;padding:0;gap:0}
-            .hh-left{padding:4px 20px 24px;align-self:auto;text-align:center}
+            .hh{border-radius:22px;margin-bottom:20px}
+            .hh-inner{flex-direction:column;align-items:stretch;padding:22px 20px 0;gap:8px;min-height:auto}
+            .hh-left{padding:0;align-self:stretch;text-align:left}
             .hh-date{font-size:11px;padding:5px 12px}
-            .hh-hello{margin:14px 0 4px;font-size:11px}
-            .hh-name{font-size:clamp(32px,11vw,46px)}
-            .hh-sub{margin:10px auto 0;font-size:13px}
-            .hh-pills{justify-content:center}
-            .hh-cta{width:100%;justify-content:center;box-sizing:border-box}
-            .hh-right{width:100%;max-width:300px;height:290px;margin:0 auto}
-            .hh-ring{display:none}
-            .hh-arch,.hh-photo{top:24px;left:30px;right:30px}
-            .hh-check{left:50%;transform:translateX(-50%);bottom:10px;white-space:nowrap}
-            .hh-initials{font-size:56px}
+            .hh-hello{margin:14px 0 4px;font-size:11px;letter-spacing:.2em}
+            .hh-name{font-size:clamp(30px,9.5vw,42px)}
+            .hh-sub{margin:8px 0 0;font-size:12.5px}
+            .hh-pills{margin-top:12px;gap:6px}
+            .hh-pill{font-size:11px;padding:4.5px 11px}
+            .hh-cta{margin-top:14px;padding:10px 18px;font-size:12px}
+            .hh-right{width:280px;height:270px;margin:6px auto 0;align-self:center}
+            .hh-ring{left:18px;right:18px;top:32px}
+            .hh-arch,.hh-initials{left:40px;right:40px;top:56px}
+            .hh-photo{left:0;right:0;top:0;bottom:0}
+            .hh-photo img{transform:scale(1.12)}
+            .hh-check{left:-8px;bottom:16px;padding:8px 13px;border-radius:14px}
+            .hh-initials{font-size:52px}
         }
     </style>
     <div class="hh">
@@ -78,7 +85,7 @@
                 </h1>
                 <p class="hh-sub">{{ $stats['scope']['subtitle'] }}</p>
                 <div class="hh-pills">
-                    <span class="hh-pill ok"><span class="hh-dot" style="{{ $user->is_active ? '' : 'background:#fb7185' }}"></span>{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    <span class="hh-pill ok"><span class="hh-dot" style="{{ $user->is_active ? '' : 'background:#fb7185;box-shadow:0 0 8px #fb7185' }}"></span>{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                     <span class="hh-pill">NIK: {{ $user->employee_code ?? 'MSN' }}</span>
                     @if ($user->division)
                         <span class="hh-pill">{{ $user->division }}</span>
@@ -97,6 +104,8 @@
 
             <div class="hh-right">
                 <div class="hh-ring"></div>
+                <span class="hh-dot-p"></span>
+                <span class="hh-dot-c"></span>
                 <div class="hh-arch"></div>
                 <div class="hh-photo">
                     @if ($user->avatar_url)
