@@ -242,28 +242,66 @@
             <!-- Grid 4 Kolom Persis Mockup Gambar 1 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 @forelse ($employeeStats as $stat)
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition p-4 sm:p-5 flex flex-col justify-between border-t-2 border-teal-500 group">
+                @php
+                    $cardUser = $stat['user'];
+                    $cardAvatar = $cardUser->avatar_url ?? null;
+                    $cardInitials = $cardUser->initials ?? strtoupper(substr($cardUser->name ?? 'K', 0, 2));
+                @endphp
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex flex-col justify-between overflow-hidden group">
                     <div>
-                        <!-- Header Kartu: Avatar + Nama + Badge X Merah Halus -->
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                            <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold shrink-0">
-                                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                </div>
-                                <span class="font-bold text-slate-800 text-xs sm:text-sm truncate">
-                                    {{ $stat['user']->name }}
+                        <!-- Hero Kartu: Foto Profil Besar ala Dashboard -->
+                        <div class="relative overflow-hidden" style="height:170px;background:radial-gradient(120% 140% at 15% 15%,#0b4a4e 0%,#05282b 60%,#021619 100%);">
+                            <!-- Glow & Arc Dekoratif -->
+                            <div class="absolute pointer-events-none" style="left:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(20,184,166,.22);filter:blur(40px);"></div>
+                            <div class="absolute pointer-events-none" style="left:50%;bottom:-70px;transform:translateX(-50%);width:190px;height:190px;border-radius:50%;background:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);box-shadow:0 0 30px rgba(20,184,166,.4);"></div>
+                            <div class="absolute pointer-events-none" style="left:50%;bottom:-86px;transform:translateX(-50%);width:222px;height:222px;border-radius:50%;border:1.5px solid rgba(94,234,212,.35);"></div>
+                            <div class="absolute pointer-events-none" style="left:50%;bottom:-102px;transform:translateX(-50%);width:254px;height:254px;border-radius:50%;border:1px solid rgba(94,234,212,.15);"></div>
+
+                            <!-- Badge Total Lembur (kanan atas) -->
+                            <span class="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold text-teal-100" style="background:rgba(2,19,22,.6);border:1px solid rgba(45,212,191,.35);backdrop-filter:blur(6px);">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" style="box-shadow:0 0 6px #34d399;"></span>
+                                {{ $stat['total_count'] }} Pengajuan
+                            </span>
+
+                            <!-- Foto Profil / Inisial -->
+                            <div class="absolute inset-x-0 bottom-0 z-[2] flex items-end justify-center pointer-events-none" style="height:150px;">
+                                @if ($cardAvatar)
+                                    <img src="{{ $cardAvatar }}" alt="{{ $cardUser->name }}"
+                                         class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                                         style="object-position:center bottom;transform-origin:50% 100%;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="items-center justify-center text-white font-black" style="display:none;width:110px;height:110px;margin-bottom:18px;border-radius:50%;font-size:38px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);">
+                                        {{ $cardInitials }}
+                                    </div>
+                                @else
+                                    <div class="flex items-center justify-center text-white font-black" style="width:110px;height:110px;margin-bottom:18px;border-radius:50%;font-size:38px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);">
+                                        {{ $cardInitials }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Fade bawah agar nama terbaca -->
+                            <div class="absolute inset-x-0 bottom-0 z-[3] pointer-events-none" style="height:60px;background:linear-gradient(180deg,rgba(2,22,25,0) 0%,rgba(2,22,25,.85) 100%);"></div>
+
+                            <!-- Nama & Kode Karyawan -->
+                            <div class="absolute inset-x-0 bottom-0 z-[4] px-4 pb-2.5 text-center">
+                                <h3 class="text-white font-extrabold text-sm uppercase tracking-tight truncate leading-tight">
+                                    {{ $cardUser->name }}
+                                </h3>
+                                <span class="text-[10px] font-mono font-semibold text-teal-200/90">
+                                    {{ $cardUser->employee_code ?: 'KR' . $cardUser->id }}
                                 </span>
                             </div>
-                            <!-- Cross icon badge persis Gambar 1 -->
-                            <span class="w-5 h-5 rounded-full bg-rose-50 text-rose-400 flex items-center justify-center text-[10px] font-bold shrink-0">
-                                ✕
-                            </span>
                         </div>
 
-                        <!-- 4 Baris Rincian Persis Gambar 1 -->
-                        <div class="py-3.5 space-y-2.5 text-xs text-slate-600">
+                        <!-- Total Uang Lembur -->
+                        <div class="mx-4 mt-3.5 px-3.5 py-2.5 rounded-xl flex items-center justify-between" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #ccfbf1;">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700">Total Uang Lembur</span>
+                            <span class="text-sm font-black text-teal-900">Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}</span>
+                        </div>
+
+                        <!-- 4 Baris Rincian -->
+                        <div class="px-4 py-3.5 space-y-2.5 text-xs text-slate-600">
                             <!-- Baris 1: Periode -->
                             <div class="flex items-center justify-between">
                                 <span class="inline-flex items-center gap-2 text-slate-400">
@@ -320,7 +358,7 @@
                     </div>
 
                     <!-- Footer: Tombol Berwarna Lihat Detail -->
-                    <div class="pt-2">
+                    <div class="px-4 pb-4 pt-1">
                         <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $stat['user']->id]) }}" 
                            style="background: linear-gradient(135deg, #093c40 0%, #155E63 55%, #0d9488 100%) !important; color: #ffffff !important;"
                            class="w-full py-2.5 px-3 rounded-xl text-white hover:opacity-95 active:scale-[0.99] text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm">
