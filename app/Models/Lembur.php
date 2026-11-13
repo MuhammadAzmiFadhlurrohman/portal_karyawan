@@ -68,29 +68,47 @@ class Lembur extends Model
     }
 
     /**
-     * Hitung nominal uang lembur berdasarkan jenis lembur:
+     * Hitung nominal uang lembur murni (sebelum pembulatan) berdasarkan jenis:
      * 1. Lembur biasa = Rp 5.000 / jam
      * 2. Piket Hari Libur = Rp 3.900 / jam
      * 3. Piket Hari Kerja = Rp 15.000 FLAT / Tetap (tidak per jam)
      */
-    public function getNominalAttribute(): int
+    public function getRawNominalAttribute(): float
     {
         $jenis = strtolower(trim((string) $this->jenis_lembur));
         $durasiMenit = (int) ($this->durasi_menit ?? 0);
-        $jam = $durasiMenit / 60;
+        $jam = $durasiMenit / 60.0;
 
         // 3. Piket Hari Kerja (Flat Rp 15.000)
         if (str_contains($jenis, 'piket') && str_contains($jenis, 'kerja')) {
-            return 15000;
+            return 15000.0;
         }
 
         // 2. Piket Hari Libur (Rp 3.900 / jam)
         if (str_contains($jenis, 'piket') && (str_contains($jenis, 'libur') || str_contains($jenis, 'minggu') || str_contains($jenis, 'merah'))) {
-            return (int) round($jam * 3900);
+            return $jam * 3900.0;
         }
 
         // 1. Lembur Biasa (Rp 5.000 / jam) - default
-        return (int) round($jam * 5000);
+        return $jam * 5000.0;
+    }
+
+    /**
+     * Pembulatan untuk Dashboard HRD / Tampilan Web:
+     * Dibulatkan ke kelipatan Rp 100 terdekat: round($uang / 100) * 100
+     */
+    public function getNominalAttribute(): int
+    {
+        return (int) (round($this->raw_nominal / 100) * 100);
+    }
+
+    /**
+     * Pembulatan untuk Export Laporan (Excel / CSV / PDF):
+     * Dibulatkan ke bawah ke kelipatan Rp 1.000: floor($uang / 1000) * 1000
+     */
+    public function getNominalExportAttribute(): int
+    {
+        return (int) (floor($this->raw_nominal / 1000) * 1000);
     }
 }
 

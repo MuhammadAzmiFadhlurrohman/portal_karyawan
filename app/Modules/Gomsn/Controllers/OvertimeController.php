@@ -232,7 +232,8 @@ class OvertimeController extends Controller
                     $hours = floor($item->durasi_menit / 60);
                     $mins = $item->durasi_menit % 60;
                     $durasiStr = "{$hours} jam " . sprintf('%02d menit', $mins);
-                    $uangLembur = (int) $item->nominal;
+                    // Pada Export Laporan (Excel/PDF): Dibulatkan ke bawah ke kelipatan Rp 1.000 (floor($uang / 1000) * 1000)
+                    $uangLembur = (int) $item->nominal_export;
 
                     fputcsv($handle, [
                         $no++,

@@ -309,16 +309,20 @@
                     const hDisplay = Math.floor(diffMinutes / 60);
                     const mDisplay = diffMinutes % 60;
 
+                    let rawNominal = 0;
+
                     // 2. Piket Hari Libur (Rp 3.900 / jam)
                     if (jenis.includes('piket') && (jenis.includes('libur') || jenis.includes('minggu') || jenis.includes('merah'))) {
-                        this.estimasiNominal = Math.round(hours * 3900);
-                        this.estimasiKeterangan = `${hDisplay} jam ${mDisplay} mnt x Rp 3.900/jam`;
+                        rawNominal = hours * 3900;
+                        this.estimasiNominal = Math.round(rawNominal / 100) * 100;
+                        this.estimasiKeterangan = `${hDisplay} jam ${mDisplay} mnt x Rp 3.900/jam (dibulatkan ke kelipatan Rp 100)`;
                         return;
                     }
 
                     // 1. Lembur Biasa (Rp 5.000 / jam)
-                    this.estimasiNominal = Math.round(hours * 5000);
-                    this.estimasiKeterangan = `${hDisplay} jam ${mDisplay} mnt x Rp 5.000/jam`;
+                    rawNominal = hours * 5000;
+                    this.estimasiNominal = Math.round(rawNominal / 100) * 100;
+                    this.estimasiKeterangan = `${hDisplay} jam ${mDisplay} mnt x Rp 5.000/jam (dibulatkan ke kelipatan Rp 100)`;
                 },
 
                 init() {
