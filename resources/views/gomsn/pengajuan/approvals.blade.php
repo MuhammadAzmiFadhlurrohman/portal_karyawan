@@ -268,7 +268,6 @@
                                 <th class="py-3.5 px-4 font-bold">Tanggal</th>
                                 <th class="py-3.5 px-4 font-bold">Pengaju</th>
                                 <th class="py-3.5 px-4 font-bold text-center">Jenis</th>
-                                <th class="py-3.5 px-4 font-bold">Keperluan</th>
                                 <th class="py-3.5 px-4 font-bold text-right">Total Pengajuan</th>
                                 <th class="py-3.5 px-4 font-bold text-center">Status</th>
                                 <th class="py-3.5 px-4 font-bold text-center w-48">Aksi</th>
@@ -331,8 +330,11 @@
                                     <!-- Pengaju -->
                                     <td class="py-3.5 px-4 whitespace-nowrap">
                                         <div class="flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                                                {{ strtoupper(substr($item->user?->name ?? 'U', 0, 1)) }}
+                                            @if ($item->user?->avatar_url)
+                                                <img src="{{ $item->user->avatar_url }}" alt="" class="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                            @endif
+                                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'U', 0, 1)) }}
                                             </div>
                                             <div class="min-w-0">
                                                 <span class="font-bold text-slate-800 block truncate leading-tight">{{ $item->user?->name ?? 'Karyawan MSN' }}</span>
@@ -352,13 +354,6 @@
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{{ $item->jenis }}</span>
                                         @endif
-                                    </td>
-
-                                    <!-- Keperluan -->
-                                    <td class="py-3.5 px-4 max-w-xs">
-                                        <span class="text-xs text-slate-600 block truncate" title="{{ $item->keperluan ?? '-' }}">
-                                            {{ $item->keperluan ?? '-' }}
-                                        </span>
                                     </td>
 
                                     <!-- Total Pengajuan -->
@@ -517,8 +512,11 @@
                                     <!-- Applicant Row -->
                                     <div class="flex items-center justify-between gap-3">
                                         <div class="flex items-center gap-2.5 min-w-0">
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                                                {{ substr($item->user?->name ?? 'U', 0, 1) }}
+                                            @if ($item->user?->avatar_url)
+                                                <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                            @endif
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                {{ $item->user?->initials ?? substr($item->user?->name ?? 'U', 0, 1) }}
                                             </div>
                                             <div class="min-w-0">
                                                 <p class="font-bold text-slate-900 text-xs truncate">{{ $item->user?->name ?? 'Karyawan MSN' }}</p>

@@ -349,7 +349,6 @@
                                     <th class="py-3.5 px-4 font-bold">Tanggal</th>
                                     <th class="py-3.5 px-4 font-bold">Pemohon</th>
                                     <th class="py-3.5 px-4 font-bold text-center">Jenis</th>
-                                    <th class="py-3.5 px-4 font-bold">Keperluan</th>
                                     <th class="py-3.5 px-4 font-bold text-right">Total Pengajuan</th>
                                     <th class="py-3.5 px-4 font-bold text-center">Status</th>
                                     <th class="py-3.5 px-4 font-bold text-center w-28">Aksi</th>
@@ -418,8 +417,11 @@
                                         <!-- Pemohon -->
                                         <td class="py-3.5 px-4 whitespace-nowrap">
                                             <div class="flex items-center gap-2.5">
-                                                <div class="w-8 h-8 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20">
-                                                    {{ strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
+                                                @if ($item->user?->avatar_url)
+                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                @endif
+                                                <div class="w-8 h-8 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                    {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
                                                 </div>
                                                 <div class="min-w-0">
                                                     <span class="font-bold text-slate-800 block truncate leading-tight">{{ $item->user?->name ?? 'Karyawan MSN' }}</span>
@@ -439,13 +441,6 @@
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white shadow-2xs">Permintaan</span>
                                             @endif
-                                        </td>
-
-                                        <!-- Keperluan -->
-                                        <td class="py-3.5 px-4 max-w-xs">
-                                            <span class="text-xs text-slate-600 block truncate" title="{{ $item->keperluan ?? '-' }}">
-                                                {{ $item->keperluan ?? '-' }}
-                                            </span>
                                         </td>
 
                                         <!-- Total Pengajuan -->
@@ -592,8 +587,11 @@
                                         <!-- Applicant & Nominal Box -->
                                         <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
                                             <div class="flex items-center gap-2.5 min-w-0">
-                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20">
-                                                    {{ strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
+                                                @if ($item->user?->avatar_url)
+                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                @endif
+                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                    {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
                                                 </div>
                                                 <div class="min-w-0">
                                                     <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-xs font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
@@ -833,7 +831,6 @@
                                     <th class="py-3.5 px-4 font-bold">Tanggal</th>
                                     <th class="py-3.5 px-4 font-bold">Pemohon</th>
                                     <th class="py-3.5 px-4 font-bold text-center">Jenis</th>
-                                    <th class="py-3.5 px-4 font-bold">Keperluan</th>
                                     <th class="py-3.5 px-4 font-bold text-right">Total Pengajuan</th>
                                     <th class="py-3.5 px-4 font-bold text-center">Status</th>
                                     <th class="py-3.5 px-4 font-bold text-center w-28">Aksi</th>
@@ -911,8 +908,11 @@
                                         <!-- Pemohon -->
                                         <td class="py-3.5 px-4 whitespace-nowrap">
                                             <div class="flex items-center gap-2.5">
-                                                <div class="w-8 h-8 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20">
-                                                    {{ strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
+                                                @if ($item->user?->avatar_url)
+                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                @endif
+                                                <div class="w-8 h-8 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                    {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
                                                 </div>
                                                 <div class="min-w-0">
                                                     <span class="font-bold text-slate-800 block truncate leading-tight">{{ $item->user?->name ?? 'Karyawan MSN' }}</span>
@@ -932,13 +932,6 @@
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white shadow-2xs">Permintaan</span>
                                             @endif
-                                        </td>
-
-                                        <!-- Keperluan -->
-                                        <td class="py-3.5 px-4 max-w-xs">
-                                            <span class="text-xs text-slate-600 block truncate" title="{{ $item->keperluan ?? '-' }}">
-                                                {{ $item->keperluan ?? '-' }}
-                                            </span>
                                         </td>
 
                                         <!-- Total Pengajuan -->
@@ -1080,8 +1073,11 @@
                                         <!-- Applicant & Nominal Box -->
                                         <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
                                             <div class="flex items-center gap-2.5 min-w-0">
-                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20">
-                                                    {{ strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
+                                                @if ($item->user?->avatar_url)
+                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                @endif
+                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                    {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
                                                 </div>
                                                 <div class="min-w-0">
                                                     <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-xs font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
