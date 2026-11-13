@@ -81,13 +81,13 @@
             
             /* Right Arch & Employee cutout on Mobile right side */
             .hh-right{position:absolute;right:0;top:0;bottom:70px;width:60%;height:auto;margin:0;align-self:auto;display:flex;align-items:flex-end;justify-content:flex-end;pointer-events:none;z-index:2;overflow:hidden}
-            .hh-circle-layer{position:absolute;right:-14px;top:75px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 50%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.3)}
-            .hh-circle-ring{position:absolute;right:-28px;top:58px;bottom:0;left:auto;transform:none;width:220px;height:auto;border-radius:999px 999px 0 0;border:1.5px solid rgba(94,234,212,.35)}
-            .hh-arc-overlay{position:absolute;right:-44px;top:42px;bottom:0;left:auto;transform:none;width:250px;height:auto;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.18)}
-            .hh-flare{left:auto;right:180px;top:150px;width:6px;height:6px}
-            .hh-photo{position:absolute;right:-10px;left:auto;bottom:0;width:215px;height:100%;max-height:330px;display:flex;align-items:flex-end;justify-content:center}
+            .hh-circle-layer{position:absolute;right:-24px;top:75px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 50%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.3)}
+            .hh-circle-ring{position:absolute;right:-38px;top:58px;bottom:0;left:auto;transform:none;width:220px;height:auto;border-radius:999px 999px 0 0;border:1.5px solid rgba(94,234,212,.35)}
+            .hh-arc-overlay{position:absolute;right:-54px;top:42px;bottom:0;left:auto;transform:none;width:250px;height:auto;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.18)}
+            .hh-flare{left:auto;right:170px;top:150px;width:6px;height:6px}
+            .hh-photo{position:absolute;right:-26px;left:auto;bottom:0;width:215px;height:100%;max-height:330px;display:flex;align-items:flex-end;justify-content:center}
             .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;transform:scale(1.0);transform-origin:50% 100%}
-            .hh-initials{position:absolute;right:-14px;top:75px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;font-size:62px}
+            .hh-initials{position:absolute;right:-24px;top:75px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;font-size:62px}
             
             /* Check-in floating pill card pinned closely under the CTA button */
             .hh-check{position:relative;left:auto;right:auto;bottom:auto;transform:none;margin:16px 0 0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:4}
