@@ -8,64 +8,74 @@
         $scopeType = $stats['scope']['type'] ?? 'self';
     @endphp
     <style>
-        .hh{position:relative;overflow:hidden;border-radius:26px;margin-bottom:24px;border:1px solid rgba(45,212,191,.18);box-shadow:0 16px 40px -8px rgba(2,24,27,.45),inset 0 1px 0 rgba(94,234,212,.2);background:radial-gradient(90% 120% at 15% 15%,#0c3b3e 0%,#07272a 50%,#04191c 100%);color:#fff;user-select:none}
-        .hh-glow1{position:absolute;left:-90px;top:-90px;width:300px;height:300px;border-radius:50%;background:rgba(20,184,166,.14);filter:blur(65px);pointer-events:none}
-        .hh-glow2{position:absolute;right:40px;bottom:-20px;width:340px;height:340px;border-radius:50%;background:rgba(45,212,191,.12);filter:blur(65px);pointer-events:none}
+        .hh{position:relative;overflow:hidden;border-radius:26px;margin-bottom:24px;border:1px solid rgba(45,212,191,.22);box-shadow:0 20px 48px -10px rgba(1,20,23,.6),inset 0 1px 0 rgba(94,234,212,.25);background:radial-gradient(100% 140% at 15% 20%,#093d40 0%,#05282b 55%,#021619 100%);color:#fff;user-select:none}
+        .hh-bg-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+        .hh-glow1{position:absolute;left:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:rgba(20,184,166,.18);filter:blur(70px);pointer-events:none;z-index:1}
+        .hh-glow2{position:absolute;right:80px;bottom:-30px;width:380px;height:380px;border-radius:50%;background:rgba(45,212,191,.15);filter:blur(75px);pointer-events:none;z-index:1}
         .hh-inner{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding:0 48px;min-height:365px}
         .hh-left{min-width:0;flex:1;padding:34px 0;align-self:center}
-        .hh-date{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(13,148,136,.18);border:1px solid rgba(45,212,191,.24);font-size:12px;font-weight:600;color:#99f6e4;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-        .hh-hello{margin:18px 0 6px;font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#5eead4}
-        .hh-name{margin:0;font-weight:800;text-transform:uppercase;line-height:1.05;letter-spacing:-.025em;font-size:clamp(34px,4.2vw,54px)}
+        .hh-date{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;background:rgba(4,26,29,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(45,212,191,.35);font-size:12.5px;font-weight:600;color:#99f6e4;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+        .hh-hello-wrap{display:flex;align-items:center;gap:12px;margin:20px 0 8px}
+        .hh-hello{margin:0;font-size:12.5px;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:#fff}
+        .hh-hello-line{width:38px;height:3px;border-radius:2px;background:#2dd4bf;box-shadow:0 0 10px rgba(45,212,191,.75)}
+        .hh-name{margin:0;font-weight:900;text-transform:uppercase;line-height:1.02;letter-spacing:-.02em;font-size:clamp(38px,4.5vw,58px)}
         .hh-name .a{display:inline;color:#fff}
-        .hh-name .b{display:inline;color:#14b8a6;background:linear-gradient(90deg,#2dd4bf 0%,#14b8a6 55%,#0d9488 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding-bottom:2px}
-        .hh-sub{margin:12px 0 0;font-size:13.5px;line-height:1.55;color:rgba(204,251,241,.74);max-width:460px}
-        .hh-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}
-        .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5.5px 13px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(4,22,25,.55);color:#e2e8f0;border:1px solid rgba(255,255,255,.12)}
-        .hh-pill.ok{background:rgba(16,185,129,.14);color:#6ee7b7;border-color:rgba(52,211,153,.28);font-weight:700}
-        .hh-dot{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399}
-        .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);box-shadow:0 8px 22px -4px rgba(13,148,136,.55),inset 0 1px 0 rgba(255,255,255,.22);transition:transform .15s ease,filter .15s ease}
-        .hh-cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
-        .hh-right{position:relative;flex:none;width:380px;height:365px;margin-right:16px;align-self:flex-end}
-        .hh-ring{position:absolute;left:22px;right:22px;top:42px;bottom:0;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.16);pointer-events:none;z-index:1}
-        .hh-dot-p{position:absolute;top:64px;left:8px;width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 12px rgba(167,139,250,.85);pointer-events:none;z-index:1}
-        .hh-dot-c{position:absolute;bottom:126px;left:0;width:6px;height:6px;border-radius:50%;background:#5eead4;box-shadow:0 0 10px rgba(94,234,212,.85);pointer-events:none;z-index:1}
-        .hh-arch{position:absolute;left:48px;right:48px;top:68px;bottom:0;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 45%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.22);z-index:1}
-        .hh-photo{position:absolute;left:0;right:0;bottom:-28px;height:365px;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
-        .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.11);transform-origin:50% 100%;filter:drop-shadow(0 12px 24px rgba(0,0,0,.42))}
-        .hh-initials{position:absolute;left:48px;right:48px;top:68px;bottom:0;border-radius:999px 999px 0 0;display:none;align-items:center;justify-content:center;font-size:68px;font-weight:800;color:rgba(255,255,255,.92);z-index:2}
+        .hh-name .b{display:inline;margin-left:6px;color:#2dd4bf;background:linear-gradient(90deg,#5eead4 0%,#2dd4bf 55%,#14b8a6 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding-bottom:2px}
+        .hh-sub{margin:12px 0 0;font-size:13.5px;font-style:italic;line-height:1.55;color:rgba(204,251,241,.82);max-width:480px}
+        .hh-pills{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px}
+        .hh-pill{display:inline-flex;align-items:center;gap:7px;padding:6.5px 14px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(2,19,22,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#e2e8f0;border:1px solid rgba(45,212,191,.25)}
+        .hh-pill.ok{background:rgba(2,24,27,.75);color:#fff;border-color:rgba(45,212,191,.45);font-weight:700}
+        .hh-dot{width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 10px #10b981}
+        .hh-cta{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:12px 24px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);border:1px solid rgba(94,234,212,.35);box-shadow:0 10px 24px -4px rgba(13,148,136,.6),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .15s ease,filter .15s ease}
+        .hh-cta:hover{filter:brightness(1.1);transform:translateY(-1px)}
+        .hh-cta svg{transition:transform .15s ease}
+        .hh-cta:hover svg{transform:translateX(2px)}
+        .hh-right{position:relative;flex:none;width:400px;height:365px;margin-right:12px;align-self:flex-end}
+        .hh-circle-layer{position:absolute;right:0;bottom:-40px;width:370px;height:370px;border-radius:50%;background:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);opacity:.92;box-shadow:0 0 45px rgba(20,184,166,.35);z-index:1}
+        .hh-circle-ring{position:absolute;right:-20px;bottom:-60px;width:410px;height:410px;border-radius:50%;border:1.5px solid rgba(94,234,212,.35);pointer-events:none;z-index:1}
+        .hh-arc-overlay{position:absolute;right:-50px;bottom:-90px;width:470px;height:470px;border-radius:50%;border:1px solid rgba(94,234,212,.18);pointer-events:none;z-index:1}
+        .hh-flare{position:absolute;left:40px;top:130px;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 16px 6px rgba(94,234,212,.9),0 0 30px 12px rgba(20,184,166,.6);pointer-events:none;z-index:2}
+        .hh-photo{position:absolute;left:0;right:0;bottom:-24px;height:365px;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+        .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.11);transform-origin:50% 100%;filter:drop-shadow(0 14px 28px rgba(0,0,0,.5))}
+        .hh-initials{position:absolute;right:0;bottom:-40px;width:370px;height:370px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:78px;font-weight:900;color:rgba(255,255,255,.95);z-index:2}
         .hh-initials.show{display:flex}
-        .hh-check{position:absolute;left:-24px;bottom:38px;z-index:3;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:16px;background:rgba(6,34,38,.90);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(94,234,212,.22);box-shadow:0 12px 28px rgba(0,0,0,.45)}
-        .hh-check .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.2)}
-        .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#34d399;display:block;box-shadow:0 0 8px #34d399}
-        .hh-check.no .ic{background:rgba(245,158,11,.2)}
-        .hh-check.no .ic i{background:#fbbf24;box-shadow:0 0 8px #fbbf24}
-        .hh-check b{display:block;font-size:12px;color:#fff;letter-spacing:.01em}
-        .hh-check small{display:block;font-size:10.5px;color:rgba(153,246,228,.75);margin-top:1px}
+        .hh-check{position:absolute;left:-55px;bottom:36px;z-index:3;display:flex;align-items:center;gap:14px;padding:12px 20px;border-radius:20px;background:rgba(4,24,28,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.3);box-shadow:0 14px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
+        .hh-check .ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.15)}
+        .hh-check .ic i{width:12px;height:12px;border-radius:50%;background:#10b981;display:block;box-shadow:0 0 10px #10b981}
+        .hh-check.no .ic{background:rgba(245,158,11,.15)}
+        .hh-check.no .ic i{background:#eab308;box-shadow:0 0 12px 2px #eab308}
+        .hh-check b{display:block;font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.01em}
+        .hh-check small{display:block;font-size:11px;color:rgba(153,246,228,.75);margin-top:1.5px}
         @media (min-width:768px) and (max-width:1100px){
             .hh-inner{padding:0 28px;min-height:330px;gap:20px}
-            .hh-right{width:320px;height:325px;margin-right:0}
-            .hh-ring{left:18px;right:18px;top:36px}
-            .hh-arch,.hh-initials{left:40px;right:40px;top:60px}
-            .hh-photo{bottom:-24px;height:325px}
+            .hh-right{width:330px;height:325px;margin-right:0}
+            .hh-circle-layer{width:310px;height:310px;bottom:-30px}
+            .hh-circle-ring{width:345px;height:345px;bottom:-48px}
+            .hh-arc-overlay{width:390px;height:390px;bottom:-70px}
+            .hh-photo{bottom:-20px;height:325px}
+            .hh-check{left:-30px;bottom:24px}
         }
         @media (max-width:767px){
             .hh{border-radius:22px;margin-bottom:20px}
             .hh-inner{flex-direction:column;align-items:stretch;padding:22px 20px 0;gap:8px;min-height:auto}
             .hh-left{padding:0;align-self:stretch;text-align:left}
             .hh-date{font-size:11px;padding:5px 12px}
-            .hh-hello{margin:14px 0 4px;font-size:11px;letter-spacing:.2em}
+            .hh-hello-wrap{margin:14px 0 4px;gap:8px}
+            .hh-hello{font-size:11px;letter-spacing:.22em}
+            .hh-hello-line{width:28px;height:2.5px}
             .hh-name{font-size:clamp(30px,9.5vw,42px)}
             .hh-sub{margin:8px 0 0;font-size:12.5px}
             .hh-pills{margin-top:12px;gap:6px}
-            .hh-pill{font-size:11px;padding:4.5px 11px}
+            .hh-pill{font-size:11px;padding:5px 12px}
             .hh-cta{margin-top:14px;padding:10px 18px;font-size:12px}
-            .hh-right{width:280px;height:260px;margin:4px auto 0;align-self:center}
-            .hh-ring{left:16px;right:16px;top:28px}
-            .hh-arch,.hh-initials{left:36px;right:36px;top:48px}
-            .hh-photo{left:0;right:0;bottom:-20px;height:260px}
-            .hh-photo img{transform:scale(1.09)}
-            .hh-check{left:-8px;bottom:16px;padding:8px 13px;border-radius:14px}
-            .hh-initials{font-size:52px}
+            .hh-right{width:290px;height:265px;margin:4px auto 0;align-self:center}
+            .hh-circle-layer{width:250px;height:250px;bottom:-20px}
+            .hh-circle-ring{width:280px;height:280px;bottom:-35px}
+            .hh-arc-overlay{width:315px;height:315px;bottom:-50px}
+            .hh-photo{left:0;right:0;bottom:-16px;height:265px}
+            .hh-photo img{transform:scale(1.08)}
+            .hh-check{left:-10px;bottom:16px;padding:8px 14px;border-radius:14px}
+            .hh-initials{width:250px;height:250px;bottom:-20px;font-size:56px}
         }
         /* Slide-in Entrance Animations on Dashboard Load (Zero Scrollbar / Zero Layout Shift) */
         @keyframes hubSlideLeft{0%{opacity:0;transform:translate3d(-24px,0,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
@@ -79,8 +89,8 @@
         .hh-sub{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .19s both;will-change:transform,opacity}
         .hh-pills{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .24s both;will-change:transform,opacity}
         .hh-cta{animation:hubSlideLeft .48s cubic-bezier(.22,1,.36,1) .29s both;will-change:transform,opacity}
-        .hh-ring{animation:hubArchUp .55s cubic-bezier(.22,1,.36,1) .08s both;transform-origin:50% 100%;will-change:transform,opacity}
-        .hh-arch{animation:hubArchUp .55s cubic-bezier(.22,1,.36,1) .12s both;transform-origin:50% 100%;will-change:transform,opacity}
+        .hh-circle-layer{animation:hubArchUp .55s cubic-bezier(.22,1,.36,1) .08s both;transform-origin:50% 100%;will-change:transform,opacity}
+        .hh-circle-ring,.hh-arc-overlay{animation:hubArchUp .58s cubic-bezier(.22,1,.36,1) .10s both;transform-origin:50% 100%;will-change:transform,opacity}
         .hh-photo{animation:hubPhotoUp .62s cubic-bezier(.16,1,.3,1) .18s both;will-change:transform,opacity}
         .hh-check{animation:hubBadgePop .52s cubic-bezier(.22,1,.36,1) .32s both;will-change:transform,opacity}
         .hub-anim-section{overflow-x:clip}
@@ -92,19 +102,62 @@
         .hub-stagger > *:nth-child(4){animation-delay:.30s}
         .hub-stagger > *:nth-child(5){animation-delay:.36s}
         @media (prefers-reduced-motion:reduce){
-            .hh-date,.hh-hello,.hh-name,.hh-sub,.hh-pills,.hh-cta,.hh-ring,.hh-arch,.hh-photo,.hh-check,.hub-anim-d2,.hub-stagger > *{animation:none!important}
+            .hh-date,.hh-hello,.hh-name,.hh-sub,.hh-pills,.hh-cta,.hh-circle-layer,.hh-circle-ring,.hh-arc-overlay,.hh-photo,.hh-check,.hub-anim-d2,.hub-stagger > *{animation:none!important}
         }
     </style>
     <div class="hh">
+        <!-- SVG Futuristic Background Geometry (Diagonal Bars, Concentric Orbit Rings, Grid Dots) -->
+        <svg class="hh-bg-svg" viewBox="0 0 1100 365" fill="none" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="hhDiag1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.35"/>
+                    <stop offset="60%" stop-color="#14b8a6" stop-opacity="0.12"/>
+                    <stop offset="100%" stop-color="#04272a" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="hhDiag2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="hhArcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.45"/>
+                    <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.2"/>
+                    <stop offset="100%" stop-color="#042f2e" stop-opacity="0.05"/>
+                </linearGradient>
+                <!-- Dot Pattern -->
+                <pattern id="hhDotGrid" x="0" y="0" width="18" height="18" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1.5" fill="#5eead4" fill-opacity="0.28"/>
+                </pattern>
+            </defs>
+            <!-- Left Top Diagonal Futuristic Glass Bars -->
+            <path d="M-80 -40 L90 -40 L-20 220 L-190 220 Z" fill="url(#hhDiag1)"/>
+            <path d="M-20 -40 L45 -40 L-85 240 L-150 240 Z" fill="url(#hhDiag2)"/>
+            <path d="M50 -40 L85 -40 L-40 220 L-75 220 Z" fill="url(#hhDiag2)" opacity="0.6"/>
+
+            <!-- Right Top Accent Wave Ribbon -->
+            <path d="M780 0 C860 120, 940 180, 1100 240 L1100 0 Z" fill="url(#hhDiag1)" opacity="0.45"/>
+
+            <!-- Large Concentric Orbit Rims Centered at Employee Portrait Circle (center around 910, 220) -->
+            <circle cx="910" cy="220" r="320" stroke="url(#hhArcGrad)" stroke-width="1.2" opacity="0.6"/>
+            <circle cx="910" cy="220" r="410" stroke="url(#hhArcGrad)" stroke-width="1" stroke-dasharray="8 6" opacity="0.4"/>
+            <circle cx="910" cy="220" r="510" stroke="url(#hhArcGrad)" stroke-width="0.8" opacity="0.3"/>
+
+            <!-- Tech Dot Matrix Grids (Top Right & Bottom Left) -->
+            <rect x="980" y="24" width="90" height="54" fill="url(#hhDotGrid)"/>
+            <rect x="28" y="285" width="90" height="54" fill="url(#hhDotGrid)"/>
+        </svg>
+
         <div class="hh-glow1"></div>
         <div class="hh-glow2"></div>
         <div class="hh-inner">
             <div class="hh-left">
                 <div class="hh-date">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     <span id="hub-live-clock">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y · H:i:s') }} WIB</span>
                 </div>
-                <p class="hh-hello">Selamat Datang 👋</p>
+                <div class="hh-hello-wrap">
+                    <p class="hh-hello">SELAMAT DATANG</p>
+                    <span class="hh-hello-line"></span>
+                </div>
                 <h1 class="hh-name">
                     <span class="a">{{ $firstName }}</span>
                     @if ($restName !== '')
@@ -113,28 +166,35 @@
                 </h1>
                 <p class="hh-sub">{{ $stats['scope']['subtitle'] }}</p>
                 <div class="hh-pills">
-                    <span class="hh-pill ok"><span class="hh-dot" style="{{ $user->is_active ? '' : 'background:#fb7185;box-shadow:0 0 8px #fb7185' }}"></span>{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-                    <span class="hh-pill">NIK: {{ $user->employee_code ?? 'MSN' }}</span>
+                    <span class="hh-pill ok"><span class="hh-dot" style="{{ $user->is_active ? '' : 'background:#fb7185;box-shadow:0 0 10px #fb7185' }}"></span>{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    <span class="hh-pill">NIK: {{ $user->employee_code ?? ($user->nik ?? 'MSN') }}</span>
                     @if ($user->division)
-                        <span class="hh-pill">{{ $user->division }}</span>
+                        <span class="hh-pill">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            {{ $user->division }}
+                        </span>
                     @endif
                 </div>
                 <a href="{{ route('portal.profile') }}" class="hh-cta">
-                    @if ($scopeType === 'company')
-                        🏢 {{ $stats['scope']['badge'] ?? 'Seluruh Perusahaan' }}
-                    @elseif ($scopeType === 'division')
-                        👥 {{ $stats['scope']['badge'] }}
-                    @else
-                        📊 Statistik Pribadi
-                    @endif
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    <span>
+                        @if ($scopeType === 'company')
+                            {{ $stats['scope']['badge'] ?? 'Seluruh Perusahaan' }}
+                        @elseif ($scopeType === 'division')
+                            {{ $stats['scope']['badge'] }}
+                        @else
+                            Statistik Pribadi
+                        @endif
+                    </span>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
             </div>
 
             <div class="hh-right">
-                <div class="hh-ring"></div>
-                <span class="hh-dot-p"></span>
-                <span class="hh-dot-c"></span>
-                <div class="hh-arch"></div>
+                <div class="hh-circle-ring"></div>
+                <div class="hh-arc-overlay"></div>
+                <div class="hh-circle-layer"></div>
+                <div class="hh-flare"></div>
                 <div class="hh-photo">
                     @if ($user->avatar_url)
                         <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}"
@@ -148,7 +208,7 @@
                     <span class="ic"><i></i></span>
                     <div>
                         <b>{{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Check-in' }}</b>
-                        <small>{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada absen hari ini' }}</small>
+                        <small>{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada rekam hari ini' }}</small>
                     </div>
                 </div>
             </div>
