@@ -60,6 +60,20 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Check if the authenticated user has write/edit permissions for employees.
+     * HRD has read-only view permission; only Super Admin, Admin, or authorized managers can modify.
+     */
+    protected function authorizeWrite(Request $request): void
+    {
+        $user = $request->user();
+        abort_unless(
+            $user && ($user->hasRole(['super_admin', 'admin']) || ($user->can('attendance.employee.manage') && ! $user->hasRole('hrd'))),
+            403,
+            'Akses ditolak. Role HRD hanya memiliki izin melihat data karyawan (Read-Only). Aksi penambahan/pengubahan hanya dapat dilakukan oleh Administrator.'
+        );
+    }
+
+    /**
      * Display a listing of employees with search and filters
      */
     public function index(Request $request): View
@@ -163,10 +177,12 @@ class EmployeeController extends Controller
             ->get();
 
         $roles = Role::query()->orderBy('name')->get();
+        $canWrite = $request->user()->hasRole(['super_admin', 'admin']) || ($request->user()->can('attendance.employee.manage') && ! $request->user()->hasRole('hrd'));
 
         return view('portal.employees.index', [
             'employees' => $employees,
             'attendanceStats' => $attendanceStats,
+            'canWrite' => $canWrite,
             'month' => $month,
             'year' => $year,
             'totalEmployees' => $totalEmployees,
@@ -193,7 +209,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeWrite($request);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -293,7 +309,7 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeWrite($request);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -381,7 +397,7 @@ class EmployeeController extends Controller
      */
     public function destroy(Request $request, User $user): RedirectResponse
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeWrite($request);
 
         // Prevent self-deletion
         if ($user->id === $request->user()->id) {
@@ -413,7 +429,7 @@ class EmployeeController extends Controller
      */
     public function resetPassword(Request $request, User $user): RedirectResponse
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeWrite($request);
 
         $defaultPassword = 'msn' . rand(1000, 9999);
         $user->update([
@@ -436,7 +452,7 @@ class EmployeeController extends Controller
      */
     public function resetFace(Request $request, User $user, AttendanceService $attendanceService): RedirectResponse
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeWrite($request);
 
         $reason = trim($request->string('reason')->toString());
         if ($reason === '') {
