@@ -239,106 +239,164 @@
                 </span>
             </div>
 
-            <!-- Grid Kartu Karyawan (Horizontal: Foto di samping Data) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5">
+            <!-- Grid Kartu Karyawan (Sesuai Desain Modern Referensi) -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 @forelse ($employeeStats as $stat)
                 @php
                     $cardUser = $stat['user'];
                     $cardAvatar = $cardUser->avatar_url ?? null;
                     $cardInitials = $cardUser->initials ?? strtoupper(substr($cardUser->name ?? 'K', 0, 2));
                 @endphp
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group flex items-stretch">
+                <div class="bg-white rounded-[28px] border border-slate-100 shadow-[0_12px_36px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-all duration-300 p-4 sm:p-5 relative overflow-hidden group flex flex-col sm:flex-row items-stretch gap-4 sm:gap-5">
 
-                    <!-- KIRI: Panel Foto Profil Besar ala Dashboard -->
-                    <div class="relative overflow-hidden shrink-0" style="width:150px;min-height:220px;background:radial-gradient(130% 120% at 20% 10%,#0b4a4e 0%,#05282b 60%,#021619 100%);">
-                        <!-- Glow & Arc Dekoratif -->
-                        <div class="absolute pointer-events-none" style="left:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:rgba(20,184,166,.25);filter:blur(36px);"></div>
-                        <div class="absolute pointer-events-none" style="left:50%;bottom:-60px;transform:translateX(-50%);width:170px;height:170px;border-radius:50%;background:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);box-shadow:0 0 28px rgba(20,184,166,.45);"></div>
-                        <div class="absolute pointer-events-none" style="left:50%;bottom:-76px;transform:translateX(-50%);width:202px;height:202px;border-radius:50%;border:1.5px solid rgba(94,234,212,.35);"></div>
-                        <div class="absolute pointer-events-none" style="left:50%;bottom:-92px;transform:translateX(-50%);width:234px;height:234px;border-radius:50%;border:1px solid rgba(94,234,212,.15);"></div>
+                    <!-- Background Soft Ambient Wave Kanan -->
+                    <svg class="absolute right-0 bottom-0 h-full w-2/5 pointer-events-none opacity-25" viewBox="0 0 200 200" fill="none" preserveAspectRatio="none">
+                        <circle cx="170" cy="170" r="130" fill="#2dd4bf" filter="blur(50px)"/>
+                        <path d="M 40 200 C 110 130, 150 170, 200 110" stroke="#0d9488" stroke-width="1.5" stroke-opacity="0.3"/>
+                        <path d="M 80 200 C 140 150, 170 180, 200 140" stroke="#0d9488" stroke-width="1.5" stroke-opacity="0.2"/>
+                    </svg>
 
-                        <!-- Badge Jumlah Pengajuan -->
-                        <span class="absolute top-2.5 left-2.5 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold text-teal-100" style="background:rgba(2,19,22,.6);border:1px solid rgba(45,212,191,.35);backdrop-filter:blur(6px);">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" style="box-shadow:0 0 6px #34d399;"></span>
-                            {{ $stat['total_count'] }} Pengajuan
-                        </span>
-
-                        <!-- Foto Profil / Inisial -->
-                        <div class="absolute inset-x-0 bottom-0 z-[2] flex items-end justify-center pointer-events-none" style="height:185px;">
-                            @if ($cardAvatar)
-                                <img src="{{ $cardAvatar }}" alt="{{ $cardUser->name }}"
-                                     class="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
-                                     style="object-position:center bottom;transform-origin:50% 100%;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45));"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="items-center justify-center text-white font-black" style="display:none;width:96px;height:96px;margin-bottom:34px;border-radius:50%;font-size:32px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);">
-                                    {{ $cardInitials }}
-                                </div>
-                            @else
-                                <div class="flex items-center justify-center text-white font-black" style="width:96px;height:96px;margin-bottom:34px;border-radius:50%;font-size:32px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);">
-                                    {{ $cardInitials }}
-                                </div>
-                            @endif
+                    <!-- KIRI: Panel Foto Profil Modern dengan Kurva Organik -->
+                    <div class="relative shrink-0 w-full sm:w-[195px] h-[230px] rounded-[24px] sm:rounded-l-[24px] sm:rounded-tr-[24px] sm:rounded-br-[80px] overflow-hidden flex items-end justify-center select-none"
+                         style="background: linear-gradient(145deg, #029990 0%, #038078 45%, #015c57 100%);">
+                        
+                        <!-- Glow & Curved Lines Abstract Dekoratif -->
+                        <div class="absolute inset-0 pointer-events-none">
+                            <div class="absolute -top-10 -left-10 w-36 h-36 rounded-full bg-teal-300/20 blur-xl"></div>
+                            <svg class="w-full h-full opacity-35" viewBox="0 0 200 240" fill="none" preserveAspectRatio="none">
+                                <circle cx="40" cy="190" r="110" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+                                <circle cx="40" cy="190" r="140" stroke="rgba(94,234,212,0.3)" stroke-width="1.5"/>
+                                <circle cx="40" cy="190" r="80" fill="rgba(20,184,166,0.35)"/>
+                            </svg>
                         </div>
+
+                        <!-- Pill Badge Jumlah Pengajuan di Kiri Atas -->
+                        <div class="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold text-white shadow-xs"
+                             style="background: rgba(3, 62, 57, 0.78); backdrop-filter: blur(8px); border: 1px solid rgba(94, 234, 212, 0.45);">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                            <span>{{ $stat['total_count'] }} Pengajuan</span>
+                        </div>
+
+                        <!-- Foto Profil Karyawan / Fallback Inisial -->
+                        @if ($cardAvatar)
+                            <img src="{{ $cardAvatar }}" alt="{{ $cardUser->name }}"
+                                 class="h-full w-full object-contain pointer-events-none transition-transform duration-500 group-hover:scale-105"
+                                 style="object-position: center bottom; filter: drop-shadow(0 12px 18px rgba(0,0,0,0.35));"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="items-center justify-center text-white font-black" style="display:none; width:90px; height:90px; margin-bottom:30px; border-radius:50%; font-size:32px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.4); text-shadow:0 2px 8px rgba(0,0,0,0.3);">
+                                {{ $cardInitials }}
+                            </div>
+                        @else
+                            <div class="flex items-center justify-center text-white font-black" style="width:90px; height:90px; margin-bottom:30px; border-radius:50%; font-size:32px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.4); text-shadow:0 2px 8px rgba(0,0,0,0.3);">
+                                {{ $cardInitials }}
+                            </div>
+                        @endif
                     </div>
 
-                    <!-- KANAN: Data Karyawan -->
-                    <div class="flex-1 min-w-0 p-4 flex flex-col justify-between gap-3">
-                        <div class="min-w-0">
-                            <!-- Nama & Kode -->
-                            <h3 class="font-extrabold text-slate-900 text-sm uppercase tracking-tight truncate leading-tight" title="{{ $cardUser->name }}">
-                                {{ $cardUser->name }}
-                            </h3>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <span class="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 border border-teal-200/80 px-1.5 py-0.5 rounded-md">
-                                    {{ $cardUser->employee_code ?: 'KR' . $cardUser->id }}
-                                </span>
-                                <span class="text-[10px] font-semibold text-slate-500 truncate">
-                                    {{ $cardUser->division ?: 'Teknik' }}
-                                </span>
-                            </div>
-
-                            <!-- Rincian -->
-                            <div class="mt-3 space-y-1.5 text-[11.5px] text-slate-600">
-                                <div class="flex items-center justify-between gap-2">
-                                    <span class="inline-flex items-center gap-1.5 text-slate-400">
-                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        Periode
+                    <!-- KANAN: Data Lengkap Karyawan Sesuai Referensi -->
+                    <div class="flex-1 min-w-0 flex flex-col justify-between h-full gap-3 sm:gap-4 relative z-10 py-1">
+                        
+                        <!-- Baris 1: Nama Karyawan & Periode -->
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h3 class="font-black text-slate-900 text-lg sm:text-xl uppercase tracking-tight truncate leading-tight" title="{{ $cardUser->name }}">
+                                    {{ $cardUser->name }}
+                                </h3>
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono text-teal-800 bg-[#e0f4f2] border border-teal-200">
+                                        {{ $cardUser->employee_code ?: 'KR' . $cardUser->id }}
                                     </span>
-                                    <span class="font-medium text-slate-700 text-right truncate">{{ $bulanNames[$selectedBulan] ?? 'November' }} {{ $selectedTahun }}</span>
-                                </div>
-                                <div class="flex items-center justify-between gap-2">
-                                    <span class="inline-flex items-center gap-1.5 text-slate-400">
-                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        Total Lembur
+                                    <span class="text-slate-300">|</span>
+                                    <span class="text-xs sm:text-sm font-semibold text-slate-600 truncate">
+                                        {{ $cardUser->division ?: 'Teknik' }}
                                     </span>
-                                    <span class="font-bold text-slate-800 text-right">{{ $stat['total_days'] }} hari</span>
-                                </div>
-                                <div class="flex items-center justify-between gap-2">
-                                    <span class="inline-flex items-center gap-1.5 text-slate-400">
-                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        Lokasi
-                                    </span>
-                                    <span class="font-medium text-slate-700 text-right truncate">{{ $cardUser->branch ?? $cardUser->location ?? 'Bandung' }}</span>
                                 </div>
                             </div>
 
-                            <!-- Total Uang Lembur -->
-                            <div class="mt-3 px-3 py-2 rounded-xl flex items-center justify-between gap-2" style="background:linear-gradient(135deg,#f0fdfa 0%,#ecfeff 100%);border:1px solid #ccfbf1;">
-                                <span class="text-[9.5px] font-bold uppercase tracking-wider text-teal-700">Total Uang</span>
-                                <span class="text-sm font-black text-teal-900 whitespace-nowrap">Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}</span>
+                            <!-- Periode Bulan & Tahun di Pojok Kanan Atas -->
+                            <div class="shrink-0 flex items-center gap-2">
+                                <div class="w-10 h-10 rounded-2xl bg-[#e6f7f5] flex items-center justify-center text-teal-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="8" cy="14" r="0.75" fill="currentColor"/>
+                                        <circle cx="12" cy="14" r="0.75" fill="currentColor"/>
+                                        <circle cx="16" cy="14" r="0.75" fill="currentColor"/>
+                                        <circle cx="8" cy="17" r="0.75" fill="currentColor"/>
+                                        <circle cx="12" cy="17" r="0.75" fill="currentColor"/>
+                                    </svg>
+                                </div>
+                                <div class="text-right leading-tight">
+                                    <div class="text-xs sm:text-sm font-semibold text-slate-700">{{ $bulanNames[$selectedBulan] ?? 'November' }}</div>
+                                    <div class="text-xs sm:text-sm font-semibold text-slate-700">{{ $selectedTahun }}</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Tombol Lihat Detail -->
-                        <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
-                           style="background: linear-gradient(135deg, #093c40 0%, #155E63 55%, #0d9488 100%) !important; color: #ffffff !important;"
-                           class="w-full py-2 px-3 rounded-xl text-white hover:opacity-95 active:scale-[0.99] text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm">
-                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            <span>Lihat Detail</span>
-                        </a>
+                        <!-- Baris 2: Total Lembur (Hari) & Lokasi (2 Kolom dengan Divider) -->
+                        <div class="flex items-center gap-4 py-1">
+                            <!-- Kolom Periode / Total Lembur -->
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                <div class="w-10 h-10 rounded-2xl bg-[#e6f7f5] flex items-center justify-center text-teal-700 shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[11px] font-medium text-slate-400">Periode</div>
+                                    <div class="text-sm sm:text-base font-extrabold text-slate-900 truncate">{{ $stat['total_days'] }} hari</div>
+                                </div>
+                            </div>
+
+                            <!-- Vertical Divider -->
+                            <div class="h-8 w-px bg-slate-200 shrink-0"></div>
+
+                            <!-- Kolom Lokasi -->
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                <div class="w-10 h-10 rounded-2xl bg-[#e6f7f5] flex items-center justify-center text-teal-700 shrink-0">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[11px] font-medium text-slate-400">Lokasi</div>
+                                    <div class="text-sm sm:text-base font-extrabold text-slate-900 truncate">{{ $cardUser->branch ?? $cardUser->location ?? 'Bandung' }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Baris 3: Total Uang & Tombol Lihat Detail Sesuai Mockup -->
+                        <div class="rounded-2xl sm:rounded-3xl p-2.5 sm:p-3 px-4 sm:px-5 flex items-center justify-between gap-3"
+                             style="background-color: #eaf6f4; border: 1px solid #d1ede8;">
+                            <!-- Total Uang -->
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs"
+                                     style="background: #0d6e67; color: #ffffff;">
+                                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
+                                        <path fill-rule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-4.875 3a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[10px] sm:text-[11px] font-semibold text-teal-800 uppercase tracking-wider">Total Uang</div>
+                                    <div class="text-base sm:text-xl font-black text-teal-950 whitespace-nowrap leading-tight">
+                                        Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tombol Lihat Detail Sesuai Gambar -->
+                            <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
+                               class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-2.8 rounded-full text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all transform active:scale-95 shrink-0"
+                               style="background: #04615c;">
+                                <span>Lihat Detail</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
                 @empty
