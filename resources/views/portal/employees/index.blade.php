@@ -427,19 +427,19 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
                     <thead>
-                        <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/70 border-b border-slate-200/80">
-                            <th class="py-3 px-4">Karyawan</th>
-                            <th class="py-3 px-3">Kontak &amp; Akun</th>
-                            <th class="py-3 px-3">Penempatan</th>
-                            <th class="py-3 px-3">Role &amp; Akses</th>
-                            <th class="py-3 px-3">Statistik Absen ({{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('M Y') }})</th>
-                            <th class="py-3 px-3">Status</th>
-                            <th class="py-3 pr-4 text-right">Aksi</th>
+                        <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
+                            <th class="py-3.5 px-4">Karyawan</th>
+                            <th class="py-3.5 px-3">Kontak &amp; Akun</th>
+                            <th class="py-3.5 px-3">Penempatan</th>
+                            <th class="py-3.5 px-3">Role &amp; Akses</th>
+                            <th class="py-3.5 px-3">Statistik Absen ({{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('M Y') }})</th>
+                            <th class="py-3.5 px-3">Status</th>
+                            <th class="py-3.5 pr-4 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse ($employees as $emp)
-                            <tr class="hover:bg-slate-50/70 transition-colors">
+                            <tr class="hover:bg-teal-50/20 transition-colors">
                                 <!-- Profile & Name -->
                                 <td class="py-3 px-4">
                                     <div class="flex items-center gap-3">
@@ -458,11 +458,12 @@
                                             </div>
                                         @endif
                                         <div class="min-w-0">
-                                            <span class="font-bold text-slate-900 block text-xs truncate max-w-[180px]">{{ $emp->name }}</span>
-                                            <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-400 font-mono">
-                                                <span class="text-teal-700 font-semibold">{{ $emp->employee_code }}</span>
+                                            <span class="font-bold text-slate-900 block text-xs tracking-tight truncate max-w-[200px]">{{ $emp->name }}</span>
+                                            <div class="flex items-center gap-1.5 mt-0.5 text-[11px] text-slate-500 font-mono">
+                                                <span class="text-teal-700 font-bold bg-teal-50 px-1 rounded">{{ $emp->employee_code }}</span>
                                                 @if ($emp->nik)
-                                                    <span>· NIK: {{ $emp->nik }}</span>
+                                                    <span class="text-slate-400">·</span>
+                                                    <span>NIK: {{ $emp->nik }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -471,25 +472,26 @@
 
                                 <!-- Contact & Username -->
                                 <td class="py-3 px-3">
-                                    <div class="text-slate-700">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="text-[11px] font-mono text-slate-500">{{ $emp->phone }}</span>
-                                        </div>
-                                        <div class="text-[11px] text-slate-400 truncate max-w-[160px]">{{ $emp->email }}</div>
-                                        <div class="text-[10px] text-teal-800 font-mono font-medium mt-0.5">@<span>{{ $emp->username }}</span></div>
+                                    <div class="text-slate-700 space-y-0.5 leading-snug">
+                                        <div class="text-xs font-mono font-semibold text-slate-800">{{ $emp->phone ?: '-' }}</div>
+                                        <div class="text-[11px] text-slate-500 truncate max-w-[170px]" title="{{ $emp->email }}">{{ $emp->email }}</div>
+                                        <div class="text-[10px] text-teal-700 font-mono font-medium">@<span>{{ $emp->username }}</span></div>
                                     </div>
                                 </td>
 
                                 <!-- Division, Position & Supervisor -->
                                 <td class="py-3 px-3">
-                                    <div>
-                                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200/80">
-                                            {{ $emp->division ?: 'Non-Divisi' }}
-                                        </span>
-                                        <span class="block text-slate-700 font-semibold text-xs mt-1">{{ $emp->position ?: '-' }}</span>
-                                        <span class="block text-[11px] text-slate-400 mt-0.5">
-                                            Atasan: {{ $emp->supervisor ? $emp->supervisor->name : '-' }}
-                                        </span>
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                                {{ $emp->division ?: 'Non-Divisi' }}
+                                            </span>
+                                            <span class="text-slate-800 font-semibold text-xs">{{ $emp->position ?: '-' }}</span>
+                                        </div>
+                                        <div class="text-[11px] text-slate-400">
+                                            <span class="text-slate-400">Atasan:</span>
+                                            <span class="text-slate-600 font-medium">{{ $emp->supervisor ? $emp->supervisor->name : '-' }}</span>
+                                        </div>
                                     </div>
                                 </td>
 
@@ -506,7 +508,7 @@
                                             default => 'bg-teal-50 text-teal-700 border-teal-200',
                                         };
                                     @endphp
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $roleColor }}">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold border tracking-wide shadow-2xs {{ $roleColor }}">
                                         {{ strtoupper(str_replace('_', ' ', $primaryRole)) }}
                                     </span>
                                 </td>
@@ -522,24 +524,24 @@
                                         'jam_kerja' => 0,
                                     ];
                                 @endphp
-                                <td class="py-3 px-3">
-                                    <div class="flex flex-col gap-1 min-w-[165px]">
+                                <td class="py-3.5 px-3">
+                                    <div class="flex flex-col gap-1.5 min-w-[170px]">
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200" title="Total Hadir">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
                                                 Hadir: {{ $empStats['total_hadir'] }} hr
                                             </span>
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200" title="Tepat Waktu">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200" title="Tepat Waktu">
                                                 Tepat: {{ $empStats['tepat_waktu'] }}
                                             </span>
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold {{ $empStats['terlambat'] > 0 ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-slate-50 text-slate-500 border border-slate-200' }}" title="Terlambat">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold {{ $empStats['terlambat'] > 0 ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-slate-50 text-slate-500 border border-slate-200' }}" title="Terlambat">
                                                 Telat: {{ $empStats['terlambat'] }}
                                             </span>
                                         </div>
-                                        <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono mt-0.5">
-                                            <span>⏱️ {{ $empStats['jam_kerja'] }} Jam</span>
+                                        <div class="flex items-center gap-2 text-[10.5px] text-slate-500 font-mono">
+                                            <span class="font-medium text-slate-600">⏱️ {{ $empStats['jam_kerja'] }} Jam</span>
                                             @if ($empStats['alpa'] > 0)
-                                                <span class="text-rose-600 font-bold">· Alpa: {{ $empStats['alpa'] }}</span>
+                                                <span class="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">Alpa: {{ $empStats['alpa'] }}</span>
                                             @endif
                                             @if ($empStats['cuti'] > 0)
                                                 <span class="text-blue-600 font-medium">· Cuti: {{ $empStats['cuti'] }}</span>
@@ -549,15 +551,15 @@
                                 </td>
 
                                 <!-- Status Aktif & Biometrik Wajah -->
-                                <td class="py-3 px-3">
-                                    <div class="flex flex-col items-start gap-1">
+                                <td class="py-3.5 px-3 align-middle">
+                                    <div class="flex flex-col items-start gap-1.5">
                                         @if ($emp->is_active)
-                                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                 Aktif
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                                                 Nonaktif
                                             </span>
@@ -577,12 +579,12 @@
                                 </td>
 
                                 <!-- Actions -->
-                                <td class="py-3 pr-4 text-right">
+                                <td class="py-3.5 pr-4 text-right">
                                     <div class="inline-flex items-center gap-1.5">
                                         <!-- Lihat Detail Absen (Requirement) -->
                                         <a href="{{ route('attendance.history', ['user_id' => $emp->id, 'month' => $month, 'year' => $year]) }}"
                                            title="Lihat Detail Riwayat Absen {{ $emp->name }}"
-                                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200 hover:border-teal-600 text-[11px] font-bold transition cursor-pointer shadow-2xs">
+                                           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200/90 hover:border-teal-600 text-[11px] font-bold transition cursor-pointer shadow-2xs">
                                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                             <span>Lihat Detail</span>
                                         </a>
@@ -591,7 +593,7 @@
                                         <button @click="openEdit({{ $emp->toJson() }})"
                                                 type="button" 
                                                 title="Ubah Data Karyawan"
-                                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition cursor-pointer">
+                                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-300 transition cursor-pointer shadow-2xs">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                         </button>
 
@@ -599,7 +601,7 @@
                                         <button @click="openResetFace({{ $emp->toJson() }})"
                                                 type="button" 
                                                 title="Reset Pendaftaran Wajah Absen (Registrasi Ulang)"
-                                                class="p-1.5 rounded-lg border transition cursor-pointer {{ $emp->faceTemplate ? 'border-cyan-200 bg-cyan-50/70 text-cyan-700 hover:bg-cyan-100 hover:border-cyan-300' : 'border-slate-200 text-slate-500 hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-300' }}">
+                                                class="p-1.5 rounded-lg border transition cursor-pointer shadow-2xs {{ $emp->faceTemplate ? 'border-cyan-200 bg-cyan-50/70 text-cyan-700 hover:bg-cyan-100 hover:border-cyan-300' : 'border-slate-200 text-slate-500 hover:bg-cyan-50 hover:text-cyan-700 hover:border-cyan-300' }}">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V6a2 2 0 012-2h2M4 16v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2M9 10h.01M15 10h.01M9.5 15a3.5 3.5 0 005 0"/>
                                             </svg>
@@ -609,7 +611,7 @@
                                         <button @click="openReset({{ $emp->toJson() }})"
                                                 type="button" 
                                                 title="Reset Password Akun"
-                                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 transition cursor-pointer">
+                                                class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 transition cursor-pointer shadow-2xs">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                         </button>
 
@@ -618,7 +620,7 @@
                                             <button @click="openDelete({{ $emp->toJson() }})"
                                                     type="button" 
                                                     title="Hapus / Nonaktifkan"
-                                                    class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 transition cursor-pointer">
+                                                    class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 transition cursor-pointer shadow-2xs">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             </button>
                                         @endif
