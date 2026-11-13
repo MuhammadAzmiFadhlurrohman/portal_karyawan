@@ -101,9 +101,9 @@ class EmployeeAttendanceRecapController extends Controller
 
         // Rates
         $asOf = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->endOfMonth();
-        $lateFeePerMinute = \App\Modules\Attendance\Services\SystemSettingService::getFloat('attendance.late_fee_per_minute', 250.0, $asOf);
-        $dailyMaxLateFee = \App\Modules\Attendance\Services\SystemSettingService::getFloat('attendance.daily_max_late_fee', 50000.0, $asOf);
-        $defaultAlpaFee = \App\Modules\Attendance\Services\SystemSettingService::getFloat('attendance.default_alpa_fee', 25000.0, $asOf);
+        $lateFeePerMinute = \App\Services\SystemSettingService::getFloat('attendance.late_fee_per_minute', 250.0, $asOf);
+        $dailyMaxLateFee = \App\Services\SystemSettingService::getFloat('attendance.daily_max_late_fee', 50000.0, $asOf);
+        $defaultAlpaFee = \App\Services\SystemSettingService::getFloat('attendance.default_alpa_fee', 25000.0, $asOf);
 
         // Employee Cards Data
         $cards = [];
