@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="w-full max-w-4xl mx-auto space-y-5 pb-10">
+    <div class="w-full space-y-5 pb-10">
         
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 select-none"

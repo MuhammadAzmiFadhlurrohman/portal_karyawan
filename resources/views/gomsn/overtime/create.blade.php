@@ -1,31 +1,58 @@
 <x-app-layout>
-    <div class="w-full space-y-6">
-        <!-- Top Breadcrumbs & Heading -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('gomsn.overtime.index') }}" 
-                   class="h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center shadow-xs transition shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    <div class="w-full space-y-6 pb-12">
+        <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 select-none"
+             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+            
+            <!-- Gloss Highlights (Top & Bottom Rims) -->
+            <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
+
+            <!-- Ambient Cyan Fluid Wave Glow on Right -->
+            <svg class="absolute right-0 top-0 bottom-0 h-full w-2/3 pointer-events-none opacity-40" viewBox="0 0 350 70" fill="none" preserveAspectRatio="none">
+                <path d="M 0 70 C 90 20 180 60 350 10 L 350 70 Z" fill="url(#createOvertimeWaveGrad)"/>
+                <path d="M 50 70 C 130 15 220 50 350 20" stroke="rgba(94, 234, 212, 0.4)" stroke-width="1.5" fill="none"/>
+                <defs>
+                    <linearGradient id="createOvertimeWaveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.1"/>
+                        <stop offset="70%" stop-color="#2dd4bf" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#5eead4" stop-opacity="0.35"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- Left: Glowing Clock Icon + Title -->
+            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                </a>
-                <div>
-                    <h1 class="text-lg sm:text-xl font-heading font-bold text-[#1E3A8A] tracking-tight">
+                </div>
+
+                <div class="min-w-0">
+                    <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
                         Form Pengajuan Lembur
                     </h1>
-                    <p class="text-[11px] sm:text-xs text-slate-500">
-                        Pastikan Anda telah melakukan absensi hadir sebelum mengajukan jam kerja lembur.
+                    <p class="text-[11px] sm:text-xs text-teal-100/85 mt-0.5 leading-snug">
+                        Pastikan Anda telah melakukan absensi hadir sebelum mengajukan jam kerja lembur
                     </p>
                 </div>
             </div>
-            <a href="{{ route('gomsn.overtime.index') }}" class="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-blue-600 hover:text-blue-800 font-semibold shadow-2xs">
-                <span>Daftar Lembur</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </a>
+
+            <!-- Right: Back Button -->
+            <div class="relative z-10 shrink-0 self-start sm:self-auto">
+                <a href="{{ route('gomsn.overtime.index') }}"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold backdrop-blur-xs transition shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span>Daftar Lembur</span>
+                </a>
+            </div>
         </div>
 
         @if (session('error'))
-        <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl flex items-start gap-3 shadow-xs">
+        <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-2xl flex items-start gap-3 shadow-xs">
             <div class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
                 ✕
             </div>
@@ -36,52 +63,64 @@
         </div>
         @endif
 
-        <!-- Overtime Form Card (Pixel-aligned with User Mockup) -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8"
+        <!-- Overtime Form Card (Premium Design Matching Pengajuan) -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
              x-data="overtimeForm()"
              x-init="init()">
-            <form method="POST" action="{{ route('gomsn.overtime.store') }}" class="space-y-6">
+            
+            <!-- Card Header Accent -->
+            <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-5 py-3.5 flex items-center justify-between text-white">
+                <div class="flex items-center gap-2 font-bold text-xs sm:text-sm">
+                    <span class="text-[#18C4C4] font-extrabold">#</span>
+                    <span>Informasi &amp; Jadwal Jam Lembur</span>
+                </div>
+                <span class="text-[11px] font-semibold text-teal-100/90 bg-white/10 px-2.5 py-1 rounded-full">
+                    Form Mandiri
+                </span>
+            </div>
+
+            <form method="POST" action="{{ route('gomsn.overtime.store') }}" class="p-5 sm:p-8 space-y-6">
                 @csrf
 
                 <!-- Tanggal Lembur -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Tanggal Lembur
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                        Tanggal Lembur <span class="text-rose-500">*</span>
                     </label>
-                    <div class="relative">
+                    <div class="relative max-w-md">
                         <input type="date"
                                name="tanggal"
                                x-model="tanggal"
                                @change="checkAttendance()"
                                required
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-xs text-slate-800 font-medium" />
+                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
                     </div>
-                    <p class="text-[11px] text-slate-500 mt-1">
-                        Pastikan Anda sudah melakukan absensi pada tanggal ini
+                    <p class="text-[11px] text-slate-500">
+                        Pastikan Anda sudah melakukan absensi masuk pada tanggal yang dipilih.
                     </p>
 
                     <!-- Checking Indicator -->
-                    <div x-show="checking" x-cloak class="mt-2.5 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5 text-xs text-slate-600">
-                        <svg class="animate-spin h-4 w-4 text-blue-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <div x-show="checking" x-cloak class="mt-2.5 p-3 bg-teal-50/60 border border-teal-200/80 rounded-xl flex items-center gap-2.5 text-xs text-teal-800">
+                        <svg class="animate-spin h-4 w-4 text-teal-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                         <span>Memeriksa data absensi tanggal terpilih...</span>
                     </div>
 
-                    <!-- No Attendance Alert (Screenshot Exact Match) -->
+                    <!-- No Attendance Alert -->
                     <div x-show="!checking && attendanceChecked && !hasAttendance" 
                          x-cloak 
-                         class="mt-3 p-3.5 bg-[#FFF5F5] border-l-4 border-rose-500 rounded-r-xl flex items-start gap-3 shadow-xs">
-                        <div class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
+                         class="mt-3 p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl flex items-start gap-3 shadow-2xs">
+                        <div class="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
                             ✕
                         </div>
                         <div>
                             <div class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
-                                <span>Tidak ditemukan absensi pada tanggal tersebut</span>
+                                <span>Tidak ditemukan data absensi hadir pada tanggal tersebut</span>
                             </div>
-                            <p class="text-[11px] text-rose-600 mt-0.5">
-                                Pastikan Anda sudah melakukan absensi dengan status Hadir/Tepat Waktu
+                            <p class="text-[11px] text-rose-600 mt-0.5 leading-relaxed">
+                                Pastikan Anda sudah melakukan absensi dengan status Hadir/Tepat Waktu sebelum mengajukan permohonan lembur.
                             </p>
                         </div>
                     </div>
@@ -89,8 +128,8 @@
                     <!-- Attendance Verified Box -->
                     <div x-show="!checking && attendanceChecked && hasAttendance" 
                          x-cloak 
-                         class="mt-3 p-3.5 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl flex items-start gap-3 shadow-xs">
-                        <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
+                         class="mt-3 p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-start gap-3 shadow-2xs">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
                             ✓
                         </div>
                         <div>
@@ -103,81 +142,94 @@
                 </div>
 
                 <!-- Jenis Lembur -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Jenis Lembur
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                        Jenis Lembur <span class="text-rose-500">*</span>
                     </label>
-                    <select name="jenis_lembur"
-                            x-model="jenisLembur"
-                            required
-                            class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-xs text-slate-800">
-                        <option value="">-- Pilih Jenis Lembur --</option>
-                        <option value="Lembur Hari Kerja">Lembur Hari Kerja</option>
-                        <option value="Lembur Hari Libur / Tanggal Merah">Lembur Hari Libur / Tanggal Merah</option>
-                        <option value="Lembur Darurat / Penanganan Gangguan">Lembur Darurat / Penanganan Gangguan</option>
-                        <option value="Lembur Proyek / Tugas Lapangan">Lembur Proyek / Tugas Lapangan</option>
-                    </select>
-                    <p class="text-[11px] text-slate-500 mt-1">
-                        Silakan pilih jenis lembur yang sesuai.
+                    <div class="max-w-md">
+                        <select name="jenis_lembur"
+                                x-model="jenisLembur"
+                                required
+                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-medium">
+                            <option value="">-- Pilih Jenis Lembur --</option>
+                            <option value="Lembur Hari Kerja">Lembur Hari Kerja</option>
+                            <option value="Lembur Hari Libur / Tanggal Merah">Lembur Hari Libur / Tanggal Merah</option>
+                            <option value="Lembur Darurat / Penanganan Gangguan">Lembur Darurat / Penanganan Gangguan</option>
+                            <option value="Lembur Proyek / Tugas Lapangan">Lembur Proyek / Tugas Lapangan</option>
+                        </select>
+                    </div>
+                    <p class="text-[11px] text-slate-500">
+                        Silakan pilih klasifikasi kegiatan lembur yang sesuai dengan penugasan.
                     </p>
                 </div>
 
                 <!-- Jam Mulai & Jam Selesai -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                            Jam Mulai Lembur
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                            Jam Mulai Lembur <span class="text-rose-500">*</span>
                         </label>
                         <input type="time"
                                name="jam_mulai"
                                x-model="jamMulai"
                                required
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-xs text-slate-800 font-medium" />
+                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                            Jam Selesai Lembur
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                            Jam Selesai Lembur <span class="text-rose-500">*</span>
                         </label>
                         <input type="time"
                                name="jam_selesai"
                                x-model="jamSelesai"
                                required
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-xs text-slate-800 font-medium" />
+                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
                     </div>
                 </div>
 
                 <!-- Alasan Lembur with Character Counter -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Alasan Lembur
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                        Alasan &amp; Rincian Pekerjaan Lembur <span class="text-rose-500">*</span>
                     </label>
                     <textarea name="alasan"
                               rows="4"
                               maxlength="100"
                               x-model="alasan"
                               required
-                              placeholder="Jelaskan alasan dan pekerjaan yang dilakukan selama lembur"
-                              class="w-full text-xs rounded-xl border-slate-300 p-3.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-xs text-slate-800 placeholder-slate-400"></textarea>
-                    <div class="flex items-center justify-between text-[11px] text-slate-500 mt-1">
+                              placeholder="Jelaskan alasan dan rincian pekerjaan yang dilakukan selama jam lembur..."
+                              class="w-full text-xs rounded-xl border-slate-300 p-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 placeholder-slate-400"></textarea>
+                    <div class="flex items-center justify-between text-[11px] text-slate-500">
                         <span>Maksimal 100 karakter</span>
-                        <span class="font-medium text-slate-600" x-text="(alasan ? alasan.length : 0) + '/100 karakter'">0/100 karakter</span>
+                        <span class="font-bold text-slate-700" x-text="(alasan ? alasan.length : 0) + '/100 karakter'">0/100 karakter</span>
                     </div>
                 </div>
 
                 <!-- Tombol Simpan Lembur -->
-                <div class="pt-2">
-                    <button type="submit"
-                            :disabled="!canSubmit"
-                            :class="canSubmit ? 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/30 cursor-pointer' : 'bg-blue-400 opacity-60 cursor-not-allowed'"
-                            class="w-full py-3 px-6 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 transition duration-200">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                        </svg>
-                        <span>Simpan Lembur</span>
-                    </button>
-                    <p x-show="!hasAttendance && attendanceChecked" x-cloak class="text-center text-[11px] text-rose-500 font-medium mt-2">
-                        Tombol dinonaktifkan karena absensi belum terdaftar di tanggal tersebut.
-                    </p>
+                <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="text-[11px] text-slate-500">
+                        Pastikan semua informasi telah benar sebelum diajukan untuk proses approval atasan.
+                    </div>
+                    <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <a href="{{ route('gomsn.overtime.index') }}"
+                           class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs text-center transition">
+                            Batal
+                        </a>
+                        <button type="submit"
+                                :disabled="!canSubmit"
+                                :class="canSubmit ? 'opacity-100 hover:opacity-90 shadow-md cursor-pointer' : 'opacity-50 cursor-not-allowed'"
+                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
+                                class="px-6 py-2.5 text-white font-bold text-xs rounded-xl inline-flex items-center justify-center gap-2 transition duration-200">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                            <span>Simpan &amp; Ajukan Lembur</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div x-show="!hasAttendance && attendanceChecked" x-cloak class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center text-xs text-rose-700 font-semibold">
+                    Tombol simpan dinonaktifkan karena absensi belum terdaftar pada tanggal yang dipilih.
                 </div>
             </form>
         </div>
