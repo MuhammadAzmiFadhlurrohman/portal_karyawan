@@ -239,6 +239,68 @@
                 </span>
             </div>
 
+            <!-- CSS Rigid Guard untuk Kartu Karyawan (Mencegah Foto Pecah/Melebar) -->
+            <style>
+                .emp-overtime-card {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    align-items: stretch !important;
+                    border-radius: 28px !important;
+                    background: #ffffff !important;
+                    box-shadow: 0 12px 36px rgba(0,0,0,0.06) !important;
+                    border: 1px solid #f1f5f9 !important;
+                    padding: 16px !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                    gap: 18px !important;
+                }
+                .emp-overtime-photo-panel {
+                    width: 195px !important;
+                    min-width: 195px !important;
+                    max-width: 195px !important;
+                    height: 230px !important;
+                    min-height: 230px !important;
+                    max-height: 230px !important;
+                    border-radius: 24px 24px 80px 24px !important;
+                    flex-shrink: 0 !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                    display: flex !important;
+                    align-items: flex-end !important;
+                    justify-content: center !important;
+                    background: linear-gradient(145deg, #029990 0%, #038078 45%, #015c57 100%) !important;
+                }
+                .emp-overtime-photo-img {
+                    width: 100% !important;
+                    height: 230px !important;
+                    max-height: 230px !important;
+                    object-fit: contain !important;
+                    object-position: center bottom !important;
+                    display: block !important;
+                    pointer-events: none !important;
+                    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.35)) !important;
+                }
+                @media (max-width: 640px) {
+                    .emp-overtime-card {
+                        flex-direction: column !important;
+                        padding: 14px !important;
+                    }
+                    .emp-overtime-photo-panel {
+                        width: 100% !important;
+                        min-width: 100% !important;
+                        max-width: 100% !important;
+                        height: 210px !important;
+                        min-height: 210px !important;
+                        max-height: 210px !important;
+                        border-radius: 22px !important;
+                    }
+                    .emp-overtime-photo-img {
+                        height: 210px !important;
+                        max-height: 210px !important;
+                    }
+                }
+            </style>
+
             <!-- Grid Kartu Karyawan (Sesuai Desain Modern Referensi) -->
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 @forelse ($employeeStats as $stat)
@@ -247,7 +309,7 @@
                     $cardAvatar = $cardUser->avatar_url ?? null;
                     $cardInitials = $cardUser->initials ?? strtoupper(substr($cardUser->name ?? 'K', 0, 2));
                 @endphp
-                <div class="bg-white rounded-[28px] border border-slate-100 shadow-[0_12px_36px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_44px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-all duration-300 p-4 sm:p-5 relative overflow-hidden group flex flex-col sm:flex-row items-stretch gap-4 sm:gap-5">
+                <div class="emp-overtime-card hover:shadow-[0_16px_44px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 transition-all duration-300 group">
 
                     <!-- Background Soft Ambient Wave Kanan -->
                     <svg class="absolute right-0 bottom-0 h-full w-2/5 pointer-events-none opacity-25" viewBox="0 0 200 200" fill="none" preserveAspectRatio="none">
@@ -256,9 +318,8 @@
                         <path d="M 80 200 C 140 150, 170 180, 200 140" stroke="#0d9488" stroke-width="1.5" stroke-opacity="0.2"/>
                     </svg>
 
-                    <!-- KIRI: Panel Foto Profil Modern dengan Kurva Organik -->
-                    <div class="relative shrink-0 w-full sm:w-[195px] h-[230px] rounded-[24px] sm:rounded-l-[24px] sm:rounded-tr-[24px] sm:rounded-br-[80px] overflow-hidden flex items-end justify-center select-none"
-                         style="background: linear-gradient(145deg, #029990 0%, #038078 45%, #015c57 100%);">
+                    <!-- KIRI: Panel Foto Profil Modern dengan Kurva Organik (Terkunci Sempurna) -->
+                    <div class="emp-overtime-photo-panel select-none">
                         
                         <!-- Glow & Curved Lines Abstract Dekoratif -->
                         <div class="absolute inset-0 pointer-events-none">
@@ -280,8 +341,7 @@
                         <!-- Foto Profil Karyawan / Fallback Inisial -->
                         @if ($cardAvatar)
                             <img src="{{ $cardAvatar }}" alt="{{ $cardUser->name }}"
-                                 class="h-full w-full object-contain pointer-events-none transition-transform duration-500 group-hover:scale-105"
-                                 style="object-position: center bottom; filter: drop-shadow(0 12px 18px rgba(0,0,0,0.35));"
+                                 class="emp-overtime-photo-img transition-transform duration-500 group-hover:scale-105"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="items-center justify-center text-white font-black" style="display:none; width:90px; height:90px; margin-bottom:30px; border-radius:50%; font-size:32px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.4); text-shadow:0 2px 8px rgba(0,0,0,0.3);">
                                 {{ $cardInitials }}
