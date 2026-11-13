@@ -332,20 +332,24 @@
                             <span>{{ $stat['total_count'] }} Pengajuan</span>
                         </div>
 
-                        <!-- Foto Profil Karyawan / Fallback Inisial -->
+                        <!-- Foto Profil Karyawan / Fallback Icon Profile User -->
                         @if ($cardAvatar)
                             <img src="{{ $cardAvatar }}" alt="{{ $cardUser->name }}"
                                  class="emp-overtime-photo-img transition-transform duration-500 group-hover:scale-105"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="flex-col items-center justify-center text-white" style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">
-                                <div class="flex items-center justify-center text-white font-black shadow-md" style="width:52px; height:52px; border-radius:50%; font-size:18px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); text-shadow:0 2px 6px rgba(0,0,0,0.3); margin-bottom:14px;">
-                                    {{ $cardInitials }}
+                                <div class="flex items-center justify-center text-white shadow-md" style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); margin-bottom:14px;">
+                                    <svg class="w-7 h-7 text-white drop-shadow-xs" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
                                 </div>
                             </div>
                         @else
                             <div class="flex flex-col items-center justify-center text-white w-full h-full" style="align-items:center; justify-content:center;">
-                                <div class="flex items-center justify-center text-white font-black shadow-md" style="width:52px; height:52px; border-radius:50%; font-size:18px; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); text-shadow:0 2px 6px rgba(0,0,0,0.3); margin-bottom:14px;">
-                                    {{ $cardInitials }}
+                                <div class="flex items-center justify-center text-white shadow-md" style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.45); margin-bottom:14px;">
+                                    <svg class="w-7 h-7 text-white drop-shadow-xs" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
                                 </div>
                             </div>
                         @endif
