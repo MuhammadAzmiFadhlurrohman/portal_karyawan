@@ -1113,7 +1113,7 @@
         }
     @endphp
 
-    <div class="md:hidden fixed bottom-2 inset-x-3 sm:inset-x-6 max-w-md mx-auto z-40 pointer-events-none pt-4"
+    <div class="md:hidden fixed bottom-3 inset-x-3 sm:inset-x-6 max-w-md mx-auto z-40 pointer-events-none pt-4"
          x-data="{
              currentTab: '{{ $navTabActive }}',
              get isMenu() { return bottomSheetOpen; },
@@ -1123,127 +1123,127 @@
              }
          }">
         <nav aria-label="Navigasi Cepat Mobile" 
-             class="pointer-events-auto bg-white/95 backdrop-blur-md rounded-[20px] shadow-[0_8px_25px_rgba(15,91,98,0.10)] border border-teal-100/80 h-[52px] px-1 flex items-center justify-around relative">
+             class="pointer-events-auto bg-gradient-to-r from-emerald-50/70 via-white to-teal-50/80 backdrop-blur-md rounded-[24px] shadow-[0_10px_30px_rgba(13,148,136,0.18)] border border-teal-200/90 h-[58px] px-2 flex items-center justify-around relative">
             
             <!-- Soft Ambient Teal Wave Background on Right Side (matching reference image) -->
-            <div class="absolute right-0 top-0 bottom-0 w-2/5 rounded-r-[20px] bg-gradient-to-l from-teal-500/10 via-teal-200/5 to-transparent pointer-events-none"></div>
-            <svg class="absolute right-0 bottom-0 h-full w-36 pointer-events-none opacity-25" viewBox="0 0 144 52" fill="none">
-                <path d="M 0 52 C 45 20 85 45 144 12 L 144 52 Z" fill="#14b8a6"/>
+            <div class="absolute right-0 top-0 bottom-0 w-2/5 rounded-r-[24px] bg-gradient-to-l from-emerald-500/15 via-teal-300/10 to-transparent pointer-events-none"></div>
+            <svg class="absolute right-0 bottom-0 h-full w-40 pointer-events-none opacity-35" viewBox="0 0 144 58" fill="none">
+                <path d="M 0 58 C 45 22 85 50 144 14 L 144 58 Z" fill="#0d9488"/>
             </svg>
 
             <!-- 1. PRESENSI -->
             <a href="{{ route('attendance.index') }}" 
                @click="currentTab = 'presensi'"
-               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10">
-                <svg class="w-[20px] h-[20px] transition-colors" 
-                     :class="isActive('presensi') ? 'text-[#155E63]' : 'text-[#195a60] group-hover:text-[#114347]'"
-                     fill="none" stroke="currentColor" :stroke-width="isActive('presensi') ? '2.1' : '1.85'" viewBox="0 0 24 24">
+               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
+                <svg class="w-[22px] h-[22px] transition-colors" 
+                     :class="isActive('presensi') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
+                     fill="none" stroke="currentColor" :stroke-width="isActive('presensi') ? '2.2' : '1.9'" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                 </svg>
-                <span class="text-[10px] tracking-tight mt-0.5 leading-none transition-colors"
-                      :class="isActive('presensi') ? 'font-bold text-[#155E63]' : 'font-medium text-slate-700 group-hover:text-slate-900'">
+                <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
+                      :class="isActive('presensi') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
                     Presensi
                 </span>
-                <div class="h-1 flex items-center justify-center mt-0.5">
-                    <span x-show="isActive('presensi')" class="w-4 h-[2px] bg-[#155E63] rounded-full" style="display: none;"></span>
+                <div class="h-1 flex items-center justify-center mt-1">
+                    <span x-show="isActive('presensi')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>
                 </div>
             </a>
 
             <!-- 2. PENGAJUAN -->
             <a href="{{ $navCanApprovePengajuan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index') }}" 
                @click="currentTab = 'pengajuan'"
-               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10">
+               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
                 <div class="relative">
-                    <svg class="w-[20px] h-[20px] transition-colors" 
-                         :class="isActive('pengajuan') ? 'text-[#155E63]' : 'text-[#195a60] group-hover:text-[#114347]'"
-                         fill="none" stroke="currentColor" :stroke-width="isActive('pengajuan') ? '2.1' : '1.85'" viewBox="0 0 24 24">
+                    <svg class="w-[22px] h-[22px] transition-colors" 
+                         :class="isActive('pengajuan') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
+                         fill="none" stroke="currentColor" :stroke-width="isActive('pengajuan') ? '2.2' : '1.9'" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                     @if (!empty($navPendingAtasanCount) && $navPendingAtasanCount > 0)
-                        <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white"></span>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white"></span>
                     @endif
                 </div>
-                <span class="text-[10px] tracking-tight mt-0.5 leading-none transition-colors"
-                      :class="isActive('pengajuan') ? 'font-bold text-[#155E63]' : 'font-medium text-slate-700 group-hover:text-slate-900'">
+                <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
+                      :class="isActive('pengajuan') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
                     Pengajuan
                 </span>
-                <div class="h-1 flex items-center justify-center mt-0.5">
-                    <span x-show="isActive('pengajuan')" class="w-4 h-[2px] bg-[#155E63] rounded-full" style="display: none;"></span>
+                <div class="h-1 flex items-center justify-center mt-1">
+                    <span x-show="isActive('pengajuan')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>
                 </div>
             </a>
 
-            <!-- 3. HOME (CENTER HERO - ORGANIC ARCH MOUND + 3D GLOSSY TEAL ORB) -->
+            <!-- 3. HOME (CENTER HERO - ORGANIC ARCH MOUND + 3D GLOSSY TEAL/EMERALD ORB) -->
             <a href="{{ route('portal.hub') }}" 
                @click="currentTab = 'home'"
-               class="flex-1 h-full flex flex-col items-center justify-end relative group select-none cursor-pointer pb-1 z-20">
+               class="flex-1 h-full flex flex-col items-center justify-end relative group select-none cursor-pointer pb-1.5 z-20">
                 
                 <!-- Seamless Arch Mound Pedestal (Curves smoothly out of the navbar) -->
-                <svg class="absolute -top-[16px] left-1/2 -translate-x-1/2 w-[76px] h-[18px] pointer-events-none drop-shadow-[0_-2px_2px_rgba(0,0,0,0.02)]" viewBox="0 0 76 18">
+                <svg class="absolute -top-[19px] left-1/2 -translate-x-1/2 w-[82px] h-[21px] pointer-events-none drop-shadow-[0_-3px_3px_rgba(13,148,136,0.12)]" viewBox="0 0 82 21">
                     <!-- Mound Fill connecting to navbar body -->
-                    <path d="M 0,18 C 16,18 24,1 38,1 C 52,1 60,18 76,18 L 76,22 L 0,22 Z" fill="#ffffff"/>
+                    <path d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21 L 82,25 L 0,25 Z" fill="#ffffff"/>
                     <!-- Crisp Top Stroke connecting with navbar border -->
-                    <path d="M 0,18 C 16,18 24,1 38,1 C 52,1 60,18 76,18" fill="none" stroke="rgba(153, 246, 228, 0.75)" stroke-width="1.3"/>
+                    <path d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21" fill="none" stroke="rgba(45, 212, 191, 0.9)" stroke-width="1.6"/>
                 </svg>
 
-                <!-- Elevated 3D Glossy Sphere Button -->
-                <div class="absolute -top-3.5 w-[44px] h-[44px] rounded-full flex items-center justify-center text-white border-[2.5px] border-white shadow-[0_5px_15px_rgba(9,64,68,0.32)] transition-transform duration-200 transform group-hover:scale-105 active:scale-95 overflow-hidden"
-                     style="background: radial-gradient(circle at 50% 28%, #14999f 0%, #0d636a 55%, #073f44 100%) !important;">
+                <!-- Elevated 3D Glossy Sphere Button with fresh rich green-teal gloss -->
+                <div class="absolute -top-4 w-[48px] h-[48px] rounded-full flex items-center justify-center text-white border-[2.5px] border-white shadow-[0_6px_18px_rgba(13,148,136,0.42)] transition-transform duration-200 transform group-hover:scale-105 active:scale-95 overflow-hidden"
+                     style="background: radial-gradient(circle at 50% 25%, #10b981 0%, #0d9488 45%, #065f46 100%) !important;">
                     
                     <!-- Specular Curved Gloss Arc (Bubble glass reflection on top) -->
-                    <div class="absolute top-1 inset-x-2 h-[16px] rounded-full bg-gradient-to-b from-white/60 via-white/20 to-transparent pointer-events-none"></div>
+                    <div class="absolute top-1 inset-x-2 h-[18px] rounded-full bg-gradient-to-b from-white/75 via-white/25 to-transparent pointer-events-none"></div>
 
                     <!-- Prominent House Icon (Peaked roof with rounded arch door) -->
-                    <svg class="w-[23px] h-[23px] text-white relative z-10 drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                    <svg class="w-[25px] h-[25px] text-white relative z-10 drop-shadow-[0_1px_3px_rgba(0,0,0,0.3)]" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
                 </div>
 
                 <!-- Label & Indicator Line -->
-                <span class="text-[10px] tracking-tight leading-none transition-colors"
-                      :class="isActive('home') ? 'font-bold text-[#0d595f]' : 'font-medium text-slate-700 group-hover:text-[#0d595f]'">
+                <span class="text-[11px] tracking-tight leading-none transition-colors"
+                      :class="isActive('home') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-[#0f766e]'">
                     Home
                 </span>
-                <div class="h-1 flex items-center justify-center mt-0.5">
-                    <span x-show="isActive('home')" class="w-6 h-[2.5px] bg-gradient-to-r from-[#14b8a6] via-[#0d7379] to-[#14b8a6] rounded-full"></span>
+                <div class="h-1 flex items-center justify-center mt-1">
+                    <span x-show="isActive('home')" class="w-7 h-[2.8px] bg-gradient-to-r from-emerald-500 via-teal-600 to-emerald-500 rounded-full"></span>
                 </div>
             </a>
 
             <!-- 4. TUGAS -->
             <a href="{{ route('gomsn.tasks.index') }}" 
                @click="currentTab = 'tugas'"
-               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10">
-                <svg class="w-[20px] h-[20px] transition-colors" 
-                     :class="isActive('tugas') ? 'text-[#155E63]' : 'text-[#195a60] group-hover:text-[#114347]'"
-                     fill="none" stroke="currentColor" :stroke-width="isActive('tugas') ? '2.1' : '1.85'" viewBox="0 0 24 24">
+               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
+                <svg class="w-[22px] h-[22px] transition-colors" 
+                     :class="isActive('tugas') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
+                     fill="none" stroke="currentColor" :stroke-width="isActive('tugas') ? '2.2' : '1.9'" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 6.5l1.5 1.5 3-3m-4.5 4.5l1.5 1.5 3-3"/>
                 </svg>
-                <span class="text-[10px] tracking-tight mt-0.5 leading-none transition-colors"
-                      :class="isActive('tugas') ? 'font-bold text-[#155E63]' : 'font-medium text-slate-700 group-hover:text-slate-900'">
+                <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
+                      :class="isActive('tugas') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
                     Tugas
                 </span>
-                <div class="h-1 flex items-center justify-center mt-0.5">
-                    <span x-show="isActive('tugas')" class="w-4 h-[2px] bg-[#155E63] rounded-full" style="display: none;"></span>
+                <div class="h-1 flex items-center justify-center mt-1">
+                    <span x-show="isActive('tugas')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>
                 </div>
             </a>
 
             <!-- 5. MENU (TOGGLE BOTTOM SHEET) -->
             <button @click="bottomSheetOpen = !bottomSheetOpen" 
                     type="button" 
-                    class="flex-1 h-full flex flex-col items-center justify-center relative group cursor-pointer select-none z-10">
-                <svg class="w-[20px] h-[20px] transition-colors" 
-                     :class="isActive('menu') ? 'text-[#155E63]' : 'text-[#195a60] group-hover:text-[#114347]'"
-                     fill="none" stroke="currentColor" :stroke-width="isActive('menu') ? '2.2' : '2'" viewBox="0 0 24 24">
+                    class="flex-1 h-full flex flex-col items-center justify-center relative group cursor-pointer select-none z-10 pt-1">
+                <svg class="w-[22px] h-[22px] transition-colors" 
+                     :class="isActive('menu') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
+                     fill="none" stroke="currentColor" :stroke-width="isActive('menu') ? '2.3' : '2'" viewBox="0 0 24 24">
                     <circle cx="7" cy="7" r="2.2"/>
                     <circle cx="17" cy="7" r="2.2"/>
                     <circle cx="7" cy="17" r="2.2"/>
                     <circle cx="17" cy="17" r="2.2"/>
                 </svg>
-                <span class="text-[10px] tracking-tight mt-0.5 leading-none transition-colors"
-                      :class="isActive('menu') ? 'font-bold text-[#155E63]' : 'font-medium text-slate-700 group-hover:text-slate-900'">
+                <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
+                      :class="isActive('menu') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
                     Menu
                 </span>
-                <div class="h-1 flex items-center justify-center mt-0.5">
-                    <span x-show="isActive('menu')" class="w-4 h-[2px] bg-[#155E63] rounded-full" style="display: none;"></span>
+                <div class="h-1 flex items-center justify-center mt-1">
+                    <span x-show="isActive('menu')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>
                 </div>
             </button>
         </nav>
