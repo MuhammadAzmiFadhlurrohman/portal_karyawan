@@ -23,6 +23,9 @@
             animation: none;
             mix-blend-mode: normal;
         }
+        img.object-cover[src*="/avatar"] {
+            object-position: center top !important;
+        }
     </style>
 </head>
 <body class="min-h-full bg-[#F8FAFC] text-slate-900 font-sans antialiased" x-data="{ bottomSheetOpen: false }">

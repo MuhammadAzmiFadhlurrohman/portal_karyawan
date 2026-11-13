@@ -111,7 +111,8 @@
                             <template x-if="photoPreview">
                                 <img :src="photoPreview"
                                      alt="Preview Foto Baru"
-                                     class="w-full h-full rounded-3xl object-cover shadow-xl ring-4 ring-white bg-white">
+                                     style="object-position: center top;"
+                                     class="w-full h-full rounded-3xl object-cover object-top shadow-xl ring-4 ring-white bg-white">
                             </template>
 
                             <template x-if="!photoPreview">
@@ -119,8 +120,9 @@
                                     @if ($user->avatar_url)
                                         <img src="{{ $user->avatar_url }}"
                                              alt="{{ $user->name }}"
+                                             style="object-position: center top;"
                                              onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
-                                             class="w-full h-full rounded-3xl object-cover shadow-xl ring-4 ring-white bg-white">
+                                             class="w-full h-full rounded-3xl object-cover object-top shadow-xl ring-4 ring-white bg-white">
                                         <div style="display: none;"
                                              class="w-full h-full rounded-3xl bg-gradient-to-tr from-[#155E63] to-[#0f172a] text-white items-center justify-center font-bold text-3xl sm:text-4xl shadow-xl ring-4 ring-white">
                                             {{ $user->initials }}
