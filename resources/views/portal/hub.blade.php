@@ -15,9 +15,9 @@
         .hh-left{min-width:0;flex:1;padding:34px 0;align-self:center}
         .hh-date{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(13,148,136,.18);border:1px solid rgba(45,212,191,.24);font-size:12px;font-weight:600;color:#99f6e4;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
         .hh-hello{margin:18px 0 6px;font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:#5eead4}
-        .hh-name{margin:0;font-weight:800;text-transform:uppercase;line-height:.96;letter-spacing:-.025em;font-size:clamp(36px,4.6vw,58px)}
-        .hh-name .a{display:block;color:#fff}
-        .hh-name .b{display:block;color:#14b8a6;background:linear-gradient(90deg,#2dd4bf 0%,#14b8a6 55%,#0d9488 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-bottom:2px}
+        .hh-name{margin:0;font-weight:800;text-transform:uppercase;line-height:1.05;letter-spacing:-.025em;font-size:clamp(34px,4.2vw,54px)}
+        .hh-name .a{display:inline;color:#fff}
+        .hh-name .b{display:inline;color:#14b8a6;background:linear-gradient(90deg,#2dd4bf 0%,#14b8a6 55%,#0d9488 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding-bottom:2px}
         .hh-sub{margin:12px 0 0;font-size:13.5px;line-height:1.55;color:rgba(204,251,241,.74);max-width:460px}
         .hh-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}
         .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5.5px 13px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(4,22,25,.55);color:#e2e8f0;border:1px solid rgba(255,255,255,.12)}
