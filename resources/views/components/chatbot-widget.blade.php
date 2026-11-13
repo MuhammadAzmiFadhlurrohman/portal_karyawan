@@ -1,5 +1,5 @@
 <div id="chatbot-widget-container" 
-     class="fixed bottom-[68px] right-3.5 sm:right-6 md:bottom-6 md:right-6 z-40 font-sans transition-all duration-300"
+     class="fixed bottom-[78px] right-3.5 sm:right-6 md:bottom-6 md:right-6 z-30 font-sans transition-all duration-300"
      :class="{ 'opacity-0 pointer-events-none scale-75': typeof bottomSheetOpen !== 'undefined' && bottomSheetOpen }"
      x-data="chatbotWidget()">
     <!-- Floating Trigger Button -->

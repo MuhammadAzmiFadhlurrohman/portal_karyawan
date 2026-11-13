@@ -345,3 +345,4 @@ class EmployeeAttendanceRecapController extends Controller
         ]);
     }
 }
+

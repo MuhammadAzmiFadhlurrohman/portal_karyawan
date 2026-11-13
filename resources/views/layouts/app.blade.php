@@ -1114,6 +1114,7 @@
     @endphp
 
     <div class="md:hidden fixed bottom-3 inset-x-3 sm:inset-x-6 max-w-md mx-auto z-40 pointer-events-none pt-4"
+         style="z-index: 40 !important;"
          x-data="{
              currentTab: '{{ $navTabActive }}',
              get isMenu() { return bottomSheetOpen; },
