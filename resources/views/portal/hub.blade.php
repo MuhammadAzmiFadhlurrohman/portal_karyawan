@@ -8,74 +8,74 @@
         $scopeType = $stats['scope']['type'] ?? 'self';
     @endphp
     <style>
-        .hh{position:relative;overflow:hidden;border-radius:26px;margin-bottom:24px;border:1px solid rgba(45,212,191,.22);box-shadow:0 20px 48px -10px rgba(1,20,23,.6),inset 0 1px 0 rgba(94,234,212,.25);background:radial-gradient(100% 140% at 15% 20%,#093d40 0%,#05282b 55%,#021619 100%);color:#fff;user-select:none}
+        .hh{position:relative;overflow:hidden;border-radius:24px;margin-bottom:20px;border:1px solid rgba(45,212,191,.22);box-shadow:0 16px 40px -10px rgba(1,20,23,.6),inset 0 1px 0 rgba(94,234,212,.25);background:radial-gradient(100% 140% at 15% 20%,#093d40 0%,#05282b 55%,#021619 100%);color:#fff;user-select:none}
         .hh-bg-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
-        .hh-glow1{position:absolute;left:-80px;top:-80px;width:340px;height:340px;border-radius:50%;background:rgba(20,184,166,.18);filter:blur(70px);pointer-events:none;z-index:1}
-        .hh-glow2{position:absolute;right:80px;bottom:-30px;width:380px;height:380px;border-radius:50%;background:rgba(45,212,191,.15);filter:blur(75px);pointer-events:none;z-index:1}
-        .hh-inner{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding:0 48px;min-height:365px}
-        .hh-left{min-width:0;flex:1;padding:34px 0;align-self:center}
-        .hh-date{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;background:rgba(4,26,29,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(45,212,191,.35);font-size:12.5px;font-weight:600;color:#99f6e4;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-        .hh-hello-wrap{display:flex;align-items:center;gap:12px;margin:20px 0 8px}
-        .hh-hello{margin:0;font-size:12.5px;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:#fff}
-        .hh-hello-line{width:38px;height:3px;border-radius:2px;background:#2dd4bf;box-shadow:0 0 10px rgba(45,212,191,.75)}
-        .hh-name{margin:0;font-weight:900;text-transform:uppercase;line-height:1.02;letter-spacing:-.02em;font-size:clamp(38px,4.5vw,58px)}
+        .hh-glow1{position:absolute;left:-70px;top:-70px;width:300px;height:300px;border-radius:50%;background:rgba(20,184,166,.18);filter:blur(65px);pointer-events:none;z-index:1}
+        .hh-glow2{position:absolute;right:80px;bottom:-30px;width:320px;height:320px;border-radius:50%;background:rgba(45,212,191,.15);filter:blur(70px);pointer-events:none;z-index:1}
+        .hh-inner{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding:0 40px;min-height:290px}
+        .hh-left{min-width:0;flex:1;padding:22px 0;align-self:center}
+        .hh-date{display:inline-flex;align-items:center;gap:7px;padding:5px 14px;border-radius:999px;background:rgba(4,26,29,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(45,212,191,.35);font-size:12px;font-weight:600;color:#99f6e4;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+        .hh-hello-wrap{display:flex;align-items:center;gap:10px;margin:12px 0 4px}
+        .hh-hello{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:#fff}
+        .hh-hello-line{width:32px;height:2.5px;border-radius:2px;background:#2dd4bf;box-shadow:0 0 10px rgba(45,212,191,.75)}
+        .hh-name{margin:0;font-weight:900;text-transform:uppercase;line-height:1.02;letter-spacing:-.02em;font-size:clamp(32px,3.8vw,48px)}
         .hh-name .a{display:inline;color:#fff}
         .hh-name .b{display:inline;margin-left:6px;color:#2dd4bf;background:linear-gradient(90deg,#5eead4 0%,#2dd4bf 55%,#14b8a6 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone;padding-bottom:2px}
-        .hh-sub{margin:12px 0 0;font-size:13.5px;font-style:italic;line-height:1.55;color:rgba(204,251,241,.82);max-width:480px}
-        .hh-pills{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px}
-        .hh-pill{display:inline-flex;align-items:center;gap:7px;padding:6.5px 14px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(2,19,22,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#e2e8f0;border:1px solid rgba(45,212,191,.25)}
+        .hh-sub{margin:8px 0 0;font-size:12.5px;font-style:italic;line-height:1.45;color:rgba(204,251,241,.82);max-width:460px}
+        .hh-pills{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+        .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(2,19,22,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#e2e8f0;border:1px solid rgba(45,212,191,.25)}
         .hh-pill.ok{background:rgba(2,24,27,.75);color:#fff;border-color:rgba(45,212,191,.45);font-weight:700}
-        .hh-dot{width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 10px #10b981}
-        .hh-cta{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:12px 24px;border-radius:999px;font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);border:1px solid rgba(94,234,212,.35);box-shadow:0 10px 24px -4px rgba(13,148,136,.6),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .15s ease,filter .15s ease}
+        .hh-dot{width:6.5px;height:6.5px;border-radius:50%;background:#10b981;box-shadow:0 0 10px #10b981}
+        .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:9.5px 20px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);border:1px solid rgba(94,234,212,.35);box-shadow:0 8px 20px -4px rgba(13,148,136,.6),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .15s ease,filter .15s ease}
         .hh-cta:hover{filter:brightness(1.1);transform:translateY(-1px)}
         .hh-cta svg{transition:transform .15s ease}
         .hh-cta:hover svg{transform:translateX(2px)}
-        .hh-right{position:relative;flex:none;width:400px;height:365px;margin-right:12px;align-self:flex-end}
-        .hh-circle-layer{position:absolute;right:0;bottom:-40px;width:370px;height:370px;border-radius:50%;background:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);opacity:.92;box-shadow:0 0 45px rgba(20,184,166,.35);z-index:1}
-        .hh-circle-ring{position:absolute;right:-20px;bottom:-60px;width:410px;height:410px;border-radius:50%;border:1.5px solid rgba(94,234,212,.35);pointer-events:none;z-index:1}
-        .hh-arc-overlay{position:absolute;right:-50px;bottom:-90px;width:470px;height:470px;border-radius:50%;border:1px solid rgba(94,234,212,.18);pointer-events:none;z-index:1}
-        .hh-flare{position:absolute;left:40px;top:130px;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 16px 6px rgba(94,234,212,.9),0 0 30px 12px rgba(20,184,166,.6);pointer-events:none;z-index:2}
-        .hh-photo{position:absolute;left:0;right:0;bottom:-24px;height:365px;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
-        .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.11);transform-origin:50% 100%;filter:drop-shadow(0 14px 28px rgba(0,0,0,.5))}
-        .hh-initials{position:absolute;right:0;bottom:-40px;width:370px;height:370px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:78px;font-weight:900;color:rgba(255,255,255,.95);z-index:2}
+        .hh-right{position:relative;flex:none;width:350px;height:290px;margin-right:8px;align-self:flex-end}
+        .hh-circle-layer{position:absolute;right:0;bottom:-30px;width:300px;height:300px;border-radius:50%;background:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);opacity:.92;box-shadow:0 0 40px rgba(20,184,166,.35);z-index:1}
+        .hh-circle-ring{position:absolute;right:-18px;bottom:-48px;width:336px;height:336px;border-radius:50%;border:1.5px solid rgba(94,234,212,.35);pointer-events:none;z-index:1}
+        .hh-arc-overlay{position:absolute;right:-42px;bottom:-72px;width:384px;height:384px;border-radius:50%;border:1px solid rgba(94,234,212,.18);pointer-events:none;z-index:1}
+        .hh-flare{position:absolute;left:32px;top:100px;width:5.5px;height:5.5px;border-radius:50%;background:#fff;box-shadow:0 0 14px 5px rgba(94,234,212,.9),0 0 26px 10px rgba(20,184,166,.6);pointer-events:none;z-index:2}
+        .hh-photo{position:absolute;left:0;right:0;bottom:-18px;height:290px;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+        .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.12);transform-origin:50% 100%;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5))}
+        .hh-initials{position:absolute;right:0;bottom:-30px;width:300px;height:300px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:64px;font-weight:900;color:rgba(255,255,255,.95);z-index:2}
         .hh-initials.show{display:flex}
-        .hh-check{position:absolute;left:-55px;bottom:36px;z-index:3;display:flex;align-items:center;gap:14px;padding:12px 20px;border-radius:20px;background:rgba(4,24,28,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.3);box-shadow:0 14px 32px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
-        .hh-check .ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.15)}
-        .hh-check .ic i{width:12px;height:12px;border-radius:50%;background:#10b981;display:block;box-shadow:0 0 10px #10b981}
+        .hh-check{position:absolute;left:-45px;bottom:24px;z-index:3;display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:18px;background:rgba(4,24,28,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.3);box-shadow:0 12px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1)}
+        .hh-check .ic{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.15)}
+        .hh-check .ic i{width:10px;height:10px;border-radius:50%;background:#10b981;display:block;box-shadow:0 0 10px #10b981}
         .hh-check.no .ic{background:rgba(245,158,11,.15)}
         .hh-check.no .ic i{background:#eab308;box-shadow:0 0 12px 2px #eab308}
-        .hh-check b{display:block;font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.01em}
-        .hh-check small{display:block;font-size:11px;color:rgba(153,246,228,.75);margin-top:1.5px}
+        .hh-check b{display:block;font-size:11.5px;font-weight:700;color:#fff;letter-spacing:.01em}
+        .hh-check small{display:block;font-size:10px;color:rgba(153,246,228,.75);margin-top:1px}
         @media (min-width:768px) and (max-width:1100px){
-            .hh-inner{padding:0 28px;min-height:330px;gap:20px}
-            .hh-right{width:330px;height:325px;margin-right:0}
-            .hh-circle-layer{width:310px;height:310px;bottom:-30px}
-            .hh-circle-ring{width:345px;height:345px;bottom:-48px}
-            .hh-arc-overlay{width:390px;height:390px;bottom:-70px}
-            .hh-photo{bottom:-20px;height:325px}
-            .hh-check{left:-30px;bottom:24px}
+            .hh-inner{padding:0 24px;min-height:270px;gap:18px}
+            .hh-right{width:300px;height:270px;margin-right:0}
+            .hh-circle-layer{width:260px;height:260px;bottom:-24px}
+            .hh-circle-ring{width:290px;height:290px;bottom:-38px}
+            .hh-arc-overlay{width:330px;height:330px;bottom:-56px}
+            .hh-photo{bottom:-16px;height:270px}
+            .hh-check{left:-25px;bottom:18px}
         }
         @media (max-width:767px){
-            .hh{border-radius:22px;margin-bottom:20px}
-            .hh-inner{flex-direction:column;align-items:stretch;padding:22px 20px 0;gap:8px;min-height:auto}
+            .hh{border-radius:20px;margin-bottom:18px}
+            .hh-inner{flex-direction:column;align-items:stretch;padding:18px 16px 0;gap:8px;min-height:auto}
             .hh-left{padding:0;align-self:stretch;text-align:left}
-            .hh-date{font-size:11px;padding:5px 12px}
-            .hh-hello-wrap{margin:14px 0 4px;gap:8px}
-            .hh-hello{font-size:11px;letter-spacing:.22em}
-            .hh-hello-line{width:28px;height:2.5px}
-            .hh-name{font-size:clamp(30px,9.5vw,42px)}
-            .hh-sub{margin:8px 0 0;font-size:12.5px}
-            .hh-pills{margin-top:12px;gap:6px}
-            .hh-pill{font-size:11px;padding:5px 12px}
-            .hh-cta{margin-top:14px;padding:10px 18px;font-size:12px}
-            .hh-right{width:290px;height:265px;margin:4px auto 0;align-self:center}
-            .hh-circle-layer{width:250px;height:250px;bottom:-20px}
-            .hh-circle-ring{width:280px;height:280px;bottom:-35px}
-            .hh-arc-overlay{width:315px;height:315px;bottom:-50px}
-            .hh-photo{left:0;right:0;bottom:-16px;height:265px}
+            .hh-date{font-size:10.5px;padding:4.5px 11px}
+            .hh-hello-wrap{margin:10px 0 3px;gap:6px}
+            .hh-hello{font-size:10.5px;letter-spacing:.2em}
+            .hh-hello-line{width:24px;height:2px}
+            .hh-name{font-size:clamp(28px,8.5vw,36px)}
+            .hh-sub{margin:6px 0 0;font-size:11.5px}
+            .hh-pills{margin-top:10px;gap:6px}
+            .hh-pill{font-size:10.5px;padding:4px 10px}
+            .hh-cta{margin-top:12px;padding:9px 16px;font-size:11.5px}
+            .hh-right{width:260px;height:240px;margin:4px auto 0;align-self:center}
+            .hh-circle-layer{width:220px;height:220px;bottom:-18px}
+            .hh-circle-ring{width:250px;height:250px;bottom:-30px}
+            .hh-arc-overlay{width:280px;height:280px;bottom:-44px}
+            .hh-photo{left:0;right:0;bottom:-14px;height:240px}
             .hh-photo img{transform:scale(1.08)}
-            .hh-check{left:-10px;bottom:16px;padding:8px 14px;border-radius:14px}
-            .hh-initials{width:250px;height:250px;bottom:-20px;font-size:56px}
+            .hh-check{left:-8px;bottom:12px;padding:7px 12px;border-radius:12px}
+            .hh-initials{width:220px;height:220px;bottom:-18px;font-size:48px}
         }
         /* Slide-in Entrance Animations on Dashboard Load (Zero Scrollbar / Zero Layout Shift) */
         @keyframes hubSlideLeft{0%{opacity:0;transform:translate3d(-24px,0,0)}100%{opacity:1;transform:translate3d(0,0,0)}}
@@ -107,7 +107,7 @@
     </style>
     <div class="hh">
         <!-- SVG Futuristic Background Geometry (Diagonal Bars, Concentric Orbit Rings, Grid Dots) -->
-        <svg class="hh-bg-svg" viewBox="0 0 1100 365" fill="none" preserveAspectRatio="none">
+        <svg class="hh-bg-svg" viewBox="0 0 1100 290" fill="none" preserveAspectRatio="none">
             <defs>
                 <linearGradient id="hhDiag1" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.35"/>
@@ -129,21 +129,21 @@
                 </pattern>
             </defs>
             <!-- Left Top Diagonal Futuristic Glass Bars -->
-            <path d="M-80 -40 L90 -40 L-20 220 L-190 220 Z" fill="url(#hhDiag1)"/>
-            <path d="M-20 -40 L45 -40 L-85 240 L-150 240 Z" fill="url(#hhDiag2)"/>
-            <path d="M50 -40 L85 -40 L-40 220 L-75 220 Z" fill="url(#hhDiag2)" opacity="0.6"/>
+            <path d="M-80 -40 L90 -40 L-20 200 L-190 200 Z" fill="url(#hhDiag1)"/>
+            <path d="M-20 -40 L45 -40 L-85 220 L-150 220 Z" fill="url(#hhDiag2)"/>
+            <path d="M50 -40 L85 -40 L-40 200 L-75 200 Z" fill="url(#hhDiag2)" opacity="0.6"/>
 
             <!-- Right Top Accent Wave Ribbon -->
-            <path d="M780 0 C860 120, 940 180, 1100 240 L1100 0 Z" fill="url(#hhDiag1)" opacity="0.45"/>
+            <path d="M800 0 C870 100, 940 150, 1100 200 L1100 0 Z" fill="url(#hhDiag1)" opacity="0.45"/>
 
-            <!-- Large Concentric Orbit Rims Centered at Employee Portrait Circle (center around 910, 220) -->
-            <circle cx="910" cy="220" r="320" stroke="url(#hhArcGrad)" stroke-width="1.2" opacity="0.6"/>
-            <circle cx="910" cy="220" r="410" stroke="url(#hhArcGrad)" stroke-width="1" stroke-dasharray="8 6" opacity="0.4"/>
-            <circle cx="910" cy="220" r="510" stroke="url(#hhArcGrad)" stroke-width="0.8" opacity="0.3"/>
+            <!-- Large Concentric Orbit Rims Centered at Employee Portrait Circle (center around 920, 175) -->
+            <circle cx="920" cy="175" r="260" stroke="url(#hhArcGrad)" stroke-width="1.2" opacity="0.6"/>
+            <circle cx="920" cy="175" r="335" stroke="url(#hhArcGrad)" stroke-width="1" stroke-dasharray="8 6" opacity="0.4"/>
+            <circle cx="920" cy="175" r="415" stroke="url(#hhArcGrad)" stroke-width="0.8" opacity="0.3"/>
 
             <!-- Tech Dot Matrix Grids (Top Right & Bottom Left) -->
-            <rect x="980" y="24" width="90" height="54" fill="url(#hhDotGrid)"/>
-            <rect x="28" y="285" width="90" height="54" fill="url(#hhDotGrid)"/>
+            <rect x="990" y="20" width="80" height="48" fill="url(#hhDotGrid)"/>
+            <rect x="24" y="228" width="80" height="48" fill="url(#hhDotGrid)"/>
         </svg>
 
         <div class="hh-glow1"></div>
