@@ -16,6 +16,8 @@
         ];
         $divisions = $divisions ?? collect();
         $isFinanceView = ($isFinance && ! $isSuperAdmin);
+        // Cek apakah halaman ini menampilkan pengajuan milik sendiri
+        $isMyOwnView = (! $isSuperAdmin && ! $isFinance) || ($tab === 'my');
     @endphp
 
     <div x-data="{
@@ -342,12 +344,14 @@
                 @else
                     <!-- DESKTOP VIEW: Table List (hidden md:table / visible on desktop) -->
                     <div class="hidden md:block overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs min-w-[850px]">
+                        <table class="w-full text-left border-collapse text-xs min-w-[750px]">
                             <thead>
                                 <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
                                     <th class="py-3.5 px-4 font-bold">No. Pengajuan</th>
                                     <th class="py-3.5 px-4 font-bold">Tanggal</th>
+                                    @if (! $isMyOwnView)
                                     <th class="py-3.5 px-4 font-bold">Pemohon</th>
+                                    @endif
                                     <th class="py-3.5 px-4 font-bold text-center">Jenis</th>
                                     <th class="py-3.5 px-4 font-bold text-right">Total Pengajuan</th>
                                     <th class="py-3.5 px-4 font-bold text-center">Status</th>
@@ -414,6 +418,7 @@
                                             <div class="text-[10px] text-slate-400 font-sans mt-0.5">{{ $item->created_at->format('H:i') }} WIB</div>
                                         </td>
 
+                                        @if (! $isMyOwnView)
                                         <!-- Pemohon -->
                                         <td class="py-3.5 px-4 whitespace-nowrap">
                                             <div class="flex items-center gap-2.5">
@@ -429,6 +434,7 @@
                                                 </div>
                                             </div>
                                         </td>
+                                        @endif
 
                                         <!-- Jenis -->
                                         <td class="py-3.5 px-4 text-center whitespace-nowrap">
@@ -824,12 +830,14 @@
                 @else
                     <!-- DESKTOP VIEW: Table List (hidden md:table / visible on desktop) -->
                     <div class="hidden md:block overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs min-w-[850px]">
+                        <table class="w-full text-left border-collapse text-xs min-w-[750px]">
                             <thead>
                                 <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
                                     <th class="py-3.5 px-4 font-bold">No. Pengajuan</th>
                                     <th class="py-3.5 px-4 font-bold">Tanggal</th>
+                                    @if (! $isMyOwnView)
                                     <th class="py-3.5 px-4 font-bold">Pemohon</th>
+                                    @endif
                                     <th class="py-3.5 px-4 font-bold text-center">Jenis</th>
                                     <th class="py-3.5 px-4 font-bold text-right">Total Pengajuan</th>
                                     <th class="py-3.5 px-4 font-bold text-center">Status</th>
@@ -905,6 +913,7 @@
                                             <div class="text-[10px] text-slate-400 font-sans mt-0.5">{{ $item->created_at->format('H:i') }} WIB</div>
                                         </td>
 
+                                        @if (! $isMyOwnView)
                                         <!-- Pemohon -->
                                         <td class="py-3.5 px-4 whitespace-nowrap">
                                             <div class="flex items-center gap-2.5">
@@ -920,6 +929,7 @@
                                                 </div>
                                             </div>
                                         </td>
+                                        @endif
 
                                         <!-- Jenis -->
                                         <td class="py-3.5 px-4 text-center whitespace-nowrap">
@@ -1071,6 +1081,26 @@
                                         </div>
 
                                         <!-- Applicant & Nominal Box -->
+                                        @if ($isMyOwnView)
+                                        <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
+                                            <div>
+                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Jenis Keperluan</span>
+                                                <span class="text-xs font-bold text-slate-800 line-clamp-1 mt-0.5">{{ $item->keperluan ?: '-' }}</span>
+                                            </div>
+                                            <div class="text-right shrink-0">
+                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Total Pengajuan</span>
+                                                @if ($item->jenis === 'STOK')
+                                                    <span class="text-xs font-extrabold text-amber-600">Stok Gudang</span>
+                                                @elseif ($item->jenis === 'PERMINTAAN' || $item->jenis === 'BARANG')
+                                                    <span class="text-xs font-extrabold text-cyan-700">Permintaan Barang</span>
+                                                @else
+                                                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                        Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @else
                                         <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
                                             <div class="flex items-center gap-2.5 min-w-0">
                                                 @if ($item->user?->avatar_url)
@@ -1102,6 +1132,7 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        @endif
 
                                         @if ($item->keperluan)
                                             <p class="text-xs text-slate-600 line-clamp-2 mt-2.5 leading-relaxed" title="{{ $item->keperluan }}">
