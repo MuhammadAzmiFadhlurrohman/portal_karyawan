@@ -45,6 +45,7 @@ class EmployeeAttendanceRecapController extends Controller
             ->orderBy('name');
 
         $employees = $employeesQuery->get();
+        $employeeIds = $employees->pluck('id')->all();
 
         // Calculate working days in selected month (count of distinct days where schedules exist or general work days)
         $scheduledDaysCount = MonthlySchedule::query()
@@ -54,7 +55,6 @@ class EmployeeAttendanceRecapController extends Controller
             ->count('date');
 
         if ($scheduledDaysCount === 0) {
-            // Fallback: count weekdays (Monday to Friday or Saturday) up to today if current month, or whole month
             $daysInMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->daysInMonth;
             $scheduledDaysCount = 0;
             for ($d = 1; $d <= $daysInMonth; $d++) {
@@ -65,65 +65,73 @@ class EmployeeAttendanceRecapController extends Controller
             }
         }
 
+        // 1. Bulk Query Attendances for all employees this month
+        $attendancesGrouped = Attendance::query()
+            ->whereIn('user_id', $employeeIds)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->groupBy('user_id');
+
+        // 2. Bulk Query Approved Leaves for all employees
+        $allLeaves = Leave::query()
+            ->whereIn('user_id', $employeeIds)
+            ->where('status', 'approved')
+            ->whereYear('start_date', $year)
+            ->get();
+
+        $monthLeaves = $allLeaves->filter(function ($l) use ($month) {
+            return Carbon::parse($l->start_date)->month == $month;
+        });
+
+        $leavesGroupedByUser = $allLeaves->groupBy('user_id');
+
+        // 3. Bulk Query Leave Balances
+        $balancesGrouped = \App\Models\LeaveBalance::query()
+            ->whereIn('user_id', $employeeIds)
+            ->where('year', $year)
+            ->get()
+            ->keyBy('user_id');
+
         // Summary metrics
         $totalEmployees = $employees->count();
         $totalPresentAll = 0;
-        $totalCutiApprovedAll = 0;
+        $totalCutiApprovedAll = $monthLeaves->where('is_alpa_conversion', false)->count();
         $totalPotonganAll = 0.0;
 
-        // Approved leaves for all employees in this month
-        $leavesInMonth = Leave::query()
-            ->where('status', 'approved')
-            ->whereYear('start_date', $year)
-            ->whereMonth('start_date', $month)
-            ->get();
-
-        $totalCutiApprovedAll = $leavesInMonth->where('is_alpa_conversion', false)->count();
+        // Rates
+        $asOf = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->endOfMonth();
+        $lateFeePerMinute = \App\Modules\Attendance\Services\SystemSettingService::getFloat('attendance.late_fee_per_minute', 250.0, $asOf);
+        $dailyMaxLateFee = \App\Modules\Attendance\Services\SystemSettingService::getFloat('attendance.daily_max_late_fee', 50000.0, $asOf);
+        $defaultAlpaFee = \App\Modules\Attendance\Services\SystemSettingService::getFloat('attendance.default_alpa_fee', 25000.0, $asOf);
 
         // Employee Cards Data
         $cards = [];
         foreach ($employees as $emp) {
-            try {
-                $monthlyReport = $deductionService->calculateUserMonthlyReport($emp, $year, $month);
-            } catch (Exception $e) {
-                $monthlyReport = [
-                    'total_late_minutes' => 0,
-                    'total_alpa_days' => 0,
-                    'total_late_deduction' => '0.00',
-                    'total_alpa_deduction' => '0.00',
-                    'grand_total_deduction' => '0.00',
-                    'daily_items' => [],
-                ];
-            }
-
-            // Attendances in month
-            $userAttendances = Attendance::query()
-                ->where('user_id', $emp->id)
-                ->whereYear('date', $year)
-                ->whereMonth('date', $month)
-                ->get();
-
+            $userAttendances = $attendancesGrouped->get($emp->id, collect());
             $hadirCount = $userAttendances->where('status', 'present')->count();
             $terlambatCount = $userAttendances->where('status', 'late')->count();
-            
-            // Total alpa from monthly report
-            $alpaCount = (int) ($monthlyReport['total_alpa_days'] ?? 0);
-            if ($alpaCount === 0) {
-                $alpaCount = $userAttendances->where('status', 'alpa')->count();
+            $alpaCount = $userAttendances->where('status', 'alpa')->count();
+
+            // Calculate Fast Deductions
+            $lateDeduction = 0.0;
+            foreach ($userAttendances->where('status', 'late') as $lateAtt) {
+                if ($lateAtt->late_minutes > 0) {
+                    $lateDeduction += min($dailyMaxLateFee, round($lateAtt->late_minutes * $lateFeePerMinute, 2));
+                }
             }
 
-            // Leave balance & usage
-            $balance = $leaveService->getOrCreateBalance($emp, $year);
-            $sisaCuti = max(0, (int) ($balance->remaining_days ?? 0));
+            $userAlpaRate = $emp->potongan_alpa !== null ? (float) $emp->potongan_alpa : $defaultAlpaFee;
+            $alpaDeduction = round($alpaCount * $userAlpaRate, 2);
+            $grandTotalPotongan = round($lateDeduction + $alpaDeduction, 2);
 
-            $cutiTerpakai = (int) Leave::query()
-                ->where('user_id', $emp->id)
-                ->where('status', 'approved')
-                ->whereYear('start_date', $year)
-                ->sum('working_days');
+            // Leave Balance
+            $userBal = $balancesGrouped->get($emp->id);
+            $sisaCuti = $userBal ? max(0, (int) $userBal->remaining_days) : 12;
 
-            $grandTotalPotongan = (float) ($monthlyReport['grand_total_deduction'] ?? 0.0);
-            $alpaPotongan = (float) ($monthlyReport['total_alpa_deduction'] ?? 0.0);
+            // Cuti Terpakai in Year
+            $userYearLeaves = $leavesGroupedByUser->get($emp->id, collect());
+            $cutiTerpakai = (int) $userYearLeaves->sum('working_days');
 
             $totalPresentAll += ($hadirCount + $terlambatCount);
             $totalPotonganAll += $grandTotalPotongan;
@@ -136,7 +144,7 @@ class EmployeeAttendanceRecapController extends Controller
                 'sisa_cuti' => $sisaCuti,
                 'cuti_terpakai' => $cutiTerpakai,
                 'total_potongan' => $grandTotalPotongan,
-                'alpa_potongan' => $alpaPotongan,
+                'alpa_potongan' => $alpaDeduction,
             ];
         }
 
