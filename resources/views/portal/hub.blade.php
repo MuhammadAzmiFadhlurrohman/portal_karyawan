@@ -60,33 +60,38 @@
             .hh-check{left:-25px;bottom:18px}
         }
         @media (max-width:767px){
-            .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65)}
-            .hh-inner{flex-direction:column;align-items:stretch;padding:22px 20px 0;gap:0;min-height:auto}
-            .hh-left{padding:0;align-self:stretch;text-align:left}
-            .hh-top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
-            .hh-date{font-size:11.5px;padding:6px 14px}
-            .hh-mobile-dots{display:flex;align-items:center;gap:3.5px;padding-right:4px}
-            .hh-mobile-dots span{width:4px;height:4px;border-radius:50%;background:#5eead4;opacity:.8}
-            .hh-hello-wrap{margin:18px 0 6px;gap:10px}
-            .hh-hello{font-size:13px;letter-spacing:.28em;color:#fff}
-            .hh-hello-line{width:36px;height:3px}
-            .hh-name{font-size:clamp(32px,9.5vw,44px);line-height:1}
-            .hh-sub{margin:8px 0 0;font-size:13px;line-height:1.45}
-            .hh-pills{margin-top:14px;gap:7px}
-            .hh-pill{font-size:11.5px;padding:5.5px 13px;border-radius:999px}
-            .hh-cta{display:flex;width:100%;justify-content:center;margin-top:16px;padding:12px 22px;font-size:13px;border-radius:999px;box-sizing:border-box}
-            .hh-cta svg:last-child{margin-left:auto}
-            .hh-right{position:relative;width:100%;height:370px;margin:18px 0 0;align-self:stretch;display:flex;justify-content:center;overflow:visible}
-            .hh-circle-layer{position:absolute;left:50%;right:auto;bottom:35px;transform:translateX(-50%);width:280px;height:280px}
-            .hh-circle-ring{position:absolute;left:50%;right:auto;bottom:15px;transform:translateX(-50%);width:320px;height:320px}
-            .hh-arc-overlay{position:absolute;left:50%;right:auto;bottom:-5px;transform:translateX(-50%);width:360px;height:360px}
-            .hh-flare{left:calc(50% - 110px);top:110px;width:6px;height:6px}
-            .hh-photo{position:absolute;left:0;right:0;bottom:0;height:360px;display:flex;align-items:flex-end;justify-content:center}
-            .hh-photo img{width:auto;max-width:100%;height:100%;object-fit:contain;object-position:center bottom;transform:scale(1.04);transform-origin:50% 100%}
-            .hh-initials{left:50%;right:auto;bottom:35px;transform:translateX(-50%);width:280px;height:280px;font-size:68px}
-            .hh-check{position:absolute;left:0;right:0;bottom:16px;transform:none;margin:0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.85);box-shadow:0 12px 30px rgba(0,0,0,.6)}
-            .hh-check .ic{width:32px;height:32px}
-            .hh-check .ic i{width:12px;height:12px}
+            .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:560px}
+            .hh-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:20px 18px 18px;gap:0;min-height:560px}
+            .hh-left{position:relative;z-index:3;padding:0;align-self:stretch;text-align:left;max-width:62%}
+            .hh-top-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;z-index:4}
+            .hh-date{font-size:11px;padding:5px 12px}
+            .hh-mobile-dots{display:flex;align-items:center;justify-content:center;padding-right:2px}
+            .hh-mobile-dots .dots-grid{display:grid;grid-template-columns:repeat(2,4.5px);gap:5.5px}
+            .hh-mobile-dots span{width:4.5px;height:4.5px;border-radius:50%;background:#5eead4;opacity:.9;box-shadow:0 0 6px rgba(94,234,212,.7)}
+            .hh-hello-wrap{margin:48px 0 4px;gap:8px}
+            .hh-hello{font-size:11px;letter-spacing:.22em;color:#fff}
+            .hh-hello-line{width:28px;height:2.5px}
+            .hh-name{font-size:clamp(26px,7.5vw,36px);line-height:1.02}
+            .hh-sub{margin:8px 0 0;font-size:11.5px;line-height:1.45}
+            .hh-pills{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:14px}
+            .hh-pill{font-size:11px;padding:5px 12px;border-radius:999px;width:auto}
+            .hh-cta{display:inline-flex;width:auto;align-self:flex-start;margin-top:14px;padding:10px 18px;font-size:11.5px;border-radius:999px}
+            .hh-cta svg:last-child{margin-left:6px}
+            
+            /* Right Arch & Employee cutout on Mobile right side */
+            .hh-right{position:absolute;right:0;top:0;bottom:0;width:58%;height:100%;margin:0;align-self:auto;display:flex;align-items:flex-end;justify-content:flex-end;pointer-events:none;z-index:2;overflow:hidden}
+            .hh-circle-layer{position:absolute;right:-18px;top:70px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 50%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.3)}
+            .hh-circle-ring{position:absolute;right:-32px;top:54px;bottom:0;left:auto;transform:none;width:220px;height:auto;border-radius:999px 999px 0 0;border:1.5px solid rgba(94,234,212,.35)}
+            .hh-arc-overlay{position:absolute;right:-48px;top:38px;bottom:0;left:auto;transform:none;width:250px;height:auto;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.18)}
+            .hh-flare{left:auto;right:180px;top:150px;width:6px;height:6px}
+            .hh-photo{position:absolute;right:-15px;left:auto;bottom:-20px;width:235px;height:440px;display:flex;align-items:flex-end;justify-content:center}
+            .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;transform:scale(1.08);transform-origin:50% 100%}
+            .hh-initials{position:absolute;right:-18px;top:70px;bottom:0;left:auto;transform:none;width:190px;height:auto;border-radius:999px 999px 0 0;font-size:62px}
+            
+            /* Check-in floating pill card pinned at full width on the bottom */
+            .hh-check{position:relative;left:auto;right:auto;bottom:auto;transform:none;margin:20px 0 0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:4}
+            .hh-check .ic{width:34px;height:34px}
+            .hh-check .ic i{width:14px;height:14px}
             .hh-check b{font-size:12.5px}
             .hh-check small{font-size:11px}
             .hh-check-arrow{display:block;margin-left:auto;color:#99f6e4}
@@ -170,7 +175,10 @@
                         <span id="hub-live-clock">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y · H:i:s') }} WIB</span>
                     </div>
                     <div class="hh-mobile-dots">
-                        <span></span><span></span><span></span>
+                        <div class="dots-grid">
+                            <span></span><span></span>
+                            <span></span><span></span>
+                        </div>
                     </div>
                 </div>
                 <div class="hh-hello-wrap">
@@ -226,14 +234,16 @@
                         <div class="hh-initials show">{{ $user->initials }}</div>
                     @endif
                 </div>
-                <div class="hh-check {{ $clockInTime ? '' : 'no' }}">
-                    <span class="ic"><i></i></span>
-                    <div class="chk-info">
-                        <b>{{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Check-in' }}</b>
-                        <small>{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada rekam hari ini' }}</small>
-                    </div>
-                    <svg class="hh-check-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </div>
+
+            <!-- Check-in Floating Card (Rendered inside inner container so it flows cleanly on mobile & desktop) -->
+            <div class="hh-check {{ $clockInTime ? '' : 'no' }}">
+                <span class="ic"><i></i></span>
+                <div class="chk-info">
+                    <b>{{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Check-in' }}</b>
+                    <small>{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada rekam hari ini' }}</small>
                 </div>
+                <svg class="hh-check-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </div>
         </div>
     </div>
