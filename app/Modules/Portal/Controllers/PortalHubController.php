@@ -92,6 +92,7 @@ class PortalHubController extends Controller
             return [
                 'attendance_today' => [
                     'status' => $todayAttendance ? strtoupper($todayAttendance->status) : 'BELUM CLOCK-IN',
+                    'clock_in_time' => $todayAttendance?->clock_in_at?->timezone('Asia/Jakarta')->format('H:i'),
                     'shift_code' => $shiftCode,
                     'shift_label' => "{$shiftName} ({$shiftCode})",
                     'office_name' => $officeName,
