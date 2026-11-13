@@ -220,6 +220,7 @@
                 @php
                     $navUser = auth()->user();
                     $navIsHrdOnly = $navUser && $navUser->hasRole('hrd') && ! $navUser->hasRole(['super_admin', 'admin']);
+                    $isHrdRole = $navIsHrdOnly;
                     $navCanApprovePengajuan = $navUser && ! $navIsHrdOnly && ($navUser->can('gomsn.pengajuan.approve_atasan') || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
                     $navCanApproveKoreksi = $navUser && ! $navIsHrdOnly && ($navUser->can('attendance.correction.approve') || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
                     $navIsAtasan = $navUser && ($navCanApprovePengajuan || $navUser->can('gomsn.lembur.approve'));
