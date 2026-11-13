@@ -64,6 +64,8 @@ Route::middleware('auth')->group(function (): void {
     // Fase 1: Modul Absensi Inti — Biometrik Wajah, Geofencing & Jadwal Shift (§5.1, §5.2, §5.9)
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
     Route::get('/attendance/history', [AttendanceController::class, 'history'])->name('attendance.history');
+    Route::get('/attendance/employee-recap', [\App\Modules\Attendance\Controllers\EmployeeAttendanceRecapController::class, 'index'])->name('attendance.employee-recap');
+    Route::get('/attendance/employee-recap/{user}', [\App\Modules\Attendance\Controllers\EmployeeAttendanceRecapController::class, 'show'])->name('attendance.employee-recap.show');
     Route::get('/attendance/reports', [AttendanceReportController::class, 'index'])->name('attendance.reports');
     Route::get('/attendance/reports/export', [AttendanceReportController::class, 'exportCsv'])->name('attendance.reports.export');
     Route::post('/attendance/reports/update', [AttendanceReportController::class, 'updateRecord'])->name('attendance.reports.update');

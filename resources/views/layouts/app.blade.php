@@ -364,6 +364,7 @@
                     $sidebarUser = auth()->user();
                     $canViewReports = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin']);
                     $isHrdRole = $sidebarUser && $sidebarUser->hasRole('hrd') && ! $sidebarUser->hasRole(['super_admin', 'admin']);
+                    $canViewEmployeeRecap = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin', 'hrd']);
                     $isAbsensiActive = request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals');
                     $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
                 @endphp
@@ -408,6 +409,19 @@
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             <span>Data Karyawan</span>
                             @if (request()->routeIs('portal.employees.*'))
+                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                            @endif
+                        </a>
+                        @endif
+
+                        @if ($canViewEmployeeRecap)
+                        <!-- Absen Karyawan (Khusus HRD / Admin) -->
+                        <a href="{{ route('attendance.employee-recap') }}"
+                           @if (request()->routeIs('attendance.employee-recap*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.employee-recap*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <span>Absen Karyawan</span>
+                            @if (request()->routeIs('attendance.employee-recap*'))
                             <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
@@ -1538,6 +1552,18 @@
                                 <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Log Kehadiran</span>
                             </div>
                         </a>
+
+                        @if ($canViewEmployeeRecap)
+                        <a href="{{ route('attendance.employee-recap') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Absen Karyawan</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Rekap &amp; Potongan</span>
+                            </div>
+                        </a>
+                        @endif
 
                         @if ($canViewReports)
                         <a href="{{ route('attendance.reports') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
