@@ -31,12 +31,12 @@
         .hh-cta svg{transition:transform .15s ease}
         .hh-cta:hover svg{transform:translateX(2px)}
         .hh-mobile-dots{display:none}
-        .hh-right{position:relative;flex:none;width:350px;height:290px;margin-right:8px;align-self:flex-end}
+        .hh-right{position:relative;flex:none;width:350px;height:290px;margin-right:0;align-self:flex-end}
         .hh-circle-layer{position:absolute;right:0;bottom:-18px;width:300px;height:300px;border-radius:50%;background:linear-gradient(135deg,#0d9488 0%,#14b8a6 50%,#2dd4bf 100%);opacity:.92;box-shadow:0 0 40px rgba(20,184,166,.35);z-index:1}
         .hh-circle-ring{position:absolute;right:-18px;bottom:-36px;width:336px;height:336px;border-radius:50%;border:1.5px solid rgba(94,234,212,.35);pointer-events:none;z-index:1}
         .hh-arc-overlay{position:absolute;right:-42px;bottom:-60px;width:384px;height:384px;border-radius:50%;border:1px solid rgba(94,234,212,.18);pointer-events:none;z-index:1}
         .hh-flare{position:absolute;left:32px;top:100px;width:5.5px;height:5.5px;border-radius:50%;background:#fff;box-shadow:0 0 14px 5px rgba(94,234,212,.9),0 0 26px 10px rgba(20,184,166,.6);pointer-events:none;z-index:2}
-        .hh-photo{position:absolute;left:0;right:0;bottom:-46px;height:310px;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+        .hh-photo{position:absolute;left:24px;right:-24px;bottom:-46px;height:310px;z-index:2;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
         .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:scale(1.02);transform-origin:50% 100%;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5))}
         .hh-initials{position:absolute;right:0;bottom:-18px;width:300px;height:300px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:64px;font-weight:900;color:rgba(255,255,255,.95);z-index:2}
         .hh-initials.show{display:flex}
@@ -55,7 +55,7 @@
             .hh-circle-layer{width:260px;height:260px;bottom:-14px}
             .hh-circle-ring{width:290px;height:290px;bottom:-28px}
             .hh-arc-overlay{width:330px;height:330px;bottom:-44px}
-            .hh-photo{bottom:-40px;height:290px}
+            .hh-photo{left:20px;right:-20px;bottom:-40px;height:290px}
             .hh-photo img{transform:scale(1.02)}
             .hh-check{right:16px;bottom:14px}
         }
