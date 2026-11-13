@@ -593,7 +593,7 @@ class ScheduleController extends Controller
             $shift = Shift::query()->where('code', 'P')->first() ?? Shift::first();
         }
 
-        $reason = $validated['reason'] ?: (
+        $reason = ! empty($validated['reason']) ? $validated['reason'] : (
             ($customStart && $customEnd)
                 ? "Atur jam custom ({$customStart}–{$customEnd})"
                 : 'Pembaruan jadwal kerja melalui Kalender Shift Admin'
