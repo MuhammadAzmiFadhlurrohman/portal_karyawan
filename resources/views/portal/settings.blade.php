@@ -1,12 +1,12 @@
-<x-layouts.app title="Konfigurasi Sistem (system_settings)">
+<x-layouts.app title="Pengaturan">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <x-status-badge variant="info" label="Single Source of Truth · §6.3 & AC-09" />
             <h1 class="font-heading text-2xl font-bold text-[#1E3A8A] mt-2">
-                Konfigurasi Parameter Sistem (<code class="font-mono">system_settings</code>)
+                Pengaturan
             </h1>
             <p class="text-xs text-[#475569] mt-1">
-                Setiap perubahan parameter menyimpan tanggal mulai berlaku (<code class="font-mono">effective_from</code>) dan alasan wajib ke <code class="font-mono">audit_logs</code> agar periode historis yang sudah ditutup tidak berubah (AC-09).
+                Atur parameter operasional dan jalannya aplikasi (radius absensi, kuota cuti, batas keterlambatan, dan kebijakan sistem). Setiap perubahan parameter tercatat secara aman di riwayat audit.
             </p>
         </div>
     </div>
