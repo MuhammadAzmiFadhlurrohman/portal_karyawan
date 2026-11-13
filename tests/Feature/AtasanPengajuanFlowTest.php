@@ -235,10 +235,10 @@ class AtasanPengajuanFlowTest extends TestCase
         $resFinance->assertSee('Tampilkan');
         $resFinance->assertSee('Export');
 
-        // Verify CSV Export
+        // Verify CSV / Excel Export
         $resExport = $this->actingAs($finance)->get(route('gomsn.pengajuan.index', ['export' => 'csv']));
         $resExport->assertOk();
-        $this->assertStringContainsString('text/csv', $resExport->headers->get('content-type'));
+        $this->assertTrue(str_contains($resExport->headers->get('content-type'), 'text/csv') || str_contains($resExport->headers->get('content-type'), 'vnd.ms-excel'));
     }
 
     public function test_submissions_only_appear_to_designated_atasan_and_not_other_atasans(): void

@@ -246,9 +246,8 @@
                 </span>
             </div>
 
-            <!-- Cards Container -->
-            <div class="p-4 sm:p-5 bg-slate-50/50">
-                @if ($pengajuanList->isEmpty())
+            @if ($pengajuanList->isEmpty())
+                <div class="p-6 bg-slate-50/50">
                     <div class="py-12 px-4 text-center bg-white rounded-2xl border border-slate-200/70">
                         <div class="max-w-xs mx-auto space-y-2">
                             <div class="w-12 h-12 rounded-full bg-slate-100 mx-auto flex items-center justify-center text-slate-400 text-xl font-bold">
@@ -258,8 +257,179 @@
                             <p class="text-xs text-slate-400 leading-relaxed">Semua permohonan dari karyawan telah diproses atau filter pencarian tidak menemukan hasil.</p>
                         </div>
                     </div>
-                @else
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
+                </div>
+            @else
+                <!-- DESKTOP VIEW: Table List (hidden md:table / visible on desktop) -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs min-w-[850px]">
+                        <thead>
+                            <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider text-[11px]">
+                                <th class="py-3.5 px-4 font-bold">No. Pengajuan</th>
+                                <th class="py-3.5 px-4 font-bold">Tanggal</th>
+                                <th class="py-3.5 px-4 font-bold">Pengaju</th>
+                                <th class="py-3.5 px-4 font-bold text-center">Jenis</th>
+                                <th class="py-3.5 px-4 font-bold">Keperluan</th>
+                                <th class="py-3.5 px-4 font-bold text-right">Total Pengajuan</th>
+                                <th class="py-3.5 px-4 font-bold text-center">Status</th>
+                                <th class="py-3.5 px-4 font-bold text-center w-48">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            @foreach ($pengajuanList as $item)
+                                @php
+                                    $modalData = [
+                                        'id' => $item->id,
+                                        'nomor' => $item->nomor_pengajuan,
+                                        'created_at' => $item->created_at->format('d M Y - H:i') . ' WIB',
+                                        'userName' => $item->user?->name ?? 'Karyawan MSN',
+                                        'userEmployeeCode' => $item->user?->employee_code ?? '',
+                                        'userDivision' => $item->user?->division ?? '-',
+                                        'atasanName' => $item->atasan?->name ?? 'Atasan Langsung',
+                                        'jenis' => strtolower($item->jenis),
+                                        'keperluan' => $item->keperluan ?? '-',
+                                        'totalFormatted' => ($item->jenis === 'STOK' ? 'Stok Gudang' : 'Rp ' . number_format((float) $item->total_nominal, 0, ',', '.')),
+                                        'totalNominal' => (float) $item->total_nominal,
+                                        'status' => $item->status,
+                                        'approveUrl' => route('gomsn.pengajuan.approve-atasan', $item->id),
+                                        'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
+                                        'nominalRealisasi' => (float) ($item->nominal_realisasi ?? $item->total_nominal),
+                                        'nominalRealisasiFormatted' => $item->nominal_realisasi !== null ? ('Rp ' . number_format((float) $item->nominal_realisasi, 0, ',', '.')) : null,
+                                        'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
+                                        'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp ' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
+                                        'buktiRealisasiPath' => $item->bukti_realisasi_path,
+                                        'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
+                                        'realisasiNotes' => $item->realisasi_notes,
+                                        'details' => $item->details->map(function ($d) use ($item) {
+                                            return [
+                                                'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
+                                                'qty' => $d->qty,
+                                                'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
+                                                'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
+                                                'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
+                                            ];
+                                        })->values()->all(),
+                                    ];
+                                    $isApprovedStatus = in_array($item->status, ['menunggu_finance', 'menunggu_executive', 'dicairkan', 'menunggu_bukti', 'selesai']);
+                                @endphp
+                                <tr class="hover:bg-teal-50/30 transition-colors">
+                                    <!-- No. Pengajuan -->
+                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-xs font-extrabold text-[#155E63] bg-teal-50 border border-teal-200/70 px-1.5 py-0.5 rounded-md">#{{ $item->id }}</span>
+                                            <button type="button" @click="openDetail({{ json_encode($modalData) }})" class="font-mono font-bold text-slate-800 hover:text-teal-700 hover:underline cursor-pointer text-left">
+                                                {{ $item->nomor_pengajuan }}
+                                            </button>
+                                        </div>
+                                    </td>
+
+                                    <!-- Tanggal -->
+                                    <td class="py-3.5 px-4 whitespace-nowrap text-slate-700">
+                                        <div class="font-medium text-slate-800">{{ $item->created_at->format('d M Y') }}</div>
+                                        <div class="text-[10px] text-slate-400 font-sans mt-0.5">{{ $item->created_at->format('H:i') }} WIB</div>
+                                    </td>
+
+                                    <!-- Pengaju -->
+                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                                                {{ strtoupper(substr($item->user?->name ?? 'U', 0, 1)) }}
+                                            </div>
+                                            <div class="min-w-0">
+                                                <span class="font-bold text-slate-800 block truncate leading-tight">{{ $item->user?->name ?? 'Karyawan MSN' }}</span>
+                                                <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">{{ $item->user?->employee_code ?: 'KR'.$item->user_id }} &bull; {{ $item->user?->division ?: '-' }}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Jenis -->
+                                    <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                        @if ($item->jenis === 'STOK')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">Stok</span>
+                                        @elseif ($item->jenis === 'DANA')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Dana</span>
+                                        @elseif ($item->jenis === 'BELI')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Beli</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{{ $item->jenis }}</span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Keperluan -->
+                                    <td class="py-3.5 px-4 max-w-xs">
+                                        <span class="text-xs text-slate-600 block truncate" title="{{ $item->keperluan ?? '-' }}">
+                                            {{ $item->keperluan ?? '-' }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Total Pengajuan -->
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                        @if ($item->jenis === 'STOK')
+                                            <span class="text-amber-700 font-semibold font-sans text-xs">Stok Gudang</span>
+                                        @else
+                                            <span class="font-mono font-bold text-slate-900 text-xs">Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}</span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                        @if ($isApprovedStatus)
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                <span>✓</span>
+                                                <span>Disetujui</span>
+                                            </span>
+                                        @elseif ($item->status === 'ditolak')
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                                <span>✕</span>
+                                                <span>Ditolak</span>
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                <span>Menunggu</span>
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Aksi -->
+                                    <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                            <button type="button" 
+                                                    @click="openDetail({{ json_encode($modalData) }})"
+                                                    style="background: linear-gradient(135deg, #0284C7 0%, #2563EB 100%) !important; color: #ffffff !important;"
+                                                    class="hover:opacity-90 text-white font-bold text-xs px-2.5 py-1.5 rounded-xl shadow-2xs transition inline-flex items-center gap-1 cursor-pointer">
+                                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                                <span>Detail</span>
+                                            </button>
+
+                                            @if ($item->status === 'menunggu_atasan')
+                                                <button type="button" 
+                                                        @click="openApprove('{{ route('gomsn.pengajuan.approve-atasan', $item->id) }}', '{{ $item->nomor_pengajuan }}')"
+                                                        style="background-color: #059669 !important; color: #ffffff !important;"
+                                                        class="hover:opacity-90 text-white font-bold text-xs px-2.5 py-1.5 rounded-xl shadow-2xs transition inline-flex items-center gap-1 cursor-pointer">
+                                                    <span>✓</span>
+                                                    <span>Setujui</span>
+                                                </button>
+                                                <button type="button" 
+                                                        @click="openReject('{{ route('gomsn.pengajuan.reject', $item->id) }}', '{{ $item->nomor_pengajuan }}')"
+                                                        class="hover:bg-rose-100 text-rose-700 font-bold text-xs px-2.5 py-1.5 rounded-xl border border-rose-200 bg-rose-50 transition inline-flex items-center gap-1 cursor-pointer">
+                                                    <span>✕</span>
+                                                    <span>Tolak</span>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- MOBILE VIEW: Cards Container (md:hidden) -->
+                <div class="md:hidden p-4 sm:p-5 bg-slate-50/50 space-y-3.5">
+                    <div class="space-y-3">
                         @foreach ($pengajuanList as $item)
                             @php
                                 $modalData = [
@@ -416,8 +586,8 @@
                             </div>
                         @endforeach
                     </div>
-                @endif
-            </div>
+                </div>
+            @endif
 
             @if ($pengajuanList->hasPages())
             <div class="p-4 border-t border-slate-200 bg-white">
