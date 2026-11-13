@@ -60,8 +60,8 @@
             .hh-check{left:-25px;bottom:18px}
         }
         @media (max-width:767px){
-            .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:540px}
-            .hh-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:16px 16px 16px;gap:0;min-height:540px}
+            .hh{border-radius:28px;margin-bottom:20px;box-shadow:0 18px 45px -8px rgba(1,20,23,.65);min-height:auto}
+            .hh-inner{position:relative;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding:16px 16px 16px;gap:0;min-height:auto}
             .hh-left{position:relative;z-index:3;padding:0;align-self:stretch;text-align:left;max-width:56%}
             .hh-top-bar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;z-index:4;margin-bottom:12px}
             .hh-date{font-size:10.5px;padding:4.5px 12px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
@@ -80,17 +80,17 @@
             .hh-cta svg:last-child{margin-left:6px}
             
             /* Right Arch & Employee cutout on Mobile right side */
-            .hh-right{position:absolute;right:0;top:0;bottom:75px;width:60%;height:auto;margin:0;align-self:auto;display:flex;align-items:flex-end;justify-content:flex-end;pointer-events:none;z-index:2;overflow:hidden}
+            .hh-right{position:absolute;right:0;top:0;bottom:70px;width:60%;height:auto;margin:0;align-self:auto;display:flex;align-items:flex-end;justify-content:flex-end;pointer-events:none;z-index:2;overflow:hidden}
             .hh-circle-layer{position:absolute;right:-14px;top:65px;bottom:0;left:auto;transform:none;width:195px;height:auto;border-radius:999px 999px 0 0;background:linear-gradient(180deg,#2dd4bf 0%,#14b8a6 50%,#0d9488 100%);box-shadow:0 -10px 35px rgba(20,184,166,.3)}
             .hh-circle-ring{position:absolute;right:-28px;top:48px;bottom:0;left:auto;transform:none;width:225px;height:auto;border-radius:999px 999px 0 0;border:1.5px solid rgba(94,234,212,.35)}
             .hh-arc-overlay{position:absolute;right:-44px;top:32px;bottom:0;left:auto;transform:none;width:255px;height:auto;border-radius:999px 999px 0 0;border:1px solid rgba(94,234,212,.18)}
             .hh-flare{left:auto;right:185px;top:140px;width:6px;height:6px}
-            .hh-photo{position:absolute;right:-10px;left:auto;bottom:0;width:235px;height:420px;display:flex;align-items:flex-end;justify-content:center}
+            .hh-photo{position:absolute;right:-10px;left:auto;bottom:0;width:235px;height:100%;max-height:380px;display:flex;align-items:flex-end;justify-content:center}
             .hh-photo img{width:100%;height:100%;object-fit:contain;object-position:center bottom;transform:scale(1.1);transform-origin:50% 100%}
             .hh-initials{position:absolute;right:-14px;top:65px;bottom:0;left:auto;transform:none;width:195px;height:auto;border-radius:999px 999px 0 0;font-size:62px}
             
-            /* Check-in floating pill card pinned at full width on the bottom */
-            .hh-check{position:relative;left:auto;right:auto;bottom:auto;transform:none;margin:18px 0 0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:4}
+            /* Check-in floating pill card pinned closely under the CTA button */
+            .hh-check{position:relative;left:auto;right:auto;bottom:auto;transform:none;margin:16px 0 0;width:100%;box-sizing:border-box;padding:12px 18px;border-radius:22px;background:rgba(4,24,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(94,234,212,.35);box-shadow:0 14px 34px rgba(0,0,0,.6);z-index:4}
             .hh-check .ic{width:34px;height:34px}
             .hh-check .ic i{width:14px;height:14px}
             .hh-check b{font-size:12.5px}
