@@ -1117,7 +1117,7 @@
          style="z-index: 40 !important;"
          x-data="{
              currentTab: '{{ $navTabActive }}',
-             get isMenu() { return bottomSheetOpen; },
+             get isMenu() { return typeof bottomSheetOpen !== 'undefined' ? bottomSheetOpen : false; },
              isActive(tab) {
                  if (this.isMenu) return tab === 'menu';
                  return this.currentTab === tab;
