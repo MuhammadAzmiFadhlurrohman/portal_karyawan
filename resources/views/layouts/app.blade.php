@@ -98,58 +98,85 @@
                style="background: linear-gradient(180deg, #022836 0%, #053b47 22%, #094d5a 50%, #0c5a68 75%, #031e26 100%) !important;"
                class="hidden md:flex md:sticky top-0 inset-y-0 left-0 z-40 w-64 text-white flex-col justify-between h-screen shadow-2xl shrink-0 border-r border-[#14b8a6]/25 relative overflow-hidden select-none">
             
-            <!-- Ambient Sculpted Waves & Elegant Fluid Lines (matching Page Header Theme) -->
+            <!-- Ambient Sculpted Waves & Clean Parallel Fiber Contours -->
             <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
                 <!-- Ambient Radial Glow Spots -->
-                <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-teal-400/10 blur-3xl pointer-events-none"></div>
-                <div class="absolute top-1/3 -left-20 w-56 h-56 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
-                <div class="absolute bottom-24 -right-16 w-60 h-60 rounded-full bg-teal-300/10 blur-3xl pointer-events-none"></div>
+                <div class="absolute -top-20 -right-16 w-56 h-56 rounded-full bg-teal-400/12 blur-3xl pointer-events-none"></div>
+                <div class="absolute top-1/2 -left-24 w-56 h-56 rounded-full bg-cyan-400/8 blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-16 -right-12 w-64 h-64 rounded-full bg-teal-300/10 blur-3xl pointer-events-none"></div>
 
-                <!-- Fluid Wave Glow & Line Geometry -->
-                <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" viewBox="0 0 256 900" fill="none" preserveAspectRatio="none">
+                <!-- Harmonious Parallel Contour Waves & Fiber Nodes -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 256 900" fill="none" preserveAspectRatio="none">
                     <defs>
-                        <linearGradient id="sidebarWaveFill1" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.08"/>
-                            <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.14"/>
-                            <stop offset="100%" stop-color="#5eead4" stop-opacity="0.03"/>
+                        <!-- Sculpted Translucent Wave Fills -->
+                        <linearGradient id="sbWaveFill1" x1="100%" y1="0%" x2="20%" y2="100%">
+                            <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.10"/>
+                            <stop offset="55%" stop-color="#14b8a6" stop-opacity="0.05"/>
+                            <stop offset="100%" stop-color="#0d9488" stop-opacity="0.0"/>
                         </linearGradient>
-                        <linearGradient id="sidebarWaveFill2" x1="100%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#0e7490" stop-opacity="0.10"/>
-                            <stop offset="70%" stop-color="#14b8a6" stop-opacity="0.06"/>
+                        <linearGradient id="sbWaveFill2" x1="100%" y1="20%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.06"/>
+                            <stop offset="60%" stop-color="#14b8a6" stop-opacity="0.04"/>
                             <stop offset="100%" stop-color="#042f2e" stop-opacity="0.0"/>
                         </linearGradient>
-                        <linearGradient id="sidebarStrokeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#5eead4" stop-opacity="0.55"/>
-                            <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.35"/>
-                            <stop offset="100%" stop-color="#0d9488" stop-opacity="0.12"/>
-                        </linearGradient>
-                        <linearGradient id="sidebarStrokeGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <linearGradient id="sbWaveFill3" x1="0%" y1="100%" x2="80%" y2="55%">
                             <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.08"/>
-                            <stop offset="40%" stop-color="#5eead4" stop-opacity="0.40"/>
-                            <stop offset="80%" stop-color="#99f6e4" stop-opacity="0.50"/>
-                            <stop offset="100%" stop-color="#5eead4" stop-opacity="0.15"/>
+                            <stop offset="65%" stop-color="#14b8a6" stop-opacity="0.03"/>
+                            <stop offset="100%" stop-color="#042f2e" stop-opacity="0.0"/>
                         </linearGradient>
-                        <linearGradient id="sidebarStrokeGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.45"/>
-                            <stop offset="50%" stop-color="#5eead4" stop-opacity="0.25"/>
-                            <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.08"/>
+
+                        <!-- Smooth Fade-in-Fade-out Parallel Stroke Gradients -->
+                        <linearGradient id="sbContour1" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#5eead4" stop-opacity="0.0"/>
+                            <stop offset="18%" stop-color="#5eead4" stop-opacity="0.34"/>
+                            <stop offset="52%" stop-color="#2dd4bf" stop-opacity="0.42"/>
+                            <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.22"/>
+                            <stop offset="100%" stop-color="#5eead4" stop-opacity="0.0"/>
                         </linearGradient>
+                        <linearGradient id="sbContour2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.0"/>
+                            <stop offset="22%" stop-color="#5eead4" stop-opacity="0.22"/>
+                            <stop offset="55%" stop-color="#38bdf8" stop-opacity="0.28"/>
+                            <stop offset="88%" stop-color="#2dd4bf" stop-opacity="0.14"/>
+                            <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.0"/>
+                        </linearGradient>
+                        <linearGradient id="sbContour3" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.0"/>
+                            <stop offset="25%" stop-color="#99f6e4" stop-opacity="0.16"/>
+                            <stop offset="60%" stop-color="#5eead4" stop-opacity="0.20"/>
+                            <stop offset="92%" stop-color="#2dd4bf" stop-opacity="0.08"/>
+                            <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.0"/>
+                        </linearGradient>
+
+                        <!-- Radial Glow for Subtle Fiber Nodes -->
+                        <radialGradient id="sbNodeGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.65"/>
+                            <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.22"/>
+                            <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.0"/>
+                        </radialGradient>
                     </defs>
 
-                    <!-- Wave Ribbon 1 (Flowing down right edge) -->
-                    <path d="M 120 0 C 200 180, 80 340, 210 520 C 290 640, 160 780, 256 900 L 256 0 Z" fill="url(#sidebarWaveFill1)"/>
-                    
-                    <!-- Wave Ribbon 2 (Flowing deep accent) -->
-                    <path d="M 180 0 C 90 220, 240 400, 140 620 C 60 760, 180 840, 256 900 L 256 0 Z" fill="url(#sidebarWaveFill2)"/>
+                    <!-- 3 Sculpted Translucent Wave Layers (Clean Logo Headroom: starts upper-right) -->
+                    <path d="M 192 0 C 232 135, 118 285, 168 465 C 216 635, 130 770, 212 900 L 256 900 L 256 0 Z" fill="url(#sbWaveFill1)"/>
+                    <path d="M 224 0 C 254 150, 152 300, 198 480 C 242 645, 168 780, 240 900 L 256 900 L 256 0 Z" fill="url(#sbWaveFill2)"/>
+                    <path d="M 0 560 C 58 615, 42 735, 128 820 C 165 858, 198 882, 224 900 L 0 900 Z" fill="url(#sbWaveFill3)"/>
 
-                    <!-- Flowing Vector Lines (Garis-garis menarik yang elegan & dinamis) -->
-                    <path d="M 120 0 C 200 180, 80 340, 210 520 C 290 640, 160 780, 256 900" stroke="url(#sidebarStrokeGrad1)" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M 145 0 C 225 175, 105 345, 235 515 C 315 635, 185 785, 256 870" stroke="url(#sidebarStrokeGrad2)" stroke-width="1.2" stroke-dasharray="4 4" stroke-linecap="round"/>
-                    <path d="M 90 0 C 170 190, 50 350, 180 530 C 260 650, 130 790, 230 900" stroke="url(#sidebarStrokeGrad3)" stroke-width="1.2" stroke-linecap="round"/>
-                    <path d="M 210 0 C 120 230, 250 420, 160 640 C 90 780, 200 860, 256 900" stroke="url(#sidebarStrokeGrad2)" stroke-width="1.5" stroke-linecap="round"/>
-                    
-                    <!-- Subtle Secondary Flow Lines at bottom half -->
-                    <path d="M 40 450 C 120 540, 70 660, 190 780 C 240 830, 230 870, 256 900" stroke="url(#sidebarStrokeGrad1)" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+                    <!-- 5 Smooth Parallel Contour Curves (No crossing clutter, no dashed lines) -->
+                    <path d="M 192 0 C 232 135, 118 285, 168 465 S 130 770, 212 900" stroke="url(#sbContour1)" stroke-width="1.4" stroke-linecap="round"/>
+                    <path d="M 208 0 C 248 135, 134 285, 184 465 S 146 770, 228 900" stroke="url(#sbContour2)" stroke-width="1.15" stroke-linecap="round"/>
+                    <path d="M 224 0 C 264 135, 150 285, 200 465 S 162 770, 244 900" stroke="url(#sbContour3)" stroke-width="1" stroke-linecap="round"/>
+                    <path d="M 176 0 C 216 135, 102 285, 152 465 S 114 770, 196 900" stroke="url(#sbContour2)" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+                    <path d="M 160 0 C 200 135, 86 285, 136 465 S 98 770, 180 900" stroke="url(#sbContour3)" stroke-width="0.85" stroke-linecap="round" opacity="0.65"/>
+
+                    <!-- 3 Subtle Glowing Fiber Nodes along the Primary Contour Curve -->
+                    <circle cx="177" cy="245" r="9" fill="url(#sbNodeGlow)"/>
+                    <circle cx="177" cy="245" r="2.2" fill="#99f6e4" fill-opacity="0.85"/>
+
+                    <circle cx="168" cy="465" r="10" fill="url(#sbNodeGlow)"/>
+                    <circle cx="168" cy="465" r="2.4" fill="#5eead4" fill-opacity="0.9"/>
+
+                    <circle cx="165" cy="705" r="8" fill="url(#sbNodeGlow)"/>
+                    <circle cx="165" cy="705" r="2" fill="#7dd3fc" fill-opacity="0.8"/>
                 </svg>
 
                 <!-- Top & Edge Specular Gloss Highlights (matching Page Header top rim) -->
