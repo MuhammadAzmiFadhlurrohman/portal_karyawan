@@ -65,24 +65,28 @@
         </div>
 
         <!-- OLT Switcher & Breadcrumb Bar -->
-        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
             <div class="flex items-center gap-2.5 text-slate-800 font-bold text-sm sm:text-base tracking-tight">
-                <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 border border-teal-100">
+                <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 border border-teal-100 shadow-2xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 </div>
                 <span>{{ $selectedOlt->nama_olt }}</span>
                 <span class="text-xs text-slate-400 font-medium">({{ $pons->total() }} PON terdaftar)</span>
             </div>
 
-            <!-- OLT Tab Switcher -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <!-- OLT Tab Switcher Segmented Control -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 p-1 bg-slate-100/80 rounded-2xl border border-slate-200/60 max-w-full">
                 @foreach ($olts as $olt)
+                    @php
+                        $isSelected = ($olt->id === $selectedOlt->id);
+                    @endphp
                     <a href="{{ route('gomsn.network.index', ['olt_id' => $olt->id]) }}" 
-                       @if ($olt->id === $selectedOlt->id)
-                           style="background: linear-gradient(135deg, #0f4c5c 0%, #0d9488 100%) !important; color: #ffffff !important;"
+                       @if ($isSelected)
+                           style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%) !important; color: #ffffff !important;"
                        @endif
-                       class="px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs {{ $olt->id === $selectedOlt->id ? 'shadow-md border border-teal-400/30' : 'bg-slate-100 text-slate-700 hover:bg-slate-200/90' }}">
-                        {{ $olt->nama_olt }}
+                       class="group px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 {{ $isSelected ? 'shadow-md border border-teal-400/40 text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80' }}">
+                        <span class="w-1.5 h-1.5 rounded-full transition-colors {{ $isSelected ? 'bg-emerald-300 shadow-[0_0_8px_#6ee7b7]' : 'bg-slate-300 group-hover:bg-slate-400' }}"></span>
+                        <span>{{ $olt->nama_olt }}</span>
                     </a>
                 @endforeach
             </div>
