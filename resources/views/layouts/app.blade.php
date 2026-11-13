@@ -322,10 +322,29 @@
                         </a>
                         @endif
 
-                        @if (! $navIsHrdOnly)
+                        @php
+                            $isOvertimeRoute = request()->routeIs('gomsn.overtime.*');
+                            $isOvertimeSaya = $isOvertimeRoute && request('view_mode') === 'saya';
+                            $isOvertimeKaryawan = $isOvertimeRoute && request('view_mode') !== 'saya';
+                        @endphp
+
+                        @if ($isHrdRole)
+                        <!-- Khusus HRD: Tombol Lembur Saya (Pengajuan & Riwayat Milik Sendiri) -->
+                        <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'saya']) }}"
+                           @if ($isOvertimeSaya) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ $isOvertimeSaya ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Lembur Saya</span>
+                            </div>
+                            @if ($isOvertimeSaya)
+                            <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                            @endif
+                        </a>
+                        @elseif (! $navIsHrdOnly)
                         <a href="{{ route('gomsn.overtime.index') }}"
-                           @if (request()->routeIs('gomsn.overtime.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.overtime.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           @if ($isOvertimeRoute) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ $isOvertimeRoute ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>{{ $navIsAtasan ? 'Persetujuan Lembur' : 'Lembur' }}</span>
@@ -334,7 +353,7 @@
                             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
                                 {{ $navPendingLemburCount }}
                             </span>
-                            @elseif (request()->routeIs('gomsn.overtime.*'))
+                            @elseif ($isOvertimeRoute)
                             <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
@@ -537,9 +556,9 @@
                             </a>
 
                             <!-- Lembur Karyawan -->
-                            <a href="{{ route('gomsn.overtime.index') }}"
-                               @if (request()->routeIs('gomsn.overtime.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                               class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.overtime.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                            <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'karyawan']) }}"
+                               @if ($isOvertimeKaryawan) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                               class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ $isOvertimeKaryawan ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                                 <div class="flex items-center gap-3">
                                     <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     <span>Lembur Karyawan</span>
@@ -548,7 +567,7 @@
                                 <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
                                     {{ $navPendingLemburCount }}
                                 </span>
-                                @elseif (request()->routeIs('gomsn.overtime.*'))
+                                @elseif ($isOvertimeKaryawan)
                                 <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
                                 @endif
                             </a>
@@ -1544,6 +1563,19 @@
                         </a>
                         @endif
 
+                        @if ($isHrdRole)
+                        <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'saya']) }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-blue-400 hover:bg-blue-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-blue-800 leading-snug">Lembur Saya</span>
+                                    <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Pengajuan &amp; SPK</span>
+                                </div>
+                            </div>
+                        </a>
+                        @else
                         <a href="{{ route('gomsn.overtime.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-blue-400 hover:bg-blue-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
@@ -1560,6 +1592,7 @@
                             </span>
                             @endif
                         </a>
+                        @endif
 
                         @if ($navIsFinance)
                         <a href="{{ route('gomsn.inventory.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
@@ -1730,7 +1763,7 @@
                         </a>
 
                         <!-- Lembur Karyawan -->
-                        <a href="{{ route('gomsn.overtime.index') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                        <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'karyawan']) }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

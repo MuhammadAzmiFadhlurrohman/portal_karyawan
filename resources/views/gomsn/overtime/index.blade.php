@@ -86,7 +86,11 @@
                         @if ($isFinance)
                             <span>Rekapitulasi &amp; Pembayaran Lembur</span>
                         @elseif ($isHrd)
-                            <span>Manajemen &amp; Approval Lembur Karyawan</span>
+                            @if ($viewMode === 'saya')
+                                <span>Pengajuan Lembur Saya Sendiri</span>
+                            @else
+                                <span>Manajemen &amp; Approval Lembur Karyawan</span>
+                            @endif
                         @elseif ($isAtasan)
                             <span>Persetujuan Lembur Karyawan</span>
                         @else
@@ -97,7 +101,11 @@
                         @if ($isFinance)
                             Berikut adalah ringkasan seluruh aktivitas keuangan &amp; pembayaran lembur karyawan real-time.
                         @elseif ($isHrd)
-                            Monitoring rekapitulasi pengajuan lembur seluruh divisi, pengajuan mandiri HRD, dan verifikasi akhir.
+                            @if ($viewMode === 'saya')
+                                Monitoring dan riwayat pengajuan lembur pribadi Anda serta status approval atasan &amp; pencairan.
+                            @else
+                                Monitoring rekapitulasi pengajuan lembur seluruh divisi staf dan proses verifikasi akhir HRD.
+                            @endif
                         @else
                             Monitoring data jam lembur, verifikasi pekerjaan lapangan, dan transparansi perhitungan uang lembur.
                         @endif

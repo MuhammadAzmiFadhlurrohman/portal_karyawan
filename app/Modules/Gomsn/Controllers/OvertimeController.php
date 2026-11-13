@@ -65,15 +65,12 @@ class OvertimeController extends Controller
             // Finance mengapprove / membayar pengajuan lembur yang sudah disetujui atasan
             $baseQuery->whereIn('status', ['approved_atasan', 'paid']);
         } elseif ($isHrd && ! $isSuperAdmin) {
-            // HRD mengapprove pengajuan lembur karyawan yang sudah disetujui atasan,
-            // atau jika mode 'saya' menampilkan lembur miliknya sendiri
+            // HRD mengapprove/melihat lembur karyawan, atau jika mode 'saya' menampilkan lembur miliknya sendiri
             if ($viewMode === 'saya') {
                 $baseQuery->where('user_id', $user->id);
             } else {
-                $baseQuery->where(function ($q) use ($user) {
-                    $q->whereIn('status', ['approved_atasan', 'paid'])
-                      ->orWhere('user_id', $user->id);
-                });
+                // Mode 'karyawan': khusus lembur seluruh staf / karyawan (tidak mencampur lembur milik HRD sendiri)
+                $baseQuery->where('user_id', '!=', $user->id);
             }
         } elseif ($isAtasan && ! $isSuperAdmin && ! $isFinance) {
             // Atasan HANYA melihat pengajuan lembur milik bawahan
