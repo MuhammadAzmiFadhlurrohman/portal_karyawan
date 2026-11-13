@@ -111,7 +111,21 @@ class DashboardStatsService
         $monthAttendances = $monthAttQuery->get();
 
         $monthPresentDays = $monthAttendances->whereIn('status', ['present', 'late'])->count();
+        $monthOntimeDays = $monthAttendances->where('status', 'present')->where('late_minutes', 0)->count();
+        $monthLateDays = $monthAttendances->where('late_minutes', '>', 0)->count();
+        $monthAbsentDays = $monthAttendances->where('status', 'alpa')->count();
         $monthLateMinutes = (int) $monthAttendances->sum('late_minutes');
+
+        // Total potongan bulan ini (untuk personal karyawan / scope)
+        $monthTotalDeduction = 0.0;
+        if ($scope['type'] === 'personal') {
+            try {
+                $deductionReport = app(\App\Modules\Attendance\Services\DeductionService::class)->calculateUserMonthlyReport($user, $currentYear, $currentMonth);
+                $monthTotalDeduction = (float) ($deductionReport['grand_total_deduction'] ?? 0);
+            } catch (\Throwable $e) {
+                $monthTotalDeduction = 0.0;
+            }
+        }
 
         $monthSchedQuery = MonthlySchedule::query()
             ->whereYear('date', $currentYear)
@@ -161,11 +175,11 @@ class DashboardStatsService
         $lemburs = $lemburQuery->get();
 
         $totalLembur = $lemburs->count();
-        $totalDurasiMenit = (int) $lemburs->whereIn('status', ['approved', 'paid'])->sum('durasi_menit');
+        $totalDurasiMenit = (int) $lemburs->whereIn('status', ['approved_atasan', 'approved', 'paid'])->sum('durasi_menit');
         $totalJamLembur = round($totalDurasiMenit / 60, 1);
 
         $lemburPending = $lemburs->where('status', 'pending')->count();
-        $lemburApproved = $lemburs->where('status', 'approved')->count();
+        $lemburApproved = $lemburs->whereIn('status', ['approved_atasan', 'approved', 'paid'])->count();
         $lemburPaid = $lemburs->where('status', 'paid')->count();
         $lemburRejected = $lemburs->where('status', 'rejected')->count();
 
@@ -258,7 +272,11 @@ class DashboardStatsService
                 'today_total' => $todayAttendedTotal,
                 'month_rate' => $attendanceRate,
                 'month_present_days' => $monthPresentDays,
+                'month_ontime_days' => $monthOntimeDays,
+                'month_late_days' => $monthLateDays,
+                'month_absent_days' => $monthAbsentDays,
                 'month_late_minutes' => $monthLateMinutes,
+                'month_total_deduction' => $monthTotalDeduction,
             ],
             'pengajuan' => [
                 'total' => $totalPengajuan,
