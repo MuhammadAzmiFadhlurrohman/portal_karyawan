@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/attendance/employee-recap/{user}', [\App\Modules\Attendance\Controllers\EmployeeAttendanceRecapController::class, 'show'])->name('attendance.employee-recap.show');
     Route::get('/attendance/reports', [AttendanceReportController::class, 'index'])->name('attendance.reports');
     Route::get('/attendance/reports/export', [AttendanceReportController::class, 'exportCsv'])->name('attendance.reports.export');
+    Route::get('/attendance/photo/{attendance}', [AttendanceReportController::class, 'photo'])->name('attendance.photo');
     Route::post('/attendance/reports/update', [AttendanceReportController::class, 'updateRecord'])->name('attendance.reports.update');
     Route::post('/attendance/reports/quick-status', [AttendanceReportController::class, 'quickStatus'])->name('attendance.reports.quick-status');
     Route::post('/attendance/enroll', [AttendanceController::class, 'enroll'])->name('attendance.enroll');

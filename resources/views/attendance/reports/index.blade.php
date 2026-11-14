@@ -273,9 +273,9 @@
                         <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 text-xs">
                             <!-- Photo Thumbnail / Status -->
                             <div class="flex items-center gap-2">
-                                @if ($row['photo_path'])
+                                @if ($row['photo_url'])
                                     <button type="button" 
-                                            @click="openPhotoModal('/storage/{{ $row['photo_path'] }}', '{{ addslashes($user->name) }}')"
+                                            @click="openPhotoModal('{{ $row['photo_url'] }}', '{{ addslashes($user->name) }}')"
                                             class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50/80 hover:bg-teal-100 text-teal-700 border border-teal-200/70 text-[11px] font-semibold transition cursor-pointer">
                                         <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                         <span>Foto</span>
@@ -410,10 +410,10 @@
 
                             <!-- FOTO ABSEN -->
                             <td class="py-3.5 px-4 text-center whitespace-nowrap">
-                                @if ($row['photo_path'])
+                                @if ($row['photo_url'])
                                     <div class="inline-block relative group cursor-pointer"
-                                         @click="openPhotoModal('/storage/{{ $row['photo_path'] }}', '{{ addslashes($user->name) }}')">
-                                        <img src="/storage/{{ $row['photo_path'] }}" 
+                                         @click="openPhotoModal('{{ $row['photo_url'] }}', '{{ addslashes($user->name) }}')">
+                                        <img src="{{ $row['photo_url'] }}" 
                                              alt="Selfie" 
                                              class="w-12 h-12 object-cover rounded-xl border border-slate-200 shadow-2xs group-hover:scale-105 transition">
                                         <div class="absolute inset-0 bg-slate-900/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-[9px] font-bold">

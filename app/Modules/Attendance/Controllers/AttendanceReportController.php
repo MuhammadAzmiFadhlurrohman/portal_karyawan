@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -122,8 +123,9 @@ class AttendanceReportController extends Controller
                 $mapUrl = "https://www.google.com/maps?q={$att->lat_in},{$att->lng_in}";
             }
 
-            // Photo path
+            // Photo path & URL
             $photoPath = $att?->photo_in_primary_path ?: $att?->photo_out_path;
+            $photoUrl = ($att && $photoPath) ? route('attendance.photo', $att->id) : null;
 
             // Alpa deduction label (e.g. Cuti (1/3 Alpa))
             $alpaCutiLabel = null;
@@ -145,6 +147,7 @@ class AttendanceReportController extends Controller
                 'clock_out' => $clockOutStr,
                 'duration' => $workDuration,
                 'photo_path' => $photoPath,
+                'photo_url' => $photoUrl,
                 'distance' => $distanceStr,
                 'map_url' => $mapUrl,
                 'remaining_leave' => $remainingLeave,
@@ -354,6 +357,72 @@ class AttendanceReportController extends Controller
         }, $fileName, [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+        ]);
+    }
+
+    /**
+     * Serve attendance selfie photo securely.
+     */
+    public function photo(Request $request, Attendance $attendance)
+    {
+        $actor = $request->user();
+        if (! $actor) {
+            abort(401);
+        }
+
+        $canView = $actor->id === $attendance->user_id
+            || $actor->hasRole(['super_admin', 'admin', 'hrd', 'atasan', 'ceo'])
+            || $actor->can('attendance.reports');
+
+        abort_unless($canView, 403, 'Akses ditolak.');
+
+        $path = $attendance->photo_in_primary_path ?: $attendance->photo_out_path ?: $attendance->photo_in_challenge_path;
+
+        $placeholderSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="100%" height="100%" fill="#f1f5f9"/><circle cx="150" cy="115" r="45" fill="#cbd5e1"/><path d="M70 230c0-44.2 35.8-80 80-80s80 35.8 80 80v20H70v-20z" fill="#cbd5e1"/><text x="50%" y="275" font-family="sans-serif" font-size="12" font-weight="bold" fill="#64748b" text-anchor="middle">Foto Tidak Ditemukan</text></svg>';
+
+        if (! $path) {
+            return response($placeholderSvg, 200, ['Content-Type' => 'image/svg+xml']);
+        }
+
+        $content = null;
+        if (Storage::disk('private')->exists($path)) {
+            $content = Storage::disk('private')->get($path);
+        } elseif (Storage::disk('public')->exists($path)) {
+            $content = Storage::disk('public')->get($path);
+        } elseif (Storage::exists($path)) {
+            $content = Storage::get($path);
+        }
+
+        if (! $content || $content === 'MANUAL') {
+            return response($placeholderSvg, 200, ['Content-Type' => 'image/svg+xml']);
+        }
+
+        // If content is Data URL (data:image/jpeg;base64,...)
+        if (preg_match('/^data:image\/(\w+);base64,(.+)$/s', $content, $matches)) {
+            $mime = 'image/' . $matches[1];
+            $binary = base64_decode($matches[2]);
+            return response($binary, 200, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'private, max-age=86400',
+            ]);
+        }
+
+        // If raw base64 string
+        $decoded = base64_decode($content, true);
+        if ($decoded !== false && (str_starts_with($decoded, "\xFF\xD8\xFF") || str_starts_with($decoded, "\x89PNG"))) {
+            $mime = str_starts_with($decoded, "\xFF\xD8\xFF") ? 'image/jpeg' : 'image/png';
+            return response($decoded, 200, [
+                'Content-Type' => $mime,
+                'Cache-Control' => 'private, max-age=86400',
+            ]);
+        }
+
+        // If already binary image bytes
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($content) ?: 'image/jpeg';
+        return response($content, 200, [
+            'Content-Type' => $mime,
+            'Cache-Control' => 'private, max-age=86400',
         ]);
     }
 }
