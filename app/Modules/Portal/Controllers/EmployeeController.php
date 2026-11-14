@@ -119,7 +119,27 @@ class EmployeeController extends Controller
         $month = (int) $request->input('month', $nowJakarta->month);
         $year = (int) $request->input('year', $nowJakarta->year);
 
-        $employees = $query->orderBy('name')->paginate(12)->withQueryString();
+        // Sort priority: admin (1), ceo (2), hrd (3), finance (4), atasan (5), karyawan (6)
+        $roleRankSub = DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->whereColumn('model_has_roles.model_id', 'users.id')
+            ->where('model_has_roles.model_type', User::class)
+            ->selectRaw("MIN(CASE 
+                WHEN roles.name IN ('super_admin', 'admin') THEN 1
+                WHEN roles.name = 'ceo' THEN 2
+                WHEN roles.name = 'hrd' THEN 3
+                WHEN roles.name = 'finance' THEN 4
+                WHEN roles.name LIKE 'atasan%' OR roles.name = 'manager_teknisi' THEN 5
+                ELSE 6
+            END)");
+
+        $employees = $query
+            ->select('users.*')
+            ->selectSub($roleRankSub, 'role_rank')
+            ->orderByRaw('COALESCE(role_rank, 6) ASC')
+            ->orderBy('users.name', 'ASC')
+            ->paginate(12)
+            ->withQueryString();
 
         // Monthly attendance statistics per employee for HRD & Admin overview
         $employeeIds = $employees->pluck('id')->all();

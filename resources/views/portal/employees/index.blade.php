@@ -511,7 +511,20 @@
                                 <!-- Role -->
                                 <td class="py-2.5 px-2">
                                     @php
-                                        $primaryRole = $emp->getRoleNames()->first() ?? 'karyawan';
+                                        $userRoles = $emp->roles->pluck('name')->all();
+                                        if (array_intersect(['super_admin', 'admin'], $userRoles)) {
+                                            $primaryRole = in_array('super_admin', $userRoles) ? 'super_admin' : 'admin';
+                                        } elseif (in_array('ceo', $userRoles)) {
+                                            $primaryRole = 'ceo';
+                                        } elseif (in_array('hrd', $userRoles)) {
+                                            $primaryRole = 'hrd';
+                                        } elseif (in_array('finance', $userRoles)) {
+                                            $primaryRole = 'finance';
+                                        } else {
+                                            $atasanRole = collect($userRoles)->first(fn($r) => str_starts_with($r, 'atasan') || $r === 'manager_teknisi');
+                                            $primaryRole = $atasanRole ?: ($userRoles[0] ?? 'karyawan');
+                                        }
+
                                         $roleColor = match ($primaryRole) {
                                             'super_admin', 'admin' => 'bg-rose-50 text-rose-700 border-rose-200',
                                             'ceo' => 'bg-purple-50 text-purple-700 border-purple-200',
