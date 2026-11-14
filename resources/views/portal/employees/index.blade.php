@@ -428,17 +428,17 @@
 
         <!-- Employee Table Card (Desktop View) -->
         <div class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <div>
-                <table class="w-full text-left text-xs table-fixed">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs table-fixed min-w-[1020px]">
                     <thead>
                         <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
-                            <th class="py-3 px-3.5 w-[22%]">Karyawan</th>
-                            <th class="py-3 px-2.5 w-[19%]">Kontak &amp; Akun</th>
-                            <th class="py-3 px-2.5 w-[14%]">Penempatan</th>
-                            <th class="py-3 px-2 w-[11%]">Role</th>
-                            <th class="py-3 px-2.5 w-[17%]">Statistik ({{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('M Y') }})</th>
+                            <th class="py-3 px-3.5 w-[20%]">Karyawan</th>
+                            <th class="py-3 px-2.5 w-[16%]">Kontak &amp; Akun</th>
+                            <th class="py-3 px-2.5 w-[13%]">Penempatan</th>
+                            <th class="py-3 px-2 w-[10%]">Role</th>
+                            <th class="py-3 px-2.5 w-[15%]">Statistik ({{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('M Y') }})</th>
                             <th class="py-3 px-2 w-[10%]">Status</th>
-                            <th class="py-3 pr-3.5 text-right w-[7%]">Aksi</th>
+                            <th class="py-3 pr-4 text-right w-[16%]">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -583,8 +583,8 @@
                                 </td>
 
                                 <!-- Actions -->
-                                <td class="py-2.5 pr-3.5 text-right">
-                                    <div class="inline-flex items-center justify-end gap-1">
+                                <td class="py-2.5 pr-4 text-right">
+                                    <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
                                         <!-- Lihat Detail Absen (Requirement) -->
                                         <a href="{{ route('attendance.history', ['user_id' => $emp->id, 'month' => $month, 'year' => $year]) }}"
                                            title="Lihat Detail Riwayat Absen {{ $emp->name }}"
