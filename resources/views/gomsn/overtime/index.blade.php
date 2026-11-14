@@ -126,7 +126,7 @@
                     <input type="hidden" name="view_mode" value="{{ $viewMode }}">
                 @endif
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 max-w-2xl">
                     <!-- PERIODE -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
@@ -140,18 +140,6 @@
                             @endforeach
                         </select>
                         <input type="hidden" name="tahun" value="{{ $selectedTahun }}">
-                    </div>
-
-                    <!-- CARI KARYAWAN -->
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
-                            Cari Karyawan
-                        </label>
-                        <input type="text" 
-                               name="cari_karyawan" 
-                               value="{{ $searchKaryawan }}" 
-                               placeholder="Username..." 
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 font-medium text-slate-800 shadow-xs placeholder-slate-400" />
                     </div>
 
                     <!-- DIVISI -->
