@@ -75,7 +75,7 @@
             </div>
 
             <!-- OLT Tab Switcher Segmented Control -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 p-1 bg-slate-100/80 rounded-2xl border border-slate-200/60 max-w-full">
+            <div class="grid grid-cols-2 min-[480px]:grid-cols-4 sm:flex sm:items-center gap-1.5 sm:gap-2 p-1 bg-slate-100/80 rounded-2xl border border-slate-200/60 w-full sm:w-auto">
                 @foreach ($olts as $olt)
                     @php
                         $isSelected = ($olt->id === $selectedOlt->id);
@@ -84,9 +84,9 @@
                        @if ($isSelected)
                            style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%) !important; color: #ffffff !important;"
                        @endif
-                       class="group px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 {{ $isSelected ? 'shadow-md border border-teal-400/40 text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80' }}">
-                        <span class="w-1.5 h-1.5 rounded-full transition-colors {{ $isSelected ? 'bg-emerald-300 shadow-[0_0_8px_#6ee7b7]' : 'bg-slate-300 group-hover:bg-slate-400' }}"></span>
-                        <span>{{ $olt->nama_olt }}</span>
+                       class="group px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 {{ $isSelected ? 'shadow-md border border-teal-400/40 text-white' : 'text-slate-600 hover:text-slate-900 hover:bg-white/80' }}">
+                        <span class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors {{ $isSelected ? 'bg-emerald-300 shadow-[0_0_8px_#6ee7b7]' : 'bg-slate-300 group-hover:bg-slate-400' }}"></span>
+                        <span class="truncate">{{ $olt->nama_olt }}</span>
                     </a>
                 @endforeach
             </div>
