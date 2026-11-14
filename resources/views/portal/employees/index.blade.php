@@ -1148,7 +1148,7 @@
                             <template x-if="summaryData && summaryData.user && summaryData.user.avatar_url">
                                 <img :src="summaryData.user.avatar_url" 
                                      :alt="summaryData.user.name"
-                                     @error="$el.style.display='none'; if($el.nextElementSibling) $el.nextElementSibling.style.display='flex'"
+                                     onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                      class="w-12 h-12 rounded-2xl object-cover border-2 border-white/30 shadow-md shrink-0">
                             </template>
                             <div x-show="!summaryData || !summaryData.user || !summaryData.user.avatar_url"
