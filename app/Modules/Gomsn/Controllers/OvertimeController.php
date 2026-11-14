@@ -92,7 +92,8 @@ class OvertimeController extends Controller
         if ($request->filled('cari_karyawan')) {
             $baseQuery->whereHas('user', function ($q) use ($searchKaryawan) {
                 $q->where('name', 'like', "%{$searchKaryawan}%")
-                  ->orWhere('username', 'like', "%{$searchKaryawan}%");
+                  ->orWhere('username', 'like', "%{$searchKaryawan}%")
+                  ->orWhere('employee_code', 'like', "%{$searchKaryawan}%");
             });
         }
 

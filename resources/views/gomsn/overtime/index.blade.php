@@ -126,7 +126,7 @@
                     <input type="hidden" name="view_mode" value="{{ $viewMode }}">
                 @endif
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 max-w-2xl">
+                <div class="grid grid-cols-1 {{ empty($selectedUserId) ? 'sm:grid-cols-3' : 'sm:grid-cols-2 max-w-2xl' }} gap-4 flex-1">
                     <!-- PERIODE -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
@@ -141,6 +141,27 @@
                         </select>
                         <input type="hidden" name="tahun" value="{{ $selectedTahun }}">
                     </div>
+
+                    @if (empty($selectedUserId))
+                    <!-- CARI KARYAWAN (Hanya pada Daftar Kartu Karyawan) -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
+                            Cari Karyawan
+                        </label>
+                        <div class="relative">
+                            <input type="text" 
+                                   name="cari_karyawan" 
+                                   value="{{ $searchKaryawan }}" 
+                                   placeholder="Nama atau kode karyawan..." 
+                                   class="w-full text-xs rounded-xl border-slate-300 py-2.5 pl-9 pr-3.5 bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 font-medium text-slate-800 shadow-xs placeholder-slate-400" />
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- DIVISI -->
                     <div>
