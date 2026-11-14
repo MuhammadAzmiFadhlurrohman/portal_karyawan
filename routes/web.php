@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/portal/settings', [PortalHubController::class, 'systemSettings'])->name('portal.settings');
     Route::post('/portal/settings', [PortalHubController::class, 'updateSystemSetting'])->name('portal.settings.update');
+    Route::post('/portal/settings/reset-defaults', [PortalHubController::class, 'resetDefaultSettings'])->name('portal.settings.reset');
+    Route::post('/portal/settings/create', [PortalHubController::class, 'createSystemSetting'])->name('portal.settings.create');
 
     Route::get('/portal/audit-logs', [PortalHubController::class, 'auditLogs'])->name('portal.audit');
 

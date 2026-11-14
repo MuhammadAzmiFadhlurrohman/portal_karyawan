@@ -181,7 +181,12 @@ class PortalHubController extends Controller
 
     public function systemSettings(Request $request): View
     {
-        abort_unless($request->user()?->can('portal.settings.manage'), 403);
+        abort_unless($request->user()?->can('portal.settings.manage') || $request->user()?->hasRole(['super_admin', 'admin']), 403);
+
+        // Otomatis isi parameter default jika database parameter masih kosong
+        if (SystemSetting::query()->count() === 0) {
+            SystemSettingService::ensureDefaults($request->user()?->id);
+        }
 
         $allSettings = SystemSetting::query()
             ->with('updater')
@@ -202,7 +207,7 @@ class PortalHubController extends Controller
 
     public function updateSystemSetting(Request $request): RedirectResponse
     {
-        abort_unless($request->user()?->can('portal.settings.manage'), 403);
+        abort_unless($request->user()?->can('portal.settings.manage') || $request->user()?->hasRole(['super_admin', 'admin']), 403);
 
         $validated = $request->validate([
             'key' => ['required', 'string', 'max:120'],
@@ -219,6 +224,46 @@ class PortalHubController extends Controller
         );
 
         return back()->with('status', "Parameter `{$validated['key']}` berhasil diperbarui dan dicatat ke jejak audit.");
+    }
+
+    public function resetDefaultSettings(Request $request): RedirectResponse
+    {
+        abort_unless($request->user()?->can('portal.settings.manage') || $request->user()?->hasRole(['super_admin', 'admin']), 403);
+
+        $inserted = SystemSettingService::ensureDefaults($request->user()?->id);
+
+        return back()->with('status', $inserted > 0 
+            ? "Berhasil memulihkan {$inserted} parameter default sistem."
+            : "Semua parameter default sistem sudah terdaftar lengkap.");
+    }
+
+    public function createSystemSetting(Request $request): RedirectResponse
+    {
+        abort_unless($request->user()?->can('portal.settings.manage') || $request->user()?->hasRole(['super_admin', 'admin']), 403);
+
+        $validated = $request->validate([
+            'key' => ['required', 'string', 'max:120', 'regex:/^[a-z0-9_.-]+$/i'],
+            'group' => ['required', 'string', 'max:50'],
+            'label' => ['required', 'string', 'max:150'],
+            'type' => ['required', 'in:string,integer,decimal,float,boolean,json'],
+            'value' => ['required', 'string', 'max:1000'],
+            'description' => ['nullable', 'string', 'max:500'],
+            'effective_from' => ['required', 'date'],
+            'change_reason' => ['required', 'string', 'min:5', 'max:500'],
+        ]);
+
+        SystemSettingService::set(
+            key: $validated['key'],
+            value: $validated['value'],
+            reason: $validated['change_reason'],
+            effectiveFrom: Carbon::parse($validated['effective_from']),
+            group: $validated['group'],
+            label: $validated['label'],
+            type: $validated['type'],
+            description: $validated['description'] ?? null
+        );
+
+        return back()->with('status', "Parameter baru `{$validated['key']}` berhasil ditambahkan.");
     }
 
     public function sessionsAndDevices(Request $request): View
