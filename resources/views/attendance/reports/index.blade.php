@@ -62,44 +62,66 @@
             }
          }">
 
-        <!-- Top Header Sesuai Contoh Gambar -->
-        <div class="rounded-3xl bg-white border border-slate-200/80 p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div class="flex items-center gap-3.5">
-                <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching GoMSN Dashboard) -->
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
+             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+            
+            <!-- Gloss Highlights (Top & Bottom Rims) -->
+            <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
+            <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
+
+            <!-- Left: Glowing Icon + Page Name -->
+            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                    <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>
-                <div>
-                    <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight leading-tight">Laporan Absensi</h1>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Riwayat kehadiran karyawan per hari</p>
+
+                <div class="min-w-0">
+                    <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
+                        <span>Laporan Absensi</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-300 border border-teal-400/30">
+                            Rekap Harian
+                        </span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+                            {{ $totalRecords }} Karyawan
+                        </span>
+                    </h1>
+                    <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
+                        Riwayat kehadiran harian karyawan, verifikasi jam kerja, lokasi &amp; status absensi
+                    </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2.5 self-start sm:self-auto">
+            <!-- Right Controls: Export Excel Button -->
+            <div class="relative z-10 flex items-center gap-2.5 self-start sm:self-auto">
                 <a href="{{ route('attendance.reports.export', ['date' => $targetDate]) }}" 
-                   class="inline-flex items-center gap-1.5 px-4.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition active:scale-[0.98]">
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md border border-emerald-400/30 transition active:scale-[0.98]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    <span>Export</span>
+                    <span>Export Excel</span>
                 </a>
             </div>
         </div>
 
-        <!-- Filter Card Tanggal Sesuai Contoh Gambar -->
-        <div class="rounded-3xl bg-white border border-slate-200/80 p-5 shadow-xs space-y-3">
-            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider"># TANGGAL</label>
-            <form method="GET" action="{{ route('attendance.reports') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <!-- Filter Card Tanggal Sesuai Tema Aplikasi -->
+        <div class="rounded-2xl bg-white border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-3">
+            <div class="flex items-center gap-2">
+                <span class="w-1.5 h-3.5 rounded-full bg-teal-600"></span>
+                <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider"># TANGGAL LAPORAN</label>
+            </div>
+            <form method="GET" action="{{ route('attendance.reports') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                 <div class="relative flex-1">
                     <input type="date" 
                            name="date" 
                            value="{{ $targetDate }}" 
-                           class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-800 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition shadow-2xs">
+                           class="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-2.5 text-xs font-semibold text-slate-800 focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition shadow-2xs">
                 </div>
 
                 <button type="submit" 
-                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-xs transition active:scale-[0.98] cursor-pointer">
+                        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition active:scale-[0.98] cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
@@ -107,8 +129,8 @@
                 </button>
 
                 <a href="{{ route('attendance.reports') }}" 
-                   class="inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition active:scale-[0.98]">
-                    <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                   class="inline-flex items-center justify-center gap-1.5 px-4.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold transition active:scale-[0.98]">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
                     <span>Reset</span>
@@ -116,14 +138,19 @@
             </form>
         </div>
 
-        <!-- Banner Indikator Tanggal Sesuai Gambar -->
-        <div class="rounded-2xl bg-blue-50 border border-blue-200/80 p-3.5 sm:px-4 text-blue-900 text-xs sm:text-sm font-medium flex items-center gap-2.5 shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
+        <!-- Banner Indikator Tanggal Sesuai Tema Aplikasi -->
+        <div class="rounded-2xl bg-teal-50/70 border border-teal-200/80 p-3 sm:px-4 text-teal-900 text-xs sm:text-sm font-medium flex items-center justify-between gap-2.5 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-lg bg-teal-700 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <span>Menampilkan data tanggal: <strong class="text-teal-950 font-bold">{{ $dateFormatted }}</strong></span>
             </div>
-            <span>Menampilkan data tanggal: <strong class="text-blue-950 font-bold">{{ $dateFormatted }}</strong></span>
+            <span class="text-[11px] font-mono font-bold text-teal-700 bg-teal-100/80 px-2 py-0.5 rounded-md hidden sm:inline-block">
+                {{ $targetDate }}
+            </span>
         </div>
 
         <!-- Flash Status Notification -->
@@ -136,16 +163,18 @@
             </div>
         @endif
 
-        <!-- Card Tabel Data Kehadiran Sesuai Contoh Gambar -->
-        <div class="rounded-3xl bg-white border border-slate-200/80 shadow-xs overflow-hidden">
+        <!-- Card Tabel Data Kehadiran Sesuai Tema Aplikasi -->
+        <div class="rounded-2xl bg-white border border-slate-200/80 shadow-xs overflow-hidden">
             <!-- Header Card & Search Input -->
             <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center gap-2.5">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                    </svg>
+                    <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-100 shadow-2xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                    </div>
                     <h2 class="font-bold text-sm text-slate-800">Data Kehadiran</h2>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
                         {{ $totalRecords }} record
                     </span>
                 </div>
@@ -159,7 +188,7 @@
                     <input type="text" 
                            x-model="search" 
                            placeholder="Cari nama karyawan..." 
-                           class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-3 py-2 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none transition">
+                           class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-3 py-2 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
                 </div>
             </div>
 
@@ -226,7 +255,7 @@
                                     </div>
                                     <div>
                                         <span class="text-[10px] text-slate-400 block font-medium">Total</span>
-                                        <span class="font-bold text-blue-600 text-xs">{{ $row['duration'] ?: '-' }}</span>
+                                        <span class="font-bold text-teal-700 text-xs">{{ $row['duration'] ?: '-' }}</span>
                                     </div>
                                 </div>
                             @else
@@ -247,15 +276,15 @@
                                 @if ($row['photo_path'])
                                     <button type="button" 
                                             @click="openPhotoModal('/storage/{{ $row['photo_path'] }}', '{{ addslashes($user->name) }}')"
-                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition cursor-pointer">
-                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50/80 hover:bg-teal-100 text-teal-700 border border-teal-200/70 text-[11px] font-semibold transition cursor-pointer">
+                                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                         <span>Foto</span>
                                     </button>
                                 @endif
 
                                 @if ($row['distance'])
                                     @if ($row['map_url'])
-                                        <a href="{{ $row['map_url'] }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline">
+                                        <a href="{{ $row['map_url'] }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-700 hover:text-teal-900 hover:underline">
                                             <span>📍 {{ $row['distance'] }}</span>
                                         </a>
                                     @else
@@ -267,7 +296,7 @@
                             <!-- Edit Action Button -->
                             <button type="button" 
                                     @click="openEditModal({{ json_encode($row) }})" 
-                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition shadow-2xs cursor-pointer">
+                                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-600 hover:text-white text-teal-700 border border-teal-200/90 text-xs font-bold transition shadow-2xs cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 <span>Edit</span>
                             </button>
@@ -284,15 +313,15 @@
             <div class="hidden sm:block overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="text-slate-400 font-bold uppercase tracking-wider text-[11px] bg-slate-50/70 border-b border-slate-100">
-                            <th class="py-3.5 px-4 text-center w-12">NO</th>
-                            <th class="py-3.5 px-4">KARYAWAN</th>
-                            <th class="py-3.5 px-4 min-w-[190px]">JAM KERJA</th>
-                            <th class="py-3.5 px-4 text-center">FOTO ABSEN</th>
-                            <th class="py-3.5 px-4">LOKASI</th>
-                            <th class="py-3.5 px-4 text-center min-w-[160px]">STATUS</th>
-                            <th class="py-3.5 px-4">KETERANGAN</th>
-                            <th class="py-3.5 px-4 text-center w-16">AKSI</th>
+                        <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
+                            <th class="py-3 px-4 text-center w-12">NO</th>
+                            <th class="py-3 px-4">KARYAWAN</th>
+                            <th class="py-3 px-4 min-w-[190px]">JAM KERJA</th>
+                            <th class="py-3 px-4 text-center">FOTO ABSEN</th>
+                            <th class="py-3 px-4">LOKASI</th>
+                            <th class="py-3 px-4 text-center min-w-[160px]">STATUS</th>
+                            <th class="py-3 px-4">KETERANGAN</th>
+                            <th class="py-3 px-4 text-center w-16">AKSI</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
@@ -302,43 +331,43 @@
                             $att = $row['attendance'];
                             $isAbsent = ($row['status'] === 'absent');
                         @endphp
-                        <tr class="hover:bg-slate-50/70 transition-colors"
+                        <tr class="hover:bg-teal-50/20 transition-colors"
                             x-show="!search || '{{ strtolower(addslashes($user->name . ' ' . $user->employee_code . ' ' . ($user->division ?? ''))) }}'.includes(search.toLowerCase())">
                             
                             <!-- NO -->
-                            <td class="py-4 px-4 text-center font-bold text-slate-700">
+                            <td class="py-3.5 px-4 text-center font-bold text-slate-700">
                                 <span class="w-6 h-6 rounded-lg bg-slate-100 flex items-center justify-center mx-auto text-[11px] text-slate-600">
                                     {{ $idx + 1 }}
                                 </span>
                             </td>
 
                             <!-- KARYAWAN -->
-                            <td class="py-4 px-4 whitespace-nowrap">
+                            <td class="py-3.5 px-4 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
                                     <div class="relative shrink-0">
                                         @if ($user->avatar_url)
                                             <img src="{{ $user->avatar_url }}" 
                                                  alt="" 
-                                                 class="w-10 h-10 rounded-2xl object-cover border border-slate-200 shadow-2xs" 
+                                                 class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs" 
                                                  onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                                            <div style="display: none;" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                                            <div style="display: none;" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white items-center justify-center font-bold text-xs shadow-2xs shrink-0">
                                                 {{ $user->initials }}
                                             </div>
                                         @else
-                                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#18C4C4] to-[#155E63] text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
                                                 {{ $user->initials }}
                                             </div>
                                         @endif
                                     </div>
                                     <div>
-                                        <span class="font-bold text-slate-800 text-xs block leading-tight">{{ $user->name }}</span>
-                                        <span class="text-[10px] text-slate-400 font-mono mt-0.5 block">{{ $user->employee_code }}</span>
+                                        <span class="font-bold text-slate-900 text-xs block leading-tight">{{ $user->name }}</span>
+                                        <span class="text-[10px] text-teal-700 font-bold bg-teal-50 px-1 rounded font-mono mt-0.5 inline-block">{{ $user->employee_code }}</span>
                                     </div>
                                 </div>
                             </td>
 
                             <!-- JAM KERJA (Box Persis Sesuai Gambar) -->
-                            <td class="py-4 px-4 whitespace-nowrap">
+                            <td class="py-3.5 px-4 whitespace-nowrap">
                                 <div class="bg-slate-50/80 border border-slate-200/80 rounded-xl p-2.5 text-[11px] space-y-1.5 min-w-[170px] shadow-2xs">
                                     @if (! $isAbsent && $row['clock_in'])
                                         <div class="flex items-center justify-between text-slate-700">
@@ -350,7 +379,7 @@
                                         </div>
                                         <div class="flex items-center justify-between text-slate-700">
                                             <span class="flex items-center gap-1.5 text-slate-500 font-medium">
-                                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
+                                                <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"/></svg>
                                                 <span>Pulang</span>
                                             </span>
                                             <span class="font-mono text-slate-600 text-xs">{{ $row['clock_out'] ?: '-' }}</span>
@@ -360,7 +389,7 @@
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                                 <span>Total</span>
                                             </span>
-                                            <span class="font-semibold text-blue-600 text-xs">{{ $row['duration'] ?: '-' }}</span>
+                                            <span class="font-bold text-teal-700 text-xs">{{ $row['duration'] ?: '-' }}</span>
                                         </div>
                                     @else
                                         <div class="flex items-center justify-between text-slate-400">
@@ -380,7 +409,7 @@
                             </td>
 
                             <!-- FOTO ABSEN -->
-                            <td class="py-4 px-4 text-center whitespace-nowrap">
+                            <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                 @if ($row['photo_path'])
                                     <div class="inline-block relative group cursor-pointer"
                                          @click="openPhotoModal('/storage/{{ $row['photo_path'] }}', '{{ addslashes($user->name) }}')">
@@ -409,7 +438,7 @@
                                         @if ($row['map_url'])
                                             <a href="{{ $row['map_url'] }}" 
                                                target="_blank" 
-                                               class="text-[11px] font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1">
+                                               class="text-[11px] font-semibold text-teal-700 hover:text-teal-900 hover:underline flex items-center gap-1">
                                                 <span>📍 Lihat Maps</span>
                                             </a>
                                         @endif
@@ -449,7 +478,7 @@
                                                 <span>{{ $row['alpa_cuti_label'] }}</span>
                                             </span>
                                         @endif
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold bg-teal-50 text-teal-800 border border-teal-200">
                                             <span>🌴</span>
                                             <span>Sisa Cuti: {{ $row['remaining_leave'] }} hari</span>
                                         </span>
@@ -471,12 +500,12 @@
                                 @endif
                             </td>
 
-                            <!-- AKSI EDIT MODAL (Pencil Button Persis Gambar) -->
+                            <!-- AKSI EDIT MODAL (Pencil Button Persis Tema Aplikasi) -->
                             <td class="py-4 px-4 text-center whitespace-nowrap">
                                 <button type="button" 
                                         @click="openEditModal({{ json_encode($row) }})"
                                         title="Edit Jam Kerja & Status Absensi"
-                                        class="w-8 h-8 rounded-xl border border-blue-200 bg-blue-50/80 hover:bg-blue-100 text-blue-600 hover:text-blue-800 inline-flex items-center justify-center shadow-2xs transition active:scale-95 cursor-pointer">
+                                        class="w-8 h-8 rounded-xl border border-teal-200 bg-teal-50/80 hover:bg-teal-600 hover:border-teal-600 text-teal-700 hover:text-white inline-flex items-center justify-center shadow-2xs transition active:scale-95 cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                                     </svg>
@@ -504,7 +533,7 @@
             
             <div @click.stop class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden transform transition-all my-8">
                 <!-- Modal Header -->
-                <div class="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
+                <div class="text-white px-6 py-4 flex items-center justify-between" style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%) !important;">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-white shrink-0">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -513,10 +542,10 @@
                         </div>
                         <div>
                             <h3 class="font-bold text-base text-white leading-tight">Edit Absensi Karyawan</h3>
-                            <div class="flex items-center gap-2 mt-0.5 text-xs text-blue-100">
+                            <div class="flex items-center gap-2 mt-0.5 text-xs text-teal-100">
                                 <span class="font-semibold" x-text="editData.employee_name"></span>
                                 <span>•</span>
-                                <span class="font-mono" x-text="editData.employee_code"></span>
+                                <span class="font-mono text-teal-200" x-text="editData.employee_code"></span>
                             </div>
                         </div>
                     </div>
@@ -532,9 +561,9 @@
                     <input type="hidden" name="date" :value="editData.date">
 
                     <!-- Tanggal Info -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs flex items-center justify-between">
-                        <span class="text-slate-500">Tanggal Absensi:</span>
-                        <strong class="font-mono text-slate-800" x-text="editData.date"></strong>
+                    <div class="p-3 bg-teal-50/50 rounded-xl border border-teal-100 text-xs flex items-center justify-between">
+                        <span class="text-slate-500 font-medium">Tanggal Absensi:</span>
+                        <strong class="font-mono text-teal-900 font-bold" x-text="editData.date"></strong>
                     </div>
 
                     <!-- Status Dropdown -->
@@ -543,7 +572,7 @@
                             Status Kehadiran <span class="text-rose-500">*</span>
                         </label>
                         <select name="status" x-model="editData.status" required
-                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white font-medium text-slate-800 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-2xs">
+                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white font-medium text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                             <option value="present">Hadir (Tepat Waktu)</option>
                             <option value="late">Terlambat</option>
                             <option value="absent">Alpa (Tidak Absen)</option>
@@ -561,7 +590,7 @@
                                    name="clock_in" 
                                    step="1"
                                    x-model="editData.clock_in" 
-                                   class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white text-slate-800 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-2xs">
+                                   class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">Jam Pulang (HH:mm:ss)</label>
@@ -569,7 +598,7 @@
                                    name="clock_out" 
                                    step="1"
                                    x-model="editData.clock_out" 
-                                   class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white text-slate-800 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-2xs">
+                                   class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs">
                         </div>
                     </div>
 
@@ -580,15 +609,15 @@
                                   x-model="editData.notes" 
                                   rows="3" 
                                   placeholder="Contoh: Disesuaikan karena kendala jaringan di lapangan / memo atasan..."
-                                  class="w-full text-xs rounded-xl border-slate-300 p-3 bg-white text-slate-800 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 shadow-2xs"></textarea>
+                                  class="w-full text-xs rounded-xl border-slate-300 p-3 bg-white text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs"></textarea>
                     </div>
 
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-                        <button type="button" @click="editModalOpen = false" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition cursor-pointer">
+                        <button type="button" @click="editModalOpen = false" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition cursor-pointer">
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white font-bold text-xs shadow-md transition cursor-pointer">
                             Simpan Perubahan
                         </button>
                     </div>
@@ -604,15 +633,15 @@
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4"
              @click="photoModalOpen = false">
             <div class="bg-white rounded-2xl overflow-hidden max-w-md w-full shadow-2xl border border-slate-200" @click.stop>
-                <div class="p-4 bg-slate-900 text-white flex items-center justify-between">
+                <div class="p-4 flex items-center justify-between text-white" style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%) !important;">
                     <span class="font-bold text-xs" x-text="'Foto Absen: ' + activePhotoName"></span>
                     <button type="button" @click="photoModalOpen = false" class="text-white hover:text-slate-300 font-bold text-lg leading-none cursor-pointer">&times;</button>
                 </div>
                 <div class="p-3 bg-slate-100 flex items-center justify-center min-h-[300px]">
                     <img :src="activePhoto" alt="Foto Absen" class="max-h-[450px] w-auto object-contain rounded-xl shadow-md">
                 </div>
-                <div class="p-3 bg-white border-t border-slate-200 flex justify-end">
-                    <a :href="activePhoto" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition">
+                <div class="p-3 bg-white border-t border-slate-100 flex justify-end">
+                    <a :href="activePhoto" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-teal-600 text-white text-xs font-bold hover:bg-teal-700 transition shadow-xs">
                         Buka Ukuran Penuh ↗
                     </a>
                 </div>
