@@ -124,12 +124,27 @@ class PengajuanController extends Controller
             });
         }
 
-        // Month & Year filter
-        if ($request->filled('bulan')) {
-            $query->whereMonth('created_at', (int) $request->input('bulan'));
+        // Month & Year filter (default: bulan ini dan tahun ini jika parameter belum diset)
+        $hasMonthParam = $request->has('bulan') || $request->has('month');
+        $rawMonth = $request->input('bulan', $request->input('month'));
+        $selectedMonth = ! $hasMonthParam ? (int) date('n') : ($rawMonth === '' || $rawMonth === 'all' || $rawMonth === null ? '' : (int) $rawMonth);
+
+        if ($selectedMonth !== '') {
+            $query->whereMonth('created_at', (int) $selectedMonth);
+            if (! $hasMonthParam) {
+                $request->merge(['bulan' => $selectedMonth]);
+            }
         }
-        if ($request->filled('tahun')) {
-            $query->whereYear('created_at', (int) $request->input('tahun'));
+
+        $hasYearParam = $request->has('tahun') || $request->has('year');
+        $rawYear = $request->input('tahun', $request->input('year'));
+        $selectedYear = ! $hasYearParam ? (int) date('Y') : ($rawYear === '' || $rawYear === 'all' || $rawYear === null ? '' : (int) $rawYear);
+
+        if ($selectedYear !== '') {
+            $query->whereYear('created_at', (int) $selectedYear);
+            if (! $hasYearParam) {
+                $request->merge(['tahun' => $selectedYear]);
+            }
         }
 
         if ($request->filled('status')) {
@@ -178,7 +193,9 @@ class PengajuanController extends Controller
             'tab',
             'pendingApprovalsCount',
             'financeMetrics',
-            'divisions'
+            'divisions',
+            'selectedMonth',
+            'selectedYear'
         ));
     }
 
@@ -246,14 +263,27 @@ class PengajuanController extends Controller
             });
         }
 
-        if ($request->filled('month') || $request->filled('bulan')) {
-            $mVal = (int) ($request->input('month') ?: $request->input('bulan'));
-            $query->whereMonth('created_at', $mVal);
+        // Month & Year filter (default: bulan ini dan tahun ini jika parameter belum diset)
+        $hasMonthParam = $request->has('month') || $request->has('bulan');
+        $rawMonth = $request->input('month', $request->input('bulan'));
+        $selectedMonth = ! $hasMonthParam ? (int) date('n') : ($rawMonth === '' || $rawMonth === 'all' || $rawMonth === null ? '' : (int) $rawMonth);
+
+        if ($selectedMonth !== '') {
+            $query->whereMonth('created_at', (int) $selectedMonth);
+            if (! $hasMonthParam) {
+                $request->merge(['month' => $selectedMonth]);
+            }
         }
 
-        if ($request->filled('year') || $request->filled('tahun')) {
-            $yVal = (int) ($request->input('year') ?: $request->input('tahun'));
-            $query->whereYear('created_at', $yVal);
+        $hasYearParam = $request->has('year') || $request->has('tahun');
+        $rawYear = $request->input('year', $request->input('tahun'));
+        $selectedYear = ! $hasYearParam ? (int) date('Y') : ($rawYear === '' || $rawYear === 'all' || $rawYear === null ? '' : (int) $rawYear);
+
+        if ($selectedYear !== '') {
+            $query->whereYear('created_at', (int) $selectedYear);
+            if (! $hasYearParam) {
+                $request->merge(['year' => $selectedYear]);
+            }
         }
 
         $statusFilter = $request->input('status', 'all');
@@ -285,7 +315,9 @@ class PengajuanController extends Controller
             'approvedCount',
             'rejectedCount',
             'totalDana',
-            'divisions'
+            'divisions',
+            'selectedMonth',
+            'selectedYear'
         ));
     }
 

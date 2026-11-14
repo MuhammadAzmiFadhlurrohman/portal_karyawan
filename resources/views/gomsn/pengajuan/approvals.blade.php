@@ -157,12 +157,14 @@
                             5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
                             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
                         ];
+                        $curSelectedMonth = isset($selectedMonth) ? $selectedMonth : (request()->has('month') ? request('month') : (request()->has('bulan') ? request('bulan') : (int) date('n')));
+                        $curSelectedYear = isset($selectedYear) ? $selectedYear : (request()->has('year') ? request('year') : (request()->has('tahun') ? request('tahun') : (int) date('Y')));
                     @endphp
                     <div class="col-span-1 lg:w-36">
                         <select name="month" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
-                            <option value="">Semua Bulan</option>
+                            <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
                             @foreach ($months as $num => $mName)
-                            <option value="{{ $num }}" {{ (string) request('month') === (string) $num ? 'selected' : '' }}>
+                            <option value="{{ $num }}" {{ (string) $curSelectedMonth === (string) $num ? 'selected' : '' }}>
                                 {{ $mName }}
                             </option>
                             @endforeach
@@ -172,9 +174,9 @@
                     <!-- Dropdown Tahun -->
                     <div class="col-span-1 lg:w-32">
                         <select name="year" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
-                            <option value="">Semua Tahun</option>
+                            <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
                             @for ($y = date('Y') + 1; $y >= 2024; $y--)
-                            <option value="{{ $y }}" {{ (string) request('year', date('Y')) === (string) $y ? 'selected' : '' }}>
+                            <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>
                                 {{ $y }}
                             </option>
                             @endfor

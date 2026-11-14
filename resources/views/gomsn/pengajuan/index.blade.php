@@ -252,19 +252,21 @@
                                 '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
                                 '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
                             ];
+                            $curSelectedMonth = isset($selectedMonth) ? $selectedMonth : (request()->has('bulan') ? request('bulan') : (request()->has('month') ? request('month') : (int) date('n')));
+                            $curSelectedYear = isset($selectedYear) ? $selectedYear : (request()->has('tahun') ? request('tahun') : (request()->has('year') ? request('year') : (int) date('Y')));
                         @endphp
                         <select name="bulan" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
-                            <option value="">Semua Bulan</option>
+                            <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
                             @foreach ($months as $mNum => $mLabel)
-                                <option value="{{ $mNum }}" {{ (string) request('bulan') === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
+                                <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
                             @endforeach
                         </select>
 
                         <!-- Dropdown Tahun -->
                         <select name="tahun" class="w-full lg:w-28 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
-                            <option value="">Semua Tahun</option>
+                            <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
                             @for ($y = date('Y') + 1; $y >= 2024; $y--)
-                                <option value="{{ $y }}" {{ (int) request('tahun') === $y ? 'selected' : '' }}>{{ $y }}</option>
+                                <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
                             @endfor
                         </select>
 
@@ -302,8 +304,8 @@
                 <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex items-center gap-2 pt-2 border-t border-slate-100">
                     @if(request('jenis')) <input type="hidden" name="jenis" value="{{ request('jenis') }}"> @endif
                     @if(request('divisi')) <input type="hidden" name="divisi" value="{{ request('divisi') }}"> @endif
-                    @if(request('bulan')) <input type="hidden" name="bulan" value="{{ request('bulan') }}"> @endif
-                    @if(request('tahun')) <input type="hidden" name="tahun" value="{{ request('tahun') }}"> @endif
+                    <input type="hidden" name="bulan" value="{{ $curSelectedMonth }}">
+                    <input type="hidden" name="tahun" value="{{ $curSelectedYear }}">
 
                     <div class="relative flex-1">
                         <input type="text" name="search" value="{{ request('search') }}" 
@@ -776,17 +778,17 @@
                         ];
                     @endphp
                     <select name="bulan" onchange="this.form.submit()" class="w-full sm:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
-                        <option value="">Semua Bulan</option>
+                        <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
                         @foreach ($monthsList as $mNum => $mLabel)
-                            <option value="{{ $mNum }}" {{ (string) request('bulan') === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
+                            <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
                         @endforeach
                     </select>
 
                     <!-- Filter Tahun -->
                     <select name="tahun" onchange="this.form.submit()" class="w-full sm:w-28 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
-                        <option value="">Semua Tahun</option>
+                        <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
                         @for ($y = date('Y') + 1; $y >= 2024; $y--)
-                            <option value="{{ $y }}" {{ (int) request('tahun', date('Y')) === $y ? 'selected' : '' }}>{{ $y }}</option>
+                            <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endfor
                     </select>
 
