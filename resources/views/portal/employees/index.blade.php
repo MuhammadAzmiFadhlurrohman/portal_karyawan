@@ -439,15 +439,15 @@
         <!-- Employee Table Card (Desktop View) -->
         <div class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs table-fixed min-w-[960px]">
+                <table class="w-full text-left text-xs table-fixed min-w-[920px]">
                     <thead>
                         <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
-                            <th class="py-3 px-3.5 w-[26%]">Karyawan</th>
-                            <th class="py-3 px-2.5 w-[24%]">Kontak &amp; Akun</th>
-                            <th class="py-3 px-2.5 w-[18%]">Penempatan</th>
-                            <th class="py-3 px-2 w-[12%]">Role</th>
+                            <th class="py-3 px-3.5 w-[22%]">Karyawan</th>
+                            <th class="py-3 px-2.5 w-[20%]">Kontak &amp; Akun</th>
+                            <th class="py-3 px-2.5 w-[16%]">Penempatan</th>
+                            <th class="py-3 px-2 w-[10%]">Role</th>
                             <th class="py-3 px-2 w-[10%]">Status</th>
-                            <th class="py-3 pr-4 text-right w-[10%]">Aksi</th>
+                            <th class="py-3 pr-4 text-right w-[22%]">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -608,7 +608,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-12 text-center text-slate-400">
+                                <td colspan="6" class="py-12 text-center text-slate-400">
                                     <div class="max-w-sm mx-auto">
                                         <span class="text-3xl block mb-2">🔍</span>
                                         <p class="font-bold text-slate-700 text-sm">Tidak ada karyawan yang sesuai filter</p>
