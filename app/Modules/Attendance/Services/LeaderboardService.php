@@ -149,6 +149,8 @@ class LeaderboardService
                 'rank' => 0,
                 'user_id' => $user->id,
                 'foto' => $shouldMask ? null : $user->foto,
+                'avatar_url' => $shouldMask ? null : $user->avatar_url,
+                'initials' => $shouldMask ? '?' : $user->initials,
                 'employee_code' => $shouldMask ? 'MSN-***' : $user->employee_code,
                 'display_name' => $shouldMask ? 'Karyawan Anonim (Opt-Out Privasi)' : $user->name,
                 'raw_name' => $user->name,
