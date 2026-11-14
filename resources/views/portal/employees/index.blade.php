@@ -9,12 +9,23 @@
         summaryLoading: false,
         summaryTab: 'absen',
         summaryData: null,
+        currentSummaryEmpId: null,
+        summaryMonth: '{{ $month ?? date("n") }}',
+        summaryYear: '{{ $year ?? date("Y") }}',
         openSummary(empId) {
+            this.currentSummaryEmpId = empId;
             this.isSummaryOpen = true;
-            this.summaryLoading = true;
             this.summaryTab = 'absen';
-            this.summaryData = null;
-            fetch('{{ url('/portal/employees') }}/' + empId + '/summary?month={{ $month }}&year={{ $year }}')
+            this.fetchSummary();
+        },
+        fetchSummary() {
+            if (!this.currentSummaryEmpId) return;
+            this.summaryLoading = true;
+            const params = new URLSearchParams({
+                month: this.summaryMonth,
+                year: this.summaryYear
+            });
+            fetch('{{ url('/portal/employees') }}/' + this.currentSummaryEmpId + '/summary?' + params.toString())
                 .then(res => res.json())
                 .then(data => {
                     this.summaryData = data;
@@ -1137,13 +1148,15 @@
                             <template x-if="summaryData && summaryData.user && summaryData.user.avatar_url">
                                 <img :src="summaryData.user.avatar_url" 
                                      :alt="summaryData.user.name"
+                                     @error="$el.style.display='none'; if($el.nextElementSibling) $el.nextElementSibling.style.display='flex'"
                                      class="w-12 h-12 rounded-2xl object-cover border-2 border-white/30 shadow-md shrink-0">
                             </template>
-                            <template x-if="!summaryData || !summaryData.user || !summaryData.user.avatar_url">
-                                <div class="w-12 h-12 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center text-white font-black text-lg shrink-0 shadow-inner">
-                                    <span x-text="summaryData && summaryData.user ? summaryData.user.initials : '?'"></span>
-                                </div>
-                            </template>
+                            <div x-show="!summaryData || !summaryData.user || !summaryData.user.avatar_url"
+                                 class="w-12 h-12 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center text-teal-200 shrink-0 shadow-inner">
+                                <svg class="w-6 h-6 text-teal-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
 
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -1179,37 +1192,86 @@
                         </button>
                     </div>
 
-                    <!-- Tab Buttons Navigation inside Header -->
-                    <div class="relative z-10 flex items-center gap-1.5 mt-4 pt-3 border-t border-white/15">
-                        <button @click="summaryTab = 'absen'" 
-                                type="button" 
-                                :class="summaryTab === 'absen' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
-                                class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>Absensi</span>
-                        </button>
+                    <!-- Tab Buttons Navigation & Periode Filters inside Header -->
+                    <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-3 border-t border-white/15">
+                        <!-- Left: Tab Buttons -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                            <button @click="summaryTab = 'absen'" 
+                                    type="button" 
+                                    :class="summaryTab === 'absen' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Absensi</span>
+                            </button>
 
-                        <button @click="summaryTab = 'lembur'" 
-                                type="button" 
-                                :class="summaryTab === 'lembur' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
-                                class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                            <span>Lembur</span>
-                            <template x-if="summaryData && summaryData.overtime">
-                                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-teal-800 text-teal-100" x-text="summaryData.overtime.total_count"></span>
-                            </template>
-                        </button>
+                            <button @click="summaryTab = 'lembur'" 
+                                    type="button" 
+                                    :class="summaryTab === 'lembur' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                <span>Lembur</span>
+                                <template x-if="summaryData && summaryData.overtime">
+                                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-teal-800 text-teal-100" x-text="summaryData.overtime.total_count"></span>
+                                </template>
+                            </button>
 
-                        <button @click="summaryTab = 'pengajuan'" 
-                                type="button" 
-                                :class="summaryTab === 'pengajuan' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
-                                class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>Pengajuan</span>
-                            <template x-if="summaryData && summaryData.pengajuan">
-                                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-teal-800 text-teal-100" x-text="summaryData.pengajuan.total_count"></span>
-                            </template>
-                        </button>
+                            <button @click="summaryTab = 'pengajuan'" 
+                                    type="button" 
+                                    :class="summaryTab === 'pengajuan' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <span>Pengajuan</span>
+                                <template x-if="summaryData && summaryData.pengajuan">
+                                    <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-teal-800 text-teal-100" x-text="summaryData.pengajuan.total_count"></span>
+                                </template>
+                            </button>
+                        </div>
+
+                        <!-- Right: Month & Year Filters with "Semua Bulan" & "Semua Tahun" -->
+                        <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                            <!-- Filter Bulan -->
+                            <div class="relative">
+                                <select x-model="summaryMonth" 
+                                        @change="fetchSummary()"
+                                        class="appearance-none bg-white/15 hover:bg-white/20 border border-white/25 text-white font-bold text-xs rounded-xl pl-2.5 pr-7 py-1.5 outline-none transition cursor-pointer">
+                                    <option value="all" class="text-slate-900 font-semibold">Semua Bulan</option>
+                                    <option value="1" class="text-slate-900 font-semibold">Januari</option>
+                                    <option value="2" class="text-slate-900 font-semibold">Februari</option>
+                                    <option value="3" class="text-slate-900 font-semibold">Maret</option>
+                                    <option value="4" class="text-slate-900 font-semibold">April</option>
+                                    <option value="5" class="text-slate-900 font-semibold">Mei</option>
+                                    <option value="6" class="text-slate-900 font-semibold">Juni</option>
+                                    <option value="7" class="text-slate-900 font-semibold">Juli</option>
+                                    <option value="8" class="text-slate-900 font-semibold">Agustus</option>
+                                    <option value="9" class="text-slate-900 font-semibold">September</option>
+                                    <option value="10" class="text-slate-900 font-semibold">Oktober</option>
+                                    <option value="11" class="text-slate-900 font-semibold">November</option>
+                                    <option value="12" class="text-slate-900 font-semibold">Desember</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/80">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </div>
+
+                            <!-- Filter Tahun -->
+                            <div class="relative">
+                                <select x-model="summaryYear" 
+                                        @change="fetchSummary()"
+                                        class="appearance-none bg-white/15 hover:bg-white/20 border border-white/25 text-white font-bold text-xs rounded-xl pl-2.5 pr-7 py-1.5 outline-none transition cursor-pointer">
+                                    <option value="all" class="text-slate-900 font-semibold">Semua Tahun</option>
+                                    @php
+                                        $currentY = (int) date('Y');
+                                        $years = range($currentY - 3, $currentY + 2);
+                                    @endphp
+                                    @foreach ($years as $yr)
+                                        <option value="{{ $yr }}" class="text-slate-900 font-semibold">{{ $yr }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white/80">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1274,7 +1336,7 @@
                                 <!-- Tabel Riwayat Absensi Terbaru -->
                                 <div class="rounded-2xl border border-slate-200 overflow-hidden">
                                     <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Riwayat Absensi (Bulan Ini)</span>
+                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Riwayat Absensi (<span x-text="summaryData ? summaryData.period.label : 'Bulan Ini'"></span>)</span>
                                         <a :href="summaryData.links.attendance" 
                                            class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 hover:underline">
                                             <span>Lihat Rekap Penuh</span>
@@ -1353,7 +1415,7 @@
                                 <!-- Tabel Riwayat Lembur -->
                                 <div class="rounded-2xl border border-slate-200 overflow-hidden">
                                     <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Daftar Lembur (Bulan Ini)</span>
+                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Daftar Lembur (<span x-text="summaryData ? summaryData.period.label : 'Bulan Ini'"></span>)</span>
                                         <a :href="summaryData.links.overtime" 
                                            class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 hover:underline">
                                             <span>Kelola Halaman Lembur</span>
@@ -1433,7 +1495,7 @@
                                 <!-- Tabel Riwayat Pengajuan -->
                                 <div class="rounded-2xl border border-slate-200 overflow-hidden">
                                     <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Riwayat Pengajuan Barang &amp; Dana</span>
+                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Riwayat Pengajuan (<span x-text="summaryData ? summaryData.period.label : 'Periode'"></span>)</span>
                                         <a :href="summaryData.links.pengajuan" 
                                            class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 hover:underline">
                                             <span>Buka Modul Pengajuan</span>

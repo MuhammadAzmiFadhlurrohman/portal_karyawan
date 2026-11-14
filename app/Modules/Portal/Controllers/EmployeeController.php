@@ -527,16 +527,40 @@ class EmployeeController extends Controller
         $this->authorizeAdmin($request);
 
         $nowJakarta = now('Asia/Jakarta');
-        $month = (int) $request->input('month', $nowJakarta->month);
-        $year = (int) $request->input('year', $nowJakarta->year);
+        $rawMonth = $request->input('month');
+        $rawYear = $request->input('year');
+
+        $isAllMonth = ($rawMonth === 'all' || $rawMonth === '' || $rawMonth === null);
+        $isAllYear = ($rawYear === 'all' || $rawYear === '' || $rawYear === null);
+
+        $month = $isAllMonth ? 'all' : (int) $rawMonth;
+        $year = $isAllYear ? 'all' : (int) $rawYear;
+
+        $monthNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        if ($isAllMonth && $isAllYear) {
+            $periodLabel = 'Semua Periode';
+        } elseif ($isAllMonth) {
+            $periodLabel = 'Semua Bulan ' . $year;
+        } elseif ($isAllYear) {
+            $periodLabel = ($monthNames[$month] ?? 'Bulan ' . $month) . ' (Semua Tahun)';
+        } else {
+            $periodLabel = ($monthNames[$month] ?? 'Bulan ' . $month) . ' ' . $year;
+        }
 
         // 1. Absensi Stats & Items
-        $attendances = Attendance::query()
-            ->where('user_id', $user->id)
-            ->whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->orderByDesc('date')
-            ->get();
+        $attQuery = Attendance::query()->where('user_id', $user->id);
+        if (! $isAllYear) {
+            $attQuery->whereYear('date', $year);
+        }
+        if (! $isAllMonth) {
+            $attQuery->whereMonth('date', $month);
+        }
+        $attendances = $attQuery->orderByDesc('date')->get();
 
         $totalHadir = $attendances->whereIn('status', ['present', 'late'])->count();
         $tepatWaktu = $attendances->where('status', 'present')->count();
@@ -546,7 +570,8 @@ class EmployeeController extends Controller
         $totalMinutes = $attendances->sum('work_duration_minutes');
         $jamKerja = round($totalMinutes / 60, 1);
 
-        $attendanceItems = $attendances->take(8)->map(function ($att) {
+        $attLimit = ($isAllMonth || $isAllYear) ? 50 : 31;
+        $attendanceItems = $attendances->take($attLimit)->map(function ($att) {
             return [
                 'id' => $att->id,
                 'date' => Carbon::parse($att->date)->translatedFormat('d M Y'),
@@ -567,16 +592,19 @@ class EmployeeController extends Controller
         });
 
         // 2. Lembur Stats & Items
-        $lemburs = \App\Models\Lembur::query()
-            ->where('user_id', $user->id)
-            ->whereYear('tanggal', $year)
-            ->whereMonth('tanggal', $month)
-            ->orderByDesc('tanggal')
-            ->get();
+        $lemburQuery = \App\Models\Lembur::query()->where('user_id', $user->id);
+        if (! $isAllYear) {
+            $lemburQuery->whereYear('tanggal', $year);
+        }
+        if (! $isAllMonth) {
+            $lemburQuery->whereMonth('tanggal', $month);
+        }
+        $lemburs = $lemburQuery->orderByDesc('tanggal')->get();
 
         $totalLemburNominal = $lemburs->sum('nominal');
 
-        $lemburItems = $lemburs->take(8)->map(function ($l) {
+        $lemburLimit = ($isAllMonth || $isAllYear) ? 50 : 20;
+        $lemburItems = $lemburs->take($lemburLimit)->map(function ($l) {
             return [
                 'id' => $l->id,
                 'nomor_lembur' => $l->nomor_lembur,
@@ -591,15 +619,19 @@ class EmployeeController extends Controller
         });
 
         // 3. Pengajuan Stats & Items
-        $pengajuans = \App\Models\Pengajuan::query()
-            ->where('user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->take(8)
-            ->get();
+        $pengajuanQuery = \App\Models\Pengajuan::query()->where('user_id', $user->id);
+        if (! $isAllYear) {
+            $pengajuanQuery->whereYear('created_at', $year);
+        }
+        if (! $isAllMonth) {
+            $pengajuanQuery->whereMonth('created_at', $month);
+        }
+        $pengajuans = $pengajuanQuery->orderByDesc('created_at')->get();
 
         $totalPengajuanNominal = $pengajuans->sum('nominal_total');
 
-        $pengajuanItems = $pengajuans->map(function ($p) {
+        $pengajuanLimit = ($isAllMonth || $isAllYear) ? 50 : 20;
+        $pengajuanItems = $pengajuans->take($pengajuanLimit)->map(function ($p) {
             return [
                 'id' => $p->id,
                 'nomor_pengajuan' => $p->nomor_pengajuan,
@@ -630,7 +662,7 @@ class EmployeeController extends Controller
             'period' => [
                 'month' => $month,
                 'year' => $year,
-                'label' => Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y'),
+                'label' => $periodLabel,
             ],
             'attendance' => [
                 'stats' => [
@@ -654,8 +686,16 @@ class EmployeeController extends Controller
                 'items' => $pengajuanItems,
             ],
             'links' => [
-                'attendance' => route('attendance.history', ['user_id' => $user->id, 'month' => $month, 'year' => $year]),
-                'overtime' => route('gomsn.overtime.index', ['user_id' => $user->id, 'bulan' => $month, 'tahun' => $year]),
+                'attendance' => route('attendance.history', array_filter([
+                    'user_id' => $user->id,
+                    'month' => $isAllMonth ? null : $month,
+                    'year' => $isAllYear ? null : $year,
+                ])),
+                'overtime' => route('gomsn.overtime.index', array_filter([
+                    'user_id' => $user->id,
+                    'bulan' => $isAllMonth ? null : $month,
+                    'tahun' => $isAllYear ? null : $year,
+                ])),
                 'pengajuan' => route('gomsn.pengajuan.index', ['tab' => 'all']),
             ],
         ]);
