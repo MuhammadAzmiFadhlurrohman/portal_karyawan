@@ -500,6 +500,148 @@ class EmployeeController extends Controller
     }
 
     /**
+     * Get employee quick summary (Attendance, Overtime, Submissions) for modal dialog.
+     */
+    public function summary(Request $request, User $user)
+    {
+        $this->authorizeAdmin($request);
+
+        $nowJakarta = now('Asia/Jakarta');
+        $month = (int) $request->input('month', $nowJakarta->month);
+        $year = (int) $request->input('year', $nowJakarta->year);
+
+        // 1. Absensi Stats & Items
+        $attendances = Attendance::query()
+            ->where('user_id', $user->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderByDesc('date')
+            ->get();
+
+        $totalHadir = $attendances->whereIn('status', ['present', 'late'])->count();
+        $tepatWaktu = $attendances->where('status', 'present')->count();
+        $terlambat = $attendances->where('status', 'late')->count();
+        $alpa = $attendances->where('status', 'absent')->count();
+        $cuti = $attendances->whereIn('status', ['leave', 'sick', 'special'])->count();
+        $totalMinutes = $attendances->sum('work_duration_minutes');
+        $jamKerja = round($totalMinutes / 60, 1);
+
+        $attendanceItems = $attendances->take(8)->map(function ($att) {
+            return [
+                'id' => $att->id,
+                'date' => Carbon::parse($att->date)->translatedFormat('d M Y'),
+                'clock_in' => $att->clock_in ? Carbon::parse($att->clock_in)->format('H:i') : '-',
+                'clock_out' => $att->clock_out ? Carbon::parse($att->clock_out)->format('H:i') : '-',
+                'status' => $att->status,
+                'status_label' => match ($att->status) {
+                    'present' => 'Tepat Waktu',
+                    'late' => 'Terlambat',
+                    'absent' => 'Alpa',
+                    'leave' => 'Cuti',
+                    'sick' => 'Sakit',
+                    'special' => 'Izin',
+                    default => ucfirst($att->status),
+                },
+                'duration' => $att->work_duration_minutes ? round($att->work_duration_minutes / 60, 1) . ' jam' : '-',
+            ];
+        });
+
+        // 2. Lembur Stats & Items
+        $lemburs = \App\Models\Lembur::query()
+            ->where('user_id', $user->id)
+            ->whereYear('tanggal', $year)
+            ->whereMonth('tanggal', $month)
+            ->orderByDesc('tanggal')
+            ->get();
+
+        $totalLemburNominal = $lemburs->sum('nominal');
+
+        $lemburItems = $lemburs->take(8)->map(function ($l) {
+            return [
+                'id' => $l->id,
+                'nomor_lembur' => $l->nomor_lembur,
+                'tanggal' => Carbon::parse($l->tanggal)->translatedFormat('d M Y'),
+                'jenis_lembur' => $l->jenis_lembur ?: 'Lembur',
+                'jam' => ($l->jam_mulai ? Carbon::parse($l->jam_mulai)->format('H:i') : '--:--') . ' - ' . ($l->jam_selesai ? Carbon::parse($l->jam_selesai)->format('H:i') : '--:--'),
+                'durasi' => $l->durasi_jam_formatted ?? ($l->durasi_menit ? round($l->durasi_menit / 60, 1) . ' jam' : '-'),
+                'nominal' => 'Rp ' . number_format($l->nominal, 0, ',', '.'),
+                'status' => $l->status,
+                'alasan' => $l->alasan ?: '-',
+            ];
+        });
+
+        // 3. Pengajuan Stats & Items
+        $pengajuans = \App\Models\Pengajuan::query()
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->take(8)
+            ->get();
+
+        $totalPengajuanNominal = $pengajuans->sum('nominal_total');
+
+        $pengajuanItems = $pengajuans->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'nomor_pengajuan' => $p->nomor_pengajuan,
+                'jenis' => ucfirst($p->jenis),
+                'keperluan' => $p->keperluan ?: ($p->judul ?: '-'),
+                'nominal' => 'Rp ' . number_format($p->nominal_total, 0, ',', '.'),
+                'status' => $p->status,
+                'tanggal' => $p->created_at ? Carbon::parse($p->created_at)->translatedFormat('d M Y') : '-',
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'employee_code' => $user->employee_code ?: 'KR' . $user->id,
+                'avatar_url' => $user->avatar_url,
+                'initials' => $user->initials,
+                'division' => $user->division ?: 'Non-Divisi',
+                'position' => $user->position ?: 'Staff',
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'branch' => $user->branch ?? 'Bandung',
+                'is_active' => (bool) $user->is_active,
+                'role' => $user->roles->first()?->name ? strtoupper($user->roles->first()->name) : 'KARYAWAN',
+            ],
+            'period' => [
+                'month' => $month,
+                'year' => $year,
+                'label' => Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y'),
+            ],
+            'attendance' => [
+                'stats' => [
+                    'total_hadir' => $totalHadir,
+                    'tepat_waktu' => $tepatWaktu,
+                    'terlambat' => $terlambat,
+                    'alpa' => $alpa,
+                    'cuti' => $cuti,
+                    'jam_kerja' => $jamKerja,
+                ],
+                'items' => $attendanceItems,
+            ],
+            'overtime' => [
+                'total_count' => $lemburs->count(),
+                'total_nominal' => 'Rp ' . number_format($totalLemburNominal, 0, ',', '.'),
+                'items' => $lemburItems,
+            ],
+            'pengajuan' => [
+                'total_count' => $pengajuans->count(),
+                'total_nominal' => 'Rp ' . number_format($totalPengajuanNominal, 0, ',', '.'),
+                'items' => $pengajuanItems,
+            ],
+            'links' => [
+                'attendance' => route('attendance.history', ['user_id' => $user->id, 'month' => $month, 'year' => $year]),
+                'overtime' => route('gomsn.overtime.index', ['user_id' => $user->id, 'bulan' => $month, 'tahun' => $year]),
+                'pengajuan' => route('gomsn.pengajuan.index', ['tab' => 'all']),
+            ],
+        ]);
+    }
+
+    /**
      * Helper to auto-generate next employee code like KR00021
      */
     protected function generateNextEmployeeCode(): string

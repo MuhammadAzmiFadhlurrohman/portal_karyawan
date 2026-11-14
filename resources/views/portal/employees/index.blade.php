@@ -5,6 +5,26 @@
         isDeleteOpen: false,
         isResetOpen: false,
         isResetFaceOpen: false,
+        isSummaryOpen: false,
+        summaryLoading: false,
+        summaryTab: 'absen',
+        summaryData: null,
+        openSummary(empId) {
+            this.isSummaryOpen = true;
+            this.summaryLoading = true;
+            this.summaryTab = 'absen';
+            this.summaryData = null;
+            fetch('{{ url('/portal/employees') }}/' + empId + '/summary?month={{ $month }}&year={{ $year }}')
+                .then(res => res.json())
+                .then(data => {
+                    this.summaryData = data;
+                    this.summaryLoading = false;
+                })
+                .catch(err => {
+                    console.error('Failed to load employee summary:', err);
+                    this.summaryLoading = false;
+                });
+        },
         selectedEmployee: null,
         editForm: {
             id: '',
@@ -353,17 +373,6 @@
 
                         <div class="flex items-center justify-between text-slate-600">
                             <span class="flex items-center gap-1.5 text-slate-400">
-                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span>Total Kehadiran</span>
-                            </span>
-                            <span class="font-bold text-slate-900">
-                                {{ $mStats['total_hadir'] }} hari
-                                <span class="text-[10px] font-normal text-slate-500">(Tepat: {{ $mStats['tepat_waktu'] }}, Telat: {{ $mStats['terlambat'] }})</span>
-                            </span>
-                        </div>
-
-                        <div class="flex items-center justify-between text-slate-600">
-                            <span class="flex items-center gap-1.5 text-slate-400">
                                 <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 <span>Divisi</span>
                             </span>
@@ -375,16 +384,17 @@
                                 <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span>Lokasi</span>
                             </span>
-                            <span class="font-semibold text-slate-800">Bandung</span>
+                            <span class="font-semibold text-slate-800">{{ $emp->branch ?? 'Bandung' }}</span>
                         </div>
                     </div>
 
-                    <!-- Full-Width "Lihat Detail" Button matching User Reference -->
-                    <a href="{{ route('attendance.history', ['user_id' => $emp->id, 'month' => $month, 'year' => $year]) }}"
-                       class="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-teal-50 hover:border-teal-400 hover:text-teal-800 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        <span>Lihat Detail</span>
-                    </a>
+                    <!-- Full-Width "Detail Karyawan" Button Opening Modal -->
+                    <button @click="openSummary({{ $emp->id }})"
+                            type="button"
+                            class="w-full py-2.5 px-4 rounded-xl border border-teal-200 bg-teal-50/70 hover:bg-teal-600 hover:border-teal-600 hover:text-white text-teal-800 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition cursor-pointer">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <span>Lihat Detail &amp; Riwayat</span>
+                    </button>
 
                     <!-- Compact Admin Action Tools (Hanya Admin) -->
                     @if ($canWrite ?? true)
@@ -429,16 +439,15 @@
         <!-- Employee Table Card (Desktop View) -->
         <div class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs table-fixed min-w-[1020px]">
+                <table class="w-full text-left text-xs table-fixed min-w-[960px]">
                     <thead>
                         <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-200">
-                            <th class="py-3 px-3.5 w-[20%]">Karyawan</th>
-                            <th class="py-3 px-2.5 w-[16%]">Kontak &amp; Akun</th>
-                            <th class="py-3 px-2.5 w-[13%]">Penempatan</th>
-                            <th class="py-3 px-2 w-[10%]">Role</th>
-                            <th class="py-3 px-2.5 w-[15%]">Statistik ({{ \Carbon\Carbon::createFromDate($year, $month, 1)->translatedFormat('M Y') }})</th>
+                            <th class="py-3 px-3.5 w-[26%]">Karyawan</th>
+                            <th class="py-3 px-2.5 w-[24%]">Kontak &amp; Akun</th>
+                            <th class="py-3 px-2.5 w-[18%]">Penempatan</th>
+                            <th class="py-3 px-2 w-[12%]">Role</th>
                             <th class="py-3 px-2 w-[10%]">Status</th>
-                            <th class="py-3 pr-4 text-right w-[16%]">Aksi</th>
+                            <th class="py-3 pr-4 text-right w-[10%]">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -517,43 +526,6 @@
                                     </span>
                                 </td>
 
-                                <!-- Statistik Absen -->
-                                @php
-                                    $empStats = $attendanceStats[$emp->id] ?? [
-                                        'total_hadir' => 0,
-                                        'tepat_waktu' => 0,
-                                        'terlambat' => 0,
-                                        'alpa' => 0,
-                                        'cuti' => 0,
-                                        'jam_kerja' => 0,
-                                    ];
-                                @endphp
-                                <td class="py-2.5 px-2.5">
-                                    <div class="flex flex-col gap-1 leading-tight">
-                                        <div class="flex items-center gap-1 flex-wrap">
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-teal-50 text-teal-800 border border-teal-200" title="Total Hadir">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                                                {{ $empStats['total_hadir'] }} hr
-                                            </span>
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200" title="Tepat Waktu">
-                                                Tepat: {{ $empStats['tepat_waktu'] }}
-                                            </span>
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9.5px] font-semibold {{ $empStats['terlambat'] > 0 ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-slate-50 text-slate-500 border border-slate-200' }}" title="Terlambat">
-                                                Telat: {{ $empStats['terlambat'] }}
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono">
-                                            <span class="font-medium text-slate-600">⏱️ {{ $empStats['jam_kerja'] }}h</span>
-                                            @if ($empStats['alpa'] > 0)
-                                                <span class="text-rose-600 font-bold bg-rose-50 px-1 py-0.2 rounded border border-rose-200">Alpa: {{ $empStats['alpa'] }}</span>
-                                            @endif
-                                            @if ($empStats['cuti'] > 0)
-                                                <span class="text-blue-600 font-medium">· Cuti: {{ $empStats['cuti'] }}</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </td>
-
                                 <!-- Status Aktif & Biometrik Wajah -->
                                 <td class="py-2.5 px-2 align-middle">
                                     <div class="flex flex-col items-start gap-1 leading-tight">
@@ -585,13 +557,14 @@
                                 <!-- Actions -->
                                 <td class="py-2.5 pr-4 text-right">
                                     <div class="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
-                                        <!-- Lihat Detail Absen (Requirement) -->
-                                        <a href="{{ route('attendance.history', ['user_id' => $emp->id, 'month' => $month, 'year' => $year]) }}"
-                                           title="Lihat Detail Riwayat Absen {{ $emp->name }}"
-                                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200/90 hover:border-teal-600 text-[10.5px] font-bold transition cursor-pointer shadow-2xs whitespace-nowrap">
+                                        <!-- Detail Karyawan (Modal Rincian: Absen, Lembur, Pengajuan) -->
+                                        <button @click="openSummary({{ $emp->id }})"
+                                                type="button" 
+                                                title="Lihat Detail Riwayat & Data {{ $emp->name }}"
+                                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white border border-teal-200/90 hover:border-teal-600 text-[10.5px] font-bold transition cursor-pointer shadow-2xs whitespace-nowrap">
                                             <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            <span>Lihat</span>
-                                        </a>
+                                            <span>Detail</span>
+                                        </button>
 
                                         @if ($canWrite ?? true)
                                         <!-- Edit Button -->
@@ -1127,6 +1100,394 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- MODAL 6: DETAIL REKAP DATA KARYAWAN (ABSEN, LEMBUR, PENGAJUAN) -->
+        <!-- ============================================================== -->
+        <div x-show="isSummaryOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs">
+            <div @click.outside="isSummaryOpen = false" 
+                 class="bg-white rounded-3xl shadow-2xl border border-slate-200/90 max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                
+                <!-- Modal Top Header (Sculpted Metallic Ocean Teal) -->
+                <div class="relative overflow-hidden p-4 sm:p-5 text-white shrink-0 select-none"
+                     style="background: linear-gradient(90deg, #022836 0%, #053b47 35%, #0a525f 70%, #084c57 100%);">
+                    
+                    <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/60 to-transparent"></div>
+
+                    <div class="relative z-10 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <!-- Avatar Foto / Fallback Inisial -->
+                            <template x-if="summaryData && summaryData.user && summaryData.user.avatar_url">
+                                <img :src="summaryData.user.avatar_url" 
+                                     :alt="summaryData.user.name"
+                                     class="w-12 h-12 rounded-2xl object-cover border-2 border-white/30 shadow-md shrink-0">
+                            </template>
+                            <template x-if="!summaryData || !summaryData.user || !summaryData.user.avatar_url">
+                                <div class="w-12 h-12 rounded-2xl bg-white/15 border-2 border-white/30 flex items-center justify-center text-white font-black text-lg shrink-0 shadow-inner">
+                                    <span x-text="summaryData && summaryData.user ? summaryData.user.initials : '?'"></span>
+                                </div>
+                            </template>
+
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="font-heading font-black text-base sm:text-lg text-white tracking-tight truncate leading-tight"
+                                        x-text="summaryData && summaryData.user ? summaryData.user.name : 'Memuat Data Karyawan...'">
+                                    </h3>
+                                    <template x-if="summaryData && summaryData.user">
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/15 text-teal-200 border border-white/20"
+                                              x-text="summaryData.user.employee_code"></span>
+                                    </template>
+                                </div>
+                                <div class="flex items-center gap-2 mt-1 text-xs text-teal-100/85 flex-wrap">
+                                    <span x-text="summaryData && summaryData.user ? (summaryData.user.division + ' • ' + summaryData.user.position) : '...' "></span>
+                                    <span class="text-teal-300/40">|</span>
+                                    <span class="inline-flex items-center gap-1 font-semibold text-[11px] text-teal-200">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                            <line x1="16" y1="2" x2="16" y2="6"/>
+                                            <line x1="8" y1="2" x2="8" y2="6"/>
+                                            <line x1="3" y1="10" x2="21" y2="10"/>
+                                        </svg>
+                                        <span x-text="summaryData ? summaryData.period.label : 'Periode'"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Close Button -->
+                        <button @click="isSummaryOpen = false" 
+                                type="button" 
+                                class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition shrink-0 cursor-pointer">
+                            ✕
+                        </button>
+                    </div>
+
+                    <!-- Tab Buttons Navigation inside Header -->
+                    <div class="relative z-10 flex items-center gap-1.5 mt-4 pt-3 border-t border-white/15">
+                        <button @click="summaryTab = 'absen'" 
+                                type="button" 
+                                :class="summaryTab === 'absen' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>Absensi</span>
+                        </button>
+
+                        <button @click="summaryTab = 'lembur'" 
+                                type="button" 
+                                :class="summaryTab === 'lembur' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <span>Lembur</span>
+                            <template x-if="summaryData && summaryData.overtime">
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-teal-800 text-teal-100" x-text="summaryData.overtime.total_count"></span>
+                            </template>
+                        </button>
+
+                        <button @click="summaryTab = 'pengajuan'" 
+                                type="button" 
+                                :class="summaryTab === 'pengajuan' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span>Pengajuan</span>
+                            <template x-if="summaryData && summaryData.pengajuan">
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-teal-800 text-teal-100" x-text="summaryData.pengajuan.total_count"></span>
+                            </template>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Body with Scroll -->
+                <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                    
+                    <!-- Loading State -->
+                    <template x-if="summaryLoading">
+                        <div class="py-16 text-center space-y-3">
+                            <div class="w-10 h-10 border-3 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <p class="text-xs font-semibold text-slate-500">Memuat rincian data karyawan...</p>
+                        </div>
+                    </template>
+
+                    <!-- Content State -->
+                    <template x-if="!summaryLoading && summaryData">
+                        <div class="space-y-4">
+                            
+                            <!-- ============================================== -->
+                            <!-- TAB 1: ABSENSI                                 -->
+                            <!-- ============================================== -->
+                            <div x-show="summaryTab === 'absen'" class="space-y-4">
+                                <!-- 4 KPI Absensi -->
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    <div class="p-3 rounded-2xl bg-teal-50/80 border border-teal-100">
+                                        <div class="text-[10.5px] font-bold text-teal-800 uppercase tracking-wider">Total Hadir</div>
+                                        <div class="text-lg font-black text-teal-950 mt-1">
+                                            <span x-text="summaryData.attendance.stats.total_hadir"></span> <span class="text-xs font-normal text-slate-500">hari</span>
+                                        </div>
+                                        <div class="text-[10px] text-teal-700/80 mt-0.5">
+                                            Durasi: <strong x-text="summaryData.attendance.stats.jam_kerja"></strong> jam
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 rounded-2xl bg-emerald-50/80 border border-emerald-100">
+                                        <div class="text-[10.5px] font-bold text-emerald-800 uppercase tracking-wider">Tepat Waktu</div>
+                                        <div class="text-lg font-black text-emerald-950 mt-1">
+                                            <span x-text="summaryData.attendance.stats.tepat_waktu"></span> <span class="text-xs font-normal text-slate-500">hari</span>
+                                        </div>
+                                        <div class="text-[10px] text-emerald-700/80 mt-0.5">Sesuai jadwal shift</div>
+                                    </div>
+
+                                    <div class="p-3 rounded-2xl bg-amber-50/80 border border-amber-100">
+                                        <div class="text-[10.5px] font-bold text-amber-800 uppercase tracking-wider">Terlambat</div>
+                                        <div class="text-lg font-black text-amber-950 mt-1">
+                                            <span x-text="summaryData.attendance.stats.terlambat"></span> <span class="text-xs font-normal text-slate-500">kali</span>
+                                        </div>
+                                        <div class="text-[10px] text-amber-700/80 mt-0.5">Lewat toleransi</div>
+                                    </div>
+
+                                    <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-100">
+                                        <div class="text-[10.5px] font-bold text-rose-800 uppercase tracking-wider">Alpa / Izin</div>
+                                        <div class="text-lg font-black text-rose-950 mt-1">
+                                            <span x-text="summaryData.attendance.stats.alpa"></span> <span class="text-xs font-normal text-slate-500">alpa</span>
+                                        </div>
+                                        <div class="text-[10px] text-rose-700/80 mt-0.5">
+                                            Cuti/Izin: <strong x-text="summaryData.attendance.stats.cuti"></strong> hari
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tabel Riwayat Absensi Terbaru -->
+                                <div class="rounded-2xl border border-slate-200 overflow-hidden">
+                                    <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Riwayat Absensi (Bulan Ini)</span>
+                                        <a :href="summaryData.links.attendance" 
+                                           class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 hover:underline">
+                                            <span>Lihat Rekap Penuh</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs">
+                                            <thead class="bg-slate-100/70 text-[10.5px] font-bold text-slate-500 uppercase border-b border-slate-200">
+                                                <tr>
+                                                    <th class="py-2 px-3">Tanggal</th>
+                                                    <th class="py-2 px-3">Masuk</th>
+                                                    <th class="py-2 px-3">Pulang</th>
+                                                    <th class="py-2 px-3">Durasi</th>
+                                                    <th class="py-2 px-3 text-right">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                <template x-for="item in summaryData.attendance.items" :key="item.id">
+                                                    <tr class="hover:bg-slate-50/80">
+                                                        <td class="py-2 px-3 font-semibold text-slate-800" x-text="item.date"></td>
+                                                        <td class="py-2 px-3 font-mono text-slate-700" x-text="item.clock_in"></td>
+                                                        <td class="py-2 px-3 font-mono text-slate-700" x-text="item.clock_out"></td>
+                                                        <td class="py-2 px-3 text-slate-600" x-text="item.duration"></td>
+                                                        <td class="py-2 px-3 text-right">
+                                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                                                  :class="{
+                                                                      'bg-emerald-50 text-emerald-700 border border-emerald-200': item.status === 'present',
+                                                                      'bg-amber-50 text-amber-700 border border-amber-200': item.status === 'late',
+                                                                      'bg-rose-50 text-rose-700 border border-rose-200': item.status === 'absent',
+                                                                      'bg-blue-50 text-blue-700 border border-blue-200': ['leave', 'sick', 'special'].includes(item.status)
+                                                                  }"
+                                                                  x-text="item.status_label">
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                                <template x-if="summaryData.attendance.items.length === 0">
+                                                    <tr>
+                                                        <td colspan="5" class="py-6 text-center text-slate-400 text-xs">
+                                                            Belum ada catatan absensi pada periode ini.
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 2: LEMBUR                                  -->
+                            <!-- ============================================== -->
+                            <div x-show="summaryTab === 'lembur'" class="space-y-4">
+                                <!-- 2 KPI Lembur -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="p-3.5 rounded-2xl bg-teal-50/80 border border-teal-100 flex items-center justify-between">
+                                        <div>
+                                            <div class="text-[10.5px] font-bold text-teal-800 uppercase tracking-wider">Total Pengajuan Lembur</div>
+                                            <div class="text-xl font-black text-teal-950 mt-1">
+                                                <span x-text="summaryData.overtime.total_count"></span> <span class="text-xs font-normal text-slate-500">pengajuan</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold">⏱️</div>
+                                    </div>
+
+                                    <div class="p-3.5 rounded-2xl bg-cyan-50/80 border border-cyan-100 flex items-center justify-between">
+                                        <div>
+                                            <div class="text-[10.5px] font-bold text-cyan-800 uppercase tracking-wider">Total Uang Lembur</div>
+                                            <div class="text-xl font-black text-cyan-950 mt-1" x-text="summaryData.overtime.total_nominal"></div>
+                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center font-bold">💰</div>
+                                    </div>
+                                </div>
+
+                                <!-- Tabel Riwayat Lembur -->
+                                <div class="rounded-2xl border border-slate-200 overflow-hidden">
+                                    <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Daftar Lembur (Bulan Ini)</span>
+                                        <a :href="summaryData.links.overtime" 
+                                           class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 hover:underline">
+                                            <span>Kelola Halaman Lembur</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs">
+                                            <thead class="bg-slate-100/70 text-[10.5px] font-bold text-slate-500 uppercase border-b border-slate-200">
+                                                <tr>
+                                                    <th class="py-2 px-3">Tanggal</th>
+                                                    <th class="py-2 px-3">Jenis</th>
+                                                    <th class="py-2 px-3">Jam</th>
+                                                    <th class="py-2 px-3">Durasi</th>
+                                                    <th class="py-2 px-3">Nominal</th>
+                                                    <th class="py-2 px-3 text-right">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                <template x-for="item in summaryData.overtime.items" :key="item.id">
+                                                    <tr class="hover:bg-slate-50/80">
+                                                        <td class="py-2 px-3 font-semibold text-slate-800" x-text="item.tanggal"></td>
+                                                        <td class="py-2 px-3 text-slate-700" x-text="item.jenis_lembur"></td>
+                                                        <td class="py-2 px-3 font-mono text-slate-600 text-[11px]" x-text="item.jam"></td>
+                                                        <td class="py-2 px-3 text-slate-700" x-text="item.durasi"></td>
+                                                        <td class="py-2 px-3 font-black text-teal-900" x-text="item.nominal"></td>
+                                                        <td class="py-2 px-3 text-right">
+                                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
+                                                                  :class="{
+                                                                      'bg-emerald-50 text-emerald-700 border border-emerald-200': item.status === 'approved_atasan' || item.status === 'paid',
+                                                                      'bg-amber-50 text-amber-700 border border-amber-200': item.status === 'pending',
+                                                                      'bg-rose-50 text-rose-700 border border-rose-200': item.status === 'rejected_atasan'
+                                                                  }"
+                                                                  x-text="item.status">
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                                <template x-if="summaryData.overtime.items.length === 0">
+                                                    <tr>
+                                                        <td colspan="6" class="py-6 text-center text-slate-400 text-xs">
+                                                            Tidak ada catatan lembur pada periode ini.
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ============================================== -->
+                            <!-- TAB 3: PENGAJUAN                               -->
+                            <!-- ============================================== -->
+                            <div x-show="summaryTab === 'pengajuan'" class="space-y-4">
+                                <!-- 2 KPI Pengajuan -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="p-3.5 rounded-2xl bg-teal-50/80 border border-teal-100 flex items-center justify-between">
+                                        <div>
+                                            <div class="text-[10.5px] font-bold text-teal-800 uppercase tracking-wider">Total Pengajuan</div>
+                                            <div class="text-xl font-black text-teal-950 mt-1">
+                                                <span x-text="summaryData.pengajuan.total_count"></span> <span class="text-xs font-normal text-slate-500">item</span>
+                                            </div>
+                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold">📦</div>
+                                    </div>
+
+                                    <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-100 flex items-center justify-between">
+                                        <div>
+                                            <div class="text-[10.5px] font-bold text-emerald-800 uppercase tracking-wider">Total Nominal Pengajuan</div>
+                                            <div class="text-xl font-black text-emerald-950 mt-1" x-text="summaryData.pengajuan.total_nominal"></div>
+                                        </div>
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">💳</div>
+                                    </div>
+                                </div>
+
+                                <!-- Tabel Riwayat Pengajuan -->
+                                <div class="rounded-2xl border border-slate-200 overflow-hidden">
+                                    <div class="px-4 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Riwayat Pengajuan Barang &amp; Dana</span>
+                                        <a :href="summaryData.links.pengajuan" 
+                                           class="text-xs font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1 hover:underline">
+                                            <span>Buka Modul Pengajuan</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs">
+                                            <thead class="bg-slate-100/70 text-[10.5px] font-bold text-slate-500 uppercase border-b border-slate-200">
+                                                <tr>
+                                                    <th class="py-2 px-3">No. Pengajuan</th>
+                                                    <th class="py-2 px-3">Jenis</th>
+                                                    <th class="py-2 px-3">Keperluan</th>
+                                                    <th class="py-2 px-3">Nominal</th>
+                                                    <th class="py-2 px-3 text-right">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                <template x-for="item in summaryData.pengajuan.items" :key="item.id">
+                                                    <tr class="hover:bg-slate-50/80">
+                                                        <td class="py-2 px-3 font-mono font-bold text-teal-700" x-text="item.nomor_pengajuan"></td>
+                                                        <td class="py-2 px-3">
+                                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200" x-text="item.jenis"></span>
+                                                        </td>
+                                                        <td class="py-2 px-3 text-slate-700 truncate max-w-xs" x-text="item.keperluan"></td>
+                                                        <td class="py-2 px-3 font-black text-slate-900" x-text="item.nominal"></td>
+                                                        <td class="py-2 px-3 text-right">
+                                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
+                                                                  :class="{
+                                                                      'bg-emerald-50 text-emerald-700 border border-emerald-200': item.status === 'selesai' || item.status === 'disetujui',
+                                                                      'bg-amber-50 text-amber-700 border border-amber-200': item.status === 'menunggu',
+                                                                      'bg-rose-50 text-rose-700 border border-rose-200': item.status === 'ditolak'
+                                                                  }"
+                                                                  x-text="item.status">
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                                <template x-if="summaryData.pengajuan.items.length === 0">
+                                                    <tr>
+                                                        <td colspan="5" class="py-6 text-center text-slate-400 text-xs">
+                                                            Belum ada pengajuan dana atau barang.
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="p-3 sm:px-6 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs shrink-0">
+                    <span class="text-slate-500 font-medium">
+                        Detail riwayat SDM terintegrasi
+                    </span>
+                    <button @click="isSummaryOpen = false" 
+                            type="button" 
+                            class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold transition cursor-pointer shadow-xs">
+                        Tutup
+                    </button>
+                </div>
+
             </div>
         </div>
 

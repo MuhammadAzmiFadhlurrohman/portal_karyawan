@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function (): void {
     // Manajemen Karyawan (§6, Admin / HRD) & Avatar Streaming
     Route::get('/portal/users/{user}/avatar', [EmployeeController::class, 'avatar'])->name('portal.user.avatar');
     Route::get('/portal/employees', [EmployeeController::class, 'index'])->name('portal.employees.index');
+    Route::get('/portal/employees/{user}/summary', [EmployeeController::class, 'summary'])->name('portal.employees.summary');
     Route::post('/portal/employees', [EmployeeController::class, 'store'])->name('portal.employees.store');
     Route::put('/portal/employees/{user}', [EmployeeController::class, 'update'])->name('portal.employees.update');
     Route::delete('/portal/employees/{user}', [EmployeeController::class, 'destroy'])->name('portal.employees.destroy');
