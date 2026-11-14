@@ -282,16 +282,23 @@
                 }
                 @media (max-width: 640px) {
                     .emp-overtime-card {
-                        flex-direction: column !important;
-                        padding: 12px !important;
+                        flex-direction: row !important;
+                        padding: 10px !important;
                         gap: 10px !important;
+                        border-radius: 20px !important;
                     }
                     .emp-overtime-photo-panel {
-                        width: 100% !important;
-                        min-width: 100% !important;
-                        max-width: 100% !important;
-                        height: 170px !important;
-                        border-radius: 18px !important;
+                        width: 100px !important;
+                        min-width: 100px !important;
+                        max-width: 100px !important;
+                        height: 155px !important;
+                        min-height: 155px !important;
+                        max-height: 155px !important;
+                        border-radius: 16px 16px 38px 16px !important;
+                    }
+                    .emp-overtime-photo-img {
+                        height: 155px !important;
+                        max-height: 155px !important;
                     }
                 }
             </style>
