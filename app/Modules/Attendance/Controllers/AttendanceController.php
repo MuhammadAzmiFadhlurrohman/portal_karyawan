@@ -61,6 +61,7 @@ class AttendanceController extends Controller
             'recentAttendances' => $recentAttendances,
             'offices' => $offices,
             'faceTemplate' => $faceTemplate,
+            'faceEmbedding' => $faceTemplate?->encrypted_embedding,
             'consecutiveFailures' => $consecutiveFailures,
             'faceServiceHealth' => $faceClient->health(),
         ]);
@@ -299,11 +300,20 @@ class AttendanceController extends Controller
             'pose_front' => ['required', 'string'],
             'pose_left' => ['nullable', 'string'],
             'pose_right' => ['nullable', 'string'],
+            'face_descriptor' => ['nullable', 'string'],
         ]);
 
         $poseFront = $validated['pose_front'];
         $poseLeft = ! empty($validated['pose_left']) ? $validated['pose_left'] : $poseFront;
         $poseRight = ! empty($validated['pose_right']) ? $validated['pose_right'] : $poseFront;
+
+        $descriptor = null;
+        if (! empty($validated['face_descriptor'])) {
+            $decoded = json_decode($validated['face_descriptor'], true);
+            if (is_array($decoded) && count($decoded) === 128) {
+                $descriptor = array_map(static fn ($v): float => (float) $v, $decoded);
+            }
+        }
 
         $attendanceService->enrollUserFace(
             user: $user,
@@ -313,7 +323,8 @@ class AttendanceController extends Controller
                 $poseRight,
             ],
             consentGiven: true,
-            ip: (string) $request->ip()
+            ip: (string) $request->ip(),
+            descriptors: $descriptor
         );
 
         return back()->with('status', 'Biometrik wajah (3 pose) berhasil didaftarkan dan dienkripsi sesuai UU PDP No. 27/2022 (§5.1, §10.2).');
@@ -382,6 +393,7 @@ class AttendanceController extends Controller
             'attempt_token' => ['nullable', 'string'],
             'primary_image' => ['nullable', 'string'],
             'challenge_image' => ['nullable', 'string'],
+            'face_descriptor' => ['nullable', 'string'],
             'use_manual_fallback' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string', 'max:500'],
             'ticket_reference' => ['nullable', 'string', 'max:64'],
@@ -398,7 +410,7 @@ class AttendanceController extends Controller
             $attemptToken = $attendanceService->issueAttemptToken($user, $sample);
             $validated['attempt_token'] = $attemptToken->token;
             if (empty($validated['challenge_image'])) {
-                $validated['challenge_image'] = base64_encode('FACE_ID:user_'.$user->id.'|CHALLENGE_AUTO');
+                $validated['challenge_image'] = 'CHALLENGE_VERIFIED_AUTO';
             }
         }
 

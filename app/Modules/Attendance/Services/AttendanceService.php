@@ -28,8 +28,9 @@ class AttendanceService
      * Enroll user biometric template with UU PDP No. 27/2022 explicit consent (§5.1, §10.2).
      *
      * @param  array<int, string>  $posesBase64
+     * @param  array<int, float>|null  $descriptors
      */
-    public function enrollUserFace(User $user, array $posesBase64, bool $consentGiven, string $ip): FaceTemplate
+    public function enrollUserFace(User $user, array $posesBase64, bool $consentGiven, string $ip, ?array $descriptors = null): FaceTemplate
     {
         if (! $consentGiven) {
             throw ValidationException::withMessages([
@@ -37,7 +38,7 @@ class AttendanceService
             ]);
         }
 
-        $result = $this->faceClient->enroll($user, $posesBase64);
+        $result = $this->faceClient->enroll($user, $posesBase64, $descriptors);
 
         $referencePath = 'biometrics/ref_'.$user->id.'_'.Str::random(24).'.txt';
         Storage::disk('private')->put($referencePath, $posesBase64[0]);
@@ -251,7 +252,8 @@ class AttendanceService
                 user: $user,
                 template: $template,
                 primaryImageBase64: (string) $data['primary_image'],
-                challengeImageBase64: (string) $data['challenge_image']
+                challengeImageBase64: (string) ($data['challenge_image'] ?? ''),
+                faceDescriptorJson: ! empty($data['face_descriptor']) ? (string) $data['face_descriptor'] : null
             );
 
             if (! $verifyResult['match']) {

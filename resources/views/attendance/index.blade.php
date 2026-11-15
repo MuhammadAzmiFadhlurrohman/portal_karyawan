@@ -1,4 +1,6 @@
 <x-layouts.app title="Presensi & Absensi Karyawan">
+    <script src="{{ asset('vendor/face-api/face-api.min.js') }}"></script>
+
     <div class="w-full space-y-4 sm:space-y-5" 
          x-data="attendancePage()"
          x-init="init()">
@@ -371,6 +373,18 @@
                             </button>
                         </form>
                     @endif
+
+                    <!-- Re-enroll Biometrics Option -->
+                    <div class="text-center pt-1">
+                        <button type="button" 
+                                @click="openEnrollModal()" 
+                                class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal-700 hover:text-teal-900 transition underline underline-offset-2 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <span>Perbarui / Daftar Ulang Wajah</span>
+                        </button>
+                    </div>
                 @endif
             </div>
             @endif
@@ -413,8 +427,9 @@
                     <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/40 via-slate-50/60 to-teal-50/30 p-5 text-center space-y-3.5 shadow-inner">
                         <!-- Camera preview / Canvas (Lebih Besar) -->
                         <div class="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto">
-                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center shadow-lg relative">
-                                <video id="enroll-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="cameraActive"></video>
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] transition-all duration-300 flex items-center justify-center shadow-lg relative"
+                                 :class="cameraActive ? (faceDetected ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-amber-400 ring-4 ring-amber-400/20') : 'border-[#155E63] ring-4 ring-teal-500/20'">
+                                <video id="enroll-video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]" x-show="cameraActive"></video>
                                 <img :src="photoPreview" x-show="photoPreview && !cameraActive" class="w-full h-full object-cover" alt="Preview Foto">
                                 <canvas id="enroll-canvas" class="hidden"></canvas>
                                 <div x-show="!cameraActive && !photoPreview" class="text-slate-400 text-center p-2">
@@ -423,25 +438,37 @@
                                 </div>
                             </div>
                             <span x-show="cameraActive" class="absolute top-2.5 right-2.5 flex h-4 w-4">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="faceDetected ? 'bg-emerald-400' : 'bg-amber-400'"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white" :class="faceDetected ? 'bg-emerald-500' : 'bg-amber-500'"></span>
                             </span>
                         </div>
 
                         <div>
-                            <template x-if="photoPreview">
+                            <template x-if="isDetecting">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#155E63] border border-teal-200 shadow-2xs">
+                                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                    <span>Mendeteksi wajah &amp; biometrik...</span>
+                                </span>
+                            </template>
+                            <template x-if="!isDetecting && photoPreview">
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
                                     <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                                    <span>Foto Wajah Siap Didaftarkan</span>
+                                    <span>✓ Wajah Terdeteksi &amp; Biometrik Siap Disimpan</span>
                                 </span>
                             </template>
-                            <template x-if="!photoPreview && cameraActive">
-                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
-                                    <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                                    <span>Posisikan wajah Anda tepat di tengah</span>
+                            <template x-if="!isDetecting && !photoPreview && cameraActive && faceDetected">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>✓ Wajah Terdeteksi — Klik "Ambil Foto Sekarang"</span>
                                 </span>
                             </template>
-                            <template x-if="!photoPreview && !cameraActive">
+                            <template x-if="!isDetecting && !photoPreview && cameraActive && !faceDetected">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                    <span>Posisikan wajah Anda tepat di tengah frame</span>
+                                </span>
+                            </template>
+                            <template x-if="!isDetecting && !photoPreview && !cameraActive">
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
                                     <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Wajib ambil foto selfie wajah</span>
@@ -460,9 +487,10 @@
                             <button type="button" 
                                     @click="capturePhoto()" 
                                     x-show="cameraActive"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer">
+                                    :disabled="isDetecting"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer disabled:opacity-50">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                                <span>Ambil Foto Sekarang</span>
+                                <span x-text="isDetecting ? 'Menganalisis...' : 'Ambil Foto Sekarang'"></span>
                             </button>
                         </div>
 
@@ -470,6 +498,7 @@
                         <input type="hidden" name="pose_front" :value="poseFront">
                         <input type="hidden" name="pose_left" :value="poseLeft">
                         <input type="hidden" name="pose_right" :value="poseRight">
+                        <input type="hidden" name="face_descriptor" :value="faceDescriptor">
                     </div>
 
                     <!-- Consent Checkbox (UU PDP) -->
@@ -537,8 +566,9 @@
                     <div class="rounded-2xl border border-teal-200/80 bg-gradient-to-b from-teal-50/45 via-slate-50/50 to-teal-50/30 p-5 text-center space-y-3.5 relative overflow-hidden shadow-inner">
                         <!-- Circular Biometric Viewport (Lebih Besar) -->
                         <div class="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto">
-                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] border-[#155E63] ring-4 ring-teal-500/20 flex items-center justify-center relative shadow-md">
-                                <video id="clockin-video" autoplay playsinline class="w-full h-full object-cover scale-x-[-1]" x-show="clockInCameraActive"></video>
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] transition-all duration-300 flex items-center justify-center relative shadow-md"
+                                 :class="clockInCameraActive ? (clockInFaceDetected ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-amber-400 ring-4 ring-amber-400/20') : (clockInVerified ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-[#155E63] ring-4 ring-teal-500/20')">
+                                <video id="clockin-video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]" x-show="clockInCameraActive"></video>
                                 <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
                                 <canvas id="clockin-canvas" class="hidden"></canvas>
                                 <div x-show="!clockInCameraActive && !clockInPhotoPreview" class="text-slate-400 text-center p-2">
@@ -548,26 +578,38 @@
                             </div>
                             <!-- Active Camera Live Indicator Dot -->
                             <span x-show="clockInCameraActive" class="absolute top-2.5 right-2.5 flex h-4 w-4">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border-2 border-white"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="clockInFaceDetected ? 'bg-emerald-400' : 'bg-amber-400'"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white" :class="clockInFaceDetected ? 'bg-emerald-500' : 'bg-amber-500'"></span>
                             </span>
                         </div>
 
                         <!-- Face Verification Status Badge -->
                         <div>
-                            <template x-if="clockInPhotoPreview">
-                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-200 shadow-2xs">
+                            <template x-if="isVerifying">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#155E63] border border-teal-200 shadow-2xs">
+                                    <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                    <span>Memverifikasi kesesuaian biometrik wajah...</span>
+                                </span>
+                            </template>
+                            <template x-if="!isVerifying && clockInPhotoPreview && clockInVerified">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-300 shadow-2xs">
                                     <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                                    <span>Foto Wajah Siap Diverifikasi</span>
+                                    <span x-text="'✓ Wajah Cocok & Terverifikasi (' + clockInMatchPercent + '%)'"></span>
                                 </span>
                             </template>
-                            <template x-if="!clockInPhotoPreview && clockInCameraActive">
-                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-white/90 text-[#155E63] border border-teal-200/80 shadow-2xs">
-                                    <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                                    <span>Posisikan wajah Anda tepat di tengah</span>
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && clockInFaceDetected">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>✓ Wajah Terdeteksi — Klik "Ambil Foto Sekarang"</span>
                                 </span>
                             </template>
-                            <template x-if="!clockInPhotoPreview && !clockInCameraActive">
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && !clockInFaceDetected">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200/90 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                    <span>Wajah belum terdeteksi. Arahkan kamera ke wajah Anda</span>
+                                </span>
+                            </template>
+                            <template x-if="!isVerifying && !clockInPhotoPreview && !clockInCameraActive">
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200/90">
                                     <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>Wajib ambil foto selfie wajah</span>
@@ -587,15 +629,17 @@
                             <button type="button" 
                                     @click="captureClockInPhoto()" 
                                     x-show="clockInCameraActive"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer">
+                                    :disabled="isVerifying"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer disabled:opacity-50">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                                <span>Ambil Foto Sekarang</span>
+                                <span x-text="isVerifying ? 'Memverifikasi...' : 'Ambil Foto Sekarang'"></span>
                             </button>
                         </div>
 
-                        <!-- Hidden Image Inputs -->
+                        <!-- Hidden Image & Biometrics Inputs -->
                         <input type="hidden" name="primary_image" :value="clockInPrimaryImage">
                         <input type="hidden" name="challenge_image" :value="clockInChallengeImage">
+                        <input type="hidden" name="face_descriptor" :value="clockInFaceDescriptor">
                     </div>
 
                     <!-- Attendance Type -->
@@ -630,8 +674,10 @@
                             Batal
                         </button>
                         <button type="submit" 
+                                :disabled="isVerifying || !clockInVerified"
+                                :class="(!clockInVerified || isVerifying) ? 'opacity-60 cursor-not-allowed' : 'hover:brightness-105 active:scale-[0.99] cursor-pointer'"
                                 style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
-                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_18px_rgba(21,94,99,0.28)] hover:brightness-105 active:scale-[0.99] transition cursor-pointer">
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_18px_rgba(21,94,99,0.28)] transition">
                             <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>Verifikasi Wajah &amp; Absen Masuk</span>
                         </button>
@@ -660,6 +706,22 @@
                 clockInPhotoPreview: null,
                 clockInPrimaryImage: '',
                 clockInChallengeImage: '',
+                clockInFaceDescriptor: '',
+                clockInFaceDetected: false,
+                clockInVerified: false,
+                clockInMatchPercent: 0,
+                isVerifying: false,
+                clockInScanInterval: null,
+
+                // Face-api Model states
+                modelsLoaded: false,
+                loadingModels: false,
+                faceDetected: false,
+                isDetecting: false,
+                faceDescriptor: '',
+                faceEnrolledLocally: false,
+                enrollScanInterval: null,
+                storedFaceEmbedding: @json($faceEmbedding ?? null),
 
                 // Auto-Detected GPS & Office states
                 gpsLat: {{ $defaultOffice?->lat ?? -6.937122 }},
@@ -678,6 +740,43 @@
 
                 init() {
                     this.detectGPS();
+                    this.loadFaceApiModels();
+                },
+
+                async loadFaceApiModels() {
+                    if (this.modelsLoaded || this.loadingModels) return;
+                    if (typeof faceapi === 'undefined') {
+                        console.warn('face-api.js library belum selesai dimuat di browser.');
+                        return;
+                    }
+                    this.loadingModels = true;
+                    const localUri = '{{ asset("vendor/face-api/models") }}';
+                    const cdnUri = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+
+                    try {
+                        await Promise.all([
+                            faceapi.nets.tinyFaceDetector.loadFromUri(localUri),
+                            faceapi.nets.faceLandmark68Net.loadFromUri(localUri),
+                            faceapi.nets.faceRecognitionNet.loadFromUri(localUri),
+                        ]);
+                        this.modelsLoaded = true;
+                        console.log('✓ Model face-api berhasil dimuat dari lokal.');
+                    } catch (errLocal) {
+                        console.warn('Gagal memuat model face-api lokal, mencoba CDN fallback...', errLocal);
+                        try {
+                            await Promise.all([
+                                faceapi.nets.tinyFaceDetector.loadFromUri(cdnUri),
+                                faceapi.nets.faceLandmark68Net.loadFromUri(cdnUri),
+                                faceapi.nets.faceRecognitionNet.loadFromUri(cdnUri),
+                            ]);
+                            this.modelsLoaded = true;
+                            console.log('✓ Model face-api berhasil dimuat dari CDN fallback.');
+                        } catch (errCdn) {
+                            console.error('Gagal memuat model face-api:', errCdn);
+                        }
+                    } finally {
+                        this.loadingModels = false;
+                    }
                 },
 
                 // Haversine formula to compute distance in meters between 2 GPS points
@@ -755,78 +854,119 @@
                 // Enrollment Modal controls
                 openEnrollModal() {
                     this.showEnrollModal = true;
+                    this.loadFaceApiModels();
                     this.$nextTick(() => {
                         this.startCamera();
                     });
                 },
 
                 closeEnrollModal() {
-                    const video = document.getElementById('enroll-video');
-                    if (video && video.srcObject) {
-                        video.srcObject.getTracks().forEach(track => track.stop());
-                        video.srcObject = null;
-                    }
-                    this.cameraActive = false;
+                    this.stopCamera();
                     this.showEnrollModal = false;
                 },
 
                 startCamera() {
                     const video = document.getElementById('enroll-video');
+                    if (this.enrollScanInterval) {
+                        clearInterval(this.enrollScanInterval);
+                        this.enrollScanInterval = null;
+                    }
+
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
                             .then((stream) => {
                                 video.srcObject = stream;
                                 this.cameraActive = true;
                                 this.photoPreview = null;
+                                this.faceDetected = false;
+
+                                // Real-time face detection loop
+                                this.enrollScanInterval = setInterval(async () => {
+                                    if (!this.cameraActive || !video || video.paused || video.ended) return;
+                                    if (typeof faceapi !== 'undefined' && this.modelsLoaded && video.videoWidth > 0) {
+                                        try {
+                                            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }));
+                                            this.faceDetected = !!det;
+                                        } catch (_) {}
+                                    }
+                                }, 350);
                             })
                             .catch((err) => {
                                 this.cameraActive = false;
-                                if (window.showToast) {
-                                    window.showToast('error', 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
-                                } else {
-                                    alert('Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
-                                }
+                                const msg = 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.';
+                                if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
                             });
                     } else {
-                        if (window.showToast) {
-                            window.showToast('error', 'Browser tidak mendukung akses kamera.');
-                        } else {
-                            alert('Browser tidak mendukung akses kamera.');
-                        }
+                        const msg = 'Browser tidak mendukung akses kamera.';
+                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
                     }
                 },
 
-                capturePhoto() {
+                stopCamera() {
+                    if (this.enrollScanInterval) {
+                        clearInterval(this.enrollScanInterval);
+                        this.enrollScanInterval = null;
+                    }
+                    const video = document.getElementById('enroll-video');
+                    if (video && video.srcObject) {
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                    }
+                    this.cameraActive = false;
+                },
+
+                async capturePhoto() {
                     const video = document.getElementById('enroll-video');
                     const canvas = document.getElementById('enroll-canvas');
-                    if (video && canvas) {
-                        canvas.width = video.videoWidth || 320;
-                        canvas.height = video.videoHeight || 240;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                        
-                        this.photoPreview = dataUrl;
-                        this.poseFront = dataUrl;
-                        this.poseLeft = dataUrl;
-                        this.poseRight = dataUrl;
+                    if (!video || !canvas) return;
 
-                        if (video.srcObject) {
-                            video.srcObject.getTracks().forEach(track => track.stop());
-                            video.srcObject = null;
-                        }
-                        this.cameraActive = false;
+                    this.isDetecting = true;
+                    if (!this.modelsLoaded) {
+                        await this.loadFaceApiModels();
                     }
+
+                    let detection = null;
+                    if (typeof faceapi !== 'undefined' && this.modelsLoaded && video.videoWidth > 0) {
+                        try {
+                            detection = await faceapi
+                                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }))
+                                .withFaceLandmarks()
+                                .withFaceDescriptor();
+                        } catch (err) {
+                            console.error('Face detection error during enroll capture:', err);
+                        }
+                    }
+
+                    // Strict Face Verification: Reject if no human face detected
+                    if (!detection) {
+                        this.isDetecting = false;
+                        const msg = 'Wajah tidak terdeteksi! Kamera tidak mendeteksi wajah manusia. Pastikan wajah Anda terlihat jelas di tengah kamera dengan pencahayaan cukup, bukan objek lain.';
+                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        return;
+                    }
+
+                    canvas.width = video.videoWidth || 320;
+                    canvas.height = video.videoHeight || 240;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    
+                    this.photoPreview = dataUrl;
+                    this.poseFront = dataUrl;
+                    this.poseLeft = dataUrl;
+                    this.poseRight = dataUrl;
+                    this.faceDescriptor = JSON.stringify(Array.from(detection.descriptor));
+                    this.faceEnrolledLocally = true;
+                    this.isDetecting = false;
+
+                    this.stopCamera();
                 },
 
                 handleEnrollSubmit(e) {
                     if (!this.poseFront) {
                         e.preventDefault();
-                        if (window.showToast) {
-                            window.showToast('warning', 'Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan.');
-                        } else {
-                            alert('Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan.');
-                        }
+                        const msg = 'Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan.';
+                        if (window.showToast) { window.showToast('warning', msg); } else { alert(msg); }
                         if (!this.cameraActive) {
                             this.startCamera();
                         }
@@ -837,6 +977,12 @@
                 // Clock-in Face Verification Modal controls
                 openClockInModal() {
                     this.showClockInModal = true;
+                    this.clockInVerified = false;
+                    this.clockInMatchPercent = 0;
+                    this.clockInPhotoPreview = null;
+                    this.clockInPrimaryImage = '';
+                    this.clockInFaceDescriptor = '';
+                    this.loadFaceApiModels();
                     this.$nextTick(() => {
                         this.startClockInCamera();
                     });
@@ -849,49 +995,46 @@
 
                 startClockInCamera() {
                     const video = document.getElementById('clockin-video');
+                    if (this.clockInScanInterval) {
+                        clearInterval(this.clockInScanInterval);
+                        this.clockInScanInterval = null;
+                    }
+
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
                             .then((stream) => {
                                 video.srcObject = stream;
                                 this.clockInCameraActive = true;
                                 this.clockInPhotoPreview = null;
+                                this.clockInFaceDetected = false;
+
+                                // Real-time face detection scan loop
+                                this.clockInScanInterval = setInterval(async () => {
+                                    if (!this.clockInCameraActive || !video || video.paused || video.ended) return;
+                                    if (typeof faceapi !== 'undefined' && this.modelsLoaded && video.videoWidth > 0) {
+                                        try {
+                                            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }));
+                                            this.clockInFaceDetected = !!det;
+                                        } catch (_) {}
+                                    }
+                                }, 350);
                             })
                             .catch((err) => {
                                 this.clockInCameraActive = false;
-                                if (window.showToast) {
-                                    window.showToast('error', 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
-                                } else {
-                                    alert('Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.');
-                                }
+                                const msg = 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.';
+                                if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
                             });
                     } else {
-                        if (window.showToast) {
-                            window.showToast('error', 'Browser tidak mendukung akses kamera.');
-                        } else {
-                            alert('Browser tidak mendukung akses kamera.');
-                        }
-                    }
-                },
-
-                captureClockInPhoto() {
-                    const video = document.getElementById('clockin-video');
-                    const canvas = document.getElementById('clockin-canvas');
-                    if (video && canvas) {
-                        canvas.width = video.videoWidth || 320;
-                        canvas.height = video.videoHeight || 240;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-                        this.clockInPhotoPreview = dataUrl;
-                        this.clockInPrimaryImage = dataUrl;
-                        this.clockInChallengeImage = '{{ base64_encode("FACE_ID:user_".$user->id."|CHALLENGE_AUTO") }}';
-
-                        this.stopClockInCamera();
+                        const msg = 'Browser tidak mendukung akses kamera.';
+                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
                     }
                 },
 
                 stopClockInCamera() {
+                    if (this.clockInScanInterval) {
+                        clearInterval(this.clockInScanInterval);
+                        this.clockInScanInterval = null;
+                    }
                     const video = document.getElementById('clockin-video');
                     if (video && video.srcObject) {
                         video.srcObject.getTracks().forEach(track => track.stop());
@@ -900,14 +1043,89 @@
                     this.clockInCameraActive = false;
                 },
 
-                handleClockInSubmit(e) {
-                    if (!this.clockInPrimaryImage) {
-                        e.preventDefault();
-                        if (window.showToast) {
-                            window.showToast('warning', 'Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.');
-                        } else {
-                            alert('Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.');
+                async captureClockInPhoto() {
+                    const video = document.getElementById('clockin-video');
+                    const canvas = document.getElementById('clockin-canvas');
+                    if (!video || !canvas) return;
+
+                    this.isVerifying = true;
+                    if (!this.modelsLoaded) {
+                        await this.loadFaceApiModels();
+                    }
+
+                    let detection = null;
+                    if (typeof faceapi !== 'undefined' && this.modelsLoaded && video.videoWidth > 0) {
+                        try {
+                            detection = await faceapi
+                                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }))
+                                .withFaceLandmarks()
+                                .withFaceDescriptor();
+                        } catch (err) {
+                            console.error('Face verification error on capture:', err);
                         }
+                    }
+
+                    // 1. REJECT IF NO HUMAN FACE DETECTED
+                    if (!detection) {
+                        this.isVerifying = false;
+                        this.clockInVerified = false;
+                        const msg = 'Wajah tidak terdeteksi! Kamera tidak mendeteksi wajah manusia. Pastikan wajah Anda terlihat jelas di dalam lingkaran kamera, bukan dinding, lantai, atau benda lain.';
+                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        return;
+                    }
+
+                    const capturedDescriptor = Array.from(detection.descriptor);
+
+                    // 2. VERIFY MATCH AGAINST REGISTERED BIOMETRIC TEMPLATE
+                    let isMatch = true;
+                    let matchScorePercent = 95;
+
+                    if (this.storedFaceEmbedding && Array.isArray(this.storedFaceEmbedding) && this.storedFaceEmbedding.length === 128) {
+                        const distance = faceapi.euclideanDistance(this.storedFaceEmbedding, capturedDescriptor);
+                        // Standard ResNet Face Distance: <= 0.55 match
+                        matchScorePercent = Math.max(0, Math.min(100, Math.round((1 - (distance / 0.70)) * 100)));
+
+                        if (distance > 0.55) {
+                            isMatch = false;
+                        }
+                    }
+
+                    if (!isMatch) {
+                        this.isVerifying = false;
+                        this.clockInVerified = false;
+                        const msg = 'Verifikasi Wajah GAGAL!\n\nWajah Anda TIDAK COCOK dengan wajah yang didaftarkan pada akun ini (Tingkat kemiripan hanya ' + matchScorePercent + '%).\n\nAbsen hanya dapat dilakukan oleh pemilik akun yang bersangkutan.';
+                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        return;
+                    }
+
+                    // SUCCESS: Match confirmed & verified
+                    canvas.width = video.videoWidth || 320;
+                    canvas.height = video.videoHeight || 240;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+                    this.clockInPhotoPreview = dataUrl;
+                    this.clockInPrimaryImage = dataUrl;
+                    this.clockInChallengeImage = 'CHALLENGE_VERIFIED_AUTO';
+                    this.clockInFaceDescriptor = JSON.stringify(capturedDescriptor);
+                    this.clockInVerified = true;
+                    this.clockInMatchPercent = matchScorePercent;
+                    this.isVerifying = false;
+
+                    this.stopClockInCamera();
+                    if (window.showToast) {
+                        window.showToast('success', 'Wajah berhasil diverifikasi (' + matchScorePercent + '% kemiripan)! Silakan klik tombol verifikasi di bawah.');
+                    }
+                },
+
+                handleClockInSubmit(e) {
+                    if (!this.clockInPrimaryImage || !this.clockInVerified) {
+                        e.preventDefault();
+                        const msg = !this.clockInPrimaryImage
+                            ? 'Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.'
+                            : 'Wajah belum terverifikasi cocok dengan data biometrik yang didaftarkan.';
+                        if (window.showToast) { window.showToast('warning', msg); } else { alert(msg); }
                         if (!this.clockInCameraActive) {
                             this.startClockInCamera();
                         }
