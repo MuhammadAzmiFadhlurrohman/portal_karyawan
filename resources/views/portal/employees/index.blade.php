@@ -1516,7 +1516,7 @@
                                             <tbody class="divide-y divide-slate-100">
                                                 <template x-for="item in summaryData.pengajuan.items" :key="item.id">
                                                     <tr class="hover:bg-slate-50/80">
-                                                        <td class="py-2 px-3 font-mono font-bold text-teal-700" x-text="item.nomor_pengajuan"></td>
+                                                        <td class="py-2 px-3 font-mono font-bold text-teal-700" x-text="'#' + item.id"></td>
                                                         <td class="py-2 px-3">
                                                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200" x-text="item.jenis"></span>
                                                         </td>

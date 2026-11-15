@@ -406,12 +406,9 @@
                                     <tr class="hover:bg-teal-50/30 transition-colors">
                                         <!-- No. Pengajuan -->
                                         <td class="py-3.5 px-4 whitespace-nowrap">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-xs font-extrabold text-teal-700 bg-teal-50 border border-teal-200/70 px-1.5 py-0.5 rounded-md">#{{ $item->id }}</span>
-                                                <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="font-mono font-bold text-slate-800 hover:text-teal-700 hover:underline cursor-pointer text-left">
-                                                    {{ $item->nomor_pengajuan }}
-                                                </button>
-                                            </div>
+                                            <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center text-xs font-extrabold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-700 border border-teal-200/70 px-2.5 py-1 rounded-lg transition cursor-pointer shadow-2xs">
+                                                #{{ $item->id }}
+                                            </button>
                                         </td>
 
                                         <!-- Tanggal -->
@@ -551,8 +548,7 @@
                                         <div class="flex items-start justify-between gap-2 mb-3">
                                             <div class="min-w-0">
                                                 <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center gap-1.5 text-left group cursor-pointer">
-                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-teal-900 bg-teal-50 border border-teal-200/70 px-2 py-0.5 rounded-lg">#{{ $item->id }}</span>
-                                                    <span class="text-[11px] font-mono font-semibold text-slate-500 truncate">{{ $item->nomor_pengajuan }}</span>
+                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-white bg-teal-50 group-hover:bg-teal-700 border border-teal-200/70 px-2 py-0.5 rounded-lg transition">#{{ $item->id }}</span>
                                                 </button>
                                                 <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
                                                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -901,12 +897,9 @@
                                     <tr class="hover:bg-teal-50/30 transition-colors">
                                         <!-- No. Pengajuan -->
                                         <td class="py-3.5 px-4 whitespace-nowrap">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-xs font-extrabold text-teal-700 bg-teal-50 border border-teal-200/70 px-1.5 py-0.5 rounded-md">#{{ $item->id }}</span>
-                                                <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="font-mono font-bold text-slate-800 hover:text-teal-700 hover:underline cursor-pointer text-left">
-                                                    {{ $item->nomor_pengajuan }}
-                                                </button>
-                                            </div>
+                                            <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center text-xs font-extrabold text-teal-700 hover:text-white bg-teal-50 hover:bg-teal-700 border border-teal-200/70 px-2.5 py-1 rounded-lg transition cursor-pointer shadow-2xs">
+                                                #{{ $item->id }}
+                                            </button>
                                         </td>
 
                                         <!-- Tanggal -->
@@ -1054,8 +1047,7 @@
                                         <div class="flex items-start justify-between gap-2 mb-3">
                                             <div class="min-w-0">
                                                 <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center gap-1.5 text-left group cursor-pointer">
-                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-teal-900 bg-teal-50 border border-teal-200/70 px-2 py-0.5 rounded-lg">#{{ $item->id }}</span>
-                                                    <span class="text-[11px] font-mono font-semibold text-slate-500 truncate">{{ $item->nomor_pengajuan }}</span>
+                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-white bg-teal-50 group-hover:bg-teal-700 border border-teal-200/70 px-2 py-0.5 rounded-lg transition">#{{ $item->id }}</span>
                                                 </button>
                                                 <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
                                                     <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
