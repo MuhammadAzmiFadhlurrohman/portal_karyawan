@@ -1002,6 +1002,18 @@
                         </div>
                     </template>
                 </div>
+
+                <!-- Modal Footer: Tombol Tutup Sebelah Kanan Bawah -->
+                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end">
+                    <button type="button" 
+                            @click="detailModal = false" 
+                            class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-xs transition cursor-pointer flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span>Tutup</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
