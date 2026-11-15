@@ -52,7 +52,10 @@ class OvertimeController extends Controller
         $isHrd = $user->hasRole('hrd');
         $isSuperAdmin = $user->hasRole(['super_admin', 'admin']);
 
-        $selectedBulan = (int) $request->input('bulan', Carbon::now()->month);
+        $rawBulan = $request->input('bulan');
+        $isFilterUnprocessed = ($rawBulan === 'unprocessed' || $rawBulan === 'pending');
+
+        $selectedBulan = $isFilterUnprocessed ? null : (int) ($rawBulan ?: Carbon::now()->month);
         $selectedTahun = (int) $request->input('tahun', Carbon::now()->year);
         $selectedUserId = $request->input('user_id');
         $searchKaryawan = $request->input('cari_karyawan');
@@ -109,26 +112,68 @@ class OvertimeController extends Controller
             $baseQuery->where('status', $request->input('status'));
         }
 
-        // Filter Periode Bulan & Tahun
-        $monthBaseQuery = (clone $baseQuery)
-            ->whereYear('tanggal', $selectedTahun)
-            ->whereMonth('tanggal', $selectedBulan);
+        // Status pending yang relevan dengan peran pengguna
+        $pendingStatus = ($isFinance && ! $isSuperAdmin) ? 'approved_atasan' : 'pending';
+
+        $bulanNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        // Cek semua pengajuan lembur yang belum diproses di seluruh scope
+        $allPendingLemburs = (clone $baseQuery)->where('status', $pendingStatus)->get(['id', 'tanggal', 'user_id', 'status']);
+        
+        $pendingPerMonth = $allPendingLemburs
+            ->groupBy(fn ($item) => Carbon::parse($item->tanggal)->format('Y-n'))
+            ->map(fn ($group) => $group->count());
+
+        $currentMonthCarbon = Carbon::createFromDate($selectedTahun, $selectedBulan ?: Carbon::now()->month, 1)->startOfMonth();
+        $previousPendingItems = $allPendingLemburs->filter(function ($item) use ($currentMonthCarbon) {
+            return Carbon::parse($item->tanggal)->lt($currentMonthCarbon);
+        });
+
+        $unprocessedPreviousCount = $previousPendingItems->count();
+        $unprocessedTotalCount = $allPendingLemburs->count();
+
+        $previousMonthsWithPending = $previousPendingItems
+            ->groupBy(fn ($item) => Carbon::parse($item->tanggal)->format('Y-n'))
+            ->map(function ($items, $key) use ($bulanNames) {
+                [$y, $m] = explode('-', $key);
+                return [
+                    'year' => (int) $y,
+                    'month' => (int) $m,
+                    'name' => ($bulanNames[(int) $m] ?? 'Bulan ' . $m) . ' ' . $y,
+                    'count' => $items->count(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        // Filter Periode Bulan & Tahun (atau Semua yang Belum Diproses)
+        if ($isFilterUnprocessed) {
+            $monthBaseQuery = (clone $baseQuery)->where('status', $pendingStatus);
+        } else {
+            $monthBaseQuery = (clone $baseQuery)
+                ->whereYear('tanggal', $selectedTahun)
+                ->whereMonth('tanggal', $selectedBulan);
+        }
 
         // Export Excel / CSV jika diminta
         if ($request->has('export') && $request->input('export') === 'excel') {
-            return $this->exportOvertime(clone $monthBaseQuery, $selectedBulan, $selectedTahun);
+            return $this->exportOvertime(clone $monthBaseQuery, $selectedBulan ?: 0, $selectedTahun);
         }
 
         // Summary counts
         if ($selectedUserId) {
             $userMonthQuery = (clone $monthBaseQuery)->where('user_id', $selectedUserId);
             $totalLemburCount = (clone $userMonthQuery)->count();
-            $menungguCount = (clone $userMonthQuery)->where('status', 'pending')->count();
+            $menungguCount = (clone $userMonthQuery)->where('status', $pendingStatus)->count();
             $disetujuiCount = (clone $userMonthQuery)->whereIn('status', ['approved_atasan', 'paid'])->count();
             $ditolakCount = (clone $userMonthQuery)->where('status', 'rejected')->count();
         } else {
             $totalLemburCount = (clone $monthBaseQuery)->count();
-            $menungguCount = (clone $monthBaseQuery)->where('status', 'pending')->count();
+            $menungguCount = (clone $monthBaseQuery)->where('status', $pendingStatus)->count();
             $disetujuiCount = (clone $monthBaseQuery)->whereIn('status', ['approved_atasan', 'paid'])->count();
             $ditolakCount = (clone $monthBaseQuery)->where('status', 'rejected')->count();
         }
@@ -149,11 +194,19 @@ class OvertimeController extends Controller
                     'total_days' => $items->pluck('tanggal')->map(fn ($d) => Carbon::parse($d)->toDateString())->unique()->count(),
                     'total_count' => $items->count(),
                     'total_nominal' => $totalNominal,
-                    'pending_count' => $items->where('status', 'pending')->count(),
+                    'pending_count' => $items->where('status', $pendingStatus)->count(),
                     'approved_count' => $items->whereIn('status', ['approved_atasan', 'paid'])->count(),
                     'rejected_count' => $items->where('status', 'rejected')->count(),
                 ];
             }
+
+            // Prioritaskan urutan karyawan yang memiliki pengajuan menunggu persetujuan
+            usort($employeeStats, function ($a, $b) {
+                if ($b['pending_count'] === $a['pending_count']) {
+                    return $b['total_count'] <=> $a['total_count'];
+                }
+                return $b['pending_count'] <=> $a['pending_count'];
+            });
         }
 
         // Detail list query
@@ -205,7 +258,12 @@ class OvertimeController extends Controller
             'divisions',
             'totalNominalLembur',
             'totalCountLembur',
-            'viewMode'
+            'viewMode',
+            'isFilterUnprocessed',
+            'pendingPerMonth',
+            'unprocessedPreviousCount',
+            'unprocessedTotalCount',
+            'previousMonthsWithPending'
         ));
     }
 

@@ -20,6 +20,11 @@
         $totalNominalLembur = $totalNominalLembur ?? 0;
         $totalCountLembur = $totalCountLembur ?? 0;
         $viewMode = $viewMode ?? 'karyawan';
+        $isFilterUnprocessed = $isFilterUnprocessed ?? false;
+        $pendingPerMonth = $pendingPerMonth ?? collect();
+        $unprocessedPreviousCount = $unprocessedPreviousCount ?? 0;
+        $unprocessedTotalCount = $unprocessedTotalCount ?? 0;
+        $previousMonthsWithPending = $previousMonthsWithPending ?? [];
 
         $bulanNames = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -129,15 +134,44 @@
                 <div class="grid grid-cols-1 {{ empty($selectedUserId) ? 'sm:grid-cols-3' : 'sm:grid-cols-2 max-w-2xl' }} gap-4 flex-1">
                     <!-- PERIODE -->
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
-                            Periode
+                        <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5 flex items-center justify-between">
+                            <span>Periode</span>
+                            @if ($unprocessedPreviousCount > 0)
+                                <span class="text-[10px] text-amber-600 font-bold lowercase tracking-normal flex items-center gap-1 animate-pulse" title="Ada pengajuan tertunda di bulan sebelumnya">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    {{ $unprocessedPreviousCount }} blm diproses
+                                </span>
+                            @endif
                         </label>
                         <select name="bulan" onchange="this.form.submit()" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 font-medium text-slate-800 shadow-xs cursor-pointer">
-                            @foreach ($bulanNames as $mNum => $mName)
-                                <option value="{{ $mNum }}" {{ $selectedBulan == $mNum ? 'selected' : '' }}>
-                                    {{ $mName }} {{ $selectedTahun }}
-                                </option>
-                            @endforeach
+                            <option value="unprocessed" {{ $isFilterUnprocessed ? 'selected' : '' }}>
+                                🚨 Semua Belum Diproses @if ($unprocessedTotalCount > 0) ({{ $unprocessedTotalCount }} Pengajuan) @endif
+                            </option>
+                            <optgroup label="Bulan di Tahun {{ $selectedTahun }}">
+                                @foreach ($bulanNames as $mNum => $mName)
+                                    @php
+                                        $key = $selectedTahun . '-' . $mNum;
+                                        $pCount = $pendingPerMonth[$key] ?? ($pendingPerMonth instanceof \Illuminate\Support\Collection ? $pendingPerMonth->get($key, 0) : 0);
+                                    @endphp
+                                    <option value="{{ $mNum }}" {{ (! $isFilterUnprocessed && $selectedBulan == $mNum) ? 'selected' : '' }}>
+                                        {{ $mName }} {{ $selectedTahun }} @if ($pCount > 0) (⚠️ {{ $pCount }} belum diproses) @endif
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                            @if (! empty($previousMonthsWithPending))
+                                @php
+                                    $outsideYearMonths = array_filter($previousMonthsWithPending, fn($pm) => $pm['year'] != $selectedTahun);
+                                @endphp
+                                @if (! empty($outsideYearMonths))
+                                    <optgroup label="Bulan Belum Diproses (Tahun Lain)">
+                                        @foreach ($outsideYearMonths as $pm)
+                                            <option value="{{ $pm['month'] }}" data-tahun="{{ $pm['year'] }}" {{ (! $isFilterUnprocessed && $selectedBulan == $pm['month'] && $selectedTahun == $pm['year']) ? 'selected' : '' }}>
+                                                ⚠️ {{ $pm['name'] }} ({{ $pm['count'] }} belum diproses)
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endif
+                            @endif
                         </select>
                         <input type="hidden" name="tahun" value="{{ $selectedTahun }}">
                     </div>
@@ -231,6 +265,35 @@
                 </div>
             </div>
             @endif
+
+            <!-- Notifikasi & Shortcut jika ada Lembur Bulan Sebelumnya yang Belum Diproses -->
+            @if ($unprocessedPreviousCount > 0 && ! $isFilterUnprocessed)
+            <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50/90 border border-amber-200/90 rounded-xl p-3 text-xs">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                        ⚠️
+                    </span>
+                    <div class="min-w-0">
+                        <span class="font-bold text-amber-950 block">
+                            Ada {{ $unprocessedPreviousCount }} pengajuan lembur dari bulan sebelumnya yang belum diproses!
+                        </span>
+                        <span class="text-[11px] text-amber-800">
+                            Periode tertunda: 
+                            @foreach ($previousMonthsWithPending as $pm)
+                                <a href="{{ route('gomsn.overtime.index', ['bulan' => $pm['month'], 'tahun' => $pm['year'], 'divisi' => $selectedDivisi, 'view_mode' => $viewMode]) }}" class="underline hover:text-amber-950 font-bold">
+                                    {{ $pm['name'] }} ({{ $pm['count'] }})
+                                </a>@if(!$loop->last), @endif
+                            @endforeach
+                        </span>
+                    </div>
+                </div>
+                <a href="{{ route('gomsn.overtime.index', ['bulan' => 'unprocessed', 'divisi' => $selectedDivisi, 'view_mode' => $viewMode]) }}" 
+                   class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-2xs transition flex items-center gap-1.5 shrink-0 whitespace-nowrap self-start sm:self-auto cursor-pointer">
+                    <span>Lihat Semua yang Belum Diproses ({{ $unprocessedTotalCount }})</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            @endif
         </div>
 
         <!-- ============================================================== -->
@@ -241,9 +304,36 @@
             <div class="flex items-center justify-between">
                 <h2 class="text-xs font-bold text-slate-700 tracking-wider uppercase flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                    <span>Daftar Karyawan Lembur ({{ $bulanNames[$selectedBulan] ?? '' }} {{ $selectedTahun }})</span>
+                    <span>Daftar Karyawan Lembur ({{ $isFilterUnprocessed ? 'Semua Belum Diproses' : ($bulanNames[$selectedBulan] ?? '') . ' ' . $selectedTahun }})</span>
                 </h2>
                 <span class="text-xs text-slate-500 font-medium">
+                    {{ count($employeeStats) }} Karyawan Terdata
+                </span>
+            </div>
+
+            <!-- Card Alert Summary di Atas Grid Jika Ada Lembur yang Perlu Disetujui -->
+            @if ($menungguCount > 0)
+            <div class="p-4 rounded-2xl border border-amber-300/80 bg-gradient-to-r from-amber-50 via-orange-50/50 to-amber-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-extrabold text-lg shrink-0 shadow-xs">
+                        ⏳
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="text-xs sm:text-sm font-extrabold text-amber-950">
+                                Terdapat {{ $menungguCount }} Pengajuan Lembur yang Perlu Disetujui
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[9.5px] font-extrabold bg-amber-500 text-white animate-pulse">
+                                Perlu Tindakan
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-amber-800 mt-0.5 leading-snug">
+                            Karyawan dengan pengajuan pending ditandai lencana <strong class="font-bold text-amber-900">"Perlu Disetujui"</strong> dan diposisikan paling atas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
                     {{ count($employeeStats) }} Karyawan Terdata
                 </span>
             </div>
@@ -320,7 +410,7 @@
                     $cardAvatar = $cardUser->avatar_url ?? null;
                     $cardInitials = $cardUser->initials ?? strtoupper(substr($cardUser->name ?? 'K', 0, 2));
                 @endphp
-                <div class="emp-overtime-card hover:shadow-[0_14px_32px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group">
+                <div class="emp-overtime-card {{ $stat['pending_count'] > 0 ? 'border-amber-300 ring-2 ring-amber-400/25 shadow-[0_8px_24px_rgba(245,158,11,0.12)]' : '' }} hover:shadow-[0_14px_32px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group">
 
                     <!-- Background Soft Ambient Wave Kanan -->
                     <svg class="absolute right-0 bottom-0 h-full w-2/5 pointer-events-none opacity-20" viewBox="0 0 200 200" fill="none" preserveAspectRatio="none">
@@ -341,11 +431,19 @@
                             </svg>
                         </div>
 
-                        <!-- Pill Badge Jumlah Pengajuan di Kiri Atas -->
-                        <div class="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold text-white shadow-xs"
-                             style="background: rgba(3, 62, 57, 0.82); backdrop-filter: blur(8px); border: 1px solid rgba(94, 234, 212, 0.45);">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
-                            <span>{{ $stat['total_count'] }} Pengajuan</span>
+                        <!-- Pill Badges di Kiri Atas Panel Foto -->
+                        <div class="absolute top-2 left-2 z-10 flex flex-col gap-1 items-start">
+                            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold text-white shadow-xs"
+                                 style="background: rgba(3, 62, 57, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(94, 234, 212, 0.45);">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
+                                <span>{{ $stat['total_count'] }} Pengajuan</span>
+                            </div>
+                            @if ($stat['pending_count'] > 0)
+                            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold text-amber-950 bg-amber-300 border border-amber-400 shadow-sm animate-pulse">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                                <span>{{ $stat['pending_count'] }} Perlu Disetujui</span>
+                            </div>
+                            @endif
                         </div>
 
                         <!-- Foto Profil Karyawan / Fallback Icon Profile User -->
@@ -385,8 +483,19 @@
                                         <line x1="8" y1="2" x2="8" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
                                         <line x1="3" y1="10" x2="21" y2="10" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    {{ $bulanNames[$selectedBulan] ?? 'November' }} {{ $selectedTahun }}
+                                    {{ $isFilterUnprocessed ? 'Semua Periode' : ($bulanNames[$selectedBulan] ?? 'November') . ' ' . $selectedTahun }}
                                 </span>
+                                @if ($stat['pending_count'] > 0)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black text-amber-900 bg-amber-100 border border-amber-300 shadow-2xs shrink-0 animate-pulse">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        {{ $stat['pending_count'] }} Perlu Disetujui
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 shrink-0">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        Selesai
+                                    </span>
+                                @endif
                             </div>
 
                             <!-- Nama Karyawan (Lebar 100% Penuh, Tidak Terpotong) -->
@@ -442,8 +551,18 @@
                                 </div>
                             </div>
 
-                            <!-- Tombol Detail -->
-                            <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
+                            <!-- Tombol Detail / Setujui -->
+                            @if ($stat['pending_count'] > 0)
+                            <a href="{{ route('gomsn.overtime.index', ['bulan' => $isFilterUnprocessed ? 'unprocessed' : $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
+                               class="px-2.5 py-1.5 rounded-full text-white text-[10.5px] font-extrabold shadow-xs hover:opacity-95 transition-all transform active:scale-95 shrink-0 whitespace-nowrap flex items-center gap-1"
+                               style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;">
+                                <span>Setujui ({{ $stat['pending_count'] }})</span>
+                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                            @else
+                            <a href="{{ route('gomsn.overtime.index', ['bulan' => $isFilterUnprocessed ? 'unprocessed' : $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
                                class="px-2.5 py-1.5 rounded-full text-white text-[10.5px] font-bold shadow-2xs hover:opacity-95 transition-all transform active:scale-95 shrink-0 whitespace-nowrap flex items-center gap-1"
                                style="background: #04615c;">
                                 <span>Detail</span>
@@ -451,6 +570,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                                 </svg>
                             </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -472,7 +592,7 @@
             @if ($selectedUserId)
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-                    <a href="{{ route('gomsn.overtime.index', ['bulan' => $selectedBulan, 'tahun' => $selectedTahun, 'view_mode' => $viewMode]) }}" 
+                    <a href="{{ route('gomsn.overtime.index', ['bulan' => $isFilterUnprocessed ? 'unprocessed' : $selectedBulan, 'tahun' => $selectedTahun, 'divisi' => $selectedDivisi, 'view_mode' => $viewMode]) }}" 
                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer shadow-xs self-start">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
