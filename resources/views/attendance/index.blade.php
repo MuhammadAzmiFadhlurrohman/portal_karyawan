@@ -358,20 +358,15 @@
                             <span>Absen Masuk Sekarang</span>
                         </button>
                     @elseif (! $todayAttendance->clock_out_at)
-                        <form method="POST" action="{{ route('attendance.clock-out') }}" onsubmit="return confirm('Apakah Anda yakin ingin melakukan absen pulang?')">
-                            @csrf
-                            <input type="hidden" name="lat" :value="gpsLat">
-                            <input type="hidden" name="lng" :value="gpsLng">
-                            <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
-                            <button type="submit"
-                                    style="background: linear-gradient(135deg, #b45309 0%, #D97706 60%, #f59e0b 100%) !important;"
-                                    class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-amber-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                                </svg>
-                                <span>Absen Pulang Sekarang</span>
-                            </button>
-                        </form>
+                        <button type="button"
+                                @click="openClockOutModal()"
+                                style="background: linear-gradient(135deg, #b45309 0%, #D97706 60%, #f59e0b 100%) !important;"
+                                class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-amber-900/20 active:scale-[0.99] transition flex items-center justify-center gap-2.5 cursor-pointer">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            <span>Absen Pulang Sekarang</span>
+                        </button>
                     @endif
 
                     <!-- Re-enroll Biometrics Option -->
@@ -686,6 +681,106 @@
             </div>
         </div>
 
+        <!-- MODAL 3: KONFIRMASI ABSEN PULANG (Themed & Modern Confirmation Dialog) -->
+        <div x-show="showClockOutModal" 
+             x-cloak 
+             x-transition.opacity.duration.200ms
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-[0_24px_60px_rgba(15,23,42,0.25)] max-w-md w-full overflow-hidden my-auto" @click.outside="closeClockOutModal()">
+                
+                <!-- Sleek Sunset Header -->
+                <div class="px-5 py-3.5 bg-gradient-to-r from-[#78350f] via-[#b45309] to-[#d97706] text-white flex items-center justify-between relative overflow-hidden">
+                    <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="w-9 h-9 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0 shadow-xs">
+                            <svg class="w-5 h-5 text-amber-100" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-sm sm:text-base text-white leading-tight">
+                                Konfirmasi Absen Pulang
+                            </h3>
+                            <p class="text-[11px] text-amber-100/90 font-normal mt-0.5">
+                                Selesaikan catatan kehadiran hari ini
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" @click="closeClockOutModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white flex items-center justify-center transition cursor-pointer relative z-10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('attendance.clock-out') }}" class="p-5 space-y-4">
+                    @csrf
+                    <input type="hidden" name="lat" :value="gpsLat">
+                    <input type="hidden" name="lng" :value="gpsLng">
+                    <input type="hidden" name="gps_accuracy" :value="gpsAccuracy">
+
+                    <!-- Visual Icon & Question -->
+                    <div class="text-center space-y-2 py-1">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 border border-amber-300 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
+                            <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-heading font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">
+                            Apakah Anda Yakin Ingin Pulang?
+                        </h4>
+                        <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+                            Sistem akan mencatat jam kepulangan dan menghitung total durasi jam kerja Anda hari ini.
+                        </p>
+                    </div>
+
+                    <!-- Bento Info Card -->
+                    <div class="rounded-2xl border border-slate-200/90 bg-slate-50/70 p-3.5 space-y-2.5">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div class="bg-white rounded-xl p-2.5 border border-slate-200/70 shadow-2xs">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Jam Masuk</span>
+                                <span class="text-xs sm:text-sm font-mono font-extrabold text-emerald-700 block mt-0.5">
+                                    {{ $todayAttendance?->clock_in_at ? \Carbon\Carbon::parse($todayAttendance->clock_in_at)->format('H:i') : '--:--' }} WIB
+                                </span>
+                            </div>
+                            <div class="bg-white rounded-xl p-2.5 border border-slate-200/70 shadow-2xs">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Waktu Sekarang</span>
+                                <span class="text-xs sm:text-sm font-mono font-extrabold text-amber-700 block mt-0.5" x-text="clockOutLiveTime + ' WIB'">
+                                    --:-- WIB
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl p-2.5 border border-slate-200/70 flex items-center justify-between text-xs shadow-2xs">
+                            <span class="text-[11px] text-slate-500 font-medium">Titik Lokasi:</span>
+                            <span class="font-bold text-slate-800 text-[11px] truncate max-w-[200px]" x-text="gpsStatus"></span>
+                        </div>
+                    </div>
+
+                    <!-- Helpful Notice -->
+                    <div class="flex items-start gap-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 p-3 text-[11px] text-amber-900 leading-snug">
+                        <span class="text-base leading-none">💡</span>
+                        <span>Pastikan seluruh file dan tugas pekerjaan Anda hari ini telah tersimpan dengan aman sebelum meninggalkan kantor.</span>
+                    </div>
+
+                    <!-- Footer Action Buttons -->
+                    <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+                        <button type="button" 
+                                @click="closeClockOutModal()" 
+                                class="px-4 py-2.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition cursor-pointer">
+                            Batal
+                        </button>
+                        <button type="submit" 
+                                style="background: linear-gradient(135deg, #b45309 0%, #D97706 60%, #f59e0b 100%) !important;"
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_18px_rgba(217,119,6,0.3)] hover:brightness-105 active:scale-[0.99] transition cursor-pointer">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            <span>Ya, Absen Pulang Sekarang</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -695,7 +790,9 @@
             return {
                 showEnrollModal: false,
                 showClockInModal: false,
+                showClockOutModal: false,
                 showLocationDetail: false,
+                clockOutLiveTime: '',
                 cameraActive: false,
                 photoPreview: null,
                 selectedOffice: '{{ $defaultOffice?->id ?? 1 }}',
@@ -893,12 +990,18 @@
                             })
                             .catch((err) => {
                                 this.cameraActive = false;
-                                const msg = 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.';
-                                if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                                this.showAlert({
+                                    icon: 'warning',
+                                    title: 'Akses Kamera Diperlukan',
+                                    text: 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser perangkat Anda.'
+                                });
                             });
                     } else {
-                        const msg = 'Browser tidak mendukung akses kamera.';
-                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'error',
+                            title: 'Browser Tidak Mendukung',
+                            text: 'Browser perangkat Anda tidak mendukung akses kamera.'
+                        });
                     }
                 },
 
@@ -940,8 +1043,12 @@
                     // Strict Face Verification: Reject if no human face detected
                     if (!detection) {
                         this.isDetecting = false;
-                        const msg = 'Wajah tidak terdeteksi! Kamera tidak mendeteksi wajah manusia. Pastikan wajah Anda terlihat jelas di tengah kamera dengan pencahayaan cukup, bukan objek lain.';
-                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'warning',
+                            title: 'Wajah Tidak Terdeteksi',
+                            text: 'Kamera tidak mendeteksi wajah manusia. Pastikan wajah Anda terlihat jelas tepat di tengah lingkaran kamera dengan pencahayaan yang cukup, bukan objek lain.',
+                            confirmText: 'Coba Lagi'
+                        });
                         return;
                     }
 
@@ -965,8 +1072,11 @@
                 handleEnrollSubmit(e) {
                     if (!this.poseFront) {
                         e.preventDefault();
-                        const msg = 'Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan.';
-                        if (window.showToast) { window.showToast('warning', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'info',
+                            title: 'Foto Wajah Diperlukan',
+                            text: 'Silakan ambil foto selfie wajah terlebih dahulu sebelum menyimpan pendaftaran biometrik Anda.'
+                        });
                         if (!this.cameraActive) {
                             this.startCamera();
                         }
@@ -991,6 +1101,44 @@
                 closeClockInModal() {
                     this.stopClockInCamera();
                     this.showClockInModal = false;
+                },
+
+                // Clock-out Modal controls
+                openClockOutModal() {
+                    const now = new Date();
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const mins = String(now.getMinutes()).padStart(2, '0');
+                    this.clockOutLiveTime = `${hours}:${mins}`;
+                    this.showClockOutModal = true;
+                },
+
+                closeClockOutModal() {
+                    this.showClockOutModal = false;
+                },
+
+                // Styled Dialog Alert (SweetAlert2)
+                showAlert({ title = 'Perhatian', text = '', html = null, icon = 'info', confirmText = 'Mengerti', confirmColor = '#155E63' }) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: title,
+                            text: html ? undefined : text,
+                            html: html || undefined,
+                            icon: icon,
+                            confirmButtonText: confirmText,
+                            confirmButtonColor: confirmColor,
+                            backdrop: 'rgba(15, 23, 42, 0.65)',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-2xl border border-slate-200/90 font-sans p-6 text-center select-none',
+                                title: 'font-extrabold text-base sm:text-lg text-slate-900 tracking-tight',
+                                htmlContainer: 'text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed',
+                                confirmButton: 'px-6 py-2.5 rounded-xl font-bold text-xs text-white shadow-md active:scale-95 transition cursor-pointer'
+                            }
+                        });
+                    } else if (window.showToast) {
+                        window.showToast(icon === 'error' ? 'error' : (icon === 'warning' ? 'warning' : 'info'), text || title);
+                    } else {
+                        alert(text || title);
+                    }
                 },
 
                 startClockInCamera() {
@@ -1021,12 +1169,18 @@
                             })
                             .catch((err) => {
                                 this.clockInCameraActive = false;
-                                const msg = 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser Anda.';
-                                if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                                this.showAlert({
+                                    icon: 'warning',
+                                    title: 'Akses Kamera Diperlukan',
+                                    text: 'Tidak dapat mengakses kamera: pastikan izin kamera diaktifkan di browser perangkat Anda.'
+                                });
                             });
                     } else {
-                        const msg = 'Browser tidak mendukung akses kamera.';
-                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'error',
+                            title: 'Browser Tidak Mendukung',
+                            text: 'Browser perangkat Anda tidak mendukung akses kamera.'
+                        });
                     }
                 },
 
@@ -1069,8 +1223,12 @@
                     if (!detection) {
                         this.isVerifying = false;
                         this.clockInVerified = false;
-                        const msg = 'Wajah tidak terdeteksi! Kamera tidak mendeteksi wajah manusia. Pastikan wajah Anda terlihat jelas di dalam lingkaran kamera, bukan dinding, lantai, atau benda lain.';
-                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'warning',
+                            title: 'Wajah Tidak Terdeteksi',
+                            text: 'Kamera tidak mendeteksi wajah manusia. Pastikan wajah Anda terlihat jelas di dalam lingkaran kamera, bukan dinding, lantai, atau objek lain.',
+                            confirmText: 'Coba Lagi'
+                        });
                         return;
                     }
 
@@ -1093,8 +1251,19 @@
                     if (!isMatch) {
                         this.isVerifying = false;
                         this.clockInVerified = false;
-                        const msg = 'Verifikasi Wajah GAGAL!\n\nWajah Anda TIDAK COCOK dengan wajah yang didaftarkan pada akun ini (Tingkat kemiripan hanya ' + matchScorePercent + '%).\n\nAbsen hanya dapat dilakukan oleh pemilik akun yang bersangkutan.';
-                        if (window.showToast) { window.showToast('error', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'error',
+                            title: 'Verifikasi Wajah Gagal',
+                            confirmColor: '#be123c',
+                            confirmText: 'Tutup',
+                            html: `<div class="space-y-2.5">
+                                <p class="text-sm font-semibold text-rose-900 leading-snug">Wajah yang terdeteksi <strong>TIDAK COCOK</strong> dengan data biometrik yang didaftarkan pada akun ini!</p>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                    Tingkat Kemiripan: ${matchScorePercent}%
+                                </div>
+                                <p class="text-xs text-slate-500">Absensi kehadiran hanya dapat dilakukan oleh pemilik akun terdaftar.</p>
+                            </div>`
+                        });
                         return;
                     }
 
@@ -1125,7 +1294,11 @@
                         const msg = !this.clockInPrimaryImage
                             ? 'Wajib mengambil foto selfie wajah terlebih dahulu untuk verifikasi identitas absensi masuk.'
                             : 'Wajah belum terverifikasi cocok dengan data biometrik yang didaftarkan.';
-                        if (window.showToast) { window.showToast('warning', msg); } else { alert(msg); }
+                        this.showAlert({
+                            icon: 'warning',
+                            title: 'Foto Wajah Diperlukan',
+                            text: msg
+                        });
                         if (!this.clockInCameraActive) {
                             this.startClockInCamera();
                         }

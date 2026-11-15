@@ -1987,6 +1987,137 @@
             @elseif (isset($errors) && $errors->any())
                 triggerToast('error', {!! json_encode($errors->first()) !!});
             @endif
+
+            // Global Elegant Confirmation Handler (Menggantikan confirm browser native yang kaku)
+            window.confirmAction = function({
+                title = 'Konfirmasi Tindakan',
+                text = 'Apakah Anda yakin ingin melanjutkan tindakan ini?',
+                icon = 'question',
+                confirmButtonText = 'Ya, Lanjutkan',
+                cancelButtonText = 'Batal',
+                confirmButtonColor = '#155E63',
+            }) {
+                if (!window.Swal) {
+                    return Promise.resolve({ isConfirmed: window.confirm(text) });
+                }
+                return Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    showCancelButton: true,
+                    confirmButtonText: confirmButtonText,
+                    cancelButtonText: cancelButtonText,
+                    confirmButtonColor: confirmButtonColor,
+                    cancelButtonColor: '#94a3b8',
+                    reverseButtons: true,
+                    backdrop: 'rgba(15, 23, 42, 0.65)',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-2xl border border-slate-200/90 font-sans p-6 text-center select-none',
+                        title: 'font-extrabold text-base sm:text-lg text-slate-900 tracking-tight',
+                        htmlContainer: 'text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed',
+                        confirmButton: 'px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-md active:scale-95 transition cursor-pointer',
+                        cancelButton: 'px-4 py-2.5 rounded-xl font-semibold text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 active:scale-95 transition cursor-pointer'
+                    }
+                });
+            };
+
+            // Global Auto-interceptor for native confirm(...) in forms and buttons
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                if (!form || form.dataset.swalBypass) {
+                    if (form) delete form.dataset.swalBypass;
+                    return;
+                }
+
+                const onsubmitAttr = form.getAttribute('onsubmit');
+                let confirmMsg = form.dataset.confirm;
+
+                if (!confirmMsg && onsubmitAttr && onsubmitAttr.includes('confirm(')) {
+                    const match = onsubmitAttr.match(/confirm\(['"]([^'"]+)['"]\)/);
+                    if (match && match[1]) {
+                        confirmMsg = match[1];
+                    }
+                }
+
+                if (confirmMsg) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    const isDanger = confirmMsg.toLowerCase().includes('hapus') || 
+                                     confirmMsg.toLowerCase().includes('tolak') || 
+                                     confirmMsg.toLowerCase().includes('batal');
+                    const icon = isDanger ? 'warning' : 'question';
+                    const color = isDanger ? '#e11d48' : '#155E63';
+                    const btnText = isDanger ? 'Ya, Lanjutkan' : 'Ya, Setujui';
+
+                    window.confirmAction({
+                        title: 'Konfirmasi Tindakan',
+                        text: confirmMsg,
+                        icon: icon,
+                        confirmButtonColor: color,
+                        confirmButtonText: btnText
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.dataset.swalBypass = 'true';
+                            if (onsubmitAttr) {
+                                form.removeAttribute('onsubmit');
+                                form.submit();
+                                form.setAttribute('onsubmit', onsubmitAttr);
+                            } else {
+                                form.submit();
+                            }
+                        }
+                    });
+                }
+            }, true);
+
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('button[onclick*="confirm("], a[onclick*="confirm("], [data-confirm]');
+                if (!btn || btn.dataset.swalBypass) return;
+
+                let confirmMsg = btn.dataset.confirm;
+                const onclickAttr = btn.getAttribute('onclick');
+
+                if (!confirmMsg && onclickAttr && onclickAttr.includes('confirm(')) {
+                    const match = onclickAttr.match(/confirm\(['"]([^'"]+)['"]\)/);
+                    if (match && match[1]) {
+                        confirmMsg = match[1];
+                    }
+                }
+
+                if (confirmMsg) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    const isDanger = confirmMsg.toLowerCase().includes('hapus') || 
+                                     confirmMsg.toLowerCase().includes('tolak') || 
+                                     confirmMsg.toLowerCase().includes('batal');
+                    const icon = isDanger ? 'warning' : 'question';
+                    const color = isDanger ? '#e11d48' : '#155E63';
+                    const btnText = isDanger ? 'Ya, Lanjutkan' : 'Ya, Setujui';
+
+                    window.confirmAction({
+                        title: 'Konfirmasi Tindakan',
+                        text: confirmMsg,
+                        icon: icon,
+                        confirmButtonColor: color,
+                        confirmButtonText: btnText
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            btn.dataset.swalBypass = 'true';
+                            if (onclickAttr) {
+                                btn.removeAttribute('onclick');
+                                btn.click();
+                                btn.setAttribute('onclick', onclickAttr);
+                            } else if (btn.form && btn.type === 'submit') {
+                                btn.form.submit();
+                            } else {
+                                btn.click();
+                            }
+                        }
+                    });
+                }
+            }, true);
         });
     </script>
     @stack('scripts')
