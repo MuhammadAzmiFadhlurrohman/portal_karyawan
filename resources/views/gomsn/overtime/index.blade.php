@@ -313,30 +313,18 @@
 
             <!-- Card Alert Summary di Atas Grid Jika Ada Lembur yang Perlu Disetujui -->
             @if ($menungguCount > 0)
-            <div class="p-4 rounded-2xl border border-amber-300/80 bg-gradient-to-r from-amber-50 via-orange-50/50 to-amber-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-extrabold text-lg shrink-0 shadow-xs">
-                        ⏳
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-xs sm:text-sm font-extrabold text-amber-950">
-                                Terdapat {{ $menungguCount }} Pengajuan Lembur yang Perlu Disetujui
-                            </h3>
-                            <span class="px-2 py-0.5 rounded-full text-[9.5px] font-extrabold bg-amber-500 text-white animate-pulse">
-                                Perlu Tindakan
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-amber-800 mt-0.5 leading-snug">
-                            Karyawan dengan pengajuan pending ditandai lencana <strong class="font-bold text-amber-900">"Perlu Disetujui"</strong> dan diposisikan paling atas.
-                        </p>
-                    </div>
+            <div class="py-2.5 px-3.5 sm:px-4 rounded-2xl border border-amber-300/80 bg-gradient-to-r from-amber-50 via-orange-50/40 to-amber-50 flex items-center justify-between gap-3 shadow-2xs">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
+                    <span class="text-xs font-bold text-amber-950 truncate">
+                        Terdapat {{ $menungguCount }} pengajuan lembur yang perlu disetujui
+                    </span>
                 </div>
-            </div>
-            @endif
-                    {{ count($employeeStats) }} Karyawan Terdata
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500 text-white shrink-0">
+                    Perlu Tindakan
                 </span>
             </div>
+            @endif
 
             <!-- CSS Rigid Guard untuk Kartu Karyawan (3 Kolom Sempurna & Rapi) -->
             <style>
@@ -438,12 +426,6 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]"></span>
                                 <span>{{ $stat['total_count'] }} Pengajuan</span>
                             </div>
-                            @if ($stat['pending_count'] > 0)
-                            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-extrabold text-amber-950 bg-amber-300 border border-amber-400 shadow-sm animate-pulse">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-                                <span>{{ $stat['pending_count'] }} Perlu Disetujui</span>
-                            </div>
-                            @endif
                         </div>
 
                         <!-- Foto Profil Karyawan / Fallback Icon Profile User -->
