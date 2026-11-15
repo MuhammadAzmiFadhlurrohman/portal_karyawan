@@ -18,6 +18,14 @@
         $isFinanceView = ($isFinance && ! $isSuperAdmin);
         // Cek apakah halaman ini menampilkan pengajuan milik sendiri
         $isMyOwnView = (! $isSuperAdmin && ! $isFinance) || ($tab === 'my');
+
+        $curSelectedMonth = isset($selectedMonth) ? $selectedMonth : (request()->has('bulan') ? request('bulan') : (request()->has('month') ? request('month') : (int) date('n')));
+        $curSelectedYear = isset($selectedYear) ? $selectedYear : (request()->has('tahun') ? request('tahun') : (request()->has('year') ? request('year') : (int) date('Y')));
+        $monthsList = [
+            '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
+            '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
+            '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+        ];
     @endphp
 
     <div x-data="{
@@ -246,18 +254,9 @@
                         </select>
 
                         <!-- Dropdown Bulan -->
-                        @php
-                            $months = [
-                                '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
-                                '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
-                                '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-                            ];
-                            $curSelectedMonth = isset($selectedMonth) ? $selectedMonth : (request()->has('bulan') ? request('bulan') : (request()->has('month') ? request('month') : (int) date('n')));
-                            $curSelectedYear = isset($selectedYear) ? $selectedYear : (request()->has('tahun') ? request('tahun') : (request()->has('year') ? request('year') : (int) date('Y')));
-                        @endphp
                         <select name="bulan" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
                             <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
-                            @foreach ($months as $mNum => $mLabel)
+                            @foreach ($monthsList as $mNum => $mLabel)
                                 <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
                             @endforeach
                         </select>
@@ -766,13 +765,6 @@
                     @endif
 
                     <!-- Filter Bulan -->
-                    @php
-                        $monthsList = [
-                            '1' => 'Januari', '2' => 'Februari', '3' => 'Maret', '4' => 'April',
-                            '5' => 'Mei', '6' => 'Juni', '7' => 'Juli', '8' => 'Agustus',
-                            '9' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
-                        ];
-                    @endphp
                     <select name="bulan" onchange="this.form.submit()" class="w-full sm:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700">
                         <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
                         @foreach ($monthsList as $mNum => $mLabel)
