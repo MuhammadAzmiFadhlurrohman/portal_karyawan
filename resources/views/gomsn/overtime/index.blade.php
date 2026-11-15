@@ -458,7 +458,7 @@
                         <div class="min-w-0">
                             <!-- Periode Kalender di Atas Nama -->
                             <div class="flex items-center justify-between gap-1 text-[10px] font-semibold text-teal-800">
-                                <span class="inline-flex items-center gap-1 truncate text-teal-700">
+                                <span class="inline-flex items-center gap-1 text-teal-700 shrink-0">
                                     <svg class="w-3 h-3 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <line x1="16" y1="2" x2="16" y2="6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -470,7 +470,7 @@
                                 @if ($stat['pending_count'] > 0)
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black text-amber-900 bg-amber-100 border border-amber-300 shadow-2xs shrink-0 animate-pulse">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                        {{ $stat['pending_count'] }} Perlu Disetujui
+                                        {{ $stat['pending_count'] }} Menunggu
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 shrink-0">
