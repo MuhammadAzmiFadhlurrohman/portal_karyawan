@@ -24,19 +24,28 @@ class ChatbotService
 
         $bestIntent = null;
         $bestScore = 0.0;
-        $matchedKeywords = [];
 
         foreach ($intents as $intent) {
             $keywords = $intent->keywords ?? [];
-            $matchCount = 0;
+            if (empty($keywords)) {
+                continue;
+            }
+
+            $matches = 0;
+            $maxKwLen = 0;
             foreach ($keywords as $kw) {
-                if (str_contains($messageClean, mb_strtolower($kw))) {
-                    $matchCount++;
+                $kwClean = mb_strtolower(trim($kw));
+                if ($kwClean === '') continue;
+
+                if (str_contains($messageClean, $kwClean)) {
+                    $matches++;
+                    $maxKwLen = max($maxKwLen, mb_strlen($kwClean));
                 }
             }
 
-            if (! empty($keywords)) {
-                $score = $matchCount / count($keywords);
+            if ($matches > 0) {
+                // Score berdasarkan jumlah kecocokan kata kunci dan bobot panjang kata kunci yang cocok
+                $score = ($matches / count($keywords)) + ($maxKwLen / 100);
                 if ($score > $bestScore) {
                     $bestScore = $score;
                     $bestIntent = $intent;
@@ -46,16 +55,17 @@ class ChatbotService
 
         // Suggestions for close matches or fallback
         $suggestions = [
-            'Bagaimana cara mengajukan cuti?',
+            'Bagaimana alur cara absen?',
             'Berapa sisa cuti saya?',
-            'Bagaimana cara klaim uang lembur?',
+            'Bagaimana cara mengajukan lembur?',
+            'Bagaimana alur pengajuan dana operasional?',
             'Cara membuka tiket gangguan baru',
-            'Bagaimana aturan jeda shift 11 jam?',
+            'Bagaimana cara tukar shift jadwal kerja?',
         ];
 
-        // Below threshold (0.50) -> Helpdesk escalation & suggestions (§5.8)
-        if ($bestScore < 0.40 || ! $bestIntent) {
-            $fallback = 'Maaf, saya belum memahami pertanyaan Anda. Anda dapat menghubungi Helpdesk NOC di WhatsApp 08112000006 atau memilih salah satu topik bantuan di bawah.';
+        // Jika tidak ada kata kunci yang cocok sama sekali
+        if ($bestScore <= 0 || ! $bestIntent) {
+            $fallback = "Halo! Maaf, saya belum menemukan jawaban yang tepat untuk pertanyaan tersebut.\n\nAnda dapat menanyakan hal seputar:\n• Presensi / Alur Absen Wajah & GPS\n• Sisa Cuti & Pengajuan Cuti\n• Jadwal Kerja & Tukar Shift\n• Pengajuan Dana & Pencairan Finance\n• Klaim Lembur\n• Tiketing & Gangguan Jaringan\n\nAtau hubungi Helpdesk NOC di WhatsApp 08112000006.";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
