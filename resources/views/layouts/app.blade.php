@@ -1951,8 +1951,10 @@
         </div>
     </div>
 
-    <!-- Floating Chatbot Asisten PT MSN (§5.8) -->
-    <x-chatbot-widget />
+    <!-- Floating Chatbot Asisten PT MSN (§5.8) - Hidden on ticket show page to avoid covering chat input -->
+    @unless(request()->routeIs('tickets.show') || !empty($hideChatbot))
+        <x-chatbot-widget />
+    @endunless
     @endauth
 
     <!-- SweetAlert2 Toast Global Notifier (Ujung Kanan Atas) -->

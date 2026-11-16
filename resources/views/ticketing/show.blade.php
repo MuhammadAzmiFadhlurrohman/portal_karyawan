@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'Tiket ' . $tiket->no_tiket . ' - Detail & Penanganan'])
+@extends('layouts.app', ['title' => 'Tiket ' . $tiket->no_tiket . ' - Detail & Penanganan', 'hideChatbot' => true])
 
 @section('content')
 <div class="space-y-6 max-w-7xl mx-auto">
