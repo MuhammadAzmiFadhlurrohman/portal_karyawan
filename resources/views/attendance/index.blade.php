@@ -1283,6 +1283,9 @@
                     this.isVerifying = false;
 
                     this.stopClockInCamera();
+                    if (typeof window.playSuccessDingSound === 'function') {
+                        window.playSuccessDingSound();
+                    }
                     if (window.showToast) {
                         window.showToast('success', 'Wajah berhasil diverifikasi (' + matchScorePercent + '% kemiripan)! Silakan klik tombol verifikasi di bawah.');
                     }
@@ -1308,5 +1311,55 @@
                 }
             };
         }
+    </script>
+
+    <!-- Audio Context Sound Generator untuk Nada 'Ting' Sukses Absen -->
+    <script>
+        window.playSuccessDingSound = function() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+
+                // Bell / Ting chord: dua frekuensi harmonis tinggi (C6 ~ 1046.5Hz dan G6 ~ 1567.98Hz)
+                const playChime = (freq, startTime, duration) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, startTime);
+
+                    // Fade-in cepat lalu decay halus seperti lonceng / ting
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(0.3, startTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                };
+
+                const now = ctx.currentTime;
+                // Nada 1: 1046.5 Hz (C6)
+                playChime(1046.5, now, 0.4);
+                // Nada 2 (Ting utama lebih tinggi): 1567.98 Hz (G6)
+                playChime(1567.98, now + 0.08, 0.9);
+            } catch (e) {
+                console.warn('Audio play failed:', e);
+            }
+        };
+
+        // Otomatis bunyikan saat halaman memuat flash alert session('status') sukses absen
+        @if (session('status'))
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    if (typeof window.playSuccessDingSound === 'function') {
+                        window.playSuccessDingSound();
+                    }
+                }, 300);
+            });
+        @endif
     </script>
 </x-layouts.app>
