@@ -6,36 +6,138 @@ use App\Models\Attendance;
 use App\Models\ChatbotIntent;
 use App\Models\ChatbotLog;
 use App\Models\LeaveBalance;
-use App\Models\Lembur;
 use App\Models\Pengajuan;
 use App\Models\Tiket;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\ChatbotKnowledgeSeeder;
+use Illuminate\Support\Facades\Cache;
 
 class ChatbotService
 {
     /**
-     * Ensure knowledge base intents are synced in database automatically
-     * so the user never has to run manual seeders after git pull.
+     * Ensure knowledge base intents are always up-to-date in database
+     * when KNOWLEDGE_VERSION changes, without needing manual seeder runs.
      */
     protected function ensureKnowledgeInitialized(): void
     {
-        $defaults = ChatbotKnowledgeSeeder::getDefaultIntents();
-        $count = ChatbotIntent::query()->count();
+        $versionKey = 'chatbot_knowledge_synced_version';
+        $currentVersion = ChatbotKnowledgeSeeder::KNOWLEDGE_VERSION;
 
-        if ($count < count($defaults)) {
-            foreach ($defaults as $in) {
+        if (Cache::get($versionKey) !== $currentVersion || ChatbotIntent::query()->count() < count(ChatbotKnowledgeSeeder::getDefaultIntents())) {
+            foreach (ChatbotKnowledgeSeeder::getDefaultIntents() as $in) {
                 ChatbotIntent::query()->updateOrCreate(
                     ['intent_key' => $in['intent_key']],
                     array_merge($in, ['is_active' => true])
                 );
             }
+            Cache::forever($versionKey, $currentVersion);
         }
     }
 
     /**
-     * Normalize Indonesian words (stemming & synonym mapping) for smarter NLU matching.
+     * Resolve action button (Label & URL) for a matched intent so the user can jump directly to the page.
+     *
+     * @return ?array{label: string, url: string}
+     */
+    protected function resolveActionLink(string $intentKey, ?User $user = null): ?array
+    {
+        return match ($intentKey) {
+            'status_absen_hari_ini',
+            'alur_cara_absen',
+            'liveness_wajah',
+            'radius_geofencing' => [
+                'label' => '📍 Buka Halaman Absen',
+                'url' => route('attendance.index'),
+            ],
+            'koreksi_absensi' => [
+                'label' => '📝 Buka Riwayat & Koreksi Absen',
+                'url' => route('attendance.history'),
+            ],
+            'approval_pengajuan_absen' => [
+                'label' => '✅ Buka Persetujuan Pengajuan Absen',
+                'url' => route('attendance.corrections.approvals'),
+            ],
+            'tukar_shift_aturan',
+            'backup_shift_aturan',
+            'aturan_jeda_shift' => [
+                'label' => '📅 Buka Jadwal Kerja',
+                'url' => route('attendance.schedules'),
+            ],
+            'sisa_cuti',
+            'cara_ajukan_sakit',
+            'cara_ajukan_cuti',
+            'cara_approve_cuti' => [
+                'label' => '🌴 Buka Halaman Cuti & Izin',
+                'url' => route('attendance.leaves'),
+            ],
+            'cara_ajukan_lembur' => [
+                'label' => '⏰ Buat Pengajuan Lembur',
+                'url' => route('gomsn.overtime.create'),
+            ],
+            'cara_approve_lembur',
+            'pencairan_lembur' => [
+                'label' => '💼 Buka Halaman Lembur',
+                'url' => route('gomsn.overtime.index'),
+            ],
+            'alur_pengajuan_operasional' => [
+                'label' => '💰 Buat Pengajuan Dana / Barang',
+                'url' => route('gomsn.pengajuan.create'),
+            ],
+            'status_pengajuan_saya',
+            'export_excel_pengajuan' => [
+                'label' => '📋 Buka Pengajuan Saya',
+                'url' => route('gomsn.pengajuan.index'),
+            ],
+            'tahapan_approval_pengajuan' => [
+                'label' => ($user && ($user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin'])))
+                    ? '✅ Buka Persetujuan Karyawan'
+                    : '📋 Buka Halaman Pengajuan',
+                'url' => ($user && ($user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin'])))
+                    ? route('gomsn.pengajuan.approvals')
+                    : route('gomsn.pengajuan.index'),
+            ],
+            'stok_barang_gudang' => [
+                'label' => '📦 Buka Stok Barang Gudang',
+                'url' => route('gomsn.inventory.index'),
+            ],
+            'tiket_aktif_saya',
+            'buka_tiket_gangguan',
+            'stop_clock_aturan' => [
+                'label' => '🎫 Buka Halaman Tiketing',
+                'url' => route('tickets.index'),
+            ],
+            'kpi_teknisi' => [
+                'label' => '📊 Buka Analitik KPI Teknisi',
+                'url' => route('gomsn.analytics.kpi'),
+            ],
+            'manajemen_jaringan_odp' => [
+                'label' => '🌐 Buka Jaringan OLT, PON & ODP',
+                'url' => route('gomsn.network.index'),
+            ],
+            'potongan_keuangan_absen' => [
+                'label' => '💵 Buka Keuangan Absen',
+                'url' => route('attendance.deductions'),
+            ],
+            'leaderboard_karyawan' => [
+                'label' => '🏆 Buka Leaderboard Kehadiran',
+                'url' => route('attendance.leaderboard'),
+            ],
+            'ganti_foto_profil',
+            'cara_login_sidik_jari' => [
+                'label' => '👤 Buka Halaman Profile',
+                'url' => route('portal.profile'),
+            ],
+            'manajemen_data_karyawan' => [
+                'label' => '👥 Buka Data Karyawan',
+                'url' => route('portal.employees.index'),
+            ],
+            default => null,
+        };
+    }
+
+    /**
+     * Normalize Indonesian words (synonym mapping + typo fixes) without conflating distinct concepts.
      */
     protected function normalizeText(string $text): string
     {
@@ -43,19 +145,17 @@ class ChatbotService
         // Hapus tanda baca menjadi spasi
         $clean = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $clean) ?? $clean;
 
-        // Sinonim sehari-hari ke kata baku aplikasi
+        // Perbaikan typo umum & sinonim kata per kata
         $synonyms = [
             'gimana' => 'bagaimana',
             'gmn' => 'bagaimana',
             'bgmn' => 'bagaimana',
-            'cara' => 'cara',
             'caranya' => 'cara',
-            'ngajuin' => 'ajukan',
-            'mengajukan' => 'ajukan',
-            'pengajuan' => 'ajukan',
-            'ngelakuin' => 'cara',
-            'bikin' => 'buat',
-            'membuat' => 'buat',
+            'ngajuin' => 'mengajukan',
+            'pengajuan' => 'pengajuan',
+            'ajukan' => 'mengajukan',
+            'bikin' => 'membuat',
+            'buat' => 'membuat',
             'uang' => 'dana',
             'duit' => 'dana',
             'reimbursement' => 'reimburse',
@@ -76,11 +176,14 @@ class ChatbotService
             'disetujui' => 'approve',
             'menyetujui' => 'approve',
             'persetujuan' => 'approve',
+            'vertifikasi' => 'verifikasi',
+            'verif' => 'verifikasi',
+            'diverifikasi' => 'verifikasi',
+            'divertifikasi' => 'verifikasi',
             'poto' => 'foto',
             'photo' => 'foto',
             'profile' => 'profil',
             'sandi' => 'password',
-            'kata sandi' => 'password',
             'brp' => 'berapa',
             'kpn' => 'kapan',
             'udh' => 'sudah',
@@ -100,7 +203,7 @@ class ChatbotService
     }
 
     /**
-     * Extract meaningful tokens (excluding common filler stopwords).
+     * Extract meaningful tokens (excluding filler/question words so scoring focuses on core subjects).
      *
      * @return list<string>
      */
@@ -108,9 +211,10 @@ class ChatbotService
     {
         $stopwords = [
             'yang', 'di', 'ke', 'dari', 'untuk', 'pada', 'dengan', 'dan', 'atau',
-            'ini', 'itu', 'sih', 'dong', 'deh', 'ya', 'yah', 'kak', 'min', 'admin',
+            'ini', 'itu', 'sih', 'dong', 'deh', 'ya', 'yah', 'kak', 'min',
             'pak', 'bu', 'bos', 'apakah', 'kalau', 'kalo', 'bila', 'jika', 'mau',
             'ingin', 'pengen', 'tanya', 'nanya', 'tolong', 'mohon', 'bantu',
+            'bagaimana', 'cara', 'bisa', 'ada', 'masih',
         ];
 
         $words = explode(' ', $normalizedText);
@@ -126,9 +230,26 @@ class ChatbotService
     }
 
     /**
-     * Process message from user and return personalized response (§5.8).
+     * High-value domain subject words that carry 3x weight when matching intents.
+     */
+    protected function isSubjectKeyword(string $token): bool
+    {
+        $subjects = [
+            'cuti', 'sakit', 'lembur', 'dana', 'kasbon', 'barang', 'stok', 'absen',
+            'wajah', 'verifikasi', 'radius', 'gps', 'koreksi', 'lupa', 'tukar', 'backup',
+            'shift', 'jadwal', 'tiket', 'gangguan', 'backbone', 'broadband', 'sla',
+            'kpi', 'olt', 'pon', 'odp', 'potongan', 'alpa', 'telat', 'leaderboard',
+            'foto', 'profil', 'password', 'sidik', 'jari', 'approve', 'excel', 'sisa',
+            'kuota', 'dokter',
+        ];
+
+        return in_array($token, $subjects, true);
+    }
+
+    /**
+     * Process message from user and return personalized response + navigation button (§5.8).
      *
-     * @return array{response: string, confidence: float, matched_intent: ?string, suggestions: list<string>}
+     * @return array{response: string, confidence: float, matched_intent: ?string, action_url: ?string, action_label: ?string, suggestions: list<string>}
      */
     public function ask(?User $user, string $message): array
     {
@@ -158,40 +279,85 @@ class ChatbotService
                     continue;
                 }
 
-                // 1. Exact phrase match in raw or normalized message (highest weight)
-                if (str_contains($rawClean, $kwRaw) || str_contains($normMessage, $kwNorm)) {
-                    $phraseWordsCount = count(explode(' ', $kwNorm));
-                    $phraseScore = 1.0 + ($phraseWordsCount * 0.45) + (mb_strlen($kwNorm) / 50);
+                // Untuk intent sapaan pendek (seperti "hi", "hai", "tes", "halo"), wajib whole-word boundary!
+                // Agar "hai" TIDAK nyangkut di dalam kata "masih" atau "tes" di dalam kata lain.
+                if ($intent->category === 'umum' && mb_strlen($kwNorm) <= 6) {
+                    if (preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)) {
+                        // Hanya menang jika kalimat user memang pendek (sapaan murni)
+                        if (count($userTokens) <= 2) {
+                            $intentScore = max($intentScore, 2.5);
+                        } else {
+                            $intentScore = max($intentScore, 0.3);
+                        }
+                    }
+                    continue;
+                }
+
+                // 1. Exact phrase match (whole words) in raw or normalized message
+                if (
+                    preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
+                    || preg_match('/\b' . preg_quote($kwNorm, '/') . '\b/u', $normMessage)
+                ) {
+                    $kwTokens = $this->extractTokens($kwNorm);
+                    $subjectBonus = 0.0;
+                    foreach ($kwTokens as $kt) {
+                        if ($this->isSubjectKeyword($kt)) {
+                            $subjectBonus += 1.2;
+                        } else {
+                            $subjectBonus += 0.4;
+                        }
+                    }
+                    $phraseScore = 1.5 + $subjectBonus + (count(explode(' ', $kwNorm)) * 0.35);
                     $intentScore = max($intentScore, $phraseScore);
                     continue;
                 }
 
-                // 2. Token-level & root word overlap (handles varied word order like "bagaimana cara mengajukan dana?")
+                // 2. Weighted Token & Subject Overlap
                 $kwTokens = $this->extractTokens($kwNorm);
                 if (! empty($kwTokens) && ! empty($userTokens)) {
-                    $matchedTokenCount = 0;
+                    $matchedWeight = 0.0;
+                    $totalKwWeight = 0.0;
+                    $matchedSubjectCount = 0;
+
                     foreach ($kwTokens as $kt) {
+                        $weight = $this->isSubjectKeyword($kt) ? 2.5 : 1.0;
+                        $totalKwWeight += $weight;
+
+                        $found = false;
                         foreach ($userTokens as $ut) {
-                            // Exact token match or prefix/stem match (min 4 chars, e.g. "ajukan" <-> "mengajukan")
-                            if ($kt === $ut || (mb_strlen($kt) >= 4 && mb_strlen($ut) >= 4 && (str_contains($ut, $kt) || str_contains($kt, $ut)))) {
-                                $matchedTokenCount++;
+                            if ($kt === $ut) {
+                                $found = true;
                                 break;
-                            } elseif (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && levenshtein($kt, $ut) <= 1) {
-                                // Toleransi typo 1 huruf (misal "lembr" -> "lembur", "absn" -> "absen")
-                                $matchedTokenCount += 0.85;
+                            }
+                            // Stem match for longer words (>= 5 chars, e.g. "mengajukan" <-> "pengajuan")
+                            if (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && (str_starts_with($ut, $kt) || str_starts_with($kt, $ut))) {
+                                $found = true;
                                 break;
+                            }
+                            // Typo tolerance (distance 1 for words >= 5 chars)
+                            if (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && levenshtein($kt, $ut) <= 1) {
+                                $found = true;
+                                $weight *= 0.9;
+                                break;
+                            }
+                        }
+
+                        if ($found) {
+                            $matchedWeight += $weight;
+                            if ($this->isSubjectKeyword($kt)) {
+                                $matchedSubjectCount++;
                             }
                         }
                     }
 
-                    if ($matchedTokenCount > 0) {
-                        $coverage = $matchedTokenCount / count($kwTokens);
-                        // Jika semua kata kunci dalam frase keyword ditemukan di kalimat user (walau urutan acak)
-                        if ($coverage >= 0.99) {
-                            $tokenScore = 0.95 + (count($kwTokens) * 0.35);
+                    if ($matchedWeight > 0 && $totalKwWeight > 0) {
+                        $coverage = $matchedWeight / $totalKwWeight;
+                        // Bonus besar jika semua kata penting di keyword cocok dengan pertanyaan user
+                        if ($coverage >= 0.95) {
+                            $tokenScore = 1.4 + ($matchedSubjectCount * 1.1) + (count($kwTokens) * 0.25);
                             $intentScore = max($intentScore, $tokenScore);
-                        } elseif ($coverage >= 0.5 && $matchedTokenCount >= 1) {
-                            $tokenScore = $coverage * 0.75;
+                        } elseif ($matchedSubjectCount >= 1 && $coverage >= 0.55) {
+                            $tokenScore = ($coverage * 1.1) + ($matchedSubjectCount * 0.6);
                             $intentScore = max($intentScore, $tokenScore);
                         }
                     }
@@ -208,15 +374,15 @@ class ChatbotService
         $suggestions = [
             'Bagaimana cara absen masuk & pulang?',
             'Bagaimana cara mengajukan dana?',
-            'Berapa sisa cuti saya?',
-            'Bagaimana cara klaim lembur?',
-            'Siapa yang approve pengajuan absen?',
-            'Cara buat tiket gangguan baru',
+            'Bagaimana cara membuat pengajuan lembur?',
+            'Apakah cuti saya masih ada?',
+            'Bagaimana cara mengajukan sakit?',
+            'Bagaimana cara approve pengajuan cuti?',
         ];
 
         // Jika tidak ada kecocokan yang memadai
-        if ($bestScore < 0.45 || ! $bestIntent) {
-            $fallback = "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan dengan kata kunci seperti:\n• \"Cara absen masuk / pulang\"\n• \"Bagaimana cara mengajukan dana / barang?\"\n• \"Status pengajuan saya\"\n• \"Berapa sisa cuti saya?\"\n• \"Cara klaim lembur\"\n• \"Cara tukar shift jadwal\"\n• \"Cara buka tiket gangguan\"\n\nAtau hubungi Helpdesk NOC di WhatsApp 08112000006.";
+        if ($bestScore < 0.75 || ! $bestIntent) {
+            $fallback = "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Bagaimana jika absen tidak bisa diverifikasi?\"\n• \"Bagaimana cara mengajukan dana?\"";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
@@ -231,6 +397,8 @@ class ChatbotService
                 'response' => $fallback,
                 'confidence' => round($bestScore, 2),
                 'matched_intent' => null,
+                'action_url' => null,
+                'action_label' => null,
                 'suggestions' => $suggestions,
             ];
         }
@@ -239,14 +407,15 @@ class ChatbotService
         $reply = $bestIntent->response_text;
         if ($user) {
             if ($bestIntent->intent_key === 'sapaan_halo') {
-                $reply = "Halo {$user->name}! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nAda yang bisa saya bantu hari ini? Anda bisa bertanya berbagai hal, misalnya:\n• \"Apakah saya sudah absen hari ini?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Status pengajuan dana saya\"\n• \"Berapa sisa cuti saya?\"\n• \"Bagaimana cara mengajukan lembur?\"\n• \"Cara tukar jadwal shift\"";
+                $reply = "Halo {$user->name}! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nAda yang bisa saya bantu hari ini? Anda bisa bertanya berbagai hal, misalnya:\n• \"Apakah saya sudah absen hari ini?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Cara tukar jadwal shift\"";
             } elseif ($bestIntent->intent_key === 'sisa_cuti') {
                 $balance = LeaveBalance::query()
                     ->where('user_id', $user->id)
                     ->where('year', (int) date('Y'))
                     ->first();
                 $sisa = $balance ? ($balance->remaining_days ?? $balance->remaining_balance ?? 12) : 12;
-                $reply = "Halo {$user->name}, sisa kuota cuti tahunan Anda untuk tahun ".date('Y')." adalah {$sisa} hari kerja.\n\nUntuk mengajukan cuti, silakan buka menu 'Cuti & Izin' di sidebar.";
+                $statusCuti = $sisa > 0 ? "Masih tersedia ({$sisa} hari kerja)" : 'Sudah habis (0 hari)';
+                $reply = "Halo {$user->name}, kuota cuti tahunan Anda untuk tahun ".date('Y').":\n• Status: {$statusCuti}\n• Sisa Kuota: {$sisa} hari kerja.\n\nKlik tombol di bawah untuk menuju halaman Cuti & Izin.";
             } elseif ($bestIntent->intent_key === 'status_absen_hari_ini') {
                 $att = Attendance::query()
                     ->where('user_id', $user->id)
@@ -256,17 +425,17 @@ class ChatbotService
                 $clockOut = $att?->clock_out_at ?? $att?->clock_out;
                 if ($att && $clockIn) {
                     $clockInTime = Carbon::parse($clockIn)->timezone('Asia/Jakarta')->format('H:i');
-                    $clockOutStr = $clockOut ? Carbon::parse($clockOut)->timezone('Asia/Jakarta')->format('H:i') . ' WIB' : 'Belum Clock-Out';
+                    $clockOutStr = $clockOut ? Carbon::parse($clockOut)->timezone('Asia/Jakarta')->format('H:i').' WIB' : 'Belum Clock-Out';
                     $reply = "Halo {$user->name}, status presensi Anda hari ini:\n• Absen Masuk: {$clockInTime} WIB\n• Absen Pulang: {$clockOutStr}\n• Status: ".strtoupper($att->status ?? 'HADIR');
                 } else {
-                    $reply = "Halo {$user->name}, Anda tercatat BELUM melakukan Absen Masuk untuk hari ini. Silakan buka menu 'Absen' untuk melakukan presensi wajah & GPS.";
+                    $reply = "Halo {$user->name}, Anda tercatat BELUM melakukan Absen Masuk untuk hari ini. Silakan klik tombol di bawah untuk menuju halaman Absen.";
                 }
             } elseif ($bestIntent->intent_key === 'tiket_aktif_saya') {
                 $count = Tiket::query()
                     ->whereHas('ticketAssignees', fn ($q) => $q->where('user_id', $user->id))
                     ->whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
                     ->count();
-                $reply = "Halo {$user->name}, saat ini terdapat {$count} tiket gangguan aktif yang ditugaskan kepada Anda. Silakan cek detailnya di menu 'Tiketing'.";
+                $reply = "Halo {$user->name}, saat ini terdapat {$count} tiket gangguan aktif yang ditugaskan kepada Anda.";
             } elseif ($bestIntent->intent_key === 'status_pengajuan_saya') {
                 $latestPengajuan = Pengajuan::query()
                     ->where('user_id', $user->id)
@@ -275,19 +444,20 @@ class ChatbotService
                     ->get();
 
                 if ($latestPengajuan->isEmpty()) {
-                    $reply = "Halo {$user->name}, Anda belum memiliki riwayat pengajuan dana/barang. Anda dapat membuat permohonan baru melalui menu 'Pengajuan Saya'.";
+                    $reply = "Halo {$user->name}, Anda belum memiliki riwayat pengajuan dana/barang.";
                 } else {
-                    $lines = ["Halo {$user->name}, berikut status pengajuan terbaru Anda:"];
+                    $lines = ["Halo {$user->name}, berikut 3 status pengajuan terbaru Anda:"];
                     foreach ($latestPengajuan as $p) {
                         $nom = $p->jenis === 'STOK' ? 'Stok Gudang' : 'Rp '.number_format((float) $p->total_nominal, 0, ',', '.');
                         $st = strtoupper(str_replace('_', ' ', $p->status));
                         $lines[] = "• #{$p->id} ({$p->jenis} - {$nom}): {$st}";
                     }
-                    $lines[] = "\nSelengkapnya dapat dilihat di menu 'Pengajuan Saya'.";
                     $reply = implode("\n", $lines);
                 }
             }
         }
+
+        $actionLink = $this->resolveActionLink($bestIntent->intent_key, $user);
 
         ChatbotLog::query()->create([
             'user_id' => $user?->id,
@@ -302,6 +472,8 @@ class ChatbotService
             'response' => $reply,
             'confidence' => round($bestScore, 2),
             'matched_intent' => $bestIntent->intent_key,
+            'action_url' => $actionLink['url'] ?? null,
+            'action_label' => $actionLink['label'] ?? null,
             'suggestions' => array_slice($suggestions, 0, 4),
         ];
     }

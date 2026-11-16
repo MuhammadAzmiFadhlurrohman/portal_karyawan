@@ -50,8 +50,22 @@
                 <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
                     <div :class="msg.sender === 'user' 
                                 ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 max-w-[85%] shadow-xs' 
-                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[85%] shadow-xs whitespace-pre-line'">
-                        <p x-text="msg.text"></p>
+                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[88%] shadow-xs whitespace-pre-line'">
+                        <p x-text="msg.text" class="leading-relaxed"></p>
+
+                        <!-- Action Button Menuju Halaman Terkait -->
+                        <template x-if="msg.action_url && msg.action_label">
+                            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                                <a :href="msg.action_url"
+                                   style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;"
+                                   class="inline-flex items-center justify-between w-full px-3 py-2 rounded-xl text-white font-semibold text-[11px] shadow-sm hover:opacity-95 transition-all group">
+                                    <span x-text="msg.action_label"></span>
+                                    <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </template>
@@ -151,7 +165,12 @@
 
                     const resJson = await response.json();
                     if (resJson && resJson.data && resJson.data.response) {
-                        this.messages.push({ sender: 'bot', text: resJson.data.response });
+                        this.messages.push({
+                            sender: 'bot',
+                            text: resJson.data.response,
+                            action_url: resJson.data.action_url || null,
+                            action_label: resJson.data.action_label || null
+                        });
                     } else {
                         this.messages.push({ sender: 'bot', text: 'Maaf, terjadi kendala saat memproses balasan.' });
                     }
