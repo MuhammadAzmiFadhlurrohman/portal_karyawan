@@ -621,9 +621,9 @@
                             3
                         </div>
                         <div class="space-y-0.5">
-                            <h4 class="font-bold text-slate-800">Dispatch Manager Teknis</h4>
+                            <h4 class="font-bold text-slate-800">Dispatch Atasan Teknik &amp; Atasan Umum</h4>
                             <p class="text-slate-500 leading-relaxed">
-                                Setelah tiket dibuat, Manager Teknis akan menugaskan tim teknisi lapangan sebelum tiket ditangani.
+                                Setelah tiket dibuat, Atasan Teknik atau Atasan Umum akan menugaskan tim teknisi lapangan sebelum tiket ditangani.
                             </p>
                         </div>
                     </div>

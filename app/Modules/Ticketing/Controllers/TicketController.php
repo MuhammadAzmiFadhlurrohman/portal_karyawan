@@ -404,12 +404,13 @@ class TicketController extends Controller
 
     /**
      * Dispatch ticket (§7.2).
+     * Penugasan teknisi diberikan oleh role atasan teknik dan atasan umum.
      */
     public function dispatchTicket(Request $request, Tiket $tiket): RedirectResponse
     {
         $user = $request->user();
-        if (! $user->can('ticket.dispatch') && ! $user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc'])) {
-            abort(403, 'Anda tidak memiliki hak akses untuk dispatch tiket.');
+        if (! $user->can('ticket.dispatch') && ! $user->hasRole(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'])) {
+            abort(403, 'Penugasan teknisi hanya dapat diberikan oleh Atasan Teknik atau Atasan Umum.');
         }
 
         $validated = $request->validate([

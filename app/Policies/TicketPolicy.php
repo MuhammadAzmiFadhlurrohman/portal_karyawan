@@ -51,6 +51,16 @@ class TicketPolicy
     }
 
     /**
+     * Determine whether the user can dispatch technicians to the ticket.
+     * Penugasan teknisi diberikan oleh role atasan teknik dan atasan umum.
+     */
+    public function dispatch(User $user, Tiket $tiket): bool
+    {
+        return $user->hasRole(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'])
+            || $user->can('ticket.dispatch');
+    }
+
+    /**
      * Determine whether the user can verify and close the ticket (§7.2, §4.3).
      */
     public function verifyClose(User $user, Tiket $tiket): bool

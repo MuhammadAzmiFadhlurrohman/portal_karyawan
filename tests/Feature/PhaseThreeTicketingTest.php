@@ -457,4 +457,60 @@ class PhaseThreeTicketingTest extends TestCase
         $showRes->assertSee('Koordinasi Update Lapangan');
         $showRes->assertSee('Template Cepat:');
     }
+
+    /**
+     * Test penugasan teknisi hanya dapat diberikan oleh atasan teknik dan atasan umum, bukan noc.
+     */
+    public function test_technician_dispatch_allowed_for_atasan_teknik_and_atasan_umum_and_forbidden_for_noc(): void
+    {
+        $noc = User::query()->where('email', 'noc@msn.co.id')->firstOrFail();
+        $teknisi = User::query()->where('username', 'teknisi1')->firstOrFail();
+
+        $tiket = Tiket::query()->create([
+            'no_tiket' => 'BDG-20261116-999',
+            'kategori_tiket' => 'BACKBONE',
+            'priority' => 'P2',
+            'status' => 'OPEN',
+            'sla_target_minutes' => 360,
+            'backbone_segment' => 'BDG-TEST-DISPATCH',
+            'status_link_impact' => 'TOTAL_DOWN',
+            'wilayah' => 'Bandung',
+            'tipe_penanganan' => 'Repair',
+            'tanggal_open' => now(),
+            'created_by' => $noc->id,
+        ]);
+
+        // 1. NOC cannot dispatch
+        $nocDispatchRes = $this->actingAs($noc)->post(route('tickets.dispatch', $tiket), [
+            'lead_id' => $teknisi->id,
+        ]);
+        $nocDispatchRes->assertStatus(403);
+
+        // 2. Atasan Teknik can dispatch
+        $atasanTeknik = User::factory()->create([
+            'name' => 'Atasan Teknik Test',
+            'email' => 'atasan.teknik.test@msn.co.id',
+            'division' => 'Teknik',
+        ]);
+        $atasanTeknik->assignRole('atasan_teknik');
+
+        $tekRes = $this->actingAs($atasanTeknik)->post(route('tickets.dispatch', $tiket), [
+            'lead_id' => $teknisi->id,
+        ]);
+        $tekRes->assertRedirect();
+        $this->assertTrue($tiket->fresh()->assignees->contains('id', $teknisi->id));
+
+        // 3. Atasan Umum can dispatch
+        $atasanUmum = User::factory()->create([
+            'name' => 'Atasan Umum Test',
+            'email' => 'atasan.umum.test@msn.co.id',
+            'division' => 'Umum',
+        ]);
+        $atasanUmum->assignRole('atasan_umum');
+
+        $umumRes = $this->actingAs($atasanUmum)->post(route('tickets.dispatch', $tiket), [
+            'lead_id' => $teknisi->id,
+        ]);
+        $umumRes->assertRedirect();
+    }
 }

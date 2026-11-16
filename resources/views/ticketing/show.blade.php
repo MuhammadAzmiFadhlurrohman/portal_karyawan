@@ -86,10 +86,12 @@
                     @endforeach
 
                     @if($tiket->assignees->isEmpty())
-                        <button type="button" onclick="openDispatchModal()"
-                                class="inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold text-xs bg-amber-400 text-slate-900 hover:bg-amber-300 transition cursor-pointer">
-                            + Tugaskan Tim Sekarang
-                        </button>
+                        @can('dispatch', $tiket)
+                            <button type="button" onclick="openDispatchModal()"
+                                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold text-xs bg-amber-400 text-slate-900 hover:bg-amber-300 transition cursor-pointer">
+                                + Tugaskan Tim (Atasan)
+                            </button>
+                        @endcan
                     @endif
                 </div>
 
@@ -133,11 +135,11 @@
                         </div>
 
                         <div class="py-1">
-                            @can('ticket.dispatch')
+                            @can('dispatch', $tiket)
                                 <button type="button" @click="open = false; openDispatchModal()"
                                         class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
                                     <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                    <span>Penugasan Tim (Dispatch)</span>
+                                    <span>Penugasan Tim (Atasan)</span>
                                 </button>
                             @endcan
 
@@ -1385,7 +1387,7 @@
     <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
         <div class="px-6 py-5 text-white flex items-center justify-between"
              style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
-            <h3 class="font-heading font-extrabold text-base text-white">Penugasan Tim Lapangan (Dispatch)</h3>
+            <h3 class="font-heading font-extrabold text-base text-white">Penugasan Tim Lapangan (Atasan Teknik / Atasan Umum)</h3>
             <button type="button" onclick="closeDispatchModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
         </div>
 
