@@ -2120,6 +2120,89 @@
             }, true);
         });
     </script>
+
+    @auth
+    @php
+        $sessionTimeoutMinutes = (int) (\App\Services\SystemSettingService::get('security.session_idle_timeout_minutes', config('session.lifetime', 120)));
+        $sessionTimeoutSeconds = max(60, $sessionTimeoutMinutes * 60);
+    @endphp
+    <script>
+        // Auto-redirect to login when session expires to prevent 419 / Page Expired
+        (function() {
+            const sessionLifetimeSeconds = {{ $sessionTimeoutSeconds }};
+            const loginUrl = "{{ route('login') }}";
+            let lastActivity = Date.now();
+
+            function updateActivity() {
+                lastActivity = Date.now();
+            }
+
+            // Track user interaction to refresh local activity timestamp
+            ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'].forEach(function(evt) {
+                window.addEventListener(evt, updateActivity, { passive: true });
+            });
+
+            function checkSessionTimeout() {
+                const idleSeconds = Math.floor((Date.now() - lastActivity) / 1000);
+                if (idleSeconds >= sessionLifetimeSeconds) {
+                    window.location.replace(loginUrl);
+                }
+            }
+
+            // Check periodically every 15 seconds
+            setInterval(checkSessionTimeout, 15000);
+
+            // Instant check when user switches back to this tab or wakes device
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    checkSessionTimeout();
+                }
+            });
+
+            window.addEventListener('focus', checkSessionTimeout);
+
+            // Intercept form submissions if idle timeout has already passed
+            document.addEventListener('submit', function(e) {
+                const idleSeconds = Math.floor((Date.now() - lastActivity) / 1000);
+                if (idleSeconds >= sessionLifetimeSeconds) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    window.location.replace(loginUrl);
+                }
+            }, true);
+
+            // Global fetch interceptor for 419 / 401
+            if (window.fetch) {
+                const nativeFetch = window.fetch;
+                window.fetch = async function(...args) {
+                    try {
+                        const response = await nativeFetch.apply(this, args);
+                        if (response && (response.status === 419 || response.status === 401)) {
+                            window.location.replace(loginUrl);
+                        }
+                        return response;
+                    } catch (err) {
+                        throw err;
+                    }
+                };
+            }
+
+            // Global XMLHttpRequest interceptor for 419 / 401
+            if (window.XMLHttpRequest) {
+                const nativeOpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(...args) {
+                    this.addEventListener('load', function() {
+                        if (this.status === 419 || this.status === 401) {
+                            window.location.replace(loginUrl);
+                        }
+                    });
+                    nativeOpen.apply(this, args);
+                };
+            }
+        })();
+    </script>
+    @endauth
+
     @stack('scripts')
 </body>
 </html>
