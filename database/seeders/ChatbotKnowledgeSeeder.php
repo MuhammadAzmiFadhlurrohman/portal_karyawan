@@ -89,9 +89,10 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'keywords' => [
                     'koreksi absen', 'lupa absen', 'salah absen', 'ajukan koreksi absen',
                     'ubah jam absen', 'lupa clock in', 'lupa clock out', 'absen manual',
-                    'cara pengajuan absen', 'mengajukan koreksi absen',
+                    'cara pengajuan absen', 'mengajukan koreksi absen', 'lupa absen masuk',
+                    'lupa absen pulang', 'koreksi kehadiran',
                 ],
-                'response_text' => "Cara Mengajukan Koreksi Absen (Jika Lupa Absen / Terkendala Teknis):\n1. Buka menu 'Keuangan Absen' atau 'Riwayat & Laporan'.\n2. Pilih tanggal kehadiran yang ingin dikoreksi.\n3. Masukkan jam masuk/pulang usulan yang sebenarnya, tulis alasan yang jelas, dan unggah foto bukti pendukung.\n4. Pengajuan Anda akan diteruskan ke menu 'Pengajuan Absen' untuk disetujui oleh Atasan Divisi atau Admin.",
+                'response_text' => "Cara Mengajukan Koreksi Absen (Jika Lupa Absen / Terkendala Teknis):\n1. Buka menu 'Riwayat Absen' di sidebar (atau klik tombol di bawah).\n2. Temukan baris tanggal kehadiran yang ingin dikoreksi.\n3. Klik tombol 'Ajukan Koreksi' pada kolom Aksi.\n4. Masukkan jam masuk/pulang usulan yang sebenarnya, tulis alasan yang jelas, dan unggah foto bukti pendukung.\n5. Pengajuan Anda akan diteruskan ke menu 'Pengajuan Absen' untuk disetujui oleh Atasan Divisi atau Admin.",
             ],
             [
                 'intent_key' => 'approval_pengajuan_absen',
