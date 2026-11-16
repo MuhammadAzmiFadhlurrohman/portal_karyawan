@@ -35,7 +35,7 @@
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 scale-95"
          class="fixed right-3 bottom-[114px] sm:right-6 md:right-6 md:bottom-20 bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden mb-2 z-50"
-         style="width: 390px; max-width: calc(100vw - 1.5rem); max-height: calc(100vh - 130px); display: none;">
+         style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 130px); display: none;">
         
         <!-- Header -->
         <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Chat History -->
-        <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto space-y-3 min-h-[280px] max-h-[380px] bg-slate-50 text-xs">
+        <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
             <template x-for="(msg, index) in messages" :key="index">
                 <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
                     <div :class="msg.sender === 'user' 
