@@ -97,15 +97,15 @@
             }
             .login-panel-left {
                 width: 100% !important;
-                min-height: 275px !important;
+                min-height: 330px !important;
                 height: auto !important;
-                padding: 24px 20px 36px 20px !important;
+                padding: 26px 20px 72px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
-                padding: 10px 20px 36px 20px !important;
-                margin-top: -16px !important;
+                padding: 14px 20px 36px 20px !important;
+                margin-top: -8px !important;
             }
         }
     </style>
@@ -234,7 +234,7 @@
             </div>
 
             <!-- Bottom Brand Text -->
-            <div class="relative z-10 pt-2 flex items-center justify-between text-[11px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10">
+            <div class="relative z-10 pt-2.5 pb-1 flex items-center justify-between text-[11px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 mb-1 lg:mb-0">
                 <span>PT MEDIA SOLUSI NETWORK</span>
                 <span class="inline-flex items-center gap-1 normal-case font-medium text-teal-300/70 text-[10.5px]">
                     <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
