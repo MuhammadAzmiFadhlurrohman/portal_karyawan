@@ -263,10 +263,10 @@
                         $navPendingKoreksiCount = $navCQ->count();
                     }
                     if ($navIsFinance) {
-                        $navLowStockCount = \App\Models\MasterMaterial::whereColumn('stok_tersedia', '<=', 'min_stok')->count();
+                        $navLowStockCount = 0;
                     }
                     $isPengajuanActive = request()->routeIs('gomsn.pengajuan.*') || request()->routeIs('attendance.corrections.*') || request()->routeIs('gomsn.overtime.*') || request()->routeIs('gomsn.inventory.*');
-                    $totalPengajuanBadges = $navPendingAtasanCount + $navPendingLemburCount + $navPendingKoreksiCount + $navLowStockCount;
+                    $totalPengajuanBadges = $navPendingAtasanCount + $navPendingLemburCount + $navPendingKoreksiCount;
                 @endphp
                 <div class="space-y-1">
                     <div class="pt-2.5 pb-1 px-3 flex items-center justify-between text-white/90 select-none">
@@ -370,11 +370,7 @@
                                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                 <span>Stok Barang</span>
                             </div>
-                            @if ($navLowStockCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs" title="{{ $navLowStockCount }} jenis barang butuh restock">
-                                {{ $navLowStockCount }}
-                            </span>
-                            @elseif (request()->routeIs('gomsn.inventory.*'))
+                            @if (request()->routeIs('gomsn.inventory.*'))
                             <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
@@ -1607,11 +1603,6 @@
                                     <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Gudang &amp; Material</span>
                                 </div>
                             </div>
-                            @if ($navLowStockCount > 0)
-                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
-                                {{ $navLowStockCount }}
-                            </span>
-                            @endif
                         </a>
                         @endif
                     </div>
