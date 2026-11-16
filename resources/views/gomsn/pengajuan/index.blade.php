@@ -391,15 +391,7 @@
                                             'buktiRealisasiPath' => $item->bukti_realisasi_path,
                                             'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                             'realisasiNotes' => $item->realisasi_notes,
-                                            'details' => $item->details->map(function ($d) use ($item) {
-                                                return [
-                                                    'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                                    'qty' => $d->qty,
-                                                    'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                                    'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                                    'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                                ];
-                                            })->values()->all(),
+                                            'details' => $item->getModalDetails(),
                                         ];
                                     @endphp
                                     <tr class="hover:bg-teal-50/30 transition-colors">
@@ -529,15 +521,7 @@
                                         'buktiRealisasiPath' => $item->bukti_realisasi_path,
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
-                                        'details' => $item->details->map(function ($d) use ($item) {
-                                            return [
-                                                'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                                'qty' => $d->qty,
-                                                'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                                'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                                'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                            ];
-                                        })->values()->all(),
+                                        'details' => $item->getModalDetails(),
                                     ];
                                 @endphp
 
@@ -857,15 +841,7 @@
                                             'buktiRealisasiPath' => $item->bukti_realisasi_path,
                                             'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                             'realisasiNotes' => $item->realisasi_notes,
-                                            'details' => $item->details->map(function ($d) use ($item) {
-                                                return [
-                                                    'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                                    'qty' => $d->qty,
-                                                    'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                                    'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                                    'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                                ];
-                                            })->values()->all(),
+                                            'details' => $item->getModalDetails(),
                                         ];
 
                                         $badge = match($item->status) {
@@ -1003,15 +979,7 @@
                                         'buktiRealisasiPath' => $item->bukti_realisasi_path,
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
-                                        'details' => $item->details->map(function ($d) use ($item) {
-                                            return [
-                                                'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                                'qty' => $d->qty,
-                                                'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                                'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                                'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                            ];
-                                        })->values()->all(),
+                                        'details' => $item->getModalDetails(),
                                     ];
 
                                     $badge = match($item->status) {
@@ -1202,7 +1170,7 @@
                             <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Informasi Pengaju</span>
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide"
-                                      :class="activeItem?.jenis === 'stok' ? 'bg-cyan-100 text-cyan-800 border border-cyan-200' : (activeItem?.jenis === 'beli' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200')"
+                                      :class="activeItem?.jenis === 'stok' ? 'bg-amber-100 text-amber-800 border border-amber-200' : (activeItem?.jenis === 'beli' ? 'bg-blue-100 text-blue-800 border border-blue-200' : (activeItem?.jenis === 'permintaan' ? 'bg-cyan-100 text-cyan-800 border border-cyan-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'))"
                                       x-text="activeItem?.jenis"></span>
                             </div>
                             <div class="space-y-3 text-xs">

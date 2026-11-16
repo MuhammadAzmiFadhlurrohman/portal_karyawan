@@ -143,9 +143,21 @@
                 </div>
 
                 <!-- Items Table Card -->
+                @php
+                    $displayItems = $pengajuan->details->isNotEmpty() ? $pengajuan->details : collect($pengajuan->getModalDetails())->map(function($d) {
+                        return (object)[
+                            'item_name' => $d['name'],
+                            'material' => null,
+                            'qty' => $d['qty'],
+                            'satuan' => $d['satuan'],
+                            'estimated_unit_price' => 0,
+                            'subtotal' => 0,
+                        ];
+                    });
+                @endphp
                 <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
                     <h3 class="font-heading font-bold text-sm text-slate-800 border-b border-slate-100 pb-2">
-                        Rincian Item ({{ $pengajuan->details->count() }})
+                        Rincian Item ({{ $displayItems->count() }})
                     </h3>
 
                     <div class="overflow-x-auto">
@@ -163,7 +175,7 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @foreach ($pengajuan->details as $item)
+                                @foreach ($displayItems as $item)
                                 <tr>
                                     <td class="py-2.5 px-3 font-medium text-slate-800">
                                         {{ $item->item_name }}

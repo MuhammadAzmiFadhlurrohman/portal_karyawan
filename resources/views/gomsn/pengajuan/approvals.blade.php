@@ -301,15 +301,7 @@
                                         'buktiRealisasiPath' => $item->bukti_realisasi_path,
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
-                                        'details' => $item->details->map(function ($d) use ($item) {
-                                            return [
-                                                'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                                'qty' => $d->qty,
-                                                'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                                'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                                'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                            ];
-                                        })->values()->all(),
+                                        'details' => $item->getModalDetails(),
                                     ];
                                     $isApprovedStatus = in_array($item->status, ['menunggu_finance', 'menunggu_executive', 'dicairkan', 'menunggu_bukti', 'selesai']);
                                 @endphp
@@ -346,13 +338,15 @@
                                     <!-- Jenis -->
                                     <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                         @if ($item->jenis === 'STOK')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">Stok</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-2xs">Stok</span>
                                         @elseif ($item->jenis === 'DANA')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Dana</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white shadow-2xs">Dana</span>
                                         @elseif ($item->jenis === 'BELI')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Beli</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white shadow-2xs">Beli</span>
+                                        @elseif ($item->jenis === 'PERMINTAAN')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white shadow-2xs">Permintaan</span>
                                         @else
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{{ $item->jenis }}</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-2xs">Stok</span>
                                         @endif
                                     </td>
 
@@ -449,15 +443,7 @@
                                     'buktiRealisasiPath' => $item->bukti_realisasi_path,
                                     'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                     'realisasiNotes' => $item->realisasi_notes,
-                                    'details' => $item->details->map(function ($d) use ($item) {
-                                        return [
-                                            'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
-                                            'qty' => $d->qty,
-                                            'satuan' => $d->satuan ?: ($d->material?->satuan ?? ''),
-                                            'unitPrice' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp' . number_format((float) $d->estimated_unit_price, 0, ',', '.')),
-                                            'subtotal' => ($item->jenis === 'STOK' ? 'Rp0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.')),
-                                        ];
-                                    })->values()->all(),
+                                    'details' => $item->getModalDetails(),
                                 ];
                                 $isApprovedStatus = in_array($item->status, ['menunggu_finance', 'menunggu_executive', 'dicairkan', 'menunggu_bukti', 'selesai']);
                             @endphp
@@ -481,13 +467,15 @@
                                         <div class="flex items-center gap-1.5 shrink-0">
                                             <!-- Jenis Badge -->
                                             @if ($item->jenis === 'STOK')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">Stok</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-2xs">Stok</span>
                                             @elseif ($item->jenis === 'DANA')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Dana</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white shadow-2xs">Dana</span>
                                             @elseif ($item->jenis === 'BELI')
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Beli</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white shadow-2xs">Beli</span>
+                                            @elseif ($item->jenis === 'PERMINTAAN')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white shadow-2xs">Permintaan</span>
                                             @else
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">{{ $item->jenis }}</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-2xs">Stok</span>
                                             @endif
 
                                             <!-- Status Badge -->
@@ -742,7 +730,7 @@
                                     <div>
                                         <span class="text-slate-500 text-[11px] block leading-none">Jenis Pengajuan</span>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wide"
-                                              :class="activeItem?.jenis === 'stok' ? 'bg-cyan-100 text-cyan-800' : (activeItem?.jenis === 'beli' ? 'bg-blue-100 text-blue-800' : 'bg-emerald-100 text-emerald-800')"
+                                              :class="activeItem?.jenis === 'stok' ? 'bg-amber-100 text-amber-800' : (activeItem?.jenis === 'beli' ? 'bg-blue-100 text-blue-800' : (activeItem?.jenis === 'permintaan' ? 'bg-cyan-100 text-cyan-800' : 'bg-emerald-100 text-emerald-800'))"
                                               x-text="activeItem?.jenis"></span>
                                     </div>
                                 </div>

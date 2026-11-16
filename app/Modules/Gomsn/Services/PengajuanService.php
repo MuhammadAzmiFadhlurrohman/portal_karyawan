@@ -37,9 +37,8 @@ class PengajuanService
     {
         $prefix = match (strtoupper($jenis)) {
             'BELI' => 'PBL',
-            'STOK' => 'PST',
+            'STOK', 'BARANG' => 'PST',
             'PERMINTAAN' => 'PRM',
-            'BARANG' => 'PBG',
             default => 'PND',
         };
         $date = Carbon::now()->format('Ymd');
@@ -64,7 +63,10 @@ class PengajuanService
 
         return DB::transaction(function () use ($user, $data, $items): Pengajuan {
             $rawJenis = strtoupper($data['jenis'] ?? 'DANA');
-            $jenis = in_array($rawJenis, ['DANA', 'BELI', 'STOK', 'PERMINTAAN', 'BARANG'], true) ? $rawJenis : 'DANA';
+            if ($rawJenis === 'BARANG') {
+                $rawJenis = 'STOK';
+            }
+            $jenis = in_array($rawJenis, ['DANA', 'BELI', 'STOK', 'PERMINTAAN'], true) ? $rawJenis : 'DANA';
             $nomor = $this->generateNomor($jenis);
 
             $pengajuan = Pengajuan::query()->create([
@@ -140,7 +142,10 @@ class PengajuanService
 
         return DB::transaction(function () use ($pengajuan, $user, $data, $items): Pengajuan {
             $rawJenis = strtoupper($data['jenis'] ?? $pengajuan->jenis);
-            $jenis = in_array($rawJenis, ['DANA', 'BELI', 'STOK', 'PERMINTAAN', 'BARANG'], true) ? $rawJenis : $pengajuan->jenis;
+            if ($rawJenis === 'BARANG') {
+                $rawJenis = 'STOK';
+            }
+            $jenis = in_array($rawJenis, ['DANA', 'BELI', 'STOK', 'PERMINTAAN'], true) ? $rawJenis : $pengajuan->jenis;
 
             $pengajuan->jenis = $jenis;
             if (isset($data['atasan_id'])) {

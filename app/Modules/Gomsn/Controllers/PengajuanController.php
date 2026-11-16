@@ -483,6 +483,9 @@ class PengajuanController extends Controller
         ]);
 
         $rawJenis = strtoupper($validated['jenis']);
+        if ($rawJenis === 'BARANG') {
+            $rawJenis = 'STOK';
+        }
         $keperluan = $validated['keterangan'] ?? $validated['keperluan'] ?? $validated['judul'] ?? 'Pengajuan Operasional';
 
         // Normalize items according to Jenis
@@ -657,6 +660,9 @@ class PengajuanController extends Controller
         ]);
 
         $rawJenis = strtoupper($validated['jenis']);
+        if ($rawJenis === 'BARANG') {
+            $rawJenis = 'STOK';
+        }
         $keperluan = $validated['keterangan'] ?? $validated['keperluan'] ?? $validated['judul'] ?? 'Pengajuan Operasional';
 
         $normalizedItems = $this->normalizeItems($rawJenis, $validated['items']);
@@ -715,7 +721,7 @@ class PengajuanController extends Controller
                     'jumlah' => (int) ($rawItem['jumlah'] ?? 1),
                     'harga_satuan' => 0,
                 ];
-            } elseif ($rawJenis === 'PERMINTAAN' || $rawJenis === 'BARANG') {
+            } elseif ($rawJenis === 'PERMINTAAN') {
                 $normalized[] = [
                     'master_material_id' => null,
                     'deskripsi' => $rawItem['nama_barang'] ?? $rawItem['deskripsi'] ?? 'Barang Permintaan',

@@ -45,6 +45,24 @@ class Pengajuan extends Model
         'realisasi_deadline' => 'datetime',
     ];
 
+    public function getJenisAttribute($value): string
+    {
+        $val = strtoupper($value ?? 'DANA');
+        if ($val === 'BARANG') {
+            return 'STOK';
+        }
+        return in_array($val, ['DANA', 'BELI', 'STOK', 'PERMINTAAN'], true) ? $val : 'DANA';
+    }
+
+    public function setJenisAttribute($value): void
+    {
+        $val = strtoupper($value ?? 'DANA');
+        if ($val === 'BARANG') {
+            $val = 'STOK';
+        }
+        $this->attributes['jenis'] = in_array($val, ['DANA', 'BELI', 'STOK', 'PERMINTAAN'], true) ? $val : 'DANA';
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -93,6 +111,106 @@ class Pengajuan extends Model
     public function approvals(): HasMany
     {
         return $this->hasMany(PengajuanApproval::class, 'pengajuan_id')->orderBy('created_at', 'asc');
+    }
+
+    /**
+     * Return structured items array for detail modal with auto-fallback for legacy unpopulated rows.
+     */
+    public function getModalDetails(): array
+    {
+        if ($this->relationLoaded('details') && $this->details->isNotEmpty()) {
+            return $this->details->map(function ($d) {
+                $isStok = in_array(strtoupper($this->jenis), ['STOK', 'PERMINTAAN'], true);
+                return [
+                    'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
+                    'qty' => (int) ($d->qty ?: 1),
+                    'satuan' => $d->satuan ?: ($d->material?->satuan ?? self::guessSatuan($d->item_name)),
+                    'unitPrice' => $isStok ? 'Rp 0' : 'Rp ' . number_format((float) $d->estimated_unit_price, 0, ',', '.'),
+                    'subtotal' => $isStok ? 'Rp 0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.'),
+                ];
+            })->values()->all();
+        }
+
+        // Fallback: parse from judul if details relationship is empty
+        return self::parseLegacyItems(
+            $this->judul ?? '',
+            $this->keperluan ?? '',
+            $this->jenis ?? 'STOK',
+            (float) ($this->nominal_total ?? 0.0)
+        );
+    }
+
+    public static function guessSatuan(?string $name): string
+    {
+        if (! $name) return 'pcs';
+        if (preg_match('/kabel|cable|dropcore|fiber/i', $name)) return 'meter';
+        if (preg_match('/\b(box|dus|pak|pack)\b/i', $name)) return 'box';
+        if (preg_match('/\b(roll|rol)\b/i', $name)) return 'roll';
+        if (preg_match('/\b(liter|ltr)\b/i', $name)) return 'liter';
+        return 'pcs';
+    }
+
+    public static function parseLegacyItems(string $judul, string $keperluan = '', string $jenis = 'STOK', float $nominal = 0.0): array
+    {
+        $text = trim($judul);
+        if (empty($text) || $text === '-') {
+            $text = trim($keperluan);
+        }
+        if (empty($text)) {
+            return [];
+        }
+
+        $rawParts = array_map('trim', explode(',', $text));
+        $buffer = '';
+        $reconstructed = [];
+
+        foreach ($rawParts as $part) {
+            if ($buffer === '') {
+                $buffer = $part;
+            } else {
+                $buffer .= ', ' . $part;
+            }
+            if (preg_match('/\([0-9]+\)$/', trim($buffer))) {
+                $reconstructed[] = trim($buffer);
+                $buffer = '';
+            }
+        }
+        if ($buffer !== '') {
+            $reconstructed[] = trim($buffer);
+        }
+
+        $items = [];
+        $isStok = in_array(strtoupper($jenis), ['STOK', 'PERMINTAAN', 'BARANG'], true);
+
+        foreach ($reconstructed as $entry) {
+            if (empty($entry)) continue;
+
+            if (preg_match('/^(.*?)\s*\(([0-9]+)\)$/', $entry, $matches)) {
+                $name = trim($matches[1]);
+                $qty = (int) $matches[2];
+            } else {
+                $name = $entry;
+                $qty = 1;
+            }
+
+            $satuan = self::guessSatuan($name);
+            if ($satuan === 'meter' && $qty <= 5) {
+                $satuan = 'pcs';
+            }
+
+            $unitPrice = $isStok ? 0.0 : ($nominal > 0 && count($reconstructed) === 1 ? $nominal : 0.0);
+            $subtotal = $isStok ? 0.0 : ($nominal > 0 && count($reconstructed) === 1 ? $nominal : 0.0);
+
+            $items[] = [
+                'name' => $name,
+                'qty' => $qty > 0 ? $qty : 1,
+                'satuan' => $satuan,
+                'unitPrice' => $isStok ? 'Rp 0' : 'Rp ' . number_format($unitPrice, 0, ',', '.'),
+                'subtotal' => $isStok ? 'Rp 0' : 'Rp ' . number_format($subtotal, 0, ',', '.'),
+            ];
+        }
+
+        return $items;
     }
 }
 
