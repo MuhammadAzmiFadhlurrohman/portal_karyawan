@@ -155,13 +155,8 @@
                         mask-repeat: no-repeat;">
             </div>
 
-            <!-- Top Header Status Pill -->
-            <div class="relative z-10 flex items-center justify-center">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-teal-100 shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Portal Operasional Terpadu</span>
-                </div>
-            </div>
+            <!-- Top Spacer for Vertical Balance -->
+            <div class="hidden lg:block h-4"></div>
 
             <!-- Center Content: Logo, Title, Description -->
             <div class="relative z-10 my-auto py-4">
@@ -212,12 +207,6 @@
                 
                 <!-- Heading Masuk ke Akun -->
                 <div class="mb-6 text-center">
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-teal-50 text-teal-800 border border-teal-200/70 mb-2.5">
-                        <svg class="w-3.5 h-3.5 text-teal-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        Autentikasi Akun
-                    </div>
                     <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                         Masuk ke Akun
                     </h2>
