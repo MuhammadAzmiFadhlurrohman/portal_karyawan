@@ -161,7 +161,7 @@
                 width: 100% !important;
                 min-height: 0 !important;
                 height: auto !important;
-                padding: 18px 20px 60px 20px !important;
+                padding: 18px 20px 70px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
