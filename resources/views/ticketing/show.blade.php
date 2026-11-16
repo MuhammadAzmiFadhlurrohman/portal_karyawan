@@ -1471,45 +1471,284 @@
 <!-- Modal Dispatch Penugasan Tim (Khusus Atasan Teknik / Atasan Umum - Disembunyikan dari NOC Pembuat Tiket) -->
 @if(auth()->id() !== $tiket->created_by && !auth()->user()->hasRole(['noc', 'atasan_noc']) && auth()->user()->division !== 'NOC')
 @can('dispatch', $tiket)
-<div id="modal-dispatch" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
-        <div class="px-6 py-5 text-white flex items-center justify-between"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
-            <h3 class="font-heading font-extrabold text-base text-white">Penugasan Tim Lapangan (Atasan Teknik / Atasan Umum)</h3>
-            <button type="button" onclick="closeDispatchModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+<div id="modal-dispatch" 
+     class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/65 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+     x-data="dispatchTeamModal()">
+    <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200 my-auto">
+        <!-- Header -->
+        <div class="px-5 py-4 sm:px-6 sm:py-5 text-white flex items-center justify-between"
+             style="background: linear-gradient(135deg, #022836 0%, #053b47 35%, #0a525f 100%);">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-teal-400/20 text-[#18C4C4] border border-teal-400/30 flex items-center justify-center shrink-0 shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-heading font-extrabold text-sm sm:text-base text-white tracking-tight">Penugasan Tim Lapangan</h3>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-teal-500/20 border border-teal-400/30 text-[10px] font-bold text-teal-200">
+                            Khusus Divisi Teknik
+                        </span>
+                        <span class="text-[11px] text-slate-300 hidden sm:inline">&bull; Atasan Teknik / Atasan Umum</span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" 
+                    onclick="closeDispatchModal()" 
+                    class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition active:scale-95 text-lg font-bold">
+                &times;
+            </button>
         </div>
 
-        <form method="POST" action="{{ route('tickets.dispatch', $tiket) }}" class="p-6 space-y-4 text-xs">
+        <form method="POST" action="{{ route('tickets.dispatch', $tiket) }}" class="p-5 sm:p-6 space-y-4 sm:space-y-5 text-xs">
             @csrf
-            <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Leader Teknisi (PIC) *</label>
-                <select name="lead_user_id" required class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5">
-                    <option value="">-- Pilih Leader Teknisi --</option>
-                    @foreach($technicians as $t)
-                        <option value="{{ $t->id }}">{{ $t->name }} ({{ $t->position ?? 'Teknik' }})</option>
-                    @endforeach
-                </select>
+            
+            <!-- Hidden real inputs for form submission -->
+            <input type="hidden" name="lead_id" :value="leadId">
+            <input type="hidden" name="lead_user_id" :value="leadId">
+            <template x-for="mid in memberIds" :key="'m_'+mid">
+                <input type="hidden" name="member_ids[]" :value="mid">
+            </template>
+            <template x-for="mid in memberIds" :key="'mu_'+mid">
+                <input type="hidden" name="member_user_ids[]" :value="mid">
+            </template>
+
+            <!-- 1. LEADER TEKNISI (PIC UTAMA) -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="block font-heading font-extrabold text-slate-700 uppercase tracking-wider text-[11px]">
+                        Leader Teknisi (PIC Utama) <span class="text-rose-500">*</span>
+                    </label>
+                    <span class="text-[10px] text-slate-400" x-text="selectedLead ? 'PIC Terpilih' : 'Wajib dipilih'"></span>
+                </div>
+
+                <!-- If Lead is already selected: show card -->
+                <div x-show="selectedLead && !showLeadPicker" 
+                     class="bg-gradient-to-r from-teal-50/70 to-emerald-50/50 rounded-2xl p-3 sm:p-3.5 border-2 border-teal-500/80 shadow-2xs flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0D9488] to-[#042f2e] text-white font-extrabold flex items-center justify-center text-xs shrink-0 shadow-sm">
+                            <span x-text="selectedLead ? selectedLead.initials : 'PIC'"></span>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="font-heading font-extrabold text-xs sm:text-sm text-slate-900 truncate" x-text="selectedLead ? selectedLead.name : ''"></span>
+                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#0D9488] text-white">★ PIC Utama</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 truncate mt-0.5" x-text="selectedLead ? (selectedLead.position || 'Divisi Teknik') : ''"></p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            @click="showLeadPicker = true"
+                            class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-[11px] font-bold transition shrink-0 shadow-2xs">
+                        Ganti Leader
+                    </button>
+                </div>
+
+                <!-- If no lead selected or editing lead: show search & dropdown -->
+                <div x-show="!selectedLead || showLeadPicker" class="space-y-2">
+                    <div class="relative">
+                        <input type="text" 
+                               x-model="searchLead" 
+                               placeholder="🔍 Cari nama karyawan teknik untuk PIC..."
+                               class="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-8 py-2.5 focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] transition">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <button type="button" 
+                                x-show="searchLead" 
+                                @click="searchLead = ''" 
+                                class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-sm">&times;</button>
+                    </div>
+
+                    <div class="max-h-48 overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-xs p-1 divide-y divide-slate-100">
+                        <template x-for="tech in filteredLeads" :key="tech.id">
+                            <button type="button" 
+                                    @click="selectLead(tech.id)"
+                                    class="w-full flex items-center justify-between p-2 rounded-xl text-left transition hover:bg-teal-50/70 group"
+                                    :class="{ 'bg-teal-50/90 font-bold': leadId == tech.id }">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-7 h-7 rounded-lg bg-teal-100 text-[#0D9488] flex items-center justify-center text-[10px] font-bold shrink-0">
+                                        <span x-text="tech.initials"></span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-semibold text-slate-800 truncate group-hover:text-teal-900" x-text="tech.name"></p>
+                                        <p class="text-[10px] text-slate-400 truncate" x-text="tech.position || 'Teknisi Lapangan'"></p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-[#0D9488] shrink-0 opacity-0 group-hover:opacity-100 transition">
+                                    Pilih &rarr;
+                                </span>
+                            </button>
+                        </template>
+                        <div x-show="filteredLeads.length === 0" class="py-4 text-center text-slate-400 text-xs">
+                            Tidak ditemukan karyawan teknik yang sesuai.
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Anggota Tim Pendukung (Crew)</label>
-                <select name="member_user_ids[]" multiple size="4" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5">
-                    @foreach($technicians as $t)
-                        <option value="{{ $t->id }}">{{ $t->name }}</option>
-                    @endforeach
-                </select>
-                <p class="text-[10px] text-slate-400 mt-1">Tahan tombol Ctrl / Cmd untuk memilih lebih dari 1 teknisi.</p>
+            <!-- 2. ANGGOTA TIM PENDUKUNG (CREW) -->
+            <div class="space-y-2 pt-2 border-t border-slate-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <label class="block font-heading font-extrabold text-slate-700 uppercase tracking-wider text-[11px]">
+                            Anggota Tim Pendukung (Crew Lapangan)
+                        </label>
+                        <p class="text-[10px] text-slate-400">Pilih satu atau beberapa teknisi pendukung.</p>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-[#0D9488]" x-text="memberIds.length + ' Crew Terpilih'"></span>
+                </div>
+
+                <!-- Selected Crew Chips -->
+                <div x-show="memberIds.length > 0" class="flex flex-wrap gap-1.5 p-2 bg-slate-50 rounded-2xl border border-slate-200/70 min-h-[42px] items-center">
+                    <template x-for="mid in memberIds" :key="'chip_'+mid">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white text-slate-800 border border-slate-200 shadow-2xs">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                            <span x-text="getTechName(mid)"></span>
+                            <button type="button" 
+                                    @click="removeMember(mid)" 
+                                    class="text-slate-400 hover:text-rose-600 font-bold ml-0.5 text-xs">&times;</button>
+                        </span>
+                    </template>
+                </div>
+
+                <!-- Search Member -->
+                <div class="relative">
+                    <input type="text" 
+                           x-model="searchMember" 
+                           placeholder="🔍 Filter nama teknisi pendukung..."
+                           class="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-8 py-2 focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488] transition">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <button type="button" 
+                            x-show="searchMember" 
+                            @click="searchMember = ''" 
+                            class="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-sm">&times;</button>
+                </div>
+
+                <!-- Member Checklist Box -->
+                <div class="max-h-44 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1 divide-y divide-slate-100 shadow-2xs">
+                    <template x-for="tech in filteredMembers" :key="'mem_'+tech.id">
+                        <div @click="toggleMember(tech.id)"
+                             class="flex items-center justify-between p-2 rounded-xl cursor-pointer transition select-none"
+                             :class="isMember(tech.id) ? 'bg-teal-50/80 hover:bg-teal-50' : 'hover:bg-slate-50'">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-4 h-4 rounded-md border flex items-center justify-center transition shrink-0"
+                                     :class="isMember(tech.id) ? 'bg-[#0D9488] border-[#0D9488] text-white' : 'border-slate-300 bg-white'">
+                                    <svg x-show="isMember(tech.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold text-slate-800 truncate" x-text="tech.name"></p>
+                                    <p class="text-[10px] text-slate-400 truncate" x-text="tech.position || 'Teknisi Lapangan'"></p>
+                                </div>
+                            </div>
+                            <span x-show="isMember(tech.id)" class="text-[10px] font-bold text-[#0D9488] px-2 py-0.5 rounded-full bg-teal-100/60 shrink-0">
+                                ✓ Crew
+                            </span>
+                        </div>
+                    </template>
+                    <div x-show="filteredMembers.length === 0" class="py-4 text-center text-slate-400 text-xs">
+                        Tidak ada teknisi lain yang tersedia.
+                    </div>
+                </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="closeDispatchModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
-                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    Simpan Penugasan
-                </button>
+            <!-- Footer Buttons -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                <div class="text-[11px] text-slate-500">
+                    <span x-show="leadId" class="font-medium">
+                        Total Tim: <strong class="text-slate-800" x-text="1 + memberIds.length"></strong> orang
+                    </span>
+                    <span x-show="!leadId" class="text-rose-500 font-medium">
+                        * Pilih Leader PIC dahulu
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" 
+                            onclick="closeDispatchModal()" 
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            :disabled="!leadId"
+                            class="px-5 py-2.5 rounded-xl text-white font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <span>Simpan Penugasan</span>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+function dispatchTeamModal() {
+    return {
+        technicians: {!! json_encode($technicians->map(function($t) {
+            $words = explode(' ', trim($t->name));
+            $initials = strtoupper(substr($words[0] ?? 'T', 0, 1) . substr($words[1] ?? '', 0, 1));
+            return [
+                'id' => $t->id,
+                'name' => $t->name,
+                'position' => $t->position ?? 'Teknisi Lapangan',
+                'initials' => $initials ?: 'T',
+            ];
+        })->values()) !!},
+        leadId: {{ $tiket->technician_id ?? 'null' }},
+        memberIds: {!! json_encode($tiket->assignees->where('is_lead', false)->pluck('user_id')->values()) !!},
+        searchLead: '',
+        searchMember: '',
+        showLeadPicker: false,
+
+        get selectedLead() {
+            if (!this.leadId) return null;
+            return this.technicians.find(t => t.id === Number(this.leadId)) || null;
+        },
+
+        get filteredLeads() {
+            if (!this.searchLead) return this.technicians;
+            const q = this.searchLead.toLowerCase();
+            return this.technicians.filter(t => t.name.toLowerCase().includes(q) || (t.position && t.position.toLowerCase().includes(q)));
+        },
+
+        get filteredMembers() {
+            // Exclude chosen lead
+            const list = this.technicians.filter(t => t.id !== Number(this.leadId));
+            if (!this.searchMember) return list;
+            const q = this.searchMember.toLowerCase();
+            return list.filter(t => t.name.toLowerCase().includes(q) || (t.position && t.position.toLowerCase().includes(q)));
+        },
+
+        selectLead(id) {
+            this.leadId = id;
+            this.showLeadPicker = false;
+            this.searchLead = '';
+            // If lead was chosen as crew, remove from crew
+            this.memberIds = this.memberIds.filter(m => m !== id);
+        },
+
+        toggleMember(id) {
+            if (this.memberIds.includes(id)) {
+                this.memberIds = this.memberIds.filter(m => m !== id);
+            } else {
+                this.memberIds.push(id);
+            }
+        },
+
+        removeMember(id) {
+            this.memberIds = this.memberIds.filter(m => m !== id);
+        },
+
+        isMember(id) {
+            return this.memberIds.includes(id);
+        },
+
+        getTechName(id) {
+            const found = this.technicians.find(t => t.id === Number(id));
+            return found ? found.name : ('ID: ' + id);
+        }
+    };
+}
+</script>
 @endcan
 @endif
 
