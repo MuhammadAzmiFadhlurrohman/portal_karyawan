@@ -97,14 +97,15 @@
             }
             .login-panel-left {
                 width: 100% !important;
-                min-height: 310px !important;
+                min-height: 275px !important;
                 height: auto !important;
-                padding: 30px 24px 45px 24px !important;
+                padding: 24px 20px 36px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
-                padding: 32px 20px 40px 20px !important;
+                padding: 10px 20px 36px 20px !important;
+                margin-top: -16px !important;
             }
         }
     </style>
@@ -206,7 +207,7 @@
             <div class="w-full max-w-[420px] sm:max-w-[440px] mx-auto relative z-10">
                 
                 <!-- Heading Masuk ke Akun -->
-                <div class="mb-6 text-center">
+                <div class="mb-4 sm:mb-6 text-center">
                     <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                         Masuk ke Akun
                     </h2>
