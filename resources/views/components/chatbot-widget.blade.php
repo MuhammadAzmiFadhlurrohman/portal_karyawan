@@ -5,13 +5,22 @@
     <!-- Floating Trigger Button -->
     <button @click="toggleChat()" 
             type="button"
-            class="h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-gradient-to-tr from-[#155E63] to-[#18C4C4] text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-200 cursor-pointer"
+            class="h-12 w-12 sm:h-13 sm:w-13 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white shadow-xl hover:shadow-2xl shadow-blue-500/35 hover:shadow-blue-500/45 flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-200 cursor-pointer"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
-        <svg x-show="!isOpen" class="w-5.5 h-5.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        <!-- Robot Icon Sesuai Request -->
+        <svg x-show="!isOpen" class="w-7 h-7 sm:w-7.5 sm:h-7.5" viewBox="0 0 24 24" fill="currentColor">
+            <!-- Top Antenna -->
+            <rect x="11" y="1.5" width="2" height="3.5" rx="1"/>
+            <!-- Left Ear -->
+            <rect x="2.5" y="9.25" width="2" height="5.5" rx="1"/>
+            <!-- Right Ear -->
+            <rect x="19.5" y="9.25" width="2" height="5.5" rx="1"/>
+            <!-- Head with Eye & Mouth Cutouts -->
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.5 5 18.5 6 18.5 8V15C18.5 17 17.5 18 15.5 18H8.5C6.5 18 5.5 17 5.5 15V8C5.5 6 6.5 5 8.5 5ZM8.75 9.75A1.25 1.25 0 108.75 12.25 1.25 1.25 0 108.75 9.75ZM15.25 9.75A1.25 1.25 0 1015.25 12.25 1.25 1.25 0 1015.25 9.75ZM8 14.5H9.5C9.78 14.5 10 14.72 10 15C10 15.28 9.78 15.5 9.5 15.5H8C7.72 15.5 7.5 15.28 7.5 15C7.5 14.72 7.72 14.5 8 14.5ZM11.25 14.5H12.75C13.03 14.5 13.25 14.72 13.25 15C13.25 15.28 13.03 15.5 12.75 15.5H11.25C10.97 15.5 10.75 15.28 10.75 15C10.75 14.72 10.97 14.5 11.25 14.5ZM14.5 14.5H16C16.28 14.5 16.5 14.72 16.5 15C16.5 15.28 16.28 15.5 16 15.5H14.5C14.22 15.5 14 15.28 14 15C14 14.72 14.22 14.5 14.5 14.5Z"/>
         </svg>
-        <svg x-show="isOpen" class="w-5.5 h-5.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display: none;">
+        <!-- Close (X) Icon -->
+        <svg x-show="isOpen" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display: none;">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
         </svg>
     </button>
@@ -31,8 +40,13 @@
         <div class="p-4 text-white flex items-center justify-between shrink-0"
              style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center font-bold text-white text-base shrink-0">
-                    🤖
+                <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
+                    <svg class="w-5.5 h-5.5" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="11" y="1.5" width="2" height="3.5" rx="1"/>
+                        <rect x="2.5" y="9.25" width="2" height="5.5" rx="1"/>
+                        <rect x="19.5" y="9.25" width="2" height="5.5" rx="1"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.5 5 18.5 6 18.5 8V15C18.5 17 17.5 18 15.5 18H8.5C6.5 18 5.5 17 5.5 15V8C5.5 6 6.5 5 8.5 5ZM8.75 9.75A1.25 1.25 0 108.75 12.25 1.25 1.25 0 108.75 9.75ZM15.25 9.75A1.25 1.25 0 1015.25 12.25 1.25 1.25 0 1015.25 9.75ZM8 14.5H9.5C9.78 14.5 10 14.72 10 15C10 15.28 9.78 15.5 9.5 15.5H8C7.72 15.5 7.5 15.28 7.5 15C7.5 14.72 7.72 14.5 8 14.5ZM11.25 14.5H12.75C13.03 14.5 13.25 14.72 13.25 15C13.25 15.28 13.03 15.5 12.75 15.5H11.25C10.97 15.5 10.75 15.28 10.75 15C10.75 14.72 10.97 14.5 11.25 14.5ZM14.5 14.5H16C16.28 14.5 16.5 14.72 16.5 15C16.5 15.28 16.28 15.5 16 15.5H14.5C14.22 15.5 14 15.28 14 15C14 14.72 14.22 14.5 14.5 14.5Z"/>
+                    </svg>
                 </div>
                 <div>
                     <h3 class="font-heading font-bold text-sm tracking-tight leading-tight">Asisten Mandiri PT MSN</h3>
