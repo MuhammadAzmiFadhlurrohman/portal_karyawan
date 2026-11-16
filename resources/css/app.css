@@ -94,6 +94,18 @@
     scrollbar-width: none;
 }
 
+/* Ticket Chat Card Viewport Fit */
+.ticket-chat-card {
+    height: calc(100dvh - 165px);
+    min-height: 480px;
+}
+@media (min-width: 768px) {
+    .ticket-chat-card {
+        height: calc(100vh - 96px);
+        min-height: 520px;
+    }
+}
+
 /* Tactile Enterprise Buttons (Compact & Crisp) */
 .btn-primary {
     display: inline-flex;

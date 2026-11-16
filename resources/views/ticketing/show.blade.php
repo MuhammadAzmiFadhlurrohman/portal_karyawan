@@ -716,9 +716,20 @@
     <!-- ========================================================================= -->
     <!-- TAB 1: KRONOLOGIS (WhatsApp-Style Live Chat matching Image 2 & 3) -->
     <!-- ========================================================================= -->
+    <style>
+        .ticket-chat-card {
+            height: calc(100dvh - 165px);
+            min-height: 480px;
+        }
+        @media (min-width: 768px) {
+            .ticket-chat-card {
+                height: calc(100vh - 96px);
+                min-height: 520px;
+            }
+        }
+    </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col"
-             style="min-height: 620px;">
+        <div class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
             <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0"
@@ -749,8 +760,8 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto bg-slate-50/70"
-                 style="min-height: 500px; max-height: 680px; background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
+            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 min-h-0 overflow-y-auto bg-slate-50/70"
+                 style="background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
                 
                 <!-- Date divider -->
                 <div class="flex justify-center">
