@@ -153,9 +153,6 @@
                             <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
                             <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Disetujui Atasan</option>
                             <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
-                            <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
-                            <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
-                            <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
                             <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
                             <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                         </select>
