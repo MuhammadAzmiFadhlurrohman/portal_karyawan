@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+    Route::post('/login/webauthn/options', [AuthController::class, 'webauthnLoginOptions'])->name('login.webauthn.options');
+    Route::post('/login/webauthn/verify', [AuthController::class, 'webauthnLoginVerify'])->name('login.webauthn.verify');
 });
 
 Route::middleware('auth')->group(function (): void {
@@ -42,6 +44,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/', [PortalHubController::class, 'index'])->name('portal.hub');
     Route::get('/portal/profile', [PortalHubController::class, 'profile'])->name('portal.profile');
     Route::put('/portal/profile', [PortalHubController::class, 'updateProfile'])->name('portal.profile.update');
+    Route::post('/portal/profile/webauthn/options', [PortalHubController::class, 'webauthnRegisterOptions'])->name('portal.profile.webauthn.options');
+    Route::post('/portal/profile/webauthn/register', [PortalHubController::class, 'webauthnRegisterStore'])->name('portal.profile.webauthn.register');
+    Route::delete('/portal/profile/webauthn/{credential}', [PortalHubController::class, 'webauthnDestroy'])->name('portal.profile.webauthn.destroy');
     Route::get('/portal/sessions', [PortalHubController::class, 'sessionsAndDevices'])->name('portal.sessions');
     Route::post('/portal/sessions/{userSession}/revoke', [PortalHubController::class, 'revokeSession'])->name('portal.sessions.revoke');
     Route::post('/portal/devices/{userDevice}/approve', [PortalHubController::class, 'approveDevice'])->name('portal.devices.approve');

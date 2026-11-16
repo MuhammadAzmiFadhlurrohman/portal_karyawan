@@ -148,6 +148,14 @@ class User extends Authenticatable
     }
 
     /**
+     * @return HasMany<WebAuthnCredential, $this>
+     */
+    public function webauthnCredentials(): HasMany
+    {
+        return $this->hasMany(WebAuthnCredential::class);
+    }
+
+    /**
      * Get avatar URL if the photo physically exists on disk.
      * Served via authenticated Laravel route so it works reliably in Docker/VPS even without storage:link.
      */

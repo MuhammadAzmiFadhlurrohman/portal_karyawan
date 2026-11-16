@@ -14,12 +14,15 @@ use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\UserDevice;
 use App\Models\UserSession;
+use App\Models\WebAuthnCredential;
 use App\Modules\Attendance\Services\LeaveService;
 use App\Services\AuditLogger;
 use App\Services\DashboardStatsService;
 use App\Services\DeviceSessionService;
 use App\Services\SystemSettingService;
+use App\Services\WebAuthnService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -396,13 +399,70 @@ class PortalHubController extends Controller
         ]);
     }
 
-    public function profile(Request $request): View
+    public function profile(Request $request, WebAuthnService $webAuthnService): View
     {
-        $user = $request->user()->load(['supervisor', 'faceTemplate']);
+        $webAuthnService->ensureTableExists();
+        $user = $request->user()->load(['supervisor', 'faceTemplate', 'webauthnCredentials']);
 
         return view('portal.profile', [
             'user' => $user,
         ]);
+    }
+
+    public function webauthnRegisterOptions(Request $request, WebAuthnService $webAuthnService): JsonResponse
+    {
+        $options = $webAuthnService->generateRegistrationOptions($request->user(), $request);
+
+        return response()->json($options);
+    }
+
+    public function webauthnRegisterStore(Request $request, WebAuthnService $webAuthnService): JsonResponse
+    {
+        $validated = $request->validate([
+            'credential_id' => ['required', 'string', 'max:255'],
+            'client_data_json' => ['required', 'string'],
+            'attestation_object' => ['nullable', 'string'],
+            'public_key_spki' => ['nullable', 'string'],
+            'algorithm' => ['nullable', 'integer'],
+            'transports' => ['nullable', 'array'],
+            'device_name' => ['nullable', 'string', 'max:150'],
+        ]);
+
+        try {
+            $credential = $webAuthnService->verifyAndStoreRegistration($request->user(), $request, $validated);
+
+            return response()->json([
+                'ok' => true,
+                'credential' => [
+                    'id' => $credential->id,
+                    'credential_id' => $credential->credential_id,
+                    'device_name' => $credential->device_name,
+                ],
+                'message' => 'Biometrik perangkat berhasil diaktifkan.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $msg = collect($e->errors())->flatten()->first() ?: 'Gagal mendaftarkan biometrik perangkat.';
+
+            return response()->json(['message' => $msg], 422);
+        }
+    }
+
+    public function webauthnDestroy(Request $request, WebAuthnCredential $credential): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless((int) $credential->user_id === (int) $user->id, 403);
+
+        $deviceName = $credential->device_name;
+        $credential->delete();
+
+        AuditLogger::record(
+            action: 'auth.webauthn_removed',
+            auditable: $user,
+            oldValues: ['device_name' => $deviceName],
+            actorId: $user->id
+        );
+
+        return back()->with('status', "Perangkat biometrik ({$deviceName}) berhasil dihapus dari akun Anda.");
     }
 
     public function updateProfile(Request $request): RedirectResponse

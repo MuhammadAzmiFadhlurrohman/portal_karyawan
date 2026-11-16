@@ -9,6 +9,8 @@ use App\Models\UserSession;
 use App\Services\AuditLogger;
 use App\Services\DeviceSessionService;
 use App\Services\OtpService;
+use App\Services\WebAuthnService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -101,6 +103,94 @@ class AuthController extends Controller
         }
 
         return redirect()->intended(route('portal.hub'));
+    }
+
+    /**
+     * Issue WebAuthn challenge & allowCredentials for biometric passwordless login.
+     */
+    public function webauthnLoginOptions(Request $request, WebAuthnService $webAuthnService): JsonResponse
+    {
+        $validated = $request->validate([
+            'identifier' => ['nullable', 'string', 'max:150'],
+            'local_credential_ids' => ['nullable', 'array', 'max:20'],
+            'local_credential_ids.*' => ['string', 'max:255'],
+        ]);
+
+        $identifier = isset($validated['identifier']) ? trim((string) $validated['identifier']) : null;
+        $localIds = (array) ($validated['local_credential_ids'] ?? []);
+
+        $options = $webAuthnService->generateLoginOptions($request, $identifier, $localIds);
+
+        return response()->json($options);
+    }
+
+    /**
+     * Verify signed WebAuthn biometric assertion and authenticate the user.
+     */
+    public function webauthnLoginVerify(
+        Request $request,
+        WebAuthnService $webAuthnService,
+        DeviceSessionService $deviceSessionService
+    ): JsonResponse {
+        $validated = $request->validate([
+            'credential_id' => ['required', 'string', 'max:255'],
+            'client_data_json' => ['required', 'string'],
+            'authenticator_data' => ['required', 'string'],
+            'signature' => ['required', 'string'],
+        ]);
+
+        $throttleKey = 'webauthn|'.$request->ip();
+        if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            return response()->json([
+                'message' => "Terlalu banyak percobaan biometrik. Silakan coba lagi dalam {$seconds} detik.",
+            ], 429);
+        }
+
+        try {
+            $user = $webAuthnService->verifyLoginAssertion($request, $validated);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            RateLimiter::hit($throttleKey, 60);
+            $msg = collect($e->errors())->flatten()->first() ?: 'Verifikasi biometrik gagal.';
+
+            return response()->json(['message' => $msg], 422);
+        }
+
+        RateLimiter::clear($throttleKey);
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        $device = $deviceSessionService->resolveAndValidateDevice($user, $request);
+        if ($device->status === 'pending') {
+            $device->update([
+                'status' => 'approved',
+                'approved_by' => $user->id,
+                'approved_at' => now(),
+            ]);
+        }
+
+        $deviceSessionService->recordSession($user, $request, $device);
+
+        AuditLogger::record(
+            action: 'auth.login_biometric_success',
+            auditable: $user,
+            newValues: [
+                'device_id' => $device->id,
+                'method' => 'webauthn',
+            ],
+            actorId: $user->id
+        );
+
+        $redirectUrl = $user->must_change_password
+            ? route('password.first-change')
+            : route('portal.hub');
+
+        return response()->json([
+            'ok' => true,
+            'redirect' => $redirectUrl,
+        ]);
     }
 
     public function showFirstPasswordChange(): View

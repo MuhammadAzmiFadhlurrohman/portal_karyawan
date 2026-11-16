@@ -17,6 +17,7 @@
             showCurrentPass: false,
             showNewPass: false,
             showConfirmPass: false,
+            biometricLoading: false,
             handlePhotoChange(event) {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -26,6 +27,111 @@
                     this.photoPreview = e.target.result;
                 };
                 reader.readAsDataURL(file);
+            },
+            b64UrlToUint8(b64url) {
+                const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
+                const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
+                const bin = atob(b64);
+                const bytes = new Uint8Array(bin.length);
+                for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                return bytes;
+            },
+            bufToB64Url(buf) {
+                const bytes = new Uint8Array(buf);
+                let bin = '';
+                for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+                return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            },
+            removeLocalBiometricCred(credId) {
+                try {
+                    const list = JSON.parse(localStorage.getItem('gomsn_biometric_creds') || '[]');
+                    localStorage.setItem('gomsn_biometric_creds', JSON.stringify(list.filter(id => id !== credId)));
+                } catch (e) {}
+            },
+            async registerBiometric() {
+                if (!window.PublicKeyCredential) {
+                    Swal.fire({ icon: 'warning', title: 'Tidak Didukung', text: 'Browser atau perangkat ini belum mendukung login biometrik WebAuthn / Passkey.' });
+                    return;
+                }
+                if (!window.isSecureContext) {
+                    Swal.fire({ icon: 'warning', title: 'Koneksi Harus HTTPS', text: 'Fitur sidik jari/Face ID hanya berjalan pada koneksi HTTPS yang aman.' });
+                    return;
+                }
+                this.biometricLoading = true;
+                try {
+                    const csrf = document.querySelector('meta[name=csrf-token]').content;
+                    const optRes = await fetch('{{ route('portal.profile.webauthn.options') }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+                        body: JSON.stringify({})
+                    });
+                    const opts = await optRes.json();
+                    if (!optRes.ok) throw new Error(opts.message || 'Gagal menyiapkan pendaftaran biometrik.');
+
+                    const publicKey = {
+                        ...opts,
+                        challenge: this.b64UrlToUint8(opts.challenge),
+                        user: {
+                            ...opts.user,
+                            id: this.b64UrlToUint8(opts.user.id)
+                        },
+                        excludeCredentials: (opts.excludeCredentials || []).map(c => ({
+                            ...c,
+                            id: this.b64UrlToUint8(c.id)
+                        }))
+                    };
+
+                    const credential = await navigator.credentials.create({ publicKey });
+                    if (!credential) throw new Error('Pendaftaran dibatalkan.');
+
+                    const credentialId = this.bufToB64Url(credential.rawId);
+                    const payload = {
+                        credential_id: credentialId,
+                        client_data_json: this.bufToB64Url(credential.response.clientDataJSON),
+                        attestation_object: this.bufToB64Url(credential.response.attestationObject),
+                        public_key_spki: typeof credential.response.getPublicKey === 'function' && credential.response.getPublicKey()
+                            ? this.bufToB64Url(credential.response.getPublicKey())
+                            : null,
+                        algorithm: typeof credential.response.getPublicKeyAlgorithm === 'function'
+                            ? credential.response.getPublicKeyAlgorithm()
+                            : -7,
+                        transports: typeof credential.response.getTransports === 'function'
+                            ? credential.response.getTransports()
+                            : []
+                    };
+
+                    const saveRes = await fetch('{{ route('portal.profile.webauthn.register') }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+                        body: JSON.stringify(payload)
+                    });
+                    const saveJson = await saveRes.json();
+                    if (!saveRes.ok) throw new Error(saveJson.message || 'Gagal menyimpan kredensial biometrik.');
+
+                    try {
+                        const existing = JSON.parse(localStorage.getItem('gomsn_biometric_creds') || '[]');
+                        if (!existing.includes(credentialId)) existing.push(credentialId);
+                        localStorage.setItem('gomsn_biometric_creds', JSON.stringify(existing));
+                    } catch (e) {}
+
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Biometrik Aktif!',
+                        text: 'Sidik jari / Face ID / Windows Hello berhasil didaftarkan untuk login cepat.',
+                        confirmButtonColor: '#155E63'
+                    });
+                    window.location.reload();
+                } catch (err) {
+                    let msg = err.message || 'Terjadi kesalahan.';
+                    if (err.name === 'NotAllowedError') {
+                        msg = 'Proses sensor biometrik dibatalkan atau waktu verifikasi habis.';
+                    } else if (err.name === 'InvalidStateError') {
+                        msg = 'Perangkat/biometrik ini sudah terdaftar pada akun Anda.';
+                    }
+                    Swal.fire({ icon: 'error', title: 'Gagal Mengaktifkan', text: msg, confirmButtonColor: '#155E63' });
+                } finally {
+                    this.biometricLoading = false;
+                }
             }
          }">
 
@@ -414,6 +520,91 @@
                             <span class="font-mono font-semibold text-teal-100" x-text="phoneVal ? phoneVal : '-'"></span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Card 3: Biometrik & Passkey Login (WebAuthn FIDO2) -->
+                <div class="bg-white rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(15,23,42,0.04)] p-5 sm:p-6 space-y-4">
+                    <div class="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-teal-50 text-[#155E63] flex items-center justify-center shrink-0 shadow-2xs">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-sm sm:text-base font-bold text-slate-900">Login Biometrik &amp; Passkey</h2>
+                                <p class="text-[11px] text-slate-500">Sidik jari, Face ID, atau Windows Hello</p>
+                            </div>
+                        </div>
+                        @if ($user->webauthnCredentials->isNotEmpty())
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                {{ $user->webauthnCredentials->count() }} Terdaftar
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold shrink-0">
+                                Belum Aktif
+                            </span>
+                        @endif
+                    </div>
+
+                    @if ($user->webauthnCredentials->isNotEmpty())
+                        <div class="space-y-2.5 text-xs">
+                            @foreach ($user->webauthnCredentials as $cred)
+                                <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-100">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-xl bg-white border border-slate-200/80 text-[#155E63] flex items-center justify-center shrink-0">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="font-bold text-slate-800 truncate">{{ $cred->device_name }}</p>
+                                            <p class="text-[10.5px] text-slate-500 truncate">
+                                                @if ($cred->last_used_at)
+                                                    Terakhir login: {{ $cred->last_used_at->diffForHumans() }}
+                                                @else
+                                                    Terdaftar {{ $cred->created_at?->diffForHumans() }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <form method="POST"
+                                          action="{{ route('portal.profile.webauthn.destroy', $cred) }}"
+                                          @submit="removeLocalBiometricCred('{{ $cred->credential_id }}')"
+                                          data-confirm="Hapus perangkat biometrik '{{ $cred->device_name }}' dari akun Anda?">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                title="Hapus Biometrik Perangkat Ini"
+                                                class="p-2 rounded-xl text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition cursor-pointer shrink-0">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="rounded-2xl bg-teal-50/60 border border-teal-100 p-3.5 text-[11.5px] text-teal-900 leading-relaxed">
+                            Aktifkan fitur ini sekali di HP atau laptop Anda agar login berikutnya cukup menempelkan <strong>Sidik Jari / Face ID / Windows Hello</strong> dalam &lt; 1 detik tanpa mengetik password.
+                        </div>
+                    @endif
+
+                    <button type="button"
+                            @click="registerBiometric()"
+                            :disabled="biometricLoading"
+                            class="w-full py-2.5 px-4 rounded-xl border border-[#155E63]/25 bg-teal-50/80 hover:bg-[#155E63] text-[#155E63] hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60">
+                        <svg x-show="!biometricLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                        </svg>
+                        <svg x-show="biometricLoading" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                        <span x-text="biometricLoading ? 'Menunggu Verifikasi Sensor...' : 'Aktifkan Sidik Jari / Biometrik di Perangkat Ini'"></span>
+                    </button>
                 </div>
             </div>
 

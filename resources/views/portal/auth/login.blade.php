@@ -85,6 +85,51 @@
         .btn-stylish:active {
             transform: translateY(0);
         }
+        .divider-or {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 18px 0 14px;
+            color: #94A3B8;
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: lowercase;
+            letter-spacing: 0.02em;
+        }
+        .divider-or::before,
+        .divider-or::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #E2E8F0, transparent);
+        }
+        .btn-biometric {
+            width: 100%;
+            padding: 13px 20px;
+            border-radius: 14px;
+            background: #FFFFFF;
+            border: 1.5px solid rgba(21, 94, 99, 0.25);
+            color: #155E63;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.06);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-biometric:hover:not(:disabled) {
+            background: #F0FDFA;
+            border-color: #155E63;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px -6px rgba(21, 94, 99, 0.22);
+        }
+        .btn-biometric:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
         .wave-desktop {
             display: block;
             position: absolute;
@@ -138,7 +183,92 @@
         }
     </style>
 
-    <div class="login-wrap" x-data="{ showPw: false }">
+    <div class="login-wrap" x-data="{
+        showPw: false,
+        biometricLoading: false,
+        biometricError: '',
+        b64UrlToUint8(b64url) {
+            const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
+            const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return bytes;
+        },
+        bufToB64Url(buf) {
+            const bytes = new Uint8Array(buf);
+            let bin = '';
+            for (let i = 0; i < bytes.byteLength; i++) bin += String.fromCharCode(bytes[i]);
+            return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        },
+        async loginWithBiometric() {
+            this.biometricError = '';
+            if (!window.PublicKeyCredential) {
+                this.biometricError = 'Browser atau perangkat ini belum mendukung login biometrik WebAuthn / Passkey.';
+                return;
+            }
+            if (!window.isSecureContext) {
+                this.biometricError = 'Login biometrik membutuhkan koneksi HTTPS yang aman.';
+                return;
+            }
+            this.biometricLoading = true;
+            try {
+                const csrf = document.querySelector('meta[name=csrf-token]').content;
+                const identifier = (document.getElementById('identifier')?.value || '').trim();
+                let localCreds = [];
+                try {
+                    localCreds = JSON.parse(localStorage.getItem('gomsn_biometric_creds') || '[]');
+                } catch (e) {}
+
+                const optRes = await fetch('{{ route('login.webauthn.options') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+                    body: JSON.stringify({ identifier: identifier || null, local_credential_ids: localCreds })
+                });
+                const opts = await optRes.json();
+                if (!optRes.ok) throw new Error(opts.message || 'Gagal menyiapkan autentikasi biometrik.');
+
+                if (identifier && (!opts.allowCredentials || opts.allowCredentials.length === 0)) {
+                    throw new Error('Akun ini belum mengaktifkan Login Biometrik. Masuk dengan password dulu lalu aktifkan di menu Profil Saya.');
+                }
+
+                const publicKey = {
+                    ...opts,
+                    challenge: this.b64UrlToUint8(opts.challenge),
+                    allowCredentials: (opts.allowCredentials || []).map(c => ({
+                        ...c,
+                        id: this.b64UrlToUint8(c.id)
+                    }))
+                };
+
+                const assertion = await navigator.credentials.get({ publicKey });
+                if (!assertion) throw new Error('Verifikasi biometrik dibatalkan.');
+
+                const verifyRes = await fetch('{{ route('login.webauthn.verify') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
+                    body: JSON.stringify({
+                        credential_id: this.bufToB64Url(assertion.rawId),
+                        client_data_json: this.bufToB64Url(assertion.response.clientDataJSON),
+                        authenticator_data: this.bufToB64Url(assertion.response.authenticatorData),
+                        signature: this.bufToB64Url(assertion.response.signature)
+                    })
+                });
+                const verifyJson = await verifyRes.json();
+                if (!verifyRes.ok) throw new Error(verifyJson.message || 'Verifikasi biometrik gagal.');
+
+                window.location.href = verifyJson.redirect || '/';
+            } catch (err) {
+                let msg = err.message || 'Login biometrik gagal.';
+                if (err.name === 'NotAllowedError') {
+                    msg = 'Sensor biometrik dibatalkan atau belum ada Passkey aktif di perangkat ini. Masuk dengan password terlebih dahulu lalu aktifkan Biometrik di menu Profil Saya.';
+                }
+                this.biometricError = msg;
+            } finally {
+                this.biometricLoading = false;
+            }
+        }
+    }">
         
         <!-- ============================================================== -->
         <!-- LEFT PANEL: HERO BRAND WITH ICONIC ORGANIC WAVE                -->
@@ -265,6 +395,14 @@
                 </div>
                 @endif
 
+                <!-- Biometric Inline Error Alert -->
+                <div x-show="biometricError" x-cloak class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5 shadow-2xs">
+                    <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span class="leading-relaxed" x-text="biometricError"></span>
+                </div>
+
                 <!-- Form Login -->
                 <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-4">
                     @csrf
@@ -350,6 +488,23 @@
                         <span>Masuk ke Dashboard</span>
                     </button>
                 </form>
+
+                <!-- Pemisah & Tombol Login Biometrik Perangkat (WebAuthn / Passkey) -->
+                <div class="divider-or">atau masuk cepat dengan</div>
+
+                <button type="button"
+                        @click="loginWithBiometric()"
+                        :disabled="biometricLoading"
+                        class="btn-biometric">
+                    <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                    </svg>
+                    <svg x-show="biometricLoading" x-cloak class="w-5 h-5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span x-text="biometricLoading ? 'Memverifikasi Sensor...' : 'Masuk dengan Sidik Jari / Biometrik'"></span>
+                </button>
 
                 <!-- Footer Support Note -->
                 <div class="mt-6 pt-4 border-t border-slate-100 text-center">
