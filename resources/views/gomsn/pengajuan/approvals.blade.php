@@ -3,6 +3,8 @@
         detailModal: false,
         approveModal: false, 
         rejectModal: false, 
+        employeeModal: false,
+        selectedEmployee: null,
         selectedActionUrl: '', 
         selectedNomor: '',
         activeItem: null,
@@ -13,6 +15,10 @@
             this.showRejectReason = false;
             this.rejectReason = '';
             this.detailModal = true;
+        },
+        openEmployee(employee) {
+            this.selectedEmployee = employee;
+            this.employeeModal = true;
         },
         openApprove(url, nomor) {
             this.selectedActionUrl = url;
@@ -294,6 +300,23 @@
                         <tbody class="divide-y divide-slate-100 bg-white">
                             @foreach ($pengajuanList as $item)
                                 @php
+                                    $employeeData = [
+                                        'id' => $item->user?->id,
+                                        'name' => $item->user?->name ?? 'Karyawan MSN',
+                                        'username' => $item->user?->username ?? '-',
+                                        'employee_code' => $item->user?->employee_code ?: ('KR' . $item->user_id),
+                                        'nik' => $item->user?->nik ?: '-',
+                                        'division' => $item->user?->division ?: '-',
+                                        'position' => $item->user?->position ?: 'Staf',
+                                        'email' => $item->user?->email ?: '-',
+                                        'phone' => $item->user?->phone ?: '-',
+                                        'join_date' => $item->user?->join_date ? $item->user->join_date->format('d M Y') : '-',
+                                        'avatar_url' => $item->user?->avatar_url,
+                                        'initials' => $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'U', 0, 1)),
+                                        'bank' => $item->user?->bank ?: '-',
+                                        'no_rekening' => $item->user?->no_rekening ?: '-',
+                                        'atas_nama' => $item->user?->atas_nama ?: '-',
+                                    ];
                                     $modalData = [
                                         'id' => $item->id,
                                         'nomor' => $item->nomor_pengajuan,
@@ -317,6 +340,7 @@
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
                                         'details' => $item->getModalDetails(),
+                                        'employee' => $employeeData,
                                     ];
                                     $isApprovedStatus = in_array($item->status, ['menunggu_finance', 'menunggu_executive', 'dicairkan', 'menunggu_bukti', 'selesai']);
                                 @endphp
@@ -336,18 +360,20 @@
 
                                     <!-- Pengaju -->
                                     <td class="py-3.5 px-4 whitespace-nowrap">
-                                        <div class="flex items-center gap-2.5">
+                                        <button type="button" 
+                                                @click="openEmployee({{ json_encode($employeeData) }})"
+                                                class="flex items-center gap-2.5 text-left group cursor-pointer focus:outline-none">
                                             @if ($item->user?->avatar_url)
-                                                <img src="{{ $item->user->avatar_url }}" alt="" class="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                <img src="{{ $item->user->avatar_url }}" alt="" class="w-8 h-8 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0 group-hover:ring-2 group-hover:ring-teal-500 transition" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
                                             @endif
-                                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs group-hover:ring-2 group-hover:ring-teal-500 transition" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
                                                 {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'U', 0, 1)) }}
                                             </div>
                                             <div class="min-w-0">
-                                                <span class="font-bold text-slate-800 block truncate leading-tight">{{ $item->user?->name ?? 'Karyawan MSN' }}</span>
-                                                <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">{{ $item->user?->employee_code ?: 'KR'.$item->user_id }} &bull; {{ $item->user?->division ?: '-' }}</span>
+                                                <span class="font-bold text-slate-800 block truncate leading-tight group-hover:text-teal-700 transition">{{ $item->user?->name ?? 'Karyawan MSN' }}</span>
+                                                <span class="text-[10px] text-slate-400 block leading-tight mt-0.5 group-hover:text-slate-500 transition">{{ $item->user?->employee_code ?: 'KR'.$item->user_id }} &bull; {{ $item->user?->division ?: '-' }}</span>
                                             </div>
-                                        </div>
+                                        </button>
                                     </td>
 
                                     <!-- Jenis -->
@@ -436,6 +462,23 @@
                     <div class="space-y-3">
                         @foreach ($pengajuanList as $item)
                             @php
+                                $employeeData = [
+                                    'id' => $item->user?->id,
+                                    'name' => $item->user?->name ?? 'Karyawan MSN',
+                                    'username' => $item->user?->username ?? '-',
+                                    'employee_code' => $item->user?->employee_code ?: ('KR' . $item->user_id),
+                                    'nik' => $item->user?->nik ?: '-',
+                                    'division' => $item->user?->division ?: '-',
+                                    'position' => $item->user?->position ?: 'Staf',
+                                    'email' => $item->user?->email ?: '-',
+                                    'phone' => $item->user?->phone ?: '-',
+                                    'join_date' => $item->user?->join_date ? $item->user->join_date->format('d M Y') : '-',
+                                    'avatar_url' => $item->user?->avatar_url,
+                                    'initials' => $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'U', 0, 1)),
+                                    'bank' => $item->user?->bank ?: '-',
+                                    'no_rekening' => $item->user?->no_rekening ?: '-',
+                                    'atas_nama' => $item->user?->atas_nama ?: '-',
+                                ];
                                 $modalData = [
                                     'id' => $item->id,
                                     'nomor' => $item->nomor_pengajuan,
@@ -459,6 +502,7 @@
                                     'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                     'realisasiNotes' => $item->realisasi_notes,
                                     'details' => $item->getModalDetails(),
+                                    'employee' => $employeeData,
                                 ];
                                 $isApprovedStatus = in_array($item->status, ['menunggu_finance', 'menunggu_executive', 'dicairkan', 'menunggu_bukti', 'selesai']);
                             @endphp
@@ -515,23 +559,25 @@
 
                                     <!-- Applicant Row -->
                                     <div class="flex items-center justify-between gap-3">
-                                        <div class="flex items-center gap-2.5 min-w-0">
+                                        <button type="button" 
+                                                @click="openEmployee({{ json_encode($employeeData) }})"
+                                                class="flex items-center gap-2.5 min-w-0 text-left group cursor-pointer focus:outline-none">
                                             @if ($item->user?->avatar_url)
-                                                <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0 group-hover:ring-2 group-hover:ring-teal-500 transition" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
                                             @endif
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs group-hover:ring-2 group-hover:ring-teal-500 transition" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
                                                 {{ $item->user?->initials ?? substr($item->user?->name ?? 'U', 0, 1) }}
                                             </div>
                                             <div class="min-w-0">
-                                                <p class="font-bold text-slate-900 text-xs truncate">{{ $item->user?->name ?? 'Karyawan MSN' }}</p>
-                                                <p class="text-[11px] text-slate-400 font-mono truncate">
+                                                <p class="font-bold text-slate-900 text-xs truncate group-hover:text-teal-700 transition">{{ $item->user?->name ?? 'Karyawan MSN' }}</p>
+                                                <p class="text-[11px] text-slate-400 font-mono truncate group-hover:text-slate-500 transition">
                                                     {{ $item->user?->employee_code ?: '-' }}
                                                     @if ($item->user?->division)
                                                         &bull; {{ $item->user->division }}
                                                     @endif
                                                 </p>
                                             </div>
-                                        </div>
+                                        </button>
 
                                         <div class="text-right shrink-0">
                                             <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Nilai</span>
@@ -1010,6 +1056,130 @@
                 <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end">
                     <button type="button" 
                             @click="detailModal = false" 
+                            class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-xs transition cursor-pointer flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span>Tutup</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- MODAL DATA PROFIL KARYAWAN (PENGAJU)                           -->
+        <!-- ============================================================== -->
+        <div x-show="employeeModal" 
+             x-cloak 
+             class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+            <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200" 
+                 @click.outside="employeeModal = false">
+                
+                <!-- Modal Header -->
+                <div class="relative overflow-hidden p-5 text-white select-none"
+                     style="background: linear-gradient(135deg, #072d31 0%, #155E63 50%, #0d9488 100%);">
+                    <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
+                    <div class="relative z-10 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-200 shadow-inner">
+                                <svg class="w-5 h-5 text-cyan-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-heading text-base font-bold text-white tracking-tight leading-snug">Profil Karyawan</h3>
+                                <p class="text-xs text-teal-100/80 font-mono" x-text="selectedEmployee?.employee_code"></p>
+                            </div>
+                        </div>
+                        <button type="button" 
+                                @click="employeeModal = false" 
+                                class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 space-y-5 max-h-[calc(90vh-140px)] overflow-y-auto">
+                    <!-- Avatar & Primary Info -->
+                    <div class="flex items-center gap-4 pb-4 border-b border-slate-100">
+                        <template x-if="selectedEmployee?.avatar_url">
+                            <img :src="selectedEmployee?.avatar_url" alt="" class="w-16 h-16 rounded-2xl object-cover border-2 border-teal-500 shadow-sm shrink-0">
+                        </template>
+                        <template x-if="!selectedEmployee?.avatar_url">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-extrabold text-xl flex items-center justify-center shrink-0 shadow-sm" x-text="selectedEmployee?.initials"></div>
+                        </template>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-heading font-extrabold text-base text-slate-900 leading-snug truncate" x-text="selectedEmployee?.name"></h4>
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200" x-text="selectedEmployee?.division"></span>
+                                <span class="text-xs text-slate-500 font-medium" x-text="selectedEmployee?.position"></span>
+                            </div>
+                            <span class="inline-block text-[11px] text-slate-400 font-mono mt-0.5" x-text="'@' + selectedEmployee?.username"></span>
+                        </div>
+                    </div>
+
+                    <!-- Detail Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Kode Karyawan</span>
+                            <span class="font-mono font-bold text-slate-800" x-text="selectedEmployee?.employee_code"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">NIK (KTP / Identitas)</span>
+                            <span class="font-mono font-semibold text-slate-800" x-text="selectedEmployee?.nik || '-'"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Email Kantor</span>
+                            <span class="font-semibold text-slate-800 break-all" x-text="selectedEmployee?.email || '-'"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Nomor Telepon / WA</span>
+                            <span class="font-mono font-semibold text-slate-800" x-text="selectedEmployee?.phone || '-'"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Tanggal Bergabung</span>
+                            <span class="font-semibold text-slate-800" x-text="selectedEmployee?.join_date || '-'"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Divisi &amp; Jabatan</span>
+                            <span class="font-semibold text-slate-800" x-text="(selectedEmployee?.division || '-') + ' / ' + (selectedEmployee?.position || '-')"></span>
+                        </div>
+                    </div>
+
+                    <!-- Rekening Bank (Finance / Pengajuan info) -->
+                    <div class="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100 text-xs">
+                        <div class="flex items-center gap-2 mb-2 text-emerald-800 font-bold">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                <circle cx="12" cy="12" r="2"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h.01M18 12h.01"/>
+                            </svg>
+                            <span>Informasi Rekening Pengaju</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div>
+                                <span class="text-slate-500 block">Bank:</span>
+                                <span class="font-bold text-slate-800" x-text="selectedEmployee?.bank || '-'"></span>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 block">No. Rekening:</span>
+                                <span class="font-mono font-bold text-slate-800" x-text="selectedEmployee?.no_rekening || '-'"></span>
+                            </div>
+                            <div class="col-span-2 pt-1 border-t border-emerald-100/70">
+                                <span class="text-slate-500">Atas Nama: </span>
+                                <span class="font-bold text-slate-800" x-text="selectedEmployee?.atas_nama || '-'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end">
+                    <button type="button" 
+                            @click="employeeModal = false" 
                             class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-xs transition cursor-pointer flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
