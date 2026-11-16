@@ -224,83 +224,111 @@
     @endif
 
     <!-- ========================================================================= -->
-    <!-- 2. FOUR KEY INFO METRIC CARDS (matching Image 1) -->
+    <!-- 2. FOUR KEY INFO METRIC CARDS (2 Baris di Mobile dengan Dropdown Toggle) -->
     <!-- ========================================================================= -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Card 1: SEGMENT BACKBONE / PELANGGAN -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0D9488] shrink-0">
-                @if($tiket->kategori_tiket === 'BACKBONE')
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                @else
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                @endif
-            </div>
-            <div class="min-w-0">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    {{ $tiket->kategori_tiket === 'BACKBONE' ? 'Segment Backbone' : 'Pelanggan Broadband' }}
-                </span>
-                <p class="text-sm font-heading font-extrabold text-slate-800 truncate mt-0.5">
-                    {{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->backbone_segment ?? '-') : ($tiket->customer_name ?? '-') }}
-                </p>
-                <span class="text-[11px] text-slate-400 truncate block">
-                    {{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->wilayah ?? 'Area Bandung') : ('CID: ' . ($tiket->customer_id ?? 'Non-CID')) }}
-                </span>
-            </div>
-        </div>
-
-        <!-- Card 2: WAKTU OPEN -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-700 shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <div class="min-w-0">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Waktu Open</span>
-                <p class="text-sm font-heading font-extrabold text-slate-800 mt-0.5">
-                    {{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d M, H:i') : '-' }} <span class="text-xs text-slate-400 font-normal">WIB</span>
-                </p>
-                <span class="text-[11px] text-slate-400 block">
-                    {{ $tiket->tanggal_open ? $tiket->tanggal_open->diffForHumans() : '-' }}
-                </span>
-            </div>
-        </div>
-
-        <!-- Card 3: WAKTU CLOSE -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <div class="min-w-0">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Waktu Close</span>
-                <p class="text-sm font-heading font-extrabold text-slate-800 mt-0.5">
-                    @if($tiket->tanggal_close)
-                        {{ $tiket->tanggal_close->format('d M, H:i') }} <span class="text-xs text-slate-400 font-normal">WIB</span>
-                    @else
-                        <span class="text-slate-400 font-semibold italic">Belum ditutup</span>
-                    @endif
-                </p>
-                <span class="text-[11px] text-slate-400 block">
-                    {{ $tiket->tanggal_close ? $tiket->tanggal_close->diffForHumans() : 'Tiket aktif' }}
-                </span>
-            </div>
-        </div>
-
-        <!-- Card 4: TARGET SLA & MTTR -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
-            </div>
-            <div class="min-w-0">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Target SLA &amp; MTTR</span>
-                <div class="flex items-center gap-2 mt-0.5">
-                    <p class="text-sm font-heading font-extrabold text-slate-800">
-                        Target: {{ round($tiket->sla_target_minutes / 60, 1) }} jam
-                    </p>
+    <div x-data="{ showParamCards: true }" class="space-y-2.5">
+        <!-- Mobile Dropdown / Accordion Bar (hanya di layar mobile < sm) -->
+        <div class="sm:hidden">
+            <button type="button" 
+                    @click="showParamCards = !showParamCards"
+                    class="w-full flex items-center justify-between px-3.5 py-2.5 bg-white rounded-2xl border border-slate-200/80 shadow-2xs hover:bg-slate-50 transition active:scale-[0.99]">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-teal-50 text-[#0D9488] flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <span class="text-xs font-heading font-extrabold text-slate-800">Parameter Tiket (4 Info)</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-[#0D9488]">2 Baris</span>
                 </div>
-                <span class="text-[11px] font-semibold block
-                    {{ $tiket->status === 'CLOSE' ? ($tiket->sla_status === 'TEPAT' ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-400' }}">
-                    MTTR: {{ $tiket->net_mttr_minutes ? round($tiket->net_mttr_minutes / 60, 1) . ' jam' : ($tiket->status === 'CLOSE' ? round($tiket->currentNetMinutes() / 60, 1) . ' jam' : 'Berjalan...') }}
-                </span>
+                <div class="flex items-center gap-1.5 text-slate-500">
+                    <span class="text-[11px] font-semibold" x-text="showParamCards ? 'Sembunyikan' : 'Lihat Card'"></span>
+                    <svg class="w-4 h-4 transform transition-transform duration-200" :class="{ 'rotate-180': showParamCards }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </div>
+            </button>
+        </div>
+
+        <!-- 4 CARDS: 2 Baris di Mobile (grid-cols-2), 1 Baris di Desktop (lg:grid-cols-4) -->
+        <div x-show="showParamCards" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+            
+            <!-- Card 1: SEGMENT BACKBONE / PELANGGAN -->
+            <div class="bg-white rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0D9488] shrink-0">
+                    @if($tiket->kategori_tiket === 'BACKBONE')
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    @else
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    @endif
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">
+                        {{ $tiket->kategori_tiket === 'BACKBONE' ? 'Segment Backbone' : 'Pelanggan Broadband' }}
+                    </span>
+                    <p class="text-xs sm:text-sm font-heading font-extrabold text-slate-800 truncate mt-0.5" title="{{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->backbone_segment ?? '-') : ($tiket->customer_name ?? '-') }}">
+                        {{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->backbone_segment ?? '-') : ($tiket->customer_name ?? '-') }}
+                    </p>
+                    <span class="text-[10px] sm:text-[11px] text-slate-400 truncate block">
+                        {{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->wilayah ?? 'Area Bandung') : ('CID: ' . ($tiket->customer_id ?? 'Non-CID')) }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card 2: WAKTU OPEN -->
+            <div class="bg-white rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-700 shrink-0">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">Waktu Open</span>
+                    <p class="text-xs sm:text-sm font-heading font-extrabold text-slate-800 mt-0.5 truncate">
+                        {{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d M, H:i') : '-' }} <span class="text-[10px] sm:text-xs text-slate-400 font-normal">WIB</span>
+                    </p>
+                    <span class="text-[10px] sm:text-[11px] text-slate-400 truncate block">
+                        {{ $tiket->tanggal_open ? $tiket->tanggal_open->diffForHumans() : '-' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card 3: WAKTU CLOSE -->
+            <div class="bg-white rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">Waktu Close</span>
+                    <p class="text-xs sm:text-sm font-heading font-extrabold text-slate-800 mt-0.5 truncate">
+                        @if($tiket->tanggal_close)
+                            {{ $tiket->tanggal_close->format('d M, H:i') }} <span class="text-[10px] sm:text-xs text-slate-400 font-normal">WIB</span>
+                        @else
+                            <span class="text-slate-400 font-semibold italic text-[11px] sm:text-sm">Belum tutup</span>
+                        @endif
+                    </p>
+                    <span class="text-[10px] sm:text-[11px] text-slate-400 truncate block">
+                        {{ $tiket->tanggal_close ? $tiket->tanggal_close->diffForHumans() : 'Tiket aktif' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Card 4: TARGET SLA & MTTR -->
+            <div class="bg-white rounded-2xl p-3 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-2.5 sm:gap-3.5">
+                <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 block truncate">Target SLA &amp; MTTR</span>
+                    <p class="text-xs sm:text-sm font-heading font-extrabold text-slate-800 mt-0.5 truncate">
+                        Target: {{ round($tiket->sla_target_minutes / 60, 1) }}j
+                    </p>
+                    <span class="text-[10px] sm:text-[11px] font-semibold truncate block
+                        {{ $tiket->status === 'CLOSE' ? ($tiket->sla_status === 'TEPAT' ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-400' }}">
+                        MTTR: {{ $tiket->net_mttr_minutes ? round($tiket->net_mttr_minutes / 60, 1) . 'j' : ($tiket->status === 'CLOSE' ? round($tiket->currentNetMinutes() / 60, 1) . 'j' : 'Berjalan...') }}
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -328,9 +356,9 @@
     <!-- ========================================================================= -->
     <!-- 4. GARIS ALUR SLA & SIKLUS HIDUP TIKET (5 Stage Stepper matching Image 1) -->
     <!-- ========================================================================= -->
-    <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-6">
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-4 sm:p-6 shadow-xs space-y-5 sm:space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-xl bg-teal-50 text-[#0D9488] flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 </div>
@@ -338,11 +366,11 @@
                     <h3 class="font-heading font-extrabold text-xs sm:text-sm text-slate-800">
                         Garis Alur SLA &amp; Siklus Hidup Tiket
                     </h3>
-                    <p class="text-[11px] text-slate-400">Open &rarr; Respon &rarr; Stop Clock &rarr; Closing Lapangan &rarr; Closing NOC</p>
+                    <p class="hidden sm:block text-[11px] text-slate-400">Open &rarr; Respon &rarr; Stop Clock &rarr; Closing Lapangan &rarr; Closing NOC</p>
                 </div>
             </div>
 
-            <span class="px-3 py-1 rounded-full text-xs font-bold font-mono bg-teal-50 text-[#0D9488] border border-teal-200 self-start sm:self-auto">
+            <span class="px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-bold font-mono bg-teal-50 text-[#0D9488] border border-teal-200 self-start sm:self-auto">
                 Target SLA: {{ round($tiket->sla_target_minutes / 60, 1) }} jam ({{ $tiket->status === 'CLOSE' ? 'Selesai' : 'Aktif' }})
             </span>
         </div>
@@ -363,83 +391,113 @@
             }
         @endphp
 
-        <!-- 5-Node Stepper Progress Line: Strict 1-Row with Connecting Bar -->
-        <div class="overflow-x-auto pb-2 -mb-2">
-            <div class="relative min-w-[620px] sm:min-w-0" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));">
+        <!-- 5-Node Stepper Progress Line: Strict 1-Row with Connecting Bar & Symmetrical Baseline Alignment -->
+        <div class="overflow-x-auto pb-2 -mb-2 scrollbar-none">
+            <div class="relative min-w-[440px] sm:min-w-0" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));">
                 <!-- Track Line (Abu-abu di belakang) -->
-                <div class="absolute top-[18px] h-[3px] bg-slate-200" style="left: 10%; right: 10%; z-index: 0;"></div>
+                <div class="absolute top-4 sm:top-[18px] h-[2px] bg-slate-200" style="left: 10%; right: 10%; z-index: 0;"></div>
                 <!-- Active Filled Progress Line (Hijau gradien) -->
-                <div class="absolute top-[18px] h-[3px] transition-all duration-500 ease-out" 
+                <div class="absolute top-4 sm:top-[18px] h-[2px] transition-all duration-500 ease-out" 
                      style="left: 10%; width: calc(80% * ({{ $stepperProgress }} / 100)); background: linear-gradient(90deg, #10B981 0%, #0D9488 100%); z-index: 0;"></div>
 
                 <!-- Stage 1: Open Tiket -->
-                <div class="flex flex-col items-center space-y-1.5 text-center relative z-10 px-1">
-                    <div class="w-9 h-9 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-sm shadow-sm ring-4 ring-white">
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white">
                         ✓
                     </div>
-                    <span class="font-heading font-extrabold text-xs text-slate-800 leading-tight">Open Tiket</span>
-                    <span class="text-[11px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d/m/y H:i') : '-' }}</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">Stage 1</span>
+                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Open Tiket</span>
+                    </div>
+                    <div class="h-4 sm:h-5 flex items-center justify-center">
+                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-mono font-medium leading-none">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d/m H:i') : '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-50 text-emerald-700 whitespace-nowrap">Stage 1</span>
+                    </div>
                 </div>
 
                 <!-- Stage 2: Respon Pertama -->
-                <div class="flex flex-col items-center space-y-1.5 text-center relative z-10 px-1">
-                    <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
                         {{ $tiket->first_response_at ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->first_response_at ? '✓' : '2' }}
                     </div>
-                    <span class="font-heading font-extrabold text-xs text-slate-800 leading-tight">Respon Pertama</span>
-                    <span class="text-[11px] text-slate-400 font-mono">
-                        {{ $tiket->first_response_at ? $tiket->first_response_at->format('d/m H:i') : 'Menunggu' }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->first_response_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                        {{ $tiket->first_response_at ? 'Terespon' : 'Pending' }}
-                    </span>
+                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Respon Pertama</span>
+                    </div>
+                    <div class="h-4 sm:h-5 flex items-center justify-center">
+                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                            {{ $tiket->first_response_at ? $tiket->first_response_at->format('d/m H:i') : 'Menunggu' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->first_response_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                            {{ $tiket->first_response_at ? 'Terespon' : 'Pending' }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Stage 3: Jeda SLA (Stop Clock) -->
-                <div class="flex flex-col items-center space-y-1.5 text-center relative z-10 px-1">
-                    <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
                         {{ $tiket->total_stop_clock_minutes > 0 || $tiket->activeStopClock ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->activeStopClock ? '⏸' : ($tiket->total_stop_clock_minutes > 0 ? '✓' : '3') }}
                     </div>
-                    <span class="font-heading font-extrabold text-xs text-slate-800 leading-tight">Jeda SLA (Stop Clock)</span>
-                    <span class="text-[11px] text-slate-400 font-mono">
-                        {{ $tiket->total_stop_clock_minutes > 0 ? $tiket->total_stop_clock_minutes . 'm jeda' : ($tiket->activeStopClock ? 'Berjalan' : 'Menunggu') }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->activeStopClock ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-500' }}">
-                        {{ $tiket->activeStopClock ? 'Aktif' : 'Normal' }}
-                    </span>
+                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Jeda SLA</span>
+                    </div>
+                    <div class="h-4 sm:h-5 flex items-center justify-center">
+                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                            {{ $tiket->total_stop_clock_minutes > 0 ? $tiket->total_stop_clock_minutes . 'm jeda' : ($tiket->activeStopClock ? 'Berjalan' : 'Menunggu') }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->activeStopClock ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-500' }}">
+                            {{ $tiket->activeStopClock ? 'Aktif' : 'Normal' }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Stage 4: Closing Awal Lapangan -->
-                <div class="flex flex-col items-center space-y-1.5 text-center relative z-10 px-1">
-                    <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
                         {{ $tiket->closing_awal_at ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->closing_awal_at ? '✓' : '4' }}
                     </div>
-                    <span class="font-heading font-extrabold text-xs text-slate-800 leading-tight">Closing Lapangan</span>
-                    <span class="text-[11px] text-slate-400 font-mono">
-                        {{ $tiket->closing_awal_at ? $tiket->closing_awal_at->format('d/m H:i') : 'Menunggu' }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->closing_awal_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                        {{ $tiket->closing_awal_at ? 'Diajukan' : 'Proses' }}
-                    </span>
+                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Closing Lapangan</span>
+                    </div>
+                    <div class="h-4 sm:h-5 flex items-center justify-center">
+                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                            {{ $tiket->closing_awal_at ? $tiket->closing_awal_at->format('d/m H:i') : 'Menunggu' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->closing_awal_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                            {{ $tiket->closing_awal_at ? 'Diajukan' : 'Proses' }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Stage 5: Closing Akhir (NOC) -->
-                <div class="flex flex-col items-center space-y-1.5 text-center relative z-10 px-1">
-                    <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
                         {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->status === 'CLOSE' ? '✓' : '5' }}
                     </div>
-                    <span class="font-heading font-extrabold text-xs text-slate-800 leading-tight">Closing Akhir (NOC)</span>
-                    <span class="text-[11px] text-slate-400 font-mono">
-                        {{ $tiket->verified_at ? $tiket->verified_at->format('d/m H:i') : 'Menunggu' }}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->status === 'CLOSE' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                        {{ $tiket->status === 'CLOSE' ? 'Terverifikasi' : 'Pending' }}
-                    </span>
+                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Closing NOC</span>
+                    </div>
+                    <div class="h-4 sm:h-5 flex items-center justify-center">
+                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                            {{ $tiket->verified_at ? $tiket->verified_at->format('d/m H:i') : 'Menunggu' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->status === 'CLOSE' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                            {{ $tiket->status === 'CLOSE' ? 'Terverifikasi' : 'Pending' }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
