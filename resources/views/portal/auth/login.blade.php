@@ -148,7 +148,7 @@
             }
             .wave-mobile {
                 display: block !important;
-                height: 46px !important;
+                height: 52px !important;
             }
             .login-wrap {
                 flex-direction: column !important;
@@ -159,19 +159,21 @@
             }
             .login-panel-left {
                 width: 100% !important;
-                min-height: 0 !important;
-                height: auto !important;
-                padding: 18px 20px 52px 20px !important;
+                min-height: 42% !important;
+                flex: 0 0 auto !important;
+                padding: 24px 20px 58px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
                 flex: 1 !important;
-                justify-content: flex-start !important;
-                padding: 12px 20px 20px 20px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                padding: 10px 20px 24px 20px !important;
                 margin-top: 0 !important;
                 z-index: 25 !important;
-                overflow: hidden !important;
+                overflow-y: auto !important;
             }
         }
     </style>
