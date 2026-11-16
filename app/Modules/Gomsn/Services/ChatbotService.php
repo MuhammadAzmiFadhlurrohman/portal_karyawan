@@ -36,6 +36,66 @@ class ChatbotService
     }
 
     /**
+     * Check if user has supervisor/manager/atasan authority.
+     */
+    protected function isAtasanOrManager(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasRole(['super_admin', 'admin', 'ceo', 'manager_teknisi', 'atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum'])) {
+            return true;
+        }
+
+        if ($user->can('gomsn.pengajuan.approve_atasan') || $user->can('attendance.correction.approve') || $user->can('gomsn.lembur.approve')) {
+            return true;
+        }
+
+        return User::query()->where('supervisor_id', $user->id)->exists();
+    }
+
+    /**
+     * Check if user can approve attendance corrections.
+     */
+    protected function canApproveAbsen(?User $user): bool
+    {
+        return $this->isAtasanOrManager($user) || ($user && $user->can('attendance.correction.approve'));
+    }
+
+    /**
+     * Check if user can approve leave requests.
+     */
+    protected function canApproveCuti(?User $user): bool
+    {
+        return $this->isAtasanOrManager($user) || ($user && ($user->hasRole('hrd') || $user->can('attendance.leave.approve')));
+    }
+
+    /**
+     * Check if user can approve overtime.
+     */
+    protected function canApproveLembur(?User $user): bool
+    {
+        return $this->isAtasanOrManager($user) || ($user && ($user->hasRole('finance') || $user->can('gomsn.lembur.approve')));
+    }
+
+    /**
+     * Check if user can approve fund/goods requests.
+     */
+    protected function canApprovePengajuanDana(?User $user): bool
+    {
+        return $this->isAtasanOrManager($user) || ($user && ($user->hasRole(['finance', 'direksi', 'ceo']) || $user->can('gomsn.pengajuan.approve_finance')));
+    }
+
+    /**
+     * Check if user can manage employee data.
+     */
+    protected function canManageEmployee(?User $user): bool
+    {
+        return $user && ($user->hasRole(['super_admin', 'admin', 'hrd']) || $user->can('attendance.employee.manage'));
+    }
+
+    /**
      * Resolve action button (Label & URL) for a matched intent so the user can jump directly to the page.
      *
      * @return ?array{label: string, url: string}
@@ -54,10 +114,15 @@ class ChatbotService
                 'label' => '📝 Buka Riwayat & Koreksi Absen',
                 'url' => route('attendance.history'),
             ],
-            'approval_pengajuan_absen' => [
-                'label' => '✅ Buka Persetujuan Pengajuan Absen',
-                'url' => route('attendance.corrections.approvals'),
-            ],
+            'approval_pengajuan_absen' => $this->canApproveAbsen($user)
+                ? [
+                    'label' => '✅ Buka Persetujuan Pengajuan Absen',
+                    'url' => route('attendance.corrections.approvals'),
+                ]
+                : [
+                    'label' => '📝 Buka Riwayat Absen Saya',
+                    'url' => route('attendance.history'),
+                ],
             'tukar_shift_aturan',
             'backup_shift_aturan',
             'aturan_jeda_shift' => [
@@ -66,16 +131,32 @@ class ChatbotService
             ],
             'sisa_cuti',
             'cara_ajukan_sakit',
-            'cara_ajukan_cuti',
-            'cara_approve_cuti' => [
+            'cara_ajukan_cuti' => [
                 'label' => '🌴 Buka Halaman Cuti & Izin',
                 'url' => route('attendance.leaves'),
             ],
+            'cara_approve_cuti' => $this->canApproveCuti($user)
+                ? [
+                    'label' => '✅ Buka Persetujuan Cuti Karyawan',
+                    'url' => route('attendance.leaves'),
+                ]
+                : [
+                    'label' => '🌴 Ajukan Cuti & Izin Saya',
+                    'url' => route('attendance.leaves'),
+                ],
             'cara_ajukan_lembur' => [
                 'label' => '⏰ Buat Pengajuan Lembur',
                 'url' => route('gomsn.overtime.create'),
             ],
-            'cara_approve_lembur',
+            'cara_approve_lembur' => $this->canApproveLembur($user)
+                ? [
+                    'label' => '💼 Buka Persetujuan Lembur',
+                    'url' => route('gomsn.overtime.index'),
+                ]
+                : [
+                    'label' => '⏰ Buat Pengajuan Lembur',
+                    'url' => route('gomsn.overtime.create'),
+                ],
             'pencairan_lembur' => [
                 'label' => '💼 Buka Halaman Lembur',
                 'url' => route('gomsn.overtime.index'),
@@ -89,14 +170,15 @@ class ChatbotService
                 'label' => '📋 Buka Pengajuan Saya',
                 'url' => route('gomsn.pengajuan.index'),
             ],
-            'tahapan_approval_pengajuan' => [
-                'label' => ($user && ($user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin'])))
-                    ? '✅ Buka Persetujuan Karyawan'
-                    : '📋 Buka Halaman Pengajuan',
-                'url' => ($user && ($user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin'])))
-                    ? route('gomsn.pengajuan.approvals')
-                    : route('gomsn.pengajuan.index'),
-            ],
+            'tahapan_approval_pengajuan' => $this->canApprovePengajuanDana($user)
+                ? [
+                    'label' => '✅ Buka Persetujuan Karyawan',
+                    'url' => route('gomsn.pengajuan.approvals'),
+                ]
+                : [
+                    'label' => '📋 Buka Pengajuan Saya',
+                    'url' => route('gomsn.pengajuan.index'),
+                ],
             'stok_barang_gudang' => [
                 'label' => '📦 Buka Stok Barang Gudang',
                 'url' => route('gomsn.inventory.index'),
@@ -128,10 +210,15 @@ class ChatbotService
                 'label' => '👤 Buka Halaman Profile',
                 'url' => route('portal.profile'),
             ],
-            'manajemen_data_karyawan' => [
-                'label' => '👥 Buka Data Karyawan',
-                'url' => route('portal.employees.index'),
-            ],
+            'manajemen_data_karyawan' => $this->canManageEmployee($user)
+                ? [
+                    'label' => '👥 Buka Data Karyawan',
+                    'url' => route('portal.employees.index'),
+                ]
+                : [
+                    'label' => '👤 Buka Halaman Profile',
+                    'url' => route('portal.profile'),
+                ],
             default => null,
         };
     }
@@ -370,19 +457,29 @@ class ChatbotService
             }
         }
 
-        // Suggestions for quick follow-up
-        $suggestions = [
+        // Suggestions for quick follow-up based on user role
+        $isApprover = $this->isAtasanOrManager($user);
+        $suggestions = $isApprover ? [
+            'Bagaimana cara approve pengajuan cuti?',
+            'Cara approve pengajuan absen karyawan',
+            'Bagaimana cara approve pengajuan dana?',
+            'Cara approve pengajuan lembur',
+            'Bagaimana cara absen masuk & pulang?',
+            'Status pengajuan saya',
+        ] : [
             'Bagaimana cara absen masuk & pulang?',
             'Bagaimana cara mengajukan dana?',
             'Bagaimana cara membuat pengajuan lembur?',
             'Apakah cuti saya masih ada?',
             'Bagaimana cara mengajukan sakit?',
-            'Bagaimana cara approve pengajuan cuti?',
+            'Bagaimana cara mengajukan koreksi absen?',
         ];
 
         // Jika tidak ada kecocokan yang memadai
         if ($bestScore < 0.75 || ! $bestIntent) {
-            $fallback = "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Bagaimana jika absen tidak bisa diverifikasi?\"\n• \"Bagaimana cara mengajukan dana?\"";
+            $fallback = $isApprover
+                ? "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Cara approve pengajuan absen karyawan\"\n• \"Bagaimana cara approve pengajuan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Status pengajuan saya\""
+                : "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Bagaimana jika absen tidak bisa diverifikasi?\"\n• \"Cara tukar jadwal shift\"";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
@@ -399,14 +496,25 @@ class ChatbotService
                 'matched_intent' => null,
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => $suggestions,
+                'suggestions' => array_slice($suggestions, 0, 4),
             ];
         }
 
-        // Personalized dynamic response for logged-in user data (§5.8)
+        // Personalized dynamic response for logged-in user data (§5.8) & Role-Based Access Restrictions
         $reply = $bestIntent->response_text;
         if ($user) {
-            if ($bestIntent->intent_key === 'sapaan_halo') {
+            // Batasan Hak Akses (Role-Based Restriction): Jika karyawan biasa menanyakan approval / tugas manajerial
+            if ($bestIntent->intent_key === 'approval_pengajuan_absen' && ! $this->canApproveAbsen($user)) {
+                $reply = "Mohon maaf {$user->name}, fitur persetujuan (approval) koreksi absen hanya dapat dilakukan oleh Atasan Divisi atau Admin.\n\nSebagai karyawan, Anda tidak memiliki akses untuk menyetujui pengajuan. Anda dapat mengajukan koreksi kehadiran Anda sendiri melalui menu 'Riwayat Absen' dan menunggu persetujuan dari atasan.";
+            } elseif ($bestIntent->intent_key === 'cara_approve_cuti' && ! $this->canApproveCuti($user)) {
+                $reply = "Mohon maaf {$user->name}, proses persetujuan (approval) cuti karyawan merupakan kewenangan dari Atasan Langsung dan HRD.\n\nSebagai karyawan, Anda tidak memiliki wewenang untuk menyetujui pengajuan cuti. Anda cukup mengajukan permohonan cuti atau izin sakit melalui menu 'Cuti & Izin' dan menunggu persetujuan dari atasan Anda.";
+            } elseif ($bestIntent->intent_key === 'cara_approve_lembur' && ! $this->canApproveLembur($user)) {
+                $reply = "Mohon maaf {$user->name}, fitur persetujuan (approval) lembur hanya dapat diakses oleh Atasan Divisi (pengesahan tugas) dan Finance (pencairan dana).\n\nSebagai karyawan, Anda tidak memiliki wewenang menyetujui lembur rekan lain. Anda dapat membuat pengajuan lembur Anda sendiri melalui menu 'Lembur'.";
+            } elseif ($bestIntent->intent_key === 'tahapan_approval_pengajuan' && ! $this->canApprovePengajuanDana($user)) {
+                $reply = "Mohon maaf {$user->name}, proses persetujuan (approval) dan pencairan pengajuan operasional dilakukan oleh Atasan Divisi, Direksi, dan Finance.\n\nSebagai karyawan/pemohon, Anda tidak memiliki wewenang untuk menyetujui pengajuan. Anda dapat membuat pengajuan baru atau memantau status pengajuan Anda melalui menu 'Pengajuan Saya'.";
+            } elseif ($bestIntent->intent_key === 'manajemen_data_karyawan' && ! $this->canManageEmployee($user)) {
+                $reply = "Mohon maaf {$user->name}, pengelolaan data karyawan (tambah karyawan, ubah divisi, reset password atau biometrik) merupakan hak akses khusus Admin & HRD.\n\nUntuk melihat atau memperbarui profil pribadi Anda serta mendaftarkan sidik jari, silakan kunjungi menu 'Profile'.";
+            } elseif ($bestIntent->intent_key === 'sapaan_halo') {
                 $reply = "Halo {$user->name}! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nAda yang bisa saya bantu hari ini? Anda bisa bertanya berbagai hal, misalnya:\n• \"Apakah saya sudah absen hari ini?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Cara tukar jadwal shift\"";
             } elseif ($bestIntent->intent_key === 'sisa_cuti') {
                 $balance = LeaveBalance::query()

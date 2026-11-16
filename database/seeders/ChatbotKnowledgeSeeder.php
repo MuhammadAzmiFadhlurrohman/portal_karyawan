@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 
 class ChatbotKnowledgeSeeder extends Seeder
 {
-    public const KNOWLEDGE_VERSION = 'v3.0';
+    public const KNOWLEDGE_VERSION = 'v3.1';
 
     /**
      * Get the complete array of built-in chatbot intents with specific topics,
@@ -25,7 +25,7 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'intent_key' => 'sapaan_halo',
                 'category' => 'umum',
                 'keywords' => ['halo', 'hai', 'hi', 'hello', 'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam', 'assalamualaikum', 'permisi', 'ping', 'tes'],
-                'response_text' => "Halo! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nSaya memahami seluruh alur kerja di aplikasi ini. Anda bisa bertanya langsung dengan bahasa sehari-hari, misalnya:\n• \"Gimana cara absen masuk dan pulang?\"\n• \"Bagaimana cara mengajukan dana atau barang?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Bagaimana cara approve pengajuan cuti dari karyawan?\"\n• \"Bagaimana jika absen wajah tidak bisa diverifikasi?\"",
+                'response_text' => "Halo! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nSaya memahami seluruh alur kerja di aplikasi ini. Anda bisa bertanya langsung dengan bahasa sehari-hari, misalnya:\n• \"Gimana cara absen masuk dan pulang?\"\n• \"Bagaimana cara mengajukan dana atau barang?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Bagaimana jika absen wajah tidak bisa diverifikasi?\"",
             ],
             [
                 'intent_key' => 'ucapan_terima_kasih',
@@ -100,7 +100,8 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'keywords' => [
                     'approve pengajuan absen', 'approve koreksi absen', 'persetujuan absen',
                     'siapa approve absen', 'cara approve absen', 'menyetujui pengajuan absen',
-                    'approval koreksi absensi', 'acc pengajuan absen',
+                    'approval koreksi absensi', 'acc pengajuan absen', 'cara approve pengajuan absen',
+                    'approval absen',
                 ],
                 'response_text' => "Cara Approve Pengajuan Koreksi Absen (Khusus Atasan & Admin):\n1. Buka menu 'Pengajuan Absen' di sidebar.\n2. Tinjau daftar pengajuan koreksi kehadiran dari anggota divisi Anda (lihat jam asal, jam usulan, alasan, serta bukti lampiran).\n3. Klik tombol 'Setujui & Perbarui Absen' untuk menyetujui (data absensi karyawan akan otomatis diperbarui), atau klik 'Tolak Pengajuan' disertai alasan penolakan.",
             ],
@@ -173,7 +174,8 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'keywords' => [
                     'approve pengajuan cuti', 'approve cuti', 'menyetujui cuti',
                     'persetujuan cuti', 'acc cuti karyawan', 'cara setujui cuti',
-                    'verifikasi cuti', 'tolak cuti karyawan',
+                    'verifikasi cuti', 'tolak cuti karyawan', 'cara approve cuti',
+                    'approval cuti', 'cara approve cuti karyawan',
                 ],
                 'response_text' => "Cara Approve Pengajuan Cuti Karyawan (Atasan & HRD):\n1. Buka halaman 'Cuti & Izin' di sidebar.\n2. Gulir ke bagian tabel 'Daftar Pengajuan Cuti Karyawan / Menunggu Persetujuan'.\n3. Periksa detail tanggal, jenis cuti/sakit, alasan, dan lampiran surat dokter (jika ada).\n4. Klik tombol 'Setujui (Approve)' untuk menyetujui tahap Atasan/HRD, atau klik 'Tolak' jika permohonan belum dapat diberikan.",
             ],
@@ -197,6 +199,7 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'keywords' => [
                     'approve lembur', 'persetujuan lembur', 'menyetujui lembur',
                     'acc lembur karyawan', 'verifikasi lembur', 'cara approve pengajuan lembur',
+                    'cara approve lembur', 'approval lembur',
                 ],
                 'response_text' => "Cara Approve Pengajuan Lembur Karyawan (Atasan & Finance):\n1. Buka menu 'Persetujuan Lembur' di sidebar.\n2. Klik karyawan atau tinjau daftar pengajuan lembur yang berstatus 'Menunggu Persetujuan'.\n3. Klik tombol 'Detail' untuk melihat jam kerja, uraian tugas, dan foto bukti lembur.\n4. Bagi Atasan: Klik 'Setujui' untuk mengesahkan lembur.\n5. Bagi Finance: Klik tombol verifikasi/pencairan setelah disetujui Atasan.",
             ],
@@ -230,7 +233,9 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'keywords' => [
                     'approve pengajuan dana', 'cara approve pengajuan karyawan', 'persetujuan karyawan',
                     'siapa approve pengajuan dana', 'pencairan finance', 'cara mencairkan dana',
-                    'metode pencairan transfer cash', 'acc pengajuan dana',
+                    'metode pencairan transfer cash', 'acc pengajuan dana', 'approve pengajuan',
+                    'cara approve pengajuan', 'persetujuan pengajuan', 'acc pengajuan', 'cara approve',
+                    'approval pengajuan', 'cara menyetujui pengajuan',
                 ],
                 'response_text' => "Cara Approve & Pencairan Pengajuan Operasional:\n1. Untuk Atasan Divisi: Buka menu 'Persetujuan Karyawan', klik 'Detail' pada pengajuan bawahan, lalu klik 'Setujui Pengajuan'.\n2. Untuk Direksi/Eksekutif: Menyetujui pengajuan yang membutuhkan otorisasi nominal besar.\n3. Untuk Finance: Buka daftar pengajuan berstatus 'Menunggu Finance', klik 'Detail', pilih metode pencairan 'Transfer' (upload bukti opsional) atau 'Cash' (tanpa upload bukti), lalu konfirmasi pencairan. Status otomatis menjadi SELESAI.",
             ],
