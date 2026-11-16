@@ -155,9 +155,13 @@ class PengajuanController extends Controller
             $query->where('jenis', strtoupper($request->input('jenis')));
         }
 
-        // Excel / CSV Export handler
+        // Excel / CSV Export handler (hanya pengajuan yang sudah disetujui)
         if (in_array($request->input('export'), ['excel', 'csv', '1'], true)) {
-            $exportItems = (clone $query)->orderBy('created_at', 'desc')->get();
+            $exportQuery = (clone $query)->orderBy('created_at', 'desc');
+            if (! $request->filled('status')) {
+                $exportQuery->whereIn('status', ['disetujui', 'menunggu_finance', 'menunggu_executive', 'dicairkan', 'ditransfer', 'menunggu_bukti', 'terealisasi', 'selesai']);
+            }
+            $exportItems = $exportQuery->get();
             return $this->streamExcelExport($exportItems, 'Data_Pengajuan_Karyawan');
         }
 
@@ -300,7 +304,11 @@ class PengajuanController extends Controller
         }
 
         if (in_array($request->input('export'), ['excel', 'csv', '1'], true)) {
-            $exportItems = (clone $query)->orderBy('created_at', 'desc')->get();
+            $exportQuery = (clone $query)->orderBy('created_at', 'desc');
+            if ($statusFilter === 'all' || ! $statusFilter) {
+                $exportQuery->whereIn('status', ['disetujui', 'menunggu_finance', 'menunggu_executive', 'dicairkan', 'ditransfer', 'menunggu_bukti', 'terealisasi', 'selesai']);
+            }
+            $exportItems = $exportQuery->get();
             return $this->streamExcelExport($exportItems, 'Persetujuan_Pengajuan_Karyawan');
         }
 
@@ -361,7 +369,6 @@ class PengajuanController extends Controller
             echo '<th>Nomor Pengajuan</th>';
             echo '<th>Tanggal Pengajuan</th>';
             echo '<th>Nama Karyawan</th>';
-            echo '<th>NIK</th>';
             echo '<th>Divisi</th>';
             echo '<th>Jenis Pengajuan</th>';
             echo '<th>Keperluan</th>';
@@ -381,7 +388,6 @@ class PengajuanController extends Controller
                 echo '<td>' . e($item->nomor_pengajuan) . '</td>';
                 echo '<td>' . $item->created_at->format('d/m/Y H:i') . '</td>';
                 echo '<td>' . e($item->user?->name ?? '-') . '</td>';
-                echo '<td>' . e($item->user?->employee_code ?? '-') . '</td>';
                 echo '<td>' . e($item->user?->division ?? '-') . '</td>';
                 echo '<td align="center">' . e($item->jenis) . '</td>';
                 echo '<td>' . e($item->keperluan ?? '-') . '</td>';
@@ -391,7 +397,7 @@ class PengajuanController extends Controller
             }
 
             echo '<tr style="background-color:#F1F5F9;font-weight:bold;">';
-            echo '<td colspan="10" align="right">TOTAL NOMINAL</td>';
+            echo '<td colspan="9" align="right">TOTAL NOMINAL</td>';
             echo '<td align="right">Rp ' . number_format($totalSum, 0, ',', '.') . '</td>';
             echo '</tr>';
             echo '</tbody></table></body></html>';
