@@ -717,7 +717,8 @@
     <!-- TAB 1: KRONOLOGIS (WhatsApp-Style Live Chat matching Image 2 & 3) -->
     <!-- ========================================================================= -->
     <div id="tab-chronology" class="tab-pane space-y-4">
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col h-[calc(100dvh-175px)] min-h-[560px] sm:h-[700px] sm:min-h-[640px]">
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col"
+             style="min-height: 620px;">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
             <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0"
@@ -749,7 +750,7 @@
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
             <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto bg-slate-50/70"
-                 style="background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
+                 style="min-height: 500px; max-height: 680px; background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
                 
                 <!-- Date divider -->
                 <div class="flex justify-center">
