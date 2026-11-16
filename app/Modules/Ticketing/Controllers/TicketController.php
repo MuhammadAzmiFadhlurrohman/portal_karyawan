@@ -92,6 +92,43 @@ class TicketController extends Controller
     }
 
     /**
+     * Show dedicated Open Ticket form (§7.1, AC-04, AC-11).
+     */
+    public function create(Request $request): View
+    {
+        $user = $request->user();
+        if (! $user->can('ticket.create') && ! $user->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
+            abort(403, 'Anda tidak memiliki hak akses untuk membuat tiket.');
+        }
+
+        $slaMatrix = MasterSla::query()->where('is_active', true)->get();
+        $today = Carbon::now('Asia/Jakarta')->format('Ymd');
+        $backbonePreview = 'BDG-' . $today . '-XXX';
+        $broadbandPreview = 'BRD-' . $today . '-XXX';
+
+        $segments = [
+            'BDG-SRE-01 (Soreang - Banjaran)',
+            'BDG-CBG-01 (Cibiru - Gedebage)',
+            'BDG-KPO-01 (Kopo - Pasirkoja)',
+            'BDG-DGO-01 (Dago - Setiabudi)',
+            'BDG-CRA-01 (Ciroyom - Andir)',
+            'BDG-UJG-01 (Ujungberung - Cipadung)',
+            'BDG-CMH-01 (Cimahi - Padalarang)',
+            'BDG-TPO-01 (Taman Kopo Indah)',
+            'BDG-RCA-01 (Rancaekek - Cicalengka)',
+            'SW BBLU - SW Reog',
+            'SW Core Dayeuhkolot - SW Distribusi',
+        ];
+
+        $initialCategory = strtolower($request->query('category', 'backbone'));
+        if (! in_array($initialCategory, ['backbone', 'broadband'])) {
+            $initialCategory = 'backbone';
+        }
+
+        return view('ticketing.create', compact('slaMatrix', 'backbonePreview', 'broadbandPreview', 'segments', 'initialCategory'));
+    }
+
+    /**
      * Show ticket detail (§7.1–§7.6).
      */
     public function show(Request $request, Tiket $tiket): View
@@ -158,13 +195,21 @@ class TicketController extends Controller
 
         $validated = $request->validate([
             'backbone_segment' => ['required', 'string', 'max:150'],
-            'status_link_impact' => ['required', 'string', 'in:TOTAL_DOWN,DEGRADED,NO_IMPACT'],
-            'wilayah' => ['required', 'string', 'max:100'],
-            'tipe_penanganan' => ['required', 'string', 'max:100'],
-            'priority' => ['required', 'string', 'in:P1,P2,P3,P4'],
+            'status_link_impact' => ['required', 'string', 'max:150'],
+            'wilayah' => ['nullable', 'string', 'max:100'],
+            'tipe_penanganan' => ['nullable', 'string', 'max:100'],
+            'priority' => ['nullable', 'string', 'in:P1,P2,P3,P4'],
+            'sla_target_minutes' => ['nullable', 'integer', 'min:15', 'max:10080'],
+            'tanggal_open' => ['nullable'],
             'notes' => ['nullable', 'string'],
             'parent_ticket_id' => ['nullable', 'exists:tiket,id'],
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['nullable', 'file', 'mimes:jpeg,jpg,png,webp,pdf', 'max:12288'],
         ]);
+
+        $priority = $validated['priority'] ?? 'P2';
+        $wilayah = ! empty($validated['wilayah']) ? $validated['wilayah'] : 'Area Bandung & Sekitarnya';
+        $tipePenanganan = ! empty($validated['tipe_penanganan']) ? $validated['tipe_penanganan'] : 'Corrective Maintenance FO';
 
         // Duplicate active check (§7.1)
         $existingActive = Tiket::query()
@@ -173,28 +218,31 @@ class TicketController extends Controller
             ->whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
             ->first();
 
-        // Resolve SLA target from master_sla (§7.1)
+        // Resolve SLA target from master_sla (§7.1) or custom SLA input
         $sla = MasterSla::query()
             ->where('kategori_tiket', 'BACKBONE')
-            ->where('priority', $validated['priority'])
+            ->where('priority', $priority)
             ->first();
-        $slaMinutes = $sla ? $sla->sla_minutes : 360; // Default 360 min
+        $slaMinutes = ! empty($validated['sla_target_minutes'])
+            ? (int) $validated['sla_target_minutes']
+            : ($sla ? $sla->sla_minutes : 360);
 
         $noTiket = $this->sequenceService->generate('BDG');
         $now = Carbon::now('Asia/Jakarta');
+        $tanggalOpen = ! empty($validated['tanggal_open']) ? Carbon::parse($validated['tanggal_open']) : $now;
 
         $tiket = Tiket::query()->create([
             'no_tiket' => $noTiket,
             'kategori_tiket' => 'BACKBONE',
-            'priority' => $validated['priority'],
+            'priority' => $priority,
             'status' => 'OPEN',
             'sla_target_minutes' => $slaMinutes,
             'backbone_segment' => $validated['backbone_segment'],
             'status_link_impact' => $validated['status_link_impact'],
-            'wilayah' => $validated['wilayah'],
-            'tipe_penanganan' => $validated['tipe_penanganan'],
+            'wilayah' => $wilayah,
+            'tipe_penanganan' => $tipePenanganan,
             'problem_temuan' => $validated['notes'] ?? null,
-            'tanggal_open' => $now,
+            'tanggal_open' => $tanggalOpen,
             'created_by' => $user->id,
             'parent_ticket_id' => $validated['parent_ticket_id'] ?? null,
         ]);
@@ -203,9 +251,25 @@ class TicketController extends Controller
             'from_status' => null,
             'to_status' => 'OPEN',
             'changed_by' => $user->id,
-            'reason' => 'Tiket Backbone dibuat oleh Helpdesk',
+            'reason' => 'Tiket Backbone dibuat oleh ' . ($user->name ?? 'Helpdesk/NOC'),
             'created_at' => $now,
         ]);
+
+        // Store photos into ticket chronologies if uploaded
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                if ($photo && $photo->isValid()) {
+                    $path = $photo->store('tickets/evidence', 'public');
+                    $tiket->chronologies()->create([
+                        'user_id' => $user->id,
+                        'category' => 'INVESTIGASI',
+                        'message' => 'Foto bukti awal open tiket: ' . ($validated['notes'] ?? 'Kondisi gangguan awal'),
+                        'photo_path' => $path,
+                        'created_at' => $now,
+                    ]);
+                }
+            }
+        }
 
         $msg = "Tiket Backbone {$noTiket} berhasil dibuat.";
         if ($existingActive) {
@@ -232,12 +296,17 @@ class TicketController extends Controller
             'customer_address' => ['nullable', 'string'],
             'customer_odp' => ['nullable', 'string', 'max:100'],
             'customer_olt' => ['nullable', 'string', 'max:100'],
-            'priority' => ['required', 'string', 'in:P1,P2,P3,P4'],
+            'priority' => ['nullable', 'string', 'in:P1,P2,P3,P4'],
+            'sla_target_minutes' => ['nullable', 'integer', 'min:15', 'max:10080'],
+            'tanggal_open' => ['nullable'],
             'notes' => ['nullable', 'string'],
             'parent_ticket_id' => ['nullable', 'exists:tiket,id'],
             'is_manual_fallback' => ['nullable', 'boolean'],
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['nullable', 'file', 'mimes:jpeg,jpg,png,webp,pdf', 'max:12288'],
         ]);
 
+        $priority = $validated['priority'] ?? 'P2';
         $cid = $validated['customer_id'] ?? null;
         $snapshot = null;
         $isValidated = true;
@@ -268,17 +337,20 @@ class TicketController extends Controller
 
         $sla = MasterSla::query()
             ->where('kategori_tiket', 'BROADBAND')
-            ->where('priority', $validated['priority'])
+            ->where('priority', $priority)
             ->first();
-        $slaMinutes = $sla ? $sla->sla_minutes : 240; // Default 240 min (§7.1)
+        $slaMinutes = ! empty($validated['sla_target_minutes'])
+            ? (int) $validated['sla_target_minutes']
+            : ($sla ? $sla->sla_minutes : 240); // Default 240 min (§7.1)
 
         $noTiket = $this->sequenceService->generate('BRD');
         $now = Carbon::now('Asia/Jakarta');
+        $tanggalOpen = ! empty($validated['tanggal_open']) ? Carbon::parse($validated['tanggal_open']) : $now;
 
         $tiket = Tiket::query()->create([
             'no_tiket' => $noTiket,
             'kategori_tiket' => 'BROADBAND',
-            'priority' => $validated['priority'],
+            'priority' => $priority,
             'status' => 'OPEN',
             'sla_target_minutes' => $slaMinutes,
             'customer_id' => $cid,
@@ -290,7 +362,7 @@ class TicketController extends Controller
             'customer_snapshot' => $snapshot,
             'is_ims_validated' => $isValidated,
             'problem_temuan' => $validated['notes'] ?? null,
-            'tanggal_open' => $now,
+            'tanggal_open' => $tanggalOpen,
             'created_by' => $user->id,
             'parent_ticket_id' => $validated['parent_ticket_id'] ?? null,
         ]);
@@ -299,9 +371,25 @@ class TicketController extends Controller
             'from_status' => null,
             'to_status' => 'OPEN',
             'changed_by' => $user->id,
-            'reason' => 'Tiket Broadband dibuat oleh Helpdesk'.($isValidated ? '' : ' (Data manual / belum tervalidasi IMS - AC-11)'),
+            'reason' => 'Tiket Broadband dibuat oleh ' . ($user->name ?? 'Helpdesk/NOC') . ($isValidated ? '' : ' (Data manual / belum tervalidasi IMS - AC-11)'),
             'created_at' => $now,
         ]);
+
+        // Store photos into ticket chronologies if uploaded
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                if ($photo && $photo->isValid()) {
+                    $path = $photo->store('tickets/evidence', 'public');
+                    $tiket->chronologies()->create([
+                        'user_id' => $user->id,
+                        'category' => 'INVESTIGASI',
+                        'message' => 'Foto bukti awal open tiket: ' . ($validated['notes'] ?? 'Kondisi gangguan pelanggan'),
+                        'photo_path' => $path,
+                        'created_at' => $now,
+                    ]);
+                }
+            }
+        }
 
         $msg = "Tiket Broadband {$noTiket} berhasil dibuat.";
         if (! $isValidated) {

@@ -129,6 +129,7 @@ Route::middleware('auth')->group(function (): void {
 
     // Fase 3: Modul Work Report & Tiketing Gangguan (§7, AC-04 s.d. AC-08, AC-11)
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
     Route::get('/tickets/ims/search', [TicketController::class, 'searchIms'])->name('tickets.ims.search');
     Route::post('/tickets/backbone', [TicketController::class, 'storeBackbone'])->name('tickets.backbone.store');
     Route::post('/tickets/broadband', [TicketController::class, 'storeBroadband'])->name('tickets.broadband.store');

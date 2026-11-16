@@ -417,4 +417,35 @@ class PhaseThreeTicketingTest extends TestCase
         $handoverService->acknowledge($handover, $teknisi2);
         $this->assertNotNull($handover->fresh()->acknowledged_at);
     }
+
+    /**
+     * Test authorized user can view open ticket page and post ticket.
+     */
+    public function test_authorized_user_can_access_open_ticket_page_and_create_ticket(): void
+    {
+        $noc = User::query()->where('email', 'noc@msn.co.id')->first();
+        if (! $noc) {
+            $noc = User::first();
+        }
+
+        $res = $this->actingAs($noc)->get(route('tickets.create'));
+        $res->assertStatus(200);
+        $res->assertSee('Open Tiket Gangguan Baru');
+        $res->assertSee('Backbone FO');
+        $res->assertSee('Maintenance Broadband');
+
+        // Test post backbone ticket
+        $postRes = $this->actingAs($noc)->post(route('tickets.backbone.store'), [
+            'backbone_segment' => 'BDG-SRE-01 (Soreang - Banjaran)',
+            'status_link_impact' => 'Backbone : SW BBLU - SW Reog Down',
+            'sla_target_minutes' => 360,
+            'notes' => 'Uji coba open tiket baru',
+        ]);
+
+        $postRes->assertRedirect();
+        $this->assertDatabaseHas('tiket', [
+            'backbone_segment' => 'BDG-SRE-01 (Soreang - Banjaran)',
+            'kategori_tiket' => 'BACKBONE',
+        ]);
+    }
 }

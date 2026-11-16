@@ -35,18 +35,18 @@
             <!-- Action Buttons: + Tiket Backbone & + Tiket Broadband -->
             <div class="flex flex-wrap items-center gap-3">
                 @can('ticket.create')
-                <button type="button" onclick="openBackboneModal()"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white shadow-lg shadow-teal-950/40 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                <a href="{{ route('tickets.create', ['category' => 'backbone']) }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white shadow-lg shadow-teal-950/40 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+                   style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                     <span>+ Tiket Backbone</span>
-                </button>
+                </a>
 
-                <button type="button" onclick="openBroadbandModal()"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white shadow-lg shadow-emerald-950/40 border border-white/20 bg-emerald-600 hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer">
+                <a href="{{ route('tickets.create', ['category' => 'broadband']) }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white shadow-lg shadow-emerald-950/40 border border-white/20 bg-emerald-600 hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.393 9.929c5.857-5.858 15.355-5.858 21.213 0"/></svg>
                     <span>+ Tiket Broadband</span>
-                </button>
+                </a>
                 @endcan
 
                 <a href="{{ route('gomsn.analytics.kpi') }}"
