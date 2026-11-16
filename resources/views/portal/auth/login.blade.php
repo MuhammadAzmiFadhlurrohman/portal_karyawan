@@ -148,7 +148,7 @@
             }
             .wave-mobile {
                 display: block !important;
-                height: 50px !important;
+                height: 46px !important;
             }
             .login-wrap {
                 flex-direction: column !important;
@@ -161,15 +161,16 @@
                 width: 100% !important;
                 min-height: 0 !important;
                 height: auto !important;
-                padding: 16px 20px 54px 20px !important;
+                padding: 18px 20px 52px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
                 flex: 1 !important;
                 justify-content: flex-start !important;
-                padding: 0 20px 14px 20px !important;
-                margin-top: -12px !important;
+                padding: 12px 20px 20px 20px !important;
+                margin-top: 0 !important;
+                z-index: 25 !important;
                 overflow: hidden !important;
             }
         }
@@ -289,13 +290,13 @@
             </svg>
 
             <!-- MOBILE MULTI-LAYER HORIZONTAL WAVES (BOTTOM EDGE) -->
-            <svg class="wave-mobile" viewBox="0 0 1000 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="wave-mobile" viewBox="0 0 1000 106" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                 <!-- Layer 1: Medium Vibrant Teal Ribbon -->
-                <path d="M 0,18 C 160,38 320,34 480,48 C 640,64 780,74 900,56 C 950,48 980,50 1000,56 L 1000,122 L 0,122 Z" fill="rgba(20, 184, 166, 0.55)" />
+                <path d="M 0,18 C 160,38 320,34 480,48 C 640,64 780,74 900,56 C 950,48 980,50 1000,56 L 1000,108 L 0,108 Z" fill="rgba(20, 184, 166, 0.55)" />
                 <!-- Layer 2: Soft Pastel Mint/Cyan Ribbon -->
-                <path d="M 0,36 C 160,56 320,52 480,66 C 640,82 780,92 900,74 C 950,66 980,68 1000,74 L 1000,122 L 0,122 Z" fill="rgba(153, 246, 228, 0.78)" />
+                <path d="M 0,36 C 160,56 320,52 480,66 C 640,82 780,92 900,74 C 950,66 980,68 1000,74 L 1000,108 L 0,108 Z" fill="rgba(153, 246, 228, 0.78)" />
                 <!-- Layer 3: Solid White Foreground -->
-                <path d="M 0,54 C 160,74 320,70 480,84 C 640,100 780,110 900,92 C 950,84 980,86 1000,92 L 1000,122 L 0,122 Z" fill="#FFFFFF" />
+                <path d="M 0,54 C 160,74 320,70 480,84 C 640,100 780,106 900,92 C 950,84 980,86 1000,92 L 1000,108 L 0,108 Z" fill="#FFFFFF" />
             </svg>
 
             <!-- Top Spacer for Vertical Balance -->
