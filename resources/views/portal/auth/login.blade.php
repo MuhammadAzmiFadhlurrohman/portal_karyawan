@@ -148,7 +148,7 @@
             }
             .wave-mobile {
                 display: block !important;
-                height: 46px !important;
+                height: 48px !important;
             }
             .login-wrap {
                 flex-direction: column !important;
@@ -159,19 +159,21 @@
             }
             .login-panel-left {
                 width: 100% !important;
-                min-height: 0 !important;
-                height: auto !important;
-                padding: 18px 20px 70px 20px !important;
+                min-height: 38% !important;
+                flex: 0 0 auto !important;
+                padding: 20px 20px 52px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
                 flex: 1 !important;
-                justify-content: flex-start !important;
-                padding: 12px 20px 20px 20px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                padding: 16px 24px 28px 24px !important;
                 margin-top: 0 !important;
                 z-index: 25 !important;
-                overflow: hidden !important;
+                overflow-y: auto !important;
             }
         }
     </style>
@@ -353,11 +355,11 @@
             <div class="w-full max-w-[420px] sm:max-w-[440px] mx-auto relative z-10">
                 
                 <!-- Heading Masuk ke Akun -->
-                <div class="mb-3 sm:mb-6 text-center">
+                <div class="mb-4 sm:mb-6 text-center">
                     <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                         Masuk ke Akun
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
                         Silakan masukkan kredensial akun Anda untuk login.
                     </p>
                 </div>
