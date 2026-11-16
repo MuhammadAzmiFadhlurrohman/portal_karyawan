@@ -12,6 +12,7 @@ use App\Modules\Ticketing\Services\ImsIntegrationService;
 use App\Modules\Ticketing\Services\TicketDispatchService;
 use App\Modules\Ticketing\Services\TicketSequenceService;
 use App\Modules\Ticketing\Services\TicketStateMachine;
+use App\Modules\Ticketing\Services\TechnicalAssetService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +29,7 @@ class TicketController extends Controller
         protected TicketStateMachine $stateMachine,
         protected TicketDispatchService $dispatchService,
         protected ChronologyService $chronologyService,
+        protected TechnicalAssetService $assetService,
     ) {}
 
     /**
@@ -54,6 +56,10 @@ class TicketController extends Controller
             $query->where('kategori_tiket', strtoupper($request->input('kategori')));
         }
 
+        if ($request->filled('priority')) {
+            $query->where('priority', strtoupper($request->input('priority')));
+        }
+
         if ($request->filled('q')) {
             $term = trim($request->input('q'));
             $query->where(function ($q) use ($term) {
@@ -64,11 +70,21 @@ class TicketController extends Controller
             });
         }
 
-        $tickets = $query->orderBy('tanggal_open', 'desc')->paginate(15);
+        $tickets = $query->orderBy('tanggal_open', 'desc')->paginate(15)->withQueryString();
         $technicians = User::role('teknisi')->where('is_active', true)->get();
         $slaMatrix = MasterSla::query()->where('is_active', true)->get();
 
-        return view('ticketing.index', compact('tickets', 'technicians', 'slaMatrix'));
+        // Calculate KPI stats (§7.1, §7.7)
+        $stats = [
+            'total' => Tiket::count(),
+            'open' => Tiket::where('status', 'OPEN')->count(),
+            'proses' => Tiket::where('status', 'PROSES')->count(),
+            'pending_verifikasi' => Tiket::where('status', 'PENDING_VERIFIKASI')->count(),
+            'selesai' => Tiket::where('status', 'CLOSE')->count(),
+            'sla_tepat' => Tiket::where('status', 'CLOSE')->where('sla_status', 'TEPAT')->count(),
+        ];
+
+        return view('ticketing.index', compact('tickets', 'technicians', 'slaMatrix', 'stats'));
     }
 
     /**
@@ -99,8 +115,9 @@ class TicketController extends Controller
         $intervalStatus = $this->chronologyService->getIntervalStatus($tiket);
         $technicians = User::role('teknisi')->where('is_active', true)->get();
         $materials = MasterMaterial::query()->where('is_active', true)->get();
+        $prerequisites = $this->assetService->checkClosingPrerequisites($tiket);
 
-        return view('ticketing.show', compact('tiket', 'intervalStatus', 'technicians', 'materials'));
+        return view('ticketing.show', compact('tiket', 'intervalStatus', 'technicians', 'materials', 'prerequisites'));
     }
 
     /**
