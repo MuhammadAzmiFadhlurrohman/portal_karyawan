@@ -26,7 +26,7 @@ class ChronologyController extends Controller
         Gate::authorize('update', $tiket);
 
         $validated = $request->validate([
-            'category' => ['required', 'string', 'in:IZIN,OTDR,TRACING,MATERIAL,JOINTING,LINK_UP,SELESAI,LAIN'],
+            'category' => ['nullable', 'string'],
             'message' => ['required', 'string'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
@@ -34,6 +34,11 @@ class ChronologyController extends Controller
             'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:5120'], // 5MB
             'video' => ['nullable', 'file', 'mimes:mp4,mov,avi', 'max:20480'], // 20MB
         ]);
+
+        $category = ! empty($validated['category']) ? strtoupper($validated['category']) : 'LAIN';
+        if (! in_array($category, ['IZIN', 'OTDR', 'TRACING', 'MATERIAL', 'JOINTING', 'LINK_UP', 'SELESAI', 'LAIN', 'INVESTIGASI'])) {
+            $category = 'LAIN';
+        }
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
@@ -49,7 +54,7 @@ class ChronologyController extends Controller
             $entry = $this->chronologyService->addChronology(
                 tiket: $tiket,
                 user: $request->user(),
-                category: $validated['category'],
+                category: $category,
                 message: $validated['message'],
                 photoPath: $photoPath,
                 videoPath: $videoPath,

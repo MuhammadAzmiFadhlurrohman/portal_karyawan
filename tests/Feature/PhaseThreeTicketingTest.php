@@ -447,5 +447,14 @@ class PhaseThreeTicketingTest extends TestCase
             'backbone_segment' => 'BDG-SRE-01 (Soreang - Banjaran)',
             'kategori_tiket' => 'BACKBONE',
         ]);
+
+        $createdTicket = Tiket::where('backbone_segment', 'BDG-SRE-01 (Soreang - Banjaran)')->first();
+        $showRes = $this->actingAs($noc)->get(route('tickets.show', $createdTicket));
+        $showRes->assertStatus(200);
+        $showRes->assertSee('Menu Aksi');
+        $showRes->assertSee('Garis Alur SLA &amp; Siklus Hidup Tiket', false);
+        $showRes->assertSee('Kesiapan Closing Tiket');
+        $showRes->assertSee('Koordinasi Update Lapangan');
+        $showRes->assertSee('Template Cepat:');
     }
 }

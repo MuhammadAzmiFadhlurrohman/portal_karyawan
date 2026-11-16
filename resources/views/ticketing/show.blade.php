@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Tiket ' . $tiket->no_tiket . ' - Detail & Penanganan'])
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6 max-w-7xl mx-auto pb-16">
     @php
         $stripe = $tiket->stripeColor();
         $stripeBg = match($stripe) {
@@ -12,108 +12,183 @@
             default => 'bg-teal-500',
         };
         $lead = $tiket->assignees->firstWhere('pivot.role_in_team', 'lead');
+        $crew = $tiket->assignees->where('pivot.role_in_team', 'member');
+
+        // Prerequisites calculation for Closing Readiness Checklist (matching Image 2)
+        $hasResume = !empty(trim((string)$tiket->problem_temuan)) && !empty(trim((string)$tiket->action_taken));
+        $hasPhoto = $tiket->chronologies->whereNotNull('photo_path')->isNotEmpty() || $tiket->chronologies->where('category', 'SELESAI')->isNotEmpty();
+        $hasRepairOrJc = $tiket->repairPoints->isNotEmpty() || $tiket->jointClosures->isNotEmpty();
+        $hasJcOrManeuver = $tiket->jointClosures->isNotEmpty() || $tiket->coreManeuvers->isNotEmpty();
+
+        $fulfilledCount = ($hasResume ? 1 : 0) + ($hasPhoto ? 1 : 0) + ($hasRepairOrJc ? 1 : 0) + ($hasJcOrManeuver ? 1 : 0);
+        $percentage = $fulfilledCount * 25;
+        $remainingCount = 4 - $fulfilledCount;
     @endphp
 
-    <!-- Top Banner: Theme Dark Ocean Teal with Left Accent Stripe -->
-    <div class="relative overflow-hidden rounded-2xl md:rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-teal-500/20"
+    <!-- ========================================================================= -->
+    <!-- 1. TOP HEADER BANNER (Theme Ocean Teal Gradient matching Image 1) -->
+    <!-- ========================================================================= -->
+    <div class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-teal-500/20"
          style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
-        <!-- Accent stripe on far left -->
-        <div class="absolute top-0 bottom-0 left-0 w-3 {{ $stripeBg }}"></div>
         
         <!-- Ambient decorative glows -->
-        <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-[#18C4C4]/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-[#18C4C4]/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute right-1/3 -bottom-20 w-80 h-80 rounded-full bg-[#0D9488]/15 blur-3xl pointer-events-none"></div>
 
-        <div class="relative z-10 pl-2 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div>
-                <!-- Breadcrumbs -->
-                <nav class="flex items-center gap-2 text-xs font-semibold text-teal-200/80 mb-2">
-                    <a href="{{ route('tickets.index') }}" class="hover:text-white transition">Pekerjaan &amp; Tiketing</a>
-                    <span>&rsaquo;</span>
-                    <span class="text-teal-300 font-mono">{{ $tiket->kategori_tiket }}</span>
-                    <span>&rsaquo;</span>
-                    <span class="text-white font-mono">{{ $tiket->no_tiket }}</span>
-                </nav>
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <div class="space-y-3 max-w-3xl">
+                <!-- Badges Row: Ticket No, Category, Status -->
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <!-- Ticket Number Pill -->
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono font-bold bg-white/10 backdrop-blur-md border border-white/20 text-[#5eead4] shadow-xs">
+                        <svg class="w-3.5 h-3.5 text-[#5eead4]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                        <span>{{ $tiket->no_tiket }}</span>
+                    </span>
 
-                <div class="flex flex-wrap items-center gap-3">
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold text-white tracking-tight">
-                        {{ $tiket->no_tiket }}
-                    </h1>
-                    
-                    <!-- Kategori Badge -->
-                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold font-mono uppercase tracking-wider
-                        {{ $tiket->kategori_tiket === 'BACKBONE' ? 'bg-cyan-500/20 text-[#5eead4] border border-cyan-400/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' }}">
+                    <!-- Category Pill -->
+                    <span class="px-3 py-1 rounded-full font-bold font-mono uppercase tracking-wider text-[11px]
+                        {{ $tiket->kategori_tiket === 'BACKBONE' ? 'bg-[#18C4C4] text-slate-900' : 'bg-emerald-400 text-slate-900' }}">
                         {{ $tiket->kategori_tiket }}
                     </span>
 
-                    <!-- Priority Badge -->
-                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold
-                        {{ $tiket->priority === 'P1' ? 'bg-red-500/20 text-red-300 border border-red-500/40' : ($tiket->priority === 'P2' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-blue-500/20 text-blue-300 border border-blue-500/40') }}">
-                        Prioritas {{ $tiket->priority }}
-                    </span>
-
-                    <!-- Status Badge -->
-                    <span class="px-3 py-1 rounded-lg text-xs font-extrabold uppercase tracking-wider
-                        {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500/30 text-emerald-200 border border-emerald-400/50' : ($tiket->status === 'PENDING_VERIFIKASI' ? 'bg-purple-500/30 text-purple-200 border border-purple-400/50' : ($tiket->status === 'PROSES' ? 'bg-amber-500/30 text-amber-200 border border-amber-400/50' : 'bg-teal-500/30 text-teal-200 border border-teal-400/50')) }}">
+                    <!-- Status Pill -->
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold uppercase tracking-wider text-[11px]
+                        {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/50' : ($tiket->status === 'PENDING_VERIFIKASI' ? 'bg-purple-500/30 text-purple-200 border border-purple-400/50' : ($tiket->status === 'PROSES' ? 'bg-amber-500/30 text-amber-200 border border-amber-400/50' : 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/50')) }}">
+                        <span class="w-2 h-2 rounded-full {{ $tiket->status === 'CLOSE' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse' }}"></span>
                         {{ $tiket->status }}
                     </span>
 
-                    @if($tiket->sla_status)
-                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold font-mono
-                            {{ $tiket->sla_status === 'TEPAT' ? 'bg-emerald-400/20 text-emerald-300 border border-emerald-400/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30' }}">
-                            SLA: {{ $tiket->sla_status }} (MTTR: {{ $tiket->net_mttr_minutes }}m)
+                    @if($tiket->priority)
+                        <span class="px-2.5 py-1 rounded-full font-bold text-[11px] bg-white/10 border border-white/15 text-white">
+                            {{ $tiket->priority }}
                         </span>
                     @endif
                 </div>
 
-                <p class="text-xs sm:text-sm text-teal-100/80 mt-2">
-                    @if($tiket->kategori_tiket === 'BACKBONE')
-                        Segmen: <strong class="text-white">{{ $tiket->backbone_segment }}</strong> &bull; Dampak: <strong class="text-white">{{ $tiket->status_link_impact }}</strong> ({{ $tiket->wilayah }})
+                <!-- Assigned Crew Pills Row (matching Image 1) -->
+                <div class="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+                    @if($lead)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-[#18C4C4]/20 border border-[#18C4C4]/40 text-[#5eead4]">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <span>PIC: {{ $lead->name }}</span>
+                        </span>
                     @else
-                        Pelanggan: <strong class="text-white">{{ $tiket->customer_name }}</strong> (CID: <span class="font-mono text-teal-200">{{ $tiket->customer_id ?? 'Non-CID' }}</span>) &bull; ODP: <strong class="text-white">{{ $tiket->customer_odp ?? '-' }}</strong>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300">
+                            <span>PIC: Belum Ditugaskan</span>
+                        </span>
                     @endif
-                </p>
+
+                    @foreach($crew as $c)
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium bg-white/10 border border-white/15 text-white/90">
+                            <svg class="w-3 h-3 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            <span>{{ $c->name }}</span>
+                        </span>
+                    @endforeach
+
+                    @if($tiket->assignees->isEmpty())
+                        <button type="button" onclick="openDispatchModal()"
+                                class="inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold text-xs bg-amber-400 text-slate-900 hover:bg-amber-300 transition cursor-pointer">
+                            + Tugaskan Tim Sekarang
+                        </button>
+                    @endif
+                </div>
+
+                <!-- Big Headline (Status Impact / Title) -->
+                <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-white tracking-tight pt-1">
+                    {{ $tiket->status_link_impact ?? ($tiket->kategori_tiket === 'BACKBONE' ? $tiket->backbone_segment : $tiket->customer_name) }}
+                </h1>
             </div>
 
-            <!-- Header Quick Metric Stats & Berita Acara Action -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div class="bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/15 flex items-center gap-4 text-xs">
-                    <div>
-                        <span class="text-teal-200/70 block text-[10px] uppercase font-bold tracking-wider">Kepatuhan 30m</span>
-                        <span class="font-bold inline-flex items-center gap-1.5 mt-0.5
-                            {{ $intervalStatus === 'NORMAL' ? 'text-emerald-300' : ($intervalStatus === 'WARNING' ? 'text-amber-300' : ($intervalStatus === 'STOP_CLOCK' ? 'text-cyan-300' : 'text-rose-400')) }}">
-                            @if($intervalStatus === 'NORMAL')
-                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> NORMAL (&le;20m)
-                            @elseif($intervalStatus === 'WARNING')
-                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> WARNING (21-30m)
-                            @elseif($intervalStatus === 'STOP_CLOCK')
-                                <span class="w-2 h-2 rounded-full bg-cyan-400"></span> STOP CLOCK
-                            @else
-                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> OVERDUE (&gt;30m)
+            <!-- Header Actions: ← Kembali & :: Menu Aksi Dropdown -->
+            <div class="flex items-center gap-2.5 shrink-0 self-start lg:self-center">
+                <a href="{{ route('tickets.index') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white/90 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span>Kembali</span>
+                </a>
+
+                <!-- Menu Aksi Dropdown -->
+                <div class="relative" x-data="{ open: false }">
+                    <button type="button"
+                            @click="open = !open"
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-lg border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        <span>Menu Aksi</span>
+                        <svg class="w-3.5 h-3.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    <div x-show="open"
+                         @click.outside="open = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-2 z-50 text-slate-800 divide-y divide-slate-100">
+                        
+                        <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Aksi Tiket
+                        </div>
+
+                        <div class="py-1">
+                            @can('ticket.dispatch')
+                                <button type="button" @click="open = false; openDispatchModal()"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    <span>Penugasan Tim (Dispatch)</span>
+                                </button>
+                            @endcan
+
+                            @if($tiket->status !== 'CLOSE' && $tiket->status !== 'CANCELLED')
+                                <button type="button" @click="open = false; openStopClockModal()"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Jeda SLA (Stop Clock)</span>
+                                </button>
+
+                                <button type="button" @click="open = false; switchTab('tab-resume')"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    <span>Input Resume &amp; Closing</span>
+                                </button>
                             @endif
-                        </span>
-                    </div>
 
-                    <div class="h-8 w-px bg-white/20"></div>
+                            @if($tiket->status === 'PENDING_VERIFIKASI')
+                                @can('ticket.verify_close')
+                                    <button type="button" @click="open = false; openVerifyCloseModal()"
+                                            class="w-full text-left px-3.5 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-50 transition flex items-center gap-2.5">
+                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span>Verifikasi Closing (NOC)</span>
+                                    </button>
+                                @endcan
+                            @endif
+                        </div>
 
-                    <div>
-                        <span class="text-teal-200/70 block text-[10px] uppercase font-bold tracking-wider">Target SLA</span>
-                        <span class="font-bold text-white font-mono text-sm mt-0.5 block">{{ $tiket->sla_target_minutes }}m</span>
-                    </div>
+                        <div class="py-1">
+                            <a href="{{ route('gomsn.tickets.berita-acara', $tiket) }}" target="_blank"
+                               class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                                <span>Cetak Berita Acara (PDF)</span>
+                            </a>
 
-                    <div class="h-8 w-px bg-white/20"></div>
-
-                    <div>
-                        <span class="text-teal-200/70 block text-[10px] uppercase font-bold tracking-wider">Jeda Stop Clock</span>
-                        <span class="font-bold text-amber-300 font-mono text-sm mt-0.5 block">{{ $tiket->total_stop_clock_minutes }}m</span>
+                            @if($tiket->status === 'CLOSE')
+                                <button type="button" @click="open = false; openReopenModal()"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-bold text-amber-700 hover:bg-amber-50 transition flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    <span>Reopen Tiket</span>
+                                </button>
+                            @elseif($tiket->status !== 'CANCELLED')
+                                <button type="button" @click="open = false; openCancelModal()"
+                                        class="w-full text-left px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 transition flex items-center gap-2.5">
+                                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <span>Batalkan Tiket</span>
+                                </button>
+                            @endif
+                        </div>
                     </div>
                 </div>
-
-                <!-- Berita Acara PDF Link Button -->
-                <a href="{{ route('gomsn.tickets.berita-acara', $tiket) }}" target="_blank"
-                   class="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm text-white shadow-lg bg-teal-600/90 hover:bg-teal-600 border border-teal-300/30 transition cursor-pointer">
-                    <svg class="w-4 h-4 text-[#5eead4]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                    <span>Cetak Berita Acara</span>
-                </a>
             </div>
         </div>
     </div>
@@ -121,7 +196,7 @@
     <!-- Feedback Alerts -->
     @if(session('success'))
         <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs sm:text-sm font-semibold flex items-center justify-between shadow-xs">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2.5">
                 <span class="w-6 h-6 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-800 font-bold shrink-0">✓</span>
                 <span>{{ session('success') }}</span>
             </div>
@@ -129,10 +204,10 @@
         </div>
     @endif
     @if($errors->any())
-        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs sm:text-sm space-y-1 shadow-xs">
+        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs sm:text-sm space-y-1.5 shadow-xs">
             <div class="flex items-center gap-2 font-bold text-rose-900">
                 <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                <span>Terjadi Kesalahan:</span>
+                <span>Perhatian:</span>
             </div>
             <ul class="list-disc list-inside pl-4 text-xs">
                 @foreach($errors->all() as $err)
@@ -142,1162 +217,1365 @@
         </div>
     @endif
 
-    <!-- Tabbed Navigation: Pill Styled with Ocean Teal Highlights -->
+    <!-- ========================================================================= -->
+    <!-- 2. FOUR KEY INFO METRIC CARDS (matching Image 1) -->
+    <!-- ========================================================================= -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: SEGMENT BACKBONE / PELANGGAN -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0D9488] shrink-0">
+                @if($tiket->kategori_tiket === 'BACKBONE')
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                @else
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                @endif
+            </div>
+            <div class="min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    {{ $tiket->kategori_tiket === 'BACKBONE' ? 'Segment Backbone' : 'Pelanggan Broadband' }}
+                </span>
+                <p class="text-sm font-heading font-extrabold text-slate-800 truncate mt-0.5">
+                    {{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->backbone_segment ?? '-') : ($tiket->customer_name ?? '-') }}
+                </p>
+                <span class="text-[11px] text-slate-400 truncate block">
+                    {{ $tiket->kategori_tiket === 'BACKBONE' ? ($tiket->wilayah ?? 'Area Bandung') : ('CID: ' . ($tiket->customer_id ?? 'Non-CID')) }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 2: WAKTU OPEN -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-700 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Waktu Open</span>
+                <p class="text-sm font-heading font-extrabold text-slate-800 mt-0.5">
+                    {{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d M, H:i') : '-' }} <span class="text-xs text-slate-400 font-normal">WIB</span>
+                </p>
+                <span class="text-[11px] text-slate-400 block">
+                    {{ $tiket->tanggal_open ? $tiket->tanggal_open->diffForHumans() : '-' }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 3: WAKTU CLOSE -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div class="min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Waktu Close</span>
+                <p class="text-sm font-heading font-extrabold text-slate-800 mt-0.5">
+                    @if($tiket->tanggal_close)
+                        {{ $tiket->tanggal_close->format('d M, H:i') }} <span class="text-xs text-slate-400 font-normal">WIB</span>
+                    @else
+                        <span class="text-slate-400 font-semibold italic">Belum ditutup</span>
+                    @endif
+                </p>
+                <span class="text-[11px] text-slate-400 block">
+                    {{ $tiket->tanggal_close ? $tiket->tanggal_close->diffForHumans() : 'Tiket aktif' }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Card 4: TARGET SLA & MTTR -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
+            </div>
+            <div class="min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Target SLA &amp; MTTR</span>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <p class="text-sm font-heading font-extrabold text-slate-800">
+                        Target: {{ round($tiket->sla_target_minutes / 60, 1) }} jam
+                    </p>
+                </div>
+                <span class="text-[11px] font-semibold block
+                    {{ $tiket->status === 'CLOSE' ? ($tiket->sla_status === 'TEPAT' ? 'text-emerald-600' : 'text-rose-600') : 'text-slate-400' }}">
+                    MTTR: {{ $tiket->net_mttr_minutes ? round($tiket->net_mttr_minutes / 60, 1) . ' jam' : ($tiket->status === 'CLOSE' ? round($tiket->currentNetMinutes() / 60, 1) . ' jam' : 'Berjalan...') }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 3. DESKRIPSI GANGGUAN & CATATAN AWAL (matching Image 1) -->
+    <!-- ========================================================================= -->
+    <div class="bg-white rounded-2xl border-l-4 border-l-[#0D9488] border border-slate-200/80 p-5 shadow-xs space-y-2">
+        <div class="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+            <span>Deskripsi Gangguan &amp; Catatan Awal</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed pl-6">
+            {{ $tiket->problem_temuan ?? 'Tidak ada deskripsi awal gangguan yang dicatat.' }}
+        </p>
+        <div class="flex items-center gap-2 text-[11px] text-slate-400 pl-6 pt-1 border-t border-slate-100">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span>Dibuat: <strong class="text-slate-600">{{ $tiket->creator->name ?? 'Helpdesk / NOC' }}</strong></span>
+            <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-bold">
+                {{ $tiket->creator->roles->first()?->name ?? 'NOC' }}
+            </span>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 4. GARIS ALUR SLA & SIKLUS HIDUP TIKET (5 Stage Stepper matching Image 1) -->
+    <!-- ========================================================================= -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-teal-50 text-[#0D9488] flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-heading font-extrabold text-xs sm:text-sm text-slate-800">
+                        Garis Alur SLA &amp; Siklus Hidup Tiket
+                    </h3>
+                    <p class="text-[11px] text-slate-400">Open &rarr; Respon &rarr; Stop Clock &rarr; Closing Lapangan &rarr; Closing NOC</p>
+                </div>
+            </div>
+
+            <span class="px-3 py-1 rounded-full text-xs font-bold font-mono bg-teal-50 text-[#0D9488] border border-teal-200 self-start sm:self-auto">
+                Target SLA: {{ round($tiket->sla_target_minutes / 60, 1) }} jam ({{ $tiket->status === 'CLOSE' ? 'Selesai' : 'Aktif' }})
+            </span>
+        </div>
+
+        <!-- 5-Node Stepper Progress Line -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center relative">
+            <!-- Stage 1: Open Tiket -->
+            <div class="flex flex-col items-center space-y-1.5">
+                <div class="w-9 h-9 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-sm shadow-sm ring-4 ring-emerald-50">
+                    ✓
+                </div>
+                <span class="font-heading font-extrabold text-xs text-slate-800">Open Tiket</span>
+                <span class="text-[11px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d/m/y H:i') : '-' }}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">Stage 1</span>
+            </div>
+
+            <!-- Stage 2: Respon Pertama -->
+            <div class="flex flex-col items-center space-y-1.5">
+                <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm
+                    {{ $tiket->first_response_at ? 'bg-emerald-500 text-white ring-4 ring-emerald-50' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
+                    {{ $tiket->first_response_at ? '✓' : '2' }}
+                </div>
+                <span class="font-heading font-extrabold text-xs text-slate-800">Respon Pertama</span>
+                <span class="text-[11px] text-slate-400 font-mono">
+                    {{ $tiket->first_response_at ? $tiket->first_response_at->format('d/m H:i') : 'Menunggu' }}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->first_response_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                    {{ $tiket->first_response_at ? 'Terespon' : 'Pending' }}
+                </span>
+            </div>
+
+            <!-- Stage 3: Jeda SLA (Stop Clock) -->
+            <div class="flex flex-col items-center space-y-1.5">
+                <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm
+                    {{ $tiket->total_stop_clock_minutes > 0 || $tiket->activeStopClock ? 'bg-amber-500 text-white ring-4 ring-amber-50' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
+                    {{ $tiket->activeStopClock ? '⏸' : ($tiket->total_stop_clock_minutes > 0 ? '✓' : '3') }}
+                </div>
+                <span class="font-heading font-extrabold text-xs text-slate-800">Jeda SLA (Stop Clock)</span>
+                <span class="text-[11px] text-slate-400 font-mono">
+                    {{ $tiket->total_stop_clock_minutes > 0 ? $tiket->total_stop_clock_minutes . 'm jeda' : ($tiket->activeStopClock ? 'Berjalan' : 'Menunggu') }}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->activeStopClock ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-500' }}">
+                    {{ $tiket->activeStopClock ? 'Aktif' : 'Normal' }}
+                </span>
+            </div>
+
+            <!-- Stage 4: Closing Awal Lapangan -->
+            <div class="flex flex-col items-center space-y-1.5">
+                <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm
+                    {{ $tiket->closing_awal_at ? 'bg-emerald-500 text-white ring-4 ring-emerald-50' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
+                    {{ $tiket->closing_awal_at ? '✓' : '4' }}
+                </div>
+                <span class="font-heading font-extrabold text-xs text-slate-800">Closing Lapangan</span>
+                <span class="text-[11px] text-slate-400 font-mono">
+                    {{ $tiket->closing_awal_at ? $tiket->closing_awal_at->format('d/m H:i') : 'Menunggu' }}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->closing_awal_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                    {{ $tiket->closing_awal_at ? 'Diajukan' : 'Proses' }}
+                </span>
+            </div>
+
+            <!-- Stage 5: Closing Akhir (NOC) -->
+            <div class="flex flex-col items-center space-y-1.5 col-span-2 sm:col-span-1">
+                <div class="w-9 h-9 rounded-full font-bold flex items-center justify-center text-sm shadow-sm
+                    {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500 text-white ring-4 ring-emerald-50' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
+                    {{ $tiket->status === 'CLOSE' ? '✓' : '5' }}
+                </div>
+                <span class="font-heading font-extrabold text-xs text-slate-800">Closing Akhir (NOC)</span>
+                <span class="text-[11px] text-slate-400 font-mono">
+                    {{ $tiket->verified_at ? $tiket->verified_at->format('d/m H:i') : 'Menunggu' }}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tiket->status === 'CLOSE' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                    {{ $tiket->status === 'CLOSE' ? 'Terverifikasi' : 'Pending' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 5. OVERDUE COMPLIANCE ALERT (30-Min SOP Interval - matching Image 2) -->
+    <!-- ========================================================================= -->
+    @if($intervalStatus === 'OVERDUE' && $tiket->status !== 'CLOSE' && $tiket->status !== 'CANCELLED')
+        <div class="rounded-2xl p-4 sm:p-5 bg-rose-50 border-2 border-rose-300 shadow-sm space-y-3">
+            <div class="flex items-center gap-2 text-rose-800">
+                <span class="w-3 h-3 rounded-full bg-rose-600 animate-ping"></span>
+                <h3 class="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-rose-900">
+                    OVERDUE &gt; 30 MENIT Wajib Kirim Update!
+                </h3>
+            </div>
+            <p class="text-xs text-rose-700">
+                Terakhir update: <strong class="text-rose-900">{{ $tiket->chronologies->last()?->created_at?->diffForHumans() ?? 'Belum ada update' }}</strong> &bull; SOP interval koordinasi teknisi maksimal 30 menit.
+            </p>
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div class="flex items-center gap-4 text-xs font-mono">
+                    <span class="px-3 py-1 rounded-xl bg-white border border-rose-200 text-rose-800 font-bold">
+                        TERAKHIR: {{ $tiket->chronologies->last()?->created_at?->format('H:i') ?? '-' }} WIB
+                    </span>
+                    <span class="px-3 py-1 rounded-xl bg-white border border-rose-200 text-slate-700">
+                        STATUS: OVERDUE INTERVAL
+                    </span>
+                </div>
+                <button type="button" onclick="switchTab('tab-chronology'); document.getElementById('quick-chat-input').focus();"
+                        class="px-4 py-2 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <span>Kirim Update Sekarang</span>
+                </button>
+            </div>
+        </div>
+    @elseif($intervalStatus === 'STOP_CLOCK')
+        <div class="rounded-2xl p-4 bg-cyan-50 border border-cyan-300 text-cyan-900 text-xs sm:text-sm font-semibold flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></span>
+                <span>Jeda SLA Aktif (Stop Clock) &mdash; Timer kepatuhan dan SLA dihentikan sementara.</span>
+            </div>
+            <button type="button" onclick="switchTab('tab-stopclock')" class="text-xs font-bold text-cyan-800 underline">Lihat Detail &rarr;</button>
+        </div>
+    @endif
+
+    <!-- ========================================================================= -->
+    <!-- 6. KESIAPAN CLOSING TIKET BACKBONE (Checklist 4 Syarat - matching Image 2) -->
+    <!-- ========================================================================= -->
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-teal-50 text-[#0D9488] flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div>
+                    <h3 class="font-heading font-extrabold text-xs sm:text-sm text-slate-800">
+                        Kesiapan Closing Tiket {{ ucfirst(strtolower($tiket->kategori_tiket)) }} ({{ $fulfilledCount }}/4 Terpenuhi ({{ $percentage }}%))
+                    </h3>
+                    <p class="text-[11px] text-slate-400">4 syarat mandatori yang wajib dilengkapi teknisi sebelum closing awal dapat diajukan</p>
+                </div>
+            </div>
+
+            <div>
+                @if($fulfilledCount === 4)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span>✓ Siap Closing Awal</span>
+                    </span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        <span>⚠️ Belum Lengkap ({{ $remainingCount }} item lagi)</span>
+                    </span>
+                @endif
+            </div>
+        </div>
+
+        <!-- 4 Interactive Checklist Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <!-- 1. Resume Kerja -->
+            <button type="button" onclick="switchTab('tab-resume')"
+                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    {{ $hasResume ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                        {{ $hasResume ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
+                        {{ $hasResume ? '✓' : '1' }}
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-extrabold text-xs text-slate-800">1. Resume Kerja</h4>
+                        <p class="text-[11px] mt-0.5 {{ $hasResume ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasResume ? 'Sudah Diisi Lengkap' : 'Belum diisi lengkap' }}
+                        </p>
+                    </div>
+                </div>
+                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+            </button>
+
+            <!-- 2. Foto / OTDR -->
+            <button type="button" onclick="switchTab('tab-chronology')"
+                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    {{ $hasPhoto ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                        {{ $hasPhoto ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
+                        {{ $hasPhoto ? '✓' : '2' }}
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-extrabold text-xs text-slate-800">2. Foto / OTDR</h4>
+                        <p class="text-[11px] mt-0.5 {{ $hasPhoto ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasPhoto ? 'Dokumentasi Terunggah' : 'Wajib minimal 1 foto' }}
+                        </p>
+                    </div>
+                </div>
+                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+            </button>
+
+            <!-- 3. Koordinat / JC -->
+            <button type="button" onclick="switchTab('tab-materials')"
+                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    {{ $hasRepairOrJc ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                        {{ $hasRepairOrJc ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
+                        {{ $hasRepairOrJc ? '✓' : '3' }}
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-extrabold text-xs text-slate-800">3. Koordinat / JC</h4>
+                        <p class="text-[11px] mt-0.5 {{ $hasRepairOrJc ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasRepairOrJc ? ($tiket->repairPoints->count() + $tiket->jointClosures->count()) . ' Titik/JC tercatat' : 'Wajib minimal 1 titik' }}
+                        </p>
+                    </div>
+                </div>
+                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+            </button>
+
+            <!-- 4. Penanganan Core & JC -->
+            <button type="button" onclick="switchTab('tab-penanganan')"
+                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    {{ $hasJcOrManeuver ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                        {{ $hasJcOrManeuver ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
+                        {{ $hasJcOrManeuver ? '✓' : '4' }}
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-extrabold text-xs text-slate-800">4. Penanganan Core</h4>
+                        <p class="text-[11px] mt-0.5 {{ $hasJcOrManeuver ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasJcOrManeuver ? ($tiket->jointClosures->count() + $tiket->coreManeuvers->count()) . ' Data Penanganan' : 'Wajib JC / Manuver Core' }}
+                        </p>
+                    </div>
+                </div>
+                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 7. THE 6 STRUCTURED TABS (matching Image 2, 4, 5) -->
+    <!-- ========================================================================= -->
     <div class="bg-white rounded-2xl border border-slate-200/80 p-1.5 shadow-xs overflow-x-auto">
         <nav class="flex space-x-1 min-w-max text-xs sm:text-sm font-semibold" aria-label="Tabs">
-            <button type="button" onclick="switchTab('tab-summary')" id="btn-tab-summary"
+            <!-- Tab 1: Kronologis -->
+            <button type="button" onclick="switchTab('tab-chronology')" id="btn-tab-chronology"
                     class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-white font-bold"
                     style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span>1. Ringkasan &amp; Tim</span>
-            </button>
-
-            <button type="button" onclick="switchTab('tab-chronology')" id="btn-tab-chronology"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                <span>2. Kronologis</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800">{{ $tiket->chronologies->count() }}</span>
-            </button>
-
-            <button type="button" onclick="switchTab('tab-stopclock')" id="btn-tab-stopclock"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>3. Stop Clock</span>
-                @if($tiket->activeStopClock)
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                @else
-                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->stopClocks->count() }}</span>
+                <span>Kronologis</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">{{ $tiket->chronologies->count() }}</span>
+            </button>
+
+            <!-- Tab 2: Resume -->
+            <button type="button" onclick="switchTab('tab-resume')" id="btn-tab-resume"
+                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Resume</span>
+                @if($hasResume)
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                 @endif
             </button>
 
-            <button type="button" onclick="switchTab('tab-assets')" id="btn-tab-assets"
+            <!-- Tab 3: Penanganan Core & JC -->
+            <button type="button" onclick="switchTab('tab-penanganan')" id="btn-tab-penanganan"
                     class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                <span>4. Joint Closure &amp; Manuver</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Penanganan Core &amp; JC</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->jointClosures->count() + $tiket->coreManeuvers->count() }}</span>
             </button>
 
+            <!-- Tab 4: Material & Titik -->
             <button type="button" onclick="switchTab('tab-materials')" id="btn-tab-materials"
                     class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                <span>5. Material &amp; Titik Perbaikan</span>
+                <span>Material &amp; Titik</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->materials->count() + $tiket->repairPoints->count() }}</span>
             </button>
 
-            <button type="button" onclick="switchTab('tab-handover')" id="btn-tab-handover"
+            <!-- Tab 5: Dokumentasi -->
+            <button type="button" onclick="switchTab('tab-documentation')" id="btn-tab-documentation"
                     class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                <span>6. Handover Shift</span>
-                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800">{{ $tiket->handovers->count() }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Dokumentasi</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->chronologies->whereNotNull('photo_path')->count() }}</span>
             </button>
 
-            <button type="button" onclick="switchTab('tab-closing')" id="btn-tab-closing"
+            <!-- Tab 6: Stop Clock & Shift -->
+            <button type="button" onclick="switchTab('tab-stopclock')" id="btn-tab-stopclock"
                     class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>7. Alur Closing &amp; Verifikasi</span>
-                @if($tiket->status === 'PENDING_VERIFIKASI')
-                    <span class="w-2 h-2 rounded-full bg-purple-500 animate-ping"></span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Stop Clock &amp; Shift</span>
+                @if($tiket->activeStopClock)
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                 @endif
             </button>
         </nav>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- TAB 1: RINGKASAN & DISPATCH TIM -->
+    <!-- TAB 1: KRONOLOGIS (WhatsApp-Style Live Chat matching Image 2 & 3) -->
     <!-- ========================================================================= -->
-    <div id="tab-summary" class="tab-pane space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Informasi Detail Tiket -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-[#0D9488]"></span>
-                        <span>Informasi Teknis Gangguan</span>
-                    </h3>
-                    <span class="text-xs font-mono font-bold text-slate-400">ID: #{{ $tiket->id }}</span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
-                    @if($tiket->kategori_tiket === 'BACKBONE')
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">Segmen Jaringan</span>
-                            <span class="font-bold text-slate-800 text-sm mt-0.5 block">{{ $tiket->backbone_segment }}</span>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">Dampak Link Jaringan</span>
-                            <span class="font-bold text-sm mt-0.5 block {{ $tiket->status_link_impact === 'TOTAL_DOWN' ? 'text-red-600' : 'text-amber-600' }}">
-                                {{ $tiket->status_link_impact }}
+    <div id="tab-chronology" class="tab-pane space-y-4">
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+            
+            <!-- Dark Ocean Teal Chat Header Banner -->
+            <div class="px-6 py-4 text-white flex items-center justify-between"
+                 style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-heading font-extrabold text-sm text-white">Koordinasi Update Lapangan</h3>
+                            <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Live Sync (5s)
                             </span>
                         </div>
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">Wilayah / Area</span>
-                            <span class="font-bold text-slate-800 mt-0.5 block">{{ $tiket->wilayah }}</span>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">Tipe Penanganan</span>
-                            <span class="font-bold text-slate-800 mt-0.5 block">{{ $tiket->tipe_penanganan }}</span>
-                        </div>
-                    @else
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">Nama Pelanggan</span>
-                            <span class="font-bold text-slate-800 text-sm mt-0.5 block">{{ $tiket->customer_name }}</span>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">Customer ID (CID)</span>
-                            <div class="flex items-center gap-1.5 mt-0.5">
-                                <span class="font-mono font-bold text-slate-800">{{ $tiket->customer_id ?? 'Non-CID' }}</span>
-                                @if($tiket->is_ims_validated)
-                                    <span class="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-bold text-[9px]">IMS ✓</span>
-                                @else
-                                    <span class="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-bold text-[9px]">Manual (AC-11)</span>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">No. WhatsApp / Telepon</span>
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $tiket->customer_phone) }}" target="_blank"
-                               class="font-mono font-bold text-teal-600 hover:underline mt-0.5 block">
-                                {{ $tiket->customer_phone }} ↗
-                            </a>
-                        </div>
-                        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <span class="text-slate-400 font-semibold block text-[10px] uppercase">ODP &amp; OLT</span>
-                            <span class="font-bold text-slate-800 mt-0.5 block font-mono">{{ $tiket->customer_odp ?? '-' }} · {{ $tiket->customer_olt ?? '-' }}</span>
-                        </div>
-                    @endif
-
-                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                        <span class="text-slate-400 font-semibold block text-[10px] uppercase">Waktu Pembukaan Tiket</span>
-                        <span class="font-mono text-slate-700 mt-0.5 block">
-                            {{ $tiket->tanggal_open ? $tiket->tanggal_open->timezone('Asia/Jakarta')->format('d M Y, H:i') : '-' }} WIB
-                        </span>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                        <span class="text-slate-400 font-semibold block text-[10px] uppercase">Respon Pertama (First Response)</span>
-                        <span class="font-mono text-slate-700 mt-0.5 block">
-                            {{ $tiket->first_response_at ? $tiket->first_response_at->timezone('Asia/Jakarta')->format('d M Y, H:i') . ' WIB' : 'Belum tercatat' }}
-                        </span>
+                        <p class="text-[11px] text-teal-200/80">Catatan teknis tiket <span class="font-mono text-[#5eead4]">{{ $tiket->no_tiket }}</span></p>
                     </div>
                 </div>
 
-                @if($tiket->customer_address)
-                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-xs">
-                        <span class="text-slate-400 font-semibold block text-[10px] uppercase">Alamat Pelanggan</span>
-                        <p class="text-slate-700 mt-0.5">{{ $tiket->customer_address }}</p>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Tim Teknisi Lapangan & Dispatch -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-[#18C4C4]"></span>
-                        <span>Penugasan Tim Teknisi (Dispatch)</span>
-                    </h3>
-                    @can('ticket.dispatch')
-                        <button type="button" onclick="openDispatchModal()"
-                                class="text-xs text-[#0D9488] hover:text-[#096a62] font-bold hover:underline cursor-pointer">
-                            + Tugaskan / Ubah Tim
-                        </button>
-                    @endcan
-                </div>
-
-                @if($lead)
-                    <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-200/70 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-2xl bg-[#0D9488] text-white flex items-center justify-center font-bold text-base shadow-sm">
-                                {{ substr($lead->name, 0, 1) }}
-                            </div>
-                            <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-200/60 px-2 py-0.5 rounded-md">
-                                    LEAD PIC TEKNISI
-                                </span>
-                                <h4 class="font-bold text-slate-900 text-sm mt-0.5">{{ $lead->name }}</h4>
-                                <p class="text-xs text-slate-500 font-mono">{{ $lead->employee_code ?? '-' }} · {{ $lead->phone ?? '-' }}</p>
-                            </div>
-                        </div>
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $lead->phone ?? '') }}" target="_blank"
-                           class="px-3 py-1.5 rounded-xl bg-white border border-teal-200 text-[#0D9488] font-bold text-xs hover:bg-teal-50 transition">
-                            Hubungi PIC
-                        </a>
-                    </div>
-                @else
-                    <div class="p-6 text-center rounded-2xl border border-dashed border-amber-300 bg-amber-50/50 text-amber-800">
-                        <p class="text-xs font-semibold">⚠️ Tiket ini belum memiliki Lead Teknisi yang di-dispatch.</p>
-                        @can('ticket.dispatch')
-                            <button type="button" onclick="openDispatchModal()" class="mt-2 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition">
-                                Dispatch Tim Sekarang
-                            </button>
-                        @endcan
-                    </div>
-                @endif
-
-                <!-- Anggota Tim Lapangan Lainnya -->
-                <div class="space-y-2 pt-1">
-                    <span class="text-slate-400 font-semibold block text-[10px] uppercase tracking-wider">Anggota Tim Teknisi Lapangan</span>
-                    <div class="space-y-2">
-                        @forelse($tiket->assignees->where('pivot.role_in_team', '!=', 'lead') as $member)
-                            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-700">
-                                        {{ substr($member->name, 0, 1) }}
-                                    </div>
-                                    <div>
-                                        <span class="font-bold text-slate-800 block">{{ $member->name }}</span>
-                                        <span class="text-slate-400 text-[11px] font-mono">{{ $member->employee_code }} · {{ $member->phone }}</span>
-                                    </div>
-                                </div>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 uppercase">
-                                    Anggota
-                                </span>
-                            </div>
-                        @empty
-                            <p class="text-slate-400 italic text-xs">Belum ada anggota tim tambahan.</p>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resume Masalah & Hasil Penanganan Terkini -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <h3 class="font-heading font-extrabold text-base text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
-                <span>Resume Masalah &amp; Hasil Penanganan Lapangan</span>
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div class="space-y-1.5">
-                    <label class="font-bold text-slate-700 block uppercase tracking-wider text-[10px]">Problem Temuan:</label>
-                    <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 text-slate-800 min-h-[70px] leading-relaxed">
-                        {{ $tiket->problem_temuan ?? 'Belum ada catatan temuan dari lapangan.' }}
-                    </div>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label class="font-bold text-slate-700 block uppercase tracking-wider text-[10px]">Action Taken (Tindakan):</label>
-                    <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 text-slate-800 min-h-[70px] leading-relaxed">
-                        {{ $tiket->action_taken ?? 'Belum ada catatan tindakan penanganan dari teknisi.' }}
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-6 text-xs pt-2 border-t border-slate-100">
                 <div class="flex items-center gap-2">
-                    <span class="text-slate-400 font-semibold">Redaman Sebelum:</span>
-                    <span class="font-mono font-bold text-slate-800">{{ $tiket->redaman_sebelum !== null ? $tiket->redaman_sebelum . ' dBm' : '-' }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-slate-400 font-semibold">Redaman Sesudah:</span>
-                    <span class="font-mono font-bold text-slate-800">{{ $tiket->redaman_sesudah !== null ? $tiket->redaman_sesudah . ' dBm' : '-' }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-slate-400 font-semibold">Status Link:</span>
-                    {!! $tiket->has_link_up ? '<span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">✓ Link UP Terpulihkan</span>' : '<span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200">✗ Belum Link Up</span>' !!}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 2: KRONOLOGIS INTERAKTIF -->
-    <!-- ========================================================================= -->
-    <div id="tab-chronology" class="tab-pane hidden space-y-6">
-        <!-- Form Tambah Kronologis (Append-Only §7.3, AC-05) -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#0D9488]"></span>
-                    <span>Tambah Catatan Kronologis (Append-Only §7.3)</span>
-                </h3>
-                <span class="text-[11px] text-teal-700 font-semibold bg-teal-50 px-2 py-0.5 rounded-full">
-                    Aturan Pelaporan 30 Menit Aktif
-                </span>
-            </div>
-
-            <form method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data" class="space-y-4">
-                @csrf
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Kategori Aktivitas *</label>
-                        <select name="category" required class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition">
-                            <option value="IZIN">IZIN (Izin Kawasan / Akses Masuk)</option>
-                            <option value="OTDR">OTDR (Pengukuran Jarak / Titik Putus)</option>
-                            <option value="TRACING">TRACING (Penelusuran Rute Kabel)</option>
-                            <option value="MATERIAL">MATERIAL (Persiapan Material &amp; Alat)</option>
-                            <option value="JOINTING">JOINTING (Penyambungan Core / Splicing)</option>
-                            <option value="LINK_UP">LINK_UP (Pemulihan Sinyal Layanan)</option>
-                            <option value="SELESAI">SELESAI (Pekerjaan Lapangan Tuntas)</option>
-                            <option value="LAIN">LAIN (Koordinasi / Catatan Lainnya)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Lampiran Foto Lapangan</label>
-                        <input type="file" name="photo" accept="image/*"
-                               class="w-full text-xs text-slate-600 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#0D9488] hover:file:bg-teal-100 cursor-pointer border border-slate-200 rounded-xl bg-slate-50/50 p-1">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Lampiran Video Lapangan</label>
-                        <input type="file" name="video" accept="video/*"
-                               class="w-full text-xs text-slate-600 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#0D9488] hover:file:bg-teal-100 cursor-pointer border border-slate-200 rounded-xl bg-slate-50/50 p-1">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Uraian Kronologis Lapangan *</label>
-                    <textarea name="message" rows="3" required placeholder="Jelaskan detail aktivitas teknis, kendala yang dihadapi, atau progres penanganan..."
-                              class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition"></textarea>
-                </div>
-
-                <!-- Hidden GPS inputs populated via Geolocation button -->
-                <input type="hidden" id="chron_lat" name="latitude">
-                <input type="hidden" id="chron_lng" name="longitude">
-                <input type="hidden" id="chron_acc" name="gps_accuracy">
-
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
-                    <button type="button" onclick="getLiveGpsCoordinates()"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition cursor-pointer">
-                        <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span id="gps_label">Sertakan Geotag GPS Terkini</span>
-                    </button>
-
-                    <button type="submit"
-                            class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
-                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                        Kirim Entri Kronologis
+                    <button type="button" onclick="getLiveGpsCoordinates()" class="text-xs text-teal-200 hover:text-white flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 transition cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                        <span id="gps_label">Sertakan GPS</span>
                     </button>
                 </div>
-            </form>
-        </div>
-
-        <!-- Kronologis Timeline Feed -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <h3 class="font-heading font-extrabold text-base text-slate-800 border-b border-slate-100 pb-3 flex items-center justify-between">
-                <span>Riwayat Kronologis &amp; Live Feed</span>
-                <span class="text-xs font-normal text-slate-400">Total: {{ $tiket->chronologies->count() }} entri</span>
-            </h3>
-
-            <div class="space-y-4 relative before:absolute before:inset-0 before:left-4 before:w-0.5 before:bg-slate-100">
-                @forelse($tiket->chronologies as $chron)
-                    @php
-                        $catBadge = match($chron->category) {
-                            'LINK_UP' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                            'SELESAI' => 'bg-teal-100 text-teal-800 border-teal-200',
-                            'OTDR' => 'bg-cyan-100 text-cyan-800 border-cyan-200',
-                            'JOINTING' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
-                            'MATERIAL' => 'bg-amber-100 text-amber-800 border-amber-200',
-                            'IZIN' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                            default => 'bg-slate-100 text-slate-700 border-slate-200',
-                        };
-                    @endphp
-                    <div class="relative flex items-start gap-3.5 pl-1 text-xs">
-                        <!-- Avatar node -->
-                        <div class="w-8 h-8 rounded-full bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center font-bold text-xs shrink-0 shadow-xs z-10">
-                            {{ substr($chron->user->name ?? 'S', 0, 1) }}
-                        </div>
-
-                        <!-- Card Body -->
-                        <div class="flex-1 bg-slate-50/70 border border-slate-200/80 rounded-2xl p-4 space-y-2">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold text-slate-800 text-sm">{{ $chron->user->name ?? 'Sistem GoMSN' }}</span>
-                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $catBadge }}">
-                                        {{ $chron->category }}
-                                    </span>
-                                </div>
-                                <span class="font-mono text-slate-400 text-[11px]">
-                                    {{ $chron->created_at ? $chron->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') : '-' }} WIB
-                                </span>
-                            </div>
-
-                            <p class="text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
-                                {{ $chron->message }}
-                            </p>
-
-                            <!-- Media Attachments & GPS Geotag -->
-                            <div class="flex flex-wrap items-center gap-3 pt-2">
-                                @if($chron->photo_path)
-                                    <a href="/storage/{{ $chron->photo_path }}" target="_blank"
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-teal-700 font-semibold text-xs hover:bg-teal-50 transition shadow-xs">
-                                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        <span>Lihat Foto Dokumentasi</span>
-                                    </a>
-                                @endif
-
-                                @if($chron->video_path)
-                                    <a href="/storage/{{ $chron->video_path }}" target="_blank"
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-indigo-700 font-semibold text-xs hover:bg-indigo-50 transition shadow-xs">
-                                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                        <span>Putar Video Lapangan</span>
-                                    </a>
-                                @endif
-
-                                @if($chron->latitude && $chron->longitude)
-                                    <a href="https://maps.google.com/?q={{ $chron->latitude }},{{ $chron->longitude }}" target="_blank"
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition shadow-xs">
-                                        <svg class="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                        <span class="font-mono text-[11px]">{{ round($chron->latitude, 5) }}, {{ round($chron->longitude, 5) }}</span>
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="p-8 text-center text-slate-400 text-xs italic">
-                        Belum ada catatan kronologis pekerjaan.
-                    </div>
-                @endforelse
             </div>
-        </div>
-    </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 3: STOP CLOCK / JEDA SLA -->
-    <!-- ========================================================================= -->
-    <div id="tab-stopclock" class="tab-pane hidden space-y-6">
-        @if($tiket->activeStopClock)
-            <!-- Active Stop Clock Banner -->
-            <div class="p-6 bg-amber-500/10 border-2 border-amber-500/40 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-                <div class="flex items-start gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shrink-0 animate-pulse">
-                        ⏸
-                    </div>
-                    <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-200 px-2 py-0.5 rounded-md">
-                            STOP CLOCK SEDANG BERJALAN
-                        </span>
-                        <h4 class="font-heading font-extrabold text-base sm:text-lg text-amber-950 mt-1">
-                            Alasan: {{ $tiket->activeStopClock->reason }}
-                        </h4>
-                        <p class="text-xs text-amber-900/80 mt-0.5">
-                            {{ $tiket->activeStopClock->reason_detail }} &bull; Dimulai sejak {{ $tiket->activeStopClock->started_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
+            <!-- WhatsApp Chat Body with Bubble Thread -->
+            <div id="chat-stream-box" class="p-4 sm:p-6 space-y-4 max-h-[520px] overflow-y-auto bg-slate-50/70"
+                 style="background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
+                
+                <!-- Date divider -->
+                <div class="flex justify-center">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 text-slate-500 shadow-xs border border-slate-200">
+                        {{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}
+                    </span>
+                </div>
+
+                <!-- Initial Ticket Creation System Note -->
+                <div class="flex justify-start">
+                    <div class="max-w-xl bg-white rounded-2xl rounded-tl-xs p-4 shadow-xs border border-slate-200 text-xs space-y-1.5">
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                                <span>{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
+                                <span class="px-1.5 py-0.2 rounded text-[10px] bg-teal-100 text-teal-800 font-bold">NOC</span>
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
+                        </div>
+                        <p class="text-slate-700 leading-relaxed font-semibold">
+                            🎫 <strong>OPEN TIKET BARU</strong>: Tiket dibuat dengan status OPEN. Kendala: {{ $tiket->problem_temuan ?? '-' }}
                         </p>
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('tickets.stop-clock.end', $tiket->activeStopClock) }}">
-                    @csrf
-                    <button type="submit"
-                            class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm shadow-md transition cursor-pointer">
-                        Hentikan Stop Clock
-                    </button>
-                </form>
-            </div>
-        @else
-            <!-- Start Stop Clock Form (§7.4) -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                        <span>Mulai Jeda SLA / Stop Clock (§7.4)</span>
-                    </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Gunakan saat pekerjaan tertunda akibat faktor eksternal di luar kendali tim teknis. Stop Clock otomatis memotong durasi MTTR.
-                    </p>
-                </div>
-
-                <form method="POST" action="{{ route('tickets.stop-clock.store', $tiket) }}" enctype="multipart/form-data" class="space-y-4">
-                    @csrf
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Alasan Stop Clock Standar *</label>
-                            <select name="reason" required class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition">
-                                <option value="IZIN_AKSES">IZIN_AKSES (Menunggu Izin Kawasan/Gedung - Wajib Bukti)</option>
-                                <option value="PIHAK_KETIGA_PLN">PIHAK_KETIGA_PLN (Menunggu PLN / Pihak Ketiga)</option>
-                                <option value="CUACA_EKSTRIM">CUACA_EKSTRIM (Hujan Badai / Bencana Alam)</option>
-                                <option value="MENUNGGU_MATERIAL">MENUNGGU_MATERIAL (Pengadaan Material Khusus)</option>
-                                <option value="PERMINTAAN_PELANGGAN">PERMINTAAN_PELANGGAN (Jadwal Ulang Pelanggan)</option>
-                                <option value="FORCE_MAJEURE">FORCE_MAJEURE (Keadaan Kahar)</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Bukti Pendukung (Foto / Surat Izin)</label>
-                            <input type="file" name="evidence" accept="image/*,application/pdf"
-                                   class="w-full text-xs text-slate-600 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-800 hover:file:bg-amber-100 cursor-pointer border border-slate-200 rounded-xl bg-slate-50/50 p-1">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Uraian Detail Kendala Lapangan *</label>
-                        <textarea name="reason_detail" rows="2" required placeholder="Jelaskan alasan detail kendala dan perkiraan estimasi penanganan..."
-                                  class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2 text-slate-800 transition"></textarea>
-                    </div>
-
-                    <div class="flex justify-end pt-2">
-                        <button type="submit"
-                                class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-amber-600 hover:bg-amber-700 shadow-md transition cursor-pointer">
-                            Aktifkan Stop Clock
-                        </button>
-                    </div>
-                </form>
-            </div>
-        @endif
-
-        <!-- Riwayat Stop Clock Table -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <h3 class="font-heading font-extrabold text-base text-slate-800 border-b border-slate-100 pb-3 flex items-center justify-between">
-                <span>Histori Jeda Stop Clock</span>
-                <span class="text-xs text-slate-500 font-mono">Total Akumulasi: <strong class="text-amber-700">{{ $tiket->total_stop_clock_minutes }} Menit</strong></span>
-            </h3>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-50 text-slate-600 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
-                        <tr>
-                            <th class="p-3">Alasan &amp; Bukti</th>
-                            <th class="p-3">Waktu Mulai</th>
-                            <th class="p-3">Waktu Berhenti</th>
-                            <th class="p-3">Durasi</th>
-                            <th class="p-3">Status Approval</th>
-                            <th class="p-3 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse($tiket->stopClocks as $sc)
-                            <tr class="hover:bg-slate-50/60 transition">
-                                <td class="p-3">
-                                    <span class="font-bold text-slate-900 block">{{ $sc->reason }}</span>
-                                    <span class="text-slate-500 text-[11px] block mt-0.5">{{ $sc->reason_detail }}</span>
-                                    @if($sc->evidence_path)
-                                        <a href="/storage/{{ $sc->evidence_path }}" target="_blank" class="text-teal-600 hover:underline text-[10px] font-semibold mt-1 inline-block">
-                                            📎 Lihat Dokumen Bukti
-                                        </a>
-                                    @endif
-                                </td>
-                                <td class="p-3 font-mono text-slate-700">
-                                    {{ $sc->started_at ? $sc->started_at->timezone('Asia/Jakarta')->format('d M, H:i') : '-' }} WIB
-                                </td>
-                                <td class="p-3 font-mono text-slate-700">
-                                    {{ $sc->ended_at ? $sc->ended_at->timezone('Asia/Jakarta')->format('d M, H:i') . ' WIB' : 'Sedang Berjalan' }}
-                                </td>
-                                <td class="p-3 font-mono font-bold text-amber-700">
-                                    {{ $sc->duration_minutes ?? '-' }} Menit
-                                </td>
-                                <td class="p-3">
-                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase
-                                        {{ $sc->approval_status === 'approved' ? 'bg-emerald-100 text-emerald-800' : ($sc->approval_status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800') }}">
-                                        {{ $sc->approval_status }}
-                                    </span>
-                                </td>
-                                <td class="p-3 text-right">
-                                    @can('ticket.stop_clock.approve')
-                                        @if($sc->approval_status === 'pending')
-                                            <div class="flex items-center justify-end gap-1.5">
-                                                <form method="POST" action="{{ route('tickets.stop-clock.approve', $sc) }}">
-                                                    @csrf
-                                                    <button type="submit" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition">Setujui</button>
-                                                </form>
-                                                <form method="POST" action="{{ route('tickets.stop-clock.reject', $sc) }}">
-                                                    @csrf
-                                                    <input type="hidden" name="reason" value="Ditolak oleh NOC">
-                                                    <button type="submit" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[10px] font-bold transition">Tolak</button>
-                                                </form>
-                                            </div>
-                                        @endif
-                                    @endcan
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="p-6 text-center text-slate-400 italic">Tidak ada catatan jeda Stop Clock pada tiket ini.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 4: JOINT CLOSURE & MANUVER CORE -->
-    <!-- ========================================================================= -->
-    <div id="tab-assets" class="tab-pane hidden space-y-6">
-        <!-- Section Joint Closure -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#0D9488]"></span>
-                    <span>Joint Closures (Kabel Sambungan FO §7.6)</span>
-                </h3>
-            </div>
-
-            <!-- Form Tambah Joint Closure -->
-            <form method="POST" action="{{ route('tickets.joint-closures.store', $tiket) }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs bg-slate-50/70 p-4 rounded-2xl border border-slate-200">
-                @csrf
-                <div class="sm:col-span-2">
-                    <label class="block font-bold text-slate-700 mb-1">Nama Joint Closure *</label>
-                    <input type="text" name="nama_closure" required placeholder="Contoh: JC-SRE-KM12 / Dome Closure" class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Kapasitas Core *</label>
-                    <input type="number" name="kapasitas_core" value="24" min="1" required class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="w-full px-4 py-2 rounded-xl text-white font-bold text-xs shadow-xs" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                        + Tambah Closure
-                    </button>
-                </div>
-            </form>
-
-            <!-- List Joint Closures & Core Matrix -->
-            <div class="space-y-4 pt-2">
-                @forelse($tiket->jointClosures as $jc)
-                    <div class="bg-slate-50/80 rounded-2xl p-4 border border-slate-200 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h4 class="font-bold text-slate-900 text-sm">{{ $jc->nama_closure }}</h4>
-                                <span class="text-xs text-slate-500">Kapasitas: {{ $jc->kapasitas_core }} Core &bull; Tipe: {{ $jc->tipe_closure ?? 'Dome' }}</span>
+                <!-- Dispatch Note if available -->
+                @if($lead)
+                    <div class="flex justify-start">
+                        <div class="max-w-xl bg-amber-50/90 rounded-2xl rounded-tl-xs p-4 shadow-xs border border-amber-200 text-xs space-y-1.5">
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="font-bold text-amber-900 flex items-center gap-1.5">
+                                    <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[10px]">MT</span>
+                                    <span>Manager Teknis</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[10px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
+                                </span>
+                                <span class="text-[10px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
                             </div>
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 text-teal-800">
-                                {{ $jc->cores->count() }} Sambungan Core
-                            </span>
+                            <p class="text-amber-950 leading-relaxed">
+                                👷 <strong>DISPATCH / PENUGASAN TIM</strong>: Ditugaskan <strong>{{ $lead->name }}</strong> (Lead) bersama tim: 
+                                {{ $crew->pluck('name')->join(', ') ?: 'mandiri' }} untuk menangani perbaikan tiket ini.
+                            </p>
                         </div>
-
-                        <!-- Form Tambah Sambungan Core -->
-                        <form method="POST" action="{{ route('tickets.closure-cores.store', $jc) }}" class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/80 text-xs">
-                            @csrf
-                            <input type="text" name="tube_asal" placeholder="Tube Asal" required class="w-20 rounded-lg border-slate-300 bg-white px-2 py-1.5 text-xs">
-                            <input type="number" name="core_asal" placeholder="Core Asal" required class="w-20 rounded-lg border-slate-300 bg-white px-2 py-1.5 text-xs">
-                            <span class="text-slate-400 font-bold">&rarr;</span>
-                            <input type="text" name="tube_tujuan" placeholder="Tube Tjn" required class="w-20 rounded-lg border-slate-300 bg-white px-2 py-1.5 text-xs">
-                            <input type="number" name="core_tujuan" placeholder="Core Tjn" required class="w-20 rounded-lg border-slate-300 bg-white px-2 py-1.5 text-xs">
-                            <input type="number" step="0.01" name="loss_db" placeholder="Loss (dB)" class="w-20 rounded-lg border-slate-300 bg-white px-2 py-1.5 text-xs">
-                            <button type="submit" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs shadow-xs">
-                                Sambung Core
-                            </button>
-                        </form>
-
-                        <!-- Tabel Matriks Core -->
-                        @if($jc->cores->count() > 0)
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-xs text-left bg-white rounded-xl border border-slate-200">
-                                    <thead class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase">
-                                        <tr>
-                                            <th class="p-2">Asal</th>
-                                            <th class="p-2">Tujuan</th>
-                                            <th class="p-2">Loss (dB)</th>
-                                            <th class="p-2">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        @foreach($jc->cores as $core)
-                                            <tr>
-                                                <td class="p-2 font-mono">Tube {{ $core->tube_asal }} / Core {{ $core->core_asal }}</td>
-                                                <td class="p-2 font-mono">Tube {{ $core->tube_tujuan }} / Core {{ $core->core_tujuan }}</td>
-                                                <td class="p-2 font-mono font-bold {{ $core->loss_db > 0.3 ? 'text-rose-600' : 'text-emerald-700' }}">{{ $core->loss_db ?? '0.00' }} dB</td>
-                                                <td class="p-2">
-                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">{{ $core->status ?? 'TERHUBUNG' }}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                @empty
-                    <p class="text-slate-400 italic text-xs p-4 text-center">Belum ada Joint Closure yang dicatat.</p>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Section Manuver Core -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-[#18C4C4]"></span>
-                    <span>Manuver Core FO (§7.6)</span>
-                </h3>
-            </div>
-
-            <!-- Form Tambah Manuver Core -->
-            <form method="POST" action="{{ route('tickets.maneuvers.store', $tiket) }}" class="grid grid-cols-1 sm:grid-cols-5 gap-3 text-xs bg-slate-50/70 p-4 rounded-2xl border border-slate-200">
-                @csrf
-                <div class="sm:col-span-2">
-                    <label class="block font-bold text-slate-700 mb-1">Segmen / Titik Manuver *</label>
-                    <input type="text" name="segmen" required placeholder="POP Soreang / OTB Rack A" class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Core Asal *</label>
-                    <input type="number" name="core_asal" required placeholder="No Core" class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Core Tujuan *</label>
-                    <input type="number" name="core_tujuan" required placeholder="No Core" class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs shadow-xs">
-                        + Manuver Core
-                    </button>
-                </div>
-            </form>
-
-            <!-- Tabel Manuver Core -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b">
-                        <tr>
-                            <th class="p-3">Segmen / Titik</th>
-                            <th class="p-3">Core Asal</th>
-                            <th class="p-3">Core Tujuan</th>
-                            <th class="p-3">Keterangan</th>
-                            <th class="p-3">Waktu</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse($tiket->coreManeuvers as $man)
-                            <tr class="hover:bg-slate-50/60 transition">
-                                <td class="p-3 font-semibold text-slate-800">{{ $man->segmen }}</td>
-                                <td class="p-3 font-mono font-bold text-teal-700">Core #{{ $man->core_asal }}</td>
-                                <td class="p-3 font-mono font-bold text-teal-700">Core #{{ $man->core_tujuan }}</td>
-                                <td class="p-3 text-slate-600">{{ $man->keterangan ?? '-' }}</td>
-                                <td class="p-3 font-mono text-slate-400">{{ $man->created_at ? $man->created_at->timezone('Asia/Jakarta')->format('d M H:i') : '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Tidak ada catatan manuver core.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 5: MATERIAL & TITIK PERBAIKAN -->
-    <!-- ========================================================================= -->
-    <div id="tab-materials" class="tab-pane hidden space-y-6">
-        <!-- Pemakaian Material / Logistik -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
-                    <span>Pemakaian Material / Logistik Lapangan (§7.6, AC-05)</span>
-                </h3>
-            </div>
-
-            <!-- Form Pemakaian Material -->
-            <form method="POST" action="{{ route('tickets.materials.use', $tiket) }}" class="flex flex-wrap items-end gap-3 text-xs bg-slate-50/70 p-4 rounded-2xl border border-slate-200">
-                @csrf
-                <div class="flex-1 min-w-[220px]">
-                    <label class="block font-bold text-slate-700 mb-1">Pilih Master Material *</label>
-                    <select name="material_id" required class="w-full text-xs rounded-xl border-slate-300 bg-white px-3.5 py-2.5">
-                        @foreach($materials as $mat)
-                            <option value="{{ $mat->id }}">{{ $mat->kode }} - {{ $mat->nama }} (Tersedia: {{ $mat->stok_tersedia }} {{ $mat->satuan }})</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="w-28">
-                    <label class="block font-bold text-slate-700 mb-1">Jumlah *</label>
-                    <input type="number" name="quantity" min="1" value="1" required class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2.5">
-                </div>
-                <button type="submit" class="px-5 py-2.5 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    + Pakai Material
-                </button>
-            </form>
-
-            <!-- Tabel Pemakaian Material -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left">
-                    <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b">
-                        <tr>
-                            <th class="p-3">Kode</th>
-                            <th class="p-3">Nama Material</th>
-                            <th class="p-3">Jumlah Pakai</th>
-                            <th class="p-3">Petugas Pencatat</th>
-                            <th class="p-3">Waktu</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse($tiket->materials as $tMat)
-                            <tr class="hover:bg-slate-50/60 transition">
-                                <td class="p-3 font-mono font-bold text-slate-800">{{ $tMat->material->kode }}</td>
-                                <td class="p-3 font-medium text-slate-800">{{ $tMat->material->nama }}</td>
-                                <td class="p-3 font-bold text-teal-800">{{ $tMat->quantity }} {{ $tMat->material->satuan }}</td>
-                                <td class="p-3 text-slate-600">{{ $tMat->user->name }}</td>
-                                <td class="p-3 font-mono text-slate-400">{{ $tMat->created_at ? $tMat->created_at->timezone('Asia/Jakarta')->format('d M H:i') : '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada material yang digunakan untuk tiket ini.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Titik Perbaikan (Repair Points) -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
-                    <span>Titik Perbaikan (Repair Points §7.6)</span>
-                </h3>
-            </div>
-
-            <!-- Form Tambah Titik Perbaikan -->
-            <form method="POST" action="{{ route('tickets.repair-points.store', $tiket) }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs bg-slate-50/70 p-4 rounded-2xl border border-slate-200">
-                @csrf
-                <div class="sm:col-span-2">
-                    <label class="block font-bold text-slate-700 mb-1">Nama Titik / Tiang / Handhole *</label>
-                    <input type="text" name="nama_titik" required placeholder="Contoh: Tiang FO KM-14 / Manhole SRE-02" class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Jenis Kerusakan</label>
-                    <input type="text" name="jenis_kerusakan" placeholder="Kabel putus / Bending / Macro-bend" class="w-full text-xs rounded-xl border-slate-300 bg-white px-3 py-2">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="w-full px-4 py-2 bg-cyan-700 hover:bg-cyan-800 text-white rounded-xl font-bold text-xs shadow-xs">
-                        + Tambah Titik
-                    </button>
-                </div>
-            </form>
-
-            <!-- Daftar Titik Perbaikan -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                @forelse($tiket->repairPoints as $rp)
-                    <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1">
-                        <h5 class="font-bold text-slate-800">{{ $rp->nama_titik }}</h5>
-                        <p class="text-slate-500 text-[11px]">Kerusakan: <span class="font-semibold text-rose-600">{{ $rp->jenis_kerusakan ?? '-' }}</span></p>
-                        @if($rp->latitude && $rp->longitude)
-                            <a href="https://maps.google.com/?q={{ $rp->latitude }},{{ $rp->longitude }}" target="_blank"
-                               class="text-teal-600 hover:underline font-mono text-[10px] inline-block font-bold mt-1">
-                                📍 {{ $rp->latitude }}, {{ $rp->longitude }} ↗
-                            </a>
-                        @endif
-                    </div>
-                @empty
-                    <p class="col-span-full text-slate-400 italic text-xs p-4 text-center">Belum ada titik perbaikan dicatat.</p>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 6: HANDOVER SHIFT -->
-    <!-- ========================================================================= -->
-    <div id="tab-handover" class="tab-pane hidden space-y-6">
-        <!-- Form Buat Handover Shift -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-            <div class="border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                    <span>Serah Terima Tugas (Handover Shift Kerja §7.5)</span>
-                </h3>
-                <p class="text-xs text-slate-500 mt-0.5">
-                    Mencatat alih tugas ke teknisi shift berikutnya agar eskalasi dan informasi penanganan tidak terputus.
-                </p>
-            </div>
-
-            <form method="POST" action="{{ route('tickets.handovers.store', $tiket) }}" class="space-y-4 text-xs">
-                @csrf
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Shift Asal *</label>
-                        <input type="text" name="shift_from" required placeholder="Pagi (08:15 - 17:00)"
-                               class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 px-3.5 py-2.5">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Shift Tujuan *</label>
-                        <input type="text" name="shift_to" required placeholder="Siang (13:00 - 21:00)"
-                               class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 px-3.5 py-2.5">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Teknisi Penerima *</label>
-                        <select name="recipient_id" required class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 px-3.5 py-2.5">
-                            @foreach($technicians as $t)
-                                <option value="{{ $t->id }}">{{ $t->name }} ({{ $t->employee_code }})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Catatan Kendala &amp; Pekerjaan Pending Wajib *</label>
-                    <textarea name="notes" rows="3" required placeholder="Tuliskan kendala teknis yang sedang berlangsung dan instruksi pekerjaan untuk shift berikutnya..."
-                              class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 px-3.5 py-2.5"></textarea>
-                </div>
-
-                <div class="flex justify-end pt-2">
-                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition cursor-pointer">
-                        Kirim Handover Shift
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Histori Handover Shift -->
-        <div class="space-y-3">
-            @forelse($tiket->handovers as $ho)
-                <div class="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs text-xs space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <span class="font-extrabold text-slate-800 text-sm">{{ $ho->shift_from }} &rarr; {{ $ho->shift_to }}</span>
-                        <span class="font-mono text-slate-400">{{ $ho->created_at ? $ho->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') : '-' }} WIB</span>
-                    </div>
-                    <div class="text-slate-600 flex items-center gap-3 text-xs">
-                        <span>Penyerah: <strong class="text-slate-900">{{ $ho->sender->name }}</strong></span>
-                        <span>&bull;</span>
-                        <span>Penerima: <strong class="text-slate-900">{{ $ho->recipient->name }}</strong></span>
-                    </div>
-                    <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-slate-800 leading-relaxed">
-                        <strong class="text-[10px] uppercase text-slate-400 block mb-1">Catatan Handover:</strong>
-                        {{ $ho->notes }}
-                    </div>
-
-                    <div class="pt-2 flex items-center justify-between">
-                        @if($ho->acknowledged_at)
-                            <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
-                                ✓ Dikonfirmasi Penerima pada {{ $ho->acknowledged_at->timezone('Asia/Jakarta')->format('d M H:i') }} WIB
-                            </span>
-                        @else
-                            <span class="text-amber-700 font-bold bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200">
-                                ⏳ Menunggu konfirmasi penerima shift
-                            </span>
-                            @if(auth()->id() === $ho->recipient_id)
-                                <form method="POST" action="{{ route('tickets.handovers.acknowledge', $ho) }}">
-                                    @csrf
-                                    <button type="submit" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-xs transition">
-                                        Konfirmasi Terima Handover
-                                    </button>
-                                </form>
-                            @endif
-                        @endif
-                    </div>
-                </div>
-            @empty
-                <div class="p-8 bg-white rounded-3xl border border-dashed border-slate-200 text-center text-slate-400 text-xs italic">
-                    Belum ada riwayat handover shift pada tiket ini.
-                </div>
-            @endforelse
-        </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 7: ALUR CLOSING & VERIFIKASI AKHIR -->
-    <!-- ========================================================================= -->
-    <div id="tab-closing" class="tab-pane hidden space-y-6">
-        <!-- Prerequisites Checklist Card (AC-06, §7.6) -->
-        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full {{ $prerequisites['passed'] ? 'bg-emerald-500' : 'bg-amber-500' }}"></span>
-                    <span>Status Prasyarat Closing Lapangan (AC-06)</span>
-                </h3>
-                <span class="px-3 py-1 rounded-full text-xs font-bold
-                    {{ $prerequisites['passed'] ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' }}">
-                    {{ $prerequisites['passed'] ? '✓ Siap Diajukan Closing' : '⚠️ Prasyarat Belum Lengkap' }}
-                </span>
-            </div>
-
-            @if(!$prerequisites['passed'])
-                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-xs space-y-1.5">
-                    <strong>Pekerjaan lapangan belum memenuhi prasyarat closing awal:</strong>
-                    <ul class="list-disc list-inside space-y-1 pl-2">
-                        @foreach($prerequisites['missing'] as $miss)
-                            <li>{{ $miss }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @else
-                <p class="text-xs text-emerald-700 font-semibold">
-                    ✓ Seluruh syarat teknis (resume, dokumentasi, redaman / titik perbaikan) telah terpenuhi.
-                </p>
-            @endif
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Tahap 1: Closing Awal Teknisi (AC-06, §7.2, §7.6) -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-md">
-                        TAHAP 1
-                    </span>
-                    <h3 class="font-heading font-extrabold text-base text-slate-800 mt-1">Pengajuan Closing Awal (Teknisi)</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Diajukan oleh teknisi lapangan setelah perbaikan selesai untuk diverifikasi oleh tim NOC.
-                    </p>
-                </div>
-
-                <form method="POST" action="{{ route('tickets.closing-awal', $tiket) }}" class="space-y-3.5 text-xs">
-                    @csrf
-                    <div>
-                        <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Problem Temuan *</label>
-                        <input type="text" name="problem_temuan" value="{{ $tiket->problem_temuan }}" required placeholder="Uraian masalah yang ditemukan..."
-                               class="w-full text-xs rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5">
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Action Taken (Tindakan) *</label>
-                        <input type="text" name="action_taken" value="{{ $tiket->action_taken }}" required placeholder="Tindakan yang telah dilakukan..."
-                               class="w-full text-xs rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Redaman Sesudah (dBm)</label>
-                            <input type="number" step="0.01" name="redaman_sesudah" value="{{ $tiket->redaman_sesudah }}" placeholder="-19.5"
-                                   class="w-full text-xs rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 font-mono">
-                        </div>
-                        <div class="flex items-center pt-5">
-                            <label class="inline-flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="has_link_up" value="1" {{ $tiket->has_link_up ? 'checked' : '' }} class="rounded text-[#0D9488] focus:ring-teal-500">
-                                <span class="font-bold text-slate-800 text-xs">Konfirmasi Link UP</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="text-right pt-2">
-                        <button type="submit"
-                                class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition cursor-pointer">
-                            Ajukan Closing Awal
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Tahap 2: Verifikasi & Closing Akhir NOC (AC-08, §7.2, §7.7) -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">
-                        TAHAP 2
-                    </span>
-                    <h3 class="font-heading font-extrabold text-base text-slate-800 mt-1">Verifikasi &amp; Closing Akhir (NOC)</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">
-                        Memvalidasi hasil kerja teknisi, menutup tiket secara permanen, dan menghitung MTTR bersih serta status SLA.
-                    </p>
-                </div>
-
-                @if($tiket->status === 'PENDING_VERIFIKASI')
-                    <div class="p-4 bg-purple-50 rounded-2xl border border-purple-200 text-xs text-purple-900 space-y-2">
-                        <p class="font-bold">Tiket ini telah diajukan Closing Awal oleh teknisi lapangan.</p>
-                        <p>Silakan verifikasi trafik monitoring dan redaman. Pilih salah satu tindakan di bawah:</p>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                        <form method="POST" action="{{ route('tickets.verify-close', $tiket) }}" class="w-full">
-                            @csrf
-                            <button type="submit"
-                                    class="w-full px-5 py-3 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md bg-emerald-600 hover:bg-emerald-700 transition cursor-pointer">
-                                ✓ Verifikasi &amp; Tutup Tiket (CLOSE)
-                            </button>
-                        </form>
-
-                        <button type="button" onclick="document.getElementById('modal-reject-closing').classList.remove('hidden')"
-                                class="w-full px-5 py-3 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md bg-rose-600 hover:bg-rose-700 transition cursor-pointer">
-                            ✗ Tolak Closing (Reject)
-                        </button>
-                    </div>
-                @else
-                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 text-center text-slate-400 text-xs italic">
-                        Tombol verifikasi aktif saat status tiket bernilai <strong class="text-purple-700">PENDING_VERIFIKASI</strong>.
                     </div>
                 @endif
 
-                <!-- Kontrol Reopen & Pembatalan Tiket -->
-                <div class="pt-4 border-t border-slate-100 space-y-3">
-                    <h4 class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Kontrol Khusus Tiket</h4>
-                    @if($tiket->status === 'CLOSE')
-                        <form method="POST" action="{{ route('tickets.reopen', $tiket) }}" class="space-y-2">
-                            @csrf
-                            <input type="text" name="reason" placeholder="Alasan pembukaan kembali tiket..." required
-                                   class="w-full text-xs rounded-xl border border-slate-300 bg-slate-50/50 px-3 py-2">
-                            <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition">
-                                Reopen Tiket (Batas Maksimal 7 Hari)
-                            </button>
-                        </form>
-                    @elseif(in_array($tiket->status, ['OPEN', 'PROSES']))
-                        <form method="POST" action="{{ route('tickets.cancel', $tiket) }}" class="space-y-2">
-                            @csrf
-                            <input type="text" name="reason" placeholder="Alasan pembatalan tiket..." required
-                                   class="w-full text-xs rounded-xl border border-slate-300 bg-slate-50/50 px-3 py-2">
-                            <button type="submit" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition">
-                                Batalkan Tiket (CANCELLED)
-                            </button>
-                        </form>
-                    @endif
+                <!-- Chronology Entries List -->
+                @forelse($tiket->chronologies as $chron)
+                    @php
+                        $isSelf = auth()->check() && $chron->user_id === auth()->id();
+                    @endphp
+                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }}">
+                        <div class="max-w-xl rounded-2xl p-4 shadow-xs border text-xs space-y-2
+                            {{ $isSelf ? 'bg-teal-50/90 border-teal-200 rounded-tr-xs' : 'bg-white border-slate-200 rounded-tl-xs' }}">
+                            
+                            <!-- Sender & Timestamp -->
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span>{{ $chron->user->name ?? 'User' }}</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase
+                                        {{ $chron->category === 'SELESAI' ? 'bg-emerald-100 text-emerald-800' : ($chron->category === 'OTDR' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-700') }}">
+                                        {{ $chron->category }}
+                                    </span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ $chron->created_at->format('H:i') }} WIB</span>
+                            </div>
+
+                            <!-- Message Content -->
+                            <p class="text-slate-800 leading-relaxed whitespace-pre-line">{{ $chron->message }}</p>
+
+                            <!-- Photo Attachment Preview if available -->
+                            @if($chron->photo_path)
+                                <div class="pt-1">
+                                    <a href="{{ asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-xl overflow-hidden border border-slate-200 max-w-xs">
+                                        <img src="{{ asset('storage/' . $chron->photo_path) }}" alt="Bukti Foto" class="w-full h-40 object-cover group-hover:scale-105 transition">
+                                        <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
+                                            Lihat Foto Penuh &rarr;
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif
+
+                            <!-- Geotag coordinates if available -->
+                            @if($chron->latitude && $chron->longitude)
+                                <div class="text-[10px] text-teal-700 flex items-center gap-1 pt-1 font-mono">
+                                    <svg class="w-3 h-3 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                    <span>GPS: {{ number_format($chron->latitude, 5) }}, {{ number_format($chron->longitude, 5) }}</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-6 text-slate-400 text-xs">
+                        Belum ada update kronologis koordinasi lapangan. Gunakan form di bawah untuk mengirim catatan.
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
+            <div class="px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto flex items-center gap-2 text-xs no-scrollbar">
+                <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
+                
+                <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    📍 Menuju lokasi
+                </button>
+                <button type="button" onclick="setQuickChip('🔍 Investigasi titik & pengukuran OTDR', 'OTDR')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    🔍 Investigasi &amp; OTDR
+                </button>
+                <button type="button" onclick="setQuickChip('✂️ Ditemukan kabel putus / bending core pada span', 'INVESTIGASI')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    ✂️ Kabel putus / bending
+                </button>
+                <button type="button" onclick="setQuickChip('⚡ Sedang proses splicing core di Joint Closure', 'JOINTING')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    ⚡ Proses splicing core
+                </button>
+                <button type="button" onclick="setQuickChip('📊 Pengukuran redaman optik selesai', 'OTDR')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    📊 Ukur redaman optik
+                </button>
+                <button type="button" onclick="setQuickChip('✅ Redaman normal & Link UP kembali', 'LINK_UP')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    ✅ Redaman normal &amp; Link UP
+                </button>
+                <button type="button" onclick="setQuickChip('⚠️ Kendala di lapangan, memerlukan manuver core', 'LAIN')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    ⚠️ Kendala / butuh manuver
+                </button>
+                <button type="button" onclick="setQuickChip('📷 Dokumentasi hasil perbaikan lapangan terlampir', 'SELESAI')"
+                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                    📷 Dokumentasi perbaikan
+                </button>
+            </div>
+
+            <!-- Chat Input Bar (matching Image 3) -->
+            <form method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
+                  class="p-4 bg-white border-t border-slate-200 flex items-center gap-2.5">
+                @csrf
+                <input type="hidden" name="category" id="chron_category" value="LAIN">
+                <input type="hidden" name="latitude" id="chron_lat">
+                <input type="hidden" name="longitude" id="chron_lng">
+                <input type="hidden" name="gps_accuracy" id="chron_acc">
+
+                <!-- Attachment Clip Button -->
+                <button type="button" onclick="document.getElementById('chron_photo_input').click()"
+                        title="Lampirkan Foto / Berkas"
+                        class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                </button>
+                <input type="file" name="photo" id="chron_photo_input" accept="image/*" class="hidden"
+                       onchange="updateAttachmentLabel(this)">
+
+                <!-- Text Input -->
+                <div class="relative flex-1">
+                    <input type="text"
+                           name="message"
+                           id="quick-chat-input"
+                           required
+                           placeholder="Ketik update koordinasi..."
+                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-4 py-2.5 text-slate-800 transition pr-28">
+                    
+                    <span id="attachment-name" class="absolute right-3 top-2.5 text-[11px] font-semibold text-teal-700 truncate max-w-[100px] pointer-events-none"></span>
                 </div>
+
+                <!-- Submit Send Button -->
+                <button type="submit"
+                        class="w-11 h-11 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    <svg class="w-5 h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: RESUME AKHIR PEKERJAAN (matching Image 4) -->
+    <!-- ========================================================================= -->
+    <div id="tab-resume" class="tab-pane hidden space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0D9488]">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-extrabold text-base text-slate-800">Resume Akhir Pekerjaan</h3>
+                        <p class="text-xs text-slate-400">Rangkuman temuan masalah, tindakan perbaikan, dan tim pelaksana</p>
+                    </div>
+                </div>
+
+                <button type="button" onclick="toggleResumeForm()"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
+                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    <span>{{ $hasResume ? 'Edit Resume Pekerjaan' : 'Input Resume Baru' }}</span>
+                </button>
+            </div>
+
+            <!-- Resume Content / Display -->
+            @if($hasResume)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Temuan Masalah di Lapangan</span>
+                        <p class="text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed">{{ $tiket->problem_temuan }}</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Tindakan Perbaikan Teknis</span>
+                        <p class="text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed">{{ $tiket->action_taken }}</p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Pengukuran Redaman Optik</span>
+                        <p class="text-xs sm:text-sm font-mono font-bold text-slate-800">
+                            Sebelum: <span class="text-rose-600">{{ $tiket->redaman_sebelum ?? '-' }} dBm</span> &bull; 
+                            Sesudah: <span class="text-emerald-600">{{ $tiket->redaman_sesudah ?? '-' }} dBm</span>
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Status Pemulihan Link</span>
+                        <p class="text-xs sm:text-sm font-bold {{ $tiket->has_link_up ? 'text-emerald-700' : 'text-amber-700' }}">
+                            {{ $tiket->has_link_up ? '✓ LINK UP RESTORED' : 'Belum Restore' }}
+                        </p>
+                    </div>
+                </div>
+            @else
+                <!-- Empty State matching Image 4 -->
+                <div id="resume-empty-state" class="p-12 text-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center mx-auto text-teal-600">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <h4 class="font-heading font-extrabold text-slate-800 text-sm">Resume Pekerjaan Belum Diinput</h4>
+                    <p class="text-xs text-slate-400 max-w-md mx-auto">
+                        Rangkuman penanganan teknis, akar penyebab gangguan, dan tindakan pemulihan di lapangan belum dicatat untuk tiket ini.
+                    </p>
+                    <button type="button" onclick="toggleResumeForm()"
+                            class="px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-md shadow-teal-950/20 cursor-pointer transition inline-flex items-center gap-2"
+                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        <span>Input Resume Sekarang</span>
+                    </button>
+                </div>
+            @endif
+
+            <!-- Form Resume & Closing Awal (Toggled or inline) -->
+            <div id="resume-form-container" class="{{ $hasResume ? 'hidden' : '' }} pt-4 border-t border-slate-100">
+                <form method="POST" action="{{ route('tickets.closing-awal', $tiket) }}" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Akar Masalah / Temuan Lapangan *
+                        </label>
+                        <textarea name="problem_temuan" rows="2" required placeholder="Jelaskan titik putus, bending, core bermasalah..."
+                                  class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-3 text-slate-800">{{ old('problem_temuan', $tiket->problem_temuan) }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Tindakan Penanganan / Pemulihan *
+                        </label>
+                        <textarea name="action_taken" rows="2" required placeholder="Tindakan yang dilakukan (splicing, re-routing, bypass core)..."
+                                  class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-3 text-slate-800">{{ old('action_taken', $tiket->action_taken) }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Redaman Sebelum (dBm)</label>
+                            <input type="number" step="0.01" name="redaman_sebelum" value="{{ old('redaman_sebelum', $tiket->redaman_sebelum) }}"
+                                   placeholder="Contoh: -32.50"
+                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5 text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Redaman Sesudah (dBm) *</label>
+                            <input type="number" step="0.01" name="redaman_sesudah" required value="{{ old('redaman_sesudah', $tiket->redaman_sesudah) }}"
+                                   placeholder="Contoh: -18.20"
+                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5 text-slate-800">
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200 flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-xs text-slate-800 block">Konfirmasi Link UP / Pulih</span>
+                            <span class="text-[11px] text-slate-500">Tandai jika sinyal optik telah terhubung normal kembali.</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="has_link_up" value="1" {{ $tiket->has_link_up ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D9488]"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="submit"
+                                class="px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
+                                style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                            Simpan Resume &amp; Ajukan Closing Awal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 3: PENANGANAN CORE & JOINT CLOSURE (matching Image 5) -->
+    <!-- ========================================================================= -->
+    <div id="tab-penanganan" class="tab-pane hidden space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-6"
+             x-data="{ mode: 'maneuver' }">
+            
+            <!-- Switcher Header (matching Image 5) -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
+                        <span>Pilih Metode Penanganan Fisik / Core</span>
+                    </h3>
+                    <p class="text-xs text-slate-400">Tentukan metode perbaikan kabel. Anda dapat memilih salah satu atau mengaktifkan keduanya sekaligus.</p>
+                </div>
+
+                <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 text-xs font-semibold">
+                    <button type="button" @click="mode = 'jointing'" :class="mode === 'jointing' ? 'bg-white shadow-xs text-teal-800 font-bold' : 'text-slate-600'" class="px-3 py-1.5 rounded-lg transition">Jointing</button>
+                    <button type="button" @click="mode = 'maneuver'" :class="mode === 'maneuver' ? 'bg-white shadow-xs text-teal-800 font-bold' : 'text-slate-600'" class="px-3 py-1.5 rounded-lg transition">Manuver Core</button>
+                    <button type="button" @click="mode = 'both'" :class="mode === 'both' ? 'bg-white shadow-xs text-teal-800 font-bold' : 'text-slate-600'" class="px-3 py-1.5 rounded-lg transition">Pilih Keduanya</button>
+                </div>
+            </div>
+
+            <!-- 2 Clickable Cards (matching Image 5) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- 1. Jointing Lurus -->
+                <div @click="mode = (mode === 'jointing' ? 'both' : 'jointing')"
+                     :class="(mode === 'jointing' || mode === 'both') ? 'border-[#0D9488] bg-teal-50/40 ring-2 ring-teal-500/20' : 'border-slate-200 bg-white'"
+                     class="p-5 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-800 flex items-center justify-center font-bold">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-white border border-slate-200 text-slate-700">
+                            {{ $tiket->jointClosures->count() }} Data JC
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-extrabold text-sm text-slate-800">1. Jointing Lurus</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Penyambungan kabel lurus eksisting &amp; jumper, mapping tube-core per tray, serta penambahan closure baru.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 2. Manuver Core -->
+                <div @click="mode = (mode === 'maneuver' ? 'both' : 'maneuver')"
+                     :class="(mode === 'maneuver' || mode === 'both') ? 'border-purple-600 bg-purple-50/40 ring-2 ring-purple-500/20' : 'border-slate-200 bg-white'"
+                     class="p-5 rounded-2xl border-2 transition cursor-pointer flex flex-col justify-between space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-white border border-purple-200 text-purple-800">
+                            {{ $tiket->coreManeuvers->count() }} Record
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-extrabold text-sm text-slate-800">2. Manuver Core</h4>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Pengalihan alokasi core serat optik (swapping core / bypass jalur putus) sebelum dan sesudah perbaikan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Joint Closure Section -->
+            <div x-show="mode === 'jointing' || mode === 'both'" class="space-y-4 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-heading font-extrabold text-sm text-slate-800">Data Joint Closure (JC)</h4>
+                        <p class="text-xs text-slate-400">Pencatatan closure pada span FO dan pemetaan tray</p>
+                    </div>
+                    <button type="button" onclick="openJcModal()" class="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-teal-600 hover:bg-teal-700 text-white transition cursor-pointer">
+                        + Tambah Joint Closure
+                    </button>
+                </div>
+
+                @if($tiket->jointClosures->isNotEmpty())
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        @foreach($tiket->jointClosures as $jc)
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-800 text-sm">{{ $jc->closure_code }}</span>
+                                    <span class="px-2 py-0.5 rounded bg-teal-100 text-teal-800 font-bold font-mono">{{ $jc->closure_type }}</span>
+                                </div>
+                                <p class="text-slate-600">Kapasitas: {{ $jc->capacity_cores }} Core &bull; Lokasi: {{ $jc->location_description ?? '-' }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="p-6 text-center rounded-2xl border border-dashed border-slate-200 text-xs text-slate-400">
+                        Belum ada Joint Closure yang dicatat pada tiket ini.
+                    </div>
+                @endif
+            </div>
+
+            <!-- Manuver Core Section (matching Image 5) -->
+            <div x-show="mode === 'maneuver' || mode === 'both'" class="space-y-4 pt-4 border-t border-slate-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-heading font-extrabold text-sm text-slate-800">Catatan Manuver Core Fiber Optik</h4>
+                        <p class="text-xs text-slate-400">Mapping alokasi core sebelum dan sesudah perbaikan</p>
+                    </div>
+                    <button type="button" onclick="openManeuverModal()"
+                            class="px-4 py-2 rounded-xl font-bold text-xs text-white bg-purple-600 hover:bg-purple-700 transition cursor-pointer flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span>Tambah Manuver Core</span>
+                    </button>
+                </div>
+
+                @if($tiket->coreManeuvers->isNotEmpty())
+                    <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px]">
+                                <tr>
+                                    <th class="p-3">Tube Asal</th>
+                                    <th class="p-3">Core Asal</th>
+                                    <th class="p-3 text-center">&rarr;</th>
+                                    <th class="p-3">Tube Tujuan</th>
+                                    <th class="p-3">Core Tujuan</th>
+                                    <th class="p-3">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach($tiket->coreManeuvers as $cm)
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="p-3 font-semibold">{{ $cm->tube_source }}</td>
+                                        <td class="p-3 font-mono font-bold text-purple-700">{{ $cm->core_source }}</td>
+                                        <td class="p-3 text-center text-slate-400 font-bold">&rarr;</td>
+                                        <td class="p-3 font-semibold">{{ $cm->tube_target }}</td>
+                                        <td class="p-3 font-mono font-bold text-emerald-700">{{ $cm->core_target }}</td>
+                                        <td class="p-3 text-slate-500">{{ $cm->reason ?? '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <!-- Empty State matching Image 5 -->
+                    <div class="p-12 text-center rounded-2xl border-2 border-dashed border-purple-200 bg-purple-50/30 space-y-3">
+                        <div class="w-14 h-14 rounded-2xl bg-white shadow-xs border border-purple-200 flex items-center justify-center mx-auto text-purple-600">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h4 class="font-heading font-extrabold text-slate-800 text-sm">Belum Ada Data Manuver Core</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto">
+                            Catat alokasi perpindahan core kabel optik (contoh: <code class="font-mono text-purple-700 font-bold">Tube 2 Core 1 &rarr; Tube 2 Core 1</code>) pada titik perbaikan.
+                        </p>
+                        <button type="button" onclick="openManeuverModal()"
+                                class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-purple-600 hover:bg-purple-700 transition cursor-pointer inline-flex items-center gap-2">
+                            <span>+ Tambah Manuver Sekarang</span>
+                        </button>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: MATERIAL & TITIK PERBAIKAN -->
+    <!-- ========================================================================= -->
+    <div id="tab-materials" class="tab-pane hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Material Usage Form & Log -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-heading font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <span>Material Digunakan (Log Fisik)</span>
+                    </h3>
+                    <span class="text-xs font-bold font-mono text-slate-400">{{ $tiket->materials->count() }} Item</span>
+                </div>
+
+                <form method="POST" action="{{ route('tickets.materials.use', $tiket) }}" class="space-y-3 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Pilih Material *</label>
+                        <select name="master_material_id" required class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                            <option value="">-- Pilih Master Material --</option>
+                            @foreach($materials as $m)
+                                <option value="{{ $m->id }}">{{ $m->nama }} (Tersedia: {{ $m->stok_tersedia }} {{ $m->satuan }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Jumlah Digunakan *</label>
+                            <input type="number" step="0.1" name="quantity_used" required min="0.1" placeholder="1" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Catatan Penggunaan</label>
+                            <input type="text" name="notes" placeholder="Lokasi span / closure" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl shadow-xs transition">
+                        + Catat Pemakaian Material
+                    </button>
+                </form>
+
+                <!-- List Material -->
+                @if($tiket->materials->isNotEmpty())
+                    <div class="space-y-2 pt-2">
+                        @foreach($tiket->materials as $tm)
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="font-bold text-slate-800">{{ $tm->material->nama ?? 'Material' }}</span>
+                                    <p class="text-[11px] text-slate-400">{{ $tm->notes ?? '-' }}</p>
+                                </div>
+                                <span class="font-mono font-bold text-teal-800">{{ $tm->quantity_used }} {{ $tm->material->satuan ?? 'pcs' }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            <!-- Titik Perbaikan (GPS Points) -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-heading font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                        <span>Titik Perbaikan (Koordinat GPS)</span>
+                    </h3>
+                    <span class="text-xs font-bold font-mono text-slate-400">{{ $tiket->repairPoints->count() }} Titik</span>
+                </div>
+
+                <form method="POST" action="{{ route('tickets.repair-points.store', $tiket) }}" class="space-y-3 text-xs">
+                    @csrf
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Deskripsi Titik Tiang / Span *</label>
+                        <input type="text" name="location_name" required placeholder="Contoh: Tiang PT MSN No. 12 Depan RSUD" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Latitude *</label>
+                            <input type="number" step="any" name="latitude" required placeholder="-6.917464" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Longitude *</label>
+                            <input type="number" step="any" name="longitude" required placeholder="107.619122" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-xs transition">
+                        + Tambah Titik Perbaikan
+                    </button>
+                </form>
+
+                @if($tiket->repairPoints->isNotEmpty())
+                    <div class="space-y-2 pt-2">
+                        @foreach($tiket->repairPoints as $rp)
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                                <div>
+                                    <span class="font-bold text-slate-800">{{ $rp->location_name }}</span>
+                                    <p class="text-[11px] font-mono text-slate-400">{{ $rp->latitude }}, {{ $rp->longitude }}</p>
+                                </div>
+                                <a href="https://maps.google.com/?q={{ $rp->latitude }},{{ $rp->longitude }}" target="_blank" class="text-teal-600 font-bold hover:underline">Maps &rarr;</a>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 5: DOKUMENTASI (Galeri Foto & Berkas) -->
+    <!-- ========================================================================= -->
+    <div id="tab-documentation" class="tab-pane hidden space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-heading font-extrabold text-base text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>Galeri Dokumentasi Foto &amp; Bukti Gangguan</span>
+                </h3>
+            </div>
+
+            @php
+                $photos = $tiket->chronologies->whereNotNull('photo_path');
+            @endphp
+
+            @if($photos->isNotEmpty())
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    @foreach($photos as $p)
+                        <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group relative">
+                            <img src="{{ asset('storage/' . $p->photo_path) }}" alt="Foto" class="w-full h-44 object-cover group-hover:scale-105 transition duration-300">
+                            <div class="p-2.5 bg-white border-t border-slate-100">
+                                <span class="font-bold text-[11px] text-slate-800 block truncate">{{ $p->user->name ?? 'User' }}</span>
+                                <span class="text-[10px] text-slate-400 block">{{ $p->created_at->format('d M, H:i') }}</span>
+                            </div>
+                            <a href="{{ asset('storage/' . $p->photo_path) }}" target="_blank" class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
+                                Buka Foto &rarr;
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="p-12 text-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 space-y-2">
+                    <p class="text-sm font-bold text-slate-700">Belum Ada Foto Terunggah</p>
+                    <p class="text-xs text-slate-400">Gunakan tab Kronologis untuk mengunggah foto OTDR, kabel putus, atau hasil perbaikan.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 6: STOP CLOCK & SHIFT HANDOVER -->
+    <!-- ========================================================================= -->
+    <div id="tab-stopclock" class="tab-pane hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Stop Clock Section -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-heading font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Stop Clock SLA (Jeda Waktu)</span>
+                    </h3>
+                    <span class="text-xs font-mono font-bold text-amber-600">{{ $tiket->total_stop_clock_minutes }}m Terpakai</span>
+                </div>
+
+                @if($tiket->activeStopClock)
+                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 space-y-3">
+                        <div class="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+                            <span>Stop Clock Sedang Berjalan!</span>
+                        </div>
+                        <p class="text-xs text-amber-800">Alasan: <strong>{{ $tiket->activeStopClock->reason }}</strong> &bull; Dimulai: {{ $tiket->activeStopClock->started_at->format('H:i') }} WIB</p>
+                        
+                        <form method="POST" action="{{ route('tickets.stop-clock.end', $tiket->activeStopClock) }}">
+                            @csrf
+                            <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition">
+                                Selesaikan Stop Clock &amp; Lanjutkan SLA
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <button type="button" onclick="openStopClockModal()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-xs transition">
+                        + Ajukan Stop Clock Baru
+                    </button>
+                @endif
+
+                <!-- History Stop Clock -->
+                @if($tiket->stopClocks->isNotEmpty())
+                    <div class="space-y-2 pt-2 divide-y divide-slate-100 text-xs">
+                        @foreach($tiket->stopClocks as $sc)
+                            <div class="pt-2 flex items-center justify-between">
+                                <div>
+                                    <span class="font-bold text-slate-800">{{ $sc->reason }}</span>
+                                    <p class="text-[11px] text-slate-400">{{ $sc->started_at->format('d M H:i') }} s.d. {{ $sc->ended_at ? $sc->ended_at->format('H:i') : 'Aktif' }}</p>
+                                </div>
+                                <span class="font-mono font-bold text-slate-700">{{ $sc->duration_minutes ?? '-' }} min</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            <!-- Shift Handover Section -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-heading font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                        <span>Handover Pergantian Shift</span>
+                    </h3>
+                    <span class="text-xs font-mono font-bold text-slate-400">{{ $tiket->handovers->count() }} Handover</span>
+                </div>
+
+                <form method="POST" action="{{ route('tickets.handovers.store', $tiket) }}" class="space-y-3 text-xs">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1 text-[10px] uppercase">Shift Asal *</label>
+                            <input type="text" name="shift_from" required placeholder="Contoh: Shift 1 Pagi" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1 text-[10px] uppercase">Shift Tujuan *</label>
+                            <input type="text" name="shift_to" required placeholder="Contoh: Shift 2 Siang" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1 text-[10px] uppercase">Teknisi Penerima Shift *</label>
+                        <select name="recipient_user_id" required class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                            <option value="">-- Pilih Teknisi Penerima --</option>
+                            @foreach($technicians as $t)
+                                <option value="{{ $t->id }}">{{ $t->name }} ({{ $t->position }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1 text-[10px] uppercase">Catatan Handover *</label>
+                        <textarea name="notes" rows="2" required placeholder="Catatan progress terakhir, kendala, core tersisa..." class="w-full text-xs rounded-xl border border-slate-300 p-2.5"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs transition">
+                        Serahkan Tiket ke Shift Berikutnya
+                    </button>
+                </form>
+
+                @if($tiket->handovers->isNotEmpty())
+                    <div class="space-y-2 pt-2 divide-y divide-slate-100 text-xs">
+                        @foreach($tiket->handovers as $h)
+                            <div class="pt-2 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-800">{{ $h->shift_from }} &rarr; {{ $h->shift_to }}</span>
+                                    <span class="text-[10px] text-slate-400">{{ $h->created_at->format('d M H:i') }}</span>
+                                </div>
+                                <p class="text-slate-600 text-[11px]">{{ $h->notes }}</p>
+                                <p class="text-[10px] text-indigo-700">Penerima: <strong>{{ $h->recipient->name ?? '-' }}</strong></p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 </div>
 
 <!-- ========================================================================= -->
-<!-- MODAL DISPATCH TIM TEKNISI -->
+<!-- MODALS SECTION -->
 <!-- ========================================================================= -->
+
+<!-- Modal Dispatch Penugasan Tim -->
 <div id="modal-dispatch" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200/80 overflow-hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
         <div class="px-6 py-5 text-white flex items-center justify-between"
              style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
-            <h3 class="font-heading font-extrabold text-base sm:text-lg text-white">Tugaskan Tim Teknisi (Dispatch)</h3>
-            <button type="button" onclick="closeDispatchModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer text-lg">&times;</button>
+            <h3 class="font-heading font-extrabold text-base text-white">Penugasan Tim Lapangan (Dispatch)</h3>
+            <button type="button" onclick="closeDispatchModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
         </div>
 
         <form method="POST" action="{{ route('tickets.dispatch', $tiket) }}" class="p-6 space-y-4 text-xs">
             @csrf
             <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Lead PIC Teknisi *</label>
-                <select name="lead_id" required class="w-full text-xs sm:text-sm rounded-xl border-slate-300 bg-slate-50/50 px-3.5 py-2.5">
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Leader Teknisi (PIC) *</label>
+                <select name="lead_user_id" required class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5">
+                    <option value="">-- Pilih Leader Teknisi --</option>
                     @foreach($technicians as $t)
-                        <option value="{{ $t->id }}" {{ $lead && $lead->id === $t->id ? 'selected' : '' }}>
-                            {{ $t->name }} ({{ $t->employee_code }})
-                        </option>
+                        <option value="{{ $t->id }}">{{ $t->name }} ({{ $t->position ?? 'Teknik' }})</option>
                     @endforeach
                 </select>
             </div>
 
             <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Anggota Tim Lapangan (Pilih Beberapa)</label>
-                <select name="member_ids[]" multiple class="w-full text-xs rounded-xl border-slate-300 bg-slate-50/50 px-3 py-2 min-h-[110px]">
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Anggota Tim Pendukung (Crew)</label>
+                <select name="member_user_ids[]" multiple size="4" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5">
                     @foreach($technicians as $t)
-                        <option value="{{ $t->id }}" {{ $tiket->assignees->pluck('id')->contains($t->id) && (!$lead || $lead->id !== $t->id) ? 'selected' : '' }}>
-                            {{ $t->name }} ({{ $t->employee_code }})
-                        </option>
+                        <option value="{{ $t->id }}">{{ $t->name }}</option>
                     @endforeach
                 </select>
-                <p class="text-[11px] text-slate-400 mt-1">Tekan CTRL untuk memilih lebih dari satu teknisi.</p>
-            </div>
-
-            <div class="flex items-center justify-end gap-3 pt-3 border-t">
-                <button type="button" onclick="closeDispatchModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl">Batal</button>
-                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold shadow-md" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    Simpan Penugasan Tim
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- ========================================================================= -->
-<!-- MODAL TOLAK CLOSING AWAL (REJECT) -->
-<!-- ========================================================================= -->
-<div id="modal-reject-closing" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200/80 overflow-hidden">
-        <div class="px-6 py-4 bg-rose-600 text-white flex items-center justify-between">
-            <h3 class="font-heading font-bold text-base">Tolak Closing Awal</h3>
-            <button type="button" onclick="document.getElementById('modal-reject-closing').classList.add('hidden')" class="text-white text-lg font-bold">&times;</button>
-        </div>
-
-        <form method="POST" action="{{ route('tickets.reject-closing', $tiket) }}" class="p-6 space-y-4 text-xs">
-            @csrf
-            <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Alasan Penolakan Closing *</label>
-                <textarea name="reason" rows="3" required placeholder="Jelaskan alasan penolakan (misal redaman belum standar, foto perbaikan buram)..."
-                          class="w-full text-xs rounded-xl border border-slate-300 p-3"></textarea>
+                <p class="text-[10px] text-slate-400 mt-1">Tahan tombol Ctrl / Cmd untuk memilih lebih dari 1 teknisi.</p>
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="document.getElementById('modal-reject-closing').classList.add('hidden')"
-                        class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl shadow-xs">
-                    Kirim Penolakan
+                <button type="button" onclick="closeDispatchModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
+                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    Simpan Penugasan
                 </button>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Modal Stop Clock -->
+<div id="modal-stopclock" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 text-white flex items-center justify-between"
+             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+            <h3 class="font-heading font-extrabold text-base text-white">Ajukan Jeda SLA (Stop Clock)</h3>
+            <button type="button" onclick="closeStopClockModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ route('tickets.stop-clock.store', $tiket) }}" class="p-6 space-y-4 text-xs">
+            @csrf
+            <div>
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Alasan Stop Clock *</label>
+                <select name="reason" required class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                    <option value="PERIZINAN">Terkendala Perizinan Kawasan / Site</option>
+                    <option value="AKSES_SITE">Akses Site Terkunci / Menunggu Kunci</option>
+                    <option value="PLN_PADAM">PLN Padam / Menunggu Genset</option>
+                    <option value="CUACA_BURUK">Cuaca Buruk / Hujan Deras Petir</option>
+                    <option value="FORCE_MAJEURE">Force Majeure (Bencana Alam / Insiden)</option>
+                    <option value="LAINNYA">Lainnya</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Keterangan Tambahan</label>
+                <textarea name="notes" rows="2" placeholder="Detail kondisi di lapangan..." class="w-full text-xs rounded-xl border border-slate-300 p-2.5"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button type="button" onclick="closeStopClockModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
+                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold bg-amber-500 hover:bg-amber-600">
+                    Mulai Stop Clock
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Joint Closure -->
+<div id="modal-jc" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 text-white flex items-center justify-between"
+             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+            <h3 class="font-heading font-extrabold text-base text-white">Tambah Joint Closure (JC)</h3>
+            <button type="button" onclick="closeJcModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ route('tickets.joint-closures.store', $tiket) }}" class="p-6 space-y-4 text-xs">
+            @csrf
+            <div>
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Kode / Nama Closure *</label>
+                <input type="text" name="closure_code" required placeholder="Contoh: JC-SRE-01 / DOME-24C" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Tipe Closure *</label>
+                    <select name="closure_type" required class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        <option value="DOME">Dome (Kubah)</option>
+                        <option value="INLINE">Inline (Horizontal)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Kapasitas Core *</label>
+                    <input type="number" name="capacity_cores" required value="24" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                </div>
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Deskripsi Lokasi Span</label>
+                <input type="text" name="location_description" placeholder="Contoh: Tiang PT MSN No. 12 Depan Alfamart" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button type="button" onclick="closeJcModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
+                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    Simpan JC
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Tambah Manuver Core -->
+<div id="modal-maneuver" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 text-white flex items-center justify-between"
+             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+            <h3 class="font-heading font-extrabold text-base text-white">Catat Manuver Core Fiber Optik</h3>
+            <button type="button" onclick="closeManeuverModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ route('tickets.maneuvers.store', $tiket) }}" class="p-6 space-y-4 text-xs">
+            @csrf
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Tube Asal *</label>
+                    <input type="text" name="tube_source" required placeholder="Tube 1 (Biru)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Core Asal *</label>
+                    <input type="text" name="core_source" required placeholder="Core 3 (Hijau)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Tube Tujuan *</label>
+                    <input type="text" name="tube_target" required placeholder="Tube 2 (Orange)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Core Tujuan *</label>
+                    <input type="text" name="core_target" required placeholder="Core 1 (Biru)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Alasan Manuver *</label>
+                <input type="text" name="reason" required placeholder="Core asal putus di span 14-15, bypass ke spare" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button type="button" onclick="closeManeuverModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
+                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold bg-purple-600 hover:bg-purple-700">
+                    Simpan Manuver
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Verifikasi Closing NOC -->
+<div id="modal-verify-close" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 text-white flex items-center justify-between"
+             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+            <h3 class="font-heading font-extrabold text-base text-white">Verifikasi Closing Tiket (NOC)</h3>
+            <button type="button" onclick="closeVerifyCloseModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+        </div>
+
+        <form method="POST" action="{{ route('tickets.verify-close', $tiket) }}" class="p-6 space-y-4 text-xs">
+            @csrf
+            <p class="text-slate-600 leading-relaxed">
+                Anda menyatakan bahwa seluruh pemeriksaan fisik, redaman optik, dan link traffic telah terverifikasi normal oleh NOC. Tiket akan ditutup resmi.
+            </p>
+
+            <div class="flex justify-end gap-2 pt-2 border-t">
+                <button type="button" onclick="closeVerifyCloseModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
+                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold bg-emerald-600 hover:bg-emerald-700">
+                    Setujui &amp; Close Tiket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
 <script>
 function switchTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
@@ -1319,34 +1597,80 @@ function switchTab(tabId) {
     }
 }
 
-function openDispatchModal() {
-    document.getElementById('modal-dispatch').classList.remove('hidden');
-}
-function closeDispatchModal() {
-    document.getElementById('modal-dispatch').classList.add('hidden');
+function setQuickChip(text, category) {
+    const input = document.getElementById('quick-chat-input');
+    const catInput = document.getElementById('chron_category');
+    if (input) {
+        input.value = text;
+        input.focus();
+    }
+    if (catInput) {
+        catInput.value = category || 'LAIN';
+    }
 }
 
-// Live HTML5 Geolocation helper for Chronology
+function updateAttachmentLabel(fileInput) {
+    const label = document.getElementById('attachment-name');
+    if (fileInput.files && fileInput.files.length > 0) {
+        label.innerText = '📎 ' + fileInput.files[0].name;
+    } else {
+        label.innerText = '';
+    }
+}
+
+function toggleResumeForm() {
+    const formCont = document.getElementById('resume-form-container');
+    const emptyState = document.getElementById('resume-empty-state');
+    if (formCont) {
+        formCont.classList.toggle('hidden');
+    }
+    if (emptyState) {
+        emptyState.classList.add('hidden');
+    }
+}
+
+// Modal triggers
+function openDispatchModal() { document.getElementById('modal-dispatch').classList.remove('hidden'); }
+function closeDispatchModal() { document.getElementById('modal-dispatch').classList.add('hidden'); }
+function openStopClockModal() { document.getElementById('modal-stopclock').classList.remove('hidden'); }
+function closeStopClockModal() { document.getElementById('modal-stopclock').classList.add('hidden'); }
+function openJcModal() { document.getElementById('modal-jc').classList.remove('hidden'); }
+function closeJcModal() { document.getElementById('modal-jc').classList.add('hidden'); }
+function openManeuverModal() { document.getElementById('modal-maneuver').classList.remove('hidden'); }
+function closeManeuverModal() { document.getElementById('modal-maneuver').classList.add('hidden'); }
+function openVerifyCloseModal() { document.getElementById('modal-verify-close').classList.remove('hidden'); }
+function closeVerifyCloseModal() { document.getElementById('modal-verify-close').classList.add('hidden'); }
+
+// Live HTML5 Geolocation helper
 function getLiveGpsCoordinates() {
     const label = document.getElementById('gps_label');
     if (!navigator.geolocation) {
         alert('Browser Anda tidak mendukung Geolocation.');
         return;
     }
-    label.innerText = 'Mengambil GPS...';
+    label.innerText = 'GPS...';
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             document.getElementById('chron_lat').value = pos.coords.latitude;
             document.getElementById('chron_lng').value = pos.coords.longitude;
             document.getElementById('chron_acc').value = pos.coords.accuracy;
-            label.innerText = `✓ Lokasi Disimpan (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`;
+            label.innerText = `✓ Lokasi Disimpan (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
         },
         (err) => {
             alert('Gagal mengambil lokasi GPS: ' + err.message);
-            label.innerText = 'Sertakan Geotag GPS Terkini';
+            label.innerText = 'Sertakan GPS';
         },
         { enableHighAccuracy: true, timeout: 10000 }
     );
 }
+
+// Auto scroll chat to bottom on load
+document.addEventListener('DOMContentLoaded', () => {
+    const chatBox = document.getElementById('chat-stream-box');
+    if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+});
 </script>
+@endpush
 @endsection
