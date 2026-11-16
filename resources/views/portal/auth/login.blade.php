@@ -494,13 +494,6 @@
                     </div>
                 </form>
 
-                <!-- Footer Support Note -->
-                <div class="mt-6 pt-4 border-t border-slate-100 text-center">
-                    <p class="text-[11px] text-slate-500 font-normal">
-                        Mengalami kendala akun? Hubungi <span class="font-semibold text-teal-700">Divisi IT &amp; SDM</span>
-                    </p>
-                </div>
-
             </div>
         </div>
     </div>
