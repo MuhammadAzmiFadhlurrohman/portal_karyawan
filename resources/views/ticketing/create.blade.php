@@ -13,30 +13,29 @@
     imsSearchUrl: '{{ route('tickets.ims.search') }}'
 })">
 
-    <!-- Top Header Banner (Corporate Ocean Teal Gradient matching GoMSN theme) -->
-    <div class="rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden"
+    <!-- Top Header Banner (Corporate Ocean Teal Gradient - Compact Sleek) -->
+    <div class="rounded-2xl px-5 py-4 sm:px-6 sm:py-4.5 text-white shadow-lg relative overflow-hidden"
          style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
-        <div class="absolute -right-12 -top-12 w-64 h-64 rounded-full bg-[#18C4C4]/10 blur-3xl pointer-events-none"></div>
-        <div class="absolute right-1/3 -bottom-16 w-80 h-80 rounded-full bg-[#0D9488]/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#18C4C4]/10 blur-2xl pointer-events-none"></div>
 
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-[#5eead4] shadow-inner shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-[#5eead4] shadow-inner shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
                 </div>
                 <div>
-                    <div class="flex items-center gap-2.5 flex-wrap">
-                        <h1 class="text-xl sm:text-2xl font-heading font-extrabold tracking-tight text-white">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-base sm:text-lg font-heading font-extrabold tracking-tight text-white">
                             Open Tiket Gangguan Baru
                         </h1>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                            <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
                             STATUS: OPEN
                         </span>
                     </div>
-                    <p class="text-xs sm:text-sm text-teal-100/80 mt-1 max-w-2xl font-normal">
+                    <p class="text-[11px] sm:text-xs text-teal-100/75 mt-0.5 max-w-xl font-normal">
                         Input tiket gangguan Backbone FO atau Maintenance Pelanggan Broadband FTTH
                     </p>
                 </div>

@@ -26,16 +26,16 @@
     @endphp
 
     <!-- ========================================================================= -->
-    <!-- 1. TOP HEADER BANNER (Theme Ocean Teal Gradient matching Image 1) -->
+    <!-- 1. TOP HEADER BANNER (Theme Ocean Teal Gradient - Compact Sleek) -->
     <!-- ========================================================================= -->
-    <div class="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-teal-500/20"
+    <div class="relative overflow-hidden rounded-2xl md:rounded-3xl px-5 py-4 sm:px-6 sm:py-5 text-white shadow-lg border border-teal-500/20"
          style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
         
         <!-- Ambient decorative glows -->
-        <div class="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-[#18C4C4]/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute right-1/3 -bottom-20 w-80 h-80 rounded-full bg-[#0D9488]/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute -right-16 -top-16 w-60 h-60 rounded-full bg-[#18C4C4]/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute right-1/3 -bottom-20 w-64 h-64 rounded-full bg-[#0D9488]/15 blur-3xl pointer-events-none"></div>
 
-        <div class="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div class="space-y-3 max-w-3xl">
                 <!-- Badges Row: Ticket No, Category, Status -->
                 <div class="flex flex-wrap items-center gap-2 text-xs">
@@ -98,7 +98,7 @@
                 </div>
 
                 <!-- Big Headline (Status Impact / Title) -->
-                <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-white tracking-tight pt-1">
+                <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white tracking-tight pt-0.5">
                     {{ $tiket->status_link_impact ?? ($tiket->kategori_tiket === 'BACKBONE' ? $tiket->backbone_segment : $tiket->customer_name) }}
                 </h1>
             </div>
