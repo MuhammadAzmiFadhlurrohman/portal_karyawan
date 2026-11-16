@@ -267,6 +267,24 @@
                     }
                     $isPengajuanActive = request()->routeIs('gomsn.pengajuan.*') || request()->routeIs('attendance.corrections.*') || request()->routeIs('gomsn.overtime.*') || request()->routeIs('gomsn.inventory.*');
                     $totalPengajuanBadges = $navPendingAtasanCount + $navPendingLemburCount + $navPendingKoreksiCount;
+
+                    // Hitung jumlah tiket aktif yang ditujukan untuk teknisi / atasan teknik
+                    $navAssignedTicketCount = 0;
+                    if ($navUser) {
+                        $navUserRoles = $navUser->roles->pluck('name')->toArray();
+                        $isNavAtasanTeknik = ! empty(array_intersect(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'], $navUserRoles));
+                        if ($isNavAtasanTeknik) {
+                            $navAssignedTicketCount = \App\Models\Tiket::whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
+                                ->where(function ($q) use ($navUser) {
+                                    $q->doesntHave('ticketAssignees')
+                                      ->orWhereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $navUser->id));
+                                })->count();
+                        } else {
+                            $navAssignedTicketCount = \App\Models\Tiket::whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
+                                ->whereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $navUser->id))
+                                ->count();
+                        }
+                    }
                 @endphp
                 <div class="space-y-1">
                     <div class="pt-2.5 pb-1 px-3 flex items-center justify-between text-white/90 select-none">
@@ -612,7 +630,11 @@
                             <div class="h-px flex-1 bg-white/15"></div>
                         </div>
                         <div class="flex items-center gap-1.5 ml-2">
-                            @if ($isTiketingActive)
+                            @if ($navAssignedTicketCount > 0)
+                                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 shadow-xs leading-none">
+                                    {{ $navAssignedTicketCount }}
+                                </span>
+                            @elseif ($isTiketingActive)
                                 <span class="w-1.5 h-1.5 rounded-full bg-[#18C4C4] shadow-xs"></span>
                             @endif
                             <svg class="w-3.5 h-3.5 text-white/70 group-hover:text-white transition-transform duration-200 ease-out" 
@@ -626,11 +648,20 @@
                     <div id="sb-menu-tiketing" x-show="openTiketing" style="{{ $isTiketingActive ? '' : 'display: none;' }}" class="space-y-1 mt-1">
                         <a href="{{ route('tickets.index') }}"
                            @if (request()->routeIs('tickets.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('tickets.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                            <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
-                            <span>Tiket Gangguan</span>
-                            @if (request()->routeIs('tickets.*'))
-                            <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                           class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('tickets.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                                <span>Tiket Gangguan</span>
+                            </div>
+                            @if ($navAssignedTicketCount > 0)
+                                <div class="flex items-center gap-1.5 ml-auto">
+                                    <span class="w-2.5 h-2.5 rounded-full {{ request()->routeIs('tickets.*') ? 'bg-white' : 'bg-amber-400' }} shadow-xs animate-pulse"></span>
+                                    <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ request()->routeIs('tickets.*') ? 'bg-white text-teal-800' : 'bg-amber-400 text-slate-900' }} shadow-xs leading-none">
+                                        {{ $navAssignedTicketCount }}
+                                    </span>
+                                </div>
+                            @elseif (request()->routeIs('tickets.*'))
+                                <span class="ml-auto w-2.5 h-2.5 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
 
@@ -1279,11 +1310,18 @@
             <a href="{{ route('tickets.index') }}" 
                @click="currentTab = 'tiket'"
                class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
-                <svg class="w-[22px] h-[22px] transition-colors" 
-                     :class="isActive('tiket') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
-                     fill="none" stroke="currentColor" :stroke-width="isActive('tiket') ? '2.2' : '1.9'" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-                </svg>
+                <div class="relative">
+                    <svg class="w-[22px] h-[22px] transition-colors" 
+                         :class="isActive('tiket') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
+                         fill="none" stroke="currentColor" :stroke-width="isActive('tiket') ? '2.2' : '1.9'" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                    </svg>
+                    @if ($navAssignedTicketCount > 0)
+                        <span class="absolute -top-1 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-slate-900 text-[9px] font-black flex items-center justify-center ring-2 ring-white shadow-xs animate-pulse">
+                            {{ $navAssignedTicketCount > 9 ? '9+' : $navAssignedTicketCount }}
+                        </span>
+                    @endif
+                </div>
                 <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
                       :class="isActive('tiket') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
                     Tiket
@@ -1797,14 +1835,21 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('tickets.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-rose-400 hover:bg-rose-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
-                            <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                        <a href="{{ route('tickets.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-rose-400 hover:bg-rose-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between group shadow-2xs">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-rose-800 leading-snug">Tiket Gangguan</span>
+                                    <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Laporan NOC / SPK</span>
+                                </div>
                             </div>
-                            <div class="min-w-0">
-                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-rose-800 leading-snug">Tiket Gangguan</span>
-                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Laporan NOC / SPK</span>
-                            </div>
+                            @if ($navAssignedTicketCount > 0)
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-900 shadow-xs shrink-0">
+                                    {{ $navAssignedTicketCount }}
+                                </span>
+                            @endif
                         </a>
 
                         <a href="{{ route('gomsn.analytics.kpi') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">

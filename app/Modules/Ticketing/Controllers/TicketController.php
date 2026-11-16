@@ -44,12 +44,16 @@ class TicketController extends Controller
         $userRoleNames = $user->roles->pluck('name')->toArray();
         $isManagerOrNoc = ! empty(array_intersect(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_noc', 'atasan_teknik', 'atasan', 'ceo'], $userRoleNames));
 
-        // Field technicians (divisi Teknik) only see assigned tickets or CLOSED tickets (§7.2)
-        if (! $isManagerOrNoc && ($user->division === 'Teknik' || str_contains($user->division ?? '', 'Teknik'))) {
+        // Field technicians (divisi Teknik / karyawan_teknik) only see assigned tickets or CLOSED tickets (§7.2)
+        if (! $isManagerOrNoc && ($user->division === 'Teknik' || str_contains($user->division ?? '', 'Teknik') || in_array('karyawan_teknik', $userRoleNames))) {
             $query->where(function ($q) use ($user) {
                 $q->whereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $user->id))
                     ->orWhere('status', 'CLOSE');
             });
+        }
+
+        if ($request->input('assigned') === 'me' || $request->input('filter') === 'my_tickets') {
+            $query->whereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $user->id));
         }
 
         if ($request->filled('status')) {

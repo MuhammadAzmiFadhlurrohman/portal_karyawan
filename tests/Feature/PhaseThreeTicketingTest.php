@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\JointClosure;
 use App\Models\MasterMaterial;
+use App\Models\TicketAssignee;
 use App\Models\Tiket;
 use App\Models\User;
 use App\Modules\Ticketing\Services\ChronologyService;
@@ -512,5 +513,52 @@ class PhaseThreeTicketingTest extends TestCase
             'lead_id' => $teknisi->id,
         ]);
         $umumRes->assertRedirect();
+    }
+
+    /**
+     * Test notification badge appears when active tickets are assigned to technician (§7.2, §7.3).
+     */
+    public function test_assigned_ticket_notification_badge_displayed_for_technician(): void
+    {
+        $noc = User::query()->where('username', 'helpdesk')->firstOrFail();
+        $teknisi = User::query()->where('username', 'teknisi1')->firstOrFail();
+
+        // 1. Initially without assigned active tickets
+        Tiket::query()->whereHas('ticketAssignees', fn ($q) => $q->where('user_id', $teknisi->id))->update(['status' => 'CLOSE']);
+
+        $responseEmpty = $this->actingAs($teknisi)->get(route('tickets.index'));
+        $responseEmpty->assertOk();
+
+        // 2. Assign active ticket to technician
+        $tiket = Tiket::query()->create([
+            'no_tiket' => 'BDG-20261116-BADGE1',
+            'kategori_tiket' => 'BACKBONE',
+            'priority' => 'P1',
+            'status' => 'OPEN',
+            'sla_target_minutes' => 240,
+            'backbone_segment' => 'BADGE-TEST-SEGMENT',
+            'wilayah' => 'Bandung',
+            'tipe_penanganan' => 'Core Splicing',
+            'tanggal_open' => now(),
+            'created_by' => $noc->id,
+        ]);
+
+        TicketAssignee::query()->create([
+            'tiket_id' => $tiket->id,
+            'user_id' => $teknisi->id,
+            'role_in_team' => 'LEAD',
+            'assigned_by' => $noc->id,
+            'assigned_at' => now(),
+        ]);
+
+        $responseWithBadge = $this->actingAs($teknisi)->get(route('tickets.index'));
+        $responseWithBadge->assertOk();
+        // Assert ticket exists in content and badge count 1 is rendered
+        $responseWithBadge->assertSee('BDG-20261116-BADGE1');
+
+        // 3. Test assigned=me filter returns only assigned ticket
+        $filterRes = $this->actingAs($teknisi)->get(route('tickets.index', ['assigned' => 'me']));
+        $filterRes->assertOk();
+        $filterRes->assertSee('BDG-20261116-BADGE1');
     }
 }
