@@ -53,11 +53,16 @@ class TicketPolicy
     /**
      * Determine whether the user can dispatch technicians to the ticket.
      * Penugasan teknisi diberikan oleh role atasan teknik dan atasan umum.
+     * NOC yang membuka tiket dilarang menugaskan teknisi.
      */
     public function dispatch(User $user, Tiket $tiket): bool
     {
-        return $user->hasRole(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'])
-            || $user->can('ticket.dispatch');
+        // NOC dan pembuat tiket dilarang menugaskan teknisi
+        if ($user->hasRole(['noc', 'atasan_noc']) || $user->division === 'NOC' || $user->id === $tiket->created_by) {
+            return false;
+        }
+
+        return $user->hasRole(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi']);
     }
 
     /**

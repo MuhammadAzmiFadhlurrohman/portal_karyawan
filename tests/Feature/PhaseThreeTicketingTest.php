@@ -481,7 +481,11 @@ class PhaseThreeTicketingTest extends TestCase
             'created_by' => $noc->id,
         ]);
 
-        // 1. NOC cannot dispatch
+        // 1. NOC cannot dispatch and cannot see "+ Tugaskan Tim (Atasan)"
+        $nocViewRes = $this->actingAs($noc)->get(route('tickets.show', $tiket));
+        $nocViewRes->assertOk();
+        $nocViewRes->assertDontSee('+ Tugaskan Tim (Atasan)');
+
         $nocDispatchRes = $this->actingAs($noc)->post(route('tickets.dispatch', $tiket), [
             'lead_id' => $teknisi->id,
         ]);

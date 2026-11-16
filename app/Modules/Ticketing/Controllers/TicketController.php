@@ -413,7 +413,11 @@ class TicketController extends Controller
     public function dispatchTicket(Request $request, Tiket $tiket): RedirectResponse
     {
         $user = $request->user();
-        if (! $user->can('ticket.dispatch') && ! $user->hasRole(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'])) {
+        if ($user->hasRole(['noc', 'atasan_noc']) || $user->division === 'NOC' || $user->id === $tiket->created_by) {
+            abort(403, 'NOC yang membuka tiket tidak dapat melakukan penugasan teknisi. Penugasan teknisi hanya dapat diberikan oleh Atasan Teknik atau Atasan Umum.');
+        }
+
+        if (! $user->can('dispatch', $tiket) && ! $user->hasRole(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'])) {
             abort(403, 'Penugasan teknisi hanya dapat diberikan oleh Atasan Teknik atau Atasan Umum.');
         }
 
