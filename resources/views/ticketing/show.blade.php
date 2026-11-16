@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Tiket ' . $tiket->no_tiket . ' - Detail & Penanganan'])
 
 @section('content')
-<div class="space-y-6 max-w-7xl mx-auto pb-16">
+<div class="space-y-6 max-w-7xl mx-auto pb-24 sm:pb-16">
     @php
         $stripe = $tiket->stripeColor();
         $stripeBg = match($stripe) {
@@ -717,10 +717,10 @@
     <!-- TAB 1: KRONOLOGIS (WhatsApp-Style Live Chat matching Image 2 & 3) -->
     <!-- ========================================================================= -->
     <div id="tab-chronology" class="tab-pane space-y-4">
-        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+        <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col h-[calc(100dvh-175px)] min-h-[560px] sm:h-[700px] sm:min-h-[640px]">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
-            <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5"
+            <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0"
                  style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
@@ -748,7 +748,7 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 max-h-[520px] overflow-y-auto bg-slate-50/70"
+            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 overflow-y-auto bg-slate-50/70"
                  style="background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
                 
                 <!-- Date divider -->
@@ -851,7 +851,7 @@
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
-            <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto flex items-center gap-1.5 sm:gap-2 text-xs scrollbar-none"
+            <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto flex items-center gap-1.5 sm:gap-2 text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
                 <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
                 
@@ -891,7 +891,7 @@
 
             <!-- Chat Input Bar (matching Image 3) -->
             <form method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
-                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5">
+                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5 shrink-0">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
                 <input type="hidden" name="latitude" id="chron_lat">
@@ -1930,6 +1930,12 @@ function switchTab(tabId) {
         activeBtn.style.background = 'linear-gradient(90deg, #18C4C4 0%, #0D9488 100%)';
         activeBtn.classList.remove('text-slate-600');
         activeBtn.classList.add('text-white', 'font-bold');
+    }
+    if (tabId === 'tab-chronology') {
+        const chatBox = document.getElementById('chat-stream-box');
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
     }
 }
 
