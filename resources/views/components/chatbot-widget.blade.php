@@ -39,9 +39,28 @@
                     <p class="text-[11px] text-teal-100">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
                 </div>
             </div>
-            <button @click="isOpen = false" class="text-teal-100 hover:text-white p-1 rounded-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+            <div class="flex items-center gap-1">
+                <!-- Tombol Hapus Riwayat Chat -->
+                <button @click="clearChat()" 
+                        type="button" 
+                        class="text-teal-100 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        title="Hapus Riwayat Chat"
+                        aria-label="Hapus Riwayat Chat">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
+                <!-- Tombol Tutup Chat -->
+                <button @click="closeChat()" 
+                        type="button" 
+                        class="text-teal-100 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        title="Tutup Chat"
+                        aria-label="Tutup Chat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Chat History -->
@@ -122,20 +141,77 @@
 
 <script>
     function chatbotWidget() {
+        const defaultGreeting = [
+            {
+                sender: 'bot',
+                text: 'Halo {{ auth()->user()?->name ?? "Rekan MSN" }}! Saya asisten virtual PT MSN. Ada yang bisa saya bantu terkait jadwal, cuti, klaim, atau tiket gangguan hari ini?'
+            }
+        ];
+        const storageKeyMessages = 'gomsn_chatbot_messages_{{ auth()->id() ?? "guest" }}';
+        const storageKeyOpen = 'gomsn_chatbot_open_{{ auth()->id() ?? "guest" }}';
+
+        let initialMessages = defaultGreeting;
+        try {
+            const saved = localStorage.getItem(storageKeyMessages);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    initialMessages = parsed;
+                }
+            }
+        } catch (e) {
+            console.warn('Gagal membaca riwayat chat dari storage', e);
+        }
+
+        let isInitiallyOpen = false;
+        try {
+            isInitiallyOpen = localStorage.getItem(storageKeyOpen) === '1';
+        } catch (e) {}
+
         return {
-            isOpen: false,
+            isOpen: isInitiallyOpen,
             loading: false,
             inputQuery: '',
-            messages: [
-                {
-                    sender: 'bot',
-                    text: 'Halo {{ auth()->user()?->name ?? "Rekan MSN" }}! Saya asisten virtual PT MSN. Ada yang bisa saya bantu terkait jadwal, cuti, klaim, atau tiket gangguan hari ini?'
-                }
-            ],
-            toggleChat() {
-                this.isOpen = !this.isOpen;
+            messages: initialMessages,
+            init() {
                 if (this.isOpen) {
                     this.scrollToBottom();
+                }
+            },
+            toggleChat() {
+                this.isOpen = !this.isOpen;
+                try {
+                    localStorage.setItem(storageKeyOpen, this.isOpen ? '1' : '0');
+                } catch (e) {}
+                if (this.isOpen) {
+                    this.scrollToBottom();
+                }
+            },
+            closeChat() {
+                this.isOpen = false;
+                try {
+                    localStorage.setItem(storageKeyOpen, '0');
+                } catch (e) {}
+            },
+            clearChat() {
+                if (confirm('Hapus semua riwayat percakapan chat ini?')) {
+                    this.messages = [
+                        {
+                            sender: 'bot',
+                            text: 'Halo {{ auth()->user()?->name ?? "Rekan MSN" }}! Saya asisten virtual PT MSN. Ada yang bisa saya bantu terkait jadwal, cuti, klaim, atau tiket gangguan hari ini?'
+                        }
+                    ];
+                    try {
+                        localStorage.removeItem(storageKeyMessages);
+                    } catch (e) {}
+                    this.scrollToBottom();
+                }
+            },
+            saveMessages() {
+                try {
+                    localStorage.setItem(storageKeyMessages, JSON.stringify(this.messages));
+                } catch (e) {
+                    console.warn('Gagal menyimpan chat ke storage', e);
                 }
             },
             askPreset(query) {
@@ -147,6 +223,7 @@
                 if (!text || this.loading) return;
 
                 this.messages.push({ sender: 'user', text: text });
+                this.saveMessages();
                 this.inputQuery = '';
                 this.loading = true;
                 this.scrollToBottom();
@@ -177,6 +254,7 @@
                 } catch (e) {
                     this.messages.push({ sender: 'bot', text: 'Maaf, terjadi kesalahan koneksi jaringan.' });
                 } finally {
+                    this.saveMessages();
                     this.loading = false;
                     this.scrollToBottom();
                 }
