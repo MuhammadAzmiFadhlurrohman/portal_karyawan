@@ -64,8 +64,9 @@ class PengajuanController extends Controller
 
         $query = Pengajuan::query()->with(['user', 'details.material', 'approvals.approver', 'atasan']);
 
-        // Tab selection: 'my' (Pengajuan Saya) vs 'finance' / 'all'
-        $tab = $request->input('tab');
+        // Tab selection: 'my' (Pengajuan Saya) vs 'all' (Semua Pengajuan)
+        // Default untuk menu sidebar "Pengajuan Saya" adalah menampilkan pengajuan milik sendiri ('my')
+        $tab = $request->input('tab', 'my');
 
         if ($isAtasan && ! $isSuperAdmin && ! $isFinance) {
             // Atasan view for this page is strictly "Pengajuan Saya" (mandiri)
@@ -93,10 +94,11 @@ class PengajuanController extends Controller
             $tab = 'my';
         } else {
             // Super Admin / Executive
-            if ($tab === 'my') {
-                $query->where('user_id', $user->id);
+            if ($tab === 'all') {
+                // Tampilkan semua pengajuan
             } else {
-                $tab = 'all';
+                $tab = 'my';
+                $query->where('user_id', $user->id);
             }
         }
 
