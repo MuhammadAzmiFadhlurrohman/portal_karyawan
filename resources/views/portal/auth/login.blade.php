@@ -85,9 +85,37 @@
         .btn-stylish:active {
             transform: translateY(0);
         }
+        .wave-desktop {
+            display: block;
+            position: absolute;
+            right: -1px;
+            top: -1px;
+            bottom: -1px;
+            width: 105px;
+            height: calc(100% + 2px);
+            z-index: 30;
+            pointer-events: none;
+        }
+        .wave-mobile {
+            display: none;
+            position: absolute;
+            bottom: -1px;
+            left: -1px;
+            right: -1px;
+            width: calc(100% + 2px);
+            height: 64px;
+            z-index: 30;
+            pointer-events: none;
+        }
 
         /* Responsive Mobile / Tablet */
         @media (max-width: 1023px) {
+            .wave-desktop {
+                display: none !important;
+            }
+            .wave-mobile {
+                display: block !important;
+            }
             .login-wrap {
                 flex-direction: column !important;
                 height: auto !important;
@@ -99,13 +127,13 @@
                 width: 100% !important;
                 min-height: 330px !important;
                 height: auto !important;
-                padding: 26px 20px 72px 20px !important;
+                padding: 26px 20px 74px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
-                padding: 14px 20px 36px 20px !important;
-                margin-top: -8px !important;
+                padding: 12px 20px 36px 20px !important;
+                margin-top: -6px !important;
             }
         }
     </style>
@@ -129,78 +157,24 @@
             </div>
 
             <!-- DESKTOP MULTI-LAYER ORGANIC CURVED WAVES (RIGHT EDGE) -->
-            <!-- Layer 1: Vibrant Teal Ribbon (Back) -->
-            <div class="hidden lg:block absolute -right-[2px] -top-[1px] -bottom-[1px] w-20 lg:w-24 xl:w-28 z-28 pointer-events-none"
-                 style="background: linear-gradient(180deg, rgba(13, 148, 136, 0.5) 0%, rgba(20, 184, 166, 0.6) 50%, rgba(13, 148, 136, 0.5) 100%);
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 22,0 C 56,160 59,320 32,500 C 4,680 8,840 26,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 22,0 C 56,160 59,320 32,500 C 4,680 8,840 26,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        -webkit-mask-size: 100% 100%;
-                        mask-size: 100% 100%;
-                        -webkit-mask-repeat: no-repeat;
-                        mask-repeat: no-repeat;">
-            </div>
-
-            <!-- Layer 2: Light Mint / Soft Cyan Ribbon (Middle) -->
-            <div class="hidden lg:block absolute -right-[2px] -top-[1px] -bottom-[1px] w-20 lg:w-24 xl:w-28 z-29 pointer-events-none"
-                 style="background: linear-gradient(180deg, rgba(94, 234, 212, 0.45) 0%, rgba(153, 246, 228, 0.55) 50%, rgba(94, 234, 212, 0.4) 100%);
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 30,0 C 64,160 67,320 40,500 C 12,680 16,840 34,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 30,0 C 64,160 67,320 40,500 C 12,680 16,840 34,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        -webkit-mask-size: 100% 100%;
-                        mask-size: 100% 100%;
-                        -webkit-mask-repeat: no-repeat;
-                        mask-repeat: no-repeat;">
-            </div>
-
-            <!-- Layer 3: White Foreground Wave with Micro-Dots (Front) -->
-            <div class="hidden lg:block absolute -right-[2px] -top-[1px] -bottom-[1px] w-20 lg:w-24 xl:w-28 z-30 pointer-events-none"
-                 style="background-color: #FFFFFF; 
-                        background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1.2px, transparent 1.2px); 
-                        background-size: 22px 22px; 
-                        background-position: calc(100% - 2px) top;
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 38,0 C 72,160 75,320 48,500 C 20,680 24,840 42,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 38,0 C 72,160 75,320 48,500 C 20,680 24,840 42,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        -webkit-mask-size: 100% 100%;
-                        mask-size: 100% 100%;
-                        -webkit-mask-repeat: no-repeat;
-                        mask-repeat: no-repeat;">
-            </div>
+            <svg class="wave-desktop" viewBox="0 0 120 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Layer 1: Medium Vibrant Teal Ribbon -->
+                <path d="M 14,0 C 50,150 58,310 42,490 C 26,670 58,830 44,1000 L 122,1000 L 122,0 Z" fill="rgba(20, 184, 166, 0.55)" />
+                <!-- Layer 2: Soft Pastel Mint/Cyan Ribbon -->
+                <path d="M 32,0 C 68,150 76,310 60,490 C 44,670 76,830 62,1000 L 122,1000 L 122,0 Z" fill="rgba(153, 246, 228, 0.78)" />
+                <!-- Layer 3: Solid White Foreground -->
+                <path d="M 50,0 C 86,150 94,310 78,490 C 62,670 94,830 80,1000 L 122,1000 L 122,0 Z" fill="#FFFFFF" />
+            </svg>
 
             <!-- MOBILE MULTI-LAYER HORIZONTAL WAVES (BOTTOM EDGE) -->
-            <!-- Layer 1: Vibrant Teal Ribbon (Back) -->
-            <div class="lg:hidden absolute -bottom-[2px] -left-[1px] -right-[1px] h-14 sm:h-16 pointer-events-none z-28"
-                 style="background: linear-gradient(90deg, rgba(13, 148, 136, 0.5) 0%, rgba(20, 184, 166, 0.6) 50%, rgba(13, 148, 136, 0.5) 100%);
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,39 C 80,12 160,-8 260,-8 C 380,-8 500,66 680,66 C 820,66 920,22 1000,14 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,39 C 80,12 160,-8 260,-8 C 380,-8 500,66 680,66 C 820,66 920,22 1000,14 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        -webkit-mask-size: 100% 100%;
-                        mask-size: 100% 100%;
-                        -webkit-mask-repeat: no-repeat;
-                        mask-repeat: no-repeat;">
-            </div>
-
-            <!-- Layer 2: Light Mint / Soft Cyan Ribbon (Middle) -->
-            <div class="lg:hidden absolute -bottom-[2px] -left-[1px] -right-[1px] h-13 sm:h-15 pointer-events-none z-29"
-                 style="background: linear-gradient(90deg, rgba(94, 234, 212, 0.45) 0%, rgba(153, 246, 228, 0.55) 50%, rgba(94, 234, 212, 0.4) 100%);
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,47 C 80,20 160,0 260,0 C 380,0 500,74 680,74 C 820,74 920,30 1000,22 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,47 C 80,20 160,0 260,0 C 380,0 500,74 680,74 C 820,74 920,30 1000,22 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        -webkit-mask-size: 100% 100%;
-                        mask-size: 100% 100%;
-                        -webkit-mask-repeat: no-repeat;
-                        mask-repeat: no-repeat;">
-            </div>
-
-            <!-- Layer 3: White Foreground Wave with Micro-Dots (Front) -->
-            <div class="lg:hidden absolute -bottom-[2px] -left-[1px] -right-[1px] h-12 sm:h-14 pointer-events-none z-30"
-                 style="background-color: #FFFFFF; 
-                        background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1.2px, transparent 1.2px); 
-                        background-size: 22px 22px; 
-                        background-position: left calc(100% - 2px);
-                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,55 C 80,28 160,8 260,8 C 380,8 500,82 680,82 C 820,82 920,38 1000,30 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,55 C 80,28 160,8 260,8 C 380,8 500,82 680,82 C 820,82 920,38 1000,30 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
-                        -webkit-mask-size: 100% 100%;
-                        mask-size: 100% 100%;
-                        -webkit-mask-repeat: no-repeat;
-                        mask-repeat: no-repeat;">
-            </div>
+            <svg class="wave-mobile" viewBox="0 0 1000 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Layer 1: Medium Vibrant Teal Ribbon -->
+                <path d="M 0,18 C 160,38 320,34 480,48 C 640,64 780,74 900,56 C 950,48 980,50 1000,56 L 1000,122 L 0,122 Z" fill="rgba(20, 184, 166, 0.55)" />
+                <!-- Layer 2: Soft Pastel Mint/Cyan Ribbon -->
+                <path d="M 0,36 C 160,56 320,52 480,66 C 640,82 780,92 900,74 C 950,66 980,68 1000,74 L 1000,122 L 0,122 Z" fill="rgba(153, 246, 228, 0.78)" />
+                <!-- Layer 3: Solid White Foreground -->
+                <path d="M 0,54 C 160,74 320,70 480,84 C 640,100 780,110 900,92 C 950,84 980,86 1000,92 L 1000,122 L 0,122 Z" fill="#FFFFFF" />
+            </svg>
 
             <!-- Top Spacer for Vertical Balance -->
             <div class="hidden lg:block h-4"></div>
