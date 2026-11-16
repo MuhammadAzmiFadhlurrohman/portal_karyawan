@@ -236,12 +236,14 @@
                         <span>{{ $monthName }} {{ $year }}</span>
                     </div>
 
+                    @if (! (auth()->user() && auth()->user()->hasRole('finance') && ! auth()->user()->hasRole(['super_admin', 'admin'])))
                     <a href="{{ route('attendance.swaps') }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-teal-200 bg-teal-50/80 hover:bg-teal-100 text-[#155E63] text-xs font-bold transition-all shadow-2xs">
                         <svg class="w-3.5 h-3.5 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
                         <span>Permintaan</span>
                     </a>
+                    @endif
                 </div>
 
                 <!-- 3. Responsive Daily Schedules List -->
@@ -252,7 +254,9 @@
                                 <tr class="border-b border-slate-100 bg-slate-50/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                                     <th class="py-3 px-4 sm:px-5">TANGGAL &amp; SHIFT</th>
                                     <th class="hidden sm:table-cell py-3 px-5">JAM KERJA</th>
+                                    @if (! (auth()->user() && auth()->user()->hasRole('finance') && ! auth()->user()->hasRole(['super_admin', 'admin'])))
                                     <th class="py-3 px-4 sm:px-5 text-right sm:pr-7 w-16 sm:w-24">AKSI</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -351,6 +355,7 @@
                                         </td>
 
                                         <!-- Aksi Button -->
+                                        @if (! (auth()->user() && auth()->user()->hasRole('finance') && ! auth()->user()->hasRole(['super_admin', 'admin'])))
                                         <td class="py-3 sm:py-3.5 px-3.5 sm:px-5 text-right sm:pr-7">
                                             @if ($isFuture)
                                                 <button type="button"
@@ -372,6 +377,7 @@
                                                 </button>
                                             @endif
                                         </td>
+                                        @endif
                                     </tr>
                                 @endfor
                             </tbody>
