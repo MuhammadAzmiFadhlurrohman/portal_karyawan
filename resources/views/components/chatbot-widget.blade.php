@@ -6,7 +6,7 @@
     <button @click="toggleChat()" 
             type="button"
             class="rounded-full text-white flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
-            style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; background-color: #2563eb !important; background: #2563eb !important; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5), 0 8px 10px -6px rgba(37, 99, 235, 0.3); border: none;"
+            style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(21, 94, 99, 0.45), 0 8px 10px -6px rgba(24, 196, 196, 0.3); border: none;"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
         <!-- Robot Icon Sesuai Request -->
