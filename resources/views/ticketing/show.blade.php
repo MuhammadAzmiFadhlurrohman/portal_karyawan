@@ -392,7 +392,7 @@
         @endphp
 
         <!-- 5-Node Stepper Progress Line: Strict 1-Row with Connecting Bar & Symmetrical Baseline Alignment -->
-        <div class="overflow-x-auto pb-2 -mb-2 scrollbar-none">
+        <div class="overflow-x-auto pb-2 -mb-2 scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
             <div class="relative min-w-[440px] sm:min-w-0" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));">
                 <!-- Track Line (Abu-abu di belakang) -->
                 <div class="absolute top-4 sm:top-[18px] h-[2px] bg-slate-200" style="left: 10%; right: 10%; z-index: 0;"></div>
@@ -656,11 +656,11 @@
     <!-- ========================================================================= -->
     <!-- 7. THE 6 STRUCTURED TABS (matching Image 2, 4, 5) -->
     <!-- ========================================================================= -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-1.5 shadow-xs overflow-x-auto">
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-1.5 shadow-xs overflow-x-auto scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
         <nav class="flex space-x-1 min-w-max text-xs sm:text-sm font-semibold" aria-label="Tabs">
             <!-- Tab 1: Kronologis -->
             <button type="button" onclick="switchTab('tab-chronology')" id="btn-tab-chronology"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-white font-bold"
+                    class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs sm:text-sm shadow-xs"
                     style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span>Kronologis</span>
@@ -669,7 +669,7 @@
 
             <!-- Tab 2: Resume -->
             <button type="button" onclick="switchTab('tab-resume')" id="btn-tab-resume"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-semibold">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span>Resume</span>
                 @if($hasResume)
@@ -679,7 +679,7 @@
 
             <!-- Tab 3: Penanganan Core & JC -->
             <button type="button" onclick="switchTab('tab-penanganan')" id="btn-tab-penanganan"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-semibold">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span>Penanganan Core &amp; JC</span>
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->jointClosures->count() + $tiket->coreManeuvers->count() }}</span>
@@ -687,7 +687,7 @@
 
             <!-- Tab 4: Material & Titik -->
             <button type="button" onclick="switchTab('tab-materials')" id="btn-tab-materials"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-semibold">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 <span>Material &amp; Titik</span>
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->materials->count() + $tiket->repairPoints->count() }}</span>
@@ -695,7 +695,7 @@
 
             <!-- Tab 5: Dokumentasi -->
             <button type="button" onclick="switchTab('tab-documentation')" id="btn-tab-documentation"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-semibold">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span>Dokumentasi</span>
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ $tiket->chronologies->whereNotNull('photo_path')->count() }}</span>
@@ -703,7 +703,7 @@
 
             <!-- Tab 6: Stop Clock & Shift -->
             <button type="button" onclick="switchTab('tab-stopclock')" id="btn-tab-stopclock"
-                    class="tab-btn px-4 py-2.5 rounded-xl transition cursor-pointer flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+                    class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs sm:text-sm font-semibold">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span>Stop Clock &amp; Shift</span>
                 @if($tiket->activeStopClock)
@@ -720,34 +720,35 @@
         <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
-            <div class="px-6 py-4 text-white flex items-center justify-between"
+            <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5"
                  style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4]">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                     </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-heading font-extrabold text-sm text-white">Koordinasi Update Lapangan</h3>
-                            <span class="px-2 py-0.2 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 sm:gap-2">
+                            <h3 class="font-heading font-extrabold text-xs sm:text-sm text-white truncate">Koordinasi Update Lapangan</h3>
+                            <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1 shrink-0">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                Live Sync (5s)
+                                <span>Live</span>
                             </span>
                         </div>
-                        <p class="text-[11px] text-teal-200/80">Catatan teknis tiket <span class="font-mono text-[#5eead4]">{{ $tiket->no_tiket }}</span></p>
+                        <p class="text-[10px] sm:text-[11px] text-teal-200/80 truncate">Tiket <span class="font-mono text-[#5eead4] font-semibold">{{ $tiket->no_tiket }}</span></p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="getLiveGpsCoordinates()" class="text-xs text-teal-200 hover:text-white flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                        <span id="gps_label">Sertakan GPS</span>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" onclick="getLiveGpsCoordinates()" class="text-xs text-teal-200 hover:text-white flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 transition cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                        <span id="gps_label" class="text-[11px] font-medium hidden sm:inline">Sertakan GPS</span>
+                        <span class="text-[10px] font-semibold sm:hidden">GPS</span>
                     </button>
                 </div>
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-4 sm:p-6 space-y-4 max-h-[520px] overflow-y-auto bg-slate-50/70"
+            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 max-h-[520px] overflow-y-auto bg-slate-50/70"
                  style="background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
                 
                 <!-- Date divider -->
@@ -759,7 +760,7 @@
 
                 <!-- Initial Ticket Creation System Note -->
                 <div class="flex justify-start">
-                    <div class="max-w-xl bg-white rounded-2xl rounded-tl-xs p-4 shadow-xs border border-slate-200 text-xs space-y-1.5">
+                    <div class="max-w-xl bg-white rounded-2xl rounded-tl-xs p-3.5 sm:p-4 shadow-xs border border-slate-200 text-xs space-y-1.5">
                         <div class="flex items-center justify-between gap-3">
                             <span class="font-bold text-slate-800 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-teal-500"></span>
@@ -777,7 +778,7 @@
                 <!-- Dispatch Note if available -->
                 @if($lead)
                     <div class="flex justify-start">
-                        <div class="max-w-xl bg-amber-50/90 rounded-2xl rounded-tl-xs p-4 shadow-xs border border-amber-200 text-xs space-y-1.5">
+                        <div class="max-w-xl bg-amber-50/90 rounded-2xl rounded-tl-xs p-3.5 sm:p-4 shadow-xs border border-amber-200 text-xs space-y-1.5">
                             <div class="flex items-center justify-between gap-3">
                                 <span class="font-bold text-amber-900 flex items-center gap-1.5">
                                     <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[10px]">MT</span>
@@ -800,7 +801,7 @@
                         $isSelf = auth()->check() && $chron->user_id === auth()->id();
                     @endphp
                     <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }}">
-                        <div class="max-w-xl rounded-2xl p-4 shadow-xs border text-xs space-y-2
+                        <div class="max-w-xl rounded-2xl p-3.5 sm:p-4 shadow-xs border text-xs space-y-2
                             {{ $isSelf ? 'bg-teal-50/90 border-teal-200 rounded-tr-xs' : 'bg-white border-slate-200 rounded-tl-xs' }}">
                             
                             <!-- Sender & Timestamp -->
@@ -840,53 +841,57 @@
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-6 text-slate-400 text-xs">
-                        Belum ada update kronologis koordinasi lapangan. Gunakan form di bawah untuk mengirim catatan.
+                    <div class="flex justify-center py-6">
+                        <div class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white/95 border border-slate-200/90 shadow-xs text-slate-500 text-xs text-center max-w-sm">
+                            <span class="text-base shrink-0">💬</span>
+                            <span class="leading-relaxed">Belum ada update koordinasi. Gunakan template atau form di bawah untuk mengirim update.</span>
+                        </div>
                     </div>
                 @endforelse
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
-            <div class="px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto flex items-center gap-2 text-xs no-scrollbar">
+            <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto flex items-center gap-1.5 sm:gap-2 text-xs scrollbar-none"
+                 style="scrollbar-width: none; -ms-overflow-style: none;">
                 <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
                 
                 <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     📍 Menuju lokasi
                 </button>
                 <button type="button" onclick="setQuickChip('🔍 Investigasi titik & pengukuran OTDR', 'OTDR')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     🔍 Investigasi &amp; OTDR
                 </button>
                 <button type="button" onclick="setQuickChip('✂️ Ditemukan kabel putus / bending core pada span', 'INVESTIGASI')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     ✂️ Kabel putus / bending
                 </button>
                 <button type="button" onclick="setQuickChip('⚡ Sedang proses splicing core di Joint Closure', 'JOINTING')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     ⚡ Proses splicing core
                 </button>
                 <button type="button" onclick="setQuickChip('📊 Pengukuran redaman optik selesai', 'OTDR')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     📊 Ukur redaman optik
                 </button>
                 <button type="button" onclick="setQuickChip('✅ Redaman normal & Link UP kembali', 'LINK_UP')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     ✅ Redaman normal &amp; Link UP
                 </button>
                 <button type="button" onclick="setQuickChip('⚠️ Kendala di lapangan, memerlukan manuver core', 'LAIN')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     ⚠️ Kendala / butuh manuver
                 </button>
                 <button type="button" onclick="setQuickChip('📷 Dokumentasi hasil perbaikan lapangan terlampir', 'SELESAI')"
-                        class="px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
                     📷 Dokumentasi perbaikan
                 </button>
             </div>
 
             <!-- Chat Input Bar (matching Image 3) -->
             <form method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
-                  class="p-4 bg-white border-t border-slate-200 flex items-center gap-2.5">
+                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
                 <input type="hidden" name="latitude" id="chron_lat">
@@ -896,8 +901,8 @@
                 <!-- Attachment Clip Button -->
                 <button type="button" onclick="document.getElementById('chron_photo_input').click()"
                         title="Lampirkan Foto / Berkas"
-                        class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                 </button>
                 <input type="file" name="photo" id="chron_photo_input" accept="image/*" class="hidden"
                        onchange="updateAttachmentLabel(this)">
@@ -909,16 +914,16 @@
                            id="quick-chat-input"
                            required
                            placeholder="Ketik update koordinasi..."
-                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-4 py-2.5 text-slate-800 transition pr-28">
+                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 sm:px-4 py-2 sm:py-2.5 text-slate-800 transition pr-24 sm:pr-28">
                     
-                    <span id="attachment-name" class="absolute right-3 top-2.5 text-[11px] font-semibold text-teal-700 truncate max-w-[100px] pointer-events-none"></span>
+                    <span id="attachment-name" class="absolute right-3 top-2 sm:top-2.5 text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[80px] sm:max-w-[100px] pointer-events-none"></span>
                 </div>
 
                 <!-- Submit Send Button -->
                 <button type="submit"
-                        class="w-11 h-11 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    <svg class="w-5 h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
             </form>
         </div>
