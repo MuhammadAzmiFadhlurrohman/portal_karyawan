@@ -8,8 +8,6 @@
 
     <div class="max-w-6xl mx-auto space-y-6 pb-8"
          x-data="{
-            photoPreview: null,
-            photoName: '',
             bankName: @js(old('bank', $user->bank ?? '')),
             accountNumber: @js(old('no_rekening', $user->no_rekening ?? '')),
             accountHolder: @js(old('atas_nama', $user->atas_nama ?: $user->name)),
@@ -18,16 +16,6 @@
             showNewPass: false,
             showConfirmPass: false,
             biometricLoading: false,
-            handlePhotoChange(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-                this.photoName = file.name;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.photoPreview = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            },
             b64UrlToUint8(b64url) {
                 const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
                 const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
@@ -213,43 +201,23 @@
                     <div class="flex flex-col sm:flex-row items-center sm:items-end gap-3.5 sm:gap-5 text-center sm:text-left w-full sm:w-auto">
                         <!-- Larger Overlapping Avatar Container -->
                         <div class="relative -mt-14 sm:-mt-16 w-28 h-28 sm:w-32 sm:h-32 shrink-0 group mx-auto sm:mx-0">
-                            <!-- Live Photo Preview when selecting new photo -->
-                            <template x-if="photoPreview">
-                                <img :src="photoPreview"
-                                     alt="Preview Foto Baru"
-                                     style="object-position: center top;"
-                                     class="w-full h-full rounded-3xl object-cover object-top shadow-xl ring-4 ring-white bg-white">
-                            </template>
-
-                            <template x-if="!photoPreview">
-                                <div class="w-full h-full">
-                                    @if ($user->avatar_url)
-                                        <img src="{{ $user->avatar_url }}"
-                                             alt="{{ $user->name }}"
-                                             style="object-position: center top;"
-                                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
-                                             class="w-full h-full rounded-3xl object-cover object-top shadow-xl ring-4 ring-white bg-white">
-                                        <div style="display: none;"
-                                             class="w-full h-full rounded-3xl bg-gradient-to-tr from-[#155E63] to-[#0f172a] text-white items-center justify-center font-bold text-3xl sm:text-4xl shadow-xl ring-4 ring-white">
-                                            {{ $user->initials }}
-                                        </div>
-                                    @else
-                                        <div class="w-full h-full rounded-3xl bg-gradient-to-tr from-[#155E63] to-[#0f172a] text-white flex items-center justify-center font-bold text-3xl sm:text-4xl shadow-xl ring-4 ring-white">
-                                            {{ $user->initials }}
-                                        </div>
-                                    @endif
-                                </div>
-                            </template>
-
-                            <!-- Camera Trigger Button to Change Avatar -->
-                            <label for="profile-foto-input"
-                                   title="Ubah Foto Profil"
-                                   class="absolute -bottom-1.5 -right-1.5 w-9 h-9 rounded-2xl bg-[#155E63] hover:bg-[#0e4549] text-white flex items-center justify-center shadow-md ring-2 ring-white cursor-pointer transition transform hover:scale-105">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                            </label>
+                            <div class="w-full h-full">
+                                @if ($user->avatar_url)
+                                    <img src="{{ $user->avatar_url }}"
+                                         alt="{{ $user->name }}"
+                                         style="object-position: center top;"
+                                         onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+                                         class="w-full h-full rounded-3xl object-cover object-top shadow-xl ring-4 ring-white bg-white">
+                                    <div style="display: none;"
+                                         class="w-full h-full rounded-3xl bg-gradient-to-tr from-[#155E63] to-[#0f172a] text-white items-center justify-center font-bold text-3xl sm:text-4xl shadow-xl ring-4 ring-white">
+                                        {{ $user->initials }}
+                                    </div>
+                                @else
+                                    <div class="w-full h-full rounded-3xl bg-gradient-to-tr from-[#155E63] to-[#0f172a] text-white flex items-center justify-center font-bold text-3xl sm:text-4xl shadow-xl ring-4 ring-white">
+                                        {{ $user->initials }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                         <!-- Name, Role & Subtitle -->
@@ -277,27 +245,14 @@
 
                     <!-- Right Quick Action Buttons (Centered on Mobile) -->
                     <div class="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
-                        <template x-if="photoPreview">
-                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-teal-50 border border-teal-200 text-xs text-teal-800">
-                                <span class="font-semibold truncate max-w-[150px]" x-text="'Foto baru: ' + photoName"></span>
-                                <button type="button"
-                                        @click="photoPreview = null; photoName = ''; document.getElementById('profile-foto-input').value = '';"
-                                        class="text-rose-600 hover:text-rose-700 font-bold cursor-pointer">
-                                    Batal
-                                </button>
-                            </div>
-                        </template>
-
-                        <button type="button"
-                                @click="document.getElementById('profile-foto-input').click()"
-                                class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200/80 transition cursor-pointer">
-                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            <span>Ganti Foto</span>
-                        </button>
-
                         @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
+                            <a href="{{ route('portal.employees.index') }}"
+                               class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200/80 transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span>Kelola Data Karyawan</span>
+                            </a>
                             <a href="{{ route('portal.sessions') }}"
                                class="sm:hidden inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#155E63] bg-teal-50/80 hover:bg-teal-100/70 border border-teal-200/70 transition">
                                 <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -612,18 +567,9 @@
             <div class="lg:col-span-7">
                 <form method="POST"
                       action="{{ route('portal.profile.update') }}"
-                      enctype="multipart/form-data"
                       class="bg-white rounded-3xl border border-slate-200/80 shadow-[0_8px_30px_rgb(15,23,42,0.04)] p-5 sm:p-7 space-y-7">
                     @csrf
                     @method('PUT')
-
-                    <!-- Hidden File Input triggered by Avatar Camera button -->
-                    <input type="file"
-                           id="profile-foto-input"
-                           name="foto"
-                           accept="image/*"
-                           class="hidden"
-                           @change="handlePhotoChange($event)">
 
                     <!-- SECTION 1: Kontak & Rekening Pencairan -->
                     <div class="space-y-5">

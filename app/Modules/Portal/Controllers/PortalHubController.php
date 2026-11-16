@@ -474,7 +474,6 @@ class PortalHubController extends Controller
             'bank' => ['nullable', 'string', 'max:100'],
             'no_rekening' => ['nullable', 'string', 'max:50'],
             'atas_nama' => ['nullable', 'string', 'max:100'],
-            'foto' => ['nullable', 'image', 'max:5120'],
             'current_password' => ['nullable', 'required_with:new_password', 'current_password'],
             'new_password' => ['nullable', 'min:8', 'confirmed'],
         ]);
@@ -486,7 +485,8 @@ class PortalHubController extends Controller
             'atas_nama' => $validated['atas_nama'] ?? null,
         ];
 
-        if ($request->hasFile('foto')) {
+        // Foto profil hanya dapat diubah oleh Administrator di menu Manajemen Data Karyawan
+        if ($request->hasFile('foto') && $user->hasRole(['super_admin', 'admin'])) {
             if ($user->foto && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->foto)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->foto);
             }
