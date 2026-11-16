@@ -180,6 +180,15 @@
         showPw: false,
         biometricLoading: false,
         biometricError: '',
+        hasRegisteredBiometric: false,
+        init() {
+            try {
+                const creds = JSON.parse(localStorage.getItem('gomsn_biometric_creds') || '[]');
+                this.hasRegisteredBiometric = Array.isArray(creds) && creds.length > 0 && !!window.PublicKeyCredential;
+            } catch (e) {
+                this.hasRegisteredBiometric = false;
+            }
+        },
         b64UrlToUint8(b64url) {
             const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
             const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
@@ -483,6 +492,8 @@
                         </button>
 
                         <button type="button"
+                                x-show="hasRegisteredBiometric"
+                                x-cloak
                                 @click="loginWithBiometric()"
                                 :disabled="biometricLoading"
                                 title="Masuk dengan Sidik Jari / Biometrik"
