@@ -50,15 +50,15 @@
                 <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
                     <div :class="msg.sender === 'user' 
                                 ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 max-w-[85%] shadow-xs' 
-                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[88%] shadow-xs whitespace-pre-line'">
-                        <p x-text="msg.text" class="leading-relaxed"></p>
+                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[88%] shadow-xs'">
+                        <p x-text="msg.text" class="leading-relaxed whitespace-pre-line"></p>
 
                         <!-- Action Button Menuju Halaman Terkait -->
                         <template x-if="msg.action_url && msg.action_label">
-                            <div class="mt-3 pt-2.5 border-t border-slate-100">
+                            <div class="mt-2 pt-2 border-t border-slate-100">
                                 <a :href="msg.action_url"
                                    style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;"
-                                   class="inline-flex items-center justify-between w-full px-3 py-2 rounded-xl text-white font-semibold text-[11px] shadow-sm hover:opacity-95 transition-all group">
+                                   class="inline-flex items-center justify-between w-full px-3 py-1.5 rounded-xl text-white font-semibold text-[11px] shadow-xs hover:opacity-95 transition-all group">
                                     <span x-text="msg.action_label"></span>
                                     <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
