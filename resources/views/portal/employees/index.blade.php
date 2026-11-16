@@ -1196,6 +1196,14 @@
                     <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-3 border-t border-white/15">
                         <!-- Left: Tab Buttons -->
                         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                            <button @click="summaryTab = 'profil'" 
+                                    type="button" 
+                                    :class="summaryTab === 'profil' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
+                                    class="px-3.5 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span>Data Profil</span>
+                            </button>
+
                             <button @click="summaryTab = 'absen'" 
                                     type="button" 
                                     :class="summaryTab === 'absen' ? 'bg-white text-teal-950 shadow-sm font-black' : 'bg-white/10 text-white hover:bg-white/15 font-semibold'"
@@ -1290,6 +1298,100 @@
                     <template x-if="!summaryLoading && summaryData">
                         <div class="space-y-4">
                             
+                            <!-- ============================================== -->
+                            <!-- TAB 0: DATA PROFIL KARYAWAN                    -->
+                            <!-- ============================================== -->
+                            <div x-show="summaryTab === 'profil'" class="space-y-4">
+                                <!-- Top Hero Profile Banner Card -->
+                                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-50/90 to-cyan-50/70 border border-teal-100/90 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3.5 min-w-0">
+                                        <template x-if="summaryData.user && summaryData.user.avatar_url">
+                                            <img :src="summaryData.user.avatar_url" alt="" class="w-14 h-14 rounded-2xl object-cover border-2 border-teal-500 shadow-xs shrink-0">
+                                        </template>
+                                        <template x-if="!summaryData.user || !summaryData.user.avatar_url">
+                                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#155E63] to-slate-800 text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-xs" x-text="summaryData.user?.initials || 'U'"></div>
+                                        </template>
+                                        <div class="min-w-0">
+                                            <h4 class="font-heading font-extrabold text-base text-slate-900 leading-snug truncate" x-text="summaryData.user?.name"></h4>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100/80 text-teal-800 border border-teal-200" x-text="summaryData.user?.division"></span>
+                                                <span class="text-xs text-slate-600 font-medium" x-text="summaryData.user?.position"></span>
+                                            </div>
+                                            <span class="inline-block text-[11px] text-slate-400 font-mono mt-0.5" x-text="'@' + summaryData.user?.username"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold"
+                                              :class="summaryData.user?.is_active ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'"
+                                              x-text="summaryData.user?.is_active ? '● Aktif Bekerja' : '● Nonaktif'">
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Detail Fields Grid -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Kode Karyawan</span>
+                                        <span class="font-mono font-bold text-slate-800 text-sm" x-text="summaryData.user?.employee_code"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">NIK (KTP / Identitas)</span>
+                                        <span class="font-mono font-semibold text-slate-800 text-sm" x-text="summaryData.user?.nik || '-'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Email Kantor</span>
+                                        <span class="font-semibold text-slate-800 break-all" x-text="summaryData.user?.email || '-'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Nomor Telepon / WhatsApp</span>
+                                        <span class="font-mono font-semibold text-slate-800" x-text="summaryData.user?.phone || '-'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Tanggal Bergabung</span>
+                                        <span class="font-semibold text-slate-800" x-text="summaryData.user?.join_date || '-'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Atasan Langsung (Supervisor)</span>
+                                        <span class="font-semibold text-slate-800" x-text="summaryData.user?.supervisor_name || 'Tidak Ada'"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Hak Akses Sistem (Role)</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200" x-text="summaryData.user?.role"></span>
+                                    </div>
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Lokasi Kerja / Cabang</span>
+                                        <span class="font-semibold text-slate-800" x-text="summaryData.user?.branch || 'Bandung'"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Rekening Payroll Card -->
+                                <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-100 text-xs">
+                                    <div class="flex items-center gap-2 mb-2.5 text-emerald-900 font-bold">
+                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                            <circle cx="12" cy="12" r="2"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h.01M18 12h.01"/>
+                                        </svg>
+                                        <span>Informasi Rekening Bank Payroll</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px]">
+                                        <div class="p-2 rounded-lg bg-white border border-emerald-100">
+                                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Bank</span>
+                                            <span class="font-bold text-slate-800 text-xs mt-0.5 block" x-text="summaryData.user?.bank || '-'"></span>
+                                        </div>
+                                        <div class="p-2 rounded-lg bg-white border border-emerald-100">
+                                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Nomor Rekening</span>
+                                            <span class="font-mono font-bold text-slate-800 text-xs mt-0.5 block" x-text="summaryData.user?.no_rekening || '-'"></span>
+                                        </div>
+                                        <div class="p-2 rounded-lg bg-white border border-emerald-100">
+                                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Atas Nama</span>
+                                            <span class="font-bold text-slate-800 text-xs mt-0.5 block" x-text="summaryData.user?.atas_nama || '-'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- ============================================== -->
                             <!-- TAB 1: ABSENSI                                 -->
                             <!-- ============================================== -->
