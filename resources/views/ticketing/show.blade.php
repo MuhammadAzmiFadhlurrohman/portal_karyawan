@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Tiket ' . $tiket->no_tiket . ' - Detail & Penanganan'])
 
 @section('content')
-<div class="space-y-6 max-w-7xl mx-auto pb-24 sm:pb-16">
+<div class="space-y-6 max-w-7xl mx-auto">
     @php
         $stripe = $tiket->stripeColor();
         $stripeBg = match($stripe) {
