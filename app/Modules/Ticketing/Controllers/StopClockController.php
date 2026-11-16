@@ -94,7 +94,7 @@ class StopClockController extends Controller
     public function approve(Request $request, StopClock $stopClock): RedirectResponse|JsonResponse
     {
         $user = $request->user();
-        if (! $user->can('ticket.stop_clock.approve') && ! $user->hasRole(['super_admin', 'manager_teknisi', 'helpdesk'])) {
+        if (! $user->can('ticket.stop_clock.approve') && ! $user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk menyetujui Stop Clock.');
         }
 

@@ -692,7 +692,7 @@
                                                 </form>
                                                 <form method="POST" action="{{ route('tickets.stop-clock.reject', $sc) }}">
                                                     @csrf
-                                                    <input type="hidden" name="reason" value="Ditolak oleh Helpdesk NOC">
+                                                    <input type="hidden" name="reason" value="Ditolak oleh NOC">
                                                     <button type="submit" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[10px] font-bold transition">Tolak</button>
                                                 </form>
                                             </div>
@@ -1116,7 +1116,7 @@
                     </span>
                     <h3 class="font-heading font-extrabold text-base text-slate-800 mt-1">Pengajuan Closing Awal (Teknisi)</h3>
                     <p class="text-xs text-slate-500 mt-0.5">
-                        Diajukan oleh teknisi lapangan setelah perbaikan selesai untuk diverifikasi oleh Helpdesk NOC.
+                        Diajukan oleh teknisi lapangan setelah perbaikan selesai untuk diverifikasi oleh tim NOC.
                     </p>
                 </div>
 
@@ -1157,7 +1157,7 @@
                 </form>
             </div>
 
-            <!-- Tahap 2: Verifikasi & Closing Akhir Helpdesk NOC (AC-08, §7.2, §7.7) -->
+            <!-- Tahap 2: Verifikasi & Closing Akhir NOC (AC-08, §7.2, §7.7) -->
             <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
                 <div class="border-b border-slate-100 pb-3">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-md">

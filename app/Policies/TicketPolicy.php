@@ -12,7 +12,7 @@ class TicketPolicy
      */
     public function view(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'manager_teknisi', 'helpdesk', 'sa_cs', 'ceo', 'noc'])) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'ceo'])) {
             return true;
         }
 
@@ -30,7 +30,7 @@ class TicketPolicy
      */
     public function update(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'manager_teknisi', 'helpdesk', 'noc'])) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc'])) {
             return true;
         }
 
@@ -43,7 +43,7 @@ class TicketPolicy
      */
     public function closingAwal(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole('super_admin')) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi'])) {
             return true;
         }
 
@@ -55,7 +55,7 @@ class TicketPolicy
      */
     public function verifyClose(User $user, Tiket $tiket): bool
     {
-        if (! $user->can('ticket.verify_close')) {
+        if (! $user->can('ticket.verify_close') && ! $user->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
             return false;
         }
 

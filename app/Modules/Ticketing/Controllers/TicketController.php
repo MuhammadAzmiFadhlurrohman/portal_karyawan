@@ -42,10 +42,10 @@ class TicketController extends Controller
 
         // Technicians see assigned tickets or CLOSED tickets (§7.2)
         $userRoleNames = $user->roles->pluck('name')->toArray();
-        $isFieldTechnicianOnly = (in_array('teknisi', $userRoleNames) || in_array('teknis', $userRoleNames) || in_array('karyawan_teknik', $userRoleNames))
-            && empty(array_intersect(['super_admin', 'admin', 'manager_teknisi', 'helpdesk', 'sa_cs', 'ceo', 'noc', 'atasan', 'atasan_teknik', 'atasan_noc'], $userRoleNames));
+        $isManagerOrNoc = ! empty(array_intersect(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_noc', 'atasan_teknik', 'atasan', 'ceo'], $userRoleNames));
 
-        if ($isFieldTechnicianOnly) {
+        // Field technicians (divisi Teknik) only see assigned tickets or CLOSED tickets (§7.2)
+        if (! $isManagerOrNoc && ($user->division === 'Teknik' || str_contains($user->division ?? '', 'Teknik'))) {
             $query->where(function ($q) use ($user) {
                 $q->whereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $user->id))
                     ->orWhere('status', 'CLOSE');
@@ -132,11 +132,10 @@ class TicketController extends Controller
         $technicians = User::query()
             ->where('is_active', true)
             ->where(function ($q) {
-                $q->whereHas('roles', function ($rq) {
-                    $rq->whereIn('name', ['teknisi', 'teknis', 'karyawan_teknik', 'manager_teknisi']);
-                })
-                ->orWhere('division', 'like', '%Teknik%')
-                ->orWhere('division', 'like', '%NOC%');
+                $q->where('division', 'Teknik')
+                    ->orWhere('division', 'like', '%Teknik%')
+                    ->orWhere('position', 'like', '%Teknisi%')
+                    ->orWhereHas('roles', fn ($rq) => $rq->whereIn('name', ['karyawan_teknik', 'atasan_teknik', 'manager_teknisi']));
             })
             ->get();
 
@@ -153,7 +152,7 @@ class TicketController extends Controller
     public function storeBackbone(Request $request): RedirectResponse
     {
         $user = $request->user();
-        if (! $user->can('ticket.create') && ! $user->hasRole(['super_admin', 'helpdesk', 'noc', 'sa_cs', 'manager_teknisi'])) {
+        if (! $user->can('ticket.create') && ! $user->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk membuat tiket.');
         }
 
@@ -222,7 +221,7 @@ class TicketController extends Controller
     public function storeBroadband(Request $request): RedirectResponse
     {
         $user = $request->user();
-        if (! $user->can('ticket.create') && ! $user->hasRole(['super_admin', 'helpdesk', 'noc', 'sa_cs', 'manager_teknisi'])) {
+        if (! $user->can('ticket.create') && ! $user->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk membuat tiket.');
         }
 
@@ -321,7 +320,7 @@ class TicketController extends Controller
     public function dispatchTicket(Request $request, Tiket $tiket): RedirectResponse
     {
         $user = $request->user();
-        if (! $user->can('ticket.dispatch') && ! $user->hasRole(['super_admin', 'manager_teknisi', 'helpdesk'])) {
+        if (! $user->can('ticket.dispatch') && ! $user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk dispatch tiket.');
         }
 
@@ -425,7 +424,7 @@ class TicketController extends Controller
      */
     public function rejectClosing(Request $request, Tiket $tiket): RedirectResponse|JsonResponse
     {
-        if (! $request->user()->can('ticket.verify_close') && ! $request->user()->hasRole(['super_admin', 'helpdesk', 'manager_teknisi'])) {
+        if (! $request->user()->can('ticket.verify_close') && ! $request->user()->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk menolak closing verifikasi.');
         }
 
@@ -456,7 +455,7 @@ class TicketController extends Controller
      */
     public function reopenTicket(Request $request, Tiket $tiket): RedirectResponse
     {
-        if (! $request->user()->can('ticket.reopen') && ! $request->user()->hasRole(['super_admin', 'helpdesk', 'manager_teknisi'])) {
+        if (! $request->user()->can('ticket.reopen') && ! $request->user()->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk reopen tiket.');
         }
 
@@ -478,7 +477,7 @@ class TicketController extends Controller
      */
     public function cancelTicket(Request $request, Tiket $tiket): RedirectResponse
     {
-        if (! $request->user()->can('ticket.cancel') && ! $request->user()->hasRole(['super_admin', 'helpdesk', 'noc'])) {
+        if (! $request->user()->can('ticket.cancel') && ! $request->user()->hasRole(['super_admin', 'admin', 'noc'])) {
             abort(403, 'Anda tidak memiliki hak akses untuk membatalkan tiket.');
         }
 
