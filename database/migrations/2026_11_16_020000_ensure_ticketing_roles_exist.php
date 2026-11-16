@@ -37,3 +37,4 @@ return new class extends Migration
         // Keep roles to prevent cascading data loss
     }
 };
+
