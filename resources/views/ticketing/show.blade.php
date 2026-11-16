@@ -546,7 +546,7 @@
     <!-- ========================================================================= -->
     <!-- 6. KESIAPAN CLOSING TIKET BACKBONE (Checklist 4 Syarat - matching Image 2) -->
     <!-- ========================================================================= -->
-    <div class="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-xs space-y-4">
+    <div class="bg-white rounded-3xl border border-slate-200/80 p-4 sm:p-6 shadow-xs space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-xl bg-teal-50 text-[#0D9488] flex items-center justify-center shrink-0">
@@ -556,7 +556,7 @@
                     <h3 class="font-heading font-extrabold text-xs sm:text-sm text-slate-800">
                         Kesiapan Closing Tiket {{ ucfirst(strtolower($tiket->kategori_tiket)) }} ({{ $fulfilledCount }}/4 Terpenuhi ({{ $percentage }}%))
                     </h3>
-                    <p class="text-[11px] text-slate-400">4 syarat mandatori yang wajib dilengkapi teknisi sebelum closing awal dapat diajukan</p>
+                    <p class="hidden sm:block text-[11px] text-slate-400">4 syarat mandatori yang wajib dilengkapi teknisi sebelum closing awal dapat diajukan</p>
                 </div>
             </div>
 
@@ -566,89 +566,89 @@
                         <span>✓ Siap Closing Awal</span>
                     </span>
                 @else
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                         <span>⚠️ Belum Lengkap ({{ $remainingCount }} item lagi)</span>
                     </span>
                 @endif
             </div>
         </div>
 
-        <!-- 4 Interactive Checklist Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <!-- 4 Interactive Checklist Cards (2 Baris di Mobile: 2 Kolom x 2 Baris) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
             <!-- 1. Resume Kerja -->
             <button type="button" onclick="switchTab('tab-resume')"
-                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    class="p-2.5 sm:p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
                     {{ $hasResume ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs shrink-0
                         {{ $hasResume ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
                         {{ $hasResume ? '✓' : '1' }}
                     </div>
-                    <div>
-                        <h4 class="font-heading font-extrabold text-xs text-slate-800">1. Resume Kerja</h4>
-                        <p class="text-[11px] mt-0.5 {{ $hasResume ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
-                            {{ $hasResume ? 'Sudah Diisi Lengkap' : 'Belum diisi lengkap' }}
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 truncate">1. Resume Kerja</h4>
+                        <p class="text-[10px] sm:text-[11px] mt-0.5 truncate {{ $hasResume ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasResume ? 'Sudah Lengkap' : 'Belum diisi lengkap' }}
                         </p>
                     </div>
                 </div>
-                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+                <span class="hidden sm:block text-slate-400 group-hover:text-teal-600 transition text-sm ml-1">&rsaquo;</span>
             </button>
 
             <!-- 2. Foto / OTDR -->
             <button type="button" onclick="switchTab('tab-chronology')"
-                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    class="p-2.5 sm:p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
                     {{ $hasPhoto ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs shrink-0
                         {{ $hasPhoto ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
                         {{ $hasPhoto ? '✓' : '2' }}
                     </div>
-                    <div>
-                        <h4 class="font-heading font-extrabold text-xs text-slate-800">2. Foto / OTDR</h4>
-                        <p class="text-[11px] mt-0.5 {{ $hasPhoto ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
-                            {{ $hasPhoto ? 'Dokumentasi Terunggah' : 'Wajib minimal 1 foto' }}
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 truncate">2. Foto / OTDR</h4>
+                        <p class="text-[10px] sm:text-[11px] mt-0.5 truncate {{ $hasPhoto ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasPhoto ? 'Terunggah' : 'Wajib minimal 1 foto' }}
                         </p>
                     </div>
                 </div>
-                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+                <span class="hidden sm:block text-slate-400 group-hover:text-teal-600 transition text-sm ml-1">&rsaquo;</span>
             </button>
 
             <!-- 3. Koordinat / JC -->
             <button type="button" onclick="switchTab('tab-materials')"
-                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    class="p-2.5 sm:p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
                     {{ $hasRepairOrJc ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs shrink-0
                         {{ $hasRepairOrJc ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
                         {{ $hasRepairOrJc ? '✓' : '3' }}
                     </div>
-                    <div>
-                        <h4 class="font-heading font-extrabold text-xs text-slate-800">3. Koordinat / JC</h4>
-                        <p class="text-[11px] mt-0.5 {{ $hasRepairOrJc ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
-                            {{ $hasRepairOrJc ? ($tiket->repairPoints->count() + $tiket->jointClosures->count()) . ' Titik/JC tercatat' : 'Wajib minimal 1 titik' }}
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 truncate">3. Koordinat / JC</h4>
+                        <p class="text-[10px] sm:text-[11px] mt-0.5 truncate {{ $hasRepairOrJc ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasRepairOrJc ? ($tiket->repairPoints->count() + $tiket->jointClosures->count()) . ' Titik/JC' : 'Wajib minimal 1 titik' }}
                         </p>
                     </div>
                 </div>
-                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+                <span class="hidden sm:block text-slate-400 group-hover:text-teal-600 transition text-sm ml-1">&rsaquo;</span>
             </button>
 
             <!-- 4. Penanganan Core & JC -->
             <button type="button" onclick="switchTab('tab-penanganan')"
-                    class="p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
+                    class="p-2.5 sm:p-4 rounded-2xl border transition text-left cursor-pointer flex items-center justify-between group
                     {{ $hasJcOrManeuver ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300' }}">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs
+                <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-xs shrink-0
                         {{ $hasJcOrManeuver ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600' }}">
                         {{ $hasJcOrManeuver ? '✓' : '4' }}
                     </div>
-                    <div>
-                        <h4 class="font-heading font-extrabold text-xs text-slate-800">4. Penanganan Core</h4>
-                        <p class="text-[11px] mt-0.5 {{ $hasJcOrManeuver ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
-                            {{ $hasJcOrManeuver ? ($tiket->jointClosures->count() + $tiket->coreManeuvers->count()) . ' Data Penanganan' : 'Wajib JC / Manuver Core' }}
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 truncate">4. Penanganan</h4>
+                        <p class="text-[10px] sm:text-[11px] mt-0.5 truncate {{ $hasJcOrManeuver ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
+                            {{ $hasJcOrManeuver ? ($tiket->jointClosures->count() + $tiket->coreManeuvers->count()) . ' Data' : 'Wajib JC / Manuver' }}
                         </p>
                     </div>
                 </div>
-                <span class="text-slate-400 group-hover:text-teal-600 transition text-sm">&rsaquo;</span>
+                <span class="hidden sm:block text-slate-400 group-hover:text-teal-600 transition text-sm ml-1">&rsaquo;</span>
             </button>
         </div>
     </div>
