@@ -38,27 +38,46 @@
          style="width: 390px; max-width: calc(100vw - 1.5rem); max-height: calc(100vh - 130px); display: none;">
         
         <!-- Header -->
-        <div class="p-4 text-white flex items-center justify-between shrink-0"
-             style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
-                    <svg class="w-5.5 h-5.5" viewBox="0 0 24 24" fill="currentColor">
-                        <rect x="11" y="1.5" width="2" height="3.5" rx="1"/>
-                        <rect x="2.5" y="9.25" width="2" height="5.5" rx="1"/>
-                        <rect x="19.5" y="9.25" width="2" height="5.5" rx="1"/>
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.5 5 18.5 6 18.5 8V15C18.5 17 17.5 18 15.5 18H8.5C6.5 18 5.5 17 5.5 15V8C5.5 6 6.5 5 8.5 5ZM8.75 9.75A1.25 1.25 0 108.75 12.25 1.25 1.25 0 108.75 9.75ZM15.25 9.75A1.25 1.25 0 1015.25 12.25 1.25 1.25 0 1015.25 9.75ZM8 14.5H9.5C9.78 14.5 10 14.72 10 15C10 15.28 9.78 15.5 9.5 15.5H8C7.72 15.5 7.5 15.28 7.5 15C7.5 14.72 7.72 14.5 8 14.5ZM11.25 14.5H12.75C13.03 14.5 13.25 14.72 13.25 15C13.25 15.28 13.03 15.5 12.75 15.5H11.25C10.97 15.5 10.75 15.28 10.75 15C10.75 14.72 10.97 14.5 11.25 14.5ZM14.5 14.5H16C16.28 14.5 16.5 14.72 16.5 15C16.5 15.28 16.28 15.5 16 15.5H14.5C14.22 15.5 14 15.28 14 15C14 14.72 14.22 14.5 14.5 14.5Z"/>
-                    </svg>
+        <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
+             style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
+            
+            <!-- Subtle decorative background glow -->
+            <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+            <div class="flex items-center gap-3 relative z-10 min-w-0">
+                <!-- Avatar with online indicator -->
+                <div class="relative shrink-0">
+                    <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-white shadow-inner">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="#ffffff">
+                            <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                            <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                            <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                            <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                        </svg>
+                    </div>
+                    <!-- Online Pulse Dot -->
+                    <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-[#155E63]"></span>
+                    </span>
                 </div>
-                <div>
-                    <h3 class="font-heading font-bold text-sm tracking-tight leading-tight">Asisten Mandiri PT MSN</h3>
-                    <p class="text-[11px] text-teal-100">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
+
+                <!-- Title & Subtitle -->
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <h3 class="font-heading font-bold text-[13.5px] sm:text-sm text-white tracking-tight leading-snug truncate" style="color: #ffffff !important;">Asisten Mandiri PT MSN</h3>
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">AI</span>
+                    </div>
+                    <p class="text-[11px] text-teal-100/90 leading-tight mt-0.5 truncate" style="color: rgba(204, 251, 241, 0.9) !important;">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
                 </div>
             </div>
-            <div class="flex items-center gap-1 shrink-0">
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-1.5 shrink-0 relative z-10">
                 <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
                 <button @click="clearChat()" 
                         type="button" 
-                        class="text-teal-100 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
                         title="Hapus Riwayat Chat"
                         aria-label="Hapus Riwayat Chat">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -68,10 +87,10 @@
                 <!-- Tombol Tutup Chat -->
                 <button @click="closeChat()" 
                         type="button" 
-                        class="text-teal-100 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors cursor-pointer"
+                        class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
                         title="Tutup Chat"
                         aria-label="Tutup Chat">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
