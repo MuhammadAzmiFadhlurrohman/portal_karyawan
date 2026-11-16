@@ -176,7 +176,9 @@ class PengajuanController extends Controller
 
         $divisions = $this->getAvailableDivisions();
 
-        $pengajuanList = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        // Jika filter bulan aktif (bukan semua bulan), tampilkan semua data dalam 1 bulan tanpa dibatasi 15 per halaman
+        $perPage = ($selectedMonth !== '') ? 500 : 15;
+        $pengajuanList = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
         $hasOverdue = $this->pengajuanService->hasOverdueRealization($user);
 
         $pendingApprovalsCount = 0;
@@ -313,7 +315,9 @@ class PengajuanController extends Controller
         }
 
         $divisions = $this->getAvailableDivisions();
-        $pengajuanList = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
+        // Jika filter bulan aktif (bukan semua bulan), tampilkan semua data dalam 1 bulan tanpa dibatasi 15 per halaman
+        $perPage = ($selectedMonth !== '') ? 500 : 15;
+        $pengajuanList = $query->orderBy('created_at', 'desc')->paginate($perPage)->withQueryString();
 
         return view('gomsn.pengajuan.approvals', compact(
             'pengajuanList',
