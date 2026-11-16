@@ -148,25 +148,29 @@
             }
             .wave-mobile {
                 display: block !important;
+                height: 50px !important;
             }
             .login-wrap {
                 flex-direction: column !important;
-                height: auto !important;
-                min-height: 100vh !important;
-                max-height: none !important;
-                overflow-y: auto !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                overflow: hidden !important;
             }
             .login-panel-left {
                 width: 100% !important;
-                min-height: 330px !important;
+                min-height: 0 !important;
                 height: auto !important;
-                padding: 26px 20px 74px 20px !important;
+                padding: 16px 20px 54px 20px !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
-                padding: 12px 20px 36px 20px !important;
-                margin-top: -6px !important;
+                flex: 1 !important;
+                justify-content: flex-start !important;
+                padding: 0 20px 14px 20px !important;
+                margin-top: -12px !important;
+                overflow: hidden !important;
             }
         }
     </style>
@@ -298,16 +302,16 @@
             <div class="hidden lg:block h-4"></div>
 
             <!-- Center Content: Logo, Title, Description -->
-            <div class="relative z-10 my-auto py-4">
+            <div class="relative z-10 my-auto py-1.5 lg:py-4">
                 <!-- Text: Selamat Datang di -->
-                <p class="text-teal-200/90 text-xs sm:text-sm font-bold tracking-wider uppercase mb-3">
+                <p class="text-teal-200/90 text-xs sm:text-sm font-bold tracking-wider uppercase mb-2 sm:mb-3">
                     Selamat Datang di
                 </p>
 
                 <!-- Circular Logo Badge with Ambient Glow -->
-                <div class="relative inline-block mx-auto mb-4 group">
+                <div class="relative inline-block mx-auto mb-2.5 sm:mb-4 group">
                     <div class="absolute -inset-1.5 bg-gradient-to-r from-teal-400/30 to-emerald-400/30 rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-300"></div>
-                    <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white shadow-[0_10px_28px_rgba(2,40,46,0.35)] ring-4 ring-white/25 flex items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105">
+                    <div class="relative w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-white shadow-[0_10px_28px_rgba(2,40,46,0.35)] ring-4 ring-white/25 flex items-center justify-center p-3 sm:p-4 transition-transform duration-300 group-hover:scale-105">
                         <img src="{{ asset('assets/logo/logo-msn2.png') }}" 
                              alt="GoMSN" 
                              class="w-full h-full object-contain">
@@ -315,18 +319,18 @@
                 </div>
 
                 <!-- App Name: GoMSN -->
-                <h1 class="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-2 leading-tight">
+                <h1 class="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-1 sm:mb-2 leading-tight">
                     Go<span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-teal-300 to-emerald-300">MSN</span>
                 </h1>
 
                 <!-- Subtitle / Deskripsi Sistem -->
-                <p class="text-xs sm:text-sm text-teal-50/85 leading-relaxed max-w-sm mx-auto font-normal">
+                <p class="text-[11.5px] sm:text-sm text-teal-50/85 leading-snug sm:leading-relaxed max-w-sm mx-auto font-normal">
                     Sistem manajemen gangguan, tiket operasional &amp; pelaporan kerja jaringan terpadu PT Media Solusi Network.
                 </p>
             </div>
 
             <!-- Bottom Brand Text -->
-            <div class="relative z-10 pt-2.5 pb-1 flex items-center justify-between text-[11px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 mb-1 lg:mb-0">
+            <div class="relative z-10 pt-2 pb-0.5 flex items-center justify-between text-[10.5px] sm:text-[11px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 lg:mb-0">
                 <span>PT MEDIA SOLUSI NETWORK</span>
                 <span class="inline-flex items-center gap-1 normal-case font-medium text-teal-300/70 text-[10.5px]">
                     <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
@@ -345,11 +349,11 @@
             <div class="w-full max-w-[420px] sm:max-w-[440px] mx-auto relative z-10">
                 
                 <!-- Heading Masuk ke Akun -->
-                <div class="mb-4 sm:mb-6 text-center">
+                <div class="mb-3 sm:mb-6 text-center">
                     <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                         Masuk ke Akun
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
                         Silakan masukkan kredensial akun Anda untuk login.
                     </p>
                 </div>
@@ -392,7 +396,7 @@
                 </div>
 
                 <!-- Form Login -->
-                <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-4">
+                <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-3 sm:space-y-4">
                     @csrf
                     <input type="hidden" name="platform" value="web">
 
