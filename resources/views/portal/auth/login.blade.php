@@ -404,7 +404,7 @@
                     <!-- Field 1: Email atau Username -->
                     <div>
                         <label for="identifier" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 text-left">
-                            Email atau Username
+                            Username
                         </label>
                         <div class="relative flex items-center group">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-teal-700 transition-colors">
@@ -419,7 +419,7 @@
                                 required
                                 autofocus
                                 value="{{ old('identifier') }}"
-                                placeholder="Masukkan email, username, atau NIK"
+                                placeholder="Masukkan username"
                                 class="input-stylish"
                             >
                         </div>
