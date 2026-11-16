@@ -377,7 +377,8 @@ class DeductionService
      */
     public function approveCorrectionBySupervisor(AttendanceCorrection $correction, User $actor, ?LeaveService $leaveService = null): AttendanceCorrection
     {
-        if ($correction->user_id === $actor->id) {
+        // Admin / Super Admin diperbolehkan menyetujui pengajuannya sendiri jika diperlukan
+        if ($correction->user_id === $actor->id && ! $actor->hasRole(['super_admin', 'admin'])) {
             throw new InvalidArgumentException('Pengaju tidak boleh menyetujui koreksi absensinya sendiri (AC-10).');
         }
 
@@ -404,7 +405,8 @@ class DeductionService
      */
     public function rejectCorrection(AttendanceCorrection $correction, User $actor, string $reason): AttendanceCorrection
     {
-        if ($correction->user_id === $actor->id) {
+        // Admin / Super Admin diperbolehkan menolak pengajuannya sendiri jika diperlukan
+        if ($correction->user_id === $actor->id && ! $actor->hasRole(['super_admin', 'admin'])) {
             throw new InvalidArgumentException('Pengaju tidak boleh menolak koreksi absensinya sendiri.');
         }
 
@@ -438,7 +440,8 @@ class DeductionService
      */
     public function approveCorrectionByHrd(AttendanceCorrection $correction, User $actor, LeaveService $leaveService): AttendanceCorrection
     {
-        if ($correction->user_id === $actor->id) {
+        // Admin / Super Admin diperbolehkan menyetujui pengajuannya sendiri jika diperlukan
+        if ($correction->user_id === $actor->id && ! $actor->hasRole(['super_admin', 'admin'])) {
             throw new InvalidArgumentException('Pengaju tidak boleh menyetujui koreksi absensinya sendiri (AC-10).');
         }
 

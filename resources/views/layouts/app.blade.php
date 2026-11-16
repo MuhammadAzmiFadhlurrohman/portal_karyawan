@@ -251,8 +251,9 @@
                         $navPendingLemburCount = $navLQ->count();
                     }
                     if ($navCanApproveKoreksi) {
-                        $navCQ = \App\Models\AttendanceCorrection::whereIn('status', ['pending_supervisor', 'pending_hrd'])->where('user_id', '!=', $navUser->id);
+                        $navCQ = \App\Models\AttendanceCorrection::whereIn('status', ['pending_supervisor', 'pending_hrd']);
                         if (! $navUser->hasRole(['super_admin', 'admin'])) {
+                            $navCQ->where('user_id', '!=', $navUser->id);
                             if (! empty($navUser->division)) {
                                 $navCQ->whereHas('user', function ($qu) use ($navUser) {
                                     $qu->whereRaw('LOWER(division) = ?', [strtolower($navUser->division)]);
