@@ -251,18 +251,16 @@
                 } catch (e) {}
             },
             clearChat() {
-                if (confirm('Hapus semua riwayat percakapan chat ini?')) {
-                    this.messages = [
-                        {
-                            sender: 'bot',
-                            text: 'Halo {{ auth()->user()?->name ?? "Rekan MSN" }}! Saya asisten virtual PT MSN. Ada yang bisa saya bantu terkait jadwal, cuti, klaim, atau tiket gangguan hari ini?'
-                        }
-                    ];
-                    try {
-                        localStorage.removeItem(storageKeyMessages);
-                    } catch (e) {}
-                    this.scrollToBottom();
-                }
+                this.messages = [
+                    {
+                        sender: 'bot',
+                        text: 'Halo {{ auth()->user()?->name ?? "Rekan MSN" }}! Saya asisten virtual PT MSN. Ada yang bisa saya bantu terkait jadwal, cuti, klaim, atau tiket gangguan hari ini?'
+                    }
+                ];
+                try {
+                    localStorage.removeItem(storageKeyMessages);
+                } catch (e) {}
+                this.scrollToBottom();
             },
             saveMessages() {
                 try {
