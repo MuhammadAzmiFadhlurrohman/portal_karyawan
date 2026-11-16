@@ -5,22 +5,23 @@
     <!-- Floating Trigger Button -->
     <button @click="toggleChat()" 
             type="button"
-            class="h-12 w-12 sm:h-13 sm:w-13 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white shadow-xl hover:shadow-2xl shadow-blue-500/35 hover:shadow-blue-500/45 flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-200 cursor-pointer"
+            class="rounded-full text-white flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
+            style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; background-color: #2563eb !important; background: #2563eb !important; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5), 0 8px 10px -6px rgba(37, 99, 235, 0.3); border: none;"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
         <!-- Robot Icon Sesuai Request -->
-        <svg x-show="!isOpen" class="w-7 h-7 sm:w-7.5 sm:h-7.5" viewBox="0 0 24 24" fill="currentColor">
+        <svg x-show="!isOpen" style="width: 30px; height: 30px;" viewBox="0 0 24 24" fill="#ffffff">
             <!-- Top Antenna -->
-            <rect x="11" y="1.5" width="2" height="3.5" rx="1"/>
+            <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
             <!-- Left Ear -->
-            <rect x="2.5" y="9.25" width="2" height="5.5" rx="1"/>
+            <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
             <!-- Right Ear -->
-            <rect x="19.5" y="9.25" width="2" height="5.5" rx="1"/>
+            <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
             <!-- Head with Eye & Mouth Cutouts -->
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.5 5 18.5 6 18.5 8V15C18.5 17 17.5 18 15.5 18H8.5C6.5 18 5.5 17 5.5 15V8C5.5 6 6.5 5 8.5 5ZM8.75 9.75A1.25 1.25 0 108.75 12.25 1.25 1.25 0 108.75 9.75ZM15.25 9.75A1.25 1.25 0 1015.25 12.25 1.25 1.25 0 1015.25 9.75ZM8 14.5H9.5C9.78 14.5 10 14.72 10 15C10 15.28 9.78 15.5 9.5 15.5H8C7.72 15.5 7.5 15.28 7.5 15C7.5 14.72 7.72 14.5 8 14.5ZM11.25 14.5H12.75C13.03 14.5 13.25 14.72 13.25 15C13.25 15.28 13.03 15.5 12.75 15.5H11.25C10.97 15.5 10.75 15.28 10.75 15C10.75 14.72 10.97 14.5 11.25 14.5ZM14.5 14.5H16C16.28 14.5 16.5 14.72 16.5 15C16.5 15.28 16.28 15.5 16 15.5H14.5C14.22 15.5 14 15.28 14 15C14 14.72 14.22 14.5 14.5 14.5Z"/>
+            <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
         </svg>
         <!-- Close (X) Icon -->
-        <svg x-show="isOpen" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display: none;">
+        <svg x-show="isOpen" class="w-6 h-6 text-white" fill="none" stroke="#ffffff" stroke-width="2.5" viewBox="0 0 24 24" style="display: none;">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
         </svg>
     </button>
