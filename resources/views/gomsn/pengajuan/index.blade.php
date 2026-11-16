@@ -1334,9 +1334,8 @@
                                 </label>
                                 <select x-model="disburseMethod" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
                                     <option value="">-- Pilih Metode --</option>
-                                    <option value="Transfer Bank BCA">Transfer Bank BCA</option>
-                                    <option value="Transfer Bank Mandiri">Transfer Bank Mandiri</option>
-                                    <option value="Kas Kecil / Tunai">Kas Kecil / Tunai (Petty Cash)</option>
+                                    <option value="Transfer">Transfer</option>
+                                    <option value="Cash">Cash</option>
                                 </select>
                             </div>
 
@@ -1407,23 +1406,28 @@
                             <form :action="activeItem?.disburseUrl" method="POST" enctype="multipart/form-data" class="space-y-3 p-4 bg-teal-50/70 border border-teal-200 rounded-2xl">
                                 @csrf
                                 <input type="hidden" name="metode_pencairan" :value="disburseMethod">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-800 mb-1">
-                                        Unggah Bukti Transfer / Pencairan <span class="text-rose-500">*</span>
-                                    </label>
-                                    <input type="file" name="bukti_transfer" required accept="image/*,application/pdf"
-                                           class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-600 file:text-white hover:file:bg-teal-700 border border-slate-300 rounded-xl bg-white p-1">
-                                    <p class="text-[10px] text-slate-500 mt-1">Format dokumen: JPG, PNG, atau PDF (Maks. 4MB)</p>
-                                </div>
+
+                                <!-- UPLOAD BUKTI TRANSFER (HANYA MUNCUL JIKA METODE TRANSFER, DAN BERSIFAT OPSIONAL) -->
+                                <template x-if="disburseMethod === 'Transfer'">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-800 mb-1">
+                                            Unggah Bukti Transfer <span class="text-slate-400 font-normal">(Opsional)</span>
+                                        </label>
+                                        <input type="file" name="bukti_transfer" accept="image/*,application/pdf"
+                                               class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-600 file:text-white hover:file:bg-teal-700 border border-slate-300 rounded-xl bg-white p-1">
+                                        <p class="text-[10px] text-slate-500 mt-1">Format dokumen: JPG, PNG, atau PDF (Maks. 4MB). Tidak wajib diunggah.</p>
+                                    </div>
+                                </template>
+
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Pencairan (Opsional):</label>
-                                    <input type="text" name="notes" placeholder="No. referensi transaksi / kas kecil..." class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white">
+                                    <input type="text" name="notes" placeholder="No. referensi transaksi / kas kecil / catatan..." class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white">
                                 </div>
                                 <button type="submit" 
                                         style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
                                         class="w-full hover:opacity-90 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                    <span>✓ Terima &amp; Cairkan Dana</span>
+                                    <span x-text="disburseMethod === 'Cash' ? '✓ Terima &amp; Cairkan Cash (Tunai)' : '✓ Terima &amp; Cairkan Dana Transfer'"></span>
                                 </button>
                             </form>
 

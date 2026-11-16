@@ -400,11 +400,24 @@
                             <p class="text-xs text-slate-600">
                                 Verifikasi saldo dan pencairan dana {{ $pengajuan->jenis === 'BELI' ? 'pembelian barang baru' : 'kasbon operasional' }} ke pemohon.
                             </p>
-                            <form method="POST" action="{{ route('gomsn.pengajuan.disburse', $pengajuan->id) }}" enctype="multipart/form-data" class="space-y-2">
+                            <form method="POST" action="{{ route('gomsn.pengajuan.disburse', $pengajuan->id) }}" enctype="multipart/form-data" class="space-y-3" x-data="{ method: 'Transfer' }">
                                 @csrf
                                 <div>
-                                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Unggah Bukti Transfer / Kwitansi Kasir <span class="text-red-500">*</span></label>
-                                    <input type="file" name="bukti_transfer" required accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                    <label class="block text-[11px] font-bold text-slate-700 mb-1">Metode Pencairan</label>
+                                    <select name="metode_pencairan" x-model="method" class="w-full text-xs rounded-lg border-slate-300 py-1.5 px-2 bg-white">
+                                        <option value="Transfer">Transfer</option>
+                                        <option value="Cash">Cash</option>
+                                    </select>
+                                </div>
+                                <template x-if="method === 'Transfer'">
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-slate-600 mb-1">Unggah Bukti Transfer <span class="text-slate-400">(Opsional)</span></label>
+                                        <input type="file" name="bukti_transfer" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                    </div>
+                                </template>
+                                <div>
+                                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Catatan Pencairan (Opsional)</label>
+                                    <input type="text" name="notes" placeholder="No. referensi / keterangan..." class="w-full text-xs rounded-lg border-slate-300 py-1.5" />
                                 </div>
                                 <button type="submit" class="btn-primary w-full text-xs py-2 justify-center">
                                     ✓ Konfirmasi Pencairan Dana

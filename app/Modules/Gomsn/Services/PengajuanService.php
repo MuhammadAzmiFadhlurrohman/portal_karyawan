@@ -415,7 +415,7 @@ class PengajuanService
     /**
      * Disburse funds by Finance (§8.1).
      */
-    public function disburseFinance(Pengajuan $pengajuan, User $financeUser, string $transferProofPath): Pengajuan
+    public function disburseFinance(Pengajuan $pengajuan, User $financeUser, ?string $transferProofPath = null, ?string $notes = null): Pengajuan
     {
         if ($pengajuan->user_id === $financeUser->id) {
             throw new Exception('Pemisahan tugas (AC-10): Pengaju tidak boleh mencairkan dananya sendiri.');
@@ -425,7 +425,7 @@ class PengajuanService
             throw new Exception("Pengajuan berstatus {$pengajuan->status} tidak dapat dicairkan.");
         }
 
-        return DB::transaction(function () use ($pengajuan, $financeUser, $transferProofPath): Pengajuan {
+        return DB::transaction(function () use ($pengajuan, $financeUser, $transferProofPath, $notes): Pengajuan {
             $now = Carbon::now();
             $deadline = $now->copy()->addDays(7); // Default 7 days to upload realization receipt
 
@@ -441,7 +441,7 @@ class PengajuanService
                 'stage' => 'finance',
                 'approver_id' => $financeUser->id,
                 'action' => 'approved',
-                'notes' => 'Dana dicairkan via transfer',
+                'notes' => $notes ?? ($transferProofPath ? 'Dana dicairkan via transfer' : 'Dana dicairkan via cash / tunai'),
             ]);
 
             AuditLogger::record(

@@ -823,15 +823,23 @@ class PengajuanController extends Controller
             }
         }
 
-        // If DANA / BELI: Finance transfers funds with transfer proof
+        // If DANA / BELI: Finance transfers funds with transfer proof (optional for transfer, omitted for cash)
         $request->validate([
-            'bukti_transfer' => ['required', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:4096'],
+            'bukti_transfer' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:4096'],
         ]);
 
-        $path = $request->file('bukti_transfer')->store('gomsn/transfer_proofs', 'public');
+        $path = $request->hasFile('bukti_transfer')
+            ? $request->file('bukti_transfer')->store('gomsn/transfer_proofs', 'public')
+            : null;
+
+        $metode = $request->input('metode_pencairan');
+        $customNotes = $request->input('notes');
+        $notesCombined = $customNotes
+            ? ($metode ? "Metode: {$metode} | {$customNotes}" : $customNotes)
+            : ($metode ? "Metode: {$metode}" : null);
 
         try {
-            $this->pengajuanService->disburseFinance($pengajuan, $user, $path);
+            $this->pengajuanService->disburseFinance($pengajuan, $user, $path, $notesCombined);
 
             return redirect()->route($redirectRoute, $redirectRoute === 'gomsn.pengajuan.show' ? $pengajuan : [])
                 ->with('success', 'Dana pengajuan telah dicairkan dan dicatat oleh Finance.');
