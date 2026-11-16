@@ -60,9 +60,16 @@
             color: #94A3B8;
             font-weight: 400;
         }
-        .btn-stylish {
+        .action-row {
+            display: flex;
+            align-items: stretch;
+            gap: 10px;
             width: 100%;
-            padding: 14px 24px;
+        }
+        .btn-stylish {
+            flex: 1;
+            min-height: 52px;
+            padding: 14px 20px;
             border-radius: 14px;
             background: linear-gradient(135deg, #072d31 0%, #155E63 50%, #0d9488 100%);
             color: #FFFFFF;
@@ -85,38 +92,19 @@
         .btn-stylish:active {
             transform: translateY(0);
         }
-        .divider-or {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 18px 0 14px;
-            color: #94A3B8;
-            font-size: 11.5px;
-            font-weight: 600;
-            text-transform: lowercase;
-            letter-spacing: 0.02em;
-        }
-        .divider-or::before,
-        .divider-or::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #E2E8F0, transparent);
-        }
         .btn-biometric {
-            width: 100%;
-            padding: 13px 20px;
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            padding: 0;
             border-radius: 14px;
             background: #FFFFFF;
-            border: 1.5px solid rgba(21, 94, 99, 0.25);
+            border: 1.5px solid rgba(21, 94, 99, 0.28);
             color: #155E63;
-            font-size: 14px;
-            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.08);
             transition: all 0.2s ease;
             cursor: pointer;
         }
@@ -124,7 +112,7 @@
             background: #F0FDFA;
             border-color: #155E63;
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px -6px rgba(21, 94, 99, 0.22);
+            box-shadow: 0 8px 20px -6px rgba(21, 94, 99, 0.25);
         }
         .btn-biometric:disabled {
             opacity: 0.65;
@@ -480,31 +468,31 @@
                         </label>
                     </div>
 
-                    <!-- Tombol Masuk ke Dashboard -->
-                    <button type="submit" class="btn-stylish">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                        </svg>
-                        <span>Masuk ke Dashboard</span>
-                    </button>
+                    <!-- Tombol Masuk ke Dashboard + Ikon Biometrik di Samping -->
+                    <div class="action-row">
+                        <button type="submit" class="btn-stylish">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            <span>Masuk ke Dashboard</span>
+                        </button>
+
+                        <button type="button"
+                                @click="loginWithBiometric()"
+                                :disabled="biometricLoading"
+                                title="Masuk dengan Sidik Jari / Biometrik"
+                                aria-label="Masuk dengan Sidik Jari / Biometrik"
+                                class="btn-biometric">
+                            <svg x-show="!biometricLoading" class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                            </svg>
+                            <svg x-show="biometricLoading" x-cloak class="w-5 h-5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </form>
-
-                <!-- Pemisah & Tombol Login Biometrik Perangkat (WebAuthn / Passkey) -->
-                <div class="divider-or">atau masuk cepat dengan</div>
-
-                <button type="button"
-                        @click="loginWithBiometric()"
-                        :disabled="biometricLoading"
-                        class="btn-biometric">
-                    <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
-                    </svg>
-                    <svg x-show="biometricLoading" x-cloak class="w-5 h-5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg>
-                    <span x-text="biometricLoading ? 'Memverifikasi Sensor...' : 'Masuk dengan Sidik Jari / Biometrik'"></span>
-                </button>
 
                 <!-- Footer Support Note -->
                 <div class="mt-6 pt-4 border-t border-slate-100 text-center">
