@@ -128,7 +128,30 @@
                 <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-emerald-400/15 blur-3xl"></div>
             </div>
 
-            <!-- DESKTOP ORGANIC CURVED WAVE (RIGHT EDGE) -->
+            <!-- DESKTOP MULTI-LAYER ORGANIC CURVED WAVES (RIGHT EDGE) -->
+            <!-- Layer 1: Vibrant Teal Ribbon (Back) -->
+            <div class="hidden lg:block absolute -right-[2px] -top-[1px] -bottom-[1px] w-20 lg:w-24 xl:w-28 z-28 pointer-events-none"
+                 style="background: linear-gradient(180deg, rgba(13, 148, 136, 0.5) 0%, rgba(20, 184, 166, 0.6) 50%, rgba(13, 148, 136, 0.5) 100%);
+                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 22,0 C 56,160 59,320 32,500 C 4,680 8,840 26,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 22,0 C 56,160 59,320 32,500 C 4,680 8,840 26,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        -webkit-mask-size: 100% 100%;
+                        mask-size: 100% 100%;
+                        -webkit-mask-repeat: no-repeat;
+                        mask-repeat: no-repeat;">
+            </div>
+
+            <!-- Layer 2: Light Mint / Soft Cyan Ribbon (Middle) -->
+            <div class="hidden lg:block absolute -right-[2px] -top-[1px] -bottom-[1px] w-20 lg:w-24 xl:w-28 z-29 pointer-events-none"
+                 style="background: linear-gradient(180deg, rgba(94, 234, 212, 0.45) 0%, rgba(153, 246, 228, 0.55) 50%, rgba(94, 234, 212, 0.4) 100%);
+                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 30,0 C 64,160 67,320 40,500 C 12,680 16,840 34,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000' preserveAspectRatio='none'%3E%3Cpath d='M 30,0 C 64,160 67,320 40,500 C 12,680 16,840 34,1000 L 105,1000 L 105,0 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        -webkit-mask-size: 100% 100%;
+                        mask-size: 100% 100%;
+                        -webkit-mask-repeat: no-repeat;
+                        mask-repeat: no-repeat;">
+            </div>
+
+            <!-- Layer 3: White Foreground Wave with Micro-Dots (Front) -->
             <div class="hidden lg:block absolute -right-[2px] -top-[1px] -bottom-[1px] w-20 lg:w-24 xl:w-28 z-30 pointer-events-none"
                  style="background-color: #FFFFFF; 
                         background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1.2px, transparent 1.2px); 
@@ -142,7 +165,30 @@
                         mask-repeat: no-repeat;">
             </div>
 
-            <!-- MOBILE HORIZONTAL WAVE (BOTTOM EDGE) -->
+            <!-- MOBILE MULTI-LAYER HORIZONTAL WAVES (BOTTOM EDGE) -->
+            <!-- Layer 1: Vibrant Teal Ribbon (Back) -->
+            <div class="lg:hidden absolute -bottom-[2px] -left-[1px] -right-[1px] h-14 sm:h-16 pointer-events-none z-28"
+                 style="background: linear-gradient(90deg, rgba(13, 148, 136, 0.5) 0%, rgba(20, 184, 166, 0.6) 50%, rgba(13, 148, 136, 0.5) 100%);
+                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,39 C 80,12 160,-8 260,-8 C 380,-8 500,66 680,66 C 820,66 920,22 1000,14 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,39 C 80,12 160,-8 260,-8 C 380,-8 500,66 680,66 C 820,66 920,22 1000,14 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        -webkit-mask-size: 100% 100%;
+                        mask-size: 100% 100%;
+                        -webkit-mask-repeat: no-repeat;
+                        mask-repeat: no-repeat;">
+            </div>
+
+            <!-- Layer 2: Light Mint / Soft Cyan Ribbon (Middle) -->
+            <div class="lg:hidden absolute -bottom-[2px] -left-[1px] -right-[1px] h-13 sm:h-15 pointer-events-none z-29"
+                 style="background: linear-gradient(90deg, rgba(94, 234, 212, 0.45) 0%, rgba(153, 246, 228, 0.55) 50%, rgba(94, 234, 212, 0.4) 100%);
+                        -webkit-mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,47 C 80,20 160,0 260,0 C 380,0 500,74 680,74 C 820,74 920,30 1000,22 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        mask-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,47 C 80,20 160,0 260,0 C 380,0 500,74 680,74 C 820,74 920,30 1000,22 L 1000,105 L 0,105 Z' fill='black' /%3E%3C/svg%3E&quot;);
+                        -webkit-mask-size: 100% 100%;
+                        mask-size: 100% 100%;
+                        -webkit-mask-repeat: no-repeat;
+                        mask-repeat: no-repeat;">
+            </div>
+
+            <!-- Layer 3: White Foreground Wave with Micro-Dots (Front) -->
             <div class="lg:hidden absolute -bottom-[2px] -left-[1px] -right-[1px] h-12 sm:h-14 pointer-events-none z-30"
                  style="background-color: #FFFFFF; 
                         background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1.2px, transparent 1.2px); 
