@@ -427,13 +427,16 @@ class PengajuanService
 
         return DB::transaction(function () use ($pengajuan, $financeUser, $transferProofPath, $notes): Pengajuan {
             $now = Carbon::now();
-            $deadline = $now->copy()->addDays(7); // Default 7 days to upload realization receipt
 
-            $pengajuan->status = 'dicairkan';
+            // Status langsung SELESAI saat disetujui Finance, upload nota bersifat opsional
+            $pengajuan->status = 'selesai';
+            $pengajuan->current_approver_stage = null;
             $pengajuan->bukti_transfer_path = $transferProofPath;
             $pengajuan->transfer_at = $now;
             $pengajuan->transfer_by = $financeUser->id;
-            $pengajuan->realisasi_deadline = $deadline;
+            $pengajuan->realisasi_at = $now;
+            $pengajuan->nominal_realisasi = $pengajuan->nominal_total;
+            $pengajuan->selisih_realisasi = 0;
             $pengajuan->save();
 
             PengajuanApproval::query()->create([
@@ -447,8 +450,8 @@ class PengajuanService
             AuditLogger::record(
                 action: 'pengajuan.disburse',
                 auditable: $pengajuan,
-                newValues: ['status' => 'dicairkan', 'transfer_at' => $now->toDateTimeString()],
-                reason: "Dana dicairkan oleh Finance {$financeUser->name}",
+                newValues: ['status' => 'selesai', 'transfer_at' => $now->toDateTimeString()],
+                reason: "Dana dicairkan dan diselesaikan oleh Finance {$financeUser->name}",
                 actorId: $financeUser->id
             );
 
@@ -463,15 +466,15 @@ class PengajuanService
         Pengajuan $pengajuan,
         User $user,
         float $nominalRealisasi,
-        string $receiptPath,
+        ?string $receiptPath = null,
         ?string $notes = null
     ): Pengajuan {
-        if ($pengajuan->user_id !== $user->id) {
-            throw new Exception('Hanya pemohon yang dapat mengunggah nota realisasi.');
+        if ($pengajuan->user_id !== $user->id && ! $user->hasRole(['super_admin', 'admin', 'finance'])) {
+            throw new Exception('Hanya pemohon atau admin yang dapat mengunggah nota realisasi.');
         }
 
-        if (! in_array($pengajuan->status, ['dicairkan', 'menunggu_bukti'], true)) {
-            throw new Exception("Pengajuan berstatus {$pengajuan->status} belum dalam tahap realisasi.");
+        if (! in_array($pengajuan->status, ['dicairkan', 'menunggu_bukti', 'selesai'], true)) {
+            throw new Exception("Pengajuan berstatus {$pengajuan->status} tidak dapat memperbarui nota.");
         }
 
         $selisih = (float) $pengajuan->nominal_total - $nominalRealisasi;
@@ -479,9 +482,13 @@ class PengajuanService
         $pengajuan->status = 'selesai';
         $pengajuan->nominal_realisasi = $nominalRealisasi;
         $pengajuan->selisih_realisasi = $selisih;
-        $pengajuan->bukti_realisasi_path = $receiptPath;
+        if ($receiptPath) {
+            $pengajuan->bukti_realisasi_path = $receiptPath;
+        }
         $pengajuan->realisasi_at = Carbon::now();
-        $pengajuan->realisasi_notes = $notes;
+        if ($notes) {
+            $pengajuan->realisasi_notes = $notes;
+        }
         $pengajuan->save();
 
         AuditLogger::record(

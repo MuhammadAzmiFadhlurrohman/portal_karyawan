@@ -1532,13 +1532,10 @@
                                         </svg>
                                     </div>
                                     <div>
-                                        <h4 class="font-bold text-sm text-slate-800 leading-tight">Upload Bukti Foto Realisasi / Struk Pembelian</h4>
-                                        <p class="text-[11px] text-slate-500 mt-0.5">Pengajuan dana &amp; beli telah disetujui Finance. Harap unggah foto bukti nota/struk dan total riil belanja.</p>
+                                        <h4 class="font-bold text-sm text-slate-800 leading-tight">Bukti Foto Struk / Nota Pembelian</h4>
+                                        <p class="text-[11px] text-slate-500 mt-0.5">Pengajuan dana &amp; beli telah disetujui Finance. Anda dapat mengunggah foto bukti nota/struk belanja riil.</p>
                                     </div>
                                 </div>
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 shrink-0">
-                                    Wajib Dilaporkan
-                                </span>
                             </div>
 
                             <template x-if="activeItem?.isOwner || {{ auth()->user()->hasRole(['super_admin', 'admin']) ? 'true' : 'false' }}">
@@ -1547,14 +1544,13 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                                                Total Pengeluaran Riil (Rp) <span class="text-rose-500">*</span>
+                                                Total Pengeluaran Riil (Rp)
                                             </label>
                                             <div class="relative">
                                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-slate-400">Rp</span>
                                                 <input type="number" 
                                                        name="nominal_realisasi" 
                                                        :value="activeItem?.totalNominal" 
-                                                       required 
                                                        min="0" 
                                                        step="any"
                                                        placeholder="0"
@@ -1565,11 +1561,10 @@
 
                                         <div>
                                             <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                                                Foto Bukti Struk / Nota / Kwitansi <span class="text-rose-500">*</span>
+                                                Foto Bukti Struk / Nota / Kwitansi
                                             </label>
                                             <input type="file" 
                                                    name="bukti_realisasi" 
-                                                   required 
                                                    accept="image/*,application/pdf"
                                                    @change="
                                                        const file = $event.target.files[0];
@@ -1616,7 +1611,7 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                             </svg>
-                                            <span>Unggah Foto Bukti &amp; Selesaikan Pengajuan</span>
+                                            <span>Simpan Bukti Foto Nota</span>
                                         </button>
                                     </div>
                                 </form>

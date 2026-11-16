@@ -433,16 +433,16 @@
                     @endif
 
                     <!-- 5. Realization Submission (By Requester) -->
-                    @if ($pengajuan->status === 'dicairkan' && auth()->id() === $pengajuan->user_id)
+                    @if (in_array($pengajuan->status, ['dicairkan', 'selesai']) && auth()->id() === $pengajuan->user_id && ! $pengajuan->bukti_realisasi_path)
                     <div class="space-y-3">
                         <div class="p-3 bg-cyan-50 border border-cyan-200 rounded-xl text-cyan-900 text-xs">
-                            Dana telah dicairkan! Harap laporkan nota pengeluaran sebelum batas waktu 7 hari.
+                            Dana telah dicairkan oleh Finance. Anda dapat mengunggah bukti nota belanja di bawah ini jika diperlukan.
                         </div>
                         <form method="POST" action="{{ route('gomsn.pengajuan.realize', $pengajuan->id) }}" enctype="multipart/form-data" class="space-y-3">
                             @csrf
                             <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-1">Total Realisasi Pengeluaran (Rp) <span class="text-red-500">*</span></label>
-                                <input type="number" name="realization_amount" required min="0" placeholder="Contoh: 450000" class="w-full text-xs rounded-lg border-slate-300 py-1.5" />
+                                <label class="block text-[11px] font-medium text-slate-600 mb-1">Total Realisasi Pengeluaran (Rp)</label>
+                                <input type="number" name="realization_amount" :value="{{ (float) $pengajuan->nominal_total }}" min="0" placeholder="Contoh: 450000" class="w-full text-xs rounded-lg border-slate-300 py-1.5" />
                             </div>
                             <div>
                                 <label class="block text-[11px] font-medium text-slate-600 mb-1">Catatan Realisasi</label>
@@ -453,7 +453,7 @@
                                 <input type="file" name="realization_proof" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
                             </div>
                             <button type="submit" class="btn-primary w-full text-xs py-2 justify-center bg-cyan-700 hover:bg-cyan-800">
-                                Kirim Laporan Realisasi
+                                Simpan Nota Belanja
                             </button>
                         </form>
                     </div>

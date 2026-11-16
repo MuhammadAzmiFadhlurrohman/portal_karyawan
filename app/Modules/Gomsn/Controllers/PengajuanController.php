@@ -886,23 +886,29 @@ class PengajuanController extends Controller
         }
 
         $request->validate([
-            'nominal_realisasi' => ['required', 'numeric', 'min:0'],
-            'bukti_realisasi' => ['required', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:4096'],
+            'nominal_realisasi' => ['nullable', 'numeric', 'min:0'],
+            'bukti_realisasi' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:4096'],
             'realisasi_notes' => ['nullable', 'string'],
         ]);
 
-        $path = $request->file('bukti_realisasi')->store('gomsn/realizations', 'public');
+        $path = $request->hasFile('bukti_realisasi')
+            ? $request->file('bukti_realisasi')->store('gomsn/realizations', 'public')
+            : null;
+
+        $nominalVal = $request->filled('nominal_realisasi')
+            ? (float) $request->input('nominal_realisasi')
+            : (float) $pengajuan->nominal_total;
 
         try {
             $this->pengajuanService->uploadRealization(
                 pengajuan: $pengajuan,
                 user: $request->user(),
-                nominalRealisasi: (float) $request->input('nominal_realisasi'),
+                nominalRealisasi: $nominalVal,
                 receiptPath: $path,
                 notes: $request->input('realisasi_notes')
             );
 
-            return back()->with('success', 'Bukti foto realisasi berhasil diunggah. Pengajuan selesai.');
+            return back()->with('success', 'Bukti foto nota belanja berhasil disimpan.');
         } catch (Exception $e) {
             return back()->withErrors(['realization' => $e->getMessage()]);
         }
