@@ -325,8 +325,8 @@
                 </h1>
 
                 <!-- Subtitle / Deskripsi Sistem -->
-                <p class="text-[11.5px] sm:text-sm text-teal-50/85 leading-snug sm:leading-relaxed max-w-sm mx-auto font-normal">
-                    Sistem manajemen gangguan, tiket operasional &amp; pelaporan kerja jaringan terpadu PT Media Solusi Network.
+                <p class="text-[11.5px] sm:text-sm text-teal-50/85 leading-snug sm:leading-relaxed max-w-xs sm:max-w-sm mx-auto font-normal">
+                    Sistem Operasional &amp; Manajemen Jaringan Terpadu
                 </p>
             </div>
 
