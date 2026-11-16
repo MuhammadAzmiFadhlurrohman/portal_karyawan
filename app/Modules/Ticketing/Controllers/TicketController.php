@@ -41,7 +41,11 @@ class TicketController extends Controller
         $query = Tiket::query()->with(['assignees', 'creator', 'activeStopClock']);
 
         // Technicians see assigned tickets or CLOSED tickets (§7.2)
-        if ($user->hasRole('teknisi') && ! $user->hasRole(['super_admin', 'manager_teknisi', 'helpdesk', 'sa_cs', 'ceo', 'noc'])) {
+        $userRoleNames = $user->roles->pluck('name')->toArray();
+        $isFieldTechnicianOnly = (in_array('teknisi', $userRoleNames) || in_array('teknis', $userRoleNames) || in_array('karyawan_teknik', $userRoleNames))
+            && empty(array_intersect(['super_admin', 'admin', 'manager_teknisi', 'helpdesk', 'sa_cs', 'ceo', 'noc', 'atasan', 'atasan_teknik', 'atasan_noc'], $userRoleNames));
+
+        if ($isFieldTechnicianOnly) {
             $query->where(function ($q) use ($user) {
                 $q->whereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $user->id))
                     ->orWhere('status', 'CLOSE');
@@ -71,7 +75,7 @@ class TicketController extends Controller
         }
 
         $tickets = $query->orderBy('tanggal_open', 'desc')->paginate(15)->withQueryString();
-        $technicians = User::role('teknisi')->where('is_active', true)->get();
+        $technicians = $this->getActiveTechnicians();
         $slaMatrix = MasterSla::query()->where('is_active', true)->get();
 
         // Calculate KPI stats (§7.1, §7.7)
@@ -113,11 +117,34 @@ class TicketController extends Controller
         ]);
 
         $intervalStatus = $this->chronologyService->getIntervalStatus($tiket);
-        $technicians = User::role('teknisi')->where('is_active', true)->get();
+        $technicians = $this->getActiveTechnicians();
         $materials = MasterMaterial::query()->where('is_active', true)->get();
         $prerequisites = $this->assetService->checkClosingPrerequisites($tiket);
 
         return view('ticketing.show', compact('tiket', 'intervalStatus', 'technicians', 'materials', 'prerequisites'));
+    }
+
+    /**
+     * Get active technicians safely without throwing RoleDoesNotExist.
+     */
+    protected function getActiveTechnicians()
+    {
+        $technicians = User::query()
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereHas('roles', function ($rq) {
+                    $rq->whereIn('name', ['teknisi', 'teknis', 'karyawan_teknik', 'manager_teknisi']);
+                })
+                ->orWhere('division', 'like', '%Teknik%')
+                ->orWhere('division', 'like', '%NOC%');
+            })
+            ->get();
+
+        if ($technicians->isEmpty()) {
+            $technicians = User::query()->where('is_active', true)->get();
+        }
+
+        return $technicians;
     }
 
     /**

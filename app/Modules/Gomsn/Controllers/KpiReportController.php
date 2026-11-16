@@ -35,11 +35,21 @@ class KpiReportController extends Controller
         $slaComplianceRate = $totalClosed > 0 ? round(($onTimeCount / $totalClosed) * 100, 1) : 0;
         $avgMttr = $totalClosed > 0 ? round($closedTickets->avg('net_mttr_minutes')) : 0;
 
-        // 2. Technicians KPI Ranking
+        // 2. Technicians KPI Ranking safely without hardcoded Spatie role exception
         $technicians = User::query()
-            ->role('teknisi')
             ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereHas('roles', function ($rq) {
+                    $rq->whereIn('name', ['teknisi', 'teknis', 'karyawan_teknik', 'manager_teknisi']);
+                })
+                ->orWhere('division', 'like', '%Teknik%')
+                ->orWhere('division', 'like', '%NOC%');
+            })
             ->get();
+
+        if ($technicians->isEmpty()) {
+            $technicians = User::query()->where('is_active', true)->get();
+        }
 
         $kpiList = [];
         foreach ($technicians as $tech) {
