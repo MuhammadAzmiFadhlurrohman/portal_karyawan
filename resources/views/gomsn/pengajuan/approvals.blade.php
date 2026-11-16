@@ -130,7 +130,7 @@
                 <!-- Row 1: Dropdown Semua Jenis, Semua Divisi, Bulan, Tahun, Tombol Filter, Refresh & Export Excel -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2.5">
                     <!-- Dropdown Jenis -->
-                    <div class="col-span-1 lg:w-40">
+                    <div class="col-span-1 lg:w-36">
                         <select name="jenis" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
                             <option value="">Semua Jenis</option>
                             <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
@@ -140,8 +140,23 @@
                         </select>
                     </div>
 
-                    <!-- Dropdown Divisi -->
+                    <!-- Dropdown Status -->
                     <div class="col-span-1 lg:w-40">
+                        <select name="status" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
+                            <option value="all">Semua Status</option>
+                            <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
+                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Disetujui Atasan</option>
+                            <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
+                            <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
+                            <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
+                            <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
+                            <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                    </div>
+
+                    <!-- Dropdown Divisi -->
+                    <div class="col-span-1 lg:w-36">
                         <select name="divisi" class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 focus:ring-teal-700 focus:border-teal-700 bg-white font-medium text-slate-700">
                             <option value="">Semua Divisi</option>
                             @foreach (($divisions ?? collect()) as $div)
