@@ -340,14 +340,8 @@
             </div>
 
             <!-- Bottom Brand Text -->
-            <div class="relative z-10 pt-2 pb-0.5 flex items-center justify-between text-[10.5px] sm:text-[11px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 lg:mb-0">
+            <div class="relative z-10 pt-2 pb-0.5 flex items-center justify-center text-[10.5px] sm:text-[11px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 lg:mb-0">
                 <span>PT MEDIA SOLUSI NETWORK</span>
-                <span class="inline-flex items-center gap-1 normal-case font-medium text-teal-300/70 text-[10.5px]">
-                    <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                    </svg>
-                    256-Bit SSL
-                </span>
             </div>
         </div>
 
