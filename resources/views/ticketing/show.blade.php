@@ -3566,6 +3566,12 @@ function toggleChatFullscreen() {
         if (fsLabel) fsLabel.innerText = 'Full Size';
         document.body.style.overflow = '';
         adjustChatHeight();
+
+        // Pastikan tetap di tab Kronologis (chat) dan scroll ke chat container
+        switchTab('tab-chronology');
+        setTimeout(() => {
+            chatCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
     }
 
     const chatBox = document.getElementById('chat-stream-box');
