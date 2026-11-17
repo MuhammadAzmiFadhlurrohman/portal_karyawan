@@ -225,7 +225,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
         @forelse($tickets as $ticket)
             @php
-                // Border & Left Stripe matched to Ticket Status
+                // Status Theme Colors: Left Stripe, Border Accent & Live Pulsing Dot
                 $statusStripeBg = match($ticket->status) {
                     'CLOSE' => 'bg-emerald-500',
                     'PROSES' => 'bg-amber-400',
@@ -236,137 +236,164 @@
                 };
 
                 $statusBorderClass = match($ticket->status) {
-                    'CLOSE' => 'border-emerald-300/90 hover:border-emerald-400',
-                    'PROSES' => 'border-amber-300/90 hover:border-amber-400',
-                    'PENDING_VERIFIKASI' => 'border-purple-300/90 hover:border-purple-400',
-                    'REOPENED' => 'border-rose-300/90 hover:border-rose-400',
-                    'CANCELLED' => 'border-slate-300/90 hover:border-slate-400',
-                    default => 'border-teal-300/90 hover:border-teal-400', // OPEN
+                    'CLOSE' => 'border-emerald-200/90 hover:border-emerald-400/90 hover:shadow-emerald-500/5',
+                    'PROSES' => 'border-amber-200/90 hover:border-amber-400/90 hover:shadow-amber-500/5',
+                    'PENDING_VERIFIKASI' => 'border-purple-200/90 hover:border-purple-400/90 hover:shadow-purple-500/5',
+                    'REOPENED' => 'border-rose-200/90 hover:border-rose-400/90 hover:shadow-rose-500/5',
+                    'CANCELLED' => 'border-slate-200/90 hover:border-slate-400/90',
+                    default => 'border-teal-200/90 hover:border-teal-400/90 hover:shadow-teal-500/5', // OPEN
                 };
 
                 $statusBadgeClass = match($ticket->status) {
-                    'CLOSE' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                    'PROSES' => 'bg-amber-100 text-amber-800 border-amber-200',
-                    'PENDING_VERIFIKASI' => 'bg-purple-100 text-purple-800 border-purple-200',
-                    'REOPENED' => 'bg-rose-100 text-rose-800 border-rose-200',
+                    'CLOSE' => 'bg-emerald-50 text-emerald-800 border-emerald-200/90',
+                    'PROSES' => 'bg-amber-50 text-amber-800 border-amber-200/90',
+                    'PENDING_VERIFIKASI' => 'bg-purple-50 text-purple-800 border-purple-200/90',
+                    'REOPENED' => 'bg-rose-50 text-rose-800 border-rose-200/90',
                     'CANCELLED' => 'bg-slate-100 text-slate-700 border-slate-200',
-                    default => 'bg-teal-100 text-teal-800 border-teal-200', // OPEN
+                    default => 'bg-teal-50 text-teal-800 border-teal-200/90', // OPEN
+                };
+
+                $statusDotBg = match($ticket->status) {
+                    'CLOSE' => 'bg-emerald-500',
+                    'PROSES' => 'bg-amber-500',
+                    'PENDING_VERIFIKASI' => 'bg-purple-500',
+                    'REOPENED' => 'bg-rose-500',
+                    'CANCELLED' => 'bg-slate-400',
+                    default => 'bg-teal-500', // OPEN
                 };
 
                 $lead = $ticket->assignees->firstWhere('pivot.role_in_team', 'lead');
                 $slaHours = round($ticket->sla_target_minutes / 60, 1);
             @endphp
-            <div class="relative bg-white rounded-2xl border {{ $statusBorderClass }} shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between group">
-                <!-- Status Accent Stripe on Left Border -->
-                <div class="absolute top-0 bottom-0 left-0 w-1.5 {{ $statusStripeBg }}"></div>
+            <div class="relative bg-white rounded-2xl border {{ $statusBorderClass }} shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden flex flex-col justify-between group">
+                <!-- Status Accent Stripe on Left Border (Slim 4px, clipped smoothly by rounded-2xl) -->
+                <div class="absolute top-0 bottom-0 left-0 w-1 {{ $statusStripeBg }}"></div>
 
-                <div class="p-3.5 pl-4 sm:p-4 sm:pl-5 space-y-2.5">
-                    <!-- Row 1: Category, Priority & Status Badges -->
+                <div class="p-3.5 pl-4 sm:p-4 sm:pl-4.5 space-y-2.5">
+                    <!-- Row 1: Category, Priority & Live Status Badges -->
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-1.5 min-w-0">
-                            <span class="px-2 py-0.5 rounded-md text-[9.5px] font-bold tracking-wider font-mono uppercase
-                                {{ $ticket->kategori_tiket === 'BACKBONE' ? 'bg-cyan-50 text-cyan-800 border border-cyan-200/80' : 'bg-emerald-50 text-emerald-800 border border-emerald-200/80' }}">
-                                {{ $ticket->kategori_tiket }}
-                            </span>
-                            <span class="px-2 py-0.5 rounded-md text-[9.5px] font-bold
-                                {{ $ticket->priority === 'P1' ? 'bg-red-100 text-red-700 border border-red-200' : ($ticket->priority === 'P2' ? 'bg-amber-100 text-amber-800 border border-amber-200' : ($ticket->priority === 'P3' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-slate-100 text-slate-700 border border-slate-200')) }}">
+                            @if($ticket->kategori_tiket === 'BACKBONE')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-bold font-mono tracking-wider uppercase bg-cyan-50/90 text-cyan-800 border border-cyan-200/80">
+                                    <svg class="w-2.5 h-2.5 text-cyan-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                    <span>BACKBONE</span>
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9.5px] font-bold font-mono tracking-wider uppercase bg-emerald-50/90 text-emerald-800 border border-emerald-200/80">
+                                    <svg class="w-2.5 h-2.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/></svg>
+                                    <span>BROADBAND</span>
+                                </span>
+                            @endif
+
+                            <span class="px-1.5 py-0.5 rounded-md text-[9.5px] font-bold
+                                {{ $ticket->priority === 'P1' ? 'bg-rose-50 text-rose-700 border border-rose-200/80' : ($ticket->priority === 'P2' ? 'bg-amber-50 text-amber-800 border border-amber-200/80' : ($ticket->priority === 'P3' ? 'bg-sky-50 text-sky-800 border border-sky-200/80' : 'bg-slate-100 text-slate-700 border border-slate-200')) }}">
                                 {{ $ticket->priority }}
                             </span>
                         </div>
 
-                        <span class="px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase border tracking-wide shrink-0 {{ $statusBadgeClass }}">
-                            {{ str_replace('_', ' ', $ticket->status) }}
+                        <!-- Live Status Pill with Pulsing Indicator Dot -->
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase tracking-wider border shrink-0 {{ $statusBadgeClass }}">
+                            <span class="w-1.5 h-1.5 rounded-full {{ $statusDotBg }} {{ $ticket->status === 'PROSES' || $ticket->status === 'OPEN' ? 'animate-pulse' : '' }}"></span>
+                            <span>{{ str_replace('_', ' ', $ticket->status) }}</span>
                         </span>
                     </div>
 
-                    <!-- Row 2: Ticket Number & Main Subject -->
+                    <!-- Row 2: Ticket Number & Problem Context -->
                     <div>
-                        <a href="{{ route('tickets.show', $ticket) }}" class="font-heading font-extrabold text-sm sm:text-[15px] text-slate-800 hover:text-[#0D9488] transition flex items-center justify-between gap-2 tracking-tight leading-snug">
-                            <span>{{ $ticket->no_tiket }}</span>
-                            <span class="text-[10px] font-mono font-normal text-slate-400">#{{ $ticket->id }}</span>
-                        </a>
-                        <p class="text-xs font-bold text-slate-700 truncate mt-0.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <a href="{{ route('tickets.show', $ticket) }}" class="font-heading font-black text-sm sm:text-[15px] text-slate-900 group-hover:text-[#0D9488] transition tracking-tight">
+                                {{ $ticket->no_tiket }}
+                            </a>
+                            <span class="text-[10px] font-mono font-medium text-slate-400 bg-slate-100/80 px-1.5 py-0.2 rounded shrink-0">#{{ $ticket->id }}</span>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-600 truncate mt-0.5">
                             @if($ticket->kategori_tiket === 'BACKBONE')
-                                {{ $ticket->backbone_segment ?? '-' }}
+                                <span class="text-slate-400 font-normal">Segmen:</span> <span class="text-slate-800 font-medium">{{ $ticket->backbone_segment ?? '-' }}</span>
                             @else
-                                {{ $ticket->customer_name ?? '-' }}
+                                <span class="text-slate-400 font-normal">Pelanggan:</span> <span class="text-slate-800 font-medium">{{ $ticket->customer_name ?? '-' }}</span>
                             @endif
                         </p>
                     </div>
 
-                    <!-- Row 3: Compact Info Box (2-Column Grid for Quick Scanning) -->
-                    <div class="bg-slate-50/80 rounded-xl px-2.5 py-2 border border-slate-100 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
+                    <!-- Row 3: Refined Data Strip (Dampak & Area + Waktu Buka) -->
+                    <div class="bg-slate-50/70 rounded-xl px-3 py-2 border border-slate-100/90 flex items-center justify-between gap-2 text-[11px]">
                         @if($ticket->kategori_tiket === 'BACKBONE')
                             <div class="min-w-0">
-                                <span class="text-[9.5px] uppercase font-bold text-slate-400 block leading-none">Dampak &amp; Area</span>
-                                <span class="font-bold text-[11px] truncate block mt-0.5 {{ $ticket->status_link_impact === 'TOTAL_DOWN' ? 'text-rose-600' : 'text-amber-600' }}">
-                                    {{ str_replace('_', ' ', $ticket->status_link_impact ?? '-') }} ({{ $ticket->wilayah ?? '-' }})
-                                </span>
+                                <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">Dampak &amp; Area</span>
+                                <div class="flex items-center gap-1.5 mt-0.5 truncate">
+                                    <span class="w-1.5 h-1.5 rounded-full shrink-0 {{ $ticket->status_link_impact === 'TOTAL_DOWN' ? 'bg-rose-500 animate-pulse' : 'bg-amber-500' }}"></span>
+                                    <span class="font-bold text-[11px] truncate {{ $ticket->status_link_impact === 'TOTAL_DOWN' ? 'text-rose-600' : 'text-amber-600' }}">
+                                        {{ str_replace('_', ' ', $ticket->status_link_impact ?? '-') }}
+                                    </span>
+                                    <span class="text-slate-400 text-[10px]">({{ $ticket->wilayah ?? '-' }})</span>
+                                </div>
                             </div>
                         @else
                             <div class="min-w-0">
-                                <span class="text-[9.5px] uppercase font-bold text-slate-400 block leading-none">CID / ODP</span>
-                                <span class="font-mono font-semibold text-slate-700 text-[11px] truncate block mt-0.5">
-                                    {{ $ticket->customer_id ?? 'Non-CID' }} · {{ $ticket->customer_odp ?? '-' }}
-                                </span>
+                                <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">CID / ODP</span>
+                                <div class="font-mono font-semibold text-slate-700 text-[11px] truncate mt-0.5">
+                                    {{ $ticket->customer_id ?? 'Non-CID' }} <span class="text-slate-300">&bull;</span> {{ $ticket->customer_odp ?? '-' }}
+                                </div>
                             </div>
                         @endif
 
-                        <div class="min-w-0 text-right">
-                            <span class="text-[9.5px] uppercase font-bold text-slate-400 block leading-none">Waktu Buka</span>
-                            <span class="font-mono font-medium text-slate-700 text-[10.5px] truncate block mt-0.5">
+                        <div class="text-right shrink-0">
+                            <span class="text-[9px] uppercase font-bold text-slate-400 block leading-tight">Waktu Buka</span>
+                            <span class="font-mono text-slate-600 text-[10.5px] block mt-0.5">
                                 {{ $ticket->tanggal_open ? $ticket->tanggal_open->timezone('Asia/Jakarta')->format('d M, H:i') : '-' }} WIB
                             </span>
                         </div>
                     </div>
 
-                    <!-- Row 4: Compact SLA Status & Target Pill -->
-                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                    <!-- Row 4: Compact SLA Status & Target -->
+                    <div class="flex items-center justify-between gap-2 text-[11px] pt-0.5">
                         <span class="text-slate-500 font-medium">
-                            Target SLA: <strong class="text-slate-700 font-mono">{{ $ticket->sla_target_minutes }}m ({{ $slaHours }}j)</strong>
+                            Target SLA: <strong class="text-slate-800 font-mono font-bold">{{ $ticket->sla_target_minutes }}m</strong> <span class="text-slate-400 text-[10px]">({{ $slaHours }}j)</span>
                         </span>
 
                         @if($ticket->activeStopClock)
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold truncate max-w-[160px]">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200/80 text-amber-800 text-[10px] font-bold truncate max-w-[150px]" title="Jeda: {{ $ticket->activeStopClock->reason }}">
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping shrink-0"></span>
                                 <span class="truncate">Jeda: {{ $ticket->activeStopClock->reason }}</span>
                             </span>
                         @elseif($ticket->isOverdue() && $ticket->status !== 'CLOSE')
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold shrink-0">
-                                <span>⚠️ Overdue SLA</span>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200/80 text-rose-700 text-[10px] font-bold shrink-0">
+                                <svg class="w-3 h-3 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <span>Overdue SLA</span>
                             </span>
                         @elseif($ticket->sla_status)
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ $ticket->sla_status === 'TEPAT' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200' }}">
-                                SLA {{ $ticket->sla_status }} ({{ $ticket->net_mttr_minutes }}m)
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 {{ $ticket->sla_status === 'TEPAT' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-rose-50 text-rose-700 border border-rose-200/80' }}">
+                                <span>{{ $ticket->sla_status === 'TEPAT' ? '✓' : '✕' }} SLA {{ $ticket->sla_status }} ({{ $ticket->net_mttr_minutes }}m)</span>
                             </span>
                         @else
-                            <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/70 text-[10px] font-semibold shrink-0">
-                                On-Track
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200/70 text-[10px] font-semibold shrink-0">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                                <span>On-Track</span>
                             </span>
                         @endif
                     </div>
                 </div>
 
                 <!-- Card Footer: PIC & Detail Action -->
-                <div class="bg-slate-50/70 px-3.5 py-2 pl-4 sm:px-4 sm:pl-5 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <div class="w-5 h-5 rounded-full bg-teal-100/80 border border-teal-200 flex items-center justify-center font-bold text-[9.5px] text-teal-900 uppercase shrink-0">
-                            {{ $lead ? substr($lead->name, 0, 1) : '?' }}
+                <div class="bg-slate-50/70 px-3.5 py-2.5 pl-4 sm:px-4 sm:pl-4.5 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <div class="w-5.5 h-5.5 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center font-bold text-[9.5px] uppercase shadow-2xs shrink-0 select-none">
+                            {{ $lead ? strtoupper(substr($lead->name, 0, 1)) : '?' }}
                         </div>
-                        <span class="text-slate-700 font-semibold truncate max-w-[125px]">
+                        <span class="text-slate-700 font-semibold truncate max-w-[125px] text-[11px]">
                             {{ $lead ? $lead->name : 'Belum ditugaskan' }}
                         </span>
                         @if($ticket->assignees->count() > 1)
-                            <span class="px-1.5 py-0.2 rounded bg-slate-200/70 text-slate-600 text-[9.5px] font-bold shrink-0">
+                            <span class="px-1.5 py-0.2 rounded-full bg-slate-200/70 text-slate-600 text-[9px] font-bold shrink-0" title="{{ $ticket->assignees->count() }} Anggota Tim">
                                 +{{ $ticket->assignees->count() - 1 }}
                             </span>
                         @endif
                     </div>
 
                     <a href="{{ route('tickets.show', $ticket) }}"
-                       class="text-[#0D9488] group-hover:text-[#096a62] font-bold inline-flex items-center gap-1 transition shrink-0">
+                       class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-bold text-[#0D9488] hover:text-[#096a62] hover:bg-teal-50 transition-all shrink-0">
                         <span>Detail</span>
-                        <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 </div>
             </div>
