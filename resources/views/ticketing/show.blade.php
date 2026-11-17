@@ -2954,6 +2954,15 @@ async function handleChatFormSubmit(e) {
     const replySender = document.getElementById('chron_reply_sender')?.value;
     const replySnippet = document.getElementById('chron_reply_snippet')?.value;
 
+    const submitBtn = document.getElementById('btn-quick-chat-submit');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+    }
+
+    // Capture form values into FormData BEFORE resetting inputs!
+    const formData = new FormData(form);
+
     // Append optimistic message bubble with pending CLOCK icon (🕒)
     const stream = document.getElementById('chat-stream-container') || document.getElementById('chat-stream-box');
     const scrollBox = document.getElementById('chat-stream-box');
@@ -3039,14 +3048,7 @@ async function handleChatFormSubmit(e) {
     clearAttachedPhoto();
     cancelReply();
 
-    const submitBtn = document.getElementById('btn-quick-chat-submit');
-    if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-    }
-
     try {
-        const formData = new FormData(form);
         const res = await fetch(form.action, {
             method: 'POST',
             headers: {
