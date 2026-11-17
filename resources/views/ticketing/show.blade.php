@@ -3238,7 +3238,8 @@ async function handleChatFormSubmit(e) {
 
         if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.message || 'Gagal mengirim pesan');
+            const errMsg = errData.message || (res.status === 403 ? 'Anda tidak memiliki hak akses untuk mengirim pesan pada tiket ini (AC-05: Khusus teknisi tim penanganan / PIC).' : (res.status === 419 ? 'Sesi login telah kedaluwarsa, silakan muat ulang halaman.' : `Gagal mengirim pesan (HTTP ${res.status})`));
+            throw new Error(errMsg);
         }
 
         const data = await res.json();
@@ -3289,10 +3290,13 @@ async function handleChatFormSubmit(e) {
             const statusSpan = tempBubbleRow.querySelector('.status-indicator');
             if (statusSpan) {
                 statusSpan.title = 'Gagal terkirim: ' + err.message;
-                statusSpan.className = 'status-indicator inline-flex items-center text-rose-500 ml-0.5 font-bold';
+                statusSpan.className = 'status-indicator inline-flex items-center text-rose-500 ml-0.5 font-bold cursor-pointer';
+                statusSpan.onclick = () => alert('Pesan tidak dapat terkirim:\n' + err.message);
                 statusSpan.innerHTML = `⚠️`;
             }
         }
+        // Tampilkan notifikasi error agar user langsung tahu penyebabnya
+        alert(err.message || 'Gagal mengirim pesan');
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
