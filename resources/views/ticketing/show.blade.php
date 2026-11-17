@@ -834,11 +834,13 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 min-h-0 overflow-y-auto relative"
-                 style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
+            <div id="chat-stream-box" class="p-3.5 sm:p-6 flex-1 min-h-0 overflow-y-auto relative"
+                 style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
                 
-                <!-- Date divider (WhatsApp Floating Pill) -->
-                <div class="flex justify-center sticky top-0 z-10 py-1">
+                <!-- Inner Centered Conversation Thread (WhatsApp Web Style) -->
+                <div id="chat-stream-container" class="max-w-4xl mx-auto w-full space-y-3.5 sm:space-y-4">
+                    <!-- Date divider (WhatsApp Floating Pill) -->
+                    <div class="flex justify-center sticky top-0 z-10 py-1">
                     <span class="px-3.5 py-1 rounded-lg text-[11px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
@@ -1004,51 +1006,55 @@
                         </div>
                     </div>
                 @endforelse
+                </div>
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
-            <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto flex items-center gap-1.5 sm:gap-2 text-xs scrollbar-none shrink-0"
+            <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
-                <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
-                
-                <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    📍 Menuju lokasi
-                </button>
-                <button type="button" onclick="setQuickChip('🔍 Investigasi titik & pengukuran OTDR', 'OTDR')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    🔍 Investigasi &amp; OTDR
-                </button>
-                <button type="button" onclick="setQuickChip('✂️ Ditemukan kabel putus / bending core pada span', 'INVESTIGASI')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    ✂️ Kabel putus / bending
-                </button>
-                <button type="button" onclick="setQuickChip('⚡ Sedang proses splicing core di Joint Closure', 'JOINTING')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    ⚡ Proses splicing core
-                </button>
-                <button type="button" onclick="setQuickChip('📊 Pengukuran redaman optik selesai', 'OTDR')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    📊 Ukur redaman optik
-                </button>
-                <button type="button" onclick="setQuickChip('✅ Redaman normal & Link UP kembali', 'LINK_UP')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    ✅ Redaman normal &amp; Link UP
-                </button>
-                <button type="button" onclick="setQuickChip('⚠️ Kendala di lapangan, memerlukan manuver core', 'LAIN')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    ⚠️ Kendala / butuh manuver
-                </button>
-                <button type="button" onclick="setQuickChip('📷 Dokumentasi hasil perbaikan lapangan terlampir', 'SELESAI')"
-                        class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                    📷 Dokumentasi perbaikan
-                </button>
+                <div class="max-w-4xl mx-auto w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
+                    <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
+                    
+                    <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        📍 Menuju lokasi
+                    </button>
+                    <button type="button" onclick="setQuickChip('🔍 Investigasi titik & pengukuran OTDR', 'OTDR')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        🔍 Investigasi &amp; OTDR
+                    </button>
+                    <button type="button" onclick="setQuickChip('✂️ Ditemukan kabel putus / bending core pada span', 'INVESTIGASI')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        ✂️ Kabel putus / bending
+                    </button>
+                    <button type="button" onclick="setQuickChip('⚡ Sedang proses splicing core di Joint Closure', 'JOINTING')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        ⚡ Proses splicing core
+                    </button>
+                    <button type="button" onclick="setQuickChip('📊 Pengukuran redaman optik selesai', 'OTDR')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        📊 Ukur redaman optik
+                    </button>
+                    <button type="button" onclick="setQuickChip('✅ Redaman normal & Link UP kembali', 'LINK_UP')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        ✅ Redaman normal &amp; Link UP
+                    </button>
+                    <button type="button" onclick="setQuickChip('⚠️ Kendala di lapangan, memerlukan manuver core', 'LAIN')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        ⚠️ Kendala / butuh manuver
+                    </button>
+                    <button type="button" onclick="setQuickChip('📷 Dokumentasi hasil perbaikan lapangan terlampir', 'SELESAI')"
+                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                        📷 Dokumentasi perbaikan
+                    </button>
+                </div>
             </div>
 
             <!-- Chat Input Bar (matching Image 3 & Attachment Menu) -->
             <form id="quick-chat-form" method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
                   onsubmit="handleChatFormSubmit(event)"
-                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5 shrink-0 relative">
+                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 shrink-0 relative">
+                <div class="max-w-4xl mx-auto w-full flex items-center gap-2 sm:gap-2.5">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
                 <input type="hidden" name="latitude" id="chron_lat">
@@ -1209,6 +1215,7 @@
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
+                </div>
             </form>
         </div>
     </div>
@@ -2247,7 +2254,8 @@ function handleChatFormSubmit(e) {
     }
 
     // Append optimistic message bubble with pending CLOCK icon (🕒)
-    const stream = document.getElementById('chat-stream-box');
+    const stream = document.getElementById('chat-stream-container') || document.getElementById('chat-stream-box');
+    const scrollBox = document.getElementById('chat-stream-box');
     if (stream) {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -2296,7 +2304,7 @@ function handleChatFormSubmit(e) {
             </div>
         `;
         stream.appendChild(bubble);
-        stream.scrollTop = stream.scrollHeight;
+        if (scrollBox) scrollBox.scrollTop = scrollBox.scrollHeight;
     }
 
     const submitBtn = document.getElementById('btn-quick-chat-submit');
