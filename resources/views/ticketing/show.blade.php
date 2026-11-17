@@ -28,48 +28,50 @@
     <!-- ========================================================================= -->
     <!-- 1. TOP HEADER BANNER (Futuristic Metallic Ocean Teal matching Dashboard) -->
     <!-- ========================================================================= -->
-    <div class="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 sm:py-5 sm:px-6 text-white border border-teal-500/30 shadow-[0_8px_30px_rgba(2,40,54,0.45)] select-none"
+    <div class="relative rounded-2xl md:rounded-3xl p-4 sm:py-5 sm:px-6 text-white border border-teal-500/30 shadow-[0_8px_30px_rgba(2,40,54,0.45)] select-none z-20"
          style="background: radial-gradient(100% 140% at 15% 20%, #093d40 0%, #05282b 55%, #021619 100%);">
         
-        <!-- SVG Geometric Tech Contours, Diagonal Glass Bars & Dot Grids (Matching Dashboard Hero) -->
-        <svg class="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 1100 240" fill="none" preserveAspectRatio="none">
-            <defs>
-                <linearGradient id="tktHdrDiag1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.30"/>
-                    <stop offset="60%" stop-color="#14b8a6" stop-opacity="0.10"/>
-                    <stop offset="100%" stop-color="#04272a" stop-opacity="0"/>
-                </linearGradient>
-                <linearGradient id="tktHdrDiag2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.18"/>
-                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0"/>
-                </linearGradient>
-                <linearGradient id="tktHdrArc" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.40"/>
-                    <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.18"/>
-                    <stop offset="100%" stop-color="#042f2e" stop-opacity="0.04"/>
-                </linearGradient>
-                <pattern id="tktHdrDots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
-                    <circle cx="2" cy="2" r="1.2" fill="#5eead4" fill-opacity="0.25"/>
-                </pattern>
-            </defs>
-            <!-- Diagonal Glass Accent Bars -->
-            <path d="M -60 -30 L 70 -30 L -15 180 L -145 180 Z" fill="url(#tktHdrDiag1)"/>
-            <path d="M -15 -30 L 35 -30 L -65 190 L -115 190 Z" fill="url(#tktHdrDiag2)"/>
-            <!-- Right Subtle Wave Flare -->
-            <path d="M 750 0 C 830 80, 910 120, 1100 160 L 1100 0 Z" fill="url(#tktHdrDiag1)" opacity="0.35"/>
-            <!-- Concentric Rims -->
-            <circle cx="950" cy="120" r="190" stroke="url(#tktHdrArc)" stroke-width="1.2" opacity="0.45"/>
-            <circle cx="950" cy="120" r="250" stroke="url(#tktHdrArc)" stroke-width="0.9" stroke-dasharray="6 5" opacity="0.3"/>
-            <!-- Dot Matrix Grids -->
-            <rect x="990" y="16" width="72" height="38" fill="url(#tktHdrDots)"/>
-            <rect x="20" y="180" width="72" height="38" fill="url(#tktHdrDots)"/>
-        </svg>
+        <!-- SVG Geometric Tech Contours, Diagonal Glass Bars & Dot Grids (Clipped in an absolute overlay so it never clips dropdowns) -->
+        <div class="absolute inset-0 rounded-2xl md:rounded-3xl overflow-hidden pointer-events-none z-0">
+            <svg class="w-full h-full" viewBox="0 0 1100 240" fill="none" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="tktHdrDiag1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.30"/>
+                        <stop offset="60%" stop-color="#14b8a6" stop-opacity="0.10"/>
+                        <stop offset="100%" stop-color="#04272a" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="tktHdrDiag2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#5eead4" stop-opacity="0.18"/>
+                        <stop offset="100%" stop-color="#0d9488" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="tktHdrArc" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#5eead4" stop-opacity="0.40"/>
+                        <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.18"/>
+                        <stop offset="100%" stop-color="#042f2e" stop-opacity="0.04"/>
+                    </linearGradient>
+                    <pattern id="tktHdrDots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                        <circle cx="2" cy="2" r="1.2" fill="#5eead4" fill-opacity="0.25"/>
+                    </pattern>
+                </defs>
+                <!-- Diagonal Glass Accent Bars -->
+                <path d="M -60 -30 L 70 -30 L -15 180 L -145 180 Z" fill="url(#tktHdrDiag1)"/>
+                <path d="M -15 -30 L 35 -30 L -65 190 L -115 190 Z" fill="url(#tktHdrDiag2)"/>
+                <!-- Right Subtle Wave Flare -->
+                <path d="M 750 0 C 830 80, 910 120, 1100 160 L 1100 0 Z" fill="url(#tktHdrDiag1)" opacity="0.35"/>
+                <!-- Concentric Rims -->
+                <circle cx="950" cy="120" r="190" stroke="url(#tktHdrArc)" stroke-width="1.2" opacity="0.45"/>
+                <circle cx="950" cy="120" r="250" stroke="url(#tktHdrArc)" stroke-width="0.9" stroke-dasharray="6 5" opacity="0.3"/>
+                <!-- Dot Matrix Grids -->
+                <rect x="990" y="16" width="72" height="38" fill="url(#tktHdrDots)"/>
+                <rect x="20" y="180" width="72" height="38" fill="url(#tktHdrDots)"/>
+            </svg>
 
-        <!-- Ambient Glow Orbs -->
-        <div class="absolute -left-16 -top-16 w-52 h-52 rounded-full bg-teal-400/15 blur-3xl pointer-events-none z-0"></div>
-        <div class="absolute right-1/4 -bottom-16 w-60 h-60 rounded-full bg-cyan-400/12 blur-3xl pointer-events-none z-0"></div>
-        <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none z-10"></div>
-        <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/30 to-transparent pointer-events-none z-10"></div>
+            <!-- Ambient Glow Orbs -->
+            <div class="absolute -left-16 -top-16 w-52 h-52 rounded-full bg-teal-400/15 blur-3xl"></div>
+            <div class="absolute right-1/4 -bottom-16 w-60 h-60 rounded-full bg-cyan-400/12 blur-3xl"></div>
+            <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent"></div>
+            <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/30 to-transparent"></div>
+        </div>
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <!-- Left Info Area -->
@@ -176,7 +178,7 @@
                          x-transition:leave="transition ease-in duration-100"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-2 z-50 text-slate-800 divide-y divide-slate-100">
+                         class="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] border border-slate-200/90 py-2 z-[60] text-slate-800 divide-y divide-slate-100">
                         
                         <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                             Aksi Tiket
