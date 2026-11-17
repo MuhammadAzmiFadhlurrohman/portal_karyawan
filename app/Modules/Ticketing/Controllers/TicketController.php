@@ -5,6 +5,7 @@ namespace App\Modules\Ticketing\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\MasterMaterial;
 use App\Models\MasterSla;
+use App\Models\TicketChronology;
 use App\Models\Tiket;
 use App\Models\User;
 use App\Modules\Ticketing\Services\ChronologyService;
@@ -138,6 +139,14 @@ class TicketController extends Controller
     public function show(Request $request, Tiket $tiket): View
     {
         Gate::authorize('view', $tiket);
+
+        // Mark incoming chronologies as read (§WhatsApp read receipt)
+        if ($request->user()) {
+            TicketChronology::where('tiket_id', $tiket->id)
+                ->where('user_id', '!=', $request->user()->id)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
 
         $tiket->load([
             'assignees',

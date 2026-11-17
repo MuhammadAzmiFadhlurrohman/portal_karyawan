@@ -893,6 +893,16 @@
                         if ($chron->latitude && $chron->longitude && str_starts_with(trim((string)$displayMessage), '📍 Lokasi Saya saat ini: https://maps.google.com/')) {
                             $displayMessage = null;
                         }
+
+                        // WhatsApp read status:
+                        // 1. Explicit read_at timestamp populated
+                        // 2. Or there exists a subsequent chronology from someone else in this ticket
+                        $isRead = !empty($chron->read_at);
+                        if (!$isRead && $isSelf) {
+                            $isRead = $tiket->chronologies->contains(function ($other) use ($chron) {
+                                return $other->id > $chron->id && $other->user_id !== $chron->user_id;
+                            });
+                        }
                     @endphp
                     <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1.5">
                         <div style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
@@ -961,12 +971,28 @@
                                 </a>
                             @endif
 
-                            <!-- Timestamp at bottom right (Matching User Attachment Image 2) -->
-                            <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-1">
+                            <!-- Timestamp & WhatsApp status indicators -->
+                            <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-1 select-none">
                                 <span>{{ $chron->created_at->format('H:i') }} WIB</span>
-                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
-                                </svg>
+                                @if($isSelf)
+                                    @if($isRead)
+                                        <!-- Double Blue Checkmark (Dibaca) -->
+                                        <span title="Dibaca" class="inline-flex items-center text-[#53bdeb] ml-0.5" aria-label="Dibaca">
+                                            <svg class="w-4 h-3.5 text-[#53bdeb]" viewBox="0 0 16 11" fill="none">
+                                                <path d="M11 1.5L4.5 8L1.5 5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M14.5 1.5L8 8L6.5 6.5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                    @else
+                                        <!-- Double Grey Checkmark (Terkirim) -->
+                                        <span title="Terkirim" class="inline-flex items-center text-slate-400 ml-0.5" aria-label="Terkirim">
+                                            <svg class="w-4 h-3.5 text-slate-400" viewBox="0 0 16 11" fill="none">
+                                                <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                    @endif
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -1020,7 +1046,8 @@
             </div>
 
             <!-- Chat Input Bar (matching Image 3 & Attachment Menu) -->
-            <form method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
+            <form id="quick-chat-form" method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
+                  onsubmit="handleChatFormSubmit(event)"
                   class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5 shrink-0 relative">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
@@ -1177,6 +1204,7 @@
 
                 <!-- Submit Send Button -->
                 <button type="submit"
+                        id="btn-quick-chat-submit"
                         class="w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
@@ -2200,6 +2228,88 @@ function switchTab(tabId) {
             chatBox.scrollTop = chatBox.scrollHeight;
         }
     }
+}
+
+function handleChatFormSubmit(e) {
+    const input = document.getElementById('quick-chat-input');
+    const msg = input ? input.value.trim() : '';
+    const lat = document.getElementById('chron_lat')?.value;
+    const lng = document.getElementById('chron_lng')?.value;
+    const mediaInput = document.getElementById('input_upload_media');
+    const videoInput = document.getElementById('input_record_video');
+    const hasMedia = (mediaInput && mediaInput.files && mediaInput.files.length > 0) ||
+                     (videoInput && videoInput.files && videoInput.files.length > 0);
+
+    // If nothing entered or attached, do not submit
+    if (!msg && !lat && !hasMedia) {
+        e.preventDefault();
+        return;
+    }
+
+    // Append optimistic message bubble with pending CLOCK icon (🕒)
+    const stream = document.getElementById('chat-stream-box');
+    if (stream) {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes} WIB`;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'flex justify-end my-1.5 opacity-90 transition-opacity';
+        
+        let mediaNotice = '';
+        if (hasMedia) {
+            mediaNotice = `<div class="p-2 rounded-xl bg-sky-100/70 text-sky-800 text-[11px] font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-sky-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+                <span>Mengunggah berkas media...</span>
+            </div>`;
+        }
+
+        let locNotice = '';
+        if (lat && lng) {
+            locNotice = `<div class="p-2 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 text-[11px] font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                <span>Lokasi: ${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)}</span>
+            </div>`;
+        }
+
+        bubble.innerHTML = `
+            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
+                 class="max-w-xl rounded-2xl rounded-tr-xs p-3 sm:p-3.5 text-xs space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-xs sm:text-sm text-teal-950">Anda</span>
+                    <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide">
+                        Teknisi
+                    </span>
+                </div>
+                ${msg ? `<p class="text-slate-800 leading-relaxed whitespace-pre-line text-xs sm:text-sm font-normal">${escapeChatHtml(msg)}</p>` : ''}
+                ${mediaNotice}
+                ${locNotice}
+                <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-1 select-none">
+                    <span>${timeStr}</span>
+                    <span title="Mengirim..." class="inline-flex items-center text-slate-400 ml-0.5">
+                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        `;
+        stream.appendChild(bubble);
+        stream.scrollTop = stream.scrollHeight;
+    }
+
+    const submitBtn = document.getElementById('btn-quick-chat-submit');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+    }
+}
+
+function escapeChatHtml(text) {
+    const p = document.createElement('p');
+    p.textContent = text;
+    return p.innerHTML;
 }
 
 function setQuickChip(text, category) {

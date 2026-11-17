@@ -23,6 +23,7 @@ class TicketChronology extends Model
         'gps_accuracy',
         'location_address',
         'created_at',
+        'read_at',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class TicketChronology extends Model
         'longitude' => 'decimal:7',
         'gps_accuracy' => 'decimal:2',
         'created_at' => 'datetime',
+        'read_at' => 'datetime',
     ];
 
     public function ticket(): BelongsTo
