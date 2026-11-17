@@ -1277,23 +1277,19 @@
                 </div>
                 </div>
 
-                <!-- Floating "Scroll to Latest Chat" Button (WhatsApp-style floating button at bottom-right of chat viewport) -->
+                <!-- Floating "Scroll to Latest Chat" Icon Button (WhatsApp-style circular button at bottom-right) -->
                 <button type="button"
                         id="btn-scroll-to-bottom"
                         onclick="scrollToLatestChat()"
                         title="Scroll ke pesan paling baru"
-                        style="display: none; position: absolute; bottom: 14px; right: 18px; z-index: 40; background: #FFFFFF; border: 1.5px solid #0D9488; box-shadow: 0 6px 20px rgba(2, 40, 54, 0.25);"
-                        class="items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-teal-50 text-[#0D9488] transition-all duration-200 active:scale-95 cursor-pointer group select-none">
-                    <span id="new-msg-badge" class="hidden px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[9.5px] font-extrabold tracking-tight leading-none animate-bounce">
-                        Baru
-                    </span>
-                    <span class="text-[11px] font-bold text-slate-700 group-hover:text-[#0D9488]">Pesan Terbaru</span>
-                    <span style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);"
-                          class="w-6 h-6 rounded-full text-white flex items-center justify-center shadow-xs shrink-0">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </span>
+                        style="display: none; position: absolute; bottom: 14px; right: 18px; z-index: 40; width: 38px; height: 38px; background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%); box-shadow: 0 4px 14px rgba(13, 148, 136, 0.42);"
+                        class="items-center justify-center rounded-full text-white hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer select-none">
+                    <span id="new-msg-badge"
+                          style="position: absolute; top: -3px; right: -3px;"
+                          class="hidden w-3 h-3 rounded-full bg-emerald-400 border-2 border-white animate-bounce"></span>
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
                 </button>
             </div>
 
