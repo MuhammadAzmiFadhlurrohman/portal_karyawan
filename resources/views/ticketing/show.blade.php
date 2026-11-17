@@ -26,61 +26,111 @@
     @endphp
 
     <!-- ========================================================================= -->
-    <!-- 1. TOP HEADER BANNER (Theme Ocean Teal Gradient - Compact Sleek) -->
+    <!-- 1. TOP HEADER BANNER (Futuristic Metallic Ocean Teal matching Dashboard) -->
     <!-- ========================================================================= -->
-    <div class="relative overflow-hidden rounded-2xl md:rounded-3xl px-5 py-4 sm:px-6 sm:py-5 text-white shadow-lg border border-teal-500/20"
-         style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
+    <div class="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 sm:py-5 sm:px-6 text-white border border-teal-500/30 shadow-[0_8px_30px_rgba(2,40,54,0.45)] select-none"
+         style="background: radial-gradient(100% 140% at 15% 20%, #093d40 0%, #05282b 55%, #021619 100%);">
         
-        <!-- Ambient decorative glows -->
-        <div class="absolute -right-16 -top-16 w-60 h-60 rounded-full bg-[#18C4C4]/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute right-1/3 -bottom-20 w-64 h-64 rounded-full bg-[#0D9488]/15 blur-3xl pointer-events-none"></div>
+        <!-- SVG Geometric Tech Contours, Diagonal Glass Bars & Dot Grids (Matching Dashboard Hero) -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 1100 240" fill="none" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="tktHdrDiag1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.30"/>
+                    <stop offset="60%" stop-color="#14b8a6" stop-opacity="0.10"/>
+                    <stop offset="100%" stop-color="#04272a" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="tktHdrDiag2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="tktHdrArc" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.40"/>
+                    <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#042f2e" stop-opacity="0.04"/>
+                </linearGradient>
+                <pattern id="tktHdrDots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1.2" fill="#5eead4" fill-opacity="0.25"/>
+                </pattern>
+            </defs>
+            <!-- Diagonal Glass Accent Bars -->
+            <path d="M -60 -30 L 70 -30 L -15 180 L -145 180 Z" fill="url(#tktHdrDiag1)"/>
+            <path d="M -15 -30 L 35 -30 L -65 190 L -115 190 Z" fill="url(#tktHdrDiag2)"/>
+            <!-- Right Subtle Wave Flare -->
+            <path d="M 750 0 C 830 80, 910 120, 1100 160 L 1100 0 Z" fill="url(#tktHdrDiag1)" opacity="0.35"/>
+            <!-- Concentric Rims -->
+            <circle cx="950" cy="120" r="190" stroke="url(#tktHdrArc)" stroke-width="1.2" opacity="0.45"/>
+            <circle cx="950" cy="120" r="250" stroke="url(#tktHdrArc)" stroke-width="0.9" stroke-dasharray="6 5" opacity="0.3"/>
+            <!-- Dot Matrix Grids -->
+            <rect x="990" y="16" width="72" height="38" fill="url(#tktHdrDots)"/>
+            <rect x="20" y="180" width="72" height="38" fill="url(#tktHdrDots)"/>
+        </svg>
 
-        <div class="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-            <div class="space-y-3 max-w-3xl">
-                <!-- Badges Row: Ticket No, Category, Status -->
-                <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <!-- Ticket Number Pill -->
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono font-bold bg-white/10 backdrop-blur-md border border-white/20 text-[#5eead4] shadow-xs">
-                        <svg class="w-3.5 h-3.5 text-[#5eead4]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
-                        <span>{{ $tiket->no_tiket }}</span>
-                    </span>
+        <!-- Ambient Glow Orbs -->
+        <div class="absolute -left-16 -top-16 w-52 h-52 rounded-full bg-teal-400/15 blur-3xl pointer-events-none z-0"></div>
+        <div class="absolute right-1/4 -bottom-16 w-60 h-60 rounded-full bg-cyan-400/12 blur-3xl pointer-events-none z-0"></div>
+        <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none z-10"></div>
+        <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/30 to-transparent pointer-events-none z-10"></div>
 
-                    <!-- Category Pill -->
-                    <span class="px-3 py-1 rounded-full font-bold font-mono uppercase tracking-wider text-[11px]
-                        {{ $tiket->kategori_tiket === 'BACKBONE' ? 'bg-[#18C4C4] text-slate-900' : 'bg-emerald-400 text-slate-900' }}">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <!-- Left Info Area -->
+            <div class="space-y-3 min-w-0 flex-1">
+                <!-- Row 1: Badges & Status (Kategori, No Tiket, Status, Prioritas) -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Category Badge -->
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-extrabold tracking-wider uppercase shadow-xs
+                        {{ $tiket->kategori_tiket === 'BACKBONE' ? 'bg-[#18C4C4] text-slate-950' : 'bg-emerald-400 text-slate-950' }}">
                         {{ $tiket->kategori_tiket }}
                     </span>
 
-                    <!-- Status Pill -->
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold uppercase tracking-wider text-[11px]
-                        {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500/30 text-emerald-300 border border-emerald-400/50' : ($tiket->status === 'PENDING_VERIFIKASI' ? 'bg-purple-500/30 text-purple-200 border border-purple-400/50' : ($tiket->status === 'PROSES' ? 'bg-amber-500/30 text-amber-200 border border-amber-400/50' : 'bg-cyan-500/30 text-cyan-200 border border-cyan-400/50')) }}">
-                        <span class="w-2 h-2 rounded-full {{ $tiket->status === 'CLOSE' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse' }}"></span>
-                        {{ $tiket->status }}
+                    <!-- Ticket Number Capsule -->
+                    <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full font-mono font-bold text-xs bg-slate-950/50 backdrop-blur-md border border-[#2dd4bf]/40 text-[#5eead4] shadow-xs">
+                        <svg class="w-3.5 h-3.5 text-[#2dd4bf]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                        <span>{{ $tiket->no_tiket }}</span>
                     </span>
 
+                    <!-- Status Indicator Badge -->
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider
+                        {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/50' : ($tiket->status === 'PENDING_VERIFIKASI' ? 'bg-purple-500/25 text-purple-200 border border-purple-400/50' : ($tiket->status === 'PROSES' ? 'bg-amber-500/25 text-amber-200 border border-amber-400/50' : 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50')) }}">
+                        <span class="w-2 h-2 rounded-full {{ $tiket->status === 'CLOSE' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse' }}"></span>
+                        <span>{{ $tiket->status }}</span>
+                    </span>
+
+                    <!-- Priority Badge -->
                     @if($tiket->priority)
-                        <span class="px-2.5 py-1 rounded-full font-bold text-[11px] bg-white/10 border border-white/15 text-white">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[11px] bg-white/10 border border-white/20 text-white/90">
                             {{ $tiket->priority }}
                         </span>
                     @endif
                 </div>
 
-                <!-- Assigned Crew Pills Row (matching Image 1) -->
-                <div class="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+                <!-- Row 2: Headline / Judul Gangguan -->
+                <div class="min-w-0">
+                    <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white tracking-tight leading-snug truncate">
+                        {{ $tiket->status_link_impact ?? ($tiket->kategori_tiket === 'BACKBONE' ? $tiket->backbone_segment : $tiket->customer_name) }}
+                    </h1>
+                </div>
+
+                <!-- Row 3: Tim Penugasan (PIC & Anggota Tim) -->
+                <div class="flex flex-wrap items-center gap-2 pt-0.5 text-xs">
+                    <span class="text-[11px] font-semibold text-teal-200/70 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        <span>Tim Lapangan:</span>
+                    </span>
+
                     @if($lead)
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-[#18C4C4]/20 border border-[#18C4C4]/40 text-[#5eead4]">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-bold bg-[#18C4C4]/20 border border-[#18C4C4]/40 text-[#5eead4]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#5eead4]"></span>
                             <span>PIC: {{ $lead->name }}</span>
                         </span>
                     @else
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-semibold bg-amber-500/20 border border-amber-500/40 text-amber-300">
                             <span>PIC: Belum Ditugaskan</span>
                         </span>
                     @endif
 
                     @foreach($crew as $c)
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-medium bg-white/10 border border-white/15 text-white/90">
-                            <svg class="w-3 h-3 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl font-medium bg-white/10 border border-white/15 text-white/90">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-300/70"></span>
                             <span>{{ $c->name }}</span>
                         </span>
                     @endforeach
@@ -89,24 +139,20 @@
                         @if(auth()->id() !== $tiket->created_by && !auth()->user()->hasRole(['noc', 'atasan_noc']) && auth()->user()->division !== 'NOC')
                             @can('dispatch', $tiket)
                                 <button type="button" onclick="openDispatchModal()"
-                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full font-bold text-xs bg-amber-400 text-slate-900 hover:bg-amber-300 transition cursor-pointer">
-                                    + Tugaskan Tim (Atasan)
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl font-bold text-xs bg-amber-400 text-slate-950 hover:bg-amber-300 transition cursor-pointer shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                    <span>Tugaskan Tim</span>
                                 </button>
                             @endcan
                         @endif
                     @endif
                 </div>
-
-                <!-- Big Headline (Status Impact / Title) -->
-                <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white tracking-tight pt-0.5">
-                    {{ $tiket->status_link_impact ?? ($tiket->kategori_tiket === 'BACKBONE' ? $tiket->backbone_segment : $tiket->customer_name) }}
-                </h1>
             </div>
 
-            <!-- Header Actions: ← Kembali & :: Menu Aksi Dropdown -->
-            <div class="flex items-center gap-2.5 shrink-0 self-start lg:self-center">
+            <!-- Right Actions Area (Kembali & Menu Aksi) -->
+            <div class="flex items-center gap-2.5 shrink-0 self-start md:self-center pt-2 md:pt-0">
                 <a href="{{ route('tickets.index') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white/90 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-sm">
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-teal-100 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Kembali</span>
                 </a>
@@ -115,11 +161,11 @@
                 <div class="relative" x-data="{ open: false }">
                     <button type="button"
                             @click="open = !open"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-lg border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
-                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-950 shadow-md hover:shadow-cyan-500/25 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+                            style="background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 50%, #0d9488 100%);">
+                        <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         <span>Menu Aksi</span>
-                        <svg class="w-3.5 h-3.5 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        <svg class="w-3.5 h-3.5 transition-transform text-slate-950" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
 
                     <div x-show="open"
