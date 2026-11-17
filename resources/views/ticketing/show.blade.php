@@ -3189,7 +3189,7 @@ async function handleChatFormSubmit(e) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
         }
-        if (input) {
+        if (input && window.innerWidth >= 768) {
             input.focus();
         }
     }
@@ -3668,7 +3668,10 @@ function adjustChatHeight() {
         }
 
         const isDesktop = window.innerWidth >= 768;
-        const windowHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        // On mobile, use window.innerHeight to prevent jarring height shrink/expand when soft keyboard opens/closes
+        const windowHeight = isDesktop 
+            ? (window.visualViewport ? window.visualViewport.height : window.innerHeight)
+            : window.innerHeight;
 
         let topOffset = 0;
         let bottomOffset = 0;
