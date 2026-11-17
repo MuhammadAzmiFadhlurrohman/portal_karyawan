@@ -1282,12 +1282,12 @@
                         id="btn-scroll-to-bottom"
                         onclick="scrollToLatestChat()"
                         title="Scroll ke pesan paling baru"
-                        style="display: none; position: absolute; bottom: 14px; right: 18px; z-index: 40; width: 38px; height: 38px; background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%); box-shadow: 0 4px 14px rgba(13, 148, 136, 0.42);"
-                        class="items-center justify-center rounded-full text-white hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer select-none">
+                        style="display: none; position: absolute; bottom: 12px; right: 16px; z-index: 40; width: 32px; height: 32px; background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(13, 148, 136, 0.35); box-shadow: 0 3px 10px rgba(2, 40, 54, 0.16); backdrop-filter: blur(6px);"
+                        class="items-center justify-center rounded-full text-[#0D9488] hover:bg-teal-50 hover:text-teal-700 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer select-none">
                     <span id="new-msg-badge"
-                          style="position: absolute; top: -3px; right: -3px;"
-                          class="hidden w-3 h-3 rounded-full bg-emerald-400 border-2 border-white animate-bounce"></span>
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                          style="position: absolute; top: -2px; right: -2px;"
+                          class="hidden w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white animate-bounce"></span>
+                    <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
