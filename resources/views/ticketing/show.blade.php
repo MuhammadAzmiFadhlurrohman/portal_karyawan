@@ -926,19 +926,25 @@
                                 <p class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $displayMessage }}</p>
                             @endif
 
-                            <!-- Photo Attachment Preview if available -->
+                            <!-- Photo Attachment Preview if available (Lightbox Modal) -->
                             @if($chron->photo_path)
+                                @php
+                                    $photoSrc = $chron->photo_url ?? asset('storage/' . $chron->photo_path);
+                                @endphp
                                 <div class="pt-0.5">
-                                    <a href="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-xl overflow-hidden border border-slate-200/90 max-w-[240px] shadow-2xs bg-slate-100">
-                                        <img src="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}"
+                                    <button type="button"
+                                            onclick="openImageLightbox('{{ $photoSrc }}', 'Foto Dokumentasi - {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}')"
+                                            class="block group relative rounded-xl overflow-hidden border border-slate-200/90 max-w-[240px] shadow-2xs bg-slate-100 cursor-pointer text-left">
+                                        <img src="{{ $photoSrc }}"
                                              alt="Bukti Foto"
                                              loading="lazy"
                                              class="w-full h-36 object-cover group-hover:scale-105 transition duration-200"
                                              onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
-                                        <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
-                                            Lihat Foto Penuh &rarr;
+                                        <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[1px]">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                            <span>Perbesar &rarr;</span>
                                         </div>
-                                    </a>
+                                    </button>
                                 </div>
                             @endif
 
@@ -1638,9 +1644,12 @@
                                 <span class="font-bold text-[11px] text-slate-800 block truncate">{{ $p->user->name ?? 'User' }}</span>
                                 <span class="text-[10px] text-slate-400 block">{{ $p->created_at->format('d M, H:i') }}</span>
                             </div>
-                            <a href="{{ $p->photo_url ?? asset('storage/' . $p->photo_path) }}" target="_blank" class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
-                                Buka Foto &rarr;
-                            </a>
+                            <button type="button"
+                                    onclick="openImageLightbox('{{ $p->photo_url ?? asset('storage/' . $p->photo_path) }}', 'Foto Dokumentasi - {{ $p->user->name ?? 'User' }}')"
+                                    class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 cursor-pointer backdrop-blur-[1px]">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                <span>Perbesar &rarr;</span>
+                            </button>
                         </div>
                     @endforeach
                 </div>
@@ -2206,8 +2215,128 @@ function dispatchTeamModal() {
     </div>
 </div>
 
+<!-- ========================================================================= -->
+<!-- IMAGE LIGHTBOX MODAL (Enlarge in Modal with Direct Download Button) -->
+<!-- ========================================================================= -->
+<div id="image-lightbox-modal"
+     class="hidden fixed inset-0 z-[99999] bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-3 sm:p-5 select-none transition-all duration-200"
+     onclick="closeImageLightbox(event)">
+    
+    <!-- Top Header Bar -->
+    <div class="flex items-center justify-between text-white z-10 shrink-0 max-w-6xl mx-auto w-full pt-1" onclick="event.stopPropagation()">
+        <div class="flex items-center gap-2.5 min-w-0 pr-2">
+            <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-[#18C4C4] border border-teal-500/30 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </span>
+            <span id="lightbox-title" class="font-bold text-xs sm:text-sm text-slate-100 truncate">Dokumentasi Foto</span>
+        </div>
+        
+        <div class="flex items-center gap-2 shrink-0">
+            <!-- Download Button -->
+            <button type="button"
+                    id="lightbox-download-btn"
+                    onclick="downloadLightboxImage(event)"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#18C4C4] to-[#0D9488] hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-teal-950/30 transition active:scale-95 cursor-pointer">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Download</span>
+            </button>
+
+            <!-- Close Button -->
+            <button type="button"
+                    onclick="closeImageLightbox()"
+                    class="w-8 h-8 rounded-xl bg-white/10 hover:bg-rose-500/80 text-white flex items-center justify-center transition active:scale-95 cursor-pointer"
+                    title="Tutup (Esc)">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Center: Scaled Image Viewport -->
+    <div class="flex-1 flex items-center justify-center p-2 min-h-0 relative select-none" onclick="closeImageLightbox(event)">
+        <img id="lightbox-image"
+             src=""
+             alt="Pratinjau Foto"
+             class="max-h-[82vh] max-w-[94vw] object-contain rounded-2xl shadow-2xl border border-white/10 cursor-zoom-out"
+             onclick="event.stopPropagation()">
+    </div>
+
+    <!-- Bottom Instruction Pill -->
+    <div class="text-center text-[11px] text-slate-400 select-none pb-1 z-10 shrink-0">
+        Klik di luar gambar atau tekan <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">ESC</kbd> untuk menutup
+    </div>
+</div>
+
 @push('scripts')
 <script>
+// Image Lightbox Modal with Direct Download
+function openImageLightbox(url, title = 'Dokumentasi Foto') {
+    const modal = document.getElementById('image-lightbox-modal');
+    const img = document.getElementById('lightbox-image');
+    const titleEl = document.getElementById('lightbox-title');
+
+    if (!modal || !img) return;
+
+    img.src = url;
+    if (titleEl) {
+        titleEl.innerText = title;
+    }
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageLightbox(e) {
+    if (e && e.target && e.target.id === 'lightbox-image') return;
+    const modal = document.getElementById('image-lightbox-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        const img = document.getElementById('lightbox-image');
+        if (img) img.src = '';
+    }
+    document.body.style.overflow = '';
+}
+
+async function downloadLightboxImage(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const img = document.getElementById('lightbox-image');
+    if (!img || !img.src) return;
+
+    try {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        let filename = (img.src.split('/').pop() || 'foto-tiket.jpg').split('?')[0];
+        if (!filename.includes('.')) filename += '.jpg';
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (err) {
+        const a = document.createElement('a');
+        a.href = img.src;
+        a.target = '_blank';
+        a.download = 'foto-tiket.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.getElementById('image-lightbox-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+            closeImageLightbox();
+        }
+    }
+});
+
 function switchTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.tab-btn').forEach(btn => {
