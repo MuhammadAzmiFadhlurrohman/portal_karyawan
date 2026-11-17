@@ -1388,40 +1388,46 @@
 
                     @keyframes newChatBorderGlowSelf {
                         0% {
-                            border-color: #2563EB !important;
-                            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35), 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+                            outline: 3px solid #2563EB;
+                            outline-offset: 1px;
+                            box-shadow: 0 0 16px rgba(37, 99, 235, 0.45);
                         }
-                        70% {
-                            border-color: #3B82F6 !important;
-                            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 1px 4px rgba(59, 130, 246, 0.1) !important;
+                        60% {
+                            outline: 2.5px solid #3B82F6;
+                            outline-offset: 1px;
+                            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
                         }
                         100% {
-                            border-color: #CFE4FC !important;
-                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+                            outline: 0px solid transparent;
+                            outline-offset: 0px;
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
                         }
                     }
 
                     @keyframes newChatBorderGlowIncoming {
                         0% {
-                            border-color: #0D9488 !important;
-                            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.35), 0 2px 8px rgba(13, 148, 136, 0.2) !important;
+                            outline: 3px solid #0D9488;
+                            outline-offset: 1px;
+                            box-shadow: 0 0 16px rgba(13, 148, 136, 0.45);
                         }
-                        70% {
-                            border-color: #14B8A6 !important;
-                            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2), 0 1px 4px rgba(20, 184, 166, 0.1) !important;
+                        60% {
+                            outline: 2.5px solid #14B8A6;
+                            outline-offset: 1px;
+                            box-shadow: 0 0 10px rgba(20, 184, 166, 0.3);
                         }
                         100% {
-                            border-color: #E2E8F0 !important;
-                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+                            outline: 0px solid transparent;
+                            outline-offset: 0px;
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
                         }
                     }
 
                     .new-chat-highlight-self {
-                        animation: newChatBorderGlowSelf 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+                        animation: newChatBorderGlowSelf 3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
                     }
 
                     .new-chat-highlight-incoming {
-                        animation: newChatBorderGlowIncoming 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+                        animation: newChatBorderGlowIncoming 3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
                     }
                 </style>
 
