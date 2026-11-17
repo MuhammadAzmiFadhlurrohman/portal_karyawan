@@ -102,6 +102,66 @@ class ChronologyController extends Controller
     }
 
     /**
+     * Update chronology message (§WhatsApp message edit).
+     */
+    public function update(Request $request, TicketChronology $chronology): RedirectResponse|JsonResponse
+    {
+        $user = $request->user();
+        $isAdmin = $user && ($user->hasRole('admin') || ($user->role ?? '') === 'admin');
+        if (! $user || ($user->id !== $chronology->user_id && ! $isAdmin)) {
+            abort(403, 'Anda tidak memiliki hak untuk mengedit pesan ini.');
+        }
+
+        $validated = $request->validate([
+            'message' => ['required', 'string'],
+        ]);
+
+        $chronology->update([
+            'message' => trim($validated['message']),
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan berhasil diperbarui.',
+                'chronology' => $chronology,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Pesan berhasil diperbarui.');
+    }
+
+    /**
+     * Delete chronology entry (§WhatsApp message delete).
+     */
+    public function destroy(Request $request, TicketChronology $chronology): RedirectResponse|JsonResponse
+    {
+        $user = $request->user();
+        $isAdmin = $user && ($user->hasRole('admin') || ($user->role ?? '') === 'admin');
+        if (! $user || ($user->id !== $chronology->user_id && ! $isAdmin)) {
+            abort(403, 'Anda tidak memiliki hak untuk menghapus pesan ini.');
+        }
+
+        if ($chronology->photo_path && Storage::disk('public')->exists($chronology->photo_path)) {
+            Storage::disk('public')->delete($chronology->photo_path);
+        }
+        if ($chronology->video_path && Storage::disk('public')->exists($chronology->video_path)) {
+            Storage::disk('public')->delete($chronology->video_path);
+        }
+
+        $chronology->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan berhasil dihapus.',
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Pesan berhasil dihapus.');
+    }
+
+    /**
      * Stream chronology photo attachment reliably across Docker/VPS environments.
      */
     public function photo(TicketChronology $chronology): BinaryFileResponse

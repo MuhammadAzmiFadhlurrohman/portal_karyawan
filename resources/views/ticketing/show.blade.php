@@ -906,24 +906,110 @@
                             });
                         }
                     @endphp
-                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1">
-                        <div style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.06);"
-                             class="max-w-[85%] sm:max-w-md rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }}">
+                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1 group/bubble relative" id="chron-row-{{ $chron->id }}">
+                        <div id="chron-bubble-{{ $chron->id }}"
+                             data-id="{{ $chron->id }}"
+                             data-sender="{{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}"
+                             data-role="{{ ucfirst(str_replace('_', ' ', $roleLabel)) }}"
+                             data-message="{{ $chron->message }}"
+                             data-time="{{ $chron->created_at->format('d M Y, H:i') }} WIB"
+                             data-read="{{ $isRead ? ($chron->read_at ? $chron->read_at->format('d M Y, H:i') . ' WIB' : 'Sudah dibaca') : 'Belum dibaca' }}"
+                             data-lat="{{ $chron->latitude ?? '' }}"
+                             data-lng="{{ $chron->longitude ?? '' }}"
+                             data-photo="{{ $chron->photo_url ?? ($chron->photo_path ? asset('storage/' . $chron->photo_path) : '') }}"
+                             data-category="{{ $chron->category ?? 'LAIN' }}"
+                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.06);"
+                             class="max-w-[85%] sm:max-w-md rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }} relative">
                             
-                            <!-- Sender & Role Badge -->
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-bold text-xs {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }}">
-                                    {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
-                                </span>
-                                <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
-                                      class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
-                                    {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
-                                </span>
+                            <!-- Sender & Role Badge + 3-Dots Dropdown Trigger (Matching User Attachment Image 1 & 2) -->
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="font-bold text-xs {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }} truncate">
+                                        {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
+                                    </span>
+                                    <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
+                                          class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide shrink-0">
+                                        {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
+                                    </span>
+                                </div>
+
+                                <!-- 3-Dots Vertical Action Button (matching Image 1) -->
+                                <div class="relative shrink-0">
+                                    <button type="button"
+                                            onclick="toggleMessageMenu({{ $chron->id }}, event)"
+                                            class="w-5 h-5 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
+                                            title="Pilihan pesan">
+                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- WhatsApp Dropdown Menu (matching Image 2) -->
+                                    <div id="msg-dropdown-{{ $chron->id }}"
+                                         class="msg-action-dropdown hidden absolute {{ $isSelf ? 'right-0' : 'left-0 sm:right-auto' }} top-full mt-1 w-52 sm:w-56 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                                        
+                                        <div class="space-y-0.5 pb-1">
+                                            <!-- 1. Salin -->
+                                            <button type="button"
+                                                    onclick="copyMessageText({{ $chron->id }})"
+                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                                <span>Salin</span>
+                                            </button>
+
+                                            <!-- 2. Info Pesan -->
+                                            <button type="button"
+                                                    onclick="openMessageInfo({{ $chron->id }})"
+                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-4 h-4 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                                <span>Info Pesan</span>
+                                            </button>
+
+                                            <!-- 3. Simpan ke Dokumentasi -->
+                                            <button type="button"
+                                                    onclick="saveToDocumentation({{ $chron->id }})"
+                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                                <span>Simpan ke Dokumentasi</span>
+                                            </button>
+
+                                            <!-- 4. Balas -->
+                                            <button type="button"
+                                                    onclick="replyToMessage({{ $chron->id }})"
+                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-4 h-4 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                                <span>Balas</span>
+                                            </button>
+
+                                            @if($isSelf || auth()->user()?->hasRole('admin'))
+                                                <!-- 5. Edit -->
+                                                <button type="button"
+                                                        onclick="editMessage({{ $chron->id }})"
+                                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                    <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                    <span>Edit</span>
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        @if($isSelf || auth()->user()?->hasRole('admin'))
+                                            <div class="pt-1">
+                                                <!-- 6. Hapus -->
+                                                <button type="button"
+                                                        onclick="deleteMessage({{ $chron->id }})"
+                                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer text-left">
+                                                    <svg class="w-4 h-4 text-slate-600 hover:text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    <span>Hapus</span>
+                                                </button>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Message Content -->
                             @if($displayMessage)
-                                <p class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $displayMessage }}</p>
+                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $displayMessage }}</p>
                             @endif
 
                             <!-- Photo Attachment Preview if available (Lightbox Modal) -->
@@ -1059,13 +1145,31 @@
             <!-- Chat Input Bar (matching Image 3 & Attachment Menu) -->
             <form id="quick-chat-form" method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
                   onsubmit="handleChatFormSubmit(event)"
-                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 shrink-0 relative">
-                <div class="max-w-2xl mx-auto w-full flex items-center gap-2 sm:gap-2.5">
+                  class="bg-white border-t border-slate-200 shrink-0 relative">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
                 <input type="hidden" name="latitude" id="chron_lat">
                 <input type="hidden" name="longitude" id="chron_lng">
                 <input type="hidden" name="gps_accuracy" id="chron_acc">
+
+                <!-- WhatsApp Reply Banner Preview (shows when replying to a message) -->
+                <div id="chat-reply-preview" class="hidden border-b border-slate-100 bg-teal-50/50 px-3.5 py-1.5 transition-all">
+                    <div class="max-w-2xl mx-auto w-full flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 min-w-0 border-l-4 border-teal-500 pl-2.5 py-0.5">
+                            <div class="min-w-0">
+                                <div class="font-bold text-teal-800 text-[10px] sm:text-[11px] flex items-center gap-1">
+                                    <svg class="w-3 h-3 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                    <span id="reply-to-sender">Membalas User</span>
+                                </div>
+                                <p id="reply-to-text" class="text-slate-500 text-[10px] sm:text-[11px] truncate mt-0.5">Isi pesan...</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="cancelReply()" class="w-6 h-6 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition cursor-pointer text-sm font-bold" title="Batal balas">&times;</button>
+                    </div>
+                </div>
+
+                <div class="p-2.5 sm:p-4">
+                    <div class="max-w-2xl mx-auto w-full flex items-center gap-2 sm:gap-2.5">
 
                 <!-- Hidden Native File Inputs -->
                 <!-- 1. General Media (Photo / Video) -->
@@ -1221,6 +1325,7 @@
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -2266,6 +2371,101 @@ function dispatchTeamModal() {
     </div>
 </div>
 
+<!-- ========================================================================= -->
+<!-- MODAL INFO PESAN (WhatsApp Style) -->
+<!-- ========================================================================= -->
+<div id="modal-msg-info" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                </div>
+                <h4 class="font-bold text-sm text-slate-800">Info Pesan</h4>
+            </div>
+            <button type="button" onclick="closeMessageInfo()" class="w-7 h-7 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-lg">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <div class="text-[10px] uppercase font-bold text-slate-400">Pengirim</div>
+                <div id="info-msg-sender" class="font-bold text-slate-800 text-sm">Nama</div>
+                <div id="info-msg-role" class="text-[11px] text-teal-700 font-semibold">Role</div>
+            </div>
+
+            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <div class="text-[10px] uppercase font-bold text-slate-400">Isi Pesan</div>
+                <div id="info-msg-content" class="text-slate-800 leading-relaxed whitespace-pre-line font-medium">-</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                    <div class="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                        <span>Terkirim</span>
+                        <svg class="w-3.5 h-3 text-slate-400" viewBox="0 0 16 11" fill="none"><path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div id="info-msg-sent-time" class="font-mono text-[11px] text-slate-700 font-bold">-</div>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                    <div class="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                        <span>Dibaca</span>
+                        <svg class="w-3.5 h-3 text-[#53bdeb]" viewBox="0 0 16 11" fill="none"><path d="M11 1.5L4.5 8L1.5 5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.5 1.5L8 8L6.5 6.5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div id="info-msg-read-time" class="font-mono text-[11px] text-emerald-600 font-bold">-</div>
+                </div>
+            </div>
+
+            <div id="info-msg-attachment-box" class="hidden p-3 rounded-2xl bg-teal-50/60 border border-teal-100 space-y-1">
+                <div class="text-[10px] uppercase font-bold text-teal-800">Lampiran</div>
+                <div id="info-msg-attachment-text" class="text-[11px] text-teal-900 font-medium">📍 Titik Lokasi &amp; Foto</div>
+            </div>
+        </div>
+
+        <button type="button" onclick="closeMessageInfo()" class="w-full py-2.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer">
+            Tutup
+        </button>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL EDIT PESAN -->
+<!-- ========================================================================= -->
+<div id="modal-msg-edit" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <h4 class="font-bold text-sm text-slate-800">Edit Pesan Koordinasi</h4>
+            </div>
+            <button type="button" onclick="closeMessageEdit()" class="w-7 h-7 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center text-lg">&times;</button>
+        </div>
+
+        <form id="form-edit-message" onsubmit="submitEditMessage(event)" class="space-y-4 text-xs">
+            <input type="hidden" id="edit-msg-id" value="">
+            <div class="space-y-1.5">
+                <label class="font-semibold text-slate-700">Teks Pesan:</label>
+                <textarea id="edit-msg-textarea" rows="4" required class="w-full rounded-2xl border border-slate-300 p-3 text-xs sm:text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeMessageEdit()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl cursor-pointer">Batal</button>
+                <button type="submit" id="btn-save-edit-msg" class="px-5 py-2 rounded-xl text-white font-bold bg-teal-600 hover:bg-teal-700 cursor-pointer shadow-md transition">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Floating Toast Feedback -->
+<div id="chat-toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[999999] px-4 py-2 rounded-full bg-slate-900/90 text-white text-xs font-semibold shadow-2xl backdrop-blur-md flex items-center gap-2 transition-all">
+    <span id="chat-toast-icon">✓</span>
+    <span id="chat-toast-text">Teks disalin</span>
+</div>
+
 @push('scripts')
 <script>
 // Image Lightbox Modal with Direct Download
@@ -2334,8 +2534,298 @@ document.addEventListener('keydown', function(e) {
         if (modal && !modal.classList.contains('hidden')) {
             closeImageLightbox();
         }
+        closeMessageInfo();
+        closeMessageEdit();
+        closeAllMessageMenus();
     }
 });
+
+// =========================================================================
+// WHATSAPP MESSAGE 3-DOTS ACTION MENU & HELPERS (Matching Image 1 & 2)
+// =========================================================================
+
+function showChatToast(text, icon = '✓') {
+    const toast = document.getElementById('chat-toast');
+    const toastText = document.getElementById('chat-toast-text');
+    const toastIcon = document.getElementById('chat-toast-icon');
+    if (!toast || !toastText) return;
+
+    toastText.innerText = text;
+    if (toastIcon) toastIcon.innerText = icon;
+    toast.classList.remove('hidden');
+
+    clearTimeout(window.__chatToastTimeout);
+    window.__chatToastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 2500);
+}
+
+function toggleMessageMenu(id, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const targetDropdown = document.getElementById('msg-dropdown-' + id);
+    const wasOpen = targetDropdown && !targetDropdown.classList.contains('hidden');
+
+    // Close all open dropdowns
+    closeAllMessageMenus();
+
+    if (!wasOpen && targetDropdown) {
+        targetDropdown.classList.remove('hidden');
+    }
+}
+
+function closeAllMessageMenus() {
+    document.querySelectorAll('.msg-action-dropdown').forEach(d => d.classList.add('hidden'));
+}
+
+// Close dropdown if clicked outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.msg-action-dropdown') && !e.target.closest('button[onclick*="toggleMessageMenu"]')) {
+        closeAllMessageMenus();
+    }
+});
+
+// 1. Salin (Copy Text)
+function copyMessageText(id) {
+    closeAllMessageMenus();
+    const bubble = document.getElementById('chron-bubble-' + id);
+    if (!bubble) return;
+
+    let textToCopy = bubble.dataset.message || '';
+    if (!textToCopy && bubble.dataset.lat && bubble.dataset.lng) {
+        textToCopy = `https://maps.google.com/?q=${bubble.dataset.lat},${bubble.dataset.lng}`;
+    } else if (!textToCopy && bubble.dataset.photo) {
+        textToCopy = bubble.dataset.photo;
+    }
+
+    if (!textToCopy) {
+        textToCopy = 'Update koordinasi lapangan';
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showChatToast('Pesan berhasil disalin ke clipboard', '📋');
+        }).catch(() => {
+            fallbackCopyText(textToCopy);
+        });
+    } else {
+        fallbackCopyText(textToCopy);
+    }
+}
+
+function fallbackCopyText(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showChatToast('Pesan berhasil disalin ke clipboard', '📋');
+    } catch (e) {
+        alert('Gagal menyalin: ' + text);
+    }
+    document.body.removeChild(textarea);
+}
+
+// 2. Info Pesan
+function openMessageInfo(id) {
+    closeAllMessageMenus();
+    const bubble = document.getElementById('chron-bubble-' + id);
+    if (!bubble) return;
+
+    const modal = document.getElementById('modal-msg-info');
+    if (!modal) return;
+
+    document.getElementById('info-msg-sender').innerText = bubble.dataset.sender || 'User';
+    document.getElementById('info-msg-role').innerText = bubble.dataset.role || 'Petugas';
+    document.getElementById('info-msg-content').innerText = bubble.dataset.message || '(Hanya lampiran media/lokasi)';
+    document.getElementById('info-msg-sent-time').innerText = bubble.dataset.time || '-';
+    document.getElementById('info-msg-read-time').innerText = bubble.dataset.read || '-';
+
+    const attachBox = document.getElementById('info-msg-attachment-box');
+    const attachText = document.getElementById('info-msg-attachment-text');
+    let attachments = [];
+    if (bubble.dataset.lat && bubble.dataset.lng) attachments.push(`📍 Titik Lokasi (${Number(bubble.dataset.lat).toFixed(6)}, ${Number(bubble.dataset.lng).toFixed(6)})`);
+    if (bubble.dataset.photo) attachments.push('📷 Foto Lampiran');
+    if (attachments.length > 0 && attachBox && attachText) {
+        attachText.innerText = attachments.join(' • ');
+        attachBox.classList.remove('hidden');
+    } else if (attachBox) {
+        attachBox.classList.add('hidden');
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeMessageInfo() {
+    const modal = document.getElementById('modal-msg-info');
+    if (modal) modal.classList.add('hidden');
+}
+
+// 3. Simpan ke Dokumentasi
+function saveToDocumentation(id) {
+    closeAllMessageMenus();
+    const bubble = document.getElementById('chron-bubble-' + id);
+    if (!bubble) return;
+
+    if (bubble.dataset.photo) {
+        showChatToast('Tersimpan di arsip dokumentasi tiket', '📁');
+        const a = document.createElement('a');
+        a.href = bubble.dataset.photo;
+        a.download = `dokumentasi-tiket-${id}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } else {
+        showChatToast('Catatan disimpan ke arsip tiket', '📁');
+    }
+}
+
+// 4. Balas (Reply to message)
+function replyToMessage(id) {
+    closeAllMessageMenus();
+    const bubble = document.getElementById('chron-bubble-' + id);
+    const input = document.getElementById('quick-chat-input');
+    const preview = document.getElementById('chat-reply-preview');
+    const replySender = document.getElementById('reply-to-sender');
+    const replyText = document.getElementById('reply-to-text');
+
+    if (!bubble) return;
+
+    const sender = bubble.dataset.sender || 'User';
+    const msg = bubble.dataset.message || (bubble.dataset.lat ? 'Titik Lokasi Lapangan' : 'Lampiran Foto');
+
+    if (replySender) replySender.innerText = 'Membalas ' + sender;
+    if (replyText) replyText.innerText = msg;
+    if (preview) preview.classList.remove('hidden');
+
+    if (input) {
+        input.focus();
+        if (!input.value.trim()) {
+            input.value = `[Balas @${sender}]: `;
+        }
+    }
+}
+
+function cancelReply() {
+    const preview = document.getElementById('chat-reply-preview');
+    const input = document.getElementById('quick-chat-input');
+    if (preview) preview.classList.add('hidden');
+    if (input && input.value.startsWith('[Balas @')) {
+        input.value = '';
+    }
+}
+
+// 5. Edit Pesan
+function editMessage(id) {
+    closeAllMessageMenus();
+    const bubble = document.getElementById('chron-bubble-' + id);
+    if (!bubble) return;
+
+    const modal = document.getElementById('modal-msg-edit');
+    const idInput = document.getElementById('edit-msg-id');
+    const textarea = document.getElementById('edit-msg-textarea');
+
+    if (!modal || !idInput || !textarea) return;
+
+    idInput.value = id;
+    textarea.value = bubble.dataset.message || '';
+    modal.classList.remove('hidden');
+    setTimeout(() => textarea.focus(), 50);
+}
+
+function closeMessageEdit() {
+    const modal = document.getElementById('modal-msg-edit');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function submitEditMessage(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-msg-id')?.value;
+    const textarea = document.getElementById('edit-msg-textarea');
+    const saveBtn = document.getElementById('btn-save-edit-msg');
+    const csrf = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
+
+    if (!id || !textarea) return;
+    const newMsg = textarea.value.trim();
+    if (!newMsg) return;
+
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = 'Menyimpan...';
+    }
+
+    try {
+        const res = await fetch(`/tickets/chronologies/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrf,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ message: newMsg })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+            const textEl = document.getElementById('chron-text-' + id);
+            const bubble = document.getElementById('chron-bubble-' + id);
+            if (textEl) textEl.innerText = newMsg;
+            if (bubble) bubble.dataset.message = newMsg;
+
+            closeMessageEdit();
+            showChatToast('Pesan berhasil diedit', '✏️');
+        } else {
+            alert(data.message || 'Gagal mengedit pesan');
+        }
+    } catch (err) {
+        alert('Terjadi kesalahan saat mengedit pesan: ' + err.message);
+    } finally {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerText = 'Simpan Perubahan';
+        }
+    }
+}
+
+// 6. Hapus Pesan
+async function deleteMessage(id) {
+    closeAllMessageMenus();
+    if (!confirm('Apakah Anda yakin ingin menghapus pesan ini dari koordinasi tiket?')) return;
+
+    const csrf = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
+    const row = document.getElementById('chron-row-' + id);
+
+    try {
+        const res = await fetch(`/tickets/chronologies/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrf,
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+            if (row) {
+                row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'scale(0.9)';
+                setTimeout(() => row.remove(), 300);
+            }
+            showChatToast('Pesan berhasil dihapus', '🗑️');
+        } else {
+            alert(data.message || 'Gagal menghapus pesan');
+        }
+    } catch (err) {
+        alert('Terjadi kesalahan saat menghapus pesan: ' + err.message);
+    }
+}
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
