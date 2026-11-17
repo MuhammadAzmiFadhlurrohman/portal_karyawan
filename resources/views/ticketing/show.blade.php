@@ -1361,6 +1361,30 @@
                         box-shadow: none !important;
                         border: none !important;
                     }
+
+                    @keyframes messagePopIn {
+                        0% {
+                            opacity: 0;
+                            transform: translateY(12px) scale(0.96);
+                        }
+                        60% {
+                            transform: translateY(-2px) scale(1.01);
+                        }
+                        100% {
+                            opacity: 1;
+                            transform: translateY(0) scale(1);
+                        }
+                    }
+
+                    .animate-message-in {
+                        animation: messagePopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                        transform-origin: bottom right;
+                    }
+
+                    .animate-message-in-left {
+                        animation: messagePopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                        transform-origin: bottom left;
+                    }
                 </style>
 
                 <!-- Submit Send Button -->
@@ -2975,7 +2999,7 @@ async function handleChatFormSubmit(e) {
         const timeStr = `${hours}:${minutes} WIB`;
 
         const bubble = document.createElement('div');
-        bubble.className = 'flex justify-end my-1 group/bubble relative transition-opacity';
+        bubble.className = 'flex justify-end my-1 group/bubble relative animate-message-in';
         bubble.id = tempRowId;
         
         let mediaNotice = '';
@@ -3763,7 +3787,8 @@ function renderIncomingLiveMessage(data) {
     }
 
     const row = document.createElement('div');
-    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} my-1 group/bubble relative`;
+    const animClass = data.is_self ? 'animate-message-in' : 'animate-message-in-left';
+    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} my-1 group/bubble relative ${animClass}`;
     row.id = 'chron-row-' + data.id;
 
     let replyBox = '';
