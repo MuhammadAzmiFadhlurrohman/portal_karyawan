@@ -1944,6 +1944,9 @@ function switchTab(tabId) {
         activeBtn.classList.add('text-white', 'font-bold');
     }
     if (tabId === 'tab-chronology') {
+        if (typeof adjustChatHeight === 'function') {
+            adjustChatHeight();
+        }
         const chatBox = document.getElementById('chat-stream-box');
         if (chatBox) {
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -2018,8 +2021,55 @@ function getLiveGpsCoordinates() {
     );
 }
 
-// Auto scroll chat to bottom on load
+// Responsive dynamic height calculation for all devices
+function adjustChatHeight() {
+    requestAnimationFrame(() => {
+        const chatCard = document.querySelector('.ticket-chat-card');
+        if (!chatCard) return;
+
+        const isDesktop = window.innerWidth >= 768;
+        const windowHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+        let topOffset = 0;
+        let bottomOffset = 0;
+
+        if (isDesktop) {
+            // Desktop: sticky top-0 header + main bottom padding
+            const header = document.querySelector('header');
+            const headerHeight = header ? header.getBoundingClientRect().height : 54;
+            const main = document.getElementById('main-content');
+            const mainPaddingBottom = main ? parseFloat(window.getComputedStyle(main).paddingBottom) || 20 : 20;
+
+            topOffset = headerHeight + 8;
+            bottomOffset = mainPaddingBottom;
+        } else {
+            // Mobile: fixed top header + fixed bottom navbar
+            const mobHeader = document.querySelector('.md\\:hidden.fixed.top-0');
+            const topHeaderHeight = mobHeader ? mobHeader.getBoundingClientRect().height : 48;
+
+            const mobNav = document.querySelector('.md\\:hidden.fixed.bottom-3 nav') || 
+                           document.querySelector('.md\\:hidden.fixed.bottom-3');
+            const bottomNavHeight = mobNav ? mobNav.getBoundingClientRect().height + 12 : 72;
+
+            topOffset = topHeaderHeight + 8;
+            bottomOffset = bottomNavHeight + 4;
+        }
+
+        const calculatedHeight = Math.max(380, Math.floor(windowHeight - topOffset - bottomOffset));
+        chatCard.style.height = calculatedHeight + 'px';
+    });
+}
+
+// Attach listeners for all devices, dynamic viewport changes, and orientation
+window.addEventListener('resize', adjustChatHeight);
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', adjustChatHeight);
+}
+window.addEventListener('orientationchange', adjustChatHeight);
+
+// Auto scroll chat to bottom and adjust height on load
 document.addEventListener('DOMContentLoaded', () => {
+    adjustChatHeight();
     const chatBox = document.getElementById('chat-stream-box');
     if (chatBox) {
         chatBox.scrollTop = chatBox.scrollHeight;
