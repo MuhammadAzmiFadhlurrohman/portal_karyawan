@@ -270,6 +270,20 @@ class ChronologyController extends Controller
         $lastId = (int) $request->query('last_id', 0);
         $currentUserId = $request->user()?->id;
 
+        // Auto mark incoming unread messages as read when viewing/polling this ticket
+        if ($currentUserId) {
+            TicketChronology::where('tiket_id', $tiket->id)
+                ->where('user_id', '!=', $currentUserId)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
+
+        // Get max read ID for self messages (up to which our own messages have been read by others)
+        $maxReadSelfId = (int) TicketChronology::where('tiket_id', $tiket->id)
+            ->where('user_id', $currentUserId)
+            ->whereNotNull('read_at')
+            ->max('id');
+
         $newChronologies = TicketChronology::with(['user', 'replyTo.user'])
             ->where('tiket_id', $tiket->id)
             ->where('id', '>', $lastId)
@@ -295,12 +309,40 @@ class ChronologyController extends Controller
                     'reply_to_id' => $chron->reply_to_id,
                     'reply_sender' => $chron->replyTo?->user?->name,
                     'reply_snippet' => $chron->replyTo ? ($chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : '📷 Lampiran Foto')) : null,
+                    'is_read' => !empty($chron->read_at),
                 ];
             });
 
         return response()->json([
             'success' => true,
             'messages' => $newChronologies,
+            'max_read_self_id' => $maxReadSelfId,
+        ]);
+    }
+
+    /**
+     * Explicit mark read endpoint for real-time receipt acknowledgement.
+     */
+    public function markRead(Request $request, Tiket $tiket): JsonResponse
+    {
+        Gate::authorize('view', $tiket);
+
+        $currentUserId = $request->user()?->id;
+        if ($currentUserId) {
+            TicketChronology::where('tiket_id', $tiket->id)
+                ->where('user_id', '!=', $currentUserId)
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+        }
+
+        $maxReadSelfId = (int) TicketChronology::where('tiket_id', $tiket->id)
+            ->where('user_id', $currentUserId)
+            ->whereNotNull('read_at')
+            ->max('id');
+
+        return response()->json([
+            'success' => true,
+            'max_read_self_id' => $maxReadSelfId,
         ]);
     }
 

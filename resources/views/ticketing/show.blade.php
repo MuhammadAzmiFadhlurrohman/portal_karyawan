@@ -1113,7 +1113,7 @@
                                 @if($isSelf)
                                     @if($isRead)
                                         <!-- Double Blue Checkmark (Dibaca) -->
-                                        <span title="Dibaca" class="inline-flex items-center text-[#53bdeb] ml-0.5" aria-label="Dibaca">
+                                        <span title="Dibaca" class="status-indicator inline-flex items-center text-[#53bdeb] ml-0.5" aria-label="Dibaca" data-status="read">
                                             <svg class="w-3.5 h-3 text-[#53bdeb]" viewBox="0 0 16 11" fill="none">
                                                 <path d="M11 1.5L4.5 8L1.5 5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M14.5 1.5L8 8L6.5 6.5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1121,7 +1121,7 @@
                                         </span>
                                     @else
                                         <!-- Double Grey Checkmark (Terkirim) -->
-                                        <span title="Terkirim" class="inline-flex items-center text-slate-400 ml-0.5" aria-label="Terkirim">
+                                        <span title="Terkirim" class="status-indicator inline-flex items-center text-slate-400 ml-0.5" aria-label="Terkirim" data-status="sent">
                                             <svg class="w-3.5 h-3 text-slate-400" viewBox="0 0 16 11" fill="none">
                                                 <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -3705,10 +3705,38 @@ async function pollLatestMessages() {
                     handleIncomingLivePayload(msg);
                 });
             }
+
+            // Real-time update read receipts (double blue checkmarks) for self messages read by others
+            if (data.max_read_self_id && data.max_read_self_id > 0) {
+                updateReadReceiptsUpTo(data.max_read_self_id);
+            }
         }
     } catch (e) {
         // Silent fail on background poll
     }
+}
+
+function updateReadReceiptsUpTo(maxReadId) {
+    const bubbles = document.querySelectorAll('[id^="chron-bubble-"]');
+    bubbles.forEach(bubble => {
+        const msgId = parseInt(bubble.dataset.id, 10);
+        const sender = bubble.dataset.sender;
+        if (sender === 'Anda' && msgId <= maxReadId) {
+            bubble.dataset.read = 'Sudah dibaca';
+            const statusSpan = bubble.querySelector('.status-indicator');
+            if (statusSpan && statusSpan.dataset.status !== 'read') {
+                statusSpan.dataset.status = 'read';
+                statusSpan.title = 'Dibaca';
+                statusSpan.className = 'status-indicator inline-flex items-center text-[#53bdeb] ml-0.5';
+                statusSpan.innerHTML = `
+                    <svg class="w-3.5 h-3 text-[#53bdeb]" viewBox="0 0 16 11" fill="none">
+                        <path d="M11 1.5L4.5 8L1.5 5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14.5 1.5L8 8L6.5 6.5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+            }
+        }
+    });
 }
 
 function handleIncomingLivePayload(data) {
@@ -3875,8 +3903,10 @@ function renderIncomingLiveMessage(data) {
             <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
                 <span>${escapeChatHtml(data.time_str || '')}</span>
                 ${data.is_self ? `
-                    <span title="Terkirim" class="inline-flex items-center text-slate-400 ml-0.5">
-                        <svg class="w-3.5 h-3 text-slate-400" viewBox="0 0 16 11" fill="none">
+                    <span title="${data.is_read ? 'Dibaca' : 'Terkirim'}"
+                          class="status-indicator inline-flex items-center ${data.is_read ? 'text-[#53bdeb]' : 'text-slate-400'} ml-0.5"
+                          data-status="${data.is_read ? 'read' : 'sent'}">
+                        <svg class="w-3.5 h-3 ${data.is_read ? 'text-[#53bdeb]' : 'text-slate-400'}" viewBox="0 0 16 11" fill="none">
                             <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
