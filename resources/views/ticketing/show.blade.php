@@ -1022,8 +1022,16 @@
                     </div>
 
                     <!-- Initial Ticket Creation System Note -->
-                    <div class="flex justify-start">
-                        <div style="max-width: min(82%, 440px);"
+                    <div class="flex justify-start items-start gap-1.5 sm:gap-2 my-1">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-teal-200/90 shadow-2xs flex items-center justify-center bg-teal-600 text-white select-none mt-0.5"
+                             title="{{ $tiket->creator->name ?? 'Helpdesk' }} (NOC)">
+                            @if($tiket->creator?->avatar_url)
+                                <img src="{{ $tiket->creator->avatar_url }}" alt="{{ $tiket->creator->name }}" class="w-full h-full object-cover" onerror="this.remove()">
+                            @else
+                                <span class="text-[10px] sm:text-[11px] font-bold text-white">{{ $tiket->creator?->initials ?? 'NOC' }}</span>
+                            @endif
+                        </div>
+                        <div style="max-width: min(80%, 420px);"
                              class="bg-white rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-slate-200/90 text-[11px] space-y-1">
                             <div class="flex items-center justify-between gap-2.5">
                                 <span class="font-bold text-slate-800 flex items-center gap-1.5">
@@ -1041,8 +1049,12 @@
 
                     <!-- Dispatch Note if available -->
                     @if($lead)
-                        <div class="flex justify-start">
-                            <div style="max-width: min(82%, 440px);"
+                        <div class="flex justify-start items-start gap-1.5 sm:gap-2 my-1">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-amber-300 shadow-2xs flex items-center justify-center bg-amber-500 text-white select-none mt-0.5"
+                                 title="Manager Teknis / Atasan">
+                                <span class="text-[10px] sm:text-[11px] font-bold text-white">MT</span>
+                            </div>
+                            <div style="max-width: min(80%, 420px);"
                                  class="bg-amber-50/90 rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-amber-200/90 text-[11px] space-y-1">
                                 <div class="flex items-center justify-between gap-2.5">
                                     <span class="font-bold text-amber-900 flex items-center gap-1.5">
@@ -1099,7 +1111,19 @@
                             });
                         }
                     @endphp
-                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-0.5 group/bubble relative" id="chron-row-{{ $chron->id }}">
+                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} items-start gap-1.5 sm:gap-2 my-1 group/bubble relative" id="chron-row-{{ $chron->id }}">
+                        @if(!$isSelf)
+                            <!-- Circular Avatar Others (Left) -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-slate-200/90 shadow-2xs flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-slate-700 select-none mt-0.5"
+                                 title="{{ $chron->user->name ?? 'User' }}">
+                                @if($chron->user?->avatar_url)
+                                    <img src="{{ $chron->user->avatar_url }}" alt="{{ $chron->user->name }}" class="w-full h-full object-cover" onerror="this.remove()">
+                                @else
+                                    <span class="text-[10px] sm:text-[11px] font-bold text-slate-700">{{ $chron->user?->initials ?? 'U' }}</span>
+                                @endif
+                            </div>
+                        @endif
+
                         <div id="chron-bubble-{{ $chron->id }}"
                              data-id="{{ $chron->id }}"
                              data-sender="{{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}"
@@ -1111,7 +1135,7 @@
                              data-lng="{{ $chron->longitude ?? '' }}"
                              data-photo="{{ $chron->photo_url ?? ($chron->photo_path ? asset('storage/' . $chron->photo_path) : '') }}"
                              data-category="{{ $chron->category ?? 'LAIN' }}"
-                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(82%, 380px);"
+                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(80%, 380px);"
                              class="rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }} relative">
                             
                             <!-- Sender & Role Badge + 3-Dots Dropdown Trigger (Matching User Attachment Image 1 & 2) -->
@@ -1305,6 +1329,18 @@
                                 @endif
                             </div>
                         </div>
+
+                        @if($isSelf)
+                            <!-- Circular Avatar Self / Anda (Right) -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-teal-200/80 shadow-2xs flex items-center justify-center bg-gradient-to-br from-teal-500 to-teal-700 text-white select-none mt-0.5"
+                                 title="Anda ({{ auth()->user()->name ?? 'User' }})">
+                                @if(auth()->user()?->avatar_url)
+                                    <img src="{{ auth()->user()->avatar_url }}" alt="Anda" class="w-full h-full object-cover" onerror="this.remove()">
+                                @else
+                                    <span class="text-[10px] sm:text-[11px] font-bold text-white">{{ auth()->user()?->initials ?? 'A' }}</span>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @empty
                     <div class="flex justify-center py-6">
@@ -3340,7 +3376,7 @@ async function handleChatFormSubmit(e) {
         const timeStr = `${hours}:${minutes} WIB`;
 
         const bubble = document.createElement('div');
-        bubble.className = 'flex justify-end my-0.5 group/bubble relative animate-message-in';
+        bubble.className = 'flex justify-end items-start gap-1.5 sm:gap-2 my-1 group/bubble relative animate-message-in';
         bubble.id = tempRowId;
         
         let mediaNotice = '';
@@ -3377,9 +3413,18 @@ async function handleChatFormSubmit(e) {
         }
 
         const authUserBadge = '{{ auth()->user()?->chat_badge ?? 'Staf' }}';
+        const authAvatarUrl = '{{ auth()->user()?->avatar_url ?? '' }}';
+        const authInitials = '{{ auth()->user()?->initials ?? 'A' }}';
+
+        const selfAvatarHtml = `
+            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-teal-200/80 shadow-2xs flex items-center justify-center bg-gradient-to-br from-teal-500 to-teal-700 text-white select-none mt-0.5"
+                 title="Anda">
+                ${authAvatarUrl ? `<img src="${authAvatarUrl}" alt="Anda" class="w-full h-full object-cover" onerror="this.remove()">` : `<span class="text-[10px] sm:text-[11px] font-bold text-white">${authInitials}</span>`}
+            </div>
+        `;
 
         bubble.innerHTML = `
-            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(82%, 380px);"
+            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(80%, 380px);"
                  class="rounded-xl rounded-tr-xs px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 relative new-chat-highlight-self">
                 <div class="flex items-center gap-1.5">
                     <span class="font-bold text-[11px] text-teal-950">Anda</span>
@@ -3397,6 +3442,11 @@ async function handleChatFormSubmit(e) {
                         <svg class="w-3 h-3 text-slate-400 shrink-0 animate-pulse" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
                         </svg>
+                    </span>
+                </div>
+            </div>
+            ${selfAvatarHtml}
+        `;
                     </span>
                 </div>
             </div>
@@ -4205,8 +4255,19 @@ function renderIncomingLiveMessage(data) {
 
     const row = document.createElement('div');
     const animClass = data.is_self ? 'animate-message-in' : 'animate-message-in-left';
-    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} my-0.5 group/bubble relative ${animClass}`;
+    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} items-start gap-1.5 sm:gap-2 my-1 group/bubble relative ${animClass}`;
     row.id = 'chron-row-' + data.id;
+
+    const avatarHtml = data.sender_avatar
+        ? `<img src="${data.sender_avatar}" alt="${escapeChatHtml(data.sender_name)}" class="w-full h-full object-cover" onerror="this.remove()">`
+        : `<span class="text-[10px] sm:text-[11px] font-bold ${data.is_self ? 'text-white' : 'text-slate-700'}">${escapeChatHtml(data.sender_initials || 'U')}</span>`;
+
+    const avatarBox = `
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border ${data.is_self ? 'border-teal-200/80 bg-gradient-to-br from-teal-500 to-teal-700 text-white' : 'border-slate-200/90 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-700'} shadow-2xs flex items-center justify-center select-none mt-0.5"
+             title="${escapeChatHtml(data.sender_name)}">
+            ${avatarHtml}
+        </div>
+    `;
 
     let replyBox = '';
     if (data.reply_sender) {
@@ -4286,7 +4347,7 @@ function renderIncomingLiveMessage(data) {
 
     const highlightClass = data.is_self ? 'new-chat-highlight-self' : 'new-chat-highlight-incoming';
 
-    row.innerHTML = `
+    const bubbleBox = `
         <div id="chron-bubble-${data.id}"
              data-id="${data.id}"
              data-sender="${escapeChatHtml(data.sender_name)}"
@@ -4298,8 +4359,69 @@ function renderIncomingLiveMessage(data) {
              data-lng="${data.longitude || ''}"
              data-photo="${data.photo_url || ''}"
              data-category="${escapeChatHtml(data.category || 'LAIN')}"
-             style="${data.is_self ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;'} box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(82%, 380px);"
+             style="${data.is_self ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;'} box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(80%, 380px);"
              class="rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 ${data.is_self ? 'rounded-tr-xs' : 'rounded-tl-xs'} relative ${highlightClass}">
+            
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 min-w-0">
+                    <span class="font-bold text-[11px] ${data.is_self ? 'text-teal-950' : 'text-slate-800'} truncate">
+                        ${escapeChatHtml(data.sender_name)}
+                    </span>
+                    <span style="${data.is_self ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;'}"
+                          class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
+                        ${escapeChatHtml(data.sender_badge)}
+                    </span>
+                </div>
+
+                <div class="relative shrink-0">
+                    <button type="button"
+                            onclick="toggleMessageMenu(${data.id}, event)"
+                            class="w-4 h-4 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
+                            title="Pilihan pesan">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                        </svg>
+                    </button>
+                    <div id="msg-dropdown-${data.id}"
+                         class="msg-action-dropdown hidden absolute ${data.is_self ? 'right-0' : 'left-0 sm:right-auto'} top-full mt-1 w-48 sm:w-52 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                        <div class="space-y-0.5 pb-1">
+                            <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                <span>Salin</span>
+                            </button>
+                            <button type="button" onclick="openMessageInfo(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                <span>Info Pesan</span>
+                            </button>
+                            <button type="button" onclick="replyToMessage(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                <span>Balas</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            ${replyBox}
+            ${data.message ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(data.message)}</p>` : ''}
+            ${photoBox}
+            ${videoBox}
+            ${locBox}
+
+            <div class="flex justify-end items-center gap-1 text-[9.5px] text-slate-400 font-mono pt-0.5 select-none leading-none">
+                <span>${escapeChatHtml(data.time_str || '')}</span>
+                ${data.is_self ? `
+                    <span title="${data.is_read ? 'Dibaca' : 'Terkirim'}"
+                          class="status-indicator inline-flex items-center ${data.is_read ? 'text-[#53bdeb]' : 'text-slate-400'} ml-0.5"
+                          data-status="${data.is_read ? 'read' : 'sent'}">
+                        <svg class="w-3.5 h-3 ${data.is_read ? 'text-[#53bdeb]' : 'text-slate-400'}" viewBox="0 0 16 11" fill="none">
+                            <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    row.innerHTML = data.is_self ? (bubbleBox + avatarBox) : (avatarBox + bubbleBox);
             
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 min-w-0">
