@@ -886,25 +886,31 @@
                     @php
                         $isSelf = auth()->check() && $chron->user_id === auth()->id();
                         $roleLabel = $chron->user?->roles?->first()?->name ?? $chron->user?->division ?? $chron->category ?? 'Petugas';
+                        
+                        // Clean duplicate raw GPS text if location card is already present
+                        $displayMessage = $chron->message;
+                        if ($chron->latitude && $chron->longitude && str_starts_with(trim((string)$displayMessage), '📍 Lokasi Saya saat ini: https://maps.google.com/')) {
+                            $displayMessage = null;
+                        }
                     @endphp
-                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }}">
-                        <div class="max-w-xl rounded-2xl p-3 sm:p-3.5 shadow-2xs border text-xs space-y-2
-                            {{ $isSelf ? 'bg-[#EBF5FF] border-blue-200/70 rounded-tr-xs' : 'bg-white border-slate-200 rounded-tl-xs' }}">
+                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1.5">
+                        <div style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
+                             class="max-w-xl rounded-2xl p-3 sm:p-3.5 text-xs space-y-2 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }}">
                             
                             <!-- Sender & Role Badge -->
                             <div class="flex items-center gap-2">
-                                <span class="font-bold {{ $isSelf ? 'text-teal-900' : 'text-slate-800' }}">
+                                <span class="font-bold text-xs sm:text-sm {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }}">
                                     {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
                                 </span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold
-                                    {{ $isSelf ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700' }}">
+                                <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
+                                      class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide">
                                     {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
                                 </span>
                             </div>
 
                             <!-- Message Content -->
-                            @if($chron->message)
-                                <p class="text-slate-800 leading-relaxed whitespace-pre-line text-xs sm:text-sm font-normal">{{ $chron->message }}</p>
+                            @if($displayMessage)
+                                <p class="text-slate-800 leading-relaxed whitespace-pre-line text-xs sm:text-sm font-normal">{{ $displayMessage }}</p>
                             @endif
 
                             <!-- Photo Attachment Preview if available -->
@@ -933,10 +939,12 @@
                             @if($chron->latitude && $chron->longitude)
                                 <a href="https://maps.google.com/?q={{ $chron->latitude }},{{ $chron->longitude }}" target="_blank"
                                    title="Buka titik koordinat di Google Maps"
-                                   class="block p-2.5 sm:p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-rose-300 transition-all group">
+                                   style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);"
+                                   class="block p-2.5 sm:p-3 rounded-2xl hover:border-rose-300 hover:shadow-xs transition-all group mt-2">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                            <svg class="w-6 h-6 text-rose-500" viewBox="0 0 24 24" fill="currentColor">
+                                        <div style="background-color: #FEE2E2; border: 1px solid #FECDD3;"
+                                             class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-5 h-5 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" clip-rule="evenodd"/>
                                             </svg>
                                         </div>
@@ -949,7 +957,7 @@
                             @endif
 
                             <!-- Timestamp at bottom right (Matching User Attachment Image 2) -->
-                            <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-0.5">
+                            <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-1">
                                 <span>{{ $chron->created_at->format('H:i') }} WIB</span>
                                 <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
