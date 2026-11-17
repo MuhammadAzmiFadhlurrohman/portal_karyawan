@@ -819,7 +819,61 @@
                 scroll-margin-top: 65px;
             }
         }
-        /* Fullscreen Zoom Mode */
+        /* Fullscreen Zoom Mode Animation & Styling */
+        @keyframes chatFsEnter {
+            0% {
+                opacity: 0;
+                transform: scale(0.94) translateY(14px);
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes chatFsExit {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+                filter: blur(2px);
+            }
+        }
+
+        @keyframes chatFsSettle {
+            0% {
+                opacity: 0.88;
+                transform: scale(0.985);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #chat-fs-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 22, 25, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        #chat-fs-backdrop.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .ticket-chat-card.is-chat-fullscreen {
             position: fixed !important;
             inset: 0 !important;
@@ -829,13 +883,31 @@
             max-width: none !important;
             border-radius: 0 !important;
             border: none !important;
-            box-shadow: none !important;
+            box-shadow: 0 25px 50px -12px rgba(2, 22, 25, 0.5) !important;
             margin: 0 !important;
             background-color: #EFEAE2 !important;
             background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2') !important;
             background-repeat: repeat !important;
             background-size: 420px auto !important;
             background-position: top left !important;
+            transform-origin: center center;
+        }
+
+        .ticket-chat-card.is-chat-fullscreen.chat-fs-entering {
+            animation: chatFsEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+            will-change: transform, opacity, filter;
+        }
+
+        .ticket-chat-card.is-chat-fullscreen.chat-fs-exiting {
+            animation: chatFsExit 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            will-change: transform, opacity, filter;
+            pointer-events: none !important;
+        }
+
+        .ticket-chat-card.chat-fs-settling {
+            animation: chatFsSettle 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+            transform-origin: center center;
+            will-change: transform, opacity;
         }
 
         .ticket-chat-card.is-chat-fullscreen #chat-stream-box {
@@ -963,6 +1035,12 @@
         }
     </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
+        <!-- Backdrop for Chat Full Size Transition -->
+        <div id="chat-fs-backdrop"
+             onclick="toggleChatFullscreen()"
+             class="hidden"
+             title="Tutup Tampilan Penuh (Esc)"></div>
+
         <div id="ticket-chat-container" class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs flex flex-col relative"
              style="overflow: visible !important;">
             
@@ -989,17 +1067,17 @@
                 <div class="flex items-center gap-1.5 shrink-0">
                     <button type="button" onclick="toggleChatFullscreen()"
                             id="btn-chat-fullscreen"
-                            title="Tampilan Penuh (Full Size)"
-                            class="text-[11px] text-white flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/30 hover:bg-teal-500/50 border border-teal-400/40 shadow-xs transition-all active:scale-95 cursor-pointer">
+                            title="Tampilan Penuh (Full Size) / Tekan Esc untuk keluar"
+                            class="text-[11px] text-white flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/30 hover:bg-teal-500/50 border border-teal-400/40 shadow-xs transition-all duration-200 active:scale-95 cursor-pointer">
                         <!-- Icon Expand / Maximize -->
-                        <svg id="icon-fs-expand" class="w-3 h-3 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <svg id="icon-fs-expand" class="w-3 h-3 text-cyan-300 transition-all duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                         </svg>
                         <!-- Icon Minimize (hidden by default) -->
-                        <svg id="icon-fs-minimize" class="w-3 h-3 text-cyan-300 hidden" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <svg id="icon-fs-minimize" class="w-3 h-3 text-cyan-300 hidden transition-all duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 4v4m0 0H5m4 0L4 3m11 1v4m0 0h4m-4 0l5-5M9 20v-4m0 0H5m4 0l-5 5m11-1v-4m0 0h4m-4 0l5 5"/>
                         </svg>
-                        <span id="fs_label" class="text-[10.5px] font-bold text-cyan-200">Full Size</span>
+                        <span id="fs_label" class="text-[10.5px] font-bold text-cyan-200 transition-colors duration-200">Full Size</span>
                     </button>
                 </div>
             </div>
@@ -2989,6 +3067,12 @@ document.addEventListener('keydown', function(e) {
         const modal = document.getElementById('image-lightbox-modal');
         if (modal && !modal.classList.contains('hidden')) {
             closeImageLightbox();
+            return;
+        }
+        const chatCard = document.querySelector('.ticket-chat-card');
+        if (chatCard && chatCard.classList.contains('is-chat-fullscreen')) {
+            toggleChatFullscreen();
+            return;
         }
         closeMessageInfo();
         closeMessageEdit();
@@ -4061,39 +4145,102 @@ function getLiveGpsCoordinates() {
     );
 }
 
-// Toggle Chat Fullscreen Mode (Zoom Full Size)
+// Toggle Chat Fullscreen Mode (Zoom Full Size) with Smooth Animation
+let isChatFullscreenTransitioning = false;
+
 function toggleChatFullscreen() {
+    if (isChatFullscreenTransitioning) return;
+
     const chatCard = document.getElementById('ticket-chat-container') || document.querySelector('.ticket-chat-card');
     if (!chatCard) return;
 
-    const isFullscreen = chatCard.classList.toggle('is-chat-fullscreen');
     const expandIcon = document.getElementById('icon-fs-expand');
     const minimizeIcon = document.getElementById('icon-fs-minimize');
     const fsLabel = document.getElementById('fs_label');
+    const backdrop = document.getElementById('chat-fs-backdrop');
 
-    if (isFullscreen) {
-        if (expandIcon) expandIcon.classList.add('hidden');
-        if (minimizeIcon) minimizeIcon.classList.remove('hidden');
-        if (fsLabel) fsLabel.innerText = 'Kecilkan';
+    const willBeFullscreen = !chatCard.classList.contains('is-chat-fullscreen');
+
+    if (willBeFullscreen) {
+        isChatFullscreenTransitioning = true;
+
+        // 1. Show backdrop with smooth fade-in
+        if (backdrop) {
+            backdrop.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                backdrop.classList.add('is-visible');
+            });
+        }
+
+        // 2. Add entering animation and fullscreen classes
+        chatCard.classList.remove('chat-fs-exiting', 'chat-fs-settling');
+        chatCard.classList.add('is-chat-fullscreen', 'chat-fs-entering');
         chatCard.style.height = '100dvh';
         document.body.style.overflow = 'hidden';
+
+        // 3. Update button UI
+        if (expandIcon) expandIcon.classList.add('hidden');
+        if (minimizeIcon) {
+            minimizeIcon.classList.remove('hidden');
+            minimizeIcon.classList.add('rotate-90');
+            requestAnimationFrame(() => minimizeIcon.classList.remove('rotate-90'));
+        }
+        if (fsLabel) fsLabel.innerText = 'Kecilkan';
+
+        // 4. Clean up enter animation class after completion
+        setTimeout(() => {
+            chatCard.classList.remove('chat-fs-entering');
+            isChatFullscreenTransitioning = false;
+        }, 280);
     } else {
-        if (expandIcon) expandIcon.classList.remove('hidden');
+        isChatFullscreenTransitioning = true;
+
+        // 1. Animate backdrop fade-out
+        if (backdrop) {
+            backdrop.classList.remove('is-visible');
+        }
+
+        // 2. Add smooth exiting animation
+        chatCard.classList.remove('chat-fs-entering');
+        chatCard.classList.add('chat-fs-exiting');
+
+        // 3. Update button UI
+        if (expandIcon) {
+            expandIcon.classList.remove('hidden');
+            expandIcon.classList.add('scale-75');
+            requestAnimationFrame(() => expandIcon.classList.remove('scale-75'));
+        }
         if (minimizeIcon) minimizeIcon.classList.add('hidden');
         if (fsLabel) fsLabel.innerText = 'Full Size';
-        document.body.style.overflow = '';
-        adjustChatHeight();
 
-        // Pastikan tetap di tab Kronologis (chat) dan scroll ke chat container
-        switchTab('tab-chronology');
+        // 4. Remove fullscreen after exit animation finishes
         setTimeout(() => {
-            chatCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 50);
+            chatCard.classList.remove('is-chat-fullscreen', 'chat-fs-exiting');
+            if (backdrop) backdrop.classList.add('hidden');
+            document.body.style.overflow = '';
+            adjustChatHeight();
+
+            // Settle animation back in page layout
+            chatCard.classList.add('chat-fs-settling');
+            setTimeout(() => {
+                chatCard.classList.remove('chat-fs-settling');
+            }, 250);
+
+            // Pastikan tetap di tab Kronologis (chat) dan scroll ke chat container
+            switchTab('tab-chronology');
+            setTimeout(() => {
+                chatCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 50);
+
+            isChatFullscreenTransitioning = false;
+        }, 220);
     }
 
     const chatBox = document.getElementById('chat-stream-box');
     if (chatBox) {
-        chatBox.scrollTop = chatBox.scrollHeight;
+        requestAnimationFrame(() => {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
     }
 }
 
