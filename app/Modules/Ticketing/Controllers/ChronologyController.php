@@ -40,6 +40,12 @@ class ChronologyController extends Controller
             $category = 'LAIN';
         }
 
+        // Clamp gps_accuracy between 0 and 9999.99 to prevent MySQL decimal(6,2) 1264 Out of range error
+        $gpsAccuracy = null;
+        if (isset($validated['gps_accuracy']) && is_numeric($validated['gps_accuracy'])) {
+            $gpsAccuracy = min(9999.99, max(0, (float) $validated['gps_accuracy']));
+        }
+
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('tickets/chronologies/photos', 'public');
@@ -60,7 +66,7 @@ class ChronologyController extends Controller
                 videoPath: $videoPath,
                 latitude: isset($validated['latitude']) ? (float) $validated['latitude'] : null,
                 longitude: isset($validated['longitude']) ? (float) $validated['longitude'] : null,
-                gpsAccuracy: isset($validated['gps_accuracy']) ? (float) $validated['gps_accuracy'] : null,
+                gpsAccuracy: $gpsAccuracy,
             );
 
             if ($request->wantsJson()) {

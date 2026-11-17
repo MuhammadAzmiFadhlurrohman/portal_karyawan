@@ -2258,9 +2258,13 @@ function shareMyCurrentLocation() {
         (pos) => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
+            // Clamp accuracy so it never exceeds database decimal(6,2)
+            const rawAcc = pos.coords.accuracy || 10;
+            const acc = Math.min(9999, Math.max(0, Math.round(rawAcc * 100) / 100));
+
             document.getElementById('chron_lat').value = lat;
             document.getElementById('chron_lng').value = lng;
-            document.getElementById('chron_acc').value = pos.coords.accuracy;
+            document.getElementById('chron_acc').value = acc;
             if (input) {
                 input.value = `📍 Lokasi Saya saat ini: https://maps.google.com/?q=${lat},${lng}`;
                 input.focus();
@@ -2335,9 +2339,12 @@ function getLiveGpsCoordinates() {
     if (label) label.innerText = 'GPS...';
     navigator.geolocation.getCurrentPosition(
         (pos) => {
+            const rawAcc = pos.coords.accuracy || 10;
+            const acc = Math.min(9999, Math.max(0, Math.round(rawAcc * 100) / 100));
+
             document.getElementById('chron_lat').value = pos.coords.latitude;
             document.getElementById('chron_lng').value = pos.coords.longitude;
-            document.getElementById('chron_acc').value = pos.coords.accuracy;
+            document.getElementById('chron_acc').value = acc;
             if (label) label.innerText = `✓ GPS (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
             const btn = document.getElementById('gps_action_btn');
             if (btn) {

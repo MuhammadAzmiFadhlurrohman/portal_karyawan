@@ -70,6 +70,9 @@ class ChronologyService
                 $address = $this->reverseGeocode($latitude, $longitude);
             }
 
+            // Clamp GPS accuracy to safe decimal(6,2) range [0, 9999.99] to prevent MySQL 1264 numeric overflow
+            $clampedGpsAccuracy = $gpsAccuracy !== null ? min(9999.99, max(0.0, (float) $gpsAccuracy)) : null;
+
             $chronology = TicketChronology::query()->create([
                 'tiket_id' => $tiket->id,
                 'user_id' => $user->id,
@@ -79,7 +82,7 @@ class ChronologyService
                 'video_path' => $videoPath,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
-                'gps_accuracy' => $gpsAccuracy,
+                'gps_accuracy' => $clampedGpsAccuracy,
                 'location_address' => $address,
                 'created_at' => $now,
             ]);
