@@ -268,7 +268,13 @@
     color: #FFFFFF;
 }
 
-/* Ticket Mobile Status Stripes */
+/* WhatsApp Attachment Dropup Menu */
+#dropdown-attachment-menu {
+    bottom: 100% !important;
+    top: auto !important;
+    margin-bottom: 12px !important;
+    transform-origin: bottom left;
+}
 .stripe-overdue { border-left: 5px solid #DC2626; }
 .stripe-open { border-left: 5px solid #18C4C4; }
 .stripe-proses { border-left: 5px solid #EAB308; }

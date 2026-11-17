@@ -1016,7 +1016,8 @@
 
                     <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
                     <div id="dropdown-attachment-menu"
-                         class="hidden absolute left-0 bottom-full mb-3 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-200/90 py-2.5 px-2 z-[100] select-none divide-y divide-slate-100">
+                         style="bottom: 100% !important; margin-bottom: 12px !important; top: auto !important;"
+                         class="hidden absolute left-0 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-200/90 py-2.5 px-2 z-[100] select-none divide-y divide-slate-100">
                         
                         <div class="space-y-1 pb-1.5">
                             <!-- Option 1: Upload Media (Foto / Video) -->
