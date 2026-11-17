@@ -838,27 +838,27 @@
                  style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
                 
                 <!-- Inner Centered Conversation Thread (WhatsApp Web Style) -->
-                <div id="chat-stream-container" class="max-w-4xl mx-auto w-full space-y-3.5 sm:space-y-4">
+                <div id="chat-stream-container" class="max-w-2xl mx-auto w-full space-y-2.5 sm:space-y-3">
                     <!-- Date divider (WhatsApp Floating Pill) -->
                     <div class="flex justify-center sticky top-0 z-10 py-1">
-                    <span class="px-3.5 py-1 rounded-lg text-[11px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span class="px-3 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5">
+                        <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
                     </span>
                 </div>
 
                 <!-- Initial Ticket Creation System Note -->
                 <div class="flex justify-start">
-                    <div class="max-w-xl bg-white rounded-2xl rounded-tl-xs p-3.5 sm:p-4 shadow-xs border border-slate-200 text-xs space-y-1.5">
+                    <div class="max-w-md bg-white rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-slate-200 text-xs space-y-1">
                         <div class="flex items-center justify-between gap-3">
                             <span class="font-bold text-slate-800 flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                                <span>{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
-                                <span class="px-1.5 py-0.2 rounded text-[10px] bg-teal-100 text-teal-800 font-bold">NOC</span>
+                                <span class="text-xs">{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
+                                <span class="px-1.5 py-0.2 rounded text-[9px] bg-teal-100 text-teal-800 font-bold">NOC</span>
                             </span>
                             <span class="text-[10px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
                         </div>
-                        <p class="text-slate-700 leading-relaxed font-semibold">
+                        <p class="text-slate-700 leading-snug font-medium text-[11px] sm:text-xs">
                             🎫 <strong>OPEN TIKET BARU</strong>: Tiket dibuat dengan status OPEN. Kendala: {{ $tiket->problem_temuan ?? '-' }}
                         </p>
                     </div>
@@ -867,16 +867,16 @@
                 <!-- Dispatch Note if available -->
                 @if($lead)
                     <div class="flex justify-start">
-                        <div class="max-w-xl bg-amber-50/90 rounded-2xl rounded-tl-xs p-3.5 sm:p-4 shadow-xs border border-amber-200 text-xs space-y-1.5">
+                        <div class="max-w-md bg-amber-50/90 rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-amber-200 text-xs space-y-1">
                             <div class="flex items-center justify-between gap-3">
                                 <span class="font-bold text-amber-900 flex items-center gap-1.5">
-                                    <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[10px]">MT</span>
-                                    <span>Manager Teknis</span>
-                                    <span class="px-1.5 py-0.2 rounded text-[10px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
+                                    <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[9px]">MT</span>
+                                    <span class="text-xs">Manager Teknis</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
                                 </span>
                                 <span class="text-[10px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
                             </div>
-                            <p class="text-amber-950 leading-relaxed">
+                            <p class="text-amber-950 leading-snug text-[11px] sm:text-xs">
                                 👷 <strong>DISPATCH / PENUGASAN TIM</strong>: Ditugaskan <strong>{{ $lead->name }}</strong> (Lead) bersama tim: 
                                 {{ $crew->pluck('name')->join(', ') ?: 'mandiri' }} untuk menangani perbaikan tiket ini.
                             </p>
@@ -906,34 +906,34 @@
                             });
                         }
                     @endphp
-                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1.5">
-                        <div style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
-                             class="max-w-xl rounded-2xl p-3 sm:p-3.5 text-xs space-y-2 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }}">
+                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1">
+                        <div style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.06);"
+                             class="max-w-[85%] sm:max-w-md rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }}">
                             
                             <!-- Sender & Role Badge -->
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-xs sm:text-sm {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }}">
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-xs {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }}">
                                     {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
                                 </span>
                                 <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
-                                      class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide">
+                                      class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
                                     {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
                                 </span>
                             </div>
 
                             <!-- Message Content -->
                             @if($displayMessage)
-                                <p class="text-slate-800 leading-relaxed whitespace-pre-line text-xs sm:text-sm font-normal">{{ $displayMessage }}</p>
+                                <p class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $displayMessage }}</p>
                             @endif
 
                             <!-- Photo Attachment Preview if available -->
                             @if($chron->photo_path)
-                                <div class="pt-1">
-                                    <a href="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-2xl overflow-hidden border border-slate-200/90 max-w-xs shadow-2xs bg-slate-100">
+                                <div class="pt-0.5">
+                                    <a href="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-xl overflow-hidden border border-slate-200/90 max-w-[240px] shadow-2xs bg-slate-100">
                                         <img src="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}"
                                              alt="Bukti Foto"
                                              loading="lazy"
-                                             class="w-full h-44 object-cover group-hover:scale-105 transition duration-200"
+                                             class="w-full h-36 object-cover group-hover:scale-105 transition duration-200"
                                              onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
                                         <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
                                             Lihat Foto Penuh &rarr;
@@ -944,43 +944,43 @@
 
                             <!-- Video Attachment Preview if available -->
                             @if($chron->video_path)
-                                <div class="pt-1">
-                                    <video controls class="w-full max-w-xs rounded-2xl border border-slate-200/90 shadow-2xs">
+                                <div class="pt-0.5">
+                                    <video controls class="w-full max-w-[240px] rounded-xl border border-slate-200/90 shadow-2xs">
                                         <source src="{{ $chron->video_url ?? asset('storage/' . $chron->video_path) }}" type="video/mp4">
                                         Browser Anda tidak mendukung pemutaran video.
                                     </video>
                                 </div>
                             @endif
 
-                            <!-- Interactive Location Card (Matching User Attachment Image 2) -->
+                            <!-- Interactive Location Card (Compact & Clean) -->
                             @if($chron->latitude && $chron->longitude)
                                 <a href="https://maps.google.com/?q={{ $chron->latitude }},{{ $chron->longitude }}" target="_blank"
                                    title="Buka titik koordinat di Google Maps"
-                                   style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);"
-                                   class="block p-2.5 sm:p-3 rounded-2xl hover:border-rose-300 hover:shadow-xs transition-all group mt-2">
-                                    <div class="flex items-center gap-3">
+                                   style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);"
+                                   class="block p-2 rounded-xl hover:border-rose-300 hover:shadow-xs transition-all group mt-1">
+                                    <div class="flex items-center gap-2.5">
                                         <div style="background-color: #FEE2E2; border: 1px solid #FECDD3;"
-                                             class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                            <svg class="w-5 h-5 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
+                                             class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" clip-rule="evenodd"/>
                                             </svg>
                                         </div>
                                         <div class="min-w-0 flex-1">
-                                            <div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-rose-600 transition-colors">Lokasi Titik Lapangan</div>
-                                            <div class="text-[11px] sm:text-xs font-mono text-slate-500 mt-0.5 truncate tracking-tight">{{ number_format($chron->latitude, 6) }}, {{ number_format($chron->longitude, 6) }}</div>
+                                            <div class="font-bold text-xs text-slate-800 group-hover:text-rose-600 transition-colors leading-tight">Lokasi Titik Lapangan</div>
+                                            <div class="text-[10px] font-mono text-slate-500 mt-0.5 truncate tracking-tight">{{ number_format($chron->latitude, 6) }}, {{ number_format($chron->longitude, 6) }}</div>
                                         </div>
                                     </div>
                                 </a>
                             @endif
 
                             <!-- Timestamp & WhatsApp status indicators -->
-                            <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-1 select-none">
+                            <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
                                 <span>{{ $chron->created_at->format('H:i') }} WIB</span>
                                 @if($isSelf)
                                     @if($isRead)
                                         <!-- Double Blue Checkmark (Dibaca) -->
                                         <span title="Dibaca" class="inline-flex items-center text-[#53bdeb] ml-0.5" aria-label="Dibaca">
-                                            <svg class="w-4 h-3.5 text-[#53bdeb]" viewBox="0 0 16 11" fill="none">
+                                            <svg class="w-3.5 h-3 text-[#53bdeb]" viewBox="0 0 16 11" fill="none">
                                                 <path d="M11 1.5L4.5 8L1.5 5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M14.5 1.5L8 8L6.5 6.5" stroke="#53bdeb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
@@ -988,7 +988,7 @@
                                     @else
                                         <!-- Double Grey Checkmark (Terkirim) -->
                                         <span title="Terkirim" class="inline-flex items-center text-slate-400 ml-0.5" aria-label="Terkirim">
-                                            <svg class="w-4 h-3.5 text-slate-400" viewBox="0 0 16 11" fill="none">
+                                            <svg class="w-3.5 h-3 text-slate-400" viewBox="0 0 16 11" fill="none">
                                                 <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                                 <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
@@ -1012,7 +1012,7 @@
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
             <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
-                <div class="max-w-4xl mx-auto w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
+                <div class="max-w-2xl mx-auto w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
                     <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
                     
                     <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
@@ -1054,7 +1054,7 @@
             <form id="quick-chat-form" method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
                   onsubmit="handleChatFormSubmit(event)"
                   class="p-2.5 sm:p-4 bg-white border-t border-slate-200 shrink-0 relative">
-                <div class="max-w-4xl mx-auto w-full flex items-center gap-2 sm:gap-2.5">
+                <div class="max-w-2xl mx-auto w-full flex items-center gap-2 sm:gap-2.5">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
                 <input type="hidden" name="latitude" id="chron_lat">
@@ -2282,21 +2282,21 @@ function handleChatFormSubmit(e) {
         }
 
         bubble.innerHTML = `
-            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 3px rgba(0,0,0,0.05);"
-                 class="max-w-xl rounded-2xl rounded-tr-xs p-3 sm:p-3.5 text-xs space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-xs sm:text-sm text-teal-950">Anda</span>
-                    <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wide">
+            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06);"
+                 class="max-w-[85%] sm:max-w-md rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5">
+                <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-xs text-teal-950">Anda</span>
+                    <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
                         Teknisi
                     </span>
                 </div>
-                ${msg ? `<p class="text-slate-800 leading-relaxed whitespace-pre-line text-xs sm:text-sm font-normal">${escapeChatHtml(msg)}</p>` : ''}
+                ${msg ? `<p class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">${escapeChatHtml(msg)}</p>` : ''}
                 ${mediaNotice}
                 ${locNotice}
-                <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-1 select-none">
+                <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
                     <span>${timeStr}</span>
                     <span title="Mengirim..." class="inline-flex items-center text-slate-400 ml-0.5">
-                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
                         </svg>
                     </span>
