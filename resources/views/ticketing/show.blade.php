@@ -834,13 +834,14 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 min-h-0 overflow-y-auto bg-slate-50/70"
-                 style="background-image: radial-gradient(#0D9488 0.5px, transparent 0.5px), radial-gradient(#0D9488 0.5px, #f8fafc 0.5px); background-size: 20px 20px; background-position: 0 0, 10px 10px; background-opacity: 0.05;">
+            <div id="chat-stream-box" class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-4 flex-1 min-h-0 overflow-y-auto relative"
+                 style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
                 
-                <!-- Date divider -->
-                <div class="flex justify-center">
-                    <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 text-slate-500 shadow-xs border border-slate-200">
-                        {{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}
+                <!-- Date divider (WhatsApp Floating Pill) -->
+                <div class="flex justify-center sticky top-0 z-10 py-1">
+                    <span class="px-3.5 py-1 rounded-lg text-[11px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
                     </span>
                 </div>
 
