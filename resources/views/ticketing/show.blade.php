@@ -794,6 +794,10 @@
             background-color: #EFEAE2 !important;
         }
 
+        .ticket-chat-card.is-chat-fullscreen .chat-header-banner {
+            border-radius: 0 !important;
+        }
+
         /* Floating WhatsApp-Style Input Bar in Mobile Fullscreen */
         @media (max-width: 767px) {
             .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
@@ -881,7 +885,7 @@
              style="overflow: visible !important;">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
-            <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0 rounded-t-3xl overflow-hidden"
+            <div class="chat-header-banner px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0 rounded-t-3xl overflow-hidden"
                  style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
