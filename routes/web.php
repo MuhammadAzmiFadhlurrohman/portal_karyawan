@@ -143,6 +143,7 @@ Route::middleware('auth')->group(function (): void {
 
     // Chronology & Interval Monitoring (§7.3, AC-05)
     Route::get('/tickets/{tiket}/chronologies/stream', [ChronologyController::class, 'stream'])->name('tickets.chronologies.stream');
+    Route::get('/tickets/{tiket}/chronologies/poll', [ChronologyController::class, 'poll'])->name('tickets.chronologies.poll');
     Route::post('/tickets/{tiket}/chronologies', [ChronologyController::class, 'store'])->name('tickets.chronologies.store');
     Route::patch('/tickets/chronologies/{chronology}', [ChronologyController::class, 'update'])->name('tickets.chronologies.update');
     Route::delete('/tickets/chronologies/{chronology}', [ChronologyController::class, 'destroy'])->name('tickets.chronologies.destroy');

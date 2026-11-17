@@ -3064,6 +3064,10 @@ async function handleChatFormSubmit(e) {
         const data = await res.json();
         const chron = data.chronology;
 
+        if (chron && chron.id) {
+            highestChronologyId = Math.max(highestChronologyId, chron.id);
+        }
+
         // Transition pending clock icon -> double grey checkmark (Terkirim) like WhatsApp
         const tempBubbleRow = document.getElementById(tempRowId);
         if (tempBubbleRow && chron) {
@@ -3641,15 +3645,25 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiveChatSSE();
 });
 
-// Real-Time Chat Synchronization via Server-Sent Events (SSE)
+// Real-Time Chat Synchronization via Server-Sent Events (SSE) with Polling Fallback
 let chatEventSource = null;
 let highestChronologyId = {{ $tiket->chronologies->max('id') ?? 0 }};
+let sseReconnectTimer = null;
+let pollTimer = null;
 
 function initLiveChatSSE() {
+    startSSEStream();
+    // Safety polling fallback every 4 seconds in case SSE is blocked by proxy/server configuration
+    if (!pollTimer) {
+        pollTimer = setInterval(pollLatestMessages, 4000);
+    }
+}
+
+function startSSEStream() {
     if (!window.EventSource) return;
 
     if (chatEventSource) {
-        chatEventSource.close();
+        try { chatEventSource.close(); } catch (e) {}
     }
 
     const streamUrl = '{{ route('tickets.chronologies.stream', $tiket) }}?last_id=' + highestChronologyId;
@@ -3659,23 +3673,52 @@ function initLiveChatSSE() {
         try {
             const data = JSON.parse(e.data);
             if (!data || !data.id) return;
-
-            highestChronologyId = Math.max(highestChronologyId, data.id);
-
-            // If message already rendered (e.g. self optimistic message), ignore or update
-            if (document.getElementById('chron-row-' + data.id)) {
-                return;
-            }
-
-            renderIncomingLiveMessage(data);
+            handleIncomingLivePayload(data);
         } catch (err) {
             console.error('SSE Message parsing error:', err);
         }
     });
 
     chatEventSource.onerror = () => {
-        // EventSource will auto-reconnect after network glitch
+        try { chatEventSource.close(); } catch (e) {}
+        if (!sseReconnectTimer) {
+            sseReconnectTimer = setTimeout(() => {
+                sseReconnectTimer = null;
+                startSSEStream();
+            }, 3000);
+        }
     };
+}
+
+async function pollLatestMessages() {
+    try {
+        const url = '{{ route('tickets.chronologies.poll', $tiket) }}?last_id=' + highestChronologyId;
+        const res = await fetch(url, {
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.messages && data.messages.length > 0) {
+                data.messages.forEach(msg => {
+                    handleIncomingLivePayload(msg);
+                });
+            }
+        }
+    } catch (e) {
+        // Silent fail on background poll
+    }
+}
+
+function handleIncomingLivePayload(data) {
+    if (!data || !data.id) return;
+    highestChronologyId = Math.max(highestChronologyId, data.id);
+
+    // If message already rendered (e.g. self optimistic message), ignore
+    if (document.getElementById('chron-row-' + data.id)) {
+        return;
+    }
+
+    renderIncomingLiveMessage(data);
 }
 
 function renderIncomingLiveMessage(data) {

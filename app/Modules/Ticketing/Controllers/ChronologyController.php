@@ -189,6 +189,11 @@ class ChronologyController extends Controller
         $lastId = (int) $request->query('last_id', 0);
         $currentUserId = $request->user()?->id;
 
+        // Release the session lock immediately so concurrent requests (like POSTing a message) are not blocked!
+        if (session()->isStarted()) {
+            session()->save();
+        }
+
         return response()->stream(function () use ($tiket, $lastId, $currentUserId) {
             // Disable output buffering for real-time flush
             while (ob_get_level() > 0) {
@@ -252,6 +257,50 @@ class ChronologyController extends Controller
             'Cache-Control' => 'no-cache, no-transform',
             'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    /**
+     * Polling fallback endpoint for chat synchronization.
+     */
+    public function poll(Request $request, Tiket $tiket): JsonResponse
+    {
+        Gate::authorize('view', $tiket);
+
+        $lastId = (int) $request->query('last_id', 0);
+        $currentUserId = $request->user()?->id;
+
+        $newChronologies = TicketChronology::with(['user', 'replyTo.user'])
+            ->where('tiket_id', $tiket->id)
+            ->where('id', '>', $lastId)
+            ->orderBy('id', 'asc')
+            ->get()
+            ->map(function ($chron) use ($currentUserId) {
+                $isSelf = $currentUserId && $chron->user_id === $currentUserId;
+                return [
+                    'id' => $chron->id,
+                    'tiket_id' => $chron->tiket_id,
+                    'user_id' => $chron->user_id,
+                    'sender_name' => $isSelf ? 'Anda' : ($chron->user?->name ?? 'User'),
+                    'is_self' => $isSelf,
+                    'sender_badge' => $chron->user?->chat_badge ?? ($chron->user?->division ?: 'Petugas'),
+                    'message' => $chron->message,
+                    'category' => $chron->category ?? 'LAIN',
+                    'time_str' => $chron->created_at ? $chron->created_at->format('H:i') . ' WIB' : '',
+                    'date_str' => $chron->created_at ? $chron->created_at->format('d M Y, H:i') . ' WIB' : '',
+                    'latitude' => $chron->latitude ? (float) $chron->latitude : null,
+                    'longitude' => $chron->longitude ? (float) $chron->longitude : null,
+                    'photo_url' => $chron->photo_url,
+                    'video_url' => $chron->video_url,
+                    'reply_to_id' => $chron->reply_to_id,
+                    'reply_sender' => $chron->replyTo?->user?->name,
+                    'reply_snippet' => $chron->replyTo ? ($chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : '📷 Lampiran Foto')) : null,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'messages' => $newChronologies,
         ]);
     }
 
