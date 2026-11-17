@@ -1023,7 +1023,7 @@
                         <div id="chron-bubble-{{ $chron->id }}"
                              data-id="{{ $chron->id }}"
                              data-sender="{{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}"
-                             data-role="{{ ucfirst(str_replace('_', ' ', $roleLabel)) }}"
+                             data-role="{{ str_replace('_', ' ', $roleLabel) }}"
                              data-message="{{ $chron->message }}"
                              data-time="{{ $chron->created_at->format('d M Y, H:i') }} WIB"
                              data-read="{{ $isRead ? ($chron->read_at ? $chron->read_at->format('d M Y, H:i') . ' WIB' : 'Sudah dibaca') : 'Belum dibaca' }}"
@@ -1042,7 +1042,7 @@
                                     </span>
                                     <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
                                           class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
-                                        {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
+                                        {{ str_replace('_', ' ', $roleLabel) }}
                                     </span>
                                 </div>
 

@@ -108,19 +108,23 @@ class User extends Authenticatable
     }
 
     /**
-     * Get display badge for chat / ticketing: Divisi untuk staf, Atasan untuk atasan/manager.
+     * Get display badge for chat / ticketing: Prioritaskan Divisi/Jabatan sesuai profil header.
      */
     public function getChatBadgeAttribute(): string
     {
-        if ($this->isAtasan()) {
-            return 'Atasan';
-        }
-
         if (! empty($this->division)) {
             return $this->division;
         }
 
-        return $this->position ?: 'Staf';
+        if (! empty($this->position)) {
+            return $this->position;
+        }
+
+        if ($this->isAtasan()) {
+            return 'Atasan';
+        }
+
+        return 'Staf';
     }
 
     /**
