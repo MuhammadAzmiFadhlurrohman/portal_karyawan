@@ -103,6 +103,7 @@ class ChronologyController extends Controller
                     'success' => true,
                     'message' => 'Pesan terkirim',
                     'chronology' => $entry,
+                    'sender_badge' => $entry->user?->chat_badge ?? 'Staf',
                     'photo_url' => $entry->photo_url,
                     'video_url' => $entry->video_url,
                 ]);

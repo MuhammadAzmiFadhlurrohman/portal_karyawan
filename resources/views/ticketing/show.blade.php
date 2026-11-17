@@ -890,7 +890,7 @@
                 @forelse($tiket->chronologies as $chron)
                     @php
                         $isSelf = auth()->check() && $chron->user_id === auth()->id();
-                        $roleLabel = $chron->user?->roles?->first()?->name ?? $chron->user?->division ?? $chron->category ?? 'Petugas';
+                        $roleLabel = $chron->user?->chat_badge ?? ($chron->user?->division ?: ($chron->category ?? 'Petugas'));
                         
                         // Clean duplicate raw GPS text if location card is already present
                         $displayMessage = $chron->message;
@@ -3002,13 +3002,15 @@ async function handleChatFormSubmit(e) {
             `;
         }
 
+        const authUserBadge = '{{ auth()->user()?->chat_badge ?? 'Staf' }}';
+
         bubble.innerHTML = `
             <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
                  class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5 relative">
                 <div class="flex items-center gap-1.5">
                     <span class="font-bold text-xs text-teal-950">Anda</span>
                     <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
-                        Teknisi
+                        ${escapeChatHtml(authUserBadge)}
                     </span>
                 </div>
                 ${replyBox}
@@ -3071,7 +3073,7 @@ async function handleChatFormSubmit(e) {
                 bubbleBox.id = 'chron-bubble-' + chron.id;
                 bubbleBox.dataset.id = chron.id;
                 bubbleBox.dataset.sender = 'Anda';
-                bubbleBox.dataset.role = 'Teknisi';
+                bubbleBox.dataset.role = data.sender_badge || authUserBadge;
                 bubbleBox.dataset.message = chron.message || '';
                 bubbleBox.dataset.time = (chron.created_at || '') + ' WIB';
                 bubbleBox.dataset.read = 'Belum dibaca';

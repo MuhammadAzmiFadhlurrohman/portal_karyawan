@@ -92,6 +92,38 @@ class User extends Authenticatable
     }
 
     /**
+     * Determine if user has supervisor/manager/atasan authority.
+     */
+    public function isAtasan(): bool
+    {
+        if ($this->hasRole(['super_admin', 'admin', 'ceo', 'manager_teknisi', 'atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum'])) {
+            return true;
+        }
+
+        if ($this->can('gomsn.pengajuan.approve_atasan') || $this->can('attendance.correction.approve') || $this->can('gomsn.lembur.approve')) {
+            return true;
+        }
+
+        return self::query()->where('supervisor_id', $this->id)->exists();
+    }
+
+    /**
+     * Get display badge for chat / ticketing: Divisi untuk staf, Atasan untuk atasan/manager.
+     */
+    public function getChatBadgeAttribute(): string
+    {
+        if ($this->isAtasan()) {
+            return 'Atasan';
+        }
+
+        if (! empty($this->division)) {
+            return $this->division;
+        }
+
+        return $this->position ?: 'Staf';
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function supervisor(): BelongsTo
