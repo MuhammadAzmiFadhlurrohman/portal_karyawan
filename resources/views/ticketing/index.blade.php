@@ -30,20 +30,14 @@
                 </div>
             </div>
 
-            <!-- Action Buttons: + Tiket Backbone, + Tiket Broadband, Rekap KPI -->
+            <!-- Action Buttons: Buat Tiket, Rekap KPI -->
             <div class="flex items-center gap-2 self-start sm:self-auto shrink-0">
                 @can('ticket.create')
-                <a href="{{ route('tickets.create', ['category' => 'backbone']) }}"
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs text-white shadow-sm shadow-teal-950/30 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+                <a href="{{ route('tickets.create') }}"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs text-white shadow-sm shadow-teal-950/30 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
                    style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                    <span>+ Backbone</span>
-                </a>
-
-                <a href="{{ route('tickets.create', ['category' => 'broadband']) }}"
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs text-white shadow-sm shadow-emerald-950/30 border border-white/20 bg-emerald-600 hover:bg-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                    <span>+ Broadband</span>
+                    <span>Buat Tiket</span>
                 </a>
                 @endcan
 
