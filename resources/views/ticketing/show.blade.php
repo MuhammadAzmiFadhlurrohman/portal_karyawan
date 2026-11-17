@@ -898,6 +898,23 @@
                             $displayMessage = null;
                         }
 
+                        // WhatsApp Reply Quote Detection:
+                        // 1. Via replyTo relation
+                        // 2. Or via [Balas @Sender | Snippet]: Message format
+                        // 3. Or via [Balas @Sender]: Message format
+                        $quotedSender = null;
+                        $quotedSnippet = null;
+                        $cleanMessage = $displayMessage;
+
+                        if (!empty($chron->reply_to_id) && $chron->relationLoaded('replyTo') && $chron->replyTo) {
+                            $quotedSender = $chron->replyTo->user->name ?? 'User';
+                            $quotedSnippet = $chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : ($chron->replyTo->photo_path ? '📷 Lampiran Foto' : 'Pesan'));
+                        } elseif ($displayMessage && preg_match('/^\[Balas @([^\]\|]+)(?: \| ([^\]]+))?\]:\s*(.*)$/s', $displayMessage, $matches)) {
+                            $quotedSender = trim($matches[1]);
+                            $quotedSnippet = !empty($matches[2]) ? trim($matches[2]) : null;
+                            $cleanMessage = trim($matches[3]);
+                        }
+
                         // WhatsApp read status:
                         // 1. Explicit read_at timestamp populated
                         // 2. Or there exists a subsequent chronology from someone else in this ticket
@@ -1009,9 +1026,28 @@
                                 </div>
                             </div>
 
+                            <!-- WhatsApp Quoted Reply Box (Matching User Reference Image) -->
+                            @if($quotedSender)
+                                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
+                                     class="px-2.5 py-1.5 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
+                                     @if(!empty($chron->reply_to_id)) onclick="scrollToChronology({{ $chron->reply_to_id }})" title="Klik untuk menuju pesan asli" @endif>
+                                    <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
+                                        <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
+                                        </svg>
+                                        <span class="truncate uppercase tracking-wide">{{ $quotedSender }}</span>
+                                    </div>
+                                    @if($quotedSnippet)
+                                        <p class="text-slate-600 text-[11px] truncate mt-0.5 leading-snug">
+                                            {{ html_entity_decode($quotedSnippet, ENT_QUOTES | ENT_HTML5, 'UTF-8') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif
+
                             <!-- Message Content -->
-                            @if($displayMessage)
-                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $displayMessage }}</p>
+                            @if($cleanMessage)
+                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $cleanMessage }}</p>
                             @endif
 
                             <!-- Photo Attachment Preview if available (Lightbox Modal) -->
@@ -1154,20 +1190,23 @@
                   class="bg-white border-t border-slate-200 shrink-0 relative">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
+                <input type="hidden" name="reply_to_id" id="chron_reply_to_id">
+                <input type="hidden" name="reply_sender" id="chron_reply_sender">
+                <input type="hidden" name="reply_snippet" id="chron_reply_snippet">
                 <input type="hidden" name="latitude" id="chron_lat">
                 <input type="hidden" name="longitude" id="chron_lng">
                 <input type="hidden" name="gps_accuracy" id="chron_acc">
 
                 <!-- WhatsApp Reply Banner Preview (shows when replying to a message) -->
-                <div id="chat-reply-preview" class="hidden border-b border-slate-100 bg-teal-50/50 px-3.5 py-1.5 transition-all">
+                <div id="chat-reply-preview" class="hidden border-b border-slate-200/90 bg-sky-50/70 px-3.5 py-2 transition-all">
                     <div class="w-full flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 min-w-0 border-l-4 border-teal-500 pl-2.5 py-0.5">
+                        <div class="flex items-center gap-2.5 min-w-0 border-l-4 border-blue-600 pl-2.5 py-0.5">
                             <div class="min-w-0">
-                                <div class="font-bold text-teal-800 text-[10px] sm:text-[11px] flex items-center gap-1">
-                                    <svg class="w-3 h-3 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                <div class="font-bold text-blue-600 text-[10px] sm:text-[11px] flex items-center gap-1.5 uppercase tracking-wide">
+                                    <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
                                     <span id="reply-to-sender">Membalas User</span>
                                 </div>
-                                <p id="reply-to-text" class="text-slate-500 text-[10px] sm:text-[11px] truncate mt-0.5">Isi pesan...</p>
+                                <p id="reply-to-text" class="text-slate-600 text-[10px] sm:text-[11px] truncate mt-0.5 font-normal">Isi pesan...</p>
                             </div>
                         </div>
                         <button type="button" onclick="cancelReply()" class="w-6 h-6 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition cursor-pointer text-sm font-bold" title="Batal balas">&times;</button>
@@ -2699,11 +2738,28 @@ function replyToMessage(id) {
     const preview = document.getElementById('chat-reply-preview');
     const replySender = document.getElementById('reply-to-sender');
     const replyText = document.getElementById('reply-to-text');
+    const replyIdInput = document.getElementById('chron_reply_to_id');
+    const replySenderInput = document.getElementById('chron_reply_sender');
+    const replySnippetInput = document.getElementById('chron_reply_snippet');
 
     if (!bubble) return;
 
     const sender = bubble.dataset.sender || 'User';
-    const msg = bubble.dataset.message || (bubble.dataset.lat ? 'Titik Lokasi Lapangan' : 'Lampiran Foto');
+    let msg = bubble.dataset.message || '';
+    if (!msg) {
+        msg = bubble.dataset.lat ? '📍 Titik Lokasi Lapangan' : (bubble.dataset.photo ? '📷 Lampiran Foto' : 'Pesan');
+    }
+    // Clean any prior reply tag from snippet
+    if (msg.startsWith('[Balas @')) {
+        const parts = msg.split(']: ');
+        if (parts.length > 1) {
+            msg = parts.slice(1).join(']: ');
+        }
+    }
+
+    if (replyIdInput) replyIdInput.value = id;
+    if (replySenderInput) replySenderInput.value = sender;
+    if (replySnippetInput) replySnippetInput.value = msg;
 
     if (replySender) replySender.innerText = 'Membalas ' + sender;
     if (replyText) replyText.innerText = msg;
@@ -2711,18 +2767,32 @@ function replyToMessage(id) {
 
     if (input) {
         input.focus();
-        if (!input.value.trim()) {
-            input.value = `[Balas @${sender}]: `;
+        // Clean input if it was prepended with old tag
+        if (input.value.startsWith('[Balas @')) {
+            input.value = '';
         }
     }
 }
 
 function cancelReply() {
     const preview = document.getElementById('chat-reply-preview');
-    const input = document.getElementById('quick-chat-input');
+    const replyIdInput = document.getElementById('chron_reply_to_id');
+    const replySenderInput = document.getElementById('chron_reply_sender');
+    const replySnippetInput = document.getElementById('chron_reply_snippet');
     if (preview) preview.classList.add('hidden');
-    if (input && input.value.startsWith('[Balas @')) {
-        input.value = '';
+    if (replyIdInput) replyIdInput.value = '';
+    if (replySenderInput) replySenderInput.value = '';
+    if (replySnippetInput) replySnippetInput.value = '';
+}
+
+function scrollToChronology(id) {
+    const target = document.getElementById('chron-row-' + id) || document.getElementById('chron-bubble-' + id);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const bubble = document.getElementById('chron-bubble-' + id);
+    if (bubble) {
+        bubble.classList.add('ring-2', 'ring-blue-400');
+        setTimeout(() => bubble.classList.remove('ring-2', 'ring-blue-400'), 1500);
     }
 }
 
@@ -2906,15 +2976,35 @@ function handleChatFormSubmit(e) {
             </div>`;
         }
 
+        const replySender = document.getElementById('chron_reply_sender')?.value;
+        const replySnippet = document.getElementById('chron_reply_snippet')?.value;
+
+        let replyBox = '';
+        if (replySender) {
+            replyBox = `
+                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
+                     class="px-2.5 py-1.5 mb-1.5 select-none overflow-hidden text-left">
+                    <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
+                        <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
+                        </svg>
+                        <span class="truncate uppercase tracking-wide">${escapeChatHtml(replySender)}</span>
+                    </div>
+                    ${replySnippet ? `<p class="text-slate-600 text-[11px] truncate mt-0.5 leading-snug">${escapeChatHtml(replySnippet)}</p>` : ''}
+                </div>
+            `;
+        }
+
         bubble.innerHTML = `
-            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06);"
-                 class="max-w-[85%] sm:max-w-md rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5">
+            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
+                 class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5">
                 <div class="flex items-center gap-1.5">
                     <span class="font-bold text-xs text-teal-950">Anda</span>
                     <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
                         Teknisi
                     </span>
                 </div>
+                ${replyBox}
                 ${msg ? `<p class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">${escapeChatHtml(msg)}</p>` : ''}
                 ${mediaNotice}
                 ${locNotice}

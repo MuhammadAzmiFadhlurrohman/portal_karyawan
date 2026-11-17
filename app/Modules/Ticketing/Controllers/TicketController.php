@@ -152,6 +152,7 @@ class TicketController extends Controller
             'assignees',
             'statusHistories.user',
             'chronologies.user',
+            'chronologies.replyTo.user',
             'breaches',
             'stopClocks.starter',
             'stopClocks.approver',

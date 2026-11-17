@@ -39,7 +39,8 @@ class ChronologyService
         ?float $latitude = null,
         ?float $longitude = null,
         ?float $gpsAccuracy = null,
-        ?Carbon $createdAt = null
+        ?Carbon $createdAt = null,
+        ?int $replyToId = null
     ): TicketChronology {
         $category = strtoupper(trim($category));
         if (! in_array($category, self::VALID_CATEGORIES, true)) {
@@ -58,7 +59,8 @@ class ChronologyService
             $latitude,
             $longitude,
             $gpsAccuracy,
-            $now
+            $now,
+            $replyToId
         ): TicketChronology {
             // Find last chronology before this one
             /** @var TicketChronology|null $lastChronology */
@@ -73,7 +75,7 @@ class ChronologyService
             // Clamp GPS accuracy to safe decimal(6,2) range [0, 9999.99] to prevent MySQL 1264 numeric overflow
             $clampedGpsAccuracy = $gpsAccuracy !== null ? min(9999.99, max(0.0, (float) $gpsAccuracy)) : null;
 
-            $chronology = TicketChronology::query()->create([
+            $payload = [
                 'tiket_id' => $tiket->id,
                 'user_id' => $user->id,
                 'category' => $category,
@@ -85,7 +87,13 @@ class ChronologyService
                 'gps_accuracy' => $clampedGpsAccuracy,
                 'location_address' => $address,
                 'created_at' => $now,
-            ]);
+            ];
+
+            if ($replyToId && \Illuminate\Support\Facades\Schema::hasColumn('ticket_chronologies', 'reply_to_id')) {
+                $payload['reply_to_id'] = $replyToId;
+            }
+
+            $chronology = TicketChronology::query()->create($payload);
 
             // If ticket was still OPEN, mark first response and set to PROSES (§7.2)
             if ($tiket->status === 'OPEN' && $category !== 'SYSTEM') {

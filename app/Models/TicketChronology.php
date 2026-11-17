@@ -13,6 +13,7 @@ class TicketChronology extends Model
 
     protected $fillable = [
         'tiket_id',
+        'reply_to_id',
         'user_id',
         'category',
         'message',
@@ -37,6 +38,11 @@ class TicketChronology extends Model
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Tiket::class, 'tiket_id');
+    }
+
+    public function replyTo(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'reply_to_id');
     }
 
     public function user(): BelongsTo

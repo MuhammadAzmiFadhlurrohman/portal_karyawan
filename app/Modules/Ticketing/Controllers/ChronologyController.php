@@ -31,6 +31,7 @@ class ChronologyController extends Controller
         $validated = $request->validate([
             'category' => ['nullable', 'string'],
             'message' => ['nullable', 'string'],
+            'reply_to_id' => ['nullable', 'integer'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'gps_accuracy' => ['nullable', 'numeric'],
@@ -70,6 +71,18 @@ class ChronologyController extends Controller
             $videoPath = $request->file('video')->store('tickets/chronologies/videos', 'public');
         }
 
+        $replyToId = $request->filled('reply_to_id') ? (int) $request->input('reply_to_id') : null;
+        $replySender = $request->input('reply_sender');
+        $replySnippet = $request->input('reply_snippet');
+
+        // Fallback for environments where migration hasn't been executed
+        if ($replyToId && $replySender && ! \Illuminate\Support\Facades\Schema::hasColumn('ticket_chronologies', 'reply_to_id')) {
+            if (! str_starts_with($message, '[Balas @')) {
+                $snippetClean = str_replace(["\r", "\n", '|', ']'], ' ', \Illuminate\Support\Str::limit((string) $replySnippet, 80));
+                $message = "[Balas @{$replySender} | {$snippetClean}]: ".$message;
+            }
+        }
+
         try {
             $entry = $this->chronologyService->addChronology(
                 tiket: $tiket,
@@ -81,6 +94,7 @@ class ChronologyController extends Controller
                 latitude: isset($validated['latitude']) ? (float) $validated['latitude'] : null,
                 longitude: isset($validated['longitude']) ? (float) $validated['longitude'] : null,
                 gpsAccuracy: $gpsAccuracy,
+                replyToId: $replyToId,
             );
 
             if ($request->wantsJson()) {
