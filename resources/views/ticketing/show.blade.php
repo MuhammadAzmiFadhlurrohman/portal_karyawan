@@ -1327,14 +1327,6 @@
                             class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         ✅ Redaman normal &amp; Link UP
                     </button>
-                    <button type="button" onclick="setQuickChip('⚠️ Kendala di lapangan, memerlukan manuver core', 'LAIN')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        ⚠️ Kendala / butuh manuver
-                    </button>
-                    <button type="button" onclick="setQuickChip('📷 Dokumentasi hasil perbaikan lapangan terlampir', 'SELESAI')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        📷 Dokumentasi perbaikan
-                    </button>
                 </div>
             </div>
 
