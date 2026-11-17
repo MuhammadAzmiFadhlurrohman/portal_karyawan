@@ -73,33 +73,33 @@
             <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/30 to-transparent"></div>
         </div>
 
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 sm:gap-4">
             <!-- Left Info Area -->
-            <div class="space-y-3 min-w-0 flex-1">
+            <div class="space-y-2.5 sm:space-y-3 min-w-0 flex-1">
                 <!-- Row 1: Badges & Status (Kategori, No Tiket, Status, Prioritas) -->
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <!-- Category Badge -->
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-extrabold tracking-wider uppercase shadow-xs
+                    <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-mono font-extrabold tracking-wider uppercase shadow-xs shrink-0
                         {{ $tiket->kategori_tiket === 'BACKBONE' ? 'bg-[#18C4C4] text-slate-950' : 'bg-emerald-400 text-slate-950' }}">
                         {{ $tiket->kategori_tiket }}
                     </span>
 
                     <!-- Ticket Number Capsule -->
-                    <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full font-mono font-bold text-xs bg-slate-950/50 backdrop-blur-md border border-[#2dd4bf]/40 text-[#5eead4] shadow-xs">
-                        <svg class="w-3.5 h-3.5 text-[#2dd4bf]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                    <span class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 rounded-full font-mono font-bold text-[11px] sm:text-xs bg-slate-950/50 backdrop-blur-md border border-[#2dd4bf]/40 text-[#5eead4] shadow-xs shrink-0">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#2dd4bf]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
                         <span>{{ $tiket->no_tiket }}</span>
                     </span>
 
                     <!-- Status Indicator Badge -->
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shrink-0
                         {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500/25 text-emerald-300 border border-emerald-400/50' : ($tiket->status === 'PENDING_VERIFIKASI' ? 'bg-purple-500/25 text-purple-200 border border-purple-400/50' : ($tiket->status === 'PROSES' ? 'bg-amber-500/25 text-amber-200 border border-amber-400/50' : 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/50')) }}">
-                        <span class="w-2 h-2 rounded-full {{ $tiket->status === 'CLOSE' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse' }}"></span>
+                        <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full {{ $tiket->status === 'CLOSE' ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse' }}"></span>
                         <span>{{ $tiket->status }}</span>
                     </span>
 
                     <!-- Priority Badge -->
                     @if($tiket->priority)
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[11px] bg-white/10 border border-white/20 text-white/90">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-md font-bold text-[10px] sm:text-[11px] bg-white/10 border border-white/20 text-white/90 shrink-0">
                             {{ $tiket->priority }}
                         </span>
                     @endif
@@ -107,33 +107,33 @@
 
                 <!-- Row 2: Headline / Judul Gangguan -->
                 <div class="min-w-0">
-                    <h1 class="text-xl sm:text-2xl font-heading font-extrabold text-white tracking-tight leading-snug truncate">
+                    <h1 class="text-lg sm:text-xl md:text-2xl font-heading font-extrabold text-white tracking-tight leading-snug break-words">
                         {{ $tiket->status_link_impact ?? ($tiket->kategori_tiket === 'BACKBONE' ? $tiket->backbone_segment : $tiket->customer_name) }}
                     </h1>
                 </div>
 
                 <!-- Row 3: Tim Penugasan (PIC & Anggota Tim) -->
-                <div class="flex flex-wrap items-center gap-2 pt-0.5 text-xs">
-                    <span class="text-[11px] font-semibold text-teal-200/70 uppercase tracking-wider shrink-0 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-0.5 text-xs">
+                    <span class="text-[10px] sm:text-[11px] font-semibold text-teal-200/70 uppercase tracking-wider shrink-0 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-teal-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <span>Tim Lapangan:</span>
                     </span>
 
                     @if($lead)
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-bold bg-[#18C4C4]/20 border border-[#18C4C4]/40 text-[#5eead4]">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[#5eead4]"></span>
-                            <span>PIC: {{ $lead->name }}</span>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-xl font-bold text-[11px] sm:text-xs bg-[#18C4C4]/20 border border-[#18C4C4]/40 text-[#5eead4]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#5eead4] shrink-0"></span>
+                            <span class="truncate max-w-[180px] sm:max-w-none">PIC: {{ $lead->name }}</span>
                         </span>
                     @else
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-semibold bg-amber-500/20 border border-amber-500/40 text-amber-300">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-xl font-semibold text-[11px] sm:text-xs bg-amber-500/20 border border-amber-500/40 text-amber-300">
                             <span>PIC: Belum Ditugaskan</span>
                         </span>
                     @endif
 
                     @foreach($crew as $c)
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl font-medium bg-white/10 border border-white/15 text-white/90">
-                            <span class="w-1.5 h-1.5 rounded-full bg-teal-300/70"></span>
-                            <span>{{ $c->name }}</span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 sm:py-1 rounded-xl font-medium text-[11px] sm:text-xs bg-white/10 border border-white/15 text-white/90">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-300/70 shrink-0"></span>
+                            <span class="truncate max-w-[140px] sm:max-w-none">{{ $c->name }}</span>
                         </span>
                     @endforeach
 
@@ -152,22 +152,22 @@
             </div>
 
             <!-- Right Actions Area (Kembali & Menu Aksi) -->
-            <div class="flex items-center gap-2.5 shrink-0 self-start md:self-center pt-2 md:pt-0">
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 pt-1 md:pt-0 border-t border-white/10 md:border-t-0 md:self-center">
                 <a href="{{ route('tickets.index') }}"
-                   class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-teal-100 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-xs">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                   class="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-teal-100 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-xs">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Kembali</span>
                 </a>
 
                 <!-- Menu Aksi Dropdown -->
-                <div class="relative" x-data="{ open: false }">
+                <div class="relative flex-1 md:flex-initial" x-data="{ open: false }">
                     <button type="button"
                             @click="open = !open"
-                            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-950 shadow-md hover:shadow-cyan-500/25 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+                            class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-950 shadow-md hover:shadow-cyan-500/25 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
                             style="background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 50%, #0d9488 100%);">
-                        <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        <svg class="w-4 h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         <span>Menu Aksi</span>
-                        <svg class="w-3.5 h-3.5 transition-transform text-slate-950" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        <svg class="w-3.5 h-3.5 transition-transform text-slate-950 shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
 
                     <div x-show="open"
