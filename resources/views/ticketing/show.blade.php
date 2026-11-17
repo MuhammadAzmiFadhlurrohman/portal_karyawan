@@ -884,6 +884,17 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
             border: 1px solid rgba(226, 232, 240, 0.9) !important;
         }
+
+        /* Desktop Fullscreen: Center bottom bar (templates + input) to 80% width */
+        @media (min-width: 768px) {
+            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar,
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
+                width: 80% !important;
+                max-width: 1100px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+        }
     </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
         <div id="ticket-chat-container" class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs flex flex-col relative"
