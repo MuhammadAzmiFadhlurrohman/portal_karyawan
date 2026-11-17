@@ -1246,6 +1246,26 @@
                     </div>
                 @endforelse
                 </div>
+
+                <!-- Floating "Scroll to Latest Chat" Button (Appears when scrolled up) -->
+                <div id="scroll-to-bottom-wrapper" class="sticky bottom-2 flex justify-end pr-1 sm:pr-2 pointer-events-none z-30 h-0 overflow-visible">
+                    <button type="button"
+                            id="btn-scroll-to-bottom"
+                            onclick="scrollToLatestChat()"
+                            title="Ke pesan terbaru"
+                            style="transform: translateY(-42px);"
+                            class="hidden pointer-events-auto relative items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-teal-50 text-[#0D9488] border border-teal-500/30 shadow-[0_4px_14px_rgba(13,148,136,0.28)] backdrop-blur-md transition-all duration-200 active:scale-95 cursor-pointer group">
+                        <span id="new-msg-badge" class="hidden px-1.5 py-0.2 rounded-full bg-emerald-500 text-white text-[9.5px] font-extrabold tracking-tight animate-bounce">
+                            Baru
+                        </span>
+                        <span class="text-[11px] font-bold text-slate-700 group-hover:text-[#0D9488]">Pesan Terbaru</span>
+                        <span class="w-5 h-5 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center shadow-2xs">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
@@ -3927,9 +3947,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chat-stream-box');
     if (chatBox) {
         chatBox.scrollTop = chatBox.scrollHeight;
+        chatBox.addEventListener('scroll', handleChatScrollPosition, { passive: true });
     }
     initLiveChatSSE();
 });
+
+function isChatNearBottom(scrollBox, threshold = 110) {
+    if (!scrollBox) return true;
+    const distance = scrollBox.scrollHeight - scrollBox.scrollTop - scrollBox.clientHeight;
+    return distance <= threshold;
+}
+
+function handleChatScrollPosition() {
+    const scrollBox = document.getElementById('chat-stream-box');
+    const btn = document.getElementById('btn-scroll-to-bottom');
+    const newBadge = document.getElementById('new-msg-badge');
+    if (!scrollBox || !btn) return;
+
+    if (isChatNearBottom(scrollBox, 110)) {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+        if (newBadge) newBadge.classList.add('hidden');
+    } else {
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+    }
+}
+
+function scrollToLatestChat() {
+    const scrollBox = document.getElementById('chat-stream-box');
+    const btn = document.getElementById('btn-scroll-to-bottom');
+    const newBadge = document.getElementById('new-msg-badge');
+    if (scrollBox) {
+        scrollBox.scrollTo({
+            top: scrollBox.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+    if (btn) {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+    }
+    if (newBadge) {
+        newBadge.classList.add('hidden');
+    }
+}
 
 // Real-Time Chat Synchronization via Server-Sent Events (SSE) with Polling Fallback
 let chatEventSource = null;
@@ -4203,11 +4265,24 @@ function renderIncomingLiveMessage(data) {
         </div>
     `;
 
+    const wasNearBottom = isChatNearBottom(scrollBox, 130);
     stream.appendChild(row);
 
-    // Auto scroll down smoothly when new message arrives
+    // Auto scroll down smoothly when user is already near bottom or sent the message themselves
     if (scrollBox) {
-        scrollBox.scrollTop = scrollBox.scrollHeight;
+        if (wasNearBottom || data.is_self) {
+            scrollBox.scrollTop = scrollBox.scrollHeight;
+        } else {
+            const btn = document.getElementById('btn-scroll-to-bottom');
+            const newBadge = document.getElementById('new-msg-badge');
+            if (btn) {
+                btn.classList.remove('hidden');
+                btn.classList.add('inline-flex');
+            }
+            if (newBadge) {
+                newBadge.classList.remove('hidden');
+            }
+        }
     }
 }
 </script>
