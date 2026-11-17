@@ -791,6 +791,89 @@
             border: none !important;
             box-shadow: none !important;
             margin: 0 !important;
+            background-color: #EFEAE2 !important;
+        }
+
+        /* Floating WhatsApp-Style Input Bar in Mobile Fullscreen */
+        @media (max-width: 767px) {
+            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
+                background: transparent !important;
+                border-top: none !important;
+                border-bottom: none !important;
+                padding-top: 0.35rem !important;
+                padding-bottom: 0.25rem !important;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar button {
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+                border-color: rgba(226, 232, 240, 0.9) !important;
+                background-color: rgba(255, 255, 255, 0.95) !important;
+                backdrop-filter: blur(4px);
+            }
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
+                background: transparent !important;
+                border-top: none !important;
+                padding: 0.25rem 0.65rem 0.65rem 0.65rem !important;
+                padding-bottom: max(0.65rem, env(safe-area-inset-bottom)) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-form .chat-form-inner {
+                padding: 0 !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen .chat-input-pill-wrapper {
+                background: #FFFFFF !important;
+                border-radius: 9999px !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14) !important;
+                border: 1px solid rgba(226, 232, 240, 0.9) !important;
+                padding-left: 0.5rem !important;
+                padding-right: 0.6rem !important;
+                padding-top: 0.2rem !important;
+                padding-bottom: 0.2rem !important;
+                display: flex !important;
+                align-items: center !important;
+                flex: 1 1 0% !important;
+                min-width: 0 !important;
+                min-height: 48px !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #chat-input-container {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                padding: 0 0.25rem !important;
+                min-height: auto !important;
+                border-radius: 0 !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle {
+                background: transparent !important;
+                color: #64748B !important;
+                width: 38px !important;
+                height: 38px !important;
+                border-radius: 9999px !important;
+                margin-right: -2px !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle:hover {
+                color: #0D9488 !important;
+                background: rgba(240, 253, 250, 0.8) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
+                border-radius: 9999px !important;
+                width: 48px !important;
+                height: 48px !important;
+                box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45) !important;
+                flex-shrink: 0 !important;
+                margin-left: 0.25rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit svg {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+                margin-right: 0 !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #chat-reply-preview {
+                margin: 0 0.5rem 0.4rem 0.5rem !important;
+                border-radius: 1rem !important;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+                border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            }
         }
     </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
@@ -1146,7 +1229,7 @@
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
-            <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
+            <div class="chat-quick-templates-bar px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
                 <div class="w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
                     <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
@@ -1215,7 +1298,7 @@
                     </div>
                 </div>
 
-                <div class="p-2.5 sm:p-4">
+                <div class="chat-form-inner p-2.5 sm:p-4">
                     <div class="w-full flex items-center gap-2 sm:gap-2.5">
 
                 <!-- Hidden Native File Inputs -->
@@ -1228,125 +1311,128 @@
                 <!-- 4. Camera Polos (Direct Camera Capture) -->
                 <input type="file" id="input_camera_plain" accept="image/*" capture="environment" class="hidden" onchange="handleFileChosen(this, 'Kamera')">
 
-                <!-- Attachment Clip Button with Dropup Menu -->
-                <div class="relative">
-                    <button type="button"
-                            id="btn-attachment-toggle"
-                            onclick="toggleAttachmentMenu(event)"
-                            title="Lampirkan Dokumen / Media / Kamera / Lokasi"
-                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                    </button>
+                <!-- Pill Container Wrapper (For Floating Fullscreen WhatsApp Input Bar) -->
+                <div class="chat-input-pill-wrapper flex-1 flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <!-- Attachment Clip Button with Dropup Menu -->
+                    <div class="relative shrink-0">
+                        <button type="button"
+                                id="btn-attachment-toggle"
+                                onclick="toggleAttachmentMenu(event)"
+                                title="Lampirkan Dokumen / Media / Kamera / Lokasi"
+                                class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                        </button>
 
-                    <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
-                    <div id="dropdown-attachment-menu"
-                         style="bottom: 100% !important; margin-bottom: 12px !important; top: auto !important;"
-                         class="hidden absolute left-0 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-200/90 py-2.5 px-2 z-[100] select-none divide-y divide-slate-100">
-                        
-                        <div class="space-y-1 pb-1.5">
-                            <!-- Option 1: Upload Media (Foto / Video) -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); document.getElementById('input_upload_media').click();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
-                                </div>
-                            </button>
+                        <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
+                        <div id="dropdown-attachment-menu"
+                             style="bottom: 100% !important; margin-bottom: 12px !important; top: auto !important;"
+                             class="hidden absolute left-0 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-200/90 py-2.5 px-2 z-[100] select-none divide-y divide-slate-100">
+                            
+                            <div class="space-y-1 pb-1.5">
+                                <!-- Option 1: Upload Media (Foto / Video) -->
+                                <button type="button"
+                                        onclick="closeAttachmentMenu(); document.getElementById('input_upload_media').click();"
+                                        class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                    <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
+                                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
+                                    </div>
+                                </button>
 
-                            <!-- Option 2: Rekam Video Lapangan -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); document.getElementById('input_record_video').click();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Rekam Video Lapangan</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
-                                </div>
-                            </button>
+                                <!-- Option 2: Rekam Video Lapangan -->
+                                <button type="button"
+                                        onclick="closeAttachmentMenu(); document.getElementById('input_record_video').click();"
+                                        class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                    <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Rekam Video Lapangan</h4>
+                                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
+                                    </div>
+                                </button>
 
-                            <!-- Option 3: Kamera GPS (Watermark) -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); captureCameraWithGps();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight flex items-center gap-1.5">
-                                        <span>Kamera GPS (Watermark)</span>
-                                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
-                                    </h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
-                                </div>
-                            </button>
+                                <!-- Option 3: Kamera GPS (Watermark) -->
+                                <button type="button"
+                                        onclick="closeAttachmentMenu(); captureCameraWithGps();"
+                                        class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight flex items-center gap-1.5">
+                                            <span>Kamera GPS (Watermark)</span>
+                                            <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
+                                        </h4>
+                                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
+                                    </div>
+                                </button>
 
-                            <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); document.getElementById('input_camera_plain').click();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
-                                </div>
-                            </button>
-                        </div>
+                                <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
+                                <button type="button"
+                                        onclick="closeAttachmentMenu(); document.getElementById('input_camera_plain').click();"
+                                        class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                    <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
+                                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
+                                    </div>
+                                </button>
+                            </div>
 
-                        <!-- Option 5: Share Lokasi Saya -->
-                        <div class="pt-1.5">
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); shareMyCurrentLocation();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-rose-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Share Lokasi Saya</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Text & Location Input Box Container (Matching Image 1) -->
-                <div id="chat-input-container"
-                     class="flex-1 rounded-2xl border border-slate-300/90 bg-white px-3.5 py-2 sm:py-2.5 transition-all flex flex-col justify-center min-h-[46px] shadow-2xs">
-                    <div class="relative flex items-center">
-                        <input type="text"
-                               name="message"
-                               id="quick-chat-input"
-                               placeholder="Ketik update koordinasi..."
-                               autocomplete="off"
-                               style="outline: none !important; box-shadow: none !important; border: none !important;"
-                               class="w-full text-xs sm:text-sm bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
-                        
-                        <span id="attachment-name" class="text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
-                    </div>
-
-                    <!-- GPS Attached Chip (shows when latitude & longitude are attached - Matching Image 1) -->
-                    <div id="gps-attached-preview" class="hidden pt-2 mt-2 border-t border-dashed border-slate-200 flex items-center justify-between">
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-600 shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
-                            <span id="gps-preview-text" class="font-bold">GPS: -6.934309, 107.594269</span>
-                            <button type="button" onclick="clearAttachedGps()" class="ml-1.5 text-rose-400 hover:text-rose-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Lokasi">&times;</button>
+                            <!-- Option 5: Share Lokasi Saya -->
+                            <div class="pt-1.5">
+                                <button type="button"
+                                        onclick="closeAttachmentMenu(); shareMyCurrentLocation();"
+                                        class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-rose-50 transition text-left cursor-pointer group">
+                                    <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Share Lokasi Saya</h4>
+                                        <p class="text-[11px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Photo Attached Chip (shows when photo or media is selected) -->
-                    <div id="photo-attached-preview" class="hidden pt-2 mt-2 border-t border-dashed border-slate-200 flex items-center justify-between">
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 border border-sky-200 text-sky-700 shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span id="photo-preview-text" class="font-bold truncate max-w-[220px]">Foto Terlampir</span>
-                            <button type="button" onclick="clearAttachedPhoto()" class="ml-1.5 text-sky-400 hover:text-sky-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Foto">&times;</button>
+                    <!-- Text & Location Input Box Container (Matching Image 1) -->
+                    <div id="chat-input-container"
+                         class="flex-1 rounded-2xl border border-slate-300/90 bg-white px-3 sm:px-3.5 py-1.5 sm:py-2.5 transition-all flex flex-col justify-center min-h-[44px] shadow-2xs min-w-0">
+                        <div class="relative flex items-center min-w-0">
+                            <input type="text"
+                                   name="message"
+                                   id="quick-chat-input"
+                                   placeholder="Ketik update koordinasi..."
+                                   autocomplete="off"
+                                   style="outline: none !important; box-shadow: none !important; border: none !important;"
+                                   class="w-full text-xs sm:text-sm bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
+                            
+                            <span id="attachment-name" class="text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
+                        </div>
+
+                        <!-- GPS Attached Chip (shows when latitude & longitude are attached - Matching Image 1) -->
+                        <div id="gps-attached-preview" class="hidden pt-1.5 mt-1.5 border-t border-dashed border-slate-200 flex items-center justify-between">
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 border border-rose-200 text-rose-600 shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                <span id="gps-preview-text" class="font-bold">GPS: -6.934309, 107.594269</span>
+                                <button type="button" onclick="clearAttachedGps()" class="ml-1.5 text-rose-400 hover:text-rose-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Lokasi">&times;</button>
+                            </div>
+                        </div>
+
+                        <!-- Photo Attached Chip (shows when photo or media is selected) -->
+                        <div id="photo-attached-preview" class="hidden pt-1.5 mt-1.5 border-t border-dashed border-slate-200 flex items-center justify-between">
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 border border-sky-200 text-sky-700 shadow-2xs">
+                                <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span id="photo-preview-text" class="font-bold truncate max-w-[200px]">Foto Terlampir</span>
+                                <button type="button" onclick="clearAttachedPhoto()" class="ml-1.5 text-sky-400 hover:text-sky-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Foto">&times;</button>
+                            </div>
                         </div>
                     </div>
                 </div>
