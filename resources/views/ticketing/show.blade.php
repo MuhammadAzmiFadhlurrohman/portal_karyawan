@@ -1369,6 +1369,7 @@
                 </button>
             </div>
 
+            @can('update', $tiket)
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
             <div class="chat-quick-templates-bar px-3 sm:px-4 py-1.5 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
@@ -1661,6 +1662,13 @@
                     </div>
                 </div>
             </form>
+            @else
+            <!-- Read-Only Banner for Non-Assigned Technicians (AC-05) -->
+            <div class="p-3.5 bg-slate-50/90 border-t border-slate-200 text-center text-xs text-slate-500 font-medium flex items-center justify-center gap-2 select-none shrink-0">
+                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <span>Mode Hanya Baca: Anda tidak memiliki hak akses mengirim koordinasi pada tiket ini (Khusus PIC &amp; Tim Penanganan).</span>
+            </div>
+            @endcan
         </div>
     </div>
 

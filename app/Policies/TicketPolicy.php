@@ -12,7 +12,7 @@ class TicketPolicy
      */
     public function view(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'ceo'])) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo']) || $user->isAtasan()) {
             return true;
         }
 
@@ -27,10 +27,11 @@ class TicketPolicy
     /**
      * Determine whether the user can update/write to the ticket (§7.2, AC-05).
      * AC-05: Non-assigned technicians must receive 403 on write attempts!
+     * Management/Supervisors (Atasan Teknik, Manager, NOC, Admin) can coordinate in all tickets.
      */
     public function update(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc'])) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo']) || $user->isAtasan()) {
             return true;
         }
 
