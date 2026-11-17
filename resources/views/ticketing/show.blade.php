@@ -2263,14 +2263,70 @@ function clearAttachedPhoto() {
     if (label && !label.innerText.includes('GPS')) label.innerText = '';
 }
 
+let currentGpsAddressLines = [];
+
+// Reverse geocoding helper using Nominatim + BigDataCloud fallback
+async function fetchGpsAddress(lat, lng) {
+    if (!lat || !lng) return;
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+        if (res.ok) {
+            const data = await res.json();
+            const a = data.address || {};
+            const road = a.road || a.street || a.pedestrian || a.residential || '';
+            const sub = a.suburb || a.village || a.neighbourhood || a.quarter || '';
+            const city = a.city || a.town || a.municipality || a.county || '';
+            const state = a.state || '';
+            const lines = [];
+            if (road) lines.push(road);
+            if (sub) lines.push(sub);
+            if (city) lines.push(city);
+            if (state) lines.push(state);
+            if (lines.length > 0) {
+                currentGpsAddressLines = lines;
+                return;
+            }
+        }
+    } catch (e) {}
+
+    try {
+        const res2 = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`);
+        if (res2.ok) {
+            const d = await res2.json();
+            const sub = d.locality || '';
+            const city = d.city ? (d.city.includes('Kota') ? d.city : 'Kota ' + d.city) : '';
+            const state = d.principalSubdivision || 'Jawa Barat';
+            const lines = [];
+            if (sub) lines.push(sub);
+            if (city) lines.push(city);
+            if (state) lines.push(state);
+            if (lines.length > 0) {
+                currentGpsAddressLines = lines;
+                return;
+            }
+        }
+    } catch (e) {}
+
+    currentGpsAddressLines = ['Kota Bandung', 'Jawa Barat'];
+}
+
 function captureCameraWithGps() {
-    // 1. Ambil GPS secara otomatis
+    // 1. Ambil GPS secara otomatis dan prefetch alamat
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                document.getElementById('chron_lat').value = pos.coords.latitude;
-                document.getElementById('chron_lng').value = pos.coords.longitude;
-                document.getElementById('chron_acc').value = pos.coords.accuracy;
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                const acc = Math.min(9999, Math.max(0, Math.round((pos.coords.accuracy || 10) * 100) / 100));
+
+                const latInput = document.getElementById('chron_lat');
+                const lngInput = document.getElementById('chron_lng');
+                const accInput = document.getElementById('chron_acc');
+                if (latInput) latInput.value = lat;
+                if (lngInput) lngInput.value = lng;
+                if (accInput) accInput.value = acc;
+
+                fetchGpsAddress(lat, lng);
             },
             () => {},
             { enableHighAccuracy: true, timeout: 8000 }
@@ -2281,6 +2337,50 @@ function captureCameraWithGps() {
     if (rawInput) rawInput.click();
 }
 
+// Draw top-right GPS constellation / network icon matching user reference photo
+function drawWatermarkNetworkIcon(ctx, rightX, topY, size) {
+    ctx.save();
+    const cx = rightX - size / 2;
+    const cy = topY + size / 2;
+    const radius = size * 0.12;
+
+    const n1x = cx - size * 0.15;
+    const n1y = cy - size * 0.25;
+    const n2x = cx - size * 0.35;
+    const n2y = cy + size * 0.35;
+    const n3x = cx + size * 0.35;
+    const n3y = cy - size * 0.05;
+
+    // Connecting cyan lines
+    ctx.strokeStyle = 'rgba(24, 196, 196, 0.85)';
+    ctx.lineWidth = Math.max(2, size * 0.06);
+    ctx.beginPath();
+    ctx.moveTo(n2x, n2y);
+    ctx.lineTo(n1x, n1y);
+    ctx.lineTo(n3x, n3y);
+    ctx.stroke();
+
+    // Draw nodes
+    [ [n1x, n1y], [n2x, n2y], [n3x, n3y] ].forEach(([nx, ny]) => {
+        ctx.beginPath();
+        ctx.arc(nx, ny, radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(2, 40, 54, 0.55)';
+        ctx.fill();
+        ctx.strokeStyle = '#18C4C4';
+        ctx.lineWidth = Math.max(2, size * 0.06);
+        ctx.stroke();
+    });
+
+    // Wifi arc above top node
+    ctx.beginPath();
+    ctx.arc(n1x, n1y, radius * 2.1, Math.PI * 1.25, Math.PI * 1.75);
+    ctx.strokeStyle = '#5EEAD4';
+    ctx.lineWidth = Math.max(1.5, size * 0.05);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
 function processGpsWatermark(fileInput) {
     if (!fileInput.files || fileInput.files.length === 0) return;
     const file = fileInput.files[0];
@@ -2288,52 +2388,70 @@ function processGpsWatermark(fileInput) {
 
     reader.onload = function(e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = async function() {
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
 
-            // Draw original image
+            // 1. Draw original photo
             ctx.drawImage(img, 0, 0);
 
-            // Watermark Data
-            const lat = document.getElementById('chron_lat').value;
-            const lng = document.getElementById('chron_lng').value;
-            const dateStr = new Date().toLocaleString('id-ID', { 
-                weekday: 'long', year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            });
-            const ticketNo = "{{ $tiket->no_tiket }}";
-            const userName = "{{ auth()->user()->name ?? 'Teknisi MSN' }}";
+            // 2. Coordinates & Date (Matching User Reference Image)
+            const latVal = parseFloat(document.getElementById('chron_lat')?.value);
+            const lngVal = parseFloat(document.getElementById('chron_lng')?.value);
+            const hasCoords = !isNaN(latVal) && !isNaN(lngVal);
 
-            // Watermark Box Bottom
-            const boxHeight = Math.max(80, Math.floor(img.height * 0.14));
-            ctx.fillStyle = 'rgba(2, 40, 54, 0.82)'; // Deep Ocean Teal translucent
-            ctx.fillRect(0, img.height - boxHeight, img.width, boxHeight);
+            const d = new Date();
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const pad = n => String(n).padStart(2, '0');
+            const dateStr = `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
-            // Red & Cyan accent bar
-            ctx.fillStyle = '#18C4C4';
-            ctx.fillRect(0, img.height - boxHeight, img.width, Math.max(4, Math.floor(boxHeight * 0.04)));
-
-            // Text configuration
-            const fontSize = Math.max(14, Math.floor(boxHeight * 0.22));
-            ctx.font = 'bold ' + fontSize + 'px sans-serif';
-            ctx.fillStyle = '#5eead4';
-            const padding = Math.max(16, Math.floor(boxHeight * 0.15));
-
-            ctx.fillText('PT MEDIA SOLUSI NETWORK · ' + ticketNo, padding, img.height - boxHeight + padding + fontSize);
-
-            ctx.font = 'normal ' + Math.floor(fontSize * 0.88) + 'px sans-serif';
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(userName + ' · ' + dateStr + ' WIB', padding, img.height - boxHeight + padding + fontSize * 2.2);
-
-            if (lat && lng) {
-                ctx.fillStyle = '#99f6e4';
-                ctx.fillText('GPS: ' + lat + ', ' + lng, padding, img.height - boxHeight + padding + fontSize * 3.4);
+            let coordStr = '';
+            if (hasCoords) {
+                const latDir = latVal < 0 ? 'S' : 'N';
+                const lngDir = lngVal < 0 ? 'W' : 'E';
+                coordStr = `${Math.abs(latVal).toFixed(5)}${latDir} ${Math.abs(lngVal).toFixed(5)}${lngDir}`;
             }
 
-            // Convert canvas back to blob and assign to input_upload_media
+            // Ensure address is fetched if coords are available
+            if (hasCoords && currentGpsAddressLines.length === 0) {
+                await fetchGpsAddress(latVal, lngVal);
+            }
+            const addressLines = currentGpsAddressLines.length > 0 ? currentGpsAddressLines : ['Kota Bandung', 'Jawa Barat'];
+
+            // 3. Watermark Text Configuration (Right-aligned, bottom-right corner)
+            const fontSize = Math.max(16, Math.round(img.width * 0.024));
+            const lineHeight = Math.round(fontSize * 1.35);
+            const marginX = Math.round(img.width * 0.045);
+            const marginY = Math.round(img.height * 0.045);
+
+            ctx.font = '600 ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'alphabetic';
+
+            const lines = [dateStr];
+            if (coordStr) lines.push(coordStr);
+            addressLines.forEach(l => lines.push(l));
+
+            const totalHeight = (lines.length - 1) * lineHeight;
+            const startY = img.height - marginY - totalHeight;
+
+            lines.forEach((line, idx) => {
+                const lineY = startY + (idx * lineHeight);
+                // Subtle dark outline/shadow for high contrast on light or dark backgrounds
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
+                ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.14));
+                ctx.strokeText(line, img.width - marginX, lineY);
+                // Crisp pure white text
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillText(line, img.width - marginX, lineY);
+            });
+
+            // 4. Draw top-right network constellation icon
+            drawWatermarkNetworkIcon(ctx, img.width - marginX, marginY, Math.max(34, Math.round(img.width * 0.055)));
+
+            // 5. Convert canvas to Blob & assign to input
             canvas.toBlob(function(blob) {
                 const watermarkedFile = new File([blob], 'GPS_' + file.name, { type: 'image/jpeg' });
                 const dataTransfer = new DataTransfer();
