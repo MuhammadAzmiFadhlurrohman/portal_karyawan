@@ -827,37 +827,55 @@
             .ticket-chat-card.is-chat-fullscreen .chat-input-pill-wrapper {
                 background: #FFFFFF !important;
                 border-radius: 9999px !important;
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14) !important;
-                border: 1px solid rgba(226, 232, 240, 0.9) !important;
-                padding-left: 0.5rem !important;
-                padding-right: 0.6rem !important;
-                padding-top: 0.2rem !important;
-                padding-bottom: 0.2rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+                border: 1px solid rgba(226, 232, 240, 0.95) !important;
+                padding-left: 0.45rem !important;
+                padding-right: 0.75rem !important;
+                padding-top: 0.25rem !important;
+                padding-bottom: 0.25rem !important;
                 display: flex !important;
                 align-items: center !important;
                 flex: 1 1 0% !important;
                 min-width: 0 !important;
                 min-height: 48px !important;
+                gap: 0.35rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen .chat-input-pill-wrapper:focus-within {
+                border-color: #0D9488 !important;
+                box-shadow: 0 0 0 3px rgba(24, 196, 196, 0.2), 0 4px 16px rgba(0, 0, 0, 0.12) !important;
             }
             .ticket-chat-card.is-chat-fullscreen #chat-input-container {
                 border: none !important;
                 box-shadow: none !important;
                 background: transparent !important;
-                padding: 0 0.25rem !important;
+                padding: 0 !important;
                 min-height: auto !important;
                 border-radius: 0 !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #chat-input-container:focus-within {
+                border-color: transparent !important;
+                box-shadow: none !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-input {
+                font-size: 0.9375rem !important;
+                line-height: 1.35 !important;
+                padding: 0.2rem 0 !important;
             }
             .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle {
                 background: transparent !important;
                 color: #64748B !important;
-                width: 38px !important;
-                height: 38px !important;
+                width: 36px !important;
+                height: 36px !important;
                 border-radius: 9999px !important;
-                margin-right: -2px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin: 0 !important;
+                transition: all 0.15s ease !important;
             }
             .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle:hover {
                 color: #0D9488 !important;
-                background: rgba(240, 253, 250, 0.8) !important;
+                background: rgba(240, 253, 250, 0.9) !important;
             }
             .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
                 border-radius: 9999px !important;
@@ -865,7 +883,7 @@
                 height: 48px !important;
                 box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45) !important;
                 flex-shrink: 0 !important;
-                margin-left: 0.25rem !important;
+                margin-left: 0.35rem !important;
             }
             .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit svg {
                 width: 1.25rem !important;
