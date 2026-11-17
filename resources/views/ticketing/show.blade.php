@@ -984,23 +984,118 @@
                 </button>
             </div>
 
-            <!-- Chat Input Bar (matching Image 3) -->
+            <!-- Chat Input Bar (matching Image 3 & Attachment Menu) -->
             <form method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
-                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5 shrink-0">
+                  class="p-2.5 sm:p-4 bg-white border-t border-slate-200 flex items-center gap-2 sm:gap-2.5 shrink-0 relative">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
                 <input type="hidden" name="latitude" id="chron_lat">
                 <input type="hidden" name="longitude" id="chron_lng">
                 <input type="hidden" name="gps_accuracy" id="chron_acc">
 
-                <!-- Attachment Clip Button -->
-                <button type="button" onclick="document.getElementById('chron_photo_input').click()"
-                        title="Lampirkan Foto / Berkas"
-                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                </button>
-                <input type="file" name="photo" id="chron_photo_input" accept="image/*" class="hidden"
-                       onchange="updateAttachmentLabel(this)">
+                <!-- Hidden Native File Inputs -->
+                <!-- 1. General Media (Photo / Video) -->
+                <input type="file" name="photo" id="input_upload_media" accept="image/*,video/*" class="hidden" onchange="handleFileChosen(this, 'Media')">
+                <!-- 2. Video Capture (HP Video Camera) -->
+                <input type="file" name="video" id="input_record_video" accept="video/*" capture="environment" class="hidden" onchange="handleFileChosen(this, 'Video')">
+                <!-- 3. Camera GPS (Watermark) trigger -->
+                <input type="file" id="input_camera_gps_raw" accept="image/*" capture="environment" class="hidden" onchange="processGpsWatermark(this)">
+                <!-- 4. Camera Polos (Direct Camera Capture) -->
+                <input type="file" id="input_camera_plain" accept="image/*" capture="environment" class="hidden" onchange="handleFileChosen(this, 'Kamera')">
+
+                <!-- Attachment Clip Button with Dropup Menu -->
+                <div class="relative" x-data="{ attachMenuOpen: false }">
+                    <button type="button"
+                            @click="attachMenuOpen = !attachMenuOpen"
+                            title="Lampirkan Dokumen / Media / Kamera / Lokasi"
+                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    </button>
+
+                    <!-- WhatsApp-Style Dropup Attachment Menu -->
+                    <div x-show="attachMenuOpen"
+                         @click.outside="attachMenuOpen = false"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave="transition ease-in duration-100"
+                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                         class="absolute left-0 bottom-full mb-3 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.28)] border border-slate-200/90 py-2.5 px-2 z-50 select-none divide-y divide-slate-100">
+                        
+                        <div class="space-y-1 pb-1.5">
+                            <!-- Option 1: Upload Media (Foto / Video) -->
+                            <button type="button"
+                                    @click="attachMenuOpen = false; document.getElementById('input_upload_media').click();"
+                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
+                                </div>
+                            </button>
+
+                            <!-- Option 2: Rekam Video Lapangan -->
+                            <button type="button"
+                                    @click="attachMenuOpen = false; document.getElementById('input_record_video').click();"
+                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Rekam Video Lapangan</h4>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
+                                </div>
+                            </button>
+
+                            <!-- Option 3: Kamera GPS (Watermark) -->
+                            <button type="button"
+                                    @click="attachMenuOpen = false; captureCameraWithGps();"
+                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight flex items-center gap-1.5">
+                                        <span>Kamera GPS (Watermark)</span>
+                                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
+                                </div>
+                            </button>
+
+                            <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
+                            <button type="button"
+                                    @click="attachMenuOpen = false; document.getElementById('input_camera_plain').click();"
+                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Option 5: Share Lokasi Saya -->
+                        <div class="pt-1.5">
+                            <button type="button"
+                                    @click="attachMenuOpen = false; shareMyCurrentLocation();"
+                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-rose-50 transition text-left cursor-pointer group">
+                                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Share Lokasi Saya</h4>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Text Input -->
                 <div class="relative flex-1">
@@ -1009,9 +1104,9 @@
                            id="quick-chat-input"
                            required
                            placeholder="Ketik update koordinasi..."
-                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 sm:px-4 py-2 sm:py-2.5 text-slate-800 transition pr-24 sm:pr-28">
+                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 sm:px-4 py-2 sm:py-2.5 text-slate-800 transition pr-28 sm:pr-32">
                     
-                    <span id="attachment-name" class="absolute right-3 top-2 sm:top-2.5 text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[80px] sm:max-w-[100px] pointer-events-none"></span>
+                    <span id="attachment-name" class="absolute right-3 top-2 sm:top-2.5 text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[100px] sm:max-w-[130px] pointer-events-none"></span>
                 </div>
 
                 <!-- Submit Send Button -->
@@ -2051,11 +2146,137 @@ function setQuickChip(text, category) {
 
 function updateAttachmentLabel(fileInput) {
     const label = document.getElementById('attachment-name');
+    if (!label) return;
     if (fileInput.files && fileInput.files.length > 0) {
         label.innerText = '📎 ' + fileInput.files[0].name;
     } else {
         label.innerText = '';
     }
+}
+
+// Handlers for WhatsApp-style attachment menu options
+function handleFileChosen(input, typeName) {
+    const label = document.getElementById('attachment-name');
+    if (input.files && input.files.length > 0) {
+        if (label) label.innerText = '📎 ' + typeName + ': ' + input.files[0].name;
+    }
+}
+
+function captureCameraWithGps() {
+    // 1. Ambil GPS secara otomatis
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                document.getElementById('chron_lat').value = pos.coords.latitude;
+                document.getElementById('chron_lng').value = pos.coords.longitude;
+                document.getElementById('chron_acc').value = pos.coords.accuracy;
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    }
+    // 2. Buka kamera
+    const rawInput = document.getElementById('input_camera_gps_raw');
+    if (rawInput) rawInput.click();
+}
+
+function processGpsWatermark(fileInput) {
+    if (!fileInput.files || fileInput.files.length === 0) return;
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+
+            // Draw original image
+            ctx.drawImage(img, 0, 0);
+
+            // Watermark Data
+            const lat = document.getElementById('chron_lat').value;
+            const lng = document.getElementById('chron_lng').value;
+            const dateStr = new Date().toLocaleString('id-ID', { 
+                weekday: 'long', year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            });
+            const ticketNo = "{{ $tiket->no_tiket }}";
+            const userName = "{{ auth()->user()->name ?? 'Teknisi MSN' }}";
+
+            // Watermark Box Bottom
+            const boxHeight = Math.max(80, Math.floor(img.height * 0.14));
+            ctx.fillStyle = 'rgba(2, 40, 54, 0.82)'; // Deep Ocean Teal translucent
+            ctx.fillRect(0, img.height - boxHeight, img.width, boxHeight);
+
+            // Red & Cyan accent bar
+            ctx.fillStyle = '#18C4C4';
+            ctx.fillRect(0, img.height - boxHeight, img.width, Math.max(4, Math.floor(boxHeight * 0.04)));
+
+            // Text configuration
+            const fontSize = Math.max(14, Math.floor(boxHeight * 0.22));
+            ctx.font = 'bold ' + fontSize + 'px sans-serif';
+            ctx.fillStyle = '#5eead4';
+            const padding = Math.max(16, Math.floor(boxHeight * 0.15));
+
+            ctx.fillText('PT MEDIA SOLUSI NETWORK · ' + ticketNo, padding, img.height - boxHeight + padding + fontSize);
+
+            ctx.font = 'normal ' + Math.floor(fontSize * 0.88) + 'px sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(userName + ' · ' + dateStr + ' WIB', padding, img.height - boxHeight + padding + fontSize * 2.2);
+
+            if (lat && lng) {
+                ctx.fillStyle = '#99f6e4';
+                ctx.fillText('GPS: ' + lat + ', ' + lng, padding, img.height - boxHeight + padding + fontSize * 3.4);
+            }
+
+            // Convert canvas back to blob and assign to input_upload_media
+            canvas.toBlob(function(blob) {
+                const watermarkedFile = new File([blob], 'GPS_' + file.name, { type: 'image/jpeg' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(watermarkedFile);
+                const mediaInput = document.getElementById('input_upload_media');
+                if (mediaInput) {
+                    mediaInput.files = dataTransfer.files;
+                }
+                const label = document.getElementById('attachment-name');
+                if (label) label.innerText = '📸 Watermark GPS Siap';
+            }, 'image/jpeg', 0.92);
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function shareMyCurrentLocation() {
+    const input = document.getElementById('quick-chat-input');
+    const label = document.getElementById('attachment-name');
+    if (!navigator.geolocation) {
+        alert('Browser Anda tidak mendukung Geolocation.');
+        return;
+    }
+    if (label) label.innerText = 'Mengambil GPS...';
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            document.getElementById('chron_lat').value = lat;
+            document.getElementById('chron_lng').value = lng;
+            document.getElementById('chron_acc').value = pos.coords.accuracy;
+            if (input) {
+                input.value = `📍 Lokasi Saya saat ini: https://maps.google.com/?q=${lat},${lng}`;
+                input.focus();
+            }
+            if (label) label.innerText = `✓ Lokasi (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        },
+        (err) => {
+            alert('Gagal mengambil lokasi GPS: ' + err.message);
+            if (label) label.innerText = '';
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
 }
 
 function toggleResumeForm() {
