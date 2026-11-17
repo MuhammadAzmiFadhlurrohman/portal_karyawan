@@ -2539,53 +2539,84 @@ function dispatchTeamModal() {
 </div>
 
 <!-- ========================================================================= -->
-<!-- IMAGE LIGHTBOX MODAL (Enlarge in Modal with Direct Download Button) -->
+<!-- IMAGE LIGHTBOX MODAL (Professional Dark Glass Viewer with Zoom Controls) -->
 <!-- ========================================================================= -->
 <div id="image-lightbox-modal"
-     class="hidden fixed inset-0 z-[99999] bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-3 sm:p-5 select-none transition-all duration-200"
+     style="position: fixed !important; inset: 0 !important; z-index: 999999 !important; background-color: rgba(2, 16, 24, 0.92) !important; backdrop-filter: blur(14px) !important; -webkit-backdrop-filter: blur(14px) !important;"
+     class="hidden flex flex-col justify-between p-3 sm:p-5 select-none transition-opacity duration-200"
      onclick="closeImageLightbox(event)">
     
-    <!-- Top Header Bar -->
-    <div class="flex items-center justify-between text-white z-10 shrink-0 max-w-6xl mx-auto w-full pt-1" onclick="event.stopPropagation()">
+    <!-- Top Floating Glass Header Bar -->
+    <div style="background: linear-gradient(135deg, rgba(2, 40, 54, 0.88) 0%, rgba(10, 82, 95, 0.88) 100%); border: 1px solid rgba(94, 234, 212, 0.25); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);"
+         class="flex items-center justify-between text-white z-20 shrink-0 max-w-5xl mx-auto w-full px-3.5 sm:px-5 py-2.5 rounded-2xl backdrop-blur-md"
+         onclick="event.stopPropagation()">
         <div class="flex items-center gap-2.5 min-w-0 pr-2">
-            <span class="w-8 h-8 rounded-xl bg-teal-500/20 text-[#18C4C4] border border-teal-500/30 flex items-center justify-center shrink-0">
+            <span class="w-8 h-8 rounded-xl bg-[#18C4C4]/20 text-[#5eead4] border border-[#18C4C4]/35 flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </span>
-            <span id="lightbox-title" class="font-bold text-xs sm:text-sm text-slate-100 truncate">Dokumentasi Foto</span>
+            <div class="min-w-0">
+                <span id="lightbox-title" class="font-bold text-xs sm:text-sm text-white block truncate leading-tight">Dokumentasi Foto</span>
+                <span class="text-[10px] text-teal-200/80 block truncate">Pratinjau Dokumentasi Tiket</span>
+            </div>
         </div>
         
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <!-- Zoom Controls Pill -->
+            <div class="hidden sm:inline-flex items-center bg-slate-950/50 border border-white/15 rounded-xl p-0.5 mr-1">
+                <button type="button" onclick="adjustLightboxZoom(-0.25)" title="Perkecil (Zoom Out)"
+                        class="w-7 h-7 rounded-lg hover:bg-white/15 text-slate-200 hover:text-white flex items-center justify-center transition cursor-pointer font-bold text-sm">
+                    &minus;
+                </button>
+                <button type="button" onclick="resetLightboxZoom()" title="Reset Ukuran (100%)"
+                        id="lightbox-zoom-label"
+                        class="px-2 text-[11px] font-mono font-bold text-cyan-200 hover:text-white cursor-pointer">
+                    100%
+                </button>
+                <button type="button" onclick="adjustLightboxZoom(0.25)" title="Perbesar (Zoom In)"
+                        class="w-7 h-7 rounded-lg hover:bg-white/15 text-slate-200 hover:text-white flex items-center justify-center transition cursor-pointer font-bold text-sm">
+                    &plus;
+                </button>
+            </div>
+
             <!-- Download Button -->
             <button type="button"
                     id="lightbox-download-btn"
                     onclick="downloadLightboxImage(event)"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#18C4C4] to-[#0D9488] hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-teal-950/30 transition active:scale-95 cursor-pointer">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);"
+                    class="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-teal-950/40 transition active:scale-95 cursor-pointer">
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span>Download</span>
             </button>
 
             <!-- Close Button -->
             <button type="button"
                     onclick="closeImageLightbox()"
-                    class="w-8 h-8 rounded-xl bg-white/10 hover:bg-rose-500/80 text-white flex items-center justify-center transition active:scale-95 cursor-pointer"
+                    class="w-8 h-8 rounded-xl bg-white/10 hover:bg-rose-500 text-white border border-white/15 flex items-center justify-center transition active:scale-95 cursor-pointer"
                     title="Tutup (Esc)">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
     </div>
 
     <!-- Center: Scaled Image Viewport -->
-    <div class="flex-1 flex items-center justify-center p-2 min-h-0 relative select-none" onclick="closeImageLightbox(event)">
+    <div class="flex-1 flex items-center justify-center p-2 sm:p-4 min-h-0 relative overflow-hidden select-none" onclick="closeImageLightbox(event)">
         <img id="lightbox-image"
              src=""
              alt="Pratinjau Foto"
-             class="max-h-[82vh] max-w-[94vw] object-contain rounded-2xl shadow-2xl border border-white/10 cursor-zoom-out"
+             ondblclick="toggleDoubleClickZoom(event)"
+             style="max-height: 78vh; max-width: 92vw; border: 1.5px solid rgba(255, 255, 255, 0.16); box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);"
+             class="object-contain rounded-2xl bg-slate-900/60 cursor-zoom-in"
              onclick="event.stopPropagation()">
     </div>
 
     <!-- Bottom Instruction Pill -->
-    <div class="text-center text-[11px] text-slate-400 select-none pb-1 z-10 shrink-0">
-        Klik di luar gambar atau tekan <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">ESC</kbd> untuk menutup
+    <div class="flex justify-center pb-1 z-20 shrink-0 pointer-events-none">
+        <div style="background-color: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);"
+             class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-medium text-slate-300 shadow-lg backdrop-blur-md pointer-events-auto">
+            <span>Klik dua kali foto untuk Zoom &bull; Klik area gelap atau tekan</span>
+            <kbd class="px-1.5 py-0.5 rounded bg-white/15 text-cyan-200 font-mono text-[10px] font-bold border border-white/10">ESC</kbd>
+            <span>untuk menutup</span>
+        </div>
     </div>
 </div>
 
@@ -2686,7 +2717,9 @@ function dispatchTeamModal() {
 
 @push('scripts')
 <script>
-// Image Lightbox Modal with Direct Download
+// Image Lightbox Modal with Direct Download & Interactive Zoom
+let currentLightboxZoom = 1;
+
 function openImageLightbox(url, title = 'Dokumentasi Foto') {
     const modal = document.getElementById('image-lightbox-modal');
     const img = document.getElementById('lightbox-image');
@@ -2694,6 +2727,12 @@ function openImageLightbox(url, title = 'Dokumentasi Foto') {
 
     if (!modal || !img) return;
 
+    // Teleport modal to document.body so it covers 100% of screen including sidebar & sticky headers
+    if (modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+
+    resetLightboxZoom();
     img.src = url;
     if (titleEl) {
         titleEl.innerText = title;
@@ -2703,15 +2742,50 @@ function openImageLightbox(url, title = 'Dokumentasi Foto') {
     document.body.style.overflow = 'hidden';
 }
 
+function adjustLightboxZoom(delta) {
+    currentLightboxZoom = Math.min(3, Math.max(0.5, Math.round((currentLightboxZoom + delta) * 100) / 100));
+    applyLightboxZoom();
+}
+
+function resetLightboxZoom() {
+    currentLightboxZoom = 1;
+    applyLightboxZoom();
+}
+
+function toggleDoubleClickZoom(e) {
+    if (e) e.stopPropagation();
+    currentLightboxZoom = currentLightboxZoom > 1 ? 1 : 1.75;
+    applyLightboxZoom();
+}
+
+function applyLightboxZoom() {
+    const img = document.getElementById('lightbox-image');
+    const label = document.getElementById('lightbox-zoom-label');
+    if (img) {
+        img.style.transform = `scale(${currentLightboxZoom})`;
+        img.style.cursor = currentLightboxZoom > 1 ? 'zoom-out' : 'zoom-in';
+    }
+    if (label) {
+        label.innerText = Math.round(currentLightboxZoom * 100) + '%';
+    }
+}
+
 function closeImageLightbox(e) {
     if (e && e.target && e.target.id === 'lightbox-image') return;
     const modal = document.getElementById('image-lightbox-modal');
     if (modal) {
         modal.classList.add('hidden');
         const img = document.getElementById('lightbox-image');
-        if (img) img.src = '';
+        if (img) {
+            img.src = '';
+            img.style.transform = 'scale(1)';
+        }
     }
-    document.body.style.overflow = '';
+    // Restore body scroll unless chat is in fullscreen mode
+    const chatCard = document.querySelector('.ticket-chat-card');
+    if (!chatCard || !chatCard.classList.contains('is-chat-fullscreen')) {
+        document.body.style.overflow = '';
+    }
 }
 
 async function downloadLightboxImage(e) {
