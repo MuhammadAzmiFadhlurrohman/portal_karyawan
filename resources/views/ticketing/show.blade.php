@@ -792,10 +792,11 @@
         }
     </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
-        <div id="ticket-chat-container" class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+        <div id="ticket-chat-container" class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs flex flex-col relative"
+             style="overflow: visible !important;">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
-            <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0"
+            <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0 rounded-t-3xl overflow-hidden"
                  style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
@@ -1004,29 +1005,23 @@
                 <input type="file" id="input_camera_plain" accept="image/*" capture="environment" class="hidden" onchange="handleFileChosen(this, 'Kamera')">
 
                 <!-- Attachment Clip Button with Dropup Menu -->
-                <div class="relative" x-data="{ attachMenuOpen: false }">
+                <div class="relative">
                     <button type="button"
-                            @click="attachMenuOpen = !attachMenuOpen"
+                            id="btn-attachment-toggle"
+                            onclick="toggleAttachmentMenu(event)"
                             title="Lampirkan Dokumen / Media / Kamera / Lokasi"
                             class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                     </button>
 
-                    <!-- WhatsApp-Style Dropup Attachment Menu -->
-                    <div x-show="attachMenuOpen"
-                         @click.outside="attachMenuOpen = false"
-                         x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                         class="absolute left-0 bottom-full mb-3 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.28)] border border-slate-200/90 py-2.5 px-2 z-50 select-none divide-y divide-slate-100">
+                    <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
+                    <div id="dropdown-attachment-menu"
+                         class="hidden absolute left-0 bottom-full mb-3 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-200/90 py-2.5 px-2 z-[100] select-none divide-y divide-slate-100">
                         
                         <div class="space-y-1 pb-1.5">
                             <!-- Option 1: Upload Media (Foto / Video) -->
                             <button type="button"
-                                    @click="attachMenuOpen = false; document.getElementById('input_upload_media').click();"
+                                    onclick="closeAttachmentMenu(); document.getElementById('input_upload_media').click();"
                                     class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
                                 <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -1039,7 +1034,7 @@
 
                             <!-- Option 2: Rekam Video Lapangan -->
                             <button type="button"
-                                    @click="attachMenuOpen = false; document.getElementById('input_record_video').click();"
+                                    onclick="closeAttachmentMenu(); document.getElementById('input_record_video').click();"
                                     class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
                                 <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -1052,7 +1047,7 @@
 
                             <!-- Option 3: Kamera GPS (Watermark) -->
                             <button type="button"
-                                    @click="attachMenuOpen = false; captureCameraWithGps();"
+                                    onclick="closeAttachmentMenu(); captureCameraWithGps();"
                                     class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
                                 <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -1068,7 +1063,7 @@
 
                             <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
                             <button type="button"
-                                    @click="attachMenuOpen = false; document.getElementById('input_camera_plain').click();"
+                                    onclick="closeAttachmentMenu(); document.getElementById('input_camera_plain').click();"
                                     class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
                                 <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
@@ -1083,7 +1078,7 @@
                         <!-- Option 5: Share Lokasi Saya -->
                         <div class="pt-1.5">
                             <button type="button"
-                                    @click="attachMenuOpen = false; shareMyCurrentLocation();"
+                                    onclick="closeAttachmentMenu(); shareMyCurrentLocation();"
                                     class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-rose-50 transition text-left cursor-pointer group">
                                 <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
@@ -2278,6 +2273,33 @@ function shareMyCurrentLocation() {
         { enableHighAccuracy: true, timeout: 10000 }
     );
 }
+
+// Attachment Dropup Menu Controls
+function toggleAttachmentMenu(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const menu = document.getElementById('dropdown-attachment-menu');
+    if (!menu) return;
+    menu.classList.toggle('hidden');
+}
+
+function closeAttachmentMenu() {
+    const menu = document.getElementById('dropdown-attachment-menu');
+    if (menu) menu.classList.add('hidden');
+}
+
+// Close attachment menu if clicked outside
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('dropdown-attachment-menu');
+    const btn = document.getElementById('btn-attachment-toggle');
+    if (!menu || menu.classList.contains('hidden')) return;
+    if (btn && btn.contains(e.target)) return;
+    if (!menu.contains(e.target)) {
+        menu.classList.add('hidden');
+    }
+});
 
 function toggleResumeForm() {
     const formCont = document.getElementById('resume-form-container');
