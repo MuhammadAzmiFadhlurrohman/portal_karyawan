@@ -3421,12 +3421,13 @@ function processGpsWatermark(fileInput) {
             const addressLines = currentGpsAddressLines.length > 0 ? currentGpsAddressLines : ['Kota Bandung', 'Jawa Barat'];
 
             // 3. Watermark Text Configuration (Right-aligned, bottom-right corner)
-            const fontSize = Math.max(16, Math.round(img.width * 0.024));
-            const lineHeight = Math.round(fontSize * 1.35);
+            // Increased font size and spacing for much clearer visibility
+            const fontSize = Math.max(20, Math.round(img.width * 0.032));
+            const lineHeight = Math.round(fontSize * 1.4);
             const marginX = Math.round(img.width * 0.045);
             const marginY = Math.round(img.height * 0.045);
 
-            ctx.font = '600 ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+            ctx.font = '700 ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
             ctx.textAlign = 'right';
             ctx.textBaseline = 'alphabetic';
 
@@ -3439,35 +3440,64 @@ function processGpsWatermark(fileInput) {
 
             lines.forEach((line, idx) => {
                 const lineY = startY + (idx * lineHeight);
-                // Subtle dark outline/shadow for high contrast on light or dark backgrounds
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.75)';
-                ctx.lineWidth = Math.max(2, Math.round(fontSize * 0.14));
+                // Strong dark outline & shadow for crystal clear contrast on any background
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+                ctx.shadowBlur = Math.round(fontSize * 0.35);
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = Math.round(fontSize * 0.1);
+
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+                ctx.lineWidth = Math.max(3, Math.round(fontSize * 0.18));
+                ctx.lineJoin = 'round';
                 ctx.strokeText(line, img.width - marginX, lineY);
+
                 // Crisp pure white text
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillText(line, img.width - marginX, lineY);
+                ctx.restore();
             });
 
-            // 4. Draw top-right network constellation icon
-            drawWatermarkNetworkIcon(ctx, img.width - marginX, marginY, Math.max(34, Math.round(img.width * 0.055)));
+            // 4. Draw Official MSN Logo on top-right (Same logo as browser tab: logo-msn2.png)
+            const logoSize = Math.max(64, Math.round(img.width * 0.09));
+            const logoImg = new Image();
+            logoImg.crossOrigin = 'anonymous';
+            logoImg.onload = function() {
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 3;
+                ctx.drawImage(logoImg, img.width - marginX - logoSize, marginY, logoSize, logoSize);
+                ctx.restore();
+                finalizeWatermarkedCanvas();
+            };
+            logoImg.onerror = function() {
+                // Fallback to stylized network icon if image load fails
+                drawWatermarkNetworkIcon(ctx, img.width - marginX, marginY, logoSize);
+                finalizeWatermarkedCanvas();
+            };
+            logoImg.src = '{{ asset('assets/logo/logo-msn2.png') }}';
 
-            // 5. Convert canvas to Blob & assign to input
-            canvas.toBlob(function(blob) {
-                const watermarkedFile = new File([blob], 'GPS_' + file.name, { type: 'image/jpeg' });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(watermarkedFile);
-                const mediaInput = document.getElementById('input_upload_media');
-                if (mediaInput) {
-                    mediaInput.files = dataTransfer.files;
-                }
-                const label = document.getElementById('attachment-name');
-                if (label) label.innerText = '📸 Watermark GPS Siap';
+            function finalizeWatermarkedCanvas() {
+                // 5. Convert canvas to Blob & assign to input
+                canvas.toBlob(function(blob) {
+                    const watermarkedFile = new File([blob], 'GPS_' + file.name, { type: 'image/jpeg' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(watermarkedFile);
+                    const mediaInput = document.getElementById('input_upload_media');
+                    if (mediaInput) {
+                        mediaInput.files = dataTransfer.files;
+                    }
+                    const label = document.getElementById('attachment-name');
+                    if (label) label.innerText = '📸 Watermark GPS Siap';
 
-                const photoChip = document.getElementById('photo-attached-preview');
-                const photoText = document.getElementById('photo-preview-text');
-                if (photoText) photoText.innerText = '📸 Watermark GPS: ' + file.name;
-                if (photoChip) photoChip.classList.remove('hidden');
-            }, 'image/jpeg', 0.92);
+                    const photoChip = document.getElementById('photo-attached-preview');
+                    const photoText = document.getElementById('photo-preview-text');
+                    if (photoText) photoText.innerText = '📸 Watermark GPS: ' + file.name;
+                    if (photoChip) photoChip.classList.remove('hidden');
+                }, 'image/jpeg', 0.92);
+            }
         };
         img.src = e.target.result;
     };
