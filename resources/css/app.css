@@ -96,13 +96,13 @@
 
 /* Ticket Chat Card Viewport Fit */
 .ticket-chat-card {
-    height: calc(100dvh - 165px);
+    height: calc(100vh - 84px);
     min-height: 480px;
 }
-@media (min-width: 768px) {
+@media (max-width: 767px) {
     .ticket-chat-card {
-        height: calc(100vh - 96px);
-        min-height: 520px;
+        height: calc(100dvh - 146px);
+        min-height: 420px;
     }
 }
 

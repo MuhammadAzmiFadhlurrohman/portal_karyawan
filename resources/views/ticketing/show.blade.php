@@ -718,13 +718,13 @@
     <!-- ========================================================================= -->
     <style>
         .ticket-chat-card {
-            height: calc(100dvh - 165px);
+            height: calc(100vh - 84px);
             min-height: 480px;
         }
-        @media (min-width: 768px) {
+        @media (max-width: 767px) {
             .ticket-chat-card {
-                height: calc(100vh - 96px);
-                min-height: 520px;
+                height: calc(100dvh - 146px);
+                min-height: 420px;
             }
         }
     </style>
@@ -2034,14 +2034,12 @@ function adjustChatHeight() {
         let bottomOffset = 0;
 
         if (isDesktop) {
-            // Desktop: sticky top-0 header + main bottom padding
+            // Desktop: sticky header (h-16 / ~53px at 82% zoom) + clean 16px bottom clearance
             const header = document.querySelector('header');
             const headerHeight = header ? header.getBoundingClientRect().height : 54;
-            const main = document.getElementById('main-content');
-            const mainPaddingBottom = main ? parseFloat(window.getComputedStyle(main).paddingBottom) || 20 : 20;
 
-            topOffset = headerHeight + 8;
-            bottomOffset = mainPaddingBottom;
+            topOffset = headerHeight + 8; // Top rests right below sticky header
+            bottomOffset = 22; // Bottom card rests right above viewport bottom
         } else {
             // Mobile: fixed top header + fixed bottom navbar
             const mobHeader = document.querySelector('.md\\:hidden.fixed.top-0');
@@ -2049,10 +2047,10 @@ function adjustChatHeight() {
 
             const mobNav = document.querySelector('.md\\:hidden.fixed.bottom-3 nav') || 
                            document.querySelector('.md\\:hidden.fixed.bottom-3');
-            const bottomNavHeight = mobNav ? mobNav.getBoundingClientRect().height + 12 : 72;
+            const bottomNavHeight = mobNav ? mobNav.getBoundingClientRect().height + 12 : 70;
 
-            topOffset = topHeaderHeight + 8;
-            bottomOffset = bottomNavHeight + 4;
+            topOffset = topHeaderHeight + 6;
+            bottomOffset = bottomNavHeight + 2;
         }
 
         const calculatedHeight = Math.max(380, Math.floor(windowHeight - topOffset - bottomOffset));
