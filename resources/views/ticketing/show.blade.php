@@ -796,91 +796,93 @@
 
         .ticket-chat-card.is-chat-fullscreen .chat-header-banner {
             border-radius: 0 !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
         }
 
-        /* Floating WhatsApp-Style Input Bar in Mobile Fullscreen */
-        @media (max-width: 767px) {
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
-                background: transparent !important;
-                border-top: none !important;
-                border-bottom: none !important;
-                padding-top: 0.35rem !important;
-                padding-bottom: 0.25rem !important;
-                padding-left: 0.75rem !important;
-                padding-right: 0.75rem !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar button {
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-                border-color: rgba(226, 232, 240, 0.9) !important;
-                background-color: rgba(255, 255, 255, 0.95) !important;
-                backdrop-filter: blur(4px);
-            }
-            .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
-                background: transparent !important;
-                border-top: none !important;
-                padding: 0.35rem 0.65rem 0.75rem 0.65rem !important;
-                padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #quick-chat-form .chat-form-inner {
-                padding: 0 !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #chat-input-container {
-                border-radius: 9999px !important;
-                background: #FFFFFF !important;
-                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.09) !important;
-                border: 1px solid rgba(226, 232, 240, 0.95) !important;
-                padding-left: 0.85rem !important;
-                padding-right: 0.85rem !important;
-                padding-top: 0.3rem !important;
-                padding-bottom: 0.3rem !important;
-                min-height: 44px !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #chat-input-container:focus-within {
-                border-color: #0D9488 !important;
-                box-shadow: 0 0 0 3px rgba(24, 196, 196, 0.2), 0 3px 12px rgba(0, 0, 0, 0.09) !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #quick-chat-input {
-                font-size: 0.875rem !important;
-                line-height: 1.25rem !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle {
-                border-radius: 9999px !important;
-                width: 44px !important;
-                height: 44px !important;
-                background: #FFFFFF !important;
-                border: 1px solid rgba(226, 232, 240, 0.95) !important;
-                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.09) !important;
-                color: #64748B !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                transition: all 0.15s ease !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle:hover {
-                color: #0D9488 !important;
-                background: rgba(240, 253, 250, 0.9) !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
-                border-radius: 9999px !important;
-                width: 44px !important;
-                height: 44px !important;
-                box-shadow: 0 4px 14px rgba(13, 148, 136, 0.45) !important;
-                flex-shrink: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit svg {
-                width: 1.2rem !important;
-                height: 1.2rem !important;
-                margin-right: 0 !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #chat-reply-preview {
-                margin: 0 0.5rem 0.4rem 0.5rem !important;
-                border-radius: 1rem !important;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
-                border: 1px solid rgba(226, 232, 240, 0.9) !important;
-            }
+        /* Floating WhatsApp-Style Input Bar in Fullscreen (All Viewports including Landscape Mobile & Desktop) */
+        .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
+            background: transparent !important;
+            border-top: none !important;
+            border-bottom: none !important;
+            padding-top: 0.25rem !important;
+            padding-bottom: 0.2rem !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar button {
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07) !important;
+            border-color: rgba(226, 232, 240, 0.9) !important;
+            background-color: rgba(255, 255, 255, 0.94) !important;
+            backdrop-filter: blur(4px);
+            padding: 0.2rem 0.65rem !important;
+            font-size: 11px !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
+            background: transparent !important;
+            border-top: none !important;
+            padding: 0.2rem 0.75rem 0.5rem 0.75rem !important;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #quick-chat-form .chat-form-inner {
+            padding: 0 !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #chat-input-container {
+            border-radius: 9999px !important;
+            background: #FFFFFF !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
+            padding-top: 0.2rem !important;
+            padding-bottom: 0.2rem !important;
+            min-height: 38px !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #chat-input-container:focus-within {
+            border-color: #0D9488 !important;
+            box-shadow: 0 0 0 2.5px rgba(24, 196, 196, 0.2), 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #quick-chat-input {
+            font-size: 0.8125rem !important;
+            line-height: 1.25rem !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle {
+            border-radius: 9999px !important;
+            width: 38px !important;
+            height: 38px !important;
+            background: #FFFFFF !important;
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+            color: #64748B !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.15s ease !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle:hover {
+            color: #0D9488 !important;
+            background: rgba(240, 253, 250, 0.95) !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
+            border-radius: 9999px !important;
+            width: 38px !important;
+            height: 38px !important;
+            box-shadow: 0 3px 10px rgba(13, 148, 136, 0.38) !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit svg {
+            width: 1.05rem !important;
+            height: 1.05rem !important;
+            margin-right: 0 !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #chat-reply-preview {
+            margin: 0 0.5rem 0.35rem 0.5rem !important;
+            border-radius: 0.85rem !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
         }
     </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
@@ -888,52 +890,52 @@
              style="overflow: visible !important;">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
-            <div class="chat-header-banner px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0 rounded-t-3xl overflow-hidden"
+            <div class="chat-header-banner px-3.5 sm:px-5 py-2.5 sm:py-3 text-white flex items-center justify-between gap-2 shrink-0 rounded-t-3xl overflow-hidden"
                  style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
-                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                     </div>
                     <div class="min-w-0">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <h3 class="font-heading font-extrabold text-xs sm:text-sm text-white truncate">Koordinasi Update Lapangan</h3>
-                            <span class="px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1 shrink-0">
+                        <div class="flex items-center gap-1.5">
+                            <h3 class="font-heading font-extrabold text-xs text-white truncate">Koordinasi Update Lapangan</h3>
+                            <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1 shrink-0 leading-none">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                                 <span>Live</span>
                             </span>
                         </div>
-                        <p class="text-[10px] sm:text-[11px] text-teal-200/80 truncate">Tiket <span class="font-mono text-[#5eead4] font-semibold">{{ $tiket->no_tiket }}</span></p>
+                        <p class="text-[10px] text-teal-200/80 truncate leading-tight mt-0.5">Tiket <span class="font-mono text-[#5eead4] font-semibold">{{ $tiket->no_tiket }}</span></p>
                     </div>
                 </div>
 
                 <!-- Header Actions: Fullscreen Zoom (Full Size) -->
-                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <div class="flex items-center gap-1.5 shrink-0">
                     <button type="button" onclick="toggleChatFullscreen()"
                             id="btn-chat-fullscreen"
                             title="Tampilan Penuh (Full Size)"
-                            class="text-xs text-white flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-teal-500/30 hover:bg-teal-500/50 border border-teal-400/40 shadow-xs transition-all active:scale-95 cursor-pointer">
+                            class="text-[11px] text-white flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/30 hover:bg-teal-500/50 border border-teal-400/40 shadow-xs transition-all active:scale-95 cursor-pointer">
                         <!-- Icon Expand / Maximize -->
-                        <svg id="icon-fs-expand" class="w-3.5 h-3.5 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <svg id="icon-fs-expand" class="w-3 h-3 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                         </svg>
                         <!-- Icon Minimize (hidden by default) -->
-                        <svg id="icon-fs-minimize" class="w-3.5 h-3.5 text-cyan-300 hidden" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <svg id="icon-fs-minimize" class="w-3 h-3 text-cyan-300 hidden" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 4v4m0 0H5m4 0L4 3m11 1v4m0 0h4m-4 0l5-5M9 20v-4m0 0H5m4 0l-5 5m11-1v-4m0 0h4m-4 0l5 5"/>
                         </svg>
-                        <span id="fs_label" class="text-[11px] font-bold text-cyan-200">Full Size</span>
+                        <span id="fs_label" class="text-[10.5px] font-bold text-cyan-200">Full Size</span>
                     </button>
                 </div>
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3.5 sm:p-6 flex-1 min-h-0 overflow-y-auto relative w-full"
+            <div id="chat-stream-box" class="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto relative w-full"
                  style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
                 
                 <!-- Full Width Conversation Stream Container -->
-                <div id="chat-stream-container" class="w-full space-y-2.5 sm:space-y-3">
+                <div id="chat-stream-container" class="w-full space-y-1.5 sm:space-y-2">
                     <!-- Date divider (WhatsApp Floating Pill) -->
                     <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none">
-                        <span class="px-3 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5 pointer-events-auto">
+                        <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto">
                             <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
                         </span>
@@ -941,17 +943,17 @@
 
                     <!-- Initial Ticket Creation System Note -->
                     <div class="flex justify-start">
-                        <div style="max-width: min(85%, 520px);"
-                             class="bg-white rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-slate-200 text-xs space-y-1">
-                            <div class="flex items-center justify-between gap-3">
+                        <div style="max-width: min(82%, 440px);"
+                             class="bg-white rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-slate-200/90 text-[11px] space-y-1">
+                            <div class="flex items-center justify-between gap-2.5">
                                 <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                                    <span class="text-xs">{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                    <span class="text-[11px]">{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
                                     <span class="px-1.5 py-0.2 rounded text-[9px] bg-teal-100 text-teal-800 font-bold">NOC</span>
                                 </span>
-                                <span class="text-[10px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
+                                <span class="text-[9.5px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
                             </div>
-                            <p class="text-slate-700 leading-snug font-medium text-[11px] sm:text-xs">
+                            <p class="text-slate-700 leading-snug font-medium text-[11px]">
                                 🎫 <strong>OPEN TIKET BARU</strong>: Tiket dibuat dengan status OPEN. Kendala: {{ $tiket->problem_temuan ?? '-' }}
                             </p>
                         </div>
@@ -960,17 +962,17 @@
                     <!-- Dispatch Note if available -->
                     @if($lead)
                         <div class="flex justify-start">
-                            <div style="max-width: min(85%, 520px);"
-                                 class="bg-amber-50/90 rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-amber-200 text-xs space-y-1">
-                                <div class="flex items-center justify-between gap-3">
+                            <div style="max-width: min(82%, 440px);"
+                                 class="bg-amber-50/90 rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-amber-200/90 text-[11px] space-y-1">
+                                <div class="flex items-center justify-between gap-2.5">
                                     <span class="font-bold text-amber-900 flex items-center gap-1.5">
-                                        <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[9px]">MT</span>
-                                        <span class="text-xs">Manager Teknis</span>
+                                        <span class="w-4 h-4 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[8px]">MT</span>
+                                        <span class="text-[11px]">Manager Teknis</span>
                                         <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
                                     </span>
-                                    <span class="text-[10px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
+                                    <span class="text-[9.5px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
                                 </div>
-                                <p class="text-amber-950 leading-snug text-[11px] sm:text-xs">
+                                <p class="text-amber-950 leading-snug text-[11px]">
                                     👷 <strong>DISPATCH / PENUGASAN TIM</strong>: Ditugaskan <strong>{{ $lead->name }}</strong> (Lead) bersama tim: 
                                     {{ $crew->pluck('name')->join(', ') ?: 'mandiri' }} untuk menangani perbaikan tiket ini.
                                 </p>
@@ -1017,7 +1019,7 @@
                             });
                         }
                     @endphp
-                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-1 group/bubble relative" id="chron-row-{{ $chron->id }}">
+                    <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }} my-0.5 group/bubble relative" id="chron-row-{{ $chron->id }}">
                         <div id="chron-bubble-{{ $chron->id }}"
                              data-id="{{ $chron->id }}"
                              data-sender="{{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}"
@@ -1029,17 +1031,17 @@
                              data-lng="{{ $chron->longitude ?? '' }}"
                              data-photo="{{ $chron->photo_url ?? ($chron->photo_path ? asset('storage/' . $chron->photo_path) : '') }}"
                              data-category="{{ $chron->category ?? 'LAIN' }}"
-                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
-                             class="rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }} relative">
+                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(82%, 380px);"
+                             class="rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }} relative">
                             
                             <!-- Sender & Role Badge + 3-Dots Dropdown Trigger (Matching User Attachment Image 1 & 2) -->
                             <div class="flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-1.5 min-w-0">
-                                    <span class="font-bold text-xs {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }} truncate">
+                                    <span class="font-bold text-[11px] {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }} truncate">
                                         {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
                                     </span>
                                     <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
-                                          class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide shrink-0">
+                                          class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
                                         {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
                                     </span>
                                 </div>
@@ -1048,47 +1050,47 @@
                                 <div class="relative shrink-0">
                                     <button type="button"
                                             onclick="toggleMessageMenu({{ $chron->id }}, event)"
-                                            class="w-5 h-5 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
+                                            class="w-4 h-4 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
                                             title="Pilihan pesan">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                                         </svg>
                                     </button>
 
                                     <!-- WhatsApp Dropdown Menu (matching Image 2) -->
                                     <div id="msg-dropdown-{{ $chron->id }}"
-                                         class="msg-action-dropdown hidden absolute {{ $isSelf ? 'right-0' : 'left-0 sm:right-auto' }} top-full mt-1 w-52 sm:w-56 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                                         class="msg-action-dropdown hidden absolute {{ $isSelf ? 'right-0' : 'left-0 sm:right-auto' }} top-full mt-1 w-48 sm:w-52 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
                                         
                                         <div class="space-y-0.5 pb-1">
                                             <!-- 1. Salin -->
                                             <button type="button"
                                                     onclick="copyMessageText({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
                                                 <span>Salin</span>
                                             </button>
 
                                             <!-- 2. Info Pesan -->
                                             <button type="button"
                                                     onclick="openMessageInfo({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-4 h-4 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
                                                 <span>Info Pesan</span>
                                             </button>
 
                                             <!-- 3. Simpan ke Dokumentasi -->
                                             <button type="button"
                                                     onclick="saveToDocumentation({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
                                                 <span>Simpan ke Dokumentasi</span>
                                             </button>
 
                                             <!-- 4. Balas -->
                                             <button type="button"
                                                     onclick="replyToMessage({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-4 h-4 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
                                                 <span>Balas</span>
                                             </button>
 
@@ -1096,8 +1098,8 @@
                                                 <!-- 5. Edit -->
                                                 <button type="button"
                                                         onclick="editMessage({{ $chron->id }})"
-                                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                    <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                        class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                    <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                                     <span>Edit</span>
                                                 </button>
                                             @endif
@@ -1108,8 +1110,8 @@
                                                 <!-- 6. Hapus -->
                                                 <button type="button"
                                                         onclick="deleteMessage({{ $chron->id }})"
-                                                        class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer text-left">
-                                                    <svg class="w-4 h-4 text-slate-600 hover:text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                        class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer text-left">
+                                                    <svg class="w-3.5 h-3.5 text-slate-600 hover:text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                     <span>Hapus</span>
                                                 </button>
                                             </div>
@@ -1120,17 +1122,17 @@
 
                             <!-- WhatsApp Quoted Reply Box (Matching User Reference Image) -->
                             @if($quotedSender)
-                                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
-                                     class="px-2.5 py-1.5 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
+                                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 3px solid #2563EB; border-radius: 6px;"
+                                     class="px-2 py-1 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
                                      @if(!empty($chron->reply_to_id)) onclick="scrollToChronology({{ $chron->reply_to_id }})" title="Klik untuk menuju pesan asli" @endif>
-                                    <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
-                                        <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <div class="flex items-center gap-1 text-blue-600 font-bold text-[10px] leading-tight">
+                                        <svg class="w-3 h-3 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
                                         </svg>
                                         <span class="truncate uppercase tracking-wide">{{ $quotedSender }}</span>
                                     </div>
                                     @if($quotedSnippet)
-                                        <p class="text-slate-600 text-[11px] truncate mt-0.5 leading-snug">
+                                        <p class="text-slate-600 text-[10px] truncate mt-0.5 leading-snug">
                                             {{ html_entity_decode($quotedSnippet, ENT_QUOTES | ENT_HTML5, 'UTF-8') }}
                                         </p>
                                     @endif
@@ -1139,7 +1141,7 @@
 
                             <!-- Message Content -->
                             @if($cleanMessage)
-                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">{{ $cleanMessage }}</p>
+                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">{{ $cleanMessage }}</p>
                             @endif
 
                             <!-- Photo Attachment Preview if available (Lightbox Modal) -->
@@ -1150,16 +1152,16 @@
                                 <div class="pt-0.5">
                                     <button type="button"
                                             onclick="openImageLightbox('{{ $photoSrc }}', 'Foto Dokumentasi - {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}')"
-                                            style="width: 220px; max-width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                                            style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
                                             class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
                                         <img src="{{ $photoSrc }}"
                                              alt="Bukti Foto"
                                              loading="lazy"
-                                             style="width: 100%; height: 140px; object-fit: cover; display: block;"
+                                             style="width: 100%; height: 118px; object-fit: cover; display: block;"
                                              class="group-hover:scale-105 transition duration-200"
                                              onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
-                                        <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[1px]">
-                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                        <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
+                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
                                             <span>Perbesar &rarr;</span>
                                         </div>
                                     </button>
@@ -1170,7 +1172,7 @@
                             @if($chron->video_path)
                                 <div class="pt-0.5">
                                     <video controls
-                                           style="width: 240px; max-width: 100%; height: 150px; border-radius: 14px; border: 1px solid #E2E8F0; display: block;"
+                                           style="width: 210px; max-width: 100%; height: 128px; border-radius: 10px; border: 1px solid #E2E8F0; display: block;"
                                            class="shadow-2xs">
                                         <source src="{{ $chron->video_url ?? asset('storage/' . $chron->video_path) }}" type="video/mp4">
                                         Browser Anda tidak mendukung pemutaran video.
@@ -1182,25 +1184,25 @@
                             @if($chron->latitude && $chron->longitude)
                                 <a href="https://maps.google.com/?q={{ $chron->latitude }},{{ $chron->longitude }}" target="_blank"
                                    title="Buka titik koordinat di Google Maps"
-                                   style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);"
-                                   class="block p-2 rounded-xl hover:border-rose-300 hover:shadow-xs transition-all group mt-1">
-                                    <div class="flex items-center gap-2.5">
+                                   style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);"
+                                   class="block p-1.5 rounded-lg hover:border-rose-300 hover:shadow-xs transition-all group mt-0.5">
+                                    <div class="flex items-center gap-2">
                                         <div style="background-color: #FEE2E2; border: 1px solid #FECDD3;"
-                                             class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                            <svg class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
+                                             class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-3.5 h-3.5 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" clip-rule="evenodd"/>
                                             </svg>
                                         </div>
                                         <div class="min-w-0 flex-1">
-                                            <div class="font-bold text-xs text-slate-800 group-hover:text-rose-600 transition-colors leading-tight">Lokasi Titik Lapangan</div>
-                                            <div class="text-[10px] font-mono text-slate-500 mt-0.5 truncate tracking-tight">{{ number_format($chron->latitude, 6) }}, {{ number_format($chron->longitude, 6) }}</div>
+                                            <div class="font-bold text-[11px] text-slate-800 group-hover:text-rose-600 transition-colors leading-tight">Lokasi Titik Lapangan</div>
+                                            <div class="text-[9.5px] font-mono text-slate-500 mt-0.5 truncate tracking-tight">{{ number_format($chron->latitude, 6) }}, {{ number_format($chron->longitude, 6) }}</div>
                                         </div>
                                     </div>
                                 </a>
                             @endif
 
                             <!-- Timestamp & WhatsApp status indicators -->
-                            <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
+                            <div class="flex justify-end items-center gap-1 text-[9.5px] text-slate-400 font-mono pt-0.5 select-none leading-none">
                                 <span>{{ $chron->created_at->format('H:i') }} WIB</span>
                                 @if($isSelf)
                                     @if($isRead)
@@ -1236,41 +1238,41 @@
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
-            <div class="chat-quick-templates-bar px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
+            <div class="chat-quick-templates-bar px-3 sm:px-4 py-1.5 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
-                <div class="w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
-                    <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
+                <div class="w-full flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+                    <span class="text-[9.5px] uppercase font-bold text-slate-400 shrink-0 tracking-wide">Template Cepat:</span>
                     
                     <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         📍 Menuju lokasi
                     </button>
                     <button type="button" onclick="setQuickChip('🔍 Investigasi titik & pengukuran OTDR', 'OTDR')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         🔍 Investigasi &amp; OTDR
                     </button>
                     <button type="button" onclick="setQuickChip('✂️ Ditemukan kabel putus / bending core pada span', 'INVESTIGASI')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         ✂️ Kabel putus / bending
                     </button>
                     <button type="button" onclick="setQuickChip('⚡ Sedang proses splicing core di Joint Closure', 'JOINTING')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         ⚡ Proses splicing core
                     </button>
                     <button type="button" onclick="setQuickChip('📊 Pengukuran redaman optik selesai', 'OTDR')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         📊 Ukur redaman optik
                     </button>
                     <button type="button" onclick="setQuickChip('✅ Redaman normal & Link UP kembali', 'LINK_UP')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         ✅ Redaman normal &amp; Link UP
                     </button>
                     <button type="button" onclick="setQuickChip('⚠️ Kendala di lapangan, memerlukan manuver core', 'LAIN')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         ⚠️ Kendala / butuh manuver
                     </button>
                     <button type="button" onclick="setQuickChip('📷 Dokumentasi hasil perbaikan lapangan terlampir', 'SELESAI')"
-                            class="px-2.5 sm:px-3 py-1 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] sm:text-xs font-medium shrink-0 transition cursor-pointer shadow-2xs">
+                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
                         📷 Dokumentasi perbaikan
                     </button>
                 </div>
@@ -1290,7 +1292,7 @@
                 <input type="hidden" name="gps_accuracy" id="chron_acc">
 
                 <!-- WhatsApp Reply Banner Preview (shows when replying to a message) -->
-                <div id="chat-reply-preview" class="hidden border-b border-slate-200/90 bg-sky-50/70 px-3.5 py-2 transition-all">
+                <div id="chat-reply-preview" class="hidden border-b border-slate-200/90 bg-sky-50/70 px-3.5 py-1.5 transition-all">
                     <div class="w-full flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2.5 min-w-0 border-l-4 border-blue-600 pl-2.5 py-0.5">
                             <div class="min-w-0">
@@ -1305,8 +1307,8 @@
                     </div>
                 </div>
 
-                <div class="chat-form-inner p-2.5 sm:p-4">
-                    <div class="w-full flex items-center gap-2 sm:gap-2.5">
+                <div class="chat-form-inner p-2 sm:px-3.5 sm:py-2.5">
+                    <div class="w-full flex items-center gap-2">
 
                 <!-- Hidden Native File Inputs -->
                 <!-- 1. General Media (Photo / Video) -->
@@ -1324,83 +1326,83 @@
                             id="btn-attachment-toggle"
                             onclick="toggleAttachmentMenu(event)"
                             title="Lampirkan Dokumen / Media / Kamera / Lokasi"
-                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                            class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                     </button>
 
                     <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
                     <div id="dropdown-attachment-menu"
-                         style="bottom: 100% !important; margin-bottom: 12px !important; top: auto !important;"
-                         class="hidden absolute left-0 w-80 sm:w-88 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.30)] border border-slate-200/90 py-2.5 px-2 z-[100] select-none divide-y divide-slate-100">
+                         style="bottom: 100% !important; margin-bottom: 10px !important; top: auto !important;"
+                         class="hidden absolute left-0 w-72 sm:w-80 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-slate-200/90 py-2 px-1.5 z-[100] select-none divide-y divide-slate-100">
                         
-                        <div class="space-y-1 pb-1.5">
+                        <div class="space-y-0.5 pb-1">
                             <!-- Option 1: Upload Media (Foto / Video) -->
                             <button type="button"
                                     onclick="closeAttachmentMenu(); document.getElementById('input_upload_media').click();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
+                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
+                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
                                 </div>
                             </button>
 
                             <!-- Option 2: Rekam Video Lapangan -->
                             <button type="button"
                                     onclick="closeAttachmentMenu(); document.getElementById('input_record_video').click();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Rekam Video Lapangan</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
+                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Rekam Video Lapangan</h4>
+                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
                                 </div>
                             </button>
 
                             <!-- Option 3: Kamera GPS (Watermark) -->
                             <button type="button"
                                     onclick="closeAttachmentMenu(); captureCameraWithGps();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight flex items-center gap-1.5">
+                                    <h4 class="font-bold text-xs text-slate-800 leading-tight flex items-center gap-1.5">
                                         <span>Kamera GPS (Watermark)</span>
-                                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
+                                        <span class="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
                                     </h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
+                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
                                 </div>
                             </button>
 
                             <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
                             <button type="button"
                                     onclick="closeAttachmentMenu(); document.getElementById('input_camera_plain').click();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
+                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
+                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
                                 </div>
                             </button>
                         </div>
 
                         <!-- Option 5: Share Lokasi Saya -->
-                        <div class="pt-1.5">
+                        <div class="pt-1">
                             <button type="button"
                                     onclick="closeAttachmentMenu(); shareMyCurrentLocation();"
-                                    class="w-full flex items-center gap-3.5 p-2 rounded-2xl hover:bg-rose-50 transition text-left cursor-pointer group">
-                                <div class="w-10 h-10 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-rose-50 transition text-left cursor-pointer group">
+                                <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs sm:text-sm text-slate-800 leading-tight">Share Lokasi Saya</h4>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
+                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Share Lokasi Saya</h4>
+                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
                                 </div>
                             </button>
                         </div>
@@ -1409,7 +1411,7 @@
 
                 <!-- Text & Location Input Box Container (Matching Image 1) -->
                 <div id="chat-input-container"
-                     class="flex-1 rounded-2xl border border-slate-300/90 bg-white px-3 sm:px-3.5 py-1.5 sm:py-2.5 transition-all flex flex-col justify-center min-h-[44px] shadow-2xs min-w-0">
+                     class="flex-1 rounded-xl border border-slate-300/90 bg-white px-3 py-1.5 transition-all flex flex-col justify-center min-h-[38px] shadow-2xs min-w-0">
                     <div class="relative flex items-center min-w-0">
                         <input type="text"
                                name="message"
@@ -1417,26 +1419,26 @@
                                placeholder="Ketik update koordinasi..."
                                autocomplete="off"
                                style="outline: none !important; box-shadow: none !important; border: none !important;"
-                               class="w-full text-xs sm:text-sm bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
+                               class="w-full text-xs bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
                         
-                        <span id="attachment-name" class="text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
+                        <span id="attachment-name" class="text-[10px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
                     </div>
 
                     <!-- GPS Attached Chip (shows when latitude & longitude are attached - Matching Image 1) -->
                     <div id="gps-attached-preview" class="hidden pt-1.5 mt-1.5 border-t border-dashed border-slate-200 flex items-center justify-between">
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 border border-rose-200 text-rose-600 shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold bg-rose-50 border border-rose-200 text-rose-600 shadow-2xs">
+                            <svg class="w-3 h-3 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
                             <span id="gps-preview-text" class="font-bold">GPS: -6.934309, 107.594269</span>
-                            <button type="button" onclick="clearAttachedGps()" class="ml-1.5 text-rose-400 hover:text-rose-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Lokasi">&times;</button>
+                            <button type="button" onclick="clearAttachedGps()" class="ml-1.5 text-rose-400 hover:text-rose-700 font-bold transition text-sm leading-none cursor-pointer" title="Hapus Lokasi">&times;</button>
                         </div>
                     </div>
 
                     <!-- Photo Attached Chip (shows when photo or media is selected) -->
                     <div id="photo-attached-preview" class="hidden pt-1.5 mt-1.5 border-t border-dashed border-slate-200 flex items-center justify-between">
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-sky-50 border border-sky-200 text-sky-700 shadow-2xs">
-                            <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold bg-sky-50 border border-sky-200 text-sky-700 shadow-2xs">
+                            <svg class="w-3 h-3 text-sky-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span id="photo-preview-text" class="font-bold truncate max-w-[200px]">Foto Terlampir</span>
-                            <button type="button" onclick="clearAttachedPhoto()" class="ml-1.5 text-sky-400 hover:text-sky-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Foto">&times;</button>
+                            <button type="button" onclick="clearAttachedPhoto()" class="ml-1.5 text-sky-400 hover:text-sky-700 font-bold transition text-sm leading-none cursor-pointer" title="Hapus Foto">&times;</button>
                         </div>
                     </div>
                 </div>
@@ -1526,9 +1528,9 @@
                 <!-- Submit Send Button -->
                 <button type="submit"
                         id="btn-quick-chat-submit"
-                        class="w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+                        class="w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    <svg class="w-4 h-4 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
                     </div>
                 </div>
@@ -3135,21 +3137,21 @@ async function handleChatFormSubmit(e) {
         const timeStr = `${hours}:${minutes} WIB`;
 
         const bubble = document.createElement('div');
-        bubble.className = 'flex justify-end my-1 group/bubble relative animate-message-in';
+        bubble.className = 'flex justify-end my-0.5 group/bubble relative animate-message-in';
         bubble.id = tempRowId;
         
         let mediaNotice = '';
         if (hasMedia) {
-            mediaNotice = `<div class="p-2 rounded-xl bg-sky-100/70 text-sky-800 text-[11px] font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 text-sky-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+            mediaNotice = `<div class="p-1.5 rounded-lg bg-sky-100/70 text-sky-800 text-[10.5px] font-semibold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-sky-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
                 <span>Mengunggah berkas media...</span>
             </div>`;
         }
 
         let locNotice = '';
         if (lat && lng) {
-            locNotice = `<div class="p-2 rounded-xl bg-rose-50 border border-rose-100 text-rose-700 text-[11px] font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+            locNotice = `<div class="p-1.5 rounded-lg bg-rose-50 border border-rose-100 text-rose-700 text-[10.5px] font-semibold flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
                 <span>Lokasi: ${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)}</span>
             </div>`;
         }
@@ -3157,16 +3159,16 @@ async function handleChatFormSubmit(e) {
         let replyBox = '';
         if (replySender) {
             replyBox = `
-                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
-                     class="px-2.5 py-1.5 mb-1.5 select-none overflow-hidden text-left cursor-pointer"
+                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 3px solid #2563EB; border-radius: 6px;"
+                     class="px-2 py-1 mb-1 select-none overflow-hidden text-left cursor-pointer"
                      ${replyId ? `onclick="scrollToChronology(${replyId})"` : ''}>
-                    <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
-                        <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1 text-blue-600 font-bold text-[10px] leading-tight">
+                        <svg class="w-3 h-3 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
                         </svg>
                         <span class="truncate uppercase tracking-wide">${escapeChatHtml(replySender)}</span>
                     </div>
-                    ${replySnippet ? `<p class="text-slate-600 text-[11px] truncate mt-0.5 leading-snug">${escapeChatHtml(replySnippet)}</p>` : ''}
+                    ${replySnippet ? `<p class="text-slate-600 text-[10px] truncate mt-0.5 leading-snug">${escapeChatHtml(replySnippet)}</p>` : ''}
                 </div>
             `;
         }
@@ -3174,19 +3176,19 @@ async function handleChatFormSubmit(e) {
         const authUserBadge = '{{ auth()->user()?->chat_badge ?? 'Staf' }}';
 
         bubble.innerHTML = `
-            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
-                 class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5 relative new-chat-highlight-self">
+            <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(82%, 380px);"
+                 class="rounded-xl rounded-tr-xs px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 relative new-chat-highlight-self">
                 <div class="flex items-center gap-1.5">
-                    <span class="font-bold text-xs text-teal-950">Anda</span>
-                    <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
+                    <span class="font-bold text-[11px] text-teal-950">Anda</span>
+                    <span style="background-color: #D6E8FF; color: #0369A1;" class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide leading-none">
                         ${escapeChatHtml(authUserBadge)}
                     </span>
                 </div>
                 ${replyBox}
-                ${msg ? `<p class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">${escapeChatHtml(msg)}</p>` : ''}
+                ${msg ? `<p class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(msg)}</p>` : ''}
                 ${mediaNotice}
                 ${locNotice}
-                <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
+                <div class="flex justify-end items-center gap-1 text-[9.5px] text-slate-400 font-mono pt-0.5 select-none leading-none">
                     <span>${timeStr}</span>
                     <span class="status-indicator inline-flex items-center text-slate-400 ml-0.5" title="Mengirim...">
                         <svg class="w-3 h-3 text-slate-400 shrink-0 animate-pulse" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -3961,22 +3963,22 @@ function renderIncomingLiveMessage(data) {
 
     const row = document.createElement('div');
     const animClass = data.is_self ? 'animate-message-in' : 'animate-message-in-left';
-    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} my-1 group/bubble relative ${animClass}`;
+    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} my-0.5 group/bubble relative ${animClass}`;
     row.id = 'chron-row-' + data.id;
 
     let replyBox = '';
     if (data.reply_sender) {
         replyBox = `
-            <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
-                 class="px-2.5 py-1.5 mb-1.5 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
+            <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 3px solid #2563EB; border-radius: 6px;"
+                 class="px-2 py-1 mb-1 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
                  ${data.reply_to_id ? `onclick="scrollToChronology(${data.reply_to_id})"` : ''}>
-                <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
-                    <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <div class="flex items-center gap-1 text-blue-600 font-bold text-[10px] leading-tight">
+                    <svg class="w-3 h-3 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
                     </svg>
                     <span class="truncate uppercase tracking-wide">${escapeChatHtml(data.reply_sender)}</span>
                 </div>
-                ${data.reply_snippet ? `<p class="text-slate-600 text-[11px] truncate mt-0.5 leading-snug">${escapeChatHtml(data.reply_snippet)}</p>` : ''}
+                ${data.reply_snippet ? `<p class="text-slate-600 text-[10px] truncate mt-0.5 leading-snug">${escapeChatHtml(data.reply_snippet)}</p>` : ''}
             </div>
         `;
     }
@@ -3987,15 +3989,15 @@ function renderIncomingLiveMessage(data) {
             <div class="pt-0.5">
                 <button type="button"
                         onclick="openImageLightbox('${data.photo_url}', 'Foto Dokumentasi - ${escapeChatHtml(data.sender_name)}')"
-                        style="width: 220px; max-width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                        style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
                         class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
                     <img src="${data.photo_url}"
                          alt="Bukti Foto"
                          loading="lazy"
-                         style="width: 100%; height: 140px; object-fit: cover; display: block;"
+                         style="width: 100%; height: 118px; object-fit: cover; display: block;"
                          class="group-hover:scale-105 transition duration-200">
-                    <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[1px]">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                    <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
+                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
                         <span>Perbesar &rarr;</span>
                     </div>
                 </button>
@@ -4008,7 +4010,7 @@ function renderIncomingLiveMessage(data) {
         videoBox = `
             <div class="pt-0.5">
                 <video controls
-                       style="width: 240px; max-width: 100%; height: 150px; border-radius: 14px; border: 1px solid #E2E8F0; display: block;"
+                       style="width: 210px; max-width: 100%; height: 128px; border-radius: 10px; border: 1px solid #E2E8F0; display: block;"
                        class="shadow-2xs">
                     <source src="${data.video_url}" type="video/mp4">
                     Browser Anda tidak mendukung pemutaran video.
@@ -4022,18 +4024,18 @@ function renderIncomingLiveMessage(data) {
         locBox = `
             <a href="https://maps.google.com/?q=${data.latitude},${data.longitude}" target="_blank"
                title="Buka titik koordinat di Google Maps"
-               style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);"
-               class="block p-2 rounded-xl hover:border-rose-300 hover:shadow-xs transition-all group mt-1">
-                <div class="flex items-center gap-2.5">
+               style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);"
+               class="block p-1.5 rounded-lg hover:border-rose-300 hover:shadow-xs transition-all group mt-0.5">
+                <div class="flex items-center gap-2">
                     <div style="background-color: #FEE2E2; border: 1px solid #FECDD3;"
-                         class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                        <svg class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
+                         class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <svg class="w-3.5 h-3.5 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" clip-rule="evenodd"/>
                         </svg>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="font-bold text-xs text-slate-800 group-hover:text-rose-600 transition-colors leading-tight">Lokasi Titik Lapangan</div>
-                        <div class="text-[10px] font-mono text-slate-500 mt-0.5 truncate tracking-tight">${Number(data.latitude).toFixed(6)}, ${Number(data.longitude).toFixed(6)}</div>
+                        <div class="font-bold text-[11px] text-slate-800 group-hover:text-rose-600 transition-colors leading-tight">Lokasi Titik Lapangan</div>
+                        <div class="text-[9.5px] font-mono text-slate-500 mt-0.5 truncate tracking-tight">${Number(data.latitude).toFixed(6)}, ${Number(data.longitude).toFixed(6)}</div>
                     </div>
                 </div>
             </a>
@@ -4054,16 +4056,16 @@ function renderIncomingLiveMessage(data) {
              data-lng="${data.longitude || ''}"
              data-photo="${data.photo_url || ''}"
              data-category="${escapeChatHtml(data.category || 'LAIN')}"
-             style="${data.is_self ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;'} box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
-             class="rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 ${data.is_self ? 'rounded-tr-xs' : 'rounded-tl-xs'} relative ${highlightClass}">
+             style="${data.is_self ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;'} box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(82%, 380px);"
+             class="rounded-xl px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 ${data.is_self ? 'rounded-tr-xs' : 'rounded-tl-xs'} relative ${highlightClass}">
             
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 min-w-0">
-                    <span class="font-bold text-xs ${data.is_self ? 'text-teal-950' : 'text-slate-800'} truncate">
+                    <span class="font-bold text-[11px] ${data.is_self ? 'text-teal-950' : 'text-slate-800'} truncate">
                         ${escapeChatHtml(data.sender_name)}
                     </span>
                     <span style="${data.is_self ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;'}"
-                          class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide shrink-0">
+                          class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
                         ${escapeChatHtml(data.sender_badge)}
                     </span>
                 </div>
@@ -4071,22 +4073,22 @@ function renderIncomingLiveMessage(data) {
                 <div class="relative shrink-0">
                     <button type="button"
                             onclick="toggleMessageMenu(${data.id}, event)"
-                            class="w-5 h-5 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
+                            class="w-4 h-4 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
                             title="Pilihan pesan">
-                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                         </svg>
                     </button>
                     <div id="msg-dropdown-${data.id}"
-                         class="msg-action-dropdown hidden absolute ${data.is_self ? 'right-0' : 'left-0 sm:right-auto'} top-full mt-1 w-52 sm:w-56 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                         class="msg-action-dropdown hidden absolute ${data.is_self ? 'right-0' : 'left-0 sm:right-auto'} top-full mt-1 w-48 sm:w-52 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
                         <div class="space-y-0.5 pb-1">
-                            <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                            <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
                                 <span>Salin</span>
                             </button>
-                            <button type="button" onclick="openMessageInfo(${data.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                            <button type="button" onclick="openMessageInfo(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
                                 <span>Info Pesan</span>
                             </button>
-                            <button type="button" onclick="replyToMessage(${data.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                            <button type="button" onclick="replyToMessage(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
                                 <span>Balas</span>
                             </button>
                         </div>
@@ -4095,12 +4097,12 @@ function renderIncomingLiveMessage(data) {
             </div>
 
             ${replyBox}
-            ${data.message ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">${escapeChatHtml(data.message)}</p>` : ''}
+            ${data.message ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(data.message)}</p>` : ''}
             ${photoBox}
             ${videoBox}
             ${locBox}
 
-            <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
+            <div class="flex justify-end items-center gap-1 text-[9.5px] text-slate-400 font-mono pt-0.5 select-none leading-none">
                 <span>${escapeChatHtml(data.time_str || '')}</span>
                 ${data.is_self ? `
                     <span title="${data.is_read ? 'Dibaca' : 'Terkirim'}"
