@@ -1127,14 +1127,16 @@
                 </div>
 
                 <!-- Text & Location Input Box Container (Matching Image 1) -->
-                <div class="flex-1 rounded-2xl border border-slate-300/90 bg-white focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20 px-3.5 py-2 sm:py-2.5 transition flex flex-col justify-center min-h-[46px] shadow-2xs">
+                <div id="chat-input-container"
+                     class="flex-1 rounded-2xl border border-slate-300/90 bg-white px-3.5 py-2 sm:py-2.5 transition-all flex flex-col justify-center min-h-[46px] shadow-2xs">
                     <div class="relative flex items-center">
                         <input type="text"
                                name="message"
                                id="quick-chat-input"
                                placeholder="Ketik update koordinasi..."
                                autocomplete="off"
-                               class="w-full text-xs sm:text-sm bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none">
+                               style="outline: none !important; box-shadow: none !important; border: none !important;"
+                               class="w-full text-xs sm:text-sm bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
                         
                         <span id="attachment-name" class="text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
                     </div>
@@ -1157,6 +1159,20 @@
                         </div>
                     </div>
                 </div>
+
+                <style>
+                    #chat-input-container:focus-within {
+                        border-color: #0D9488 !important;
+                        box-shadow: 0 0 0 3px rgba(24, 196, 196, 0.22) !important;
+                    }
+                    #quick-chat-input,
+                    #quick-chat-input:focus,
+                    #quick-chat-input:focus-visible {
+                        outline: none !important;
+                        box-shadow: none !important;
+                        border: none !important;
+                    }
+                </style>
 
                 <!-- Submit Send Button -->
                 <button type="submit"
