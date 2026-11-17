@@ -2932,7 +2932,10 @@ function switchTab(tabId) {
     }
 }
 
-function handleChatFormSubmit(e) {
+async function handleChatFormSubmit(e) {
+    e.preventDefault();
+
+    const form = document.getElementById('quick-chat-form');
     const input = document.getElementById('quick-chat-input');
     const msg = input ? input.value.trim() : '';
     const lat = document.getElementById('chron_lat')?.value;
@@ -2944,13 +2947,18 @@ function handleChatFormSubmit(e) {
 
     // If nothing entered or attached, do not submit
     if (!msg && !lat && !hasMedia) {
-        e.preventDefault();
         return;
     }
+
+    const replyId = document.getElementById('chron_reply_to_id')?.value;
+    const replySender = document.getElementById('chron_reply_sender')?.value;
+    const replySnippet = document.getElementById('chron_reply_snippet')?.value;
 
     // Append optimistic message bubble with pending CLOCK icon (🕒)
     const stream = document.getElementById('chat-stream-container') || document.getElementById('chat-stream-box');
     const scrollBox = document.getElementById('chat-stream-box');
+    const tempRowId = 'temp-row-' + Date.now();
+
     if (stream) {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -2958,7 +2966,8 @@ function handleChatFormSubmit(e) {
         const timeStr = `${hours}:${minutes} WIB`;
 
         const bubble = document.createElement('div');
-        bubble.className = 'flex justify-end my-1.5 opacity-90 transition-opacity';
+        bubble.className = 'flex justify-end my-1 group/bubble relative transition-opacity';
+        bubble.id = tempRowId;
         
         let mediaNotice = '';
         if (hasMedia) {
@@ -2976,14 +2985,12 @@ function handleChatFormSubmit(e) {
             </div>`;
         }
 
-        const replySender = document.getElementById('chron_reply_sender')?.value;
-        const replySnippet = document.getElementById('chron_reply_snippet')?.value;
-
         let replyBox = '';
         if (replySender) {
             replyBox = `
                 <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
-                     class="px-2.5 py-1.5 mb-1.5 select-none overflow-hidden text-left">
+                     class="px-2.5 py-1.5 mb-1.5 select-none overflow-hidden text-left cursor-pointer"
+                     ${replyId ? `onclick="scrollToChronology(${replyId})"` : ''}>
                     <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
                         <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
@@ -2997,7 +3004,7 @@ function handleChatFormSubmit(e) {
 
         bubble.innerHTML = `
             <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
-                 class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5">
+                 class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5 relative">
                 <div class="flex items-center gap-1.5">
                     <span class="font-bold text-xs text-teal-950">Anda</span>
                     <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
@@ -3010,8 +3017,8 @@ function handleChatFormSubmit(e) {
                 ${locNotice}
                 <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
                     <span>${timeStr}</span>
-                    <span title="Mengirim..." class="inline-flex items-center text-slate-400 ml-0.5">
-                        <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <span class="status-indicator inline-flex items-center text-slate-400 ml-0.5" title="Mengirim...">
+                        <svg class="w-3 h-3 text-slate-400 shrink-0 animate-pulse" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
                         </svg>
                     </span>
@@ -3019,13 +3026,95 @@ function handleChatFormSubmit(e) {
             </div>
         `;
         stream.appendChild(bubble);
-        if (scrollBox) scrollBox.scrollTop = scrollBox.scrollHeight;
+        if (scrollBox) {
+            scrollBox.scrollTop = scrollBox.scrollHeight;
+        }
     }
+
+    // Reset input fields immediately so user can continue chatting seamlessly
+    if (input) input.value = '';
+    clearAttachedGps();
+    clearAttachedPhoto();
+    cancelReply();
 
     const submitBtn = document.getElementById('btn-quick-chat-submit');
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+    }
+
+    try {
+        const formData = new FormData(form);
+        const res = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            body: formData,
+        });
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.message || 'Gagal mengirim pesan');
+        }
+
+        const data = await res.json();
+        const chron = data.chronology;
+
+        // Transition pending clock icon -> double grey checkmark (Terkirim) like WhatsApp
+        const tempBubbleRow = document.getElementById(tempRowId);
+        if (tempBubbleRow && chron) {
+            tempBubbleRow.id = 'chron-row-' + chron.id;
+            const bubbleBox = tempBubbleRow.firstElementChild;
+            if (bubbleBox) {
+                bubbleBox.id = 'chron-bubble-' + chron.id;
+                bubbleBox.dataset.id = chron.id;
+                bubbleBox.dataset.sender = 'Anda';
+                bubbleBox.dataset.role = 'Teknisi';
+                bubbleBox.dataset.message = chron.message || '';
+                bubbleBox.dataset.time = (chron.created_at || '') + ' WIB';
+                bubbleBox.dataset.read = 'Belum dibaca';
+                bubbleBox.dataset.lat = chron.latitude || '';
+                bubbleBox.dataset.lng = chron.longitude || '';
+                bubbleBox.dataset.photo = data.photo_url || (chron.photo_path ? `/storage/${chron.photo_path}` : '');
+                bubbleBox.dataset.category = chron.category || 'LAIN';
+
+                const statusSpan = bubbleBox.querySelector('.status-indicator');
+                if (statusSpan) {
+                    statusSpan.title = 'Terkirim';
+                    statusSpan.className = 'status-indicator inline-flex items-center text-slate-400 ml-0.5';
+                    statusSpan.innerHTML = `
+                        <svg class="w-3.5 h-3 text-slate-400" viewBox="0 0 16 11" fill="none">
+                            <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    `;
+                }
+            }
+        }
+        if (scrollBox) {
+            scrollBox.scrollTop = scrollBox.scrollHeight;
+        }
+    } catch (err) {
+        console.error('Chat submit error:', err);
+        const tempBubbleRow = document.getElementById(tempRowId);
+        if (tempBubbleRow) {
+            const statusSpan = tempBubbleRow.querySelector('.status-indicator');
+            if (statusSpan) {
+                statusSpan.title = 'Gagal terkirim: ' + err.message;
+                statusSpan.className = 'status-indicator inline-flex items-center text-rose-500 ml-0.5 font-bold';
+                statusSpan.innerHTML = `⚠️`;
+            }
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+        }
+        if (input) {
+            input.focus();
+        }
     }
 }
 

@@ -98,10 +98,13 @@ class ChronologyController extends Controller
             );
 
             if ($request->wantsJson()) {
+                $entry->load(['user', 'replyTo.user']);
                 return response()->json([
                     'success' => true,
-                    'message' => 'Kronologis berhasil ditambahkan.',
+                    'message' => 'Pesan terkirim',
                     'chronology' => $entry,
+                    'photo_url' => $entry->photo_url,
+                    'video_url' => $entry->video_url,
                 ]);
             }
 
