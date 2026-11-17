@@ -3,6 +3,7 @@
 namespace App\Modules\Ticketing\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\TicketChronology;
 use App\Models\Tiket;
 use App\Modules\Ticketing\Services\ChronologyService;
 use Exception;
@@ -10,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ChronologyController extends Controller
 {
@@ -96,5 +99,75 @@ class ChronologyController extends Controller
 
             return redirect()->route('tickets.show', $tiket)->withErrors(['chronology' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Stream chronology photo attachment reliably across Docker/VPS environments.
+     */
+    public function photo(TicketChronology $chronology): BinaryFileResponse
+    {
+        if (empty($chronology->photo_path)) {
+            abort(404);
+        }
+
+        $cleanPath = ltrim($chronology->photo_path, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        }
+
+        if (Storage::disk('public')->exists($cleanPath)) {
+            return response()->file(Storage::disk('public')->path($cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        if (file_exists(public_path('storage/' . $cleanPath))) {
+            return response()->file(public_path('storage/' . $cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        if (file_exists(public_path($cleanPath))) {
+            return response()->file(public_path($cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        abort(404);
+    }
+
+    /**
+     * Stream chronology video attachment reliably across Docker/VPS environments.
+     */
+    public function video(TicketChronology $chronology): BinaryFileResponse
+    {
+        if (empty($chronology->video_path)) {
+            abort(404);
+        }
+
+        $cleanPath = ltrim($chronology->video_path, '/');
+        if (str_starts_with($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        }
+
+        if (Storage::disk('public')->exists($cleanPath)) {
+            return response()->file(Storage::disk('public')->path($cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        if (file_exists(public_path('storage/' . $cleanPath))) {
+            return response()->file(public_path('storage/' . $cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        if (file_exists(public_path($cleanPath))) {
+            return response()->file(public_path($cleanPath), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
+        abort(404);
     }
 }

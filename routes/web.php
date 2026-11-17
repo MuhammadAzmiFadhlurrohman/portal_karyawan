@@ -143,6 +143,8 @@ Route::middleware('auth')->group(function (): void {
 
     // Chronology & Interval Monitoring (§7.3, AC-05)
     Route::post('/tickets/{tiket}/chronologies', [ChronologyController::class, 'store'])->name('tickets.chronologies.store');
+    Route::get('/tickets/chronologies/{chronology}/photo', [ChronologyController::class, 'photo'])->name('tickets.chronologies.photo');
+    Route::get('/tickets/chronologies/{chronology}/video', [ChronologyController::class, 'video'])->name('tickets.chronologies.video');
 
     // Stop Clock Control (§7.4, AC-07)
     Route::post('/tickets/{tiket}/stop-clock', [StopClockController::class, 'store'])->name('tickets.stop-clock.store');

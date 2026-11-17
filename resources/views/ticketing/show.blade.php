@@ -916,8 +916,12 @@
                             <!-- Photo Attachment Preview if available -->
                             @if($chron->photo_path)
                                 <div class="pt-1">
-                                    <a href="{{ asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-xl overflow-hidden border border-slate-200 max-w-xs shadow-2xs">
-                                        <img src="{{ asset('storage/' . $chron->photo_path) }}" alt="Bukti Foto" class="w-full h-40 object-cover group-hover:scale-105 transition">
+                                    <a href="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-2xl overflow-hidden border border-slate-200/90 max-w-xs shadow-2xs bg-slate-100">
+                                        <img src="{{ $chron->photo_url ?? asset('storage/' . $chron->photo_path) }}"
+                                             alt="Bukti Foto"
+                                             loading="lazy"
+                                             class="w-full h-44 object-cover group-hover:scale-105 transition duration-200"
+                                             onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
                                         <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
                                             Lihat Foto Penuh &rarr;
                                         </div>
@@ -928,8 +932,8 @@
                             <!-- Video Attachment Preview if available -->
                             @if($chron->video_path)
                                 <div class="pt-1">
-                                    <video controls class="w-full max-w-xs rounded-xl border border-slate-200 shadow-2xs">
-                                        <source src="{{ asset('storage/' . $chron->video_path) }}" type="video/mp4">
+                                    <video controls class="w-full max-w-xs rounded-2xl border border-slate-200/90 shadow-2xs">
+                                        <source src="{{ $chron->video_url ?? asset('storage/' . $chron->video_path) }}" type="video/mp4">
                                         Browser Anda tidak mendukung pemutaran video.
                                     </video>
                                 </div>
@@ -1141,6 +1145,15 @@
                             <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
                             <span id="gps-preview-text" class="font-bold">GPS: -6.934309, 107.594269</span>
                             <button type="button" onclick="clearAttachedGps()" class="ml-1.5 text-rose-400 hover:text-rose-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Lokasi">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- Photo Attached Chip (shows when photo or media is selected) -->
+                    <div id="photo-attached-preview" class="hidden pt-2 mt-2 border-t border-dashed border-slate-200 flex items-center justify-between">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 border border-sky-200 text-sky-700 shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-sky-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span id="photo-preview-text" class="font-bold truncate max-w-[220px]">Foto Terlampir</span>
+                            <button type="button" onclick="clearAttachedPhoto()" class="ml-1.5 text-sky-400 hover:text-sky-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Foto">&times;</button>
                         </div>
                     </div>
                 </div>
@@ -1564,12 +1577,16 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     @foreach($photos as $p)
                         <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group relative">
-                            <img src="{{ asset('storage/' . $p->photo_path) }}" alt="Foto" class="w-full h-44 object-cover group-hover:scale-105 transition duration-300">
+                            <img src="{{ $p->photo_url ?? asset('storage/' . $p->photo_path) }}"
+                                 alt="Foto"
+                                 loading="lazy"
+                                 class="w-full h-44 object-cover group-hover:scale-105 transition duration-300"
+                                 onerror="if(this.src!=='{{ asset('storage/' . $p->photo_path) }}'){this.src='{{ asset('storage/' . $p->photo_path) }}';}">
                             <div class="p-2.5 bg-white border-t border-slate-100">
                                 <span class="font-bold text-[11px] text-slate-800 block truncate">{{ $p->user->name ?? 'User' }}</span>
                                 <span class="text-[10px] text-slate-400 block">{{ $p->created_at->format('d M, H:i') }}</span>
                             </div>
-                            <a href="{{ asset('storage/' . $p->photo_path) }}" target="_blank" class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
+                            <a href="{{ $p->photo_url ?? asset('storage/' . $p->photo_path) }}" target="_blank" class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
                                 Buka Foto &rarr;
                             </a>
                         </div>
@@ -2193,9 +2210,40 @@ function updateAttachmentLabel(fileInput) {
 // Handlers for WhatsApp-style attachment menu options
 function handleFileChosen(input, typeName) {
     const label = document.getElementById('attachment-name');
+    const photoChip = document.getElementById('photo-attached-preview');
+    const photoText = document.getElementById('photo-preview-text');
+    const mediaInput = document.getElementById('input_upload_media');
+
     if (input.files && input.files.length > 0) {
-        if (label) label.innerText = '📎 ' + typeName + ': ' + input.files[0].name;
+        const file = input.files[0];
+        // If camera plain was picked, transfer file into the form input
+        if (input.id === 'input_camera_plain' && mediaInput) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            mediaInput.files = dt.files;
+        }
+        if (label) label.innerText = '📎 ' + typeName + ': ' + file.name;
+        if (photoText) photoText.innerText = '📷 ' + typeName + ': ' + file.name;
+        if (photoChip) photoChip.classList.remove('hidden');
     }
+}
+
+function clearAttachedPhoto() {
+    const mediaInput = document.getElementById('input_upload_media');
+    const videoInput = document.getElementById('input_record_video');
+    const plainInput = document.getElementById('input_camera_plain');
+    const gpsRawInput = document.getElementById('input_camera_gps_raw');
+    const photoChip = document.getElementById('photo-attached-preview');
+    const photoText = document.getElementById('photo-preview-text');
+    const label = document.getElementById('attachment-name');
+
+    if (mediaInput) mediaInput.value = '';
+    if (videoInput) videoInput.value = '';
+    if (plainInput) plainInput.value = '';
+    if (gpsRawInput) gpsRawInput.value = '';
+    if (photoChip) photoChip.classList.add('hidden');
+    if (photoText) photoText.innerText = '';
+    if (label && !label.innerText.includes('GPS')) label.innerText = '';
 }
 
 function captureCameraWithGps() {
@@ -2279,6 +2327,11 @@ function processGpsWatermark(fileInput) {
                 }
                 const label = document.getElementById('attachment-name');
                 if (label) label.innerText = '📸 Watermark GPS Siap';
+
+                const photoChip = document.getElementById('photo-attached-preview');
+                const photoText = document.getElementById('photo-preview-text');
+                if (photoText) photoText.innerText = '📸 Watermark GPS: ' + file.name;
+                if (photoChip) photoChip.classList.remove('hidden');
             }, 'image/jpeg', 0.92);
         };
         img.src = e.target.result;

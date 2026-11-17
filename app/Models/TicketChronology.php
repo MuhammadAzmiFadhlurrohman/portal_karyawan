@@ -41,4 +41,36 @@ class TicketChronology extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    /**
+     * Get reliable direct streaming URL for photo attachment across Docker/VPS.
+     */
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (empty($this->photo_path)) {
+            return null;
+        }
+
+        try {
+            return route('tickets.chronologies.photo', $this);
+        } catch (\Throwable $e) {
+            return asset('storage/' . $this->photo_path);
+        }
+    }
+
+    /**
+     * Get reliable direct streaming URL for video attachment across Docker/VPS.
+     */
+    public function getVideoUrlAttribute(): ?string
+    {
+        if (empty($this->video_path)) {
+            return null;
+        }
+
+        try {
+            return route('tickets.chronologies.video', $this);
+        } catch (\Throwable $e) {
+            return asset('storage/' . $this->video_path);
+        }
+    }
 }
