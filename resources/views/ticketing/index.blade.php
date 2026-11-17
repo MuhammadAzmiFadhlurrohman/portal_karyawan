@@ -221,142 +221,152 @@
         </form>
     </div>
 
-    <!-- Ticket Cards Grid with Left Color Stripe (§11, AC-08) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+    <!-- Ticket Cards Grid with Status-Colored Border & Compact Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
         @forelse($tickets as $ticket)
             @php
-                $stripe = $ticket->stripeColor();
-                $stripeBg = match($stripe) {
-                    'red' => 'bg-red-500',
-                    'yellow' => 'bg-amber-400',
-                    'green' => 'bg-emerald-500',
-                    'gray' => 'bg-slate-400',
-                    default => 'bg-teal-600',
+                // Border & Left Stripe matched to Ticket Status
+                $statusStripeBg = match($ticket->status) {
+                    'CLOSE' => 'bg-emerald-500',
+                    'PROSES' => 'bg-amber-400',
+                    'PENDING_VERIFIKASI' => 'bg-purple-500',
+                    'REOPENED' => 'bg-rose-500',
+                    'CANCELLED' => 'bg-slate-400',
+                    default => 'bg-teal-500', // OPEN
                 };
+
+                $statusBorderClass = match($ticket->status) {
+                    'CLOSE' => 'border-emerald-300/90 hover:border-emerald-400',
+                    'PROSES' => 'border-amber-300/90 hover:border-amber-400',
+                    'PENDING_VERIFIKASI' => 'border-purple-300/90 hover:border-purple-400',
+                    'REOPENED' => 'border-rose-300/90 hover:border-rose-400',
+                    'CANCELLED' => 'border-slate-300/90 hover:border-slate-400',
+                    default => 'border-teal-300/90 hover:border-teal-400', // OPEN
+                };
+
+                $statusBadgeClass = match($ticket->status) {
+                    'CLOSE' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                    'PROSES' => 'bg-amber-100 text-amber-800 border-amber-200',
+                    'PENDING_VERIFIKASI' => 'bg-purple-100 text-purple-800 border-purple-200',
+                    'REOPENED' => 'bg-rose-100 text-rose-800 border-rose-200',
+                    'CANCELLED' => 'bg-slate-100 text-slate-700 border-slate-200',
+                    default => 'bg-teal-100 text-teal-800 border-teal-200', // OPEN
+                };
+
                 $lead = $ticket->assignees->firstWhere('pivot.role_in_team', 'lead');
+                $slaHours = round($ticket->sla_target_minutes / 60, 1);
             @endphp
-            <div class="relative bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition overflow-hidden flex flex-col justify-between group">
-                <!-- Stripe Accent on Left Border -->
-                <div class="absolute top-0 bottom-0 left-0 w-2.5 {{ $stripeBg }}"></div>
+            <div class="relative bg-white rounded-2xl border {{ $statusBorderClass }} shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col justify-between group">
+                <!-- Status Accent Stripe on Left Border -->
+                <div class="absolute top-0 bottom-0 left-0 w-1.5 {{ $statusStripeBg }}"></div>
 
-                <div class="p-5 pl-6 sm:pl-7 space-y-3.5">
-                    <!-- Top Bar: Ticket No & Badges -->
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider font-mono
-                                    {{ $ticket->kategori_tiket === 'BACKBONE' ? 'bg-cyan-50 text-cyan-800 border border-cyan-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200' }}">
-                                    {{ $ticket->kategori_tiket }}
-                                </span>
-                                <span class="text-[11px] text-slate-400">#{{ $ticket->id }}</span>
-                            </div>
-                            <a href="{{ route('tickets.show', $ticket) }}" class="font-heading font-black text-base sm:text-lg text-slate-800 hover:text-[#0D9488] transition block mt-1 tracking-tight">
-                                {{ $ticket->no_tiket }}
-                            </a>
-                        </div>
-
-                        <!-- Priority & Status Pills -->
-                        <div class="flex flex-col items-end gap-1 shrink-0">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold
+                <div class="p-3.5 pl-4 sm:p-4 sm:pl-5 space-y-2.5">
+                    <!-- Row 1: Category, Priority & Status Badges -->
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="px-2 py-0.5 rounded-md text-[9.5px] font-bold tracking-wider font-mono uppercase
+                                {{ $ticket->kategori_tiket === 'BACKBONE' ? 'bg-cyan-50 text-cyan-800 border border-cyan-200/80' : 'bg-emerald-50 text-emerald-800 border border-emerald-200/80' }}">
+                                {{ $ticket->kategori_tiket }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded-md text-[9.5px] font-bold
                                 {{ $ticket->priority === 'P1' ? 'bg-red-100 text-red-700 border border-red-200' : ($ticket->priority === 'P2' ? 'bg-amber-100 text-amber-800 border border-amber-200' : ($ticket->priority === 'P3' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-slate-100 text-slate-700 border border-slate-200')) }}">
                                 {{ $ticket->priority }}
                             </span>
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase
-                                {{ $ticket->status === 'CLOSE' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : ($ticket->status === 'CANCELLED' ? 'bg-slate-100 text-slate-700' : ($ticket->status === 'PENDING_VERIFIKASI' ? 'bg-purple-100 text-purple-800 border border-purple-200' : ($ticket->status === 'PROSES' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-teal-100 text-teal-800 border border-teal-200'))) }}">
-                                {{ $ticket->status }}
-                            </span>
                         </div>
+
+                        <span class="px-2.5 py-0.5 rounded-full text-[9.5px] font-extrabold uppercase border tracking-wide shrink-0 {{ $statusBadgeClass }}">
+                            {{ str_replace('_', ' ', $ticket->status) }}
+                        </span>
                     </div>
 
-                    <!-- Problem / Segment Info Body -->
-                    <div class="bg-slate-50/70 rounded-xl p-3 border border-slate-100 space-y-1.5 text-xs text-slate-600">
+                    <!-- Row 2: Ticket Number & Main Subject -->
+                    <div>
+                        <a href="{{ route('tickets.show', $ticket) }}" class="font-heading font-extrabold text-sm sm:text-[15px] text-slate-800 hover:text-[#0D9488] transition flex items-center justify-between gap-2 tracking-tight leading-snug">
+                            <span>{{ $ticket->no_tiket }}</span>
+                            <span class="text-[10px] font-mono font-normal text-slate-400">#{{ $ticket->id }}</span>
+                        </a>
+                        <p class="text-xs font-bold text-slate-700 truncate mt-0.5">
+                            @if($ticket->kategori_tiket === 'BACKBONE')
+                                {{ $ticket->backbone_segment ?? '-' }}
+                            @else
+                                {{ $ticket->customer_name ?? '-' }}
+                            @endif
+                        </p>
+                    </div>
+
+                    <!-- Row 3: Compact Info Box (2-Column Grid for Quick Scanning) -->
+                    <div class="bg-slate-50/80 rounded-xl px-2.5 py-2 border border-slate-100 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
                         @if($ticket->kategori_tiket === 'BACKBONE')
-                            <div class="flex items-start justify-between gap-1">
-                                <span class="text-slate-400 font-medium">Segmen:</span>
-                                <span class="font-bold text-slate-800 text-right text-xs truncate max-w-[200px]">{{ $ticket->backbone_segment ?? '-' }}</span>
-                            </div>
-                            <div class="flex items-center justify-between gap-1">
-                                <span class="text-slate-400 font-medium">Dampak:</span>
-                                <span class="font-semibold text-xs {{ $ticket->status_link_impact === 'TOTAL_DOWN' ? 'text-red-600' : 'text-amber-600' }}">
-                                    {{ $ticket->status_link_impact ?? '-' }} ({{ $ticket->wilayah }})
+                            <div class="min-w-0">
+                                <span class="text-[9.5px] uppercase font-bold text-slate-400 block leading-none">Dampak &amp; Area</span>
+                                <span class="font-bold text-[11px] truncate block mt-0.5 {{ $ticket->status_link_impact === 'TOTAL_DOWN' ? 'text-rose-600' : 'text-amber-600' }}">
+                                    {{ str_replace('_', ' ', $ticket->status_link_impact ?? '-') }} ({{ $ticket->wilayah ?? '-' }})
                                 </span>
                             </div>
                         @else
-                            <div class="flex items-start justify-between gap-1">
-                                <span class="text-slate-400 font-medium">Pelanggan:</span>
-                                <span class="font-bold text-slate-800 text-right text-xs truncate max-w-[190px]">
-                                    {{ $ticket->customer_name }}
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between gap-1 text-[11px]">
-                                <span class="text-slate-400 font-medium">CID / ODP:</span>
-                                <span class="font-mono text-slate-700">
+                            <div class="min-w-0">
+                                <span class="text-[9.5px] uppercase font-bold text-slate-400 block leading-none">CID / ODP</span>
+                                <span class="font-mono font-semibold text-slate-700 text-[11px] truncate block mt-0.5">
                                     {{ $ticket->customer_id ?? 'Non-CID' }} · {{ $ticket->customer_odp ?? '-' }}
-                                    @if(!$ticket->is_ims_validated)
-                                        <span class="text-amber-600 font-bold ml-1">(Manual)</span>
-                                    @endif
                                 </span>
                             </div>
                         @endif
 
-                        <div class="flex items-center justify-between gap-1 text-[11px] pt-1 border-t border-slate-200/60">
-                            <span class="text-slate-400 font-medium">Buka:</span>
-                            <span class="text-slate-700 font-medium font-mono">
-                                {{ $ticket->tanggal_open ? $ticket->tanggal_open->timezone('Asia/Jakarta')->format('d M Y, H:i') : '-' }} WIB
+                        <div class="min-w-0 text-right">
+                            <span class="text-[9.5px] uppercase font-bold text-slate-400 block leading-none">Waktu Buka</span>
+                            <span class="font-mono font-medium text-slate-700 text-[10.5px] truncate block mt-0.5">
+                                {{ $ticket->tanggal_open ? $ticket->tanggal_open->timezone('Asia/Jakarta')->format('d M, H:i') : '-' }} WIB
                             </span>
                         </div>
                     </div>
 
-                    <!-- SLA & Team Lead Footer -->
-                    <div class="space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between text-slate-600">
-                            <span class="text-slate-400 text-[11px]">Target SLA:</span>
-                            <span class="font-bold text-slate-700 font-mono">{{ $ticket->sla_target_minutes }} Menit</span>
-                        </div>
+                    <!-- Row 4: Compact SLA Status & Target Pill -->
+                    <div class="flex items-center justify-between gap-2 text-[11px]">
+                        <span class="text-slate-500 font-medium">
+                            Target SLA: <strong class="text-slate-700 font-mono">{{ $ticket->sla_target_minutes }}m ({{ $slaHours }}j)</strong>
+                        </span>
 
-                        <!-- SLA Live Warning Alert -->
                         @if($ticket->activeStopClock)
-                            <div class="p-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                                <span>Stop Clock Aktif ({{ $ticket->activeStopClock->reason }})</span>
-                            </div>
-                        @elseif($ticket->isOverdue() && $ticket->status !== 'CLOSE')
-                            <div class="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold flex items-center gap-1.5">
-                                <span>⚠️ Overdue Target SLA</span>
-                            </div>
-                        @elseif($ticket->sla_status)
-                            <div class="text-[11px] text-right">
-                                <span class="font-bold {{ $ticket->sla_status === 'TEPAT' ? 'text-emerald-700' : 'text-rose-600' }}">
-                                    Hasil: SLA {{ $ticket->sla_status }} ({{ $ticket->net_mttr_minutes }}m)
-                                </span>
-                            </div>
-                        @endif
-
-                        <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center font-bold text-[10px] text-slate-700 uppercase">
-                                    {{ $lead ? substr($lead->name, 0, 1) : '?' }}
-                                </div>
-                                <span class="text-slate-700 font-medium truncate max-w-[130px] text-xs">
-                                    {{ $lead ? $lead->name : 'Belum di-dispatch' }}
-                                </span>
-                            </div>
-                            <span class="text-[11px] text-slate-400">
-                                {{ $ticket->assignees->count() }} Teknisi
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold truncate max-w-[160px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping shrink-0"></span>
+                                <span class="truncate">Jeda: {{ $ticket->activeStopClock->reason }}</span>
                             </span>
-                        </div>
+                        @elseif($ticket->isOverdue() && $ticket->status !== 'CLOSE')
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-bold shrink-0">
+                                <span>⚠️ Overdue SLA</span>
+                            </span>
+                        @elseif($ticket->sla_status)
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 {{ $ticket->sla_status === 'TEPAT' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200' }}">
+                                SLA {{ $ticket->sla_status }} ({{ $ticket->net_mttr_minutes }}m)
+                            </span>
+                        @else
+                            <span class="px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/70 text-[10px] font-semibold shrink-0">
+                                On-Track
+                            </span>
+                        @endif
                     </div>
                 </div>
 
-                <!-- Footer Action Link -->
-                <div class="bg-slate-50/80 px-5 py-3 pl-6 sm:pl-7 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-400 uppercase tracking-wider text-[10px] font-mono">
-                        {{ $ticket->status_link_impact ?? $ticket->wilayah ?? 'OPERASIONAL' }}
-                    </span>
+                <!-- Card Footer: PIC & Detail Action -->
+                <div class="bg-slate-50/70 px-3.5 py-2 pl-4 sm:px-4 sm:pl-5 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <div class="w-5 h-5 rounded-full bg-teal-100/80 border border-teal-200 flex items-center justify-center font-bold text-[9.5px] text-teal-900 uppercase shrink-0">
+                            {{ $lead ? substr($lead->name, 0, 1) : '?' }}
+                        </div>
+                        <span class="text-slate-700 font-semibold truncate max-w-[125px]">
+                            {{ $lead ? $lead->name : 'Belum ditugaskan' }}
+                        </span>
+                        @if($ticket->assignees->count() > 1)
+                            <span class="px-1.5 py-0.2 rounded bg-slate-200/70 text-slate-600 text-[9.5px] font-bold shrink-0">
+                                +{{ $ticket->assignees->count() - 1 }}
+                            </span>
+                        @endif
+                    </div>
+
                     <a href="{{ route('tickets.show', $ticket) }}"
-                       class="text-[#0D9488] group-hover:text-[#096a62] font-bold inline-flex items-center gap-1.5 transition">
-                        <span>Lihat Detail</span>
-                        <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                       class="text-[#0D9488] group-hover:text-[#096a62] font-bold inline-flex items-center gap-1 transition shrink-0">
+                        <span>Detail</span>
+                        <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
                 </div>
             </div>
