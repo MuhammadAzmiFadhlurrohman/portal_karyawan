@@ -1385,6 +1385,44 @@
                         animation: messagePopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                         transform-origin: bottom left;
                     }
+
+                    @keyframes newChatBorderGlowSelf {
+                        0% {
+                            border-color: #2563EB !important;
+                            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35), 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+                        }
+                        70% {
+                            border-color: #3B82F6 !important;
+                            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 1px 4px rgba(59, 130, 246, 0.1) !important;
+                        }
+                        100% {
+                            border-color: #CFE4FC !important;
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+                        }
+                    }
+
+                    @keyframes newChatBorderGlowIncoming {
+                        0% {
+                            border-color: #0D9488 !important;
+                            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.35), 0 2px 8px rgba(13, 148, 136, 0.2) !important;
+                        }
+                        70% {
+                            border-color: #14B8A6 !important;
+                            box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2), 0 1px 4px rgba(20, 184, 166, 0.1) !important;
+                        }
+                        100% {
+                            border-color: #E2E8F0 !important;
+                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+                        }
+                    }
+
+                    .new-chat-highlight-self {
+                        animation: newChatBorderGlowSelf 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+                    }
+
+                    .new-chat-highlight-incoming {
+                        animation: newChatBorderGlowIncoming 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+                    }
                 </style>
 
                 <!-- Submit Send Button -->
@@ -3039,7 +3077,7 @@ async function handleChatFormSubmit(e) {
 
         bubble.innerHTML = `
             <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
-                 class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5 relative">
+                 class="rounded-2xl rounded-tr-xs p-2.5 sm:p-3 text-xs space-y-1.5 relative new-chat-highlight-self">
                 <div class="flex items-center gap-1.5">
                     <span class="font-bold text-xs text-teal-950">Anda</span>
                     <span style="background-color: #D6E8FF; color: #0369A1;" class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide">
@@ -3867,6 +3905,8 @@ function renderIncomingLiveMessage(data) {
         `;
     }
 
+    const highlightClass = data.is_self ? 'new-chat-highlight-self' : 'new-chat-highlight-incoming';
+
     row.innerHTML = `
         <div id="chron-bubble-${data.id}"
              data-id="${data.id}"
@@ -3880,7 +3920,7 @@ function renderIncomingLiveMessage(data) {
              data-photo="${data.photo_url || ''}"
              data-category="${escapeChatHtml(data.category || 'LAIN')}"
              style="${data.is_self ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;'} box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
-             class="rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 ${data.is_self ? 'rounded-tr-xs' : 'rounded-tl-xs'} relative">
+             class="rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 ${data.is_self ? 'rounded-tr-xs' : 'rounded-tl-xs'} relative ${highlightClass}">
             
             <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 min-w-0">
