@@ -376,11 +376,9 @@
 
                 <!-- Card Footer: PIC & Detail Action -->
                 <div class="bg-slate-50/70 px-3.5 py-2.5 pl-4 sm:px-4 sm:pl-4.5 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
-                    <div class="flex items-center gap-2 min-w-0">
-                        <div class="w-5.5 h-5.5 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center font-bold text-[9.5px] uppercase shadow-2xs shrink-0 select-none">
-                            {{ $lead ? strtoupper(substr($lead->name, 0, 1)) : '?' }}
-                        </div>
-                        <span class="text-slate-700 font-semibold truncate max-w-[125px] text-[11px]">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <span class="text-slate-700 font-semibold truncate max-w-[140px] text-[11px]">
                             {{ $lead ? $lead->name : 'Belum ditugaskan' }}
                         </span>
                         @if($ticket->assignees->count() > 1)
