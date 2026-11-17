@@ -834,55 +834,57 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3.5 sm:p-6 flex-1 min-h-0 overflow-y-auto relative"
+            <div id="chat-stream-box" class="p-3.5 sm:p-6 flex-1 min-h-0 overflow-y-auto relative w-full"
                  style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
                 
-                <!-- Inner Centered Conversation Thread (WhatsApp Web Style) -->
-                <div id="chat-stream-container" class="max-w-2xl mx-auto w-full space-y-2.5 sm:space-y-3">
+                <!-- Full Width Conversation Stream Container -->
+                <div id="chat-stream-container" class="w-full space-y-2.5 sm:space-y-3">
                     <!-- Date divider (WhatsApp Floating Pill) -->
-                    <div class="flex justify-center sticky top-0 z-10 py-1">
-                    <span class="px-3 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5">
-                        <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
-                    </span>
-                </div>
-
-                <!-- Initial Ticket Creation System Note -->
-                <div class="flex justify-start">
-                    <div class="max-w-md bg-white rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-slate-200 text-xs space-y-1">
-                        <div class="flex items-center justify-between gap-3">
-                            <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                                <span class="text-xs">{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] bg-teal-100 text-teal-800 font-bold">NOC</span>
-                            </span>
-                            <span class="text-[10px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
-                        </div>
-                        <p class="text-slate-700 leading-snug font-medium text-[11px] sm:text-xs">
-                            🎫 <strong>OPEN TIKET BARU</strong>: Tiket dibuat dengan status OPEN. Kendala: {{ $tiket->problem_temuan ?? '-' }}
-                        </p>
+                    <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none">
+                        <span class="px-3 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1.5 pointer-events-auto">
+                            <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
+                        </span>
                     </div>
-                </div>
 
-                <!-- Dispatch Note if available -->
-                @if($lead)
+                    <!-- Initial Ticket Creation System Note -->
                     <div class="flex justify-start">
-                        <div class="max-w-md bg-amber-50/90 rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-amber-200 text-xs space-y-1">
+                        <div style="max-width: min(85%, 520px);"
+                             class="bg-white rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-slate-200 text-xs space-y-1">
                             <div class="flex items-center justify-between gap-3">
-                                <span class="font-bold text-amber-900 flex items-center gap-1.5">
-                                    <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[9px]">MT</span>
-                                    <span class="text-xs">Manager Teknis</span>
-                                    <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
+                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                                    <span class="text-xs">{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[9px] bg-teal-100 text-teal-800 font-bold">NOC</span>
                                 </span>
-                                <span class="text-[10px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
                             </div>
-                            <p class="text-amber-950 leading-snug text-[11px] sm:text-xs">
-                                👷 <strong>DISPATCH / PENUGASAN TIM</strong>: Ditugaskan <strong>{{ $lead->name }}</strong> (Lead) bersama tim: 
-                                {{ $crew->pluck('name')->join(', ') ?: 'mandiri' }} untuk menangani perbaikan tiket ini.
+                            <p class="text-slate-700 leading-snug font-medium text-[11px] sm:text-xs">
+                                🎫 <strong>OPEN TIKET BARU</strong>: Tiket dibuat dengan status OPEN. Kendala: {{ $tiket->problem_temuan ?? '-' }}
                             </p>
                         </div>
                     </div>
-                @endif
+
+                    <!-- Dispatch Note if available -->
+                    @if($lead)
+                        <div class="flex justify-start">
+                            <div style="max-width: min(85%, 520px);"
+                                 class="bg-amber-50/90 rounded-2xl rounded-tl-xs p-2.5 sm:p-3 shadow-xs border border-amber-200 text-xs space-y-1">
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="font-bold text-amber-900 flex items-center gap-1.5">
+                                        <span class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[9px]">MT</span>
+                                        <span class="text-xs">Manager Teknis</span>
+                                        <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
+                                    </span>
+                                    <span class="text-[10px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
+                                </div>
+                                <p class="text-amber-950 leading-snug text-[11px] sm:text-xs">
+                                    👷 <strong>DISPATCH / PENUGASAN TIM</strong>: Ditugaskan <strong>{{ $lead->name }}</strong> (Lead) bersama tim: 
+                                    {{ $crew->pluck('name')->join(', ') ?: 'mandiri' }} untuk menangani perbaikan tiket ini.
+                                </p>
+                            </div>
+                        </div>
+                    @endif
 
                 <!-- Chronology Entries List -->
                 @forelse($tiket->chronologies as $chron)
@@ -918,8 +920,8 @@
                              data-lng="{{ $chron->longitude ?? '' }}"
                              data-photo="{{ $chron->photo_url ?? ($chron->photo_path ? asset('storage/' . $chron->photo_path) : '') }}"
                              data-category="{{ $chron->category ?? 'LAIN' }}"
-                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.06);"
-                             class="max-w-[85%] sm:max-w-md rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }} relative">
+                             style="{{ $isSelf ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;' }} box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
+                             class="rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 {{ $isSelf ? 'rounded-tr-xs' : 'rounded-tl-xs' }} relative">
                             
                             <!-- Sender & Role Badge + 3-Dots Dropdown Trigger (Matching User Attachment Image 1 & 2) -->
                             <div class="flex items-center justify-between gap-2">
@@ -1020,11 +1022,13 @@
                                 <div class="pt-0.5">
                                     <button type="button"
                                             onclick="openImageLightbox('{{ $photoSrc }}', 'Foto Dokumentasi - {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}')"
-                                            class="block group relative rounded-xl overflow-hidden border border-slate-200/90 max-w-[240px] shadow-2xs bg-slate-100 cursor-pointer text-left">
+                                            style="width: 220px; max-width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                                            class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
                                         <img src="{{ $photoSrc }}"
                                              alt="Bukti Foto"
                                              loading="lazy"
-                                             class="w-full h-36 object-cover group-hover:scale-105 transition duration-200"
+                                             style="width: 100%; height: 140px; object-fit: cover; display: block;"
+                                             class="group-hover:scale-105 transition duration-200"
                                              onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
                                         <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[1px]">
                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
@@ -1037,7 +1041,9 @@
                             <!-- Video Attachment Preview if available -->
                             @if($chron->video_path)
                                 <div class="pt-0.5">
-                                    <video controls class="w-full max-w-[240px] rounded-xl border border-slate-200/90 shadow-2xs">
+                                    <video controls
+                                           style="width: 240px; max-width: 100%; height: 150px; border-radius: 14px; border: 1px solid #E2E8F0; display: block;"
+                                           class="shadow-2xs">
                                         <source src="{{ $chron->video_url ?? asset('storage/' . $chron->video_path) }}" type="video/mp4">
                                         Browser Anda tidak mendukung pemutaran video.
                                     </video>
@@ -1104,7 +1110,7 @@
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
             <div class="px-3 sm:px-4 py-2 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
-                <div class="max-w-2xl mx-auto w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
+                <div class="w-full flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none">
                     <span class="text-[10px] uppercase font-bold text-slate-400 shrink-0">Template Cepat:</span>
                     
                     <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
@@ -1154,7 +1160,7 @@
 
                 <!-- WhatsApp Reply Banner Preview (shows when replying to a message) -->
                 <div id="chat-reply-preview" class="hidden border-b border-slate-100 bg-teal-50/50 px-3.5 py-1.5 transition-all">
-                    <div class="max-w-2xl mx-auto w-full flex items-center justify-between gap-2">
+                    <div class="w-full flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2 min-w-0 border-l-4 border-teal-500 pl-2.5 py-0.5">
                             <div class="min-w-0">
                                 <div class="font-bold text-teal-800 text-[10px] sm:text-[11px] flex items-center gap-1">
@@ -1169,7 +1175,7 @@
                 </div>
 
                 <div class="p-2.5 sm:p-4">
-                    <div class="max-w-2xl mx-auto w-full flex items-center gap-2 sm:gap-2.5">
+                    <div class="w-full flex items-center gap-2 sm:gap-2.5">
 
                 <!-- Hidden Native File Inputs -->
                 <!-- 1. General Media (Photo / Video) -->
