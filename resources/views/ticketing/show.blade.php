@@ -814,18 +814,8 @@
                     </div>
                 </div>
 
-                <!-- Header Actions: Fullscreen Zoom & GPS Action -->
+                <!-- Header Actions: Fullscreen Zoom (Full Size) -->
                 <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                    <!-- GPS Indicator / Action (Compact) -->
-                    <button type="button" onclick="getLiveGpsCoordinates()"
-                            id="gps_action_btn"
-                            title="Ambil dan sertakan lokasi GPS otomatis"
-                            class="text-xs text-teal-200 hover:text-white flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                        <span id="gps_label" class="text-[11px] font-medium hidden md:inline">GPS</span>
-                    </button>
-
-                    <!-- Tombol Zoom Fullscreen (Full Size) -->
                     <button type="button" onclick="toggleChatFullscreen()"
                             id="btn-chat-fullscreen"
                             title="Tampilan Penuh (Full Size)"
@@ -895,30 +885,32 @@
                 @forelse($tiket->chronologies as $chron)
                     @php
                         $isSelf = auth()->check() && $chron->user_id === auth()->id();
+                        $roleLabel = $chron->user?->roles?->first()?->name ?? $chron->user?->division ?? $chron->category ?? 'Petugas';
                     @endphp
                     <div class="flex {{ $isSelf ? 'justify-end' : 'justify-start' }}">
-                        <div class="max-w-xl rounded-2xl p-3.5 sm:p-4 shadow-xs border text-xs space-y-2
-                            {{ $isSelf ? 'bg-teal-50/90 border-teal-200 rounded-tr-xs' : 'bg-white border-slate-200 rounded-tl-xs' }}">
+                        <div class="max-w-xl rounded-2xl p-3 sm:p-3.5 shadow-2xs border text-xs space-y-2
+                            {{ $isSelf ? 'bg-[#EBF5FF] border-blue-200/70 rounded-tr-xs' : 'bg-white border-slate-200 rounded-tl-xs' }}">
                             
-                            <!-- Sender & Timestamp -->
-                            <div class="flex items-center justify-between gap-3">
-                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
-                                    <span>{{ $chron->user->name ?? 'User' }}</span>
-                                    <span class="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase
-                                        {{ $chron->category === 'SELESAI' ? 'bg-emerald-100 text-emerald-800' : ($chron->category === 'OTDR' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-700') }}">
-                                        {{ $chron->category }}
-                                    </span>
+                            <!-- Sender & Role Badge -->
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold {{ $isSelf ? 'text-teal-900' : 'text-slate-800' }}">
+                                    {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
                                 </span>
-                                <span class="text-[10px] text-slate-400 font-mono">{{ $chron->created_at->format('H:i') }} WIB</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold
+                                    {{ $isSelf ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700' }}">
+                                    {{ ucfirst(str_replace('_', ' ', $roleLabel)) }}
+                                </span>
                             </div>
 
                             <!-- Message Content -->
-                            <p class="text-slate-800 leading-relaxed whitespace-pre-line">{{ $chron->message }}</p>
+                            @if($chron->message)
+                                <p class="text-slate-800 leading-relaxed whitespace-pre-line text-xs sm:text-sm font-normal">{{ $chron->message }}</p>
+                            @endif
 
                             <!-- Photo Attachment Preview if available -->
                             @if($chron->photo_path)
                                 <div class="pt-1">
-                                    <a href="{{ asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-xl overflow-hidden border border-slate-200 max-w-xs">
+                                    <a href="{{ asset('storage/' . $chron->photo_path) }}" target="_blank" class="block group relative rounded-xl overflow-hidden border border-slate-200 max-w-xs shadow-2xs">
                                         <img src="{{ asset('storage/' . $chron->photo_path) }}" alt="Bukti Foto" class="w-full h-40 object-cover group-hover:scale-105 transition">
                                         <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs">
                                             Lihat Foto Penuh &rarr;
@@ -927,13 +919,42 @@
                                 </div>
                             @endif
 
-                            <!-- Geotag coordinates if available -->
-                            @if($chron->latitude && $chron->longitude)
-                                <div class="text-[10px] text-teal-700 flex items-center gap-1 pt-1 font-mono">
-                                    <svg class="w-3 h-3 text-teal-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
-                                    <span>GPS: {{ number_format($chron->latitude, 5) }}, {{ number_format($chron->longitude, 5) }}</span>
+                            <!-- Video Attachment Preview if available -->
+                            @if($chron->video_path)
+                                <div class="pt-1">
+                                    <video controls class="w-full max-w-xs rounded-xl border border-slate-200 shadow-2xs">
+                                        <source src="{{ asset('storage/' . $chron->video_path) }}" type="video/mp4">
+                                        Browser Anda tidak mendukung pemutaran video.
+                                    </video>
                                 </div>
                             @endif
+
+                            <!-- Interactive Location Card (Matching User Attachment Image 2) -->
+                            @if($chron->latitude && $chron->longitude)
+                                <a href="https://maps.google.com/?q={{ $chron->latitude }},{{ $chron->longitude }}" target="_blank"
+                                   title="Buka titik koordinat di Google Maps"
+                                   class="block p-2.5 sm:p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-rose-300 transition-all group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-11 h-11 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-6 h-6 text-rose-500" viewBox="0 0 24 24" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-rose-600 transition-colors">Lokasi Titik Lapangan</div>
+                                            <div class="text-[11px] sm:text-xs font-mono text-slate-500 mt-0.5 truncate tracking-tight">{{ number_format($chron->latitude, 6) }}, {{ number_format($chron->longitude, 6) }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endif
+
+                            <!-- Timestamp at bottom right (Matching User Attachment Image 2) -->
+                            <div class="flex justify-end items-center gap-1 text-[10px] sm:text-[11px] text-slate-400 font-mono pt-0.5">
+                                <span>{{ $chron->created_at->format('H:i') }} WIB</span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -1093,21 +1114,32 @@
                     </div>
                 </div>
 
-                <!-- Text Input -->
-                <div class="relative flex-1">
-                    <input type="text"
-                           name="message"
-                           id="quick-chat-input"
-                           required
-                           placeholder="Ketik update koordinasi..."
-                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 sm:px-4 py-2 sm:py-2.5 text-slate-800 transition pr-28 sm:pr-32">
-                    
-                    <span id="attachment-name" class="absolute right-3 top-2 sm:top-2.5 text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[100px] sm:max-w-[130px] pointer-events-none"></span>
+                <!-- Text & Location Input Box Container (Matching Image 1) -->
+                <div class="flex-1 rounded-2xl border border-slate-300/90 bg-white focus-within:border-teal-500 focus-within:ring-2 focus-within:ring-teal-500/20 px-3.5 py-2 sm:py-2.5 transition flex flex-col justify-center min-h-[46px] shadow-2xs">
+                    <div class="relative flex items-center">
+                        <input type="text"
+                               name="message"
+                               id="quick-chat-input"
+                               placeholder="Ketik update koordinasi..."
+                               autocomplete="off"
+                               class="w-full text-xs sm:text-sm bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none">
+                        
+                        <span id="attachment-name" class="text-[10px] sm:text-[11px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
+                    </div>
+
+                    <!-- GPS Attached Chip (shows when latitude & longitude are attached - Matching Image 1) -->
+                    <div id="gps-attached-preview" class="hidden pt-2 mt-2 border-t border-dashed border-slate-200 flex items-center justify-between">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-600 shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                            <span id="gps-preview-text" class="font-bold">GPS: -6.934309, 107.594269</span>
+                            <button type="button" onclick="clearAttachedGps()" class="ml-1.5 text-rose-400 hover:text-rose-700 font-bold transition text-base leading-none cursor-pointer" title="Hapus Lokasi">&times;</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Submit Send Button -->
                 <button type="submit"
-                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+                        class="w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
@@ -2249,6 +2281,9 @@ function processGpsWatermark(fileInput) {
 function shareMyCurrentLocation() {
     const input = document.getElementById('quick-chat-input');
     const label = document.getElementById('attachment-name');
+    const preview = document.getElementById('gps-attached-preview');
+    const previewText = document.getElementById('gps-preview-text');
+
     if (!navigator.geolocation) {
         alert('Browser Anda tidak mendukung Geolocation.');
         return;
@@ -2262,14 +2297,24 @@ function shareMyCurrentLocation() {
             const rawAcc = pos.coords.accuracy || 10;
             const acc = Math.min(9999, Math.max(0, Math.round(rawAcc * 100) / 100));
 
-            document.getElementById('chron_lat').value = lat;
-            document.getElementById('chron_lng').value = lng;
-            document.getElementById('chron_acc').value = acc;
+            const latInput = document.getElementById('chron_lat');
+            const lngInput = document.getElementById('chron_lng');
+            const accInput = document.getElementById('chron_acc');
+            if (latInput) latInput.value = lat;
+            if (lngInput) lngInput.value = lng;
+            if (accInput) accInput.value = acc;
+
+            if (previewText) {
+                previewText.innerText = `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+            if (preview) {
+                preview.classList.remove('hidden');
+            }
+            if (label) label.innerText = '';
+
             if (input) {
-                input.value = `📍 Lokasi Saya saat ini: https://maps.google.com/?q=${lat},${lng}`;
                 input.focus();
             }
-            if (label) label.innerText = `✓ Lokasi (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
         },
         (err) => {
             alert('Gagal mengambil lokasi GPS: ' + err.message);
@@ -2277,6 +2322,22 @@ function shareMyCurrentLocation() {
         },
         { enableHighAccuracy: true, timeout: 10000 }
     );
+}
+
+function clearAttachedGps() {
+    const lat = document.getElementById('chron_lat');
+    const lng = document.getElementById('chron_lng');
+    const acc = document.getElementById('chron_acc');
+    const preview = document.getElementById('gps-attached-preview');
+    const previewText = document.getElementById('gps-preview-text');
+    const label = document.getElementById('attachment-name');
+
+    if (lat) lat.value = '';
+    if (lng) lng.value = '';
+    if (acc) acc.value = '';
+    if (preview) preview.classList.add('hidden');
+    if (previewText) previewText.innerText = '';
+    if (label && label.innerText.includes('GPS')) label.innerText = '';
 }
 
 // Attachment Dropup Menu Controls
@@ -2332,6 +2393,8 @@ function closeVerifyCloseModal() { document.getElementById('modal-verify-close')
 // Live HTML5 Geolocation helper
 function getLiveGpsCoordinates() {
     const label = document.getElementById('gps_label');
+    const preview = document.getElementById('gps-attached-preview');
+    const previewText = document.getElementById('gps-preview-text');
     if (!navigator.geolocation) {
         alert('Browser Anda tidak mendukung Geolocation.');
         return;
@@ -2346,6 +2409,8 @@ function getLiveGpsCoordinates() {
             document.getElementById('chron_lng').value = pos.coords.longitude;
             document.getElementById('chron_acc').value = acc;
             if (label) label.innerText = `✓ GPS (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
+            if (previewText) previewText.innerText = `GPS: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
+            if (preview) preview.classList.remove('hidden');
             const btn = document.getElementById('gps_action_btn');
             if (btn) {
                 btn.classList.add('bg-emerald-500/30', 'text-emerald-200', 'border-emerald-400/40');

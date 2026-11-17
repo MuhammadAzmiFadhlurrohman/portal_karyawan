@@ -27,7 +27,7 @@ class ChronologyController extends Controller
 
         $validated = $request->validate([
             'category' => ['nullable', 'string'],
-            'message' => ['required', 'string'],
+            'message' => ['nullable', 'string'],
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'gps_accuracy' => ['nullable', 'numeric'],
@@ -38,6 +38,17 @@ class ChronologyController extends Controller
         $category = ! empty($validated['category']) ? strtoupper($validated['category']) : 'LAIN';
         if (! in_array($category, ['IZIN', 'OTDR', 'TRACING', 'MATERIAL', 'JOINTING', 'LINK_UP', 'SELESAI', 'LAIN', 'INVESTIGASI'])) {
             $category = 'LAIN';
+        }
+
+        $message = trim((string) ($request->input('message') ?? ''));
+        if ($message === '') {
+            if (! empty($validated['latitude']) && ! empty($validated['longitude'])) {
+                $message = '📍 Lokasi Titik Lapangan terlampir';
+            } elseif ($request->hasFile('photo') || $request->hasFile('video')) {
+                $message = '📷 Lampiran dokumentasi lapangan';
+            } else {
+                $message = 'Update koordinasi lapangan';
+            }
         }
 
         // Clamp gps_accuracy between 0 and 9999.99 to prevent MySQL decimal(6,2) 1264 Out of range error
@@ -61,7 +72,7 @@ class ChronologyController extends Controller
                 tiket: $tiket,
                 user: $request->user(),
                 category: $category,
-                message: $validated['message'],
+                message: $message,
                 photoPath: $photoPath,
                 videoPath: $videoPath,
                 latitude: isset($validated['latitude']) ? (float) $validated['latitude'] : null,
