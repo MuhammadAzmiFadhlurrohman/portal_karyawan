@@ -965,8 +965,11 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div id="chat-stream-box" class="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto relative w-full"
-                 style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
+            <div class="flex-1 min-h-0 relative w-full flex flex-col">
+                <div id="chat-stream-box"
+                     onscroll="handleChatScrollPosition()"
+                     class="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto relative w-full"
+                     style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
                 
                 <!-- Full Width Conversation Stream Container -->
                 <div id="chat-stream-container" class="w-full space-y-1.5 sm:space-y-2">
@@ -1272,26 +1275,26 @@
                     </div>
                 @endforelse
                 </div>
-
-                <!-- Floating "Scroll to Latest Chat" Button (Appears when scrolled up) -->
-                <div id="scroll-to-bottom-wrapper" class="sticky bottom-2 flex justify-end pr-1 sm:pr-2 pointer-events-none z-30 h-0 overflow-visible">
-                    <button type="button"
-                            id="btn-scroll-to-bottom"
-                            onclick="scrollToLatestChat()"
-                            title="Ke pesan terbaru"
-                            style="transform: translateY(-42px);"
-                            class="hidden pointer-events-auto relative items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 hover:bg-teal-50 text-[#0D9488] border border-teal-500/30 shadow-[0_4px_14px_rgba(13,148,136,0.28)] backdrop-blur-md transition-all duration-200 active:scale-95 cursor-pointer group">
-                        <span id="new-msg-badge" class="hidden px-1.5 py-0.2 rounded-full bg-emerald-500 text-white text-[9.5px] font-extrabold tracking-tight animate-bounce">
-                            Baru
-                        </span>
-                        <span class="text-[11px] font-bold text-slate-700 group-hover:text-[#0D9488]">Pesan Terbaru</span>
-                        <span class="w-5 h-5 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center shadow-2xs">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-                            </svg>
-                        </span>
-                    </button>
                 </div>
+
+                <!-- Floating "Scroll to Latest Chat" Button (WhatsApp-style floating button at bottom-right of chat viewport) -->
+                <button type="button"
+                        id="btn-scroll-to-bottom"
+                        onclick="scrollToLatestChat()"
+                        title="Scroll ke pesan paling baru"
+                        style="display: none; position: absolute; bottom: 14px; right: 18px; z-index: 40; background: #FFFFFF; border: 1.5px solid #0D9488; box-shadow: 0 6px 20px rgba(2, 40, 54, 0.25);"
+                        class="items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-teal-50 text-[#0D9488] transition-all duration-200 active:scale-95 cursor-pointer group select-none">
+                    <span id="new-msg-badge" class="hidden px-1.5 py-0.5 rounded-full bg-emerald-500 text-white text-[9.5px] font-extrabold tracking-tight leading-none animate-bounce">
+                        Baru
+                    </span>
+                    <span class="text-[11px] font-bold text-slate-700 group-hover:text-[#0D9488]">Pesan Terbaru</span>
+                    <span style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);"
+                          class="w-6 h-6 rounded-full text-white flex items-center justify-center shadow-xs shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </span>
+                </button>
             </div>
 
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
@@ -3978,7 +3981,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLiveChatSSE();
 });
 
-function isChatNearBottom(scrollBox, threshold = 110) {
+function isChatNearBottom(scrollBox, threshold = 60) {
     if (!scrollBox) return true;
     const distance = scrollBox.scrollHeight - scrollBox.scrollTop - scrollBox.clientHeight;
     return distance <= threshold;
@@ -3990,13 +3993,11 @@ function handleChatScrollPosition() {
     const newBadge = document.getElementById('new-msg-badge');
     if (!scrollBox || !btn) return;
 
-    if (isChatNearBottom(scrollBox, 110)) {
-        btn.classList.add('hidden');
-        btn.classList.remove('inline-flex');
+    if (isChatNearBottom(scrollBox, 60)) {
+        btn.style.display = 'none';
         if (newBadge) newBadge.classList.add('hidden');
     } else {
-        btn.classList.remove('hidden');
-        btn.classList.add('inline-flex');
+        btn.style.display = 'inline-flex';
     }
 }
 
@@ -4011,8 +4012,7 @@ function scrollToLatestChat() {
         });
     }
     if (btn) {
-        btn.classList.add('hidden');
-        btn.classList.remove('inline-flex');
+        btn.style.display = 'none';
     }
     if (newBadge) {
         newBadge.classList.add('hidden');
@@ -4291,7 +4291,7 @@ function renderIncomingLiveMessage(data) {
         </div>
     `;
 
-    const wasNearBottom = isChatNearBottom(scrollBox, 130);
+    const wasNearBottom = isChatNearBottom(scrollBox, 80);
     stream.appendChild(row);
 
     // Auto scroll down smoothly when user is already near bottom or sent the message themselves
@@ -4302,8 +4302,7 @@ function renderIncomingLiveMessage(data) {
             const btn = document.getElementById('btn-scroll-to-bottom');
             const newBadge = document.getElementById('new-msg-badge');
             if (btn) {
-                btn.classList.remove('hidden');
-                btn.classList.add('inline-flex');
+                btn.style.display = 'inline-flex';
             }
             if (newBadge) {
                 newBadge.classList.remove('hidden');
