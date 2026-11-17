@@ -441,111 +441,111 @@
             }
         @endphp
 
-        <!-- 5-Node Stepper Progress Line: Strict 1-Row with Connecting Bar & Symmetrical Baseline Alignment -->
-        <div class="overflow-x-auto pb-2 -mb-2 scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
-            <div class="relative min-w-[440px] sm:min-w-0" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));">
+        <!-- 5-Node Stepper Progress Line: Strict 1-Row without scroll, responsive on all mobile screens -->
+        <div class="w-full">
+            <div class="relative w-full" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));">
                 <!-- Track Line (Abu-abu di belakang) -->
-                <div class="absolute top-4 sm:top-[18px] h-[2px] bg-slate-200" style="left: 10%; right: 10%; z-index: 0;"></div>
+                <div class="absolute top-3.5 sm:top-[18px] h-[2px] bg-slate-200" style="left: 10%; right: 10%; z-index: 0;"></div>
                 <!-- Active Filled Progress Line (Hijau gradien) -->
-                <div class="absolute top-4 sm:top-[18px] h-[2px] transition-all duration-500 ease-out" 
+                <div class="absolute top-3.5 sm:top-[18px] h-[2px] transition-all duration-500 ease-out" 
                      style="left: 10%; width: calc(80% * ({{ $stepperProgress }} / 100)); background: linear-gradient(90deg, #10B981 0%, #0D9488 100%); z-index: 0;"></div>
 
                 <!-- Stage 1: Open Tiket -->
-                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white">
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-0.5 sm:px-1 space-y-0.5 sm:space-y-1.5">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-emerald-500 text-white font-bold flex items-center justify-center text-[11px] sm:text-sm shadow-sm ring-2 sm:ring-4 ring-white">
                         ✓
                     </div>
-                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
-                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Open Tiket</span>
+                    <div class="min-h-[24px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[9px] sm:text-xs text-slate-800 leading-tight">Open Tiket</span>
                     </div>
-                    <div class="h-4 sm:h-5 flex items-center justify-center">
-                        <span class="text-[10px] sm:text-[11px] text-slate-500 font-mono font-medium leading-none">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d/m H:i') : '-' }}</span>
+                    <div class="h-3.5 sm:h-5 flex items-center justify-center">
+                        <span class="text-[8px] sm:text-[11px] text-slate-500 font-mono font-medium leading-none">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('d/m H:i') : '-' }}</span>
                     </div>
                     <div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-50 text-emerald-700 whitespace-nowrap">Stage 1</span>
+                        <span class="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold bg-emerald-50 text-emerald-700 whitespace-nowrap">Stage 1</span>
                     </div>
                 </div>
 
                 <!-- Stage 2: Respon Pertama -->
-                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-0.5 sm:px-1 space-y-0.5 sm:space-y-1.5">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-[11px] sm:text-sm shadow-sm ring-2 sm:ring-4 ring-white
                         {{ $tiket->first_response_at ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->first_response_at ? '✓' : '2' }}
                     </div>
-                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
-                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Respon Pertama</span>
+                    <div class="min-h-[24px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[9px] sm:text-xs text-slate-800 leading-tight">Respon Pertama</span>
                     </div>
-                    <div class="h-4 sm:h-5 flex items-center justify-center">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                    <div class="h-3.5 sm:h-5 flex items-center justify-center">
+                        <span class="text-[8px] sm:text-[11px] text-slate-400 font-mono leading-none">
                             {{ $tiket->first_response_at ? $tiket->first_response_at->format('d/m H:i') : 'Menunggu' }}
                         </span>
                     </div>
                     <div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->first_response_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                        <span class="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->first_response_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
                             {{ $tiket->first_response_at ? 'Terespon' : 'Pending' }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Stage 3: Jeda SLA (Stop Clock) -->
-                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-0.5 sm:px-1 space-y-0.5 sm:space-y-1.5">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-[11px] sm:text-sm shadow-sm ring-2 sm:ring-4 ring-white
                         {{ $tiket->total_stop_clock_minutes > 0 || $tiket->activeStopClock ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->activeStopClock ? '⏸' : ($tiket->total_stop_clock_minutes > 0 ? '✓' : '3') }}
                     </div>
-                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
-                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Jeda SLA</span>
+                    <div class="min-h-[24px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[9px] sm:text-xs text-slate-800 leading-tight">Jeda SLA</span>
                     </div>
-                    <div class="h-4 sm:h-5 flex items-center justify-center">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
-                            {{ $tiket->total_stop_clock_minutes > 0 ? $tiket->total_stop_clock_minutes . 'm jeda' : ($tiket->activeStopClock ? 'Berjalan' : 'Menunggu') }}
+                    <div class="h-3.5 sm:h-5 flex items-center justify-center">
+                        <span class="text-[8px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                            {{ $tiket->total_stop_clock_minutes > 0 ? $tiket->total_stop_clock_minutes . 'm' : ($tiket->activeStopClock ? 'Aktif' : 'Menunggu') }}
                         </span>
                     </div>
                     <div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->activeStopClock ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-500' }}">
+                        <span class="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->activeStopClock ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-slate-100 text-slate-500' }}">
                             {{ $tiket->activeStopClock ? 'Aktif' : 'Normal' }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Stage 4: Closing Awal Lapangan -->
-                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-0.5 sm:px-1 space-y-0.5 sm:space-y-1.5">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-[11px] sm:text-sm shadow-sm ring-2 sm:ring-4 ring-white
                         {{ $tiket->closing_awal_at ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->closing_awal_at ? '✓' : '4' }}
                     </div>
-                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
-                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Closing Lapangan</span>
+                    <div class="min-h-[24px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[9px] sm:text-xs text-slate-800 leading-tight">Closing Lapangan</span>
                     </div>
-                    <div class="h-4 sm:h-5 flex items-center justify-center">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                    <div class="h-3.5 sm:h-5 flex items-center justify-center">
+                        <span class="text-[8px] sm:text-[11px] text-slate-400 font-mono leading-none">
                             {{ $tiket->closing_awal_at ? $tiket->closing_awal_at->format('d/m H:i') : 'Menunggu' }}
                         </span>
                     </div>
                     <div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->closing_awal_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                        <span class="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->closing_awal_at ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
                             {{ $tiket->closing_awal_at ? 'Diajukan' : 'Proses' }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Stage 5: Closing Akhir (NOC) -->
-                <div class="flex flex-col items-center justify-between text-center relative z-10 px-1 space-y-1 sm:space-y-1.5">
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-xs sm:text-sm shadow-sm ring-4 ring-white
+                <div class="flex flex-col items-center justify-between text-center relative z-10 px-0.5 sm:px-1 space-y-0.5 sm:space-y-1.5">
+                    <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full font-bold flex items-center justify-center text-[11px] sm:text-sm shadow-sm ring-2 sm:ring-4 ring-white
                         {{ $tiket->status === 'CLOSE' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 border border-slate-200' }}">
                         {{ $tiket->status === 'CLOSE' ? '✓' : '5' }}
                     </div>
-                    <div class="min-h-[28px] sm:min-h-[32px] flex items-center justify-center">
-                        <span class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 leading-tight">Closing NOC</span>
+                    <div class="min-h-[24px] sm:min-h-[32px] flex items-center justify-center">
+                        <span class="font-heading font-extrabold text-[9px] sm:text-xs text-slate-800 leading-tight">Closing NOC</span>
                     </div>
-                    <div class="h-4 sm:h-5 flex items-center justify-center">
-                        <span class="text-[10px] sm:text-[11px] text-slate-400 font-mono leading-none">
+                    <div class="h-3.5 sm:h-5 flex items-center justify-center">
+                        <span class="text-[8px] sm:text-[11px] text-slate-400 font-mono leading-none">
                             {{ $tiket->verified_at ? $tiket->verified_at->format('d/m H:i') : 'Menunggu' }}
                         </span>
                     </div>
                     <div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->status === 'CLOSE' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
-                            {{ $tiket->status === 'CLOSE' ? 'Terverifikasi' : 'Pending' }}
+                        <span class="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold whitespace-nowrap {{ $tiket->status === 'CLOSE' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">
+                            {{ $tiket->status === 'CLOSE' ? 'Selesai' : 'Pending' }}
                         </span>
                     </div>
                 </div>
