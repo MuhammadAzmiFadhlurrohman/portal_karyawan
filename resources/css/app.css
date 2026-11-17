@@ -96,14 +96,28 @@
 
 /* Ticket Chat Card Viewport Fit */
 .ticket-chat-card {
-    height: calc(100vh - 84px);
+    height: calc(100vh - 150px);
     min-height: 480px;
+    scroll-margin-top: 80px;
 }
 @media (max-width: 767px) {
     .ticket-chat-card {
-        height: calc(100dvh - 146px);
+        height: calc(100dvh - 165px);
         min-height: 420px;
+        scroll-margin-top: 65px;
     }
+}
+.ticket-chat-card.is-chat-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+    height: 100dvh !important;
+    width: 100vw !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
 }
 
 /* Tactile Enterprise Buttons (Compact & Crisp) */

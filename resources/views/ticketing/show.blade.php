@@ -764,18 +764,33 @@
     <!-- ========================================================================= -->
     <style>
         .ticket-chat-card {
-            height: calc(100vh - 84px);
+            height: calc(100vh - 150px);
             min-height: 480px;
+            scroll-margin-top: 80px;
         }
         @media (max-width: 767px) {
             .ticket-chat-card {
-                height: calc(100dvh - 146px);
+                height: calc(100dvh - 165px);
                 min-height: 420px;
+                scroll-margin-top: 65px;
             }
+        }
+        /* Fullscreen Zoom Mode */
+        .ticket-chat-card.is-chat-fullscreen {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 9999 !important;
+            height: 100dvh !important;
+            width: 100vw !important;
+            max-width: none !important;
+            border-radius: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0 !important;
         }
     </style>
     <div id="tab-chronology" class="tab-pane space-y-4">
-        <div class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
+        <div id="ticket-chat-container" class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col">
             
             <!-- Dark Ocean Teal Chat Header Banner -->
             <div class="px-3.5 sm:px-6 py-3 sm:py-4 text-white flex items-center justify-between gap-2.5 shrink-0"
@@ -796,11 +811,31 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
-                    <button type="button" onclick="getLiveGpsCoordinates()" class="text-xs text-teal-200 hover:text-white flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 transition cursor-pointer">
+                <!-- Header Actions: Fullscreen Zoom & GPS Action -->
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                    <!-- GPS Indicator / Action (Compact) -->
+                    <button type="button" onclick="getLiveGpsCoordinates()"
+                            id="gps_action_btn"
+                            title="Ambil dan sertakan lokasi GPS otomatis"
+                            class="text-xs text-teal-200 hover:text-white flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition cursor-pointer">
                         <svg class="w-3.5 h-3.5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                        <span id="gps_label" class="text-[11px] font-medium hidden sm:inline">Sertakan GPS</span>
-                        <span class="text-[10px] font-semibold sm:hidden">GPS</span>
+                        <span id="gps_label" class="text-[11px] font-medium hidden md:inline">GPS</span>
+                    </button>
+
+                    <!-- Tombol Zoom Fullscreen (Full Size) -->
+                    <button type="button" onclick="toggleChatFullscreen()"
+                            id="btn-chat-fullscreen"
+                            title="Tampilan Penuh (Full Size)"
+                            class="text-xs text-white flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-teal-500/30 hover:bg-teal-500/50 border border-teal-400/40 shadow-xs transition-all active:scale-95 cursor-pointer">
+                        <!-- Icon Expand / Maximize -->
+                        <svg id="icon-fs-expand" class="w-3.5 h-3.5 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                        </svg>
+                        <!-- Icon Minimize (hidden by default) -->
+                        <svg id="icon-fs-minimize" class="w-3.5 h-3.5 text-cyan-300 hidden" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 4v4m0 0H5m4 0L4 3m11 1v4m0 0h4m-4 0l5-5M9 20v-4m0 0H5m4 0l-5 5m11-1v-4m0 0h4m-4 0l5 5"/>
+                        </svg>
+                        <span id="fs_label" class="text-[11px] font-bold text-cyan-200">Full Size</span>
                     </button>
                 </div>
             </div>
@@ -2051,20 +2086,54 @@ function getLiveGpsCoordinates() {
         alert('Browser Anda tidak mendukung Geolocation.');
         return;
     }
-    label.innerText = 'GPS...';
+    if (label) label.innerText = 'GPS...';
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             document.getElementById('chron_lat').value = pos.coords.latitude;
             document.getElementById('chron_lng').value = pos.coords.longitude;
             document.getElementById('chron_acc').value = pos.coords.accuracy;
-            label.innerText = `✓ Lokasi Disimpan (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
+            if (label) label.innerText = `✓ GPS (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
+            const btn = document.getElementById('gps_action_btn');
+            if (btn) {
+                btn.classList.add('bg-emerald-500/30', 'text-emerald-200', 'border-emerald-400/40');
+            }
         },
         (err) => {
             alert('Gagal mengambil lokasi GPS: ' + err.message);
-            label.innerText = 'Sertakan GPS';
+            if (label) label.innerText = 'GPS';
         },
         { enableHighAccuracy: true, timeout: 10000 }
     );
+}
+
+// Toggle Chat Fullscreen Mode (Zoom Full Size)
+function toggleChatFullscreen() {
+    const chatCard = document.getElementById('ticket-chat-container') || document.querySelector('.ticket-chat-card');
+    if (!chatCard) return;
+
+    const isFullscreen = chatCard.classList.toggle('is-chat-fullscreen');
+    const expandIcon = document.getElementById('icon-fs-expand');
+    const minimizeIcon = document.getElementById('icon-fs-minimize');
+    const fsLabel = document.getElementById('fs_label');
+
+    if (isFullscreen) {
+        if (expandIcon) expandIcon.classList.add('hidden');
+        if (minimizeIcon) minimizeIcon.classList.remove('hidden');
+        if (fsLabel) fsLabel.innerText = 'Kecilkan';
+        chatCard.style.height = '100dvh';
+        document.body.style.overflow = 'hidden';
+    } else {
+        if (expandIcon) expandIcon.classList.remove('hidden');
+        if (minimizeIcon) minimizeIcon.classList.add('hidden');
+        if (fsLabel) fsLabel.innerText = 'Full Size';
+        document.body.style.overflow = '';
+        adjustChatHeight();
+    }
+
+    const chatBox = document.getElementById('chat-stream-box');
+    if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 }
 
 // Responsive dynamic height calculation for all devices
@@ -2073,6 +2142,12 @@ function adjustChatHeight() {
         const chatCard = document.querySelector('.ticket-chat-card');
         if (!chatCard) return;
 
+        // Skip recalculation if in fullscreen zoom mode
+        if (chatCard.classList.contains('is-chat-fullscreen')) {
+            chatCard.style.height = '100dvh';
+            return;
+        }
+
         const isDesktop = window.innerWidth >= 768;
         const windowHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
@@ -2080,23 +2155,24 @@ function adjustChatHeight() {
         let bottomOffset = 0;
 
         if (isDesktop) {
-            // Desktop: sticky header (h-16 / ~53px at 82% zoom) + clean 16px bottom clearance
+            // Desktop: sticky header (h-16 / ~53px at 82% zoom) + clean clearance
             const header = document.querySelector('header');
             const headerHeight = header ? header.getBoundingClientRect().height : 54;
 
-            topOffset = headerHeight + 8; // Top rests right below sticky header
-            bottomOffset = 22; // Bottom card rests right above viewport bottom
+            // Extra top clearance (+16px) so card top is never clipped under header shadow
+            topOffset = headerHeight + 16;
+            bottomOffset = 24; 
         } else {
-            // Mobile: fixed top header + fixed bottom navbar
+            // Mobile: fixed top header + fixed bottom navbar + safe margin
             const mobHeader = document.querySelector('.md\\:hidden.fixed.top-0');
             const topHeaderHeight = mobHeader ? mobHeader.getBoundingClientRect().height : 48;
 
             const mobNav = document.querySelector('.md\\:hidden.fixed.bottom-3 nav') || 
                            document.querySelector('.md\\:hidden.fixed.bottom-3');
-            const bottomNavHeight = mobNav ? mobNav.getBoundingClientRect().height + 12 : 70;
+            const bottomNavHeight = mobNav ? mobNav.getBoundingClientRect().height + 14 : 72;
 
-            topOffset = topHeaderHeight + 6;
-            bottomOffset = bottomNavHeight + 2;
+            topOffset = topHeaderHeight + 14; // Memberi ruang ekstra agar tidak tertutup header mobile
+            bottomOffset = bottomNavHeight + 4;
         }
 
         const calculatedHeight = Math.max(380, Math.floor(windowHeight - topOffset - bottomOffset));
