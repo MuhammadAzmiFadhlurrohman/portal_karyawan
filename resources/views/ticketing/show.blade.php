@@ -3632,7 +3632,216 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chatBox) {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
+    initLiveChatSSE();
 });
+
+// Real-Time Chat Synchronization via Server-Sent Events (SSE)
+let chatEventSource = null;
+let highestChronologyId = {{ $tiket->chronologies->max('id') ?? 0 }};
+
+function initLiveChatSSE() {
+    if (!window.EventSource) return;
+
+    if (chatEventSource) {
+        chatEventSource.close();
+    }
+
+    const streamUrl = '{{ route('tickets.chronologies.stream', $tiket) }}?last_id=' + highestChronologyId;
+    chatEventSource = new EventSource(streamUrl);
+
+    chatEventSource.addEventListener('new_message', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (!data || !data.id) return;
+
+            highestChronologyId = Math.max(highestChronologyId, data.id);
+
+            // If message already rendered (e.g. self optimistic message), ignore or update
+            if (document.getElementById('chron-row-' + data.id)) {
+                return;
+            }
+
+            renderIncomingLiveMessage(data);
+        } catch (err) {
+            console.error('SSE Message parsing error:', err);
+        }
+    });
+
+    chatEventSource.onerror = () => {
+        // EventSource will auto-reconnect after network glitch
+    };
+}
+
+function renderIncomingLiveMessage(data) {
+    const stream = document.getElementById('chat-stream-container') || document.getElementById('chat-stream-box');
+    const scrollBox = document.getElementById('chat-stream-box');
+    if (!stream) return;
+
+    // Remove empty chat placeholder if present
+    const emptyNotice = stream.querySelector('.py-6');
+    if (emptyNotice && emptyNotice.innerText.includes('Belum ada update koordinasi')) {
+        emptyNotice.remove();
+    }
+
+    const row = document.createElement('div');
+    row.className = `flex ${data.is_self ? 'justify-end' : 'justify-start'} my-1 group/bubble relative`;
+    row.id = 'chron-row-' + data.id;
+
+    let replyBox = '';
+    if (data.reply_sender) {
+        replyBox = `
+            <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 4px solid #2563EB; border-radius: 8px;"
+                 class="px-2.5 py-1.5 mb-1.5 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
+                 ${data.reply_to_id ? `onclick="scrollToChronology(${data.reply_to_id})"` : ''}>
+                <div class="flex items-center gap-1.5 text-blue-600 font-bold text-[11px] leading-tight">
+                    <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
+                    </svg>
+                    <span class="truncate uppercase tracking-wide">${escapeChatHtml(data.reply_sender)}</span>
+                </div>
+                ${data.reply_snippet ? `<p class="text-slate-600 text-[11px] truncate mt-0.5 leading-snug">${escapeChatHtml(data.reply_snippet)}</p>` : ''}
+            </div>
+        `;
+    }
+
+    let photoBox = '';
+    if (data.photo_url) {
+        photoBox = `
+            <div class="pt-0.5">
+                <button type="button"
+                        onclick="openImageLightbox('${data.photo_url}', 'Foto Dokumentasi - ${escapeChatHtml(data.sender_name)}')"
+                        style="width: 220px; max-width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                        class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
+                    <img src="${data.photo_url}"
+                         alt="Bukti Foto"
+                         loading="lazy"
+                         style="width: 100%; height: 140px; object-fit: cover; display: block;"
+                         class="group-hover:scale-105 transition duration-200">
+                    <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-[1px]">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                        <span>Perbesar &rarr;</span>
+                    </div>
+                </button>
+            </div>
+        `;
+    }
+
+    let videoBox = '';
+    if (data.video_url) {
+        videoBox = `
+            <div class="pt-0.5">
+                <video controls
+                       style="width: 240px; max-width: 100%; height: 150px; border-radius: 14px; border: 1px solid #E2E8F0; display: block;"
+                       class="shadow-2xs">
+                    <source src="${data.video_url}" type="video/mp4">
+                    Browser Anda tidak mendukung pemutaran video.
+                </video>
+            </div>
+        `;
+    }
+
+    let locBox = '';
+    if (data.latitude && data.longitude) {
+        locBox = `
+            <a href="https://maps.google.com/?q=${data.latitude},${data.longitude}" target="_blank"
+               title="Buka titik koordinat di Google Maps"
+               style="background-color: #FFFFFF; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);"
+               class="block p-2 rounded-xl hover:border-rose-300 hover:shadow-xs transition-all group mt-1">
+                <div class="flex items-center gap-2.5">
+                    <div style="background-color: #FEE2E2; border: 1px solid #FECDD3;"
+                         class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <svg class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-xs text-slate-800 group-hover:text-rose-600 transition-colors leading-tight">Lokasi Titik Lapangan</div>
+                        <div class="text-[10px] font-mono text-slate-500 mt-0.5 truncate tracking-tight">${Number(data.latitude).toFixed(6)}, ${Number(data.longitude).toFixed(6)}</div>
+                    </div>
+                </div>
+            </a>
+        `;
+    }
+
+    row.innerHTML = `
+        <div id="chron-bubble-${data.id}"
+             data-id="${data.id}"
+             data-sender="${escapeChatHtml(data.sender_name)}"
+             data-role="${escapeChatHtml(data.sender_badge)}"
+             data-message="${escapeChatHtml(data.message || '')}"
+             data-time="${escapeChatHtml(data.date_str || '')}"
+             data-read="Belum dibaca"
+             data-lat="${data.latitude || ''}"
+             data-lng="${data.longitude || ''}"
+             data-photo="${data.photo_url || ''}"
+             data-category="${escapeChatHtml(data.category || 'LAIN')}"
+             style="${data.is_self ? 'background-color: #EAF4FE; border: 1px solid #CFE4FC;' : 'background-color: #FFFFFF; border: 1px solid #E2E8F0;'} box-shadow: 0 1px 2px rgba(0,0,0,0.06); max-width: min(85%, 440px);"
+             class="rounded-2xl p-2.5 sm:p-3 text-xs space-y-1.5 ${data.is_self ? 'rounded-tr-xs' : 'rounded-tl-xs'} relative">
+            
+            <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1.5 min-w-0">
+                    <span class="font-bold text-xs ${data.is_self ? 'text-teal-950' : 'text-slate-800'} truncate">
+                        ${escapeChatHtml(data.sender_name)}
+                    </span>
+                    <span style="${data.is_self ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;'}"
+                          class="px-2 py-0.5 rounded-full text-[9px] font-semibold tracking-wide shrink-0">
+                        ${escapeChatHtml(data.sender_badge)}
+                    </span>
+                </div>
+
+                <div class="relative shrink-0">
+                    <button type="button"
+                            onclick="toggleMessageMenu(${data.id}, event)"
+                            class="w-5 h-5 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
+                            title="Pilihan pesan">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                        </svg>
+                    </button>
+                    <div id="msg-dropdown-${data.id}"
+                         class="msg-action-dropdown hidden absolute ${data.is_self ? 'right-0' : 'left-0 sm:right-auto'} top-full mt-1 w-52 sm:w-56 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                        <div class="space-y-0.5 pb-1">
+                            <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                <span>Salin</span>
+                            </button>
+                            <button type="button" onclick="openMessageInfo(${data.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                <span>Info Pesan</span>
+                            </button>
+                            <button type="button" onclick="replyToMessage(${data.id})" class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                <span>Balas</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            ${replyBox}
+            ${data.message ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-xs font-normal">${escapeChatHtml(data.message)}</p>` : ''}
+            ${photoBox}
+            ${videoBox}
+            ${locBox}
+
+            <div class="flex justify-end items-center gap-1 text-[10px] text-slate-400 font-mono pt-0.5 select-none">
+                <span>${escapeChatHtml(data.time_str || '')}</span>
+                ${data.is_self ? `
+                    <span title="Terkirim" class="inline-flex items-center text-slate-400 ml-0.5">
+                        <svg class="w-3.5 h-3 text-slate-400" viewBox="0 0 16 11" fill="none">
+                            <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    stream.appendChild(row);
+
+    // Auto scroll down smoothly when new message arrives
+    if (scrollBox) {
+        scrollBox.scrollTop = scrollBox.scrollHeight;
+    }
+}
 </script>
 @endpush
 @endsection

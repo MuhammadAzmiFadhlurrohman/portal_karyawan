@@ -180,6 +180,82 @@ class ChronologyController extends Controller
     }
 
     /**
+     * Server-Sent Events (SSE) live chat stream for real-time synchronization across accounts.
+     */
+    public function stream(Request $request, Tiket $tiket): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        Gate::authorize('view', $tiket);
+
+        $lastId = (int) $request->query('last_id', 0);
+        $currentUserId = $request->user()?->id;
+
+        return response()->stream(function () use ($tiket, $lastId, $currentUserId) {
+            // Disable output buffering for real-time flush
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+
+            $currentLastId = $lastId;
+            $startTime = time();
+
+            // Run loop for up to 25 seconds (safe for PHP max execution and Nginx timeout)
+            while (time() - $startTime < 25) {
+                if (connection_aborted()) {
+                    break;
+                }
+
+                $newChronologies = TicketChronology::with(['user', 'replyTo.user'])
+                    ->where('tiket_id', $tiket->id)
+                    ->where('id', '>', $currentLastId)
+                    ->orderBy('id', 'asc')
+                    ->get();
+
+                if ($newChronologies->isNotEmpty()) {
+                    foreach ($newChronologies as $chron) {
+                        $currentLastId = max($currentLastId, $chron->id);
+                        $isSelf = $currentUserId && $chron->user_id === $currentUserId;
+
+                        $payload = [
+                            'id' => $chron->id,
+                            'tiket_id' => $chron->tiket_id,
+                            'user_id' => $chron->user_id,
+                            'sender_name' => $isSelf ? 'Anda' : ($chron->user?->name ?? 'User'),
+                            'is_self' => $isSelf,
+                            'sender_badge' => $chron->user?->chat_badge ?? ($chron->user?->division ?: 'Petugas'),
+                            'message' => $chron->message,
+                            'category' => $chron->category ?? 'LAIN',
+                            'time_str' => $chron->created_at ? $chron->created_at->format('H:i') . ' WIB' : '',
+                            'date_str' => $chron->created_at ? $chron->created_at->format('d M Y, H:i') . ' WIB' : '',
+                            'latitude' => $chron->latitude ? (float) $chron->latitude : null,
+                            'longitude' => $chron->longitude ? (float) $chron->longitude : null,
+                            'photo_url' => $chron->photo_url,
+                            'video_url' => $chron->video_url,
+                            'reply_to_id' => $chron->reply_to_id,
+                            'reply_sender' => $chron->replyTo?->user?->name,
+                            'reply_snippet' => $chron->replyTo ? ($chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : '📷 Lampiran Foto')) : null,
+                        ];
+
+                        echo "event: new_message\n";
+                        echo "data: " . json_encode($payload) . "\n\n";
+                        flush();
+                    }
+                }
+
+                // Send periodic heartbeat comment to keep connection alive
+                echo ": keepalive\n\n";
+                flush();
+
+                usleep(1500000); // Poll every 1.5s
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache, no-transform',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    /**
      * Stream chronology photo attachment reliably across Docker/VPS environments.
      */
     public function photo(TicketChronology $chronology): BinaryFileResponse
