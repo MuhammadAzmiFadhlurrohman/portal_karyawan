@@ -152,10 +152,10 @@
             </div>
 
             <!-- Right Actions Area (Kembali & Menu Aksi) -->
-            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 pt-1 md:pt-0 border-t border-white/10 md:border-t-0 md:self-center">
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0 pt-2 md:pt-0 border-t border-white/10 md:border-t-0 md:self-center">
                 <a href="{{ route('tickets.index') }}"
-                   class="flex-1 md:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-teal-100 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-xs">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                   class="flex-1 md:flex-initial h-9 sm:h-10 inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 rounded-xl font-semibold text-xs text-teal-100 bg-white/10 hover:bg-white/20 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer shadow-xs whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     <span>Kembali</span>
                 </a>
 
@@ -163,9 +163,9 @@
                 <div class="relative flex-1 md:flex-initial" x-data="{ open: false }">
                     <button type="button"
                             @click="open = !open"
-                            class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm text-slate-950 shadow-md hover:shadow-cyan-500/25 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
+                            class="w-full md:w-auto h-9 sm:h-10 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 rounded-xl font-bold text-xs text-slate-950 shadow-md hover:shadow-cyan-500/25 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer whitespace-nowrap"
                             style="background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 50%, #0d9488 100%);">
-                        <svg class="w-4 h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         <span>Menu Aksi</span>
                         <svg class="w-3.5 h-3.5 transition-transform text-slate-950 shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
