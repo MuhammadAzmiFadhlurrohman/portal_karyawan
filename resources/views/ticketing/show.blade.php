@@ -1404,7 +1404,7 @@
 
             <!-- Chat Input Bar (matching Image 3 & Attachment Menu) -->
             <form id="quick-chat-form" method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
-                  onsubmit="handleChatFormSubmit(event)"
+                  onsubmit="event.preventDefault(); handleChatFormSubmit(event); return false;"
                   class="bg-white border-t border-slate-200 shrink-0 relative">
                 @csrf
                 <input type="hidden" name="category" id="chron_category" value="LAIN">
@@ -1542,6 +1542,7 @@
                                id="quick-chat-input"
                                placeholder="Ketik update koordinasi..."
                                autocomplete="off"
+                               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();handleChatFormSubmit(event);return false;}"
                                style="outline: none !important; box-shadow: none !important; border: none !important;"
                                class="w-full text-xs bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
                         
@@ -1650,8 +1651,9 @@
                 </style>
 
                 <!-- Submit Send Button -->
-                <button type="submit"
+                <button type="button"
                         id="btn-quick-chat-submit"
+                        onclick="handleChatFormSubmit(event)"
                         class="w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
@@ -3334,7 +3336,10 @@ function switchTab(tabId) {
 }
 
 async function handleChatFormSubmit(e) {
-    e.preventDefault();
+    if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
 
     const form = document.getElementById('quick-chat-form');
     const input = document.getElementById('quick-chat-input');
@@ -3348,8 +3353,12 @@ async function handleChatFormSubmit(e) {
 
     // If nothing entered or attached, do not submit
     if (!msg && !lat && !hasMedia) {
-        return;
+        return false;
     }
+
+    const authUserBadge = '{{ auth()->user()?->chat_badge ?? 'Staf' }}';
+    const authAvatarUrl = '{{ auth()->user()?->avatar_url ?? '' }}';
+    const authInitials = '{{ auth()->user()?->initials ?? 'A' }}';
 
     const replyId = document.getElementById('chron_reply_to_id')?.value;
     const replySender = document.getElementById('chron_reply_sender')?.value;
@@ -3412,10 +3421,6 @@ async function handleChatFormSubmit(e) {
             `;
         }
 
-        const authUserBadge = '{{ auth()->user()?->chat_badge ?? 'Staf' }}';
-        const authAvatarUrl = '{{ auth()->user()?->avatar_url ?? '' }}';
-        const authInitials = '{{ auth()->user()?->initials ?? 'A' }}';
-
         const selfAvatarHtml = `
             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-teal-200/80 shadow-2xs flex items-center justify-center bg-gradient-to-br from-teal-500 to-teal-700 text-white select-none mt-0.5"
                  title="Anda">
@@ -3446,10 +3451,6 @@ async function handleChatFormSubmit(e) {
                 </div>
             </div>
             ${selfAvatarHtml}
-        `;
-                    </span>
-                </div>
-            </div>
         `;
         stream.appendChild(bubble);
         if (scrollBox) {
@@ -4140,7 +4141,7 @@ function scrollToLatestChat() {
 
 // Real-Time Chat Synchronization via Server-Sent Events (SSE) with Polling Fallback
 let chatEventSource = null;
-let highestChronologyId = {{ $tiket->chronologies->max('id') ?? 0 }};
+var highestChronologyId = {{ $tiket->chronologies->max('id') ?? 0 }};
 let sseReconnectTimer = null;
 let pollTimer = null;
 
