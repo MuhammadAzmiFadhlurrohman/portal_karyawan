@@ -4422,65 +4422,6 @@ function renderIncomingLiveMessage(data) {
     `;
 
     row.innerHTML = data.is_self ? (bubbleBox + avatarBox) : (avatarBox + bubbleBox);
-            
-            <div class="flex items-center justify-between gap-2">
-                <div class="flex items-center gap-1.5 min-w-0">
-                    <span class="font-bold text-[11px] ${data.is_self ? 'text-teal-950' : 'text-slate-800'} truncate">
-                        ${escapeChatHtml(data.sender_name)}
-                    </span>
-                    <span style="${data.is_self ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;'}"
-                          class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
-                        ${escapeChatHtml(data.sender_badge)}
-                    </span>
-                </div>
-
-                <div class="relative shrink-0">
-                    <button type="button"
-                            onclick="toggleMessageMenu(${data.id}, event)"
-                            class="w-4 h-4 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
-                            title="Pilihan pesan">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
-                        </svg>
-                    </button>
-                    <div id="msg-dropdown-${data.id}"
-                         class="msg-action-dropdown hidden absolute ${data.is_self ? 'right-0' : 'left-0 sm:right-auto'} top-full mt-1 w-48 sm:w-52 rounded-2xl bg-white shadow-xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
-                        <div class="space-y-0.5 pb-1">
-                            <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                <span>Salin</span>
-                            </button>
-                            <button type="button" onclick="openMessageInfo(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                <span>Info Pesan</span>
-                            </button>
-                            <button type="button" onclick="replyToMessage(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                <span>Balas</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            ${replyBox}
-            ${data.message ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(data.message)}</p>` : ''}
-            ${photoBox}
-            ${videoBox}
-            ${locBox}
-
-            <div class="flex justify-end items-center gap-1 text-[9.5px] text-slate-400 font-mono pt-0.5 select-none leading-none">
-                <span>${escapeChatHtml(data.time_str || '')}</span>
-                ${data.is_self ? `
-                    <span title="${data.is_read ? 'Dibaca' : 'Terkirim'}"
-                          class="status-indicator inline-flex items-center ${data.is_read ? 'text-[#53bdeb]' : 'text-slate-400'} ml-0.5"
-                          data-status="${data.is_read ? 'read' : 'sent'}">
-                        <svg class="w-3.5 h-3 ${data.is_read ? 'text-[#53bdeb]' : 'text-slate-400'}" viewBox="0 0 16 11" fill="none">
-                            <path d="M11 1.5L4.5 8L1.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M14.5 1.5L8 8L6.5 6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </span>
-                ` : ''}
-            </div>
-        </div>
-    `;
 
     const wasNearBottom = isChatNearBottom(scrollBox, 80);
     stream.appendChild(row);
