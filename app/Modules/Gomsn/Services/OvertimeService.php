@@ -41,7 +41,7 @@ class OvertimeService
                 ->first();
 
             if (! $attendance) {
-                throw new Exception('Tidak ditemukan absensi pada tanggal tersebut. Pastikan Anda sudah melakukan absensi dengan status Hadir/Tepat Waktu.');
+                throw new Exception('Belum ada data absensi. Silakan absen sebelum mengajukan lembur.');
             }
         }
 

@@ -429,8 +429,8 @@ class OvertimeController extends Controller
         if (! $attendance) {
             return response()->json([
                 'has_attendance' => false,
-                'message' => 'Tidak ditemukan absensi pada tanggal tersebut',
-                'subtext' => 'Pastikan Anda sudah melakukan absensi dengan status Hadir/Tepat Waktu',
+                'message' => 'Belum ada data absensi',
+                'subtext' => 'Silakan absen sebelum mengajukan lembur.',
             ]);
         }
 

@@ -111,16 +111,16 @@
                     <!-- No Attendance Alert -->
                     <div x-show="!checking && attendanceChecked && !hasAttendance" 
                          x-cloak 
-                         class="mt-3 p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl flex items-start gap-3 shadow-2xs">
-                        <div class="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
+                         class="mt-2.5 p-3 bg-rose-50/80 border border-rose-200 rounded-xl flex items-center gap-2.5 shadow-2xs">
+                        <div class="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold">
                             ✕
                         </div>
-                        <div>
-                            <div class="text-xs font-bold text-rose-800 flex items-center gap-1.5">
-                                <span>Tidak ditemukan data absensi hadir pada tanggal tersebut</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-bold text-rose-800">
+                                <span x-text="attendanceData.message || 'Belum Ada Data Absensi'">Belum Ada Data Absensi</span>
                             </div>
-                            <p class="text-[11px] text-rose-600 mt-0.5 leading-relaxed">
-                                Pastikan Anda sudah melakukan absensi dengan status Hadir/Tepat Waktu sebelum mengajukan permohonan lembur.
+                            <p class="text-[11px] text-rose-600 mt-0.5" x-text="attendanceData.subtext || 'Silakan absen sebelum mengajukan lembur.'">
+                                Silakan absen sebelum mengajukan lembur.
                             </p>
                         </div>
                     </div>
@@ -246,8 +246,8 @@
                     </div>
                 </div>
 
-                <div x-show="!hasAttendance && attendanceChecked" x-cloak class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center text-xs text-rose-700 font-semibold">
-                    Tombol simpan dinonaktifkan karena absensi belum terdaftar pada tanggal yang dipilih.
+                <div x-show="!hasAttendance && attendanceChecked" x-cloak class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-center text-xs text-rose-700 font-semibold">
+                    Pengajuan dinonaktifkan: belum ada data absensi pada tanggal ini.
                 </div>
             </form>
         </div>

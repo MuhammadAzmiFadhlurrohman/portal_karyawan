@@ -516,8 +516,8 @@ class ChatbotService
         // Jika tidak ada kecocokan yang memadai
         if ($bestScore < 0.75 || ! $bestIntent) {
             $fallback = $isApprover
-                ? "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Cara approve pengajuan absen karyawan\"\n• \"Bagaimana cara approve pengajuan dana?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Bagaimana cara absen dinas luar?\"\n• \"Status pengajuan saya\""
-                : "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara absen dinas luar?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Cara catat penanganan core & joint closure\"\n• \"Bagaimana cara membuat tugas operasional?\"";
+                ? "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Cara approve pengajuan absen karyawan\"\n• \"Bagaimana cara approve pengajuan dana?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Bagaimana cara absen dinas luar?\"\n• \"Status pengajuan saya\"\n\nJika butuh bantuan teknis darurat, silakan hubungi Helpdesk NOC."
+                : "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara absen dinas luar?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Cara catat penanganan core & joint closure\"\n• \"Bagaimana cara membuat tugas operasional?\"\n\nJika butuh bantuan segera, silakan hubungi Helpdesk NOC.";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
