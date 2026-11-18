@@ -4087,6 +4087,25 @@ let speechRecognizer = null;
 let isRecordingVoice = false;
 let voiceInitialText = '';
 
+function scrollChatInputToEnd(inputEl) {
+    if (!inputEl) inputEl = document.getElementById('quick-chat-input');
+    if (!inputEl) return;
+    try {
+        const len = inputEl.value.length;
+        inputEl.setSelectionRange(len, len);
+    } catch (e) {}
+    inputEl.scrollLeft = inputEl.scrollWidth;
+    setTimeout(() => {
+        if (inputEl) {
+            inputEl.scrollLeft = inputEl.scrollWidth;
+            try {
+                const len = inputEl.value.length;
+                inputEl.setSelectionRange(len, len);
+            } catch (e) {}
+        }
+    }, 15);
+}
+
 function toggleVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -4174,6 +4193,9 @@ function startVoiceRecognition() {
                 const prefix = voiceInitialText.trim() ? voiceInitialText.trim() + ' ' : '';
                 chatInput.value = prefix + currentSpoken;
                 chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+                // Geser scroll input ke posisi paling kanan agar kata terbaru yang diucapkan selalu terlihat
+                scrollChatInputToEnd(chatInput);
             }
         };
 

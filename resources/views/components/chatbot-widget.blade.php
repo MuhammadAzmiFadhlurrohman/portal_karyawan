@@ -229,6 +229,8 @@
         <!-- Input Bar -->
         <form @submit.prevent="sendMessage()" class="p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
             <input type="text" 
+                   id="chatbot-input-query"
+                   x-ref="chatInput"
                    x-model="inputQuery" 
                    :placeholder="isListening ? '🎙️ Mendengarkan suara Anda...' : 'Ketik pertanyaan Anda...'" 
                    class="flex-1 bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 outline-none transition"
@@ -349,6 +351,25 @@
                         if (liveText) {
                             const prefix = initialText.trim() ? initialText.trim() + ' ' : '';
                             this.inputQuery = prefix + liveText;
+                            this.$nextTick(() => {
+                                const el = this.$refs.chatInput || document.getElementById('chatbot-input-query');
+                                if (el) {
+                                    try {
+                                        const len = el.value.length;
+                                        el.setSelectionRange(len, len);
+                                    } catch (e) {}
+                                    el.scrollLeft = el.scrollWidth;
+                                    setTimeout(() => {
+                                        if (el) {
+                                            el.scrollLeft = el.scrollWidth;
+                                            try {
+                                                const len = el.value.length;
+                                                el.setSelectionRange(len, len);
+                                            } catch (e) {}
+                                        }
+                                    }, 15);
+                                }
+                            });
                         }
                     };
 
