@@ -159,6 +159,9 @@ class PengajuanController extends Controller
 
         // Excel / CSV Export handler (hanya pengajuan yang sudah disetujui)
         if (in_array($request->input('export'), ['excel', 'csv', '1'], true)) {
+            if (! $isSuperAdmin && ! $isFinance && ! $isAtasan) {
+                abort(403, 'Aksi export tidak diizinkan untuk role karyawan.');
+            }
             $exportQuery = (clone $query)->orderBy('created_at', 'desc');
             if (! $request->filled('status')) {
                 $exportQuery->whereIn('status', ['disetujui', 'menunggu_finance', 'menunggu_executive', 'dicairkan', 'ditransfer', 'menunggu_bukti', 'terealisasi', 'selesai']);

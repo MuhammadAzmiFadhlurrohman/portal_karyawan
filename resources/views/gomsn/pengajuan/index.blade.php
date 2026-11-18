@@ -281,12 +281,14 @@
                                 <span>Refresh</span>
                             </a>
 
+                            @if ($isSuperAdmin || $isFinance || $isAtasan)
                             <button type="submit" name="export" value="excel" title="Export Excel" class="flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold p-2 sm:px-3.5 sm:py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
                                 <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
                                 <span class="hidden sm:inline">Export Excel</span>
                             </button>
+                            @endif
                         </div>
 
                         <div class="hidden xl:flex items-center gap-1.5 text-xs text-slate-500 font-medium ml-auto shrink-0">
@@ -770,6 +772,7 @@
                             <span>Total <strong class="text-slate-800 font-bold">{{ $pengajuanList->total() }}</strong> pengajuan</span>
                         </span>
 
+                        @if ($isSuperAdmin || $isFinance || $isAtasan)
                         <button type="submit" name="export" value="excel" title="Export Excel" 
                                 class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold py-2 px-3 sm:px-3.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer shrink-0">
                             <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -777,6 +780,7 @@
                             </svg>
                             <span>Export Excel</span>
                         </button>
+                        @endif
                     </div>
                 </form>
             </div>

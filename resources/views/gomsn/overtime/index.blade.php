@@ -18,6 +18,7 @@
         $selectedDivisi = $selectedDivisi ?? 'all';
         $divisions = $divisions ?? ['Teknik', 'NOC', 'Umum', 'Finance', 'HRD'];
         $canFilterDivisi = $canFilterDivisi ?? ($isSuperAdmin || $isHrd || $isFinance);
+        $canExport = $canExport ?? ($isSuperAdmin || $isHrd || $isFinance || $isAtasan);
         $totalNominalLembur = $totalNominalLembur ?? 0;
         $totalCountLembur = $totalCountLembur ?? 0;
         $viewMode = $viewMode ?? 'karyawan';
@@ -239,7 +240,8 @@
                             <span>Filter</span>
                         </button>
 
-                        <!-- Tombol Export Excel Hijau (Sesuai Gambar 1) -->
+                        @if ($canExport)
+                        <!-- Tombol Export Excel Hijau (Khusus Atasan / HRD / Finance / Admin) -->
                         <a href="{{ route('gomsn.overtime.index', array_merge(request()->query(), ['export' => 'excel', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun])) }}" 
                            title="Export Data ke Excel/CSV"
                            class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center shrink-0 cursor-pointer">
@@ -247,6 +249,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </a>
+                        @endif
                     </div>
 
                     <!-- Tombol Buat Pengajuan Lembur -->

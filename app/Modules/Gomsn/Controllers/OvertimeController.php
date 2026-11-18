@@ -52,6 +52,7 @@ class OvertimeController extends Controller
         $isHrd = $user->hasRole('hrd');
         $isSuperAdmin = $user->hasRole(['super_admin', 'admin']);
         $canFilterDivisi = ($isSuperAdmin || $isHrd || $isFinance);
+        $canExport = ($isSuperAdmin || $isHrd || $isFinance || $isAtasan);
 
         $rawBulan = $request->input('bulan');
         $isFilterUnprocessed = ($rawBulan === 'unprocessed' || $rawBulan === 'pending');
@@ -162,6 +163,9 @@ class OvertimeController extends Controller
 
         // Export Excel / CSV jika diminta
         if ($request->has('export') && $request->input('export') === 'excel') {
+            if (! $canExport) {
+                abort(403, 'Aksi export tidak diizinkan untuk role karyawan.');
+            }
             return $this->exportOvertime(clone $monthBaseQuery, $selectedBulan ?: 0, $selectedTahun);
         }
 
@@ -270,7 +274,8 @@ class OvertimeController extends Controller
             'unprocessedPreviousCount',
             'unprocessedTotalCount',
             'previousMonthsWithPending',
-            'canFilterDivisi'
+            'canFilterDivisi',
+            'canExport'
         ));
     }
 
