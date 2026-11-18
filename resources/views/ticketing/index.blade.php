@@ -74,8 +74,55 @@
         </div>
     @endif
 
-    <!-- 4 Metric KPI Cards (Clean, Proportional Cards) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <!-- MOBILE VIEW: 1 Baris 4 Kolom (Persis seperti Halaman Riwayat Absen) -->
+    <div class="sm:hidden grid grid-cols-4 gap-2">
+        <!-- 1. Total Tiket -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+            <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0D9488] shrink-0">
+                <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+            <span class="text-base font-black text-slate-800 leading-tight mt-1.5">{{ number_format($stats['total'] ?? 0) }}</span>
+            <span class="text-[10px] font-semibold text-slate-500 mt-0.5 truncate max-w-full">Total</span>
+        </div>
+
+        <!-- 2. Dalam Penanganan (Open + Proses) -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+            <div class="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+            </div>
+            <span class="text-base font-black text-amber-700 leading-tight mt-1.5">{{ number_format(($stats['open'] ?? 0) + ($stats['proses'] ?? 0)) }}</span>
+            <span class="text-[10px] font-semibold text-slate-500 mt-0.5 truncate max-w-full">Penanganan</span>
+        </div>
+
+        <!-- 3. Verifikasi Closing -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+            <div class="w-8 h-8 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
+                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <span class="text-base font-black text-purple-700 leading-tight mt-1.5">{{ number_format($stats['pending_verifikasi'] ?? 0) }}</span>
+            <span class="text-[10px] font-semibold text-slate-500 mt-0.5 truncate max-w-full">Verifikasi</span>
+        </div>
+
+        <!-- 4. Selesai (Close) -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+            <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <span class="text-base font-black text-emerald-700 leading-tight mt-1.5">{{ number_format($stats['selesai'] ?? 0) }}</span>
+            <span class="text-[10px] font-semibold text-slate-500 mt-0.5 truncate max-w-full">Selesai</span>
+        </div>
+    </div>
+
+    <!-- DESKTOP VIEW: 4 Metric KPI Cards (Clean, Proportional Cards) -->
+    <div class="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <!-- Total Tiket -->
         <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs hover:shadow-md transition flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-[#0D9488] shrink-0">
