@@ -84,73 +84,73 @@
     </div>
 
     <!-- 6 Metric Cards in 2 Rows (Matches Gambar 2) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
         <!-- Row 1: HADIR -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             </div>
-            <div>
-                <span class="text-xl font-black text-slate-800 block leading-tight">{{ $hadirCount }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">HADIR</span>
+            <div class="min-w-0">
+                <span class="text-lg sm:text-xl font-black text-slate-800 block leading-tight truncate">{{ $hadirCount }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate block">HADIR</span>
             </div>
         </div>
 
         <!-- Row 1: TERLAMBAT -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-3.5 border-t-2 border-t-amber-400">
-            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5 border-t-2 border-t-amber-400">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
-            <div>
-                <span class="text-xl font-black text-slate-800 block leading-tight">{{ $terlambatCount }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">TERLAMBAT</span>
+            <div class="min-w-0">
+                <span class="text-lg sm:text-xl font-black text-slate-800 block leading-tight truncate">{{ $terlambatCount }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate block">TERLAMBAT</span>
             </div>
         </div>
 
         <!-- Row 1: ALPA -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-3.5 border-t-2 border-t-rose-500">
-            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5 border-t-2 border-t-rose-500">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </div>
-            <div>
-                <span class="text-xl font-black text-slate-800 block leading-tight">{{ $alpaCount }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ALPA</span>
+            <div class="min-w-0">
+                <span class="text-lg sm:text-xl font-black text-slate-800 block leading-tight truncate">{{ $alpaCount }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate block">ALPA</span>
             </div>
         </div>
 
         <!-- Row 2: SISA CUTI -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
-            <div>
-                <span class="text-xl font-black text-slate-800 block leading-tight">{{ $sisaCuti }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">SISA CUTI</span>
-                <span class="text-[10px] text-slate-400">Dari {{ $annualQuota }} hari</span>
+            <div class="min-w-0">
+                <span class="text-lg sm:text-xl font-black text-slate-800 block leading-tight truncate">{{ $sisaCuti }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">SISA CUTI</span>
+                <span class="text-[9.5px] sm:text-[10px] text-slate-400 block truncate">Dari {{ $annualQuota }} hari</span>
             </div>
         </div>
 
         <!-- Row 2: CUTI TERPAKAI -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <div>
-                <span class="text-xl font-black text-slate-800 block leading-tight">{{ $cutiTerpakaiAnnual }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">CUTI TERPAKAI</span>
-                <span class="text-[10px] text-slate-400">Bulan ini: {{ $monthLeavesCount }}</span>
+            <div class="min-w-0">
+                <span class="text-lg sm:text-xl font-black text-slate-800 block leading-tight truncate">{{ $cutiTerpakaiAnnual }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">CUTI TERPAKAI</span>
+                <span class="text-[9.5px] sm:text-[10px] text-slate-400 block truncate">Bulan ini: {{ $monthLeavesCount }}</span>
             </div>
         </div>
 
         <!-- Row 2: TOTAL POTONGAN -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-3.5 border-t-2 border-t-rose-500">
-            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3.5 border-t-2 border-t-rose-500">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <div>
-                <span class="text-base font-black text-slate-800 block leading-tight">Rp {{ number_format($totalPotongan, 0, ',', '.') }}</span>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">TOTAL POTONGAN</span>
-                <span class="text-[10px] text-slate-400">Telat: Rp {{ number_format($telatPotongan, 0, ',', '.') }} | Alpa: Rp {{ number_format($alpaPotongan, 0, ',', '.') }}</span>
+            <div class="min-w-0">
+                <span class="text-base sm:text-lg font-black text-slate-800 block leading-tight truncate">Rp {{ number_format($totalPotongan, 0, ',', '.') }}</span>
+                <span class="text-[9.5px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">TOTAL POTONGAN</span>
+                <span class="text-[9.5px] sm:text-[10px] text-slate-400 block truncate">Telat: Rp {{ number_format($telatPotongan, 0, ',', '.') }} | Alpa: Rp {{ number_format($alpaPotongan, 0, ',', '.') }}</span>
             </div>
         </div>
     </div>

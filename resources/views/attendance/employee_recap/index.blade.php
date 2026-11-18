@@ -107,56 +107,58 @@
     </div>
 
     <!-- 4 Summary Metrics Cards (Matches Gambar 1) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
         <!-- Card 1: Total Karyawan -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 justify-between sm:justify-start">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
-            <div>
-                <span class="text-[11px] font-medium text-slate-500 block">Total Karyawan</span>
-                <span class="text-2xl font-black text-slate-800 tracking-tight">{{ $totalEmployees }}</span>
+            <div class="min-w-0">
+                <span class="text-[10px] sm:text-[11px] font-medium text-slate-500 block truncate">Total Karyawan</span>
+                <span class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block truncate">{{ $totalEmployees }}</span>
             </div>
         </div>
 
         <!-- Card 2: Rata-rata Kehadiran -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 justify-between sm:justify-start">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
             </div>
-            <div>
-                <span class="text-[11px] font-medium text-slate-500 block">Rata-rata Kehadiran</span>
-                <span class="text-2xl font-black text-slate-800 tracking-tight">{{ $avgKehadiran }}</span>
+            <div class="min-w-0">
+                <span class="text-[10px] sm:text-[11px] font-medium text-slate-500 block truncate">Rata-rata Kehadiran</span>
+                <span class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block truncate">{{ $avgKehadiran }}</span>
             </div>
         </div>
 
         <!-- Card 3: Cuti Disetujui -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 justify-between sm:justify-start">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <div>
-                <span class="text-[11px] font-medium text-slate-500 block">Cuti Disetujui</span>
-                <span class="text-2xl font-black text-slate-800 tracking-tight">{{ $totalCutiApprovedAll }}</span>
+            <div class="min-w-0">
+                <span class="text-[10px] sm:text-[11px] font-medium text-slate-500 block truncate">Cuti Disetujui</span>
+                <span class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block truncate">{{ $totalCutiApprovedAll }}</span>
             </div>
         </div>
 
         <!-- Card 4: Total Potongan -->
-        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center gap-4 border-l-4 border-l-rose-500">
-            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 justify-between sm:justify-start border-l-4 border-l-rose-500">
+            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <div>
-                <span class="text-[11px] font-medium text-slate-500 block">Total Potongan</span>
-                <span class="text-lg font-black text-slate-800 tracking-tight">Rp {{ number_format($totalPotonganAll, 0, ',', '.') }}</span>
+            <div class="min-w-0">
+                <span class="text-[10px] sm:text-[11px] font-medium text-slate-500 block truncate">Total Potongan</span>
+                <span class="text-base sm:text-lg font-black text-slate-800 tracking-tight block truncate" title="Rp {{ number_format($totalPotonganAll, 0, ',', '.') }}">
+                    Rp {{ number_format($totalPotonganAll, 0, ',', '.') }}
+                </span>
             </div>
         </div>
     </div>
