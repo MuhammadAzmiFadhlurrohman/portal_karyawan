@@ -178,6 +178,49 @@
             scrollbar-width: none !important;
         }
 
+        /* Brand Circular Logo Badge (Fixed dimensions to prevent any overflow) */
+        .brand-logo-badge {
+            width: 76px;
+            height: 76px;
+            min-width: 76px;
+            min-height: 76px;
+            max-width: 76px;
+            max-height: 76px;
+            border-radius: 9999px;
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-shadow: 0 8px 24px rgba(2, 40, 46, 0.35);
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            margin: 0 auto;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        @media (min-width: 1024px) {
+            .brand-logo-badge {
+                width: 96px;
+                height: 96px;
+                min-width: 96px;
+                min-height: 96px;
+                max-width: 96px;
+                max-height: 96px;
+                padding: 12px;
+            }
+        }
+        .brand-logo-badge:hover {
+            transform: scale(1.05);
+        }
+        .brand-logo-img {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
         /* Responsive Mobile / Tablet (< 1024px) */
         @media (max-width: 1023px) {
             .wave-desktop {
@@ -185,7 +228,7 @@
             }
             .wave-mobile {
                 display: block !important;
-                height: 32px !important;
+                height: 38px !important;
             }
             .login-wrap {
                 flex-direction: column !important;
@@ -194,63 +237,81 @@
                 max-height: 100dvh !important;
                 overflow: hidden !important;
             }
+            .brand-logo-badge {
+                width: 58px !important;
+                height: 58px !important;
+                min-width: 58px !important;
+                min-height: 58px !important;
+                max-width: 58px !important;
+                max-height: 58px !important;
+                padding: 8px !important;
+            }
             .login-panel-left {
                 width: 100% !important;
-                height: 32% !important;
-                height: 32dvh !important;
-                max-height: 220px !important;
-                min-height: 150px !important;
+                height: 38% !important;
+                height: 38dvh !important;
+                max-height: 260px !important;
+                min-height: 200px !important;
                 flex: 0 0 auto !important;
-                padding: 10px 16px 26px 16px !important;
+                padding: 14px 20px 42px 20px !important;
                 justify-content: space-around !important;
             }
             .login-panel-right {
                 width: 100% !important;
-                height: 68% !important;
-                height: 68dvh !important;
+                height: 62% !important;
+                height: 62dvh !important;
                 flex: 1 1 auto !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 10px 20px 8px 20px !important;
+                padding: 14px 24px 12px 24px !important;
                 margin-top: 0 !important;
                 z-index: 25 !important;
                 overflow: hidden !important;
             }
             .input-stylish {
-                padding: 10px 14px 10px 38px !important;
+                padding: 11px 14px 11px 40px !important;
                 border-radius: 12px !important;
-                font-size: 13px !important;
+                font-size: 13.5px !important;
             }
             .btn-stylish {
-                min-height: 44px !important;
-                padding: 10px 16px !important;
+                min-height: 46px !important;
+                padding: 11px 16px !important;
                 border-radius: 12px !important;
                 font-size: 14px !important;
             }
             .btn-biometric {
-                width: 44px !important;
-                height: 44px !important;
+                width: 46px !important;
+                height: 46px !important;
                 border-radius: 12px !important;
             }
         }
 
         /* Ultra small mobile screens (height <= 640px) */
         @media (max-height: 640px) and (max-width: 1023px) {
+            .brand-logo-badge {
+                width: 48px !important;
+                height: 48px !important;
+                min-width: 48px !important;
+                min-height: 48px !important;
+                max-width: 48px !important;
+                max-height: 48px !important;
+                padding: 6px !important;
+            }
             .login-panel-left {
-                height: 29% !important;
-                height: 29dvh !important;
-                min-height: 135px !important;
-                padding: 6px 12px 22px 12px !important;
+                height: 34% !important;
+                height: 34dvh !important;
+                min-height: 170px !important;
+                padding: 10px 14px 34px 14px !important;
             }
             .login-panel-right {
-                height: 71% !important;
-                height: 71dvh !important;
-                padding: 6px 16px 6px 16px !important;
+                height: 66% !important;
+                height: 66dvh !important;
+                padding: 10px 18px 8px 18px !important;
             }
             .wave-mobile {
-                height: 24px !important;
+                height: 30px !important;
             }
         }
     </style>
@@ -393,33 +454,33 @@
             <!-- Center Content: Logo, Title, Description -->
             <div class="relative z-10 my-auto py-1 sm:py-2">
                 <!-- Text: Selamat Datang di -->
-                <p class="text-teal-200/90 text-[10px] sm:text-xs font-bold tracking-wider uppercase mb-1 sm:mb-2">
+                <p class="text-teal-200/90 text-xs sm:text-sm font-bold tracking-wider uppercase mb-1.5 sm:mb-2.5">
                     Selamat Datang di
                 </p>
 
                 <!-- Circular Logo Badge with Ambient Glow -->
-                <div class="relative inline-block mx-auto mb-1 sm:mb-3 group">
+                <div class="relative inline-block mx-auto mb-2 sm:mb-3 group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-teal-400/30 to-emerald-400/30 rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-300"></div>
-                    <div class="relative w-13 h-13 sm:w-18 sm:h-18 lg:w-24 lg:h-24 rounded-full bg-white shadow-[0_6px_20px_rgba(2,40,46,0.35)] ring-3 ring-white/25 flex items-center justify-center p-2 sm:p-3 transition-transform duration-300 group-hover:scale-105">
+                    <div class="brand-logo-badge">
                         <img src="{{ asset('assets/logo/logo-msn2.png') }}" 
                              alt="GoMSN" 
-                             class="w-full h-full object-contain">
+                             class="brand-logo-img">
                     </div>
                 </div>
 
                 <!-- App Name: GoMSN -->
-                <h1 class="font-heading text-xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight mb-0.5 leading-tight">
+                <h1 class="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-1 leading-tight">
                     Go<span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-teal-300 to-emerald-300">MSN</span>
                 </h1>
 
                 <!-- Subtitle / Deskripsi Sistem -->
-                <p class="text-[10px] sm:text-xs text-teal-50/85 leading-tight max-w-xs sm:max-w-sm mx-auto font-normal">
+                <p class="text-xs sm:text-sm text-teal-50/85 leading-snug max-w-xs sm:max-w-sm mx-auto font-normal">
                     Sistem Operasional &amp; Manajemen Jaringan Terpadu
                 </p>
             </div>
 
             <!-- Bottom Brand Text -->
-            <div class="relative z-10 pt-1 pb-0.5 flex items-center justify-center text-[9px] sm:text-[10px] font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 lg:mb-0">
+            <div class="relative z-10 pt-1.5 pb-0.5 flex items-center justify-center text-[10px] sm:text-xs font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 lg:mb-0">
                 <span>PT MEDIA SOLUSI NETWORK</span>
             </div>
         </div>
