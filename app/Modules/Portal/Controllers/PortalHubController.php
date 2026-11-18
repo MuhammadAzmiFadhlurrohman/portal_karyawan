@@ -36,6 +36,7 @@ class PortalHubController extends Controller
         $user = $request->user();
 
         $stats = $dashboardStatsService->getStats($user);
+        $monthlyCalendar = $dashboardStatsService->getMonthlyCalendar($user);
 
         $hubMetrics = Cache::remember("portal_hub_metrics:user:{$user->id}", 15, function () use ($user, $leaveService) {
             $nowJkt = now('Asia/Jakarta');
@@ -175,6 +176,7 @@ class PortalHubController extends Controller
             'user' => $user,
             'stats' => $stats,
             'metrics' => $hubMetrics,
+            'monthlyCalendar' => $monthlyCalendar,
             'effectiveApprover' => $effectiveApprover,
             'activeSessionsCount' => $activeSessionsCount,
             'approvedDevicesCount' => $approvedDevicesCount,

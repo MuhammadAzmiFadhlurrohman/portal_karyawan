@@ -858,8 +858,8 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-5">
-            <!-- Chart 1: Tren Kehadiran 7 Hari Terakhir (Col 8) -->
-            <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+            <!-- Chart 1: Tren Kehadiran 7 Hari Terakhir (Col 7) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
                 <div>
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
                         <div>
@@ -890,6 +890,106 @@
                 </div>
             </div>
 
+            <!-- Kalender Kehadiran Bulan Ini (Matching User Reference) -->
+            @if (isset($monthlyCalendar))
+            <div class="lg:col-span-5 order-first lg:order-last bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+                <div>
+                    <!-- Header: Icon, Month & Year, Present Counter Badge -->
+                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-2xs border border-blue-100/80 shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-heading font-extrabold text-slate-800 text-sm sm:text-base leading-tight">
+                                    {{ $monthlyCalendar['month_name'] }}
+                                </h3>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200/70 shadow-2xs">
+                                {{ $monthlyCalendar['present_count'] }} hari hadir
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Day Names Row (SEN, SEL, RAB, KAM, JUM, SAB, MIN) -->
+                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2 text-center mb-2">
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">SEN</span>
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">SEL</span>
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">RAB</span>
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">KAM</span>
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">JUM</span>
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">SAB</span>
+                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">MIN</span>
+                    </div>
+
+                    <!-- Day Tiles Grid (7 Columns) -->
+                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2 text-center">
+                        <!-- Empty offset slots before day 1 -->
+                        @for ($i = 0; $i < $monthlyCalendar['empty_slots']; $i++)
+                            <div class="aspect-square"></div>
+                        @endfor
+
+                        <!-- Month Days -->
+                        @foreach ($monthlyCalendar['days'] as $dayItem)
+                            @php
+                                $status = $dayItem['status'];
+                                $isToday = $dayItem['is_today'];
+                                
+                                // Color state rules:
+                                // Hijau = hadir, Kuning = terlambat, Merah = alpa, Abu = libur, Putih = belum terlewat
+                                if ($status === 'present') {
+                                    $tileStyle = 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold hover:bg-emerald-100/80';
+                                } elseif ($status === 'late') {
+                                    $tileStyle = 'bg-amber-50 text-amber-700 border border-amber-200 font-semibold hover:bg-amber-100/80';
+                                } elseif ($status === 'absent') {
+                                    $tileStyle = 'bg-[#fef2f2] text-[#ef4444] border border-[#fecaca] font-semibold hover:bg-rose-100/80';
+                                } elseif ($status === 'off') {
+                                    $tileStyle = 'bg-[#f1f5f9] text-[#94a3b8] border border-[#e2e8f0] font-medium hover:bg-slate-200/60';
+                                } else { // future / belum terlewat
+                                    $tileStyle = 'bg-white text-[#94a3b8] border border-dashed border-[#e2e8f0] font-medium';
+                                }
+
+                                $todayRing = $isToday ? 'ring-2 ring-blue-500 ring-offset-1 border-transparent shadow-xs' : '';
+                            @endphp
+                            <div class="aspect-square rounded-xl sm:rounded-2xl flex items-center justify-center relative select-none transition-transform duration-150 hover:scale-105 cursor-pointer {{ $tileStyle }} {{ $todayRing }}"
+                                 title="{{ $dayItem['date_formatted'] }}: {{ $dayItem['label'] }}{{ $isToday ? ' (Hari Ini)' : '' }}">
+                                <span class="text-xs sm:text-sm">{{ $dayItem['day'] }}</span>
+                                @if ($isToday)
+                                    <span class="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Legend at Bottom -->
+                <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-center gap-3 sm:gap-4 flex-wrap text-[10.5px] sm:text-xs text-slate-500 font-medium">
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-emerald-500 shrink-0"></span>
+                        Hadir
+                    </span>
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-amber-500 shrink-0"></span>
+                        Terlambat
+                    </span>
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-400 border border-rose-500 shrink-0"></span>
+                        Alpa
+                    </span>
+                    <span class="inline-flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-200 border border-slate-300 shrink-0"></span>
+                        Libur
+                    </span>
+                </div>
+            </div>
+            @endif
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
             <!-- Chart 2: Komposisi Pengajuan (Col 4) -->
             <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
                 <div>
@@ -933,28 +1033,36 @@
                     Total {{ $stats['pengajuan']['total'] }} Pengajuan di periode ini
                 </div>
             </div>
-        </div>
 
-        <!-- Chart 3: Tren Jam Lembur Mingguan (Full Width Col 12) -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
+            <!-- Chart 3: Tren Jam Lembur Harian (Col 8) -->
+            <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
                 <div>
-                    <h3 class="font-heading font-bold text-sm text-slate-800">
-                        Tren Jam Lembur Harian (7 Hari Terakhir)
-                    </h3>
-                    <p class="text-xs text-slate-400 mt-0.5">
-                        Akumulasi total jam lembur yang telah disetujui &amp; diverifikasi per hari
-                    </p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                        Total 7 Hari: {{ array_sum($stats['charts']['lembur']['hours']) }} Jam
-                    </span>
-                </div>
-            </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
+                        <div>
+                            <h3 class="font-heading font-bold text-sm text-slate-800">
+                                Tren Jam Lembur Harian (7 Hari Terakhir)
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">
+                                Akumulasi total jam lembur yang telah disetujui &amp; diverifikasi per hari
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                Total 7 Hari: {{ array_sum($stats['charts']['lembur']['hours']) }} Jam
+                            </span>
+                        </div>
+                    </div>
 
-            <div class="relative w-full h-[220px] sm:h-[240px]">
-                <canvas id="overtimeTrendChart"></canvas>
+                    <div class="relative w-full h-[220px] sm:h-[240px]">
+                        <canvas id="overtimeTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                    <span>*Data dihitung berdasarkan Surat Perintah Lembur yang telah disetujui</span>
+                    <a href="{{ route('gomsn.overtime.index') }}" class="font-semibold text-indigo-700 hover:underline">
+                        Lihat Lembur &rarr;
+                    </a>
+                </div>
             </div>
         </div>
     </section>

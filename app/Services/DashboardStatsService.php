@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Leave;
 use App\Models\Lembur;
 use App\Models\MonthlySchedule;
+use App\Models\NationalHoliday;
 use App\Models\Pengajuan;
 use App\Models\User;
 use Carbon\Carbon;
@@ -304,6 +305,129 @@ class DashboardStatsService
                 'pengajuan' => $recentPengajuan,
                 'lembur' => $recentLembur,
             ],
+        ];
+    }
+
+    /**
+     * Get monthly attendance calendar for the specified user
+     */
+    public function getMonthlyCalendar(User $user, ?int $year = null, ?int $month = null): array
+    {
+        $now = now('Asia/Jakarta');
+        $year = $year ?: (int) $now->format('Y');
+        $month = $month ?: (int) $now->format('n');
+        $todayStr = $now->toDateString();
+
+        $startOfMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->startOfDay();
+        $daysInMonth = $startOfMonth->daysInMonth;
+        $monthName = $startOfMonth->locale('id')->translatedFormat('F Y');
+
+        // ISO day of week: 1 (Senin/Mon) ... 7 (Minggu/Sun)
+        // If day 1 is Monday (1), leading blank slots = 0
+        // If day 1 is Sunday (7), leading blank slots = 6
+        $emptySlots = $startOfMonth->dayOfWeekIso - 1;
+
+        $attendances = Attendance::query()
+            ->where('user_id', $user->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(fn ($a) => $a->date instanceof Carbon ? $a->date->toDateString() : substr((string) $a->date, 0, 10));
+
+        $schedules = MonthlySchedule::query()
+            ->with('shift')
+            ->where('user_id', $user->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(fn ($s) => $s->date instanceof Carbon ? $s->date->toDateString() : substr((string) $s->date, 0, 10));
+
+        $holidays = NationalHoliday::query()
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(fn ($h) => $h->date instanceof Carbon ? $h->date->toDateString() : substr((string) $h->date, 0, 10));
+
+        $approvedLeaves = Leave::query()
+            ->where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->where(function ($q) use ($year, $month) {
+                $q->whereYear('start_date', $year)->whereMonth('start_date', $month)
+                    ->orWhere(function ($q2) use ($year, $month) {
+                        $q2->whereYear('end_date', $year)->whereMonth('end_date', $month);
+                    });
+            })
+            ->get();
+
+        $presentCount = 0;
+        $days = [];
+
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $dateObj = Carbon::createFromDate($year, $month, $d, 'Asia/Jakarta')->startOfDay();
+            $dateStr = $dateObj->toDateString();
+            $dayOfWeek = $dateObj->dayOfWeekIso; // 1 = Monday .. 7 = Sunday
+            $isWeekend = ($dayOfWeek >= 6); // 6 = Saturday, 7 = Sunday
+            $isToday = ($dateStr === $todayStr);
+            $isFuture = ($dateStr > $todayStr);
+
+            $att = $attendances->get($dateStr);
+            $sched = $schedules->get($dateStr);
+            $holiday = $holidays->get($dateStr);
+
+            $hasApprovedLeave = $approvedLeaves->first(function ($l) use ($dateStr) {
+                $s = $l->start_date instanceof Carbon ? $l->start_date->toDateString() : substr((string) $l->start_date, 0, 10);
+                $e = $l->end_date instanceof Carbon ? $l->end_date->toDateString() : substr((string) $l->end_date, 0, 10);
+                return $dateStr >= $s && $dateStr <= $e;
+            });
+
+            // Day off conditions: Holiday OR Shift set to Day Off OR Weekend (unless scheduled for piket)
+            $isDayOff = $holiday !== null
+                || ($sched && $sched->shift && $sched->shift->is_day_off)
+                || ($isWeekend && (!$sched || !$sched->shift || $sched->shift->is_day_off || !$sched->shift->is_piket));
+
+            if ($isFuture) {
+                $status = 'future';
+                $label = 'Belum terlewat';
+            } elseif ($att && in_array(strtolower((string) $att->status), ['present', 'late', 'hadir', 'terlambat'])) {
+                $isLate = ($att->late_minutes > 0) || (strtolower((string) $att->status) === 'late');
+                if ($isLate) {
+                    $status = 'late';
+                    $label = 'Terlambat (' . $att->late_minutes . ' menit)';
+                } else {
+                    $status = 'present';
+                    $label = 'Hadir';
+                }
+                $presentCount++;
+            } elseif ($hasApprovedLeave) {
+                $status = 'off';
+                $label = 'Cuti / Izin Disetujui';
+            } elseif ($isDayOff) {
+                $status = 'off';
+                $label = $holiday ? 'Libur: ' . $holiday->name : 'Libur Akhir Pekan / Off';
+            } else {
+                $status = 'absent';
+                $label = 'Alpa (Tidak Hadir)';
+            }
+
+            $days[] = [
+                'day' => $d,
+                'date' => $dateStr,
+                'status' => $status,
+                'label' => $label,
+                'is_today' => $isToday,
+                'is_future' => $isFuture,
+                'date_formatted' => $dateObj->locale('id')->isoFormat('dddd, D MMMM Y'),
+            ];
+        }
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'month_name' => $monthName,
+            'days_in_month' => $daysInMonth,
+            'empty_slots' => $emptySlots,
+            'present_count' => $presentCount,
+            'days' => $days,
         ];
     }
 }
