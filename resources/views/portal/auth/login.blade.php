@@ -250,10 +250,10 @@
                 width: 100% !important;
                 height: 38% !important;
                 height: 38dvh !important;
-                max-height: 260px !important;
-                min-height: 200px !important;
+                max-height: 320px !important;
+                min-height: 210px !important;
                 flex: 0 0 auto !important;
-                padding: 14px 20px 42px 20px !important;
+                padding: 16px 20px 44px 20px !important;
                 justify-content: space-around !important;
             }
             .login-panel-right {
@@ -265,25 +265,25 @@
                 flex-direction: column !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 8px 24px 12px 24px !important;
+                padding: 16px 24px 16px 24px !important;
                 margin-top: 0 !important;
                 z-index: 25 !important;
-                overflow: hidden !important;
+                overflow-y: auto !important;
             }
             .input-stylish {
-                padding: 11px 14px 11px 40px !important;
-                border-radius: 12px !important;
-                font-size: 13.5px !important;
-            }
-            .btn-stylish {
-                min-height: 46px !important;
-                padding: 11px 16px !important;
+                padding: 12px 14px 12px 42px !important;
                 border-radius: 12px !important;
                 font-size: 14px !important;
             }
+            .btn-stylish {
+                min-height: 48px !important;
+                padding: 12px 18px !important;
+                border-radius: 12px !important;
+                font-size: 14.5px !important;
+            }
             .btn-biometric {
-                width: 46px !important;
-                height: 46px !important;
+                width: 48px !important;
+                height: 48px !important;
                 border-radius: 12px !important;
             }
         }
@@ -490,10 +490,10 @@
         <!-- ============================================================== -->
         <div class="login-panel-right">
             
-            <div class="w-full max-w-[380px] sm:max-w-[420px] mx-auto mt-1 sm:my-auto mb-auto relative z-10">
+            <div class="w-full max-w-[380px] sm:max-w-[420px] mx-auto my-auto relative z-10">
                 
                 <!-- Heading Masuk ke Akun -->
-                <div class="mb-2 sm:mb-4 text-center">
+                <div class="mb-3 sm:mb-4 text-center">
                     <h2 class="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                         Masuk ke Akun
                     </h2>
@@ -540,7 +540,7 @@
                 </div>
 
                 <!-- Form Login -->
-                <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-2 sm:space-y-3.5">
+                <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-3 sm:space-y-3.5">
                     @csrf
                     <input type="hidden" name="platform" value="web">
 
@@ -642,13 +642,20 @@
                             </svg>
                         </button>
                     </div>
+
+                    <!-- Helpdesk Support Link -->
+                    <div class="pt-2 text-center select-none">
+                        <span class="text-[11px] text-slate-400">
+                            Kendala masuk akun? <a href="mailto:noc@ptmsn.co.id" class="text-teal-700 hover:text-teal-800 font-semibold hover:underline">Hubungi Tim IT / NOC</a>
+                        </span>
+                    </div>
                 </form>
 
             </div>
 
-            <!-- Footer Hak Cipta & Keamanan Portal (Mengisi Bagian Bawah Layar HP) -->
-            <div class="w-full text-center pt-1.5 pb-0.5 relative z-10 select-none">
-                <p class="text-[10px] sm:text-[11px] text-slate-400 font-medium inline-flex items-center gap-1.5 justify-center">
+            <!-- Footer Hak Cipta & Keamanan Portal -->
+            <div class="w-full text-center py-2.5 sm:py-3 relative z-10 select-none shrink-0">
+                <p class="text-[10.5px] sm:text-[11px] text-slate-400 font-medium inline-flex items-center gap-1.5 justify-center">
                     <svg class="w-3.5 h-3.5 text-teal-600/70 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                     </svg>
