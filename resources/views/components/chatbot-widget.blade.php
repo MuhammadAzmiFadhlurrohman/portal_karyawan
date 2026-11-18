@@ -227,15 +227,25 @@
         </div>
 
         <!-- Input Bar -->
-        <form @submit.prevent="sendMessage()" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
+        <form @submit.prevent="sendMessage()" class="p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
             <input type="text" 
                    x-model="inputQuery" 
-                   placeholder="Ketik pertanyaan Anda..." 
+                   :placeholder="isListening ? '🎙️ Mendengarkan suara Anda...' : 'Ketik pertanyaan Anda...'" 
                    class="flex-1 bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 outline-none transition"
                    :disabled="loading" />
+            <button type="button" 
+                    @click="toggleVoiceInput()"
+                    :title="isListening ? 'Berhenti mendengarkan' : 'Bicara untuk mengetik (Voice-to-Text)'"
+                    :class="isListening ? 'bg-rose-50 text-rose-600 border border-rose-300' : 'bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488]'"
+                    class="h-8 w-8 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
+                <svg class="w-4 h-4" :class="isListening ? 'text-rose-600 animate-pulse' : 'text-slate-600'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                </svg>
+                <span x-show="isListening" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+            </button>
             <button type="submit" 
                     :disabled="loading || !inputQuery.trim()" 
-                    class="h-8 px-4 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs flex items-center justify-center transition cursor-pointer shrink-0">
+                    class="h-8 px-3.5 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs flex items-center justify-center transition cursor-pointer shrink-0">
                 Kirim
             </button>
         </form>
@@ -275,10 +285,74 @@
             isOpen: isInitiallyOpen,
             loading: false,
             inputQuery: '',
+            isListening: false,
+            speechRecognizer: null,
             messages: initialMessages,
             init() {
                 if (this.isOpen) {
                     this.scrollToBottom();
+                }
+            },
+            toggleVoiceInput() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Browser Tidak Mendukung',
+                            text: 'Browser Anda belum mendukung input suara. Silakan gunakan Google Chrome.',
+                            confirmButtonColor: '#155E63'
+                        });
+                    } else {
+                        alert('Browser Anda belum mendukung input suara.');
+                    }
+                    return;
+                }
+                if (this.isListening) {
+                    if (this.speechRecognizer) {
+                        try { this.speechRecognizer.stop(); } catch(e) {}
+                    }
+                    this.isListening = false;
+                    return;
+                }
+                try {
+                    this.speechRecognizer = new SpeechRecognition();
+                    this.speechRecognizer.lang = 'id-ID';
+                    this.speechRecognizer.interimResults = true;
+                    this.speechRecognizer.continuous = false;
+                    const initialText = this.inputQuery;
+                    this.speechRecognizer.onstart = () => {
+                        this.isListening = true;
+                    };
+                    this.speechRecognizer.onresult = (event) => {
+                        let transcript = '';
+                        for (let i = event.resultIndex; i < event.results.length; ++i) {
+                            transcript += event.results[i][0].transcript;
+                        }
+                        if (transcript.trim()) {
+                            const prefix = initialText.trim() ? initialText.trim() + ' ' : '';
+                            this.inputQuery = prefix + transcript.trim();
+                        }
+                    };
+                    this.speechRecognizer.onerror = (event) => {
+                        this.isListening = false;
+                        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+                            if (window.Swal) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Akses Mikrofon Ditolak',
+                                    text: 'Silakan izinkan akses mikrofon di browser Anda.',
+                                    confirmButtonColor: '#155E63'
+                                });
+                            }
+                        }
+                    };
+                    this.speechRecognizer.onend = () => {
+                        this.isListening = false;
+                    };
+                    this.speechRecognizer.start();
+                } catch (e) {
+                    this.isListening = false;
                 }
             },
             toggleChat() {
@@ -320,6 +394,10 @@
                 this.sendMessage();
             },
             async sendMessage() {
+                if (this.isListening && this.speechRecognizer) {
+                    try { this.speechRecognizer.stop(); } catch(e) {}
+                    this.isListening = false;
+                }
                 const text = this.inputQuery.trim();
                 if (!text || this.loading) return;
 

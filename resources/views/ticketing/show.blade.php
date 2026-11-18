@@ -1729,6 +1729,21 @@
                     }
                 </style>
 
+                <!-- Voice-to-Text Microphone Button -->
+                <button type="button"
+                        id="btn-voice-to-text"
+                        onclick="toggleVoiceRecognition()"
+                        title="Bicara untuk Mengetik (Voice-to-Text)"
+                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
+                    <!-- Mic Normal Icon -->
+                    <svg id="mic-icon-normal" class="w-4 h-4 text-slate-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                    </svg>
+                    <!-- Mic Active (Recording Pulse) -->
+                    <span id="mic-pulse-indicator" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+                    <span id="mic-dot-indicator" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                </button>
+
                 <!-- Submit Send Button -->
                 <button type="button"
                         id="btn-quick-chat-submit"
@@ -3433,6 +3448,10 @@ async function handleChatFormSubmit(e) {
         if (typeof e.stopPropagation === 'function') e.stopPropagation();
     }
 
+    if (typeof stopVoiceRecognition === 'function') {
+        stopVoiceRecognition();
+    }
+
     const form = document.getElementById('quick-chat-form');
     const input = document.getElementById('quick-chat-input');
     const msg = input ? input.value.trim() : '';
@@ -4059,6 +4078,152 @@ function clearAttachedGps() {
     if (preview) preview.classList.add('hidden');
     if (previewText) previewText.innerText = '';
     if (label && label.innerText.includes('GPS')) label.innerText = '';
+}
+
+// =========================================================================
+// VOICE-TO-TEXT SPEECH RECOGNITION (Input Suara Jadi Teks)
+// =========================================================================
+let speechRecognizer = null;
+let isRecordingVoice = false;
+
+function toggleVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Browser Tidak Mendukung',
+                text: 'Browser Anda belum mendukung fitur Voice-to-Text (Speech Recognition). Silakan gunakan Google Chrome atau browser berbasis Chromium.',
+                confirmButtonColor: '#155E63'
+            });
+        } else {
+            alert('Browser Anda belum mendukung fitur Voice-to-Text. Silakan gunakan Google Chrome.');
+        }
+        return;
+    }
+
+    if (isRecordingVoice) {
+        stopVoiceRecognition();
+    } else {
+        startVoiceRecognition();
+    }
+}
+
+function startVoiceRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    try {
+        speechRecognizer = new SpeechRecognition();
+        speechRecognizer.lang = 'id-ID'; // Bahasa Indonesia
+        speechRecognizer.interimResults = true; // Real-time feedback
+        speechRecognizer.continuous = false; // Otomatis selesai setelah jeda bicara
+        speechRecognizer.maxAlternatives = 1;
+
+        const micBtn = document.getElementById('btn-voice-to-text');
+        const micNormal = document.getElementById('mic-icon-normal');
+        const micPulse = document.getElementById('mic-pulse-indicator');
+        const micDot = document.getElementById('mic-dot-indicator');
+        const chatInput = document.getElementById('quick-chat-input');
+
+        let initialInputValue = (chatInput ? chatInput.value : '');
+
+        speechRecognizer.onstart = function() {
+            isRecordingVoice = true;
+            if (micBtn) {
+                micBtn.classList.remove('bg-slate-100', 'text-slate-600');
+                micBtn.classList.add('bg-rose-50', 'text-rose-600', 'border', 'border-rose-300', 'shadow-xs');
+            }
+            if (micNormal) {
+                micNormal.classList.remove('text-slate-600');
+                micNormal.classList.add('text-rose-600', 'animate-pulse');
+            }
+            if (micPulse) micPulse.classList.remove('hidden');
+            if (micDot) micDot.classList.remove('hidden');
+
+            if (chatInput) {
+                chatInput.placeholder = '🎙️ Mendengarkan suara Anda... Silakan bicara';
+                chatInput.focus();
+            }
+        };
+
+        speechRecognizer.onresult = function(event) {
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            const speechText = (finalTranscript || interimTranscript).trim();
+            if (speechText && chatInput) {
+                const prefix = initialInputValue.trim() ? initialInputValue.trim() + ' ' : '';
+                chatInput.value = prefix + speechText;
+                chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        };
+
+        speechRecognizer.onerror = function(event) {
+            console.warn('[Voice-to-Text] Error:', event.error);
+            stopVoiceRecognition();
+            if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Akses Mikrofon Ditolak',
+                        text: 'Silakan izinkan akses mikrofon di pengaturan browser Anda untuk mengubah suara menjadi teks.',
+                        confirmButtonColor: '#155E63'
+                    });
+                } else {
+                    alert('Akses mikrofon ditolak. Silakan izinkan akses mikrofon di browser Anda.');
+                }
+            }
+        };
+
+        speechRecognizer.onend = function() {
+            stopVoiceRecognition();
+        };
+
+        speechRecognizer.start();
+    } catch (err) {
+        console.error('[Voice-to-Text] Failed to start:', err);
+        stopVoiceRecognition();
+    }
+}
+
+function stopVoiceRecognition() {
+    isRecordingVoice = false;
+    if (speechRecognizer) {
+        try {
+            speechRecognizer.stop();
+        } catch (e) {}
+        speechRecognizer = null;
+    }
+
+    const micBtn = document.getElementById('btn-voice-to-text');
+    const micNormal = document.getElementById('mic-icon-normal');
+    const micPulse = document.getElementById('mic-pulse-indicator');
+    const micDot = document.getElementById('mic-dot-indicator');
+    const chatInput = document.getElementById('quick-chat-input');
+
+    if (micBtn) {
+        micBtn.classList.remove('bg-rose-50', 'text-rose-600', 'border', 'border-rose-300', 'shadow-xs');
+        micBtn.classList.add('bg-slate-100', 'text-slate-600');
+    }
+    if (micNormal) {
+        micNormal.classList.remove('text-rose-600', 'animate-pulse');
+        micNormal.classList.add('text-slate-600');
+    }
+    if (micPulse) micPulse.classList.add('hidden');
+    if (micDot) micDot.classList.add('hidden');
+
+    if (chatInput && chatInput.placeholder.includes('Mendengarkan')) {
+        chatInput.placeholder = 'Ketik update koordinasi...';
+    }
 }
 
 // Attachment Dropup Menu Controls
