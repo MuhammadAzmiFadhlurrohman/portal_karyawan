@@ -259,58 +259,6 @@
 
         </div>
 
-        <!-- 6-Month Trend Bar Visualization (§5.5) -->
-        <div class="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 text-[#155E63] flex items-center justify-center shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="font-heading text-sm sm:text-base font-bold text-slate-800 leading-tight">
-                            Grafik Tren Potongan 6 Bulan Terakhir
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Historis tarif terjaga dengan integritas <code class="font-mono text-slate-600">system_settings.effective_from</code></p>
-                    </div>
-                </div>
-                <span class="text-[11px] font-medium text-slate-400 self-start sm:self-auto">AC-09 Snapshot Protection</span>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                @foreach ($sixMonthTrend as $t)
-                    @php
-                        $isSelected = ($t['period'] === sprintf('%04d-%02d', $year, $month));
-                    @endphp
-                    <div class="rounded-xl border p-3.5 flex flex-col justify-between transition-all {{ $isSelected ? 'border-[#155E63] ring-2 ring-[#155E63]/25 bg-teal-50/40 shadow-xs' : 'border-slate-200/80 bg-slate-50/50 hover:bg-white hover:shadow-2xs' }}">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold font-mono {{ $isSelected ? 'text-[#155E63]' : 'text-slate-600' }}">
-                                {{ $t['period'] }}
-                            </span>
-                            @if ($isSelected)
-                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#155E63] text-white">Aktif</span>
-                            @endif
-                        </div>
-
-                        <div class="my-2.5">
-                            <div class="text-base font-bold font-mono tracking-tight {{ $isSelected ? 'text-[#155E63]' : 'text-slate-900' }}">
-                                Rp {{ number_format((float) $t['grand_total'], 0, ',', '.') }}
-                            </div>
-                            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                <span>Telat: Rp {{ number_format((float) $t['late_deduction'], 0, ',', '.') }}</span>
-                            </div>
-                            <div class="flex items-center gap-1.5 text-[11px] text-rose-600 mt-0.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                <span>Alpa: Rp {{ number_format((float) $t['alpa_deduction'], 0, ',', '.') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
         <!-- Lower Section: Daily Table (Left) & HRD Config (Right) -->
         <div class="grid grid-cols-1 {{ auth()->user()?->can('attendance.deduction.lock_period') ? 'lg:grid-cols-12' : '' }} gap-6">
             
