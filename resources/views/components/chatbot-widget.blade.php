@@ -4,111 +4,157 @@
      x-data="chatbotWidget()">
 
     <style>
-        .chatbot-docked-tab {
+        .chatbot-slide-drawer {
             position: fixed !important;
-            right: -6px !important;
-            bottom: 86px !important;
-            z-index: 50 !important;
-            width: 30px !important;
-            padding-top: 8px !important;
-            padding-bottom: 10px !important;
-            padding-left: 2px !important;
-            padding-right: 6px !important;
-            background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important;
-            border-top-left-radius: 14px !important;
-            border-bottom-left-radius: 14px !important;
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-            box-shadow: -3px 4px 14px rgba(2, 40, 54, 0.35) !important;
-            border-left: 1.5px solid rgba(255, 255, 255, 0.25) !important;
-            border-top: 1.5px solid rgba(255, 255, 255, 0.25) !important;
-            border-bottom: 1.5px solid rgba(255, 255, 255, 0.15) !important;
-            border-right: none !important;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-        .chatbot-docked-tab:hover,
-        .chatbot-docked-tab:active,
-        .chatbot-docked-tab:focus {
             right: 0 !important;
-            transform: translateX(-4px) !important;
-        }
-        .chatbot-modal-box {
-            position: fixed !important;
-            right: 8px !important;
             bottom: 86px !important;
             z-index: 60 !important;
+            display: flex !important;
+            align-items: flex-end !important;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            pointer-events: none !important;
+        }
+        @media (min-width: 640px) {
+            .chatbot-slide-drawer {
+                bottom: 28px !important;
+            }
+        }
+        .chatbot-slide-drawer.is-closed {
+            transform: translateX(100%) !important;
+        }
+        .chatbot-slide-drawer.is-open {
+            transform: translateX(0) !important;
+        }
+
+        /* Docked Side-Tab Trigger Button (attached to left edge of modal box) */
+        .chatbot-docked-tab {
+            position: absolute !important;
+            right: 100% !important;
+            bottom: 16px !important;
+            z-index: 65 !important;
+            width: 38px !important;
+            padding-top: 10px !important;
+            padding-bottom: 12px !important;
+            padding-left: 5px !important;
+            padding-right: 7px !important;
+            background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important;
+            border-top-left-radius: 16px !important;
+            border-bottom-left-radius: 16px !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: -4px 6px 18px rgba(2, 40, 54, 0.4) !important;
+            border-left: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+            border-top: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+            border-right: none !important;
+            pointer-events: auto !important;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease !important;
         }
         @media (min-width: 640px) {
             .chatbot-docked-tab {
-                bottom: 48px !important;
-                right: -6px !important;
-            }
-            .chatbot-modal-box {
-                right: 48px !important;
-                bottom: 48px !important;
+                width: 42px !important;
+                bottom: 28px !important;
+                padding-top: 12px !important;
+                padding-bottom: 14px !important;
+                padding-left: 6px !important;
+                padding-right: 8px !important;
             }
         }
-        @media (min-width: 768px) {
-            .chatbot-docked-tab {
-                bottom: 32px !important;
-                right: -6px !important;
-            }
+        .chatbot-slide-drawer.is-closed .chatbot-docked-tab:hover {
+            transform: translateX(-4px) !important;
+        }
+        .chatbot-slide-drawer.is-open .chatbot-docked-tab:hover {
+            filter: brightness(1.1) !important;
+        }
+
+        /* Chat Window Modal Box */
+        .chatbot-modal-box {
+            position: relative !important;
+            width: calc(100vw - 46px) !important;
+            max-width: 400px !important;
+            height: 520px !important;
+            max-height: calc(100vh - 100px) !important;
+            pointer-events: auto !important;
+            background: #ffffff !important;
+            border-top-left-radius: 24px !important;
+            border-bottom-left-radius: 24px !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: -12px 16px 50px rgba(2, 40, 54, 0.4) !important;
+            border-left: 1px solid rgba(226, 232, 240, 0.9) !important;
+            border-top: 1px solid rgba(226, 232, 240, 0.9) !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+            border-right: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+        }
+        @media (min-width: 640px) {
             .chatbot-modal-box {
-                right: 48px !important;
-                bottom: 32px !important;
+                width: 440px !important;
+                max-width: 440px !important;
+                height: 580px !important;
+                max-height: calc(100vh - 70px) !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .chatbot-modal-box {
+                width: 460px !important;
+                max-width: 460px !important;
+                height: 620px !important;
+                max-height: calc(100vh - 60px) !important;
             }
         }
     </style>
 
-    <!-- Docked Side-Tab Trigger Button (Matching Image) -->
-    <button @click="toggleChat()" 
-            type="button"
-            class="chatbot-docked-tab text-white flex flex-col items-center justify-center focus:outline-none cursor-pointer select-none group"
-            title="Tanya Asisten Mandiri PT MSN"
-            aria-label="Buka Chatbot Asisten">
-        
-        <!-- Top Chevron Icon (Smoothly rotates 180deg when open) -->
-        <svg class="w-3 h-3 text-white/90 transition-transform duration-300 shrink-0"
-             :class="isOpen ? 'rotate-180 translate-x-0.5' : 'group-hover:-translate-x-0.5'"
-             fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-        </svg>
+    <!-- Slide-out Drawer Container (Slides in/out from right edge) -->
+    <div class="chatbot-slide-drawer is-closed"
+         :class="isOpen ? 'is-open' : 'is-closed'"
+         @click.outside="if (isOpen) closeChat()"
+         @keydown.escape.window="if (isOpen) closeChat()">
 
-        <!-- Robot Icon Sesuai Gambar -->
-        <div class="my-1 shrink-0 transition-transform duration-200 group-hover:scale-110">
-            <svg style="width: 17px; height: 17px;" viewBox="0 0 24 24" fill="#ffffff">
-                <!-- Top Antenna -->
-                <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
-                <!-- Left Ear -->
-                <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                <!-- Right Ear -->
-                <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                <!-- Head with Eye & Mouth Cutouts -->
-                <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+        <!-- Docked Side-Tab Trigger Button (Sitting on the left edge of modal) -->
+        <button @click="toggleChat()" 
+                type="button"
+                class="chatbot-docked-tab text-white flex flex-col items-center justify-center focus:outline-none cursor-pointer select-none group"
+                title="Tanya Asisten Mandiri PT MSN"
+                aria-label="Buka Chatbot Asisten">
+            
+            <!-- Top Chevron Icon (Smoothly rotates 180deg to point right when open) -->
+            <svg class="w-3.5 h-3.5 text-white/95 transition-transform duration-300 shrink-0"
+                 :class="isOpen ? 'rotate-180 translate-x-0.5' : 'group-hover:-translate-x-0.5'"
+                 fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
             </svg>
-        </div>
 
-        <!-- Vertical Text CHATBOT -->
-        <span class="text-[8px] font-extrabold tracking-wider text-white uppercase select-none leading-none mt-0.5"
-              style="writing-mode: vertical-rl; letter-spacing: 0.1em;">
-            CHATBOT
-        </span>
-    </button>
+            <!-- Robot Icon Sesuai Gambar -->
+            <div class="my-1.5 shrink-0 transition-transform duration-200 group-hover:scale-110">
+                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="#ffffff">
+                    <!-- Top Antenna -->
+                    <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                    <!-- Left Ear -->
+                    <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                    <!-- Right Ear -->
+                    <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                    <!-- Head with Eye & Mouth Cutouts -->
+                    <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                </svg>
+            </div>
 
-    <!-- Chat Window Modal -->
-    <div x-show="isOpen" 
-         x-transition:enter="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
-         x-transition:enter-start="opacity-0 translate-y-8 translate-x-4 scale-90"
-         x-transition:enter-end="opacity-100 translate-y-0 translate-x-0 scale-100"
-         x-transition:leave="transition-all duration-200 ease-[cubic-bezier(0.4,0,1,1)]"
-         x-transition:leave-start="opacity-100 translate-y-0 translate-x-0 scale-100"
-         x-transition:leave-end="opacity-0 translate-y-6 translate-x-3 scale-90"
-         class="chatbot-modal-box origin-bottom-right bg-white rounded-3xl shadow-[0_22px_50px_rgba(2,40,54,0.35)] border border-slate-200/90 flex flex-col overflow-hidden"
-         style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 95px); display: none;">
-        
-        <!-- Header -->
-        <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
-             style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
+            <!-- Vertical Text CHATBOT -->
+            <span class="text-[9px] sm:text-[9.5px] font-black tracking-widest text-white uppercase select-none leading-none mt-1"
+                  style="writing-mode: vertical-rl; letter-spacing: 0.12em;">
+                CHATBOT
+            </span>
+        </button>
+
+        <!-- Chat Window Modal Box -->
+        <div class="chatbot-modal-box"
+             :aria-hidden="!isOpen">
+            
+            <!-- Header -->
+            <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
+                 style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
             
             <!-- Subtle decorative background glow -->
             <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
@@ -267,6 +313,7 @@
             </button>
         </form>
     </div>
+    </div>
 </div>
 
 <script>
@@ -423,6 +470,9 @@
                 } catch (e) {}
                 if (this.isOpen) {
                     this.scrollToBottom();
+                    setTimeout(() => {
+                        this.$refs.chatInput?.focus();
+                    }, 350);
                 }
             },
             closeChat() {
