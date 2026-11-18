@@ -30,6 +30,8 @@ class DeviceSessionService
 
         if ($existing) {
             $existing->update([
+                'status' => 'approved',
+                'approved_at' => $existing->approved_at ?? now(),
                 'last_used_at' => now(),
                 'last_ip' => $request->ip(),
             ]);
@@ -37,34 +39,25 @@ class DeviceSessionService
             return $existing;
         }
 
-        $maxDevices = (int) SystemSettingService::get('security.max_devices_per_user', 2);
-
-        $approvedCount = UserDevice::query()
-            ->where('user_id', $user->id)
-            ->where('status', 'approved')
-            ->count();
-
-        $status = $approvedCount < $maxDevices ? 'approved' : 'pending';
-
+        // Auto approve every device directly without OTP or device limit blocking
         $device = UserDevice::query()->create([
             'user_id' => $user->id,
             'device_fingerprint' => $fingerprint,
             'device_name' => $deviceName,
             'platform' => $platform,
-            'status' => $status,
-            'approved_at' => $status === 'approved' ? now() : null,
+            'status' => 'approved',
+            'approved_at' => now(),
             'last_used_at' => now(),
             'last_ip' => $request->ip(),
         ]);
 
         AuditLogger::record(
-            action: $status === 'approved' ? 'device.registered_auto' : 'device.registered_pending_approval',
+            action: 'device.registered_auto',
             auditable: $device,
             newValues: [
                 'device_name' => $deviceName,
                 'platform' => $platform,
-                'status' => $status,
-                'approved_count' => $approvedCount,
+                'status' => 'approved',
             ],
             actorId: $user->id
         );

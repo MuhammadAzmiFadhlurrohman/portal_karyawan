@@ -90,14 +90,6 @@ class AuthController extends Controller
             actorId: $user->id
         );
 
-        if ($device->status === 'pending') {
-            $issued = $otpService->issue($user, 'device_approval', ['device_id' => $device->id]);
-            $request->session()->put('pending_device_id', $device->id);
-            $request->session()->flash('demo_otp_code', $issued['plain_code']);
-
-            return redirect()->route('auth.device.otp');
-        }
-
         if ($user->must_change_password) {
             return redirect()->route('password.first-change');
         }
@@ -229,48 +221,30 @@ class AuthController extends Controller
         return redirect()->route('portal.hub')->with('status', 'Password berhasil diperbarui sesuai standar keamanan PT MSN.');
     }
 
-    public function showDeviceOtp(Request $request): View|RedirectResponse
+    public function showDeviceOtp(Request $request): RedirectResponse
     {
-        $deviceId = $request->session()->get('pending_device_id');
-        if (! $deviceId) {
-            return redirect()->route('portal.hub');
+        $deviceId = $request->session()->pull('pending_device_id');
+        if ($deviceId) {
+            UserDevice::query()->where('id', $deviceId)->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+            ]);
         }
 
-        $device = UserDevice::query()->find($deviceId);
-
-        return view('portal.auth.device-otp', [
-            'device' => $device,
-        ]);
+        return redirect()->route('portal.hub');
     }
 
     public function verifyDeviceOtp(Request $request, OtpService $otpService): RedirectResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        $validated = $request->validate([
-            'otp_code' => ['required', 'digits:6'],
-        ]);
-
-        if (! $otpService->verify($user, 'device_approval', $validated['otp_code'])) {
-            return back()->withErrors([
-                'otp_code' => 'Kode OTP tidak valid, sudah kedaluwarsa (5 menit), atau melampaui batas 3 percobaan.',
+        $deviceId = $request->session()->pull('pending_device_id');
+        if ($deviceId) {
+            UserDevice::query()->where('id', $deviceId)->update([
+                'status' => 'approved',
+                'approved_at' => now(),
             ]);
         }
 
-        $deviceId = $request->session()->pull('pending_device_id');
-        if ($deviceId) {
-            UserDevice::query()
-                ->where('id', $deviceId)
-                ->where('user_id', $user->id)
-                ->update([
-                    'status' => 'approved',
-                    'approved_by' => $user->id,
-                    'approved_at' => now(),
-                ]);
-        }
-
-        return redirect()->route('portal.hub')->with('status', 'Perangkat baru berhasil diverifikasi dan disetujui.');
+        return redirect()->route('portal.hub');
     }
 
     public function logout(Request $request): RedirectResponse
