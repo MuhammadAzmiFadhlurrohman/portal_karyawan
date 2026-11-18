@@ -642,12 +642,12 @@ class AtasanPengajuanFlowTest extends TestCase
         $service->disburseFinance($pengajuan->fresh(), $finance, $path);
 
         $freshPengajuan = $pengajuan->fresh();
-        $this->assertEquals('dicairkan', $freshPengajuan->status);
+        $this->assertEquals('selesai', $freshPengajuan->status);
 
         // Karyawan opens pengajuan index and views modal data
         $resIndex = $this->actingAs($karyawan)->get(route('gomsn.pengajuan.index'));
         $resIndex->assertOk();
-        $resIndex->assertSee('Upload Bukti Foto Realisasi');
+        $resIndex->assertSee('Simpan Bukti Foto Nota');
 
         // Karyawan submits realization receipt photo
         $receipt = UploadedFile::fake()->image('nota_struk.jpg');

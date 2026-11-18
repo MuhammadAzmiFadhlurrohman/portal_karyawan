@@ -222,10 +222,28 @@
                         </div>
 
                         <div class="py-1">
-                            <a href="{{ route('gomsn.tickets.berita-acara', $tiket) }}" target="_blank"
-                               class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
-                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                                <span>Cetak Berita Acara (PDF)</span>
+                            <div class="px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                EXPORT DOKUMEN
+                            </div>
+                            <a href="{{ route('tickets.export.pdf', ['tiket' => $tiket, 'type' => 'internal']) }}" target="_blank"
+                               class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-slate-50 transition flex items-center gap-3 group">
+                                <div class="w-8 h-8 rounded-xl bg-rose-100/70 border border-rose-200/50 flex items-center justify-center shrink-0 text-rose-600 shadow-2xs group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v1.5h2v1.5h-2V16H4V9h3.5c.8 0 1.5.7 1.5 1.5v1c0 .8-.7 1.5-1.5 1.5zm5 4.5h-3.5V9H14c.8 0 1.5.7 1.5 1.5v4c0 .8-.7 1.5-1.5 1.5zm4.5-4.5H17v1.5h2V14h-2v2h-1.5V9H19c.8 0 1.5.7 1.5 1.5v1c0 .8-.7 1.5-1.5 1.5z"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-slate-800 leading-tight">PDF Internal (Lengkap)</div>
+                                    <div class="text-[10px] text-slate-400 font-normal truncate">Data teknis, mapping core &amp; kronologis</div>
+                                </div>
+                            </a>
+                            <a href="{{ route('tickets.export.pdf', ['tiket' => $tiket, 'type' => 'customer']) }}" target="_blank"
+                               class="w-full text-left px-3 py-2 text-xs font-semibold hover:bg-slate-50 transition flex items-center gap-3 group">
+                                <div class="w-8 h-8 rounded-xl bg-sky-100/70 border border-sky-200/50 flex items-center justify-center shrink-0 text-sky-600 shadow-2xs group-hover:scale-105 transition-transform">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-slate-800 leading-tight">PDF Pelanggan (Customer)</div>
+                                    <div class="text-[10px] text-slate-400 font-normal truncate">Berita Acara resmi, akar masalah &amp; foto</div>
+                                </div>
                             </a>
 
                             @if($tiket->status === 'CLOSE')
@@ -1823,6 +1841,36 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     <span>{{ $hasResume ? 'Edit Resume Pekerjaan' : 'Input Resume Baru' }}</span>
                 </button>
+            </div>
+
+            <!-- EXPORT DOKUMEN QUICK ACTION -->
+            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">EXPORT DOKUMEN</span>
+                    <p class="text-xs text-slate-600 font-medium">Cetak dan unduh Berita Acara resmi gangguan dalam format PDF (Internal &amp; Pelanggan)</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <a href="{{ route('tickets.export.pdf', ['tiket' => $tiket, 'type' => 'internal']) }}" target="_blank"
+                       class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-rose-300 hover:bg-rose-50/50 text-xs font-semibold shadow-2xs transition group">
+                        <div class="w-7 h-7 rounded-lg bg-rose-100/70 border border-rose-200/50 flex items-center justify-center shrink-0 text-rose-600 group-hover:scale-105 transition-transform">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v1.5h2v1.5h-2V16H4V9h3.5c.8 0 1.5.7 1.5 1.5v1c0 .8-.7 1.5-1.5 1.5zm5 4.5h-3.5V9H14c.8 0 1.5.7 1.5 1.5v4c0 .8-.7 1.5-1.5 1.5zm4.5-4.5H17v1.5h2V14h-2v2h-1.5V9H19c.8 0 1.5.7 1.5 1.5v1c0 .8-.7 1.5-1.5 1.5z"/></svg>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-slate-800 leading-tight">PDF Internal (Lengkap)</div>
+                            <div class="text-[10px] text-slate-400 font-normal">Data teknis, mapping core &amp; kronologis</div>
+                        </div>
+                    </a>
+                    <a href="{{ route('tickets.export.pdf', ['tiket' => $tiket, 'type' => 'customer']) }}" target="_blank"
+                       class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 hover:border-sky-300 hover:bg-sky-50/50 text-xs font-semibold shadow-2xs transition group">
+                        <div class="w-7 h-7 rounded-lg bg-sky-100/70 border border-sky-200/50 flex items-center justify-center shrink-0 text-sky-600 group-hover:scale-105 transition-transform">
+                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
+                        </div>
+                        <div class="text-left">
+                            <div class="font-bold text-slate-800 leading-tight">PDF Pelanggan (Customer)</div>
+                            <div class="text-[10px] text-slate-400 font-normal">Berita Acara resmi, akar masalah &amp; foto</div>
+                        </div>
+                    </a>
+                </div>
             </div>
 
             <!-- Resume Content / Display -->

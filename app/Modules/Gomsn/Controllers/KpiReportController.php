@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Tiket;
 use App\Models\User;
 use App\Modules\Gomsn\Services\KpiAndReportService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class KpiReportController extends Controller
@@ -81,11 +83,114 @@ class KpiReportController extends Controller
     /**
      * Preview / Print Berita Acara Penyelesaian Gangguan (§7.7).
      */
-    public function beritaAcara(Request $request, Tiket $tiket): View
+    public function beritaAcara(Request $request, Tiket $tiket): View|Response
     {
-        $payload = $this->kpiService->generateBeritaAcaraData($tiket);
+        return $this->exportPdf($request, $tiket);
+    }
 
-        return view('gomsn.berita_acara.pdf', $payload);
+    /**
+     * Export Dokumen Berita Acara PDF (Internal Lengkap vs Pelanggan Customer).
+     */
+    public function exportPdf(Request $request, Tiket $tiket): View|Response
+    {
+        $type = $request->input('type', 'internal');
+
+        $tiket->loadMissing([
+            'creator',
+            'closingAwalUser',
+            'verifierUser',
+            'materials.material',
+            'repairPoints',
+            'jointClosures.cores',
+            'coreManeuvers',
+            'assignees',
+            'handovers.handoverUser',
+            'handovers.receiverUser',
+            'chronologies.user',
+        ]);
+
+        $viewName = $type === 'customer'
+            ? 'reports.pdf_customer_tiket'
+            : 'reports.pdf_single_tiket';
+
+        // Base64 Logo untuk DomPDF
+        $logoPath = public_path('assets/logo/logo-msn.png');
+        if (! file_exists($logoPath)) {
+            $logoPath = public_path('assets/logo/logo-msn2.png');
+        }
+        $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
+
+        // Galeri Foto Dokumentasi Lapangan
+        $photoDocs = $tiket->chronologies
+            ->filter(fn ($c) => ! empty($c->photo_path))
+            ->map(function ($c) {
+                $base64 = null;
+                $candidates = [
+                    storage_path('app/public/' . $c->photo_path),
+                    public_path('storage/' . $c->photo_path),
+                    public_path($c->photo_path),
+                    storage_path('app/' . $c->photo_path),
+                ];
+                foreach ($candidates as $cand) {
+                    if (file_exists($cand) && ! is_dir($cand)) {
+                        $mime = mime_content_type($cand) ?: 'image/jpeg';
+                        $base64 = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($cand));
+                        break;
+                    }
+                }
+
+                return [
+                    'category' => $c->category ?: 'Dokumentasi',
+                    'message' => $c->message,
+                    'created_at' => $c->created_at,
+                    'user_name' => $c->user?->name ?? 'Teknisi',
+                    'base64' => $base64,
+                ];
+            })
+            ->filter(fn ($p) => ! empty($p['base64']))
+            ->values();
+
+        // Filter Kronologis Internal agar bersih dan informatif
+        $cleanChronologies = $tiket->chronologies->filter(function ($c) {
+            $msg = trim($c->message ?? '');
+            if (empty($msg) && empty($c->photo_path)) {
+                return false;
+            }
+            if (empty($c->photo_path) && in_array(strtolower($msg), ['p', 'tes', 'halo', 'cek', 'tes halo', 'hai', 'ini'], true)) {
+                return false;
+            }
+
+            return true;
+        })->values();
+
+        if ($cleanChronologies->isEmpty()) {
+            $cleanChronologies = $tiket->chronologies;
+        }
+
+        $data = [
+            'tiket' => $tiket,
+            'type' => $type,
+            'logoBase64' => $logoBase64,
+            'photoDocs' => $photoDocs,
+            'chronologies' => $cleanChronologies,
+            'printDate' => Carbon::now('Asia/Jakarta')->translatedFormat('l, d F Y H:i') . ' WIB',
+        ];
+
+        // Jika requested HTML preview
+        if ($request->input('preview') === 'html') {
+            return view($viewName, $data);
+        }
+
+        $pdf = Pdf::loadView($viewName, $data)->setPaper('a4', 'portrait');
+
+        $ticketCode = $tiket->no_tiket ?: ('TIKET-' . $tiket->id);
+        $filename = ($type === 'customer' ? 'Berita_Acara_Pelanggan_' : 'Berita_Acara_Internal_') . $ticketCode . '.pdf';
+
+        if ($request->has('download')) {
+            return $pdf->download($filename);
+        }
+
+        return $pdf->stream($filename);
     }
 }
 

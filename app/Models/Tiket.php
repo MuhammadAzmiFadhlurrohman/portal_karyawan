@@ -218,6 +218,44 @@ class Tiket extends Model
      * Hijau: CLOSE
      * Abu-abu: CANCELLED
      */
+    public function getFormattedMttrAttribute(): string
+    {
+        $min = $this->net_mttr_minutes ?? $this->currentNetMinutes();
+        if ($min <= 0) {
+            return '-';
+        }
+        $h = floor($min / 60);
+        $m = $min % 60;
+        if ($h > 0 && $m > 0) {
+            return "{$h} Jam {$m} Menit";
+        }
+        if ($h > 0) {
+            return "{$h} Jam";
+        }
+        return "{$m} Menit";
+    }
+
+    public function getFormattedSlaTargetAttribute(): string
+    {
+        $target = $this->sla_target_minutes ?? 360;
+        $h = round($target / 60, 1);
+        return "{$h} Jam";
+    }
+
+    public function getCloserAttribute(): ?User
+    {
+        return $this->verifierUser ?? $this->closingAwalUser;
+    }
+
+    public function getAssignedLeadAttribute(): ?User
+    {
+        return $this->assignees->firstWhere('pivot.role_in_team', 'lead') 
+            ?? $this->assignees->first();
+    }
+
+    /**
+     * Mobile card stripe indicator color (§11, AC-08).
+     */
     public function stripeColor(): string
     {
         if ($this->status === 'CANCELLED') {

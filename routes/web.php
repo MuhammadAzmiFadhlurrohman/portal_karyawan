@@ -216,6 +216,7 @@ Route::middleware('auth')->group(function (): void {
     // Analitik MTTR & KPI Teknisi (§7.7, §11.1)
     Route::get('/gomsn/analytics/kpi', [KpiReportController::class, 'index'])->name('gomsn.analytics.kpi');
     Route::get('/gomsn/tickets/{tiket}/berita-acara', [KpiReportController::class, 'beritaAcara'])->name('gomsn.tickets.berita-acara');
+    Route::get('/tickets/{tiket}/export-pdf', [KpiReportController::class, 'exportPdf'])->name('tickets.export.pdf');
 
     // Manajemen Jaringan: OLT, PON & ODP (NOC & Teknis)
     Route::get('/gomsn/network', [NetworkOdpController::class, 'index'])->name('gomsn.network.index');

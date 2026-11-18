@@ -1497,7 +1497,7 @@
                     <!-- ============================================== -->
                     <!-- UPLOAD BUKTI REALISASI / BELI & DANA (ROLE KARYAWAN) -->
                     <!-- ============================================== -->
-                    <template x-if="(activeItem?.jenis === 'dana' || activeItem?.jenis === 'beli') && (activeItem?.status === 'dicairkan' || activeItem?.status === 'menunggu_bukti') && !activeItem?.buktiRealisasiPath">
+                    <template x-if="(activeItem?.jenis === 'dana' || activeItem?.jenis === 'beli') && (activeItem?.status === 'dicairkan' || activeItem?.status === 'menunggu_bukti' || activeItem?.status === 'selesai') && !activeItem?.buktiRealisasiPath">
                         <div class="mt-4 border border-teal-300/80 bg-gradient-to-br from-teal-50/80 via-emerald-50/50 to-slate-50/70 rounded-2xl p-5 shadow-xs space-y-4">
                             <div class="flex items-center justify-between border-b border-teal-200/80 pb-3">
                                 <div class="flex items-center gap-3">
