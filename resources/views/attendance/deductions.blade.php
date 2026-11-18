@@ -2,7 +2,7 @@
     <div class="space-y-6 w-full pb-12">
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal) -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex items-center justify-between gap-4 select-none"
              style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
@@ -10,16 +10,18 @@
             <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
 
             <!-- Left: Glowing Icon + Page Name -->
-            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
+            <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
                 <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                     <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
 
-                <div class="min-w-0">
-                    <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
-                        <span>Keuangan Absen</span>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                            Keuangan Absen
+                        </h1>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-300 border border-teal-400/30">
                             Potongan &amp; Payroll
                         </span>
@@ -32,47 +34,10 @@
                                 Periode Terbuka
                             </span>
                         @endif
-                    </h1>
+                    </div>
                     <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
                         Laporan potongan keterlambatan, alpa &amp; penyesuaian gaji absensi karyawan
                     </p>
-                </div>
-            </div>
-
-            <!-- Right: Profile Info Card (Geser ke Kanan, tanpa awan putih) -->
-            <div class="relative z-10 flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl px-3.5 py-2 text-white shrink-0 shadow-xs self-start sm:self-auto">
-                <div class="relative shrink-0">
-                    @if ($selectedUser->avatar_url)
-                        <img src="{{ $selectedUser->avatar_url }}" 
-                             alt="" 
-                             class="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-cyan-400/40 shadow-sm" 
-                             onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                        <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                            {{ $selectedUser->initials }}
-                        </div>
-                    @else
-                        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-400/40 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                            {{ $selectedUser->initials }}
-                        </div>
-                    @endif
-                </div>
-
-                <div class="text-left leading-tight min-w-0">
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-xs sm:text-sm text-white tracking-tight truncate max-w-[140px] sm:max-w-[180px]">
-                            {{ strtoupper($selectedUser->name) }}
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>{{ $selectedUser->is_active ? 'Aktif' : 'Non-Aktif' }}</span>
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-[11px] text-teal-200/85">
-                        <span class="font-mono text-cyan-200">NIK: {{ $selectedUser->employee_code }}</span>
-                        @if ($selectedUser->division)
-                            <span class="truncate">· Divisi: {{ $selectedUser->division }}</span>
-                        @endif
-                    </div>
                 </div>
             </div>
         </div>
