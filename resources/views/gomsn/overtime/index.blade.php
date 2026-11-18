@@ -133,10 +133,13 @@
                 @endif
 
                 @php
-                    if ($canFilterDivisi) {
-                        $gridColsClass = empty($selectedUserId) ? 'sm:grid-cols-3' : 'sm:grid-cols-2 max-w-2xl';
+                    $isViewingSelf = (! $isAtasan && ! $isFinance && ! $isHrd && ! $isSuperAdmin) || ($isHrd && $viewMode === 'saya');
+                    $showEmployeeSearch = empty($selectedUserId) && ! $isViewingSelf;
+
+                    if ($showEmployeeSearch) {
+                        $gridColsClass = $canFilterDivisi ? 'sm:grid-cols-3' : 'sm:grid-cols-2 max-w-2xl';
                     } else {
-                        $gridColsClass = empty($selectedUserId) ? 'sm:grid-cols-2 max-w-2xl' : 'sm:grid-cols-1 max-w-md';
+                        $gridColsClass = ($canFilterDivisi && ! $isViewingSelf) ? 'sm:grid-cols-2 max-w-xl' : 'sm:grid-cols-1 max-w-xs';
                     }
                 @endphp
                 <div class="grid grid-cols-1 {{ $gridColsClass }} gap-4 flex-1">
@@ -184,8 +187,8 @@
                         <input type="hidden" name="tahun" value="{{ $selectedTahun }}">
                     </div>
 
-                    @if (empty($selectedUserId))
-                    <!-- CARI KARYAWAN (Hanya pada Daftar Kartu Karyawan) -->
+                    @if ($showEmployeeSearch)
+                    <!-- CARI KARYAWAN (Hanya pada Mode Daftar Seluruh Karyawan) -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
                             Cari Karyawan
@@ -205,8 +208,8 @@
                     </div>
                     @endif
 
-                    @if ($canFilterDivisi)
-                    <!-- DIVISI (Khusus SuperAdmin, HRD, dan Finance. Atasan hanya menangani staf se-divisinya) -->
+                    @if ($canFilterDivisi && ! $isViewingSelf)
+                    <!-- DIVISI (Khusus SuperAdmin, HRD, dan Finance saat mode daftar karyawan) -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
                             Divisi
@@ -223,35 +226,38 @@
                     @endif
                 </div>
 
-                <!-- Action Buttons: Filter & Excel Export -->
-                <div class="flex items-center gap-2.5 w-full sm:w-auto sm:self-end pt-1 sm:pt-0">
-                    <!-- Tombol Filter Gradient -->
-                    <button type="submit" 
-                            class="flex-1 sm:flex-initial py-2.5 px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
-                            style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                        <span>Filter</span>
-                    </button>
+                <!-- Action Buttons: Filter, Excel Export, & Ajukan Lembur -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto sm:self-end pt-1 sm:pt-0">
+                    <div class="flex items-center gap-2 flex-1 sm:flex-initial">
+                        <!-- Tombol Filter Gradient -->
+                        <button type="submit" 
+                                class="flex-1 sm:flex-initial py-2.5 px-4 sm:px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
+                                style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Filter</span>
+                        </button>
 
-                    <!-- Tombol Export Excel Hijau (Sesuai Gambar 1) -->
-                    <a href="{{ route('gomsn.overtime.index', array_merge(request()->query(), ['export' => 'excel', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun])) }}" 
-                       title="Export Data ke Excel/CSV"
-                       class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center shrink-0 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </a>
+                        <!-- Tombol Export Excel Hijau (Sesuai Gambar 1) -->
+                        <a href="{{ route('gomsn.overtime.index', array_merge(request()->query(), ['export' => 'excel', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun])) }}" 
+                           title="Export Data ke Excel/CSV"
+                           class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center shrink-0 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </a>
+                    </div>
 
-                    <!-- Tombol Buat Pengajuan Lembur (HRD Bisa Ajukan untuk Dirinya Sendiri) -->
+                    <!-- Tombol Buat Pengajuan Lembur -->
                     @if ($isHrd || ! $isAtasan)
                     <a href="{{ route('gomsn.overtime.create') }}" 
-                       class="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer whitespace-nowrap">
-                        <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                       class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
+                       style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
-                        <span>Ajukan Lembur</span>
+                        <span>+ Ajukan Lembur</span>
                     </a>
                     @endif
                 </div>
@@ -608,38 +614,38 @@
             </div>
             @endif
 
-            <!-- 2 Kartu Summary Atas (Persis Gambar 2) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <!-- 2 Kartu Summary Atas (Mobile: 2-Kolom Ringkas & Proporsional) -->
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-4">
                 <!-- Card 1: TOTAL LEMBUR (Mint / Emerald) -->
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4 border-t-2 border-emerald-500">
-                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 border-t-2 border-emerald-500">
+                    <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
-                    <div>
-                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block">
+                    <div class="min-w-0">
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block truncate">
                             TOTAL LEMBUR
                         </span>
-                        <span class="text-xl sm:text-2xl font-extrabold text-slate-900 block mt-0.5">
+                        <span class="text-sm sm:text-2xl font-black text-slate-900 block mt-0.5 truncate">
                             Rp {{ number_format($totalNominalLembur, 0, ',', '.') }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Card 2: RINCIAN PENGAJUAN (Soft Blue) -->
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-5 flex items-center gap-3.5 sm:gap-4 border-t-2 border-blue-500">
-                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 border-t-2 border-blue-500">
+                    <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                         </svg>
                     </div>
-                    <div>
-                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block">
+                    <div class="min-w-0">
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block truncate">
                             RINCIAN PENGAJUAN
                         </span>
                         <div class="mt-1">
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                            <span class="px-2 py-0.5 sm:px-2.5 rounded-full text-[10.5px] sm:text-xs font-semibold bg-blue-100 text-blue-700 inline-block">
                                 Lembur: {{ $totalCountLembur }}
                             </span>
                         </div>
@@ -761,8 +767,22 @@
                         </div>
                     </div>
                 @empty
-                    <div class="p-8 text-center bg-white rounded-2xl border border-slate-200/80 text-slate-400 text-xs">
-                        Tidak ada data rincian lembur untuk karyawan ini pada periode yang dipilih.
+                    <div class="p-8 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 shadow-xs">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-700">Belum Ada Catatan Lembur</h4>
+                        <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-1 leading-relaxed">
+                            Tidak ada data rincian lembur untuk periode yang dipilih.
+                        </p>
+                        @if ($isHrd || ! $isAtasan)
+                            <a href="{{ route('gomsn.overtime.create') }}" class="inline-flex items-center gap-1.5 mt-3.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                <span>Ajukan Lembur Sekarang</span>
+                            </a>
+                        @endif
                     </div>
                 @endforelse
             </div>

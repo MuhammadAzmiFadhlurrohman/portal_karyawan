@@ -216,9 +216,14 @@ class OvertimeController extends Controller
         $totalNominalLembur = 0;
         $totalCountLembur = 0;
 
-        if ($selectedUserId) {
-            $query->where('user_id', $selectedUserId);
-            $detailEmployee = \App\Models\User::find($selectedUserId);
+        $isRegularEmployee = (! $isAtasan && ! $isFinance && ! $isHrd && ! $isSuperAdmin) || ($isHrd && $viewMode === 'saya');
+        $effectiveUserId = $selectedUserId ?: ($isRegularEmployee ? $user->id : null);
+
+        if ($effectiveUserId) {
+            if ($selectedUserId) {
+                $query->where('user_id', $selectedUserId);
+            }
+            $detailEmployee = \App\Models\User::find($effectiveUserId);
             $allSelectedUserLemburs = (clone $query)->get();
             $totalNominalLembur = $allSelectedUserLemburs->sum(fn ($i) => (int) $i->nominal);
             $totalCountLembur = $allSelectedUserLemburs->count();
