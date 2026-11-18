@@ -6,46 +6,55 @@
     <style>
         .chatbot-docked-tab {
             position: fixed !important;
-            right: 0 !important;
+            right: -6px !important;
             bottom: 86px !important;
             z-index: 50 !important;
-            width: 38px !important;
-            padding-top: 10px !important;
-            padding-bottom: 12px !important;
-            padding-left: 4px !important;
-            padding-right: 4px !important;
+            width: 30px !important;
+            padding-top: 8px !important;
+            padding-bottom: 10px !important;
+            padding-left: 2px !important;
+            padding-right: 6px !important;
             background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important;
-            border-top-left-radius: 16px !important;
-            border-bottom-left-radius: 16px !important;
+            border-top-left-radius: 14px !important;
+            border-bottom-left-radius: 14px !important;
             border-top-right-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
-            box-shadow: -4px 6px 20px rgba(2, 40, 54, 0.4), -1px 2px 4px rgba(20, 184, 166, 0.2) !important;
+            box-shadow: -3px 4px 14px rgba(2, 40, 54, 0.35) !important;
             border-left: 1.5px solid rgba(255, 255, 255, 0.25) !important;
             border-top: 1.5px solid rgba(255, 255, 255, 0.25) !important;
             border-bottom: 1.5px solid rgba(255, 255, 255, 0.15) !important;
             border-right: none !important;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .chatbot-docked-tab:hover,
+        .chatbot-docked-tab:active,
+        .chatbot-docked-tab:focus {
+            right: 0 !important;
+            transform: translateX(-4px) !important;
         }
         .chatbot-modal-box {
             position: fixed !important;
-            right: 12px !important;
+            right: 8px !important;
             bottom: 86px !important;
             z-index: 60 !important;
         }
         @media (min-width: 640px) {
             .chatbot-docked-tab {
                 bottom: 48px !important;
+                right: -6px !important;
             }
             .chatbot-modal-box {
-                right: 56px !important;
+                right: 48px !important;
                 bottom: 48px !important;
             }
         }
         @media (min-width: 768px) {
             .chatbot-docked-tab {
                 bottom: 32px !important;
+                right: -6px !important;
             }
             .chatbot-modal-box {
-                right: 56px !important;
+                right: 48px !important;
                 bottom: 32px !important;
             }
         }
@@ -54,20 +63,20 @@
     <!-- Docked Side-Tab Trigger Button (Matching Image) -->
     <button @click="toggleChat()" 
             type="button"
-            class="chatbot-docked-tab text-white flex flex-col items-center justify-center transition-all duration-300 group hover:-translate-x-1 active:scale-95 focus:outline-none cursor-pointer select-none"
+            class="chatbot-docked-tab text-white flex flex-col items-center justify-center focus:outline-none cursor-pointer select-none group"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
         
         <!-- Top Chevron Icon (Smoothly rotates 180deg when open) -->
-        <svg class="w-3.5 h-3.5 text-white/90 transition-transform duration-300 shrink-0"
+        <svg class="w-3 h-3 text-white/90 transition-transform duration-300 shrink-0"
              :class="isOpen ? 'rotate-180 translate-x-0.5' : 'group-hover:-translate-x-0.5'"
              fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
 
         <!-- Robot Icon Sesuai Gambar -->
-        <div class="my-1.5 shrink-0 transition-transform duration-200 group-hover:scale-110">
-            <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="#ffffff">
+        <div class="my-1 shrink-0 transition-transform duration-200 group-hover:scale-110">
+            <svg style="width: 17px; height: 17px;" viewBox="0 0 24 24" fill="#ffffff">
                 <!-- Top Antenna -->
                 <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
                 <!-- Left Ear -->
@@ -80,8 +89,8 @@
         </div>
 
         <!-- Vertical Text CHATBOT -->
-        <span class="text-[9.5px] sm:text-[10px] font-extrabold tracking-widest text-white uppercase select-none leading-none mt-0.5"
-              style="writing-mode: vertical-rl; letter-spacing: 0.12em;">
+        <span class="text-[8px] font-extrabold tracking-wider text-white uppercase select-none leading-none mt-0.5"
+              style="writing-mode: vertical-rl; letter-spacing: 0.1em;">
             CHATBOT
         </span>
     </button>
