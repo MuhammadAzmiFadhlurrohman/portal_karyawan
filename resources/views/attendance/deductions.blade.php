@@ -43,41 +43,56 @@
         </div>
 
         <!-- Action & Filter Toolbar -->
-        <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5">
+        <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-3.5">
             <!-- Left: Back Button & Info Chips -->
-            <div class="flex flex-wrap items-center gap-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full lg:w-auto">
+                <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+                    <a href="{{ route('attendance.history', ['month' => $month, 'year' => $year]) }}" 
+                       class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer">
+                        <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <span class="truncate">Riwayat Absen</span>
+                    </a>
+
+                    <a href="{{ route('attendance.leaves') }}" 
+                       class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer">
+                        <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="truncate">Manajemen Cuti</span>
+                    </a>
+                </div>
+
                 @if (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage'))
                 <a href="{{ route('attendance.reports') }}" 
-                   class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-cyan-300 bg-cyan-50/70 hover:bg-cyan-100/70 text-cyan-900 text-xs font-semibold transition cursor-pointer">
-                    <svg class="w-4 h-4 text-cyan-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                   class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-cyan-300 bg-cyan-50/70 hover:bg-cyan-100/70 text-cyan-900 text-xs font-semibold transition cursor-pointer w-full sm:w-auto">
+                    <svg class="w-4 h-4 text-cyan-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                     <span>Laporan Absensi</span>
                 </a>
                 @endif
 
-                <a href="{{ route('attendance.history', ['month' => $month, 'year' => $year]) }}" 
-                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer">
-                    <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    <span>Riwayat Absen</span>
-                </a>
-
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-teal-50/80 border border-teal-200/70 text-xs">
-                    <span class="text-teal-700 font-medium">Periode:</span>
-                    <span class="font-mono font-bold text-slate-800">{{ sprintf('%04d-%02d', $year, $month) }}</span>
+                <div class="inline-flex items-center justify-between sm:justify-start gap-2 px-3 py-1.5 rounded-xl bg-teal-50/80 border border-teal-200/70 text-xs w-full sm:w-auto">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-teal-700 font-medium">Periode:</span>
+                        <span class="font-mono font-bold text-slate-800">{{ sprintf('%04d-%02d', $year, $month) }}</span>
+                    </div>
                     <span class="text-teal-300">|</span>
-                    <span class="text-teal-700 font-medium">Tarif Alpa:</span>
-                    <span class="font-mono font-bold text-rose-600">Rp {{ number_format((float) ($selectedUser->potongan_alpa ?? 25000), 0, ',', '.') }}</span><span class="text-slate-500 text-[11px]">/hari</span>
+                    <div class="flex items-center gap-1">
+                        <span class="text-teal-700 font-medium">Tarif Alpa:</span>
+                        <span class="font-mono font-bold text-rose-600">Rp {{ number_format((float) ($selectedUser->potongan_alpa ?? 25000), 0, ',', '.') }}</span>
+                        <span class="text-slate-500 text-[10px]">/hari</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Right: Filter Form -->
-            <form method="GET" action="{{ route('attendance.deductions') }}" class="flex flex-wrap items-center gap-2">
+            <form method="GET" action="{{ route('attendance.deductions') }}" class="flex flex-col sm:flex-row sm:items-center gap-2 w-full lg:w-auto">
                 @if ($allEmployees->count() > 1)
-                    <div class="relative">
-                        <select name="user_id" class="rounded-xl border border-slate-200 bg-white px-3 py-2 pr-8 text-xs font-semibold text-slate-700 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer">
+                    <div class="relative w-full sm:w-auto">
+                        <select name="user_id" class="w-full sm:w-auto rounded-xl border border-slate-200 bg-white px-3 py-2 pr-8 text-xs font-semibold text-slate-700 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer">
                             @foreach ($allEmployees as $emp)
                                 <option value="{{ $emp->id }}" @selected($emp->id === $selectedUser->id)>
                                     {{ $emp->name }} ({{ $emp->employee_code }})
@@ -87,22 +102,22 @@
                     </div>
                 @endif
 
-                <div class="flex items-center gap-1.5">
-                    <select name="month" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer">
+                <div class="grid grid-cols-3 sm:flex sm:items-center gap-1.5 w-full sm:w-auto">
+                    <select name="month" class="rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-2 text-xs font-semibold text-slate-700 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer">
                         @for ($m = 1; $m <= 12; $m++)
-                            <option value="{{ $m }}" @selected($m === $month)>Bulan {{ sprintf('%02d', $m) }}</option>
+                            <option value="{{ $m }}" @selected($m === $month)>Bln {{ sprintf('%02d', $m) }}</option>
                         @endfor
                     </select>
 
                     <input type="number" name="year" value="{{ $year }}" min="2025" max="2035" 
-                           class="w-20 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-mono font-semibold text-slate-700 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition">
+                           class="w-full sm:w-20 rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-2 text-xs font-mono font-semibold text-slate-700 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition">
 
                     <button type="submit" 
-                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#155E63] hover:bg-[#114b4f] text-white text-xs font-semibold shadow-xs transition active:scale-[0.98] cursor-pointer">
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            class="inline-flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-[#155E63] hover:bg-[#114b4f] text-white text-xs font-semibold shadow-xs transition active:scale-[0.98] cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        <span>Tampilkan</span>
+                        <span>Filter</span>
                     </button>
                 </div>
             </form>
@@ -132,92 +147,92 @@
         @endif
 
         <!-- Summary Metric Cards (DECIMAL 15,2) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
             
             <!-- Card 1: Potongan Terlambat -->
-            <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Potongan Terlambat</span>
-                    <div class="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1.5">
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate">Potongan Terlambat</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <div class="text-2xl font-extrabold text-slate-900 font-mono tracking-tight">
+                <div class="mt-2.5 sm:mt-3">
+                    <div class="text-base sm:text-2xl font-extrabold text-slate-900 font-mono tracking-tight truncate">
                         Rp {{ number_format((float) $monthlyReport['total_late_deduction'], 2, ',', '.') }}
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-                        <span>Total: <strong class="text-slate-700">{{ $monthlyReport['total_late_minutes'] }}</strong> menit terlambat</span>
+                    <div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 mt-1 truncate">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                        <span class="truncate">Total: <strong class="text-slate-700">{{ $monthlyReport['total_late_minutes'] }}</strong> mnt terlambat</span>
                     </div>
                 </div>
             </div>
 
             <!-- Card 2: Potongan Alpa -->
-            <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Potongan Alpa</span>
-                    <div class="w-8 h-8 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1.5">
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate">Potongan Alpa</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                         </svg>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <div class="text-2xl font-extrabold text-rose-600 font-mono tracking-tight">
+                <div class="mt-2.5 sm:mt-3">
+                    <div class="text-base sm:text-2xl font-extrabold text-rose-600 font-mono tracking-tight truncate">
                         Rp {{ number_format((float) $monthlyReport['total_alpa_deduction'], 2, ',', '.') }}
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                        <span>Total: <strong class="text-rose-700">{{ $monthlyReport['total_alpa_days'] }}</strong> hari alpa berbayar</span>
+                    <div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 mt-1 truncate">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                        <span class="truncate">Total: <strong class="text-rose-700">{{ $monthlyReport['total_alpa_days'] }}</strong> hari alpa</span>
                     </div>
                 </div>
             </div>
 
             <!-- Card 3: Adjustment Lintas Periode -->
-            <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Adjustment Periode</span>
-                    <div class="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1.5">
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 truncate">Adjustment Periode</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
                         </svg>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <div class="text-2xl font-extrabold text-amber-700 font-mono tracking-tight">
+                <div class="mt-2.5 sm:mt-3">
+                    <div class="text-base sm:text-2xl font-extrabold text-amber-700 font-mono tracking-tight truncate">
                         Rp {{ number_format((float) $monthlyReport['total_adjustment_amount'], 2, ',', '.') }}
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        <span>Koreksi pasca-penguncian (§5.5)</span>
+                    <div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500 mt-1 truncate">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+                        <span class="truncate">Koreksi pasca-kunci</span>
                     </div>
                 </div>
             </div>
 
             <!-- Card 4: Total Potongan Bersih (Hero Metallic Box) -->
-            <div class="rounded-2xl p-5 shadow-sm text-white flex flex-col justify-between relative overflow-hidden"
+            <div class="rounded-2xl p-3.5 sm:p-5 shadow-sm text-white flex flex-col justify-between relative overflow-hidden"
                  style="background: linear-gradient(135deg, #022836 0%, #06404d 50%, #0e6774 100%);">
                 <!-- Gloss Rims -->
                 <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#5eead4]/60 to-transparent pointer-events-none"></div>
 
-                <div class="flex items-center justify-between gap-2 relative z-10">
-                    <span class="text-xs font-bold uppercase tracking-wider text-teal-200/90">Total Potongan Bersih</span>
-                    <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 text-cyan-300 flex items-center justify-center shrink-0 shadow-inner">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <div class="flex items-center justify-between gap-1.5 relative z-10">
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-teal-200/90 truncate">Total Potongan</span>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white/10 border border-white/20 text-cyan-300 flex items-center justify-center shrink-0 shadow-inner">
+                        <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="mt-3 relative z-10">
-                    <div class="text-2xl sm:text-[26px] font-extrabold text-white font-mono tracking-tight">
+                <div class="mt-2.5 sm:mt-3 relative z-10">
+                    <div class="text-base sm:text-[26px] font-extrabold text-white font-mono tracking-tight truncate">
                         Rp {{ number_format((float) $monthlyReport['grand_total_deduction'], 2, ',', '.') }}
                     </div>
-                    <div class="flex items-center gap-1.5 text-xs text-teal-200/80 mt-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse"></span>
-                        <span>Presisi hitungan <code class="font-mono text-cyan-200">DECIMAL(15,2)</code></span>
+                    <div class="flex items-center gap-1.5 text-[10px] sm:text-xs text-teal-200/80 mt-1 truncate">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse shrink-0"></span>
+                        <span class="truncate">Presisi <code class="font-mono text-cyan-200">DECIMAL(15,2)</code></span>
                     </div>
                 </div>
             </div>
@@ -263,7 +278,65 @@
                             <p class="text-xs text-slate-400 mt-0.5">Belum ada jadwal kerja atau catatan absensi pada periode bulan ini.</p>
                         </div>
                     @else
-                        <div class="overflow-x-auto rounded-xl border border-slate-200/80">
+                        <!-- Mobile Card List View (sm:hidden) -->
+                        <div class="sm:hidden space-y-2.5">
+                            @foreach ($monthlyReport['daily_items'] as $item)
+                                <div class="rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs space-y-2">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-mono font-bold text-xs text-slate-800">
+                                                {{ $item['date'] }}
+                                            </span>
+                                            <span class="px-1.5 py-0.5 rounded font-mono font-semibold text-[10px] bg-slate-100 text-slate-700">
+                                                {{ $item['shift_code'] }}
+                                            </span>
+                                        </div>
+
+                                        @if ($item['status'] === 'present')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Hadir Tepat</span>
+                                        @elseif ($item['status'] === 'late')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Terlambat</span>
+                                        @elseif ($item['status'] === 'absent')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Alpa</span>
+                                        @elseif ($item['status'] === 'leave')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">Cuti</span>
+                                        @else
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ strtoupper($item['status']) }}</span>
+                                        @endif
+                                    </div>
+
+                                    <div class="flex items-center justify-between text-xs pt-1.5 border-t border-slate-100">
+                                        <div class="text-[11px] text-slate-500 font-mono">
+                                            @if ($item['clock_in'])
+                                                {{ $item['clock_in'] }} - {{ $item['clock_out'] ?? '--:--' }}
+                                            @else
+                                                <span class="text-slate-400">Tidak ada jam</span>
+                                            @endif
+                                        </div>
+
+                                        <div class="flex items-center gap-2">
+                                            @if ($item['late_minutes'] > 0)
+                                                <span class="font-mono font-semibold text-[11px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">
+                                                    {{ $item['late_minutes'] }} mnt
+                                                </span>
+                                            @endif
+                                            <span class="font-mono font-bold text-xs {{ ((float) $item['total_deduction']) > 0 ? 'text-rose-600' : 'text-emerald-700' }}">
+                                                Rp {{ number_format((float) $item['total_deduction'], 2, ',', '.') }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    @if (!empty($item['notes']))
+                                        <p class="text-[10px] text-slate-400 italic bg-slate-50/70 p-1.5 rounded">
+                                            {{ $item['notes'] }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Desktop Table View (hidden sm:block) -->
+                        <div class="hidden sm:block overflow-x-auto rounded-xl border border-slate-200/80">
                             <table class="w-full text-left border-collapse text-xs">
                                 <thead>
                                     <tr class="bg-slate-50 border-b border-slate-200/80 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
