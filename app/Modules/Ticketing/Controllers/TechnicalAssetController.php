@@ -187,6 +187,22 @@ class TechnicalAssetController extends Controller
     }
 
     /**
+     * Delete Joint Closure.
+     */
+    public function destroyJointClosure(Request $request, JointClosure $jointClosure): RedirectResponse|JsonResponse
+    {
+        Gate::authorize('update', $jointClosure->ticket);
+        $tiket = $jointClosure->ticket;
+        $jointClosure->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Joint Closure berhasil dihapus.']);
+        }
+
+        return redirect()->route('tickets.show', $tiket)->with('success', 'Joint Closure berhasil dihapus.');
+    }
+
+    /**
      * Add Closure Core Sambungan (§7.6).
      */
     public function storeClosureCore(Request $request, JointClosure $jointClosure): RedirectResponse|JsonResponse
