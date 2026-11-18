@@ -3429,33 +3429,33 @@ function coreManeuverModal() {
                     <template x-for="(row, idx) in matrix" :key="idx">
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/50">
                             <div class="sm:col-span-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Tube Asal</label>
-                                <input type="text" x-model="row.tube_asal" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                                <label class="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300 tracking-wider mb-0.5">Tube Asal</label>
+                                <input type="text" x-model="row.tube_asal" class="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 p-1.5 outline-hidden transition">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Core Asal</label>
-                                <input type="text" x-model="row.core_asal_label" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                                <label class="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300 tracking-wider mb-0.5">Core Asal</label>
+                                <input type="text" x-model="row.core_asal_label" class="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 p-1.5 outline-hidden transition">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Tube Jumper</label>
-                                <input type="text" x-model="row.tube_jumper" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                                <label class="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300 tracking-wider mb-0.5">Tube Jumper</label>
+                                <input type="text" x-model="row.tube_jumper" class="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 p-1.5 outline-hidden transition">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Core Jumper</label>
-                                <input type="text" x-model="row.core_jumper_label" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                                <label class="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300 tracking-wider mb-0.5">Core Jumper</label>
+                                <input type="text" x-model="row.core_jumper_label" class="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 p-1.5 outline-hidden transition">
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Status</label>
-                                <select x-model="row.status" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
-                                    <option value="TERHUBUNG">TERHUBUNG</option>
-                                    <option value="PUTUS / LOSS">PUTUS / LOSS</option>
-                                    <option value="CADANGAN / SPARE">CADANGAN / SPARE</option>
-                                    <option value="RUSAK">RUSAK</option>
+                                <label class="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300 tracking-wider mb-0.5">Status</label>
+                                <select x-model="row.status" class="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 p-1.5 outline-hidden transition">
+                                    <option class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white" value="TERHUBUNG">TERHUBUNG</option>
+                                    <option class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white" value="PUTUS / LOSS">PUTUS / LOSS</option>
+                                    <option class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white" value="CADANGAN / SPARE">CADANGAN / SPARE</option>
+                                    <option class="bg-white dark:bg-slate-800 text-slate-900 dark:text-white" value="RUSAK">RUSAK</option>
                                 </select>
                             </div>
                             <div class="sm:col-span-1">
-                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Loss (dB)</label>
-                                <input type="number" step="0.01" x-model.number="row.loss" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                                <label class="block text-[10px] uppercase font-bold text-slate-600 dark:text-slate-300 tracking-wider mb-0.5">Loss (dB)</label>
+                                <input type="number" step="0.01" x-model.number="row.loss" class="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 p-1.5 outline-hidden transition">
                             </div>
                             <div class="sm:col-span-1 flex justify-center pt-3 sm:pt-0">
                                 <button type="button" @click="removeRow(idx)" title="Hapus sambungan"
