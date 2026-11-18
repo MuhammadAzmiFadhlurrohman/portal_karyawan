@@ -952,8 +952,8 @@
             background: #FFFFFF !important;
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.09) !important;
             border: 1px solid rgba(226, 232, 240, 0.95) !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
+            padding-left: 0.35rem !important;
+            padding-right: 0.85rem !important;
             padding-top: 0.25rem !important;
             padding-bottom: 0.25rem !important;
             min-height: 40px !important;
@@ -968,11 +968,11 @@
         }
         .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle {
             border-radius: 9999px !important;
-            width: 40px !important;
-            height: 40px !important;
-            background: #FFFFFF !important;
-            border: 1px solid rgba(226, 232, 240, 0.95) !important;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.09) !important;
+            width: 32px !important;
+            height: 32px !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
             color: #64748B !important;
             display: flex !important;
             align-items: center !important;
@@ -1552,99 +1552,99 @@
                 <!-- 4. Camera Polos (Direct Camera Capture) -->
                 <input type="file" id="input_camera_plain" accept="image/*" capture="environment" class="hidden" onchange="handleFileChosen(this, 'Kamera')">
 
-                <!-- Attachment Clip Button with Dropup Menu -->
-                <div class="relative shrink-0">
-                    <button type="button"
-                            id="btn-attachment-toggle"
-                            onclick="toggleAttachmentMenu(event)"
-                            title="Lampirkan Dokumen / Media / Kamera / Lokasi"
-                            class="w-10 h-10 rounded-full bg-white border border-slate-200/95 shadow-[0_3px_12px_rgba(0,0,0,0.09)] hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                    </button>
-
-                    <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
-                    <div id="dropdown-attachment-menu"
-                         style="bottom: 100% !important; margin-bottom: 10px !important; top: auto !important;"
-                         class="hidden absolute left-0 w-72 sm:w-80 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-slate-200/90 py-2 px-1.5 z-[100] select-none divide-y divide-slate-100">
-                        
-                        <div class="space-y-0.5 pb-1">
-                            <!-- Option 1: Upload Media (Foto / Video) -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); document.getElementById('input_upload_media').click();"
-                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
-                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
-                                </div>
-                            </button>
-
-                            <!-- Option 2: Rekam Video Lapangan -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); document.getElementById('input_record_video').click();"
-                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Rekam Video Lapangan</h4>
-                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
-                                </div>
-                            </button>
-
-                            <!-- Option 3: Kamera GPS (Watermark) -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); captureCameraWithGps();"
-                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs text-slate-800 leading-tight flex items-center gap-1.5">
-                                        <span>Kamera GPS (Watermark)</span>
-                                        <span class="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
-                                    </h4>
-                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
-                                </div>
-                            </button>
-
-                            <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); document.getElementById('input_camera_plain').click();"
-                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
-                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
-                                </div>
-                            </button>
-                        </div>
-
-                        <!-- Option 5: Share Lokasi Saya -->
-                        <div class="pt-1">
-                            <button type="button"
-                                    onclick="closeAttachmentMenu(); shareMyCurrentLocation();"
-                                    class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-rose-50 transition text-left cursor-pointer group">
-                                <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <h4 class="font-bold text-xs text-slate-800 leading-tight">Share Lokasi Saya</h4>
-                                    <p class="text-[10px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Text & Location Input Box Container (Matching Image 1) -->
+                <!-- Text & Location Input Box Container with Integrated Attachment Clip (Nyambung Bagian Putihnya) -->
                 <div id="chat-input-container"
-                     class="flex-1 rounded-full border border-slate-300/90 bg-white px-4 py-1.5 transition-all flex flex-col justify-center min-h-[40px] shadow-[0_3px_12px_rgba(0,0,0,0.09)] min-w-0">
-                    <div class="relative flex items-center min-w-0">
+                     class="flex-1 rounded-full border border-slate-300/90 bg-white pl-1.5 pr-4 py-1 transition-all flex flex-col justify-center min-h-[40px] shadow-[0_3px_12px_rgba(0,0,0,0.09)] min-w-0">
+                    <div class="relative flex items-center min-w-0 w-full gap-1">
+                        <!-- Attachment Clip Button inside the white pill -->
+                        <div class="relative shrink-0">
+                            <button type="button"
+                                    id="btn-attachment-toggle"
+                                    onclick="toggleAttachmentMenu(event)"
+                                    title="Lampirkan Dokumen / Media / Kamera / Lokasi"
+                                    class="w-8 h-8 rounded-full bg-transparent hover:bg-slate-100 text-slate-500 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                            </button>
+
+                            <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
+                            <div id="dropdown-attachment-menu"
+                                 style="bottom: 100% !important; margin-bottom: 10px !important; top: auto !important;"
+                                 class="hidden absolute left-0 w-72 sm:w-80 rounded-2xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.25)] border border-slate-200/90 py-2 px-1.5 z-[100] select-none divide-y divide-slate-100">
+                                
+                                <div class="space-y-0.5 pb-1">
+                                    <!-- Option 1: Upload Media (Foto / Video) -->
+                                    <button type="button"
+                                            onclick="closeAttachmentMenu(); document.getElementById('input_upload_media').click();"
+                                            class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                        <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-xs text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
+                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
+                                        </div>
+                                    </button>
+
+                                    <!-- Option 2: Rekam Video Lapangan -->
+                                    <button type="button"
+                                            onclick="closeAttachmentMenu(); document.getElementById('input_record_video').click();"
+                                            class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                        <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-xs text-slate-800 leading-tight">Rekam Video Lapangan</h4>
+                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Rekam langsung kamera HP (Video Ringan &amp; Cepat)</p>
+                                        </div>
+                                    </button>
+
+                                    <!-- Option 3: Kamera GPS (Watermark) -->
+                                    <button type="button"
+                                            onclick="closeAttachmentMenu(); captureCameraWithGps();"
+                                            class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-xs text-slate-800 leading-tight flex items-center gap-1.5">
+                                                <span>Kamera GPS (Watermark)</span>
+                                                <span class="px-1.5 py-0.2 rounded-full text-[8.5px] font-bold bg-emerald-100 text-emerald-700">MSN GPS</span>
+                                            </h4>
+                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Dengan Logo MSN, Timestamp &amp; Alamat</p>
+                                        </div>
+                                    </button>
+
+                                    <!-- Option 4: Kamera Polos (Tanpa Watermark) -->
+                                    <button type="button"
+                                            onclick="closeAttachmentMenu(); document.getElementById('input_camera_plain').click();"
+                                            class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-50 transition text-left cursor-pointer group">
+                                        <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-xs text-slate-800 leading-tight">Kamera Polos (Tanpa Watermark)</h4>
+                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Potret langsung foto kamera original</p>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                <!-- Option 5: Share Lokasi Saya -->
+                                <div class="pt-1">
+                                    <button type="button"
+                                            onclick="closeAttachmentMenu(); shareMyCurrentLocation();"
+                                            class="w-full flex items-center gap-3 p-1.5 rounded-xl hover:bg-rose-50 transition text-left cursor-pointer group">
+                                        <div class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 border border-rose-200 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <h4 class="font-bold text-xs text-slate-800 leading-tight">Share Lokasi Saya</h4>
+                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Sematkan koordinat GPS lapangan</p>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <input type="text"
                                name="message"
                                id="quick-chat-input"
@@ -1652,9 +1652,9 @@
                                autocomplete="off"
                                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();handleChatFormSubmit(event);return false;}"
                                style="outline: none !important; box-shadow: none !important; border: none !important;"
-                               class="w-full text-xs bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0">
+                               class="flex-1 text-xs bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0 min-w-0 pr-1">
                         
-                        <span id="attachment-name" class="text-[10px] font-semibold text-teal-700 truncate max-w-[120px] ml-2 shrink-0"></span>
+                        <span id="attachment-name" class="text-[10px] font-semibold text-teal-700 truncate max-w-[120px] ml-1 shrink-0"></span>
                     </div>
 
                     <!-- GPS Attached Chip (shows when latitude & longitude are attached - Matching Image 1) -->
