@@ -151,7 +151,7 @@
                 </div>
                 <div class="mt-1.5 sm:mt-2">
                     <div class="text-sm sm:text-lg lg:text-xl font-bold text-slate-900 font-mono tracking-tight truncate">
-                        Rp {{ number_format((float) $monthlyReport['total_late_deduction'], 2, ',', '.') }}
+                        Rp {{ number_format((float) $monthlyReport['total_late_deduction'], 0, ',', '.') }}
                     </div>
                     <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">
                         <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
@@ -172,7 +172,7 @@
                 </div>
                 <div class="mt-1.5 sm:mt-2">
                     <div class="text-sm sm:text-lg lg:text-xl font-bold text-rose-600 font-mono tracking-tight truncate">
-                        Rp {{ number_format((float) $monthlyReport['total_alpa_deduction'], 2, ',', '.') }}
+                        Rp {{ number_format((float) $monthlyReport['total_alpa_deduction'], 0, ',', '.') }}
                     </div>
                     <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">
                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
@@ -193,7 +193,7 @@
                 </div>
                 <div class="mt-1.5 sm:mt-2">
                     <div class="text-sm sm:text-lg lg:text-xl font-bold text-amber-700 font-mono tracking-tight truncate">
-                        Rp {{ number_format((float) $monthlyReport['total_adjustment_amount'], 2, ',', '.') }}
+                        Rp {{ number_format((float) $monthlyReport['total_adjustment_amount'], 0, ',', '.') }}
                     </div>
                     <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500 mt-0.5 sm:mt-1 truncate">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
@@ -218,7 +218,7 @@
                 </div>
                 <div class="mt-1.5 sm:mt-2 relative z-10">
                     <div class="text-sm sm:text-lg lg:text-xl font-extrabold text-white font-mono tracking-tight truncate">
-                        Rp {{ number_format((float) $monthlyReport['grand_total_deduction'], 2, ',', '.') }}
+                        Rp {{ number_format((float) $monthlyReport['grand_total_deduction'], 0, ',', '.') }}
                     </div>
                     <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-teal-200/80 mt-0.5 sm:mt-1 truncate">
                         <span class="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse shrink-0"></span>
@@ -305,7 +305,7 @@
                                         </span>
                                     @endif
                                     <span class="font-mono font-bold text-xs {{ ((float) $item['total_deduction']) > 0 ? 'text-rose-600' : 'text-emerald-700' }}">
-                                        Rp {{ number_format((float) $item['total_deduction'], 2, ',', '.') }}
+                                        Rp {{ number_format((float) $item['total_deduction'], 0, ',', '.') }}
                                     </span>
                                 </div>
                             </div>
@@ -370,7 +370,7 @@
                                         {{ $item['late_minutes'] > 0 ? $item['late_minutes'] . ' mnt' : '-' }}
                                     </td>
                                     <td class="py-3 px-3 text-right font-mono font-bold {{ ((float) $item['total_deduction']) > 0 ? 'text-rose-600' : 'text-emerald-700' }}">
-                                        {{ number_format((float) $item['total_deduction'], 2, ',', '.') }}
+                                        {{ number_format((float) $item['total_deduction'], 0, ',', '.') }}
                                     </td>
                                     <td class="py-3 px-3 text-right">
                                         <a href="{{ route('attendance.history', ['month' => $month, 'year' => $year]) }}"
