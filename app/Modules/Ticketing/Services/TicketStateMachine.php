@@ -46,6 +46,13 @@ class TicketStateMachine
         if (isset($closingData['action_taken'])) {
             $tiket->action_taken = $closingData['action_taken'];
         }
+        if (isset($closingData['team_members'])) {
+            $cleanMembers = array_values(array_filter(array_map('trim', (array) $closingData['team_members'])));
+            $tiket->team_members = ! empty($cleanMembers) ? $cleanMembers : null;
+        }
+        if (isset($closingData['catatan_tambahan'])) {
+            $tiket->catatan_tambahan = $closingData['catatan_tambahan'];
+        }
         if (isset($closingData['redaman_sebelum'])) {
             $tiket->redaman_sebelum = $closingData['redaman_sebelum'];
         }

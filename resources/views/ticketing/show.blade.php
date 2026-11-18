@@ -203,7 +203,7 @@
                                     <span>Jeda SLA (Stop Clock)</span>
                                 </button>
 
-                                <button type="button" @click="open = false; switchTab('tab-resume')"
+                                <button type="button" @click="open = false; openResumeModal()"
                                         class="w-full text-left px-3.5 py-2 text-xs font-semibold hover:bg-teal-50 hover:text-teal-900 transition flex items-center gap-2.5">
                                     <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <span>Input Resume &amp; Closing</span>
@@ -1811,7 +1811,7 @@
                     </div>
                 </div>
 
-                <button type="button" onclick="toggleResumeForm()"
+                <button type="button" onclick="openResumeModal()"
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -1822,27 +1822,72 @@
             <!-- Resume Content / Display -->
             @if($hasResume)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Team OM / Daftar Nama Teknis Lapangan -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 md:col-span-2">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Team OM / Daftar Nama Teknis Lapangan</span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            @php
+                                $displayMembers = ($tiket->team_members && count($tiket->team_members) > 0)
+                                    ? $tiket->team_members
+                                    : ($tiket->assignees->count() > 0 ? $tiket->assignees->pluck('name')->values()->all() : ['Ricky']);
+                            @endphp
+                            @foreach($displayMembers as $m)
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-800 shadow-2xs">
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                    <span>{{ $m }}</span>
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Problem / Temuan Masalah -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Temuan Masalah di Lapangan</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Problem / Temuan Masalah di Lapangan</span>
                         <p class="text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed">{{ $tiket->problem_temuan }}</p>
                     </div>
+
+                    <!-- Action / Tindakan Perbaikan -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Tindakan Perbaikan Teknis</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Action / Tindakan Perbaikan yang Dilakukan</span>
                         <p class="text-xs sm:text-sm text-slate-800 font-semibold leading-relaxed">{{ $tiket->action_taken }}</p>
                     </div>
+
+                    <!-- Tipe Penanganan Fisik / Core -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Pengukuran Redaman Optik</span>
-                        <p class="text-xs sm:text-sm font-mono font-bold text-slate-800">
-                            Sebelum: <span class="text-rose-600">{{ $tiket->redaman_sebelum ?? '-' }} dBm</span> &bull; 
-                            Sesudah: <span class="text-emerald-600">{{ $tiket->redaman_sesudah ?? '-' }} dBm</span>
-                        </p>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Tipe Penanganan Fisik / Core</span>
+                        <div class="pt-0.5">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#0D9488] text-white shadow-2xs inline-block">
+                                Jointing Lurus &amp; Manuver Core
+                            </span>
+                        </div>
                     </div>
+
+                    <!-- Status Pemulihan Link -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
                         <span class="text-[10px] uppercase font-bold text-slate-400">Status Pemulihan Link</span>
                         <p class="text-xs sm:text-sm font-bold {{ $tiket->has_link_up ? 'text-emerald-700' : 'text-amber-700' }}">
                             {{ $tiket->has_link_up ? '✓ LINK UP RESTORED' : 'Belum Restore' }}
                         </p>
                     </div>
+
+                    @if($tiket->catatan_tambahan)
+                    <!-- Catatan Tambahan -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1 md:col-span-2">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Catatan Tambahan</span>
+                        <p class="text-xs sm:text-sm text-slate-800 leading-relaxed">{{ $tiket->catatan_tambahan }}</p>
+                    </div>
+                    @endif
+
+                    @if($tiket->redaman_sebelum || $tiket->redaman_sesudah)
+                    <!-- Pengukuran Redaman Optik -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1 md:col-span-2">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Pengukuran Redaman Optik</span>
+                        <p class="text-xs sm:text-sm font-mono font-bold text-slate-800">
+                            Sebelum: <span class="text-rose-600">{{ $tiket->redaman_sebelum ?? '-' }} dBm</span> &bull; 
+                            Sesudah: <span class="text-emerald-600">{{ $tiket->redaman_sesudah ?? '-' }} dBm</span>
+                        </p>
+                    </div>
+                    @endif
                 </div>
             @else
                 <!-- Empty State matching Image 4 -->
@@ -1854,69 +1899,13 @@
                     <p class="text-xs text-slate-400 max-w-md mx-auto">
                         Rangkuman penanganan teknis, akar penyebab gangguan, dan tindakan pemulihan di lapangan belum dicatat untuk tiket ini.
                     </p>
-                    <button type="button" onclick="toggleResumeForm()"
+                    <button type="button" onclick="openResumeModal()"
                             class="px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-md shadow-teal-950/20 cursor-pointer transition inline-flex items-center gap-2"
                             style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                         <span>Input Resume Sekarang</span>
                     </button>
                 </div>
             @endif
-
-            <!-- Form Resume & Closing Awal (Toggled or inline) -->
-            <div id="resume-form-container" class="{{ $hasResume ? 'hidden' : '' }} pt-4 border-t border-slate-100">
-                <form method="POST" action="{{ route('tickets.closing-awal', $tiket) }}" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                            Akar Masalah / Temuan Lapangan *
-                        </label>
-                        <textarea name="problem_temuan" rows="2" required placeholder="Jelaskan titik putus, bending, core bermasalah..."
-                                  class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-3 text-slate-800">{{ old('problem_temuan', $tiket->problem_temuan) }}</textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                            Tindakan Penanganan / Pemulihan *
-                        </label>
-                        <textarea name="action_taken" rows="2" required placeholder="Tindakan yang dilakukan (splicing, re-routing, bypass core)..."
-                                  class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-3 text-slate-800">{{ old('action_taken', $tiket->action_taken) }}</textarea>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Redaman Sebelum (dBm)</label>
-                            <input type="number" step="0.01" name="redaman_sebelum" value="{{ old('redaman_sebelum', $tiket->redaman_sebelum) }}"
-                                   placeholder="Contoh: -32.50"
-                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5 text-slate-800">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Redaman Sesudah (dBm) *</label>
-                            <input type="number" step="0.01" name="redaman_sesudah" required value="{{ old('redaman_sesudah', $tiket->redaman_sesudah) }}"
-                                   placeholder="Contoh: -18.20"
-                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5 text-slate-800">
-                        </div>
-                    </div>
-
-                    <div class="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200 flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-xs text-slate-800 block">Konfirmasi Link UP / Pulih</span>
-                            <span class="text-[11px] text-slate-500">Tandai jika sinyal optik telah terhubung normal kembali.</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="has_link_up" value="1" {{ $tiket->has_link_up ? 'checked' : '' }} class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D9488]"></div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-3 pt-2">
-                        <button type="submit"
-                                class="px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
-                                style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                            Simpan Resume &amp; Ajukan Closing Awal
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 
@@ -2818,6 +2807,159 @@ function dispatchTeamModal() {
                 <button type="button" onclick="closeVerifyCloseModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
                 <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold bg-emerald-600 hover:bg-emerald-700">
                     Setujui &amp; Close Tiket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL INPUT RESUME PEKERJAAN (Matching Reference UI) -->
+<!-- ========================================================================= -->
+@php
+    $modalInitialMembers = old('team_members');
+    if (!is_array($modalInitialMembers) || empty($modalInitialMembers)) {
+        $modalInitialMembers = ($tiket->team_members && count($tiket->team_members) > 0)
+            ? array_values($tiket->team_members)
+            : ($tiket->assignees->count() > 0 ? array_values($tiket->assignees->pluck('name')->all()) : ['Ricky']);
+    }
+    if (empty($modalInitialMembers)) {
+        $modalInitialMembers = ['Ricky'];
+    }
+@endphp
+<div id="modal-resume" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5"
+     x-data="resumeFormModal(@js($modalInitialMembers))">
+    <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto transform transition-all animate-in fade-in zoom-in-95 duration-150">
+        <!-- Header -->
+        <div class="px-5 py-4 sm:px-6 text-white flex items-center justify-between"
+             style="background: #0f1d35;">
+            <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold shrink-0">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </span>
+                <h3 class="font-bold text-sm sm:text-base text-white tracking-tight">Input Resume Pekerjaan</h3>
+            </div>
+            <button type="button" onclick="closeResumeModal()"
+                    class="w-8 h-8 rounded-full text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition cursor-pointer text-lg">
+                &times;
+            </button>
+        </div>
+
+        <form method="POST" action="{{ route('tickets.closing-awal', $tiket) }}">
+            @csrf
+            <div class="p-5 sm:p-6 space-y-4 max-h-[calc(85vh-120px)] overflow-y-auto">
+                
+                <!-- 1. Team OM / Daftar Nama Teknis Lapangan * -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-2">
+                        Team OM / Daftar Nama Teknis Lapangan <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="space-y-2">
+                        <template x-for="(member, idx) in teamMembers" :key="idx">
+                            <div class="flex items-center gap-2">
+                                <div class="relative flex-1">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                    </span>
+                                    <input type="text"
+                                           name="team_members[]"
+                                           x-model="teamMembers[idx]"
+                                           required
+                                           placeholder="Nama teknisi..."
+                                           class="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 transition outline-none">
+                                </div>
+                                <button type="button"
+                                        @click="removeMember(idx)"
+                                        title="Hapus Anggota"
+                                        class="w-9 h-9 rounded-xl border border-rose-300 hover:border-rose-400 text-rose-500 hover:bg-rose-50 flex items-center justify-center shrink-0 cursor-pointer transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="button"
+                                @click="addMember()"
+                                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition cursor-pointer">
+                            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Tambah Anggota Team</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Problem / Temuan Masalah di Lapangan * -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1.5">
+                        Problem / Temuan Masalah di Lapangan <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="problem_temuan"
+                              rows="3"
+                              required
+                              placeholder="Contoh: Kabel Tertarik Truk di Crossingan Jalan span KM 12+400"
+                              class="w-full p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 outline-none transition leading-relaxed">{{ old('problem_temuan', $tiket->problem_temuan) }}</textarea>
+                </div>
+
+                <!-- 3. Action / Tindakan Perbaikan yang Dilakukan * -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1.5">
+                        Action / Tindakan Perbaikan yang Dilakukan <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea name="action_taken"
+                              rows="3"
+                              required
+                              placeholder="Contoh: Jumper Kabel 150 meter, Pemasangan New JC 2 Titik (JC1 dan JC2)..."
+                              class="w-full p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 outline-none transition leading-relaxed">{{ old('action_taken', $tiket->action_taken) }}</textarea>
+                </div>
+
+                <!-- 4. Tipe Penanganan Fisik / Core -->
+                <div class="p-3.5 sm:px-4 sm:py-3 rounded-2xl border border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                        <span class="text-xs font-bold text-slate-700 shrink-0">Tipe Penanganan Fisik / Core:</span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#0D9488] text-white shadow-2xs">
+                            Jointing Lurus &amp; Manuver Core
+                        </span>
+                    </div>
+                    <span class="text-[11px] text-slate-400 sm:text-right">Dikelola di menu <b class="text-slate-600 font-semibold">Penanganan Core &amp; JC</b></span>
+                </div>
+
+                <!-- 5. Catatan Tambahan (Opsional) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-800 mb-1.5">
+                        Catatan Tambahan (Opsional)
+                    </label>
+                    <textarea name="catatan_tambahan"
+                              rows="2"
+                              placeholder="Catatan tambahan hasil pengujian redaman / informasi khusus..."
+                              class="w-full p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 outline-none transition leading-relaxed">{{ old('catatan_tambahan', $tiket->catatan_tambahan) }}</textarea>
+                </div>
+
+                <!-- Hidden Optical Measurement & Status Preservation -->
+                <input type="hidden" name="redaman_sebelum" value="{{ old('redaman_sebelum', $tiket->redaman_sebelum) }}">
+                <input type="hidden" name="redaman_sesudah" value="{{ old('redaman_sesudah', $tiket->redaman_sesudah) }}">
+                <input type="hidden" name="has_link_up" value="{{ $tiket->has_link_up ? 1 : 0 }}">
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3.5 sm:px-6 bg-slate-50/90 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                <button type="button"
+                        onclick="closeResumeModal()"
+                        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition cursor-pointer">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                    <span>Simpan Resume</span>
                 </button>
             </div>
         </form>
@@ -4335,15 +4477,37 @@ document.addEventListener('click', function(e) {
     }
 });
 
+function openResumeModal() {
+    const m = document.getElementById('modal-resume');
+    if (m) m.classList.remove('hidden');
+}
+function closeResumeModal() {
+    const m = document.getElementById('modal-resume');
+    if (m) m.classList.add('hidden');
+}
 function toggleResumeForm() {
-    const formCont = document.getElementById('resume-form-container');
-    const emptyState = document.getElementById('resume-empty-state');
-    if (formCont) {
-        formCont.classList.toggle('hidden');
-    }
-    if (emptyState) {
-        emptyState.classList.add('hidden');
-    }
+    openResumeModal();
+}
+function resumeFormModal(initialMembers) {
+    return {
+        teamMembers: Array.isArray(initialMembers) && initialMembers.length > 0 ? [...initialMembers] : ['Ricky'],
+        addMember() {
+            this.teamMembers.push('');
+            this.$nextTick(() => {
+                const inputs = this.$el.querySelectorAll('input[name="team_members[]"]');
+                if (inputs.length > 0) {
+                    inputs[inputs.length - 1].focus();
+                }
+            });
+        },
+        removeMember(idx) {
+            if (this.teamMembers.length > 1) {
+                this.teamMembers.splice(idx, 1);
+            } else {
+                this.teamMembers[0] = '';
+            }
+        }
+    };
 }
 
 // Modal triggers

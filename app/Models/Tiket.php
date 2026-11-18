@@ -39,6 +39,8 @@ class Tiket extends Model
         'is_ims_validated',
         'problem_temuan',
         'action_taken',
+        'team_members',
+        'catatan_tambahan',
         'redaman_sebelum',
         'redaman_sesudah',
         'has_link_up',
@@ -62,6 +64,7 @@ class Tiket extends Model
 
     protected $casts = [
         'customer_snapshot' => 'array',
+        'team_members' => 'array',
         'is_ims_validated' => 'boolean',
         'has_link_up' => 'boolean',
         'sla_target_minutes' => 'integer',

@@ -483,6 +483,9 @@ class TicketController extends Controller
         $validated = $request->validate([
             'problem_temuan' => ['nullable', 'string'],
             'action_taken' => ['nullable', 'string'],
+            'team_members' => ['nullable', 'array'],
+            'team_members.*' => ['nullable', 'string'],
+            'catatan_tambahan' => ['nullable', 'string'],
             'redaman_sebelum' => ['nullable', 'numeric'],
             'redaman_sesudah' => ['nullable', 'numeric'],
             'has_link_up' => ['nullable', 'boolean'],
