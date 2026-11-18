@@ -227,8 +227,20 @@
                     @endif
                 </div>
 
-                <!-- Action Buttons: Filter, Excel Export, & Ajukan Lembur -->
+                <!-- Action Buttons: Ajukan Lembur, Filter, & Excel Export -->
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto sm:self-end pt-1 sm:pt-0">
+                    <!-- Tombol Buat Pengajuan Lembur (Berada di atas Filter) -->
+                    @if ($isHrd || ! $isAtasan)
+                    <a href="{{ route('gomsn.overtime.create') }}" 
+                       class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
+                       style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        <span>Ajukan Lembur</span>
+                    </a>
+                    @endif
+
                     <div class="flex items-center gap-2 flex-1 sm:flex-initial">
                         <!-- Tombol Filter Gradient -->
                         <button type="submit" 
@@ -251,18 +263,6 @@
                         </a>
                         @endif
                     </div>
-
-                    <!-- Tombol Buat Pengajuan Lembur -->
-                    @if ($isHrd || ! $isAtasan)
-                    <a href="{{ route('gomsn.overtime.create') }}" 
-                       class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
-                       style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        <span>+ Ajukan Lembur</span>
-                    </a>
-                    @endif
                 </div>
             </form>
 
