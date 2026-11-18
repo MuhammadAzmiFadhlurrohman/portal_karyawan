@@ -3132,15 +3132,16 @@ function coreManeuverModal() {
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 pt-1">
-                    <div class="md:col-span-7 space-y-1">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    <!-- Koordinat GPS -->
+                    <div class="space-y-1.5">
                         <div class="flex items-center justify-between">
                             <label class="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 text-[11px]">
                                 <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <circle cx="12" cy="12" r="10" stroke-width="2"/>
                                     <circle cx="12" cy="12" r="3" stroke-width="2"/>
                                 </svg>
-                                Koordinat GPS Lokasi Closure
+                                <span>Koordinat GPS Lokasi Closure</span>
                             </label>
                             <button type="button" @click="getGps()" :disabled="isGpsLoading" class="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 inline-flex items-center gap-1 cursor-pointer">
                                 <svg class="w-3.5 h-3.5" :class="isGpsLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3149,40 +3150,39 @@ function coreManeuverModal() {
                                 <span x-text="isGpsLoading ? 'Mengambil GPS...' : 'Ambil GPS Saya'"></span>
                             </button>
                         </div>
-                        <div class="grid grid-cols-12 gap-2">
-                            <div class="col-span-5 flex items-center">
-                                <span class="inline-flex items-center px-2.5 py-2 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">Lat</span>
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-2.5 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-500">Lat</span>
                                 <input type="text" name="latitude" x-model="lat" placeholder="-6.xxxxxx"
                                        class="w-full text-xs rounded-r-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
                             </div>
-                            <div class="col-span-5 flex items-center">
-                                <span class="inline-flex items-center px-2.5 py-2 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">Lng</span>
+                            <div class="flex-1 flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-2.5 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-500">Lng</span>
                                 <input type="text" name="longitude" x-model="lng" placeholder="107.xxxxxx"
                                        class="w-full text-xs rounded-r-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
                             </div>
-                            <div class="col-span-2">
-                                <button type="button" @click="openMap()" title="Buka di Maps"
-                                        class="w-full h-full flex items-center justify-center rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
-                                    <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 012.5 15.488V4.724a2 2 0 012.947-1.789L9 4m0 16l6-3m-6 3V4m6 16l5.447-2.724A2 2 0 0021.5 15.488V4.724a2 2 0 00-2.947-1.789L15 4m0 16V4m0 0L9 4"/>
-                                    </svg>
-                                </button>
-                            </div>
+                            <button type="button" @click="openMap()" title="Buka di Maps"
+                                    class="w-9 h-9 shrink-0 flex items-center justify-center rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 012.5 15.488V4.724a2 2 0 012.947-1.789L9 4m0 16l6-3m-6 3V4m6 16l5.447-2.724A2 2 0 0021.5 15.488V4.724a2 2 0 00-2.947-1.789L15 4m0 16V4m0 0L9 4"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="md:col-span-5 flex items-center p-3 rounded-xl border border-amber-200/60 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20">
-                        <label class="flex items-start gap-3 cursor-pointer select-none">
+                    <!-- Tandai Penambahan Aset Baru (New Cut) -->
+                    <div class="flex items-center p-3 sm:p-3.5 rounded-xl border border-amber-200/60 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20">
+                        <label class="flex items-center gap-3 cursor-pointer select-none w-full">
                             <input type="checkbox" name="is_new_cut" x-model="isNewCut" value="1"
-                                   class="mt-1 w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300">
-                            <div>
+                                   class="w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300 shrink-0">
+                            <div class="min-w-0 flex-1">
                                 <span class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                     </svg>
-                                    Tandai Penambahan Aset Baru (New Cut)
+                                    <span>Tandai Penambahan Aset Baru (New Cut)</span>
                                 </span>
-                                <span class="block text-[10.5px] text-slate-500 dark:text-slate-400">Centang jika ada pemasangan closure fisik baru di span ini.</span>
+                                <span class="block text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">Centang jika ada pemasangan closure fisik baru di span ini.</span>
                             </div>
                         </label>
                     </div>
