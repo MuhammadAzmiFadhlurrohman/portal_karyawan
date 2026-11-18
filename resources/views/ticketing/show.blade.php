@@ -4085,6 +4085,7 @@ function clearAttachedGps() {
 // =========================================================================
 let speechRecognizer = null;
 let isRecordingVoice = false;
+let voiceInitialText = '';
 
 function toggleVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -4109,62 +4110,20 @@ function toggleVoiceRecognition() {
     }
 }
 
-async function startVoiceRecognition() {
+function startVoiceRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
-    // 1. Handshake audio hardware via getUserMedia to unlock Chrome & Windows Core Audio
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-            const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            // Release the stream tracks so SpeechRecognition has exclusive audio input access
-            testStream.getTracks().forEach(track => track.stop());
-        } catch (micErr) {
-            console.warn('[Voice-to-Text] getUserMedia check failed:', micErr);
-            let title = 'Mikrofon Tidak Dapat Diakses';
-            let detail = 'Perangkat mikrofon tidak dapat dibuka oleh browser atau sistem Windows.';
-
-            if (micErr.name === 'NotAllowedError' || micErr.name === 'PermissionDeniedError') {
-                title = 'Izin Mikrofon Windows Terkunci';
-                detail = 'Meskipun izin di Chrome sudah ALLOW, <b>Sistem Operasi Windows</b> masih memblokir akses mikrofon untuk aplikasi browser.';
-            } else if (micErr.name === 'NotFoundError' || micErr.name === 'DevicesNotFoundError') {
-                title = 'Mikrofon Tidak Ditemukan';
-                detail = 'Tidak ada perangkat mikrofon/headset yang aktif atau tercolok di komputer Anda.';
-            } else if (micErr.name === 'NotReadableError' || micErr.name === 'TrackStartError') {
-                title = 'Mikrofon Sedang Digunakan';
-                detail = 'Mikrofon sedang dipakai eksklusif oleh aplikasi lain (seperti Zoom, Google Meet, atau Teams).';
-            }
-
-            if (window.Swal) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: title,
-                    html: `<div class="text-left text-xs leading-relaxed space-y-2.5">
-                        <p>${detail}</p>
-                        <div class="p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 space-y-1.5 mt-2">
-                            <p class="font-bold text-amber-950">Cara Mengaktifkan di Windows:</p>
-                            <ol class="list-decimal pl-4 space-y-1 text-[11px]">
-                                <li>Tekan tombol keyboard <kbd class="px-1.5 py-0.5 rounded bg-amber-100 border border-amber-300 font-mono font-bold">Win + I</kbd> untuk buka <b>Windows Settings</b>.</li>
-                                <li>Pilih menu <b>Privacy &amp; Security</b> &rarr; <b>Microphone</b>.</li>
-                                <li>Pastikan opsi <b>"Microphone access"</b> bernilai <b>ON</b>.</li>
-                                <li>Scroll ke bawah dan pastikan <b>"Let desktop apps access your microphone"</b> juga <b>ON</b> (khususnya untuk Google Chrome).</li>
-                            </ol>
-                        </div>
-                    </div>`,
-                    confirmButtonColor: '#155E63'
-                });
-            } else {
-                alert(detail);
-            }
-            return;
-        }
+    if (speechRecognizer) {
+        try { speechRecognizer.abort(); } catch (e) {}
+        speechRecognizer = null;
     }
 
     try {
         speechRecognizer = new SpeechRecognition();
         speechRecognizer.lang = 'id-ID'; // Bahasa Indonesia
-        speechRecognizer.interimResults = true; // Real-time feedback
-        speechRecognizer.continuous = false; // Otomatis selesai setelah jeda bicara
+        speechRecognizer.interimResults = true; // Real-time responsif instan saat berbicara
+        speechRecognizer.continuous = true; // Terus mendengarkan tanpa putus saat jeda napas
         speechRecognizer.maxAlternatives = 1;
 
         const micBtn = document.getElementById('btn-voice-to-text');
@@ -4173,70 +4132,76 @@ async function startVoiceRecognition() {
         const micDot = document.getElementById('mic-dot-indicator');
         const chatInput = document.getElementById('quick-chat-input');
 
-        let initialInputValue = (chatInput ? chatInput.value : '');
+        voiceInitialText = (chatInput ? chatInput.value : '');
+
+        // Umpan balik visual instan tanpa delay
+        isRecordingVoice = true;
+        if (micBtn) {
+            micBtn.classList.remove('bg-slate-100', 'text-slate-600');
+            micBtn.classList.add('bg-rose-50', 'text-rose-600', 'border', 'border-rose-300', 'shadow-xs');
+        }
+        if (micNormal) {
+            micNormal.classList.remove('text-slate-600');
+            micNormal.classList.add('text-rose-600', 'animate-pulse');
+        }
+        if (micPulse) micPulse.classList.remove('hidden');
+        if (micDot) micDot.classList.remove('hidden');
+
+        if (chatInput) {
+            chatInput.placeholder = '🎙️ Mendengarkan... Bicara sekarang (otomatis tertulis)';
+            chatInput.focus();
+        }
 
         speechRecognizer.onstart = function() {
             isRecordingVoice = true;
-            if (micBtn) {
-                micBtn.classList.remove('bg-slate-100', 'text-slate-600');
-                micBtn.classList.add('bg-rose-50', 'text-rose-600', 'border', 'border-rose-300', 'shadow-xs');
-            }
-            if (micNormal) {
-                micNormal.classList.remove('text-slate-600');
-                micNormal.classList.add('text-rose-600', 'animate-pulse');
-            }
-            if (micPulse) micPulse.classList.remove('hidden');
-            if (micDot) micDot.classList.remove('hidden');
-
-            if (chatInput) {
-                chatInput.placeholder = '🎙️ Mendengarkan suara Anda... Silakan bicara';
-                chatInput.focus();
-            }
         };
 
         speechRecognizer.onresult = function(event) {
-            let finalTranscript = '';
-            let interimTranscript = '';
+            let finalAccumulated = '';
+            let interimAccumulated = '';
 
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
+            for (let i = 0; i < event.results.length; ++i) {
+                const res = event.results[i];
+                if (res.isFinal) {
+                    finalAccumulated += res[0].transcript + ' ';
                 } else {
-                    interimTranscript += event.results[i][0].transcript;
+                    interimAccumulated += res[0].transcript;
                 }
             }
 
-            const speechText = (finalTranscript || interimTranscript).trim();
-            if (speechText && chatInput) {
-                const prefix = initialInputValue.trim() ? initialInputValue.trim() + ' ' : '';
-                chatInput.value = prefix + speechText;
+            const currentSpoken = (finalAccumulated + interimAccumulated).trim();
+            if (chatInput) {
+                const prefix = voiceInitialText.trim() ? voiceInitialText.trim() + ' ' : '';
+                chatInput.value = prefix + currentSpoken;
                 chatInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
         };
 
         speechRecognizer.onerror = function(event) {
             console.warn('[Voice-to-Text] Error:', event.error);
+            if (event.error === 'no-speech') {
+                return; // User belum bicara, jangan dihentikan
+            }
             stopVoiceRecognition();
             if (event.error === 'not-allowed' || event.error === 'permission-denied') {
                 if (window.Swal) {
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Akses Mikrofon Ditolak Sistem',
+                        title: 'Akses Mikrofon Belum Diizinkan',
                         html: `<div class="text-left text-xs leading-relaxed space-y-2.5">
-                            <p>Izin di Chrome sudah di-Allow, namun sistem operasi Windows atau browser menolak koneksi audio internal.</p>
+                            <p>Izin mikrofon belum aktif atau diblokir oleh browser / Windows.</p>
                             <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 space-y-1.5 mt-2">
-                                <p class="font-bold text-slate-900">Periksa 2 Pengaturan Windows:</p>
-                                <ol class="list-decimal pl-4 space-y-1.5 text-[11px]">
-                                    <li><b>Pengaturan Windows:</b> Tekan <kbd class="px-1.5 py-0.5 rounded bg-slate-200 border border-slate-300 font-mono">Win + I</kbd> &rarr; <b>Privacy &amp; Security</b> &rarr; <b>Microphone</b> &rarr; Pastikan <b>"Let desktop apps access your microphone"</b> aktif (ON).</li>
-                                    <li><b>Perangkat Input Sound:</b> Pastikan ada headset/mic yang terdeteksi dan tidak di-<i>Mute</i> atau <i>Disable</i> di Windows Sound Settings.</li>
-                                    <li><b>Layanan Suara Google:</b> Pastikan koneksi internet stabil (Web Speech API mengirim audio ke server pengenal suara Google).</li>
+                                <p class="font-bold text-slate-900">Langkah Membuka Izin:</p>
+                                <ol class="list-decimal pl-4 space-y-1 text-[11px]">
+                                    <li>Klik ikon pengaturan/gembok di sebelah kiri address bar (URL) &rarr; ubah <b>Microphone</b> menjadi <b>Allow / Izinkan</b>.</li>
+                                    <li>Buka <b>Windows Settings (Win+I)</b> &rarr; <b>Privacy &amp; Security</b> &rarr; <b>Microphone</b> &rarr; Pastikan <b>Microphone access</b> dan <b>Let desktop apps access your microphone</b> aktif (ON).</li>
                                 </ol>
                             </div>
                         </div>`,
                         confirmButtonColor: '#155E63'
                     });
                 } else {
-                    alert('Akses mikrofon ditolak oleh sistem Windows. Silakan periksa Windows Privacy Settings -> Microphone.');
+                    alert('Akses mikrofon diblokir. Pastikan mikrofon diizinkan di browser dan Windows Privacy Settings.');
                 }
             } else if (event.error === 'network') {
                 if (window.Swal) {

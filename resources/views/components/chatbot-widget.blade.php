@@ -293,7 +293,7 @@
                     this.scrollToBottom();
                 }
             },
-            async toggleVoiceInput() {
+            toggleVoiceInput() {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) {
                     if (window.Swal) {
@@ -316,168 +316,67 @@
                     return;
                 }
 
-                // Handshake audio device via getUserMedia
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    try {
-                        const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        testStream.getTracks().forEach(track => track.stop());
-                    } catch (micErr) {
-                        console.warn('[Chatbot-Voice] getUserMedia check failed:', micErr);
-                        let detail = 'Periksa izin mikrofon di Windows Settings (Privacy & Security -> Microphone) dan pastikan headset/mic terpasang.';
-                        if (window.Swal) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Izin Mikrofon Windows Terkunci',
-                                html: `<div class="text-left text-xs leading-relaxed space-y-2">
-                                    <p>Izin mikrofon browser sudah aktif, namun sistem Windows membatasi akses audio.</p>
-                                    <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 mt-2">
-                                        <b>Solusi di Windows:</b>
-                                        <ol class="list-decimal pl-4 mt-1 space-y-1 text-[11px]">
-                                            <li>Buka <b>Windows Settings</b> (<kbd>Win + I</kbd>) &rarr; <b>Privacy &amp; Security</b> &rarr; <b>Microphone</b>.</li>
-                                            <li>Pastikan <b>"Microphone access"</b> dan <b>"Let desktop apps access your microphone"</b> aktif (ON).</li>
-                                        </ol>
-                                    </div>
-                                </div>`,
-                                confirmButtonColor: '#155E63'
-                            });
-                        } else {
-                            alert(detail);
-                        }
-                        return;
-                    }
+                if (this.speechRecognizer) {
+                    try { this.speechRecognizer.abort(); } catch(e) {}
+                    this.speechRecognizer = null;
                 }
 
                 try {
                     this.speechRecognizer = new SpeechRecognition();
                     this.speechRecognizer.lang = 'id-ID';
                     this.speechRecognizer.interimResults = true;
-                    this.speechRecognizer.continuous = false;
+                    this.speechRecognizer.continuous = true;
+                    this.speechRecognizer.maxAlternatives = 1;
+
                     const initialText = this.inputQuery;
+                    this.isListening = true;
+
                     this.speechRecognizer.onstart = () => {
                         this.isListening = true;
                     };
+
                     this.speechRecognizer.onresult = (event) => {
-                        let transcript = '';
-                        for (let i = event.resultIndex; i < event.results.length; ++i) {
-                            transcript += event.results[i][0].transcript;
+                        let accumulatedFinal = '';
+                        let interimSpoken = '';
+                        for (let i = 0; i < event.results.length; ++i) {
+                            if (event.results[i].isFinal) {
+                                accumulatedFinal += event.results[i][0].transcript + ' ';
+                            } else {
+                                interimSpoken += event.results[i][0].transcript;
+                            }
                         }
-                        if (transcript.trim()) {
+                        const liveText = (accumulatedFinal + interimSpoken).trim();
+                        if (liveText) {
                             const prefix = initialText.trim() ? initialText.trim() + ' ' : '';
-                            this.inputQuery = prefix + transcript.trim();
+                            this.inputQuery = prefix + liveText;
                         }
                     };
+
                     this.speechRecognizer.onerror = (event) => {
+                        console.warn('[Chatbot-Voice] Error:', event.error);
+                        if (event.error === 'no-speech') {
+                            return;
+                        }
                         this.isListening = false;
                         if (event.error === 'not-allowed' || event.error === 'permission-denied') {
                             if (window.Swal) {
                                 Swal.fire({
                                     icon: 'warning',
-                                    title: 'Akses Mikrofon Ditolak Sistem',
-                                    text: 'Izin di Chrome sudah aktif, namun sistem Windows belum mengizinkan akses mikrofon untuk aplikasi desktop. Silakan periksa Windows Settings -> Privacy -> Microphone.',
+                                    title: 'Akses Mikrofon Belum Diizinkan',
+                                    text: 'Izin mikrofon belum aktif atau diblokir. Pastikan mikrofon diizinkan di browser dan Windows Privacy Settings.',
                                     confirmButtonColor: '#155E63'
                                 });
                             }
                         }
                     };
+
                     this.speechRecognizer.onend = () => {
                         this.isListening = false;
                     };
+
                     this.speechRecognizer.start();
                 } catch (e) {
-                    this.isListening = false;
-                }
-            },
-            async toggleVoiceInput() {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SpeechRecognition) {
-                    if (window.Swal) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Browser Tidak Mendukung',
-                            text: 'Browser Anda belum mendukung input suara. Silakan gunakan Google Chrome.',
-                            confirmButtonColor: '#155E63'
-                        });
-                    } else {
-                        alert('Browser Anda belum mendukung input suara.');
-                    }
-                    return;
-                }
-                if (this.isListening) {
-                    if (this.speechRecognizer) {
-                        try { this.speechRecognizer.stop(); } catch(e) {}
-                    }
-                    this.isListening = false;
-                    return;
-                }
-
-                // Handshake audio device via getUserMedia
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    try {
-                        const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        testStream.getTracks().forEach(track => track.stop());
-                    } catch (micErr) {
-                        console.warn('[Chatbot-Voice] getUserMedia check failed:', micErr);
-                        let detail = 'Periksa izin mikrofon di Windows Settings (Privacy & Security -> Microphone) dan pastikan headset/mic terpasang.';
-                        if (window.Swal) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Izin Mikrofon Windows Terkunci',
-                                html: `<div class="text-left text-xs leading-relaxed space-y-2">
-                                    <p>Izin mikrofon browser sudah aktif, namun sistem Windows membatasi akses audio.</p>
-                                    <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 mt-2">
-                                        <b>Solusi di Windows:</b>
-                                        <ol class="list-decimal pl-4 mt-1 space-y-1 text-[11px]">
-                                            <li>Buka <b>Windows Settings</b> (<kbd>Win + I</kbd>) &rarr; <b>Privacy &amp; Security</b> &rarr; <b>Microphone</b>.</li>
-                                            <li>Pastikan <b>"Microphone access"</b> dan <b>"Let desktop apps access your microphone"</b> aktif (ON).</li>
-                                        </ol>
-                                    </div>
-                                </div>`,
-                                confirmButtonColor: '#155E63'
-                            });
-                        } else {
-                            alert(detail);
-                        }
-                        return;
-                    }
-                }
-
-                try {
-                    this.speechRecognizer = new SpeechRecognition();
-                    this.speechRecognizer.lang = 'id-ID';
-                    this.speechRecognizer.interimResults = true;
-                    this.speechRecognizer.continuous = false;
-                    const initialText = this.inputQuery;
-                    this.speechRecognizer.onstart = () => {
-                        this.isListening = true;
-                    };
-                    this.speechRecognizer.onresult = (event) => {
-                        let transcript = '';
-                        for (let i = event.resultIndex; i < event.results.length; ++i) {
-                            transcript += event.results[i][0].transcript;
-                        }
-                        if (transcript.trim()) {
-                            const prefix = initialText.trim() ? initialText.trim() + ' ' : '';
-                            this.inputQuery = prefix + transcript.trim();
-                        }
-                    };
-                    this.speechRecognizer.onerror = (event) => {
-                        this.isListening = false;
-                        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-                            if (window.Swal) {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Akses Mikrofon Ditolak Sistem',
-                                    text: 'Izin di Chrome sudah aktif, namun sistem Windows belum mengizinkan akses mikrofon untuk aplikasi desktop. Silakan periksa Windows Settings -> Privacy -> Microphone.',
-                                    confirmButtonColor: '#155E63'
-                                });
-                            }
-                        }
-                    };
-                    this.speechRecognizer.onend = () => {
-                        this.isListening = false;
-                    };
-                    this.speechRecognizer.start();
-                } catch (e) {
+                    console.error('[Chatbot-Voice] Failed to start:', e);
                     this.isListening = false;
                 }
             },
