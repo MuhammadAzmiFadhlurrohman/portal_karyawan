@@ -308,14 +308,14 @@
                             @endif
                         </a>
 
-                        <!-- 2. Persetujuan Karyawan (Khusus Atasan — Tidak Muncul di Role HRD) -->
+                        <!-- 2. Pengajuan Karyawan (Khusus Atasan — Tidak Muncul di Role HRD) -->
                         @if ($navCanApprovePengajuan)
                         <a href="{{ route('gomsn.pengajuan.approvals') }}"
                            @if (request()->routeIs('gomsn.pengajuan.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white' : 'text-amber-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span>Persetujuan Karyawan</span>
+                                <span>Pengajuan Karyawan</span>
                             </div>
                             @if ($navPendingAtasanCount > 0)
                             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
@@ -367,7 +367,7 @@
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ $isOvertimeRoute ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span>{{ $navIsAtasan ? 'Persetujuan Lembur' : 'Lembur' }}</span>
+                                <span>{{ $navIsAtasan ? 'Pengajuan Lembur' : 'Lembur' }}</span>
                             </div>
                             @if ($navPendingLemburCount > 0)
                             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">

@@ -654,7 +654,7 @@
                     @if ($isAtasan)
                     <a href="{{ route('gomsn.pengajuan.approvals') }}" class="btn-secondary min-h-[38px] inline-flex items-center gap-2 text-xs">
                         <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>Persetujuan Karyawan</span>
+                        <span>Pengajuan Karyawan</span>
                         @if ($pendingApprovalsCount > 0)
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
                             {{ $pendingApprovalsCount }}
@@ -687,7 +687,7 @@
                 <a href="{{ route('gomsn.pengajuan.approvals') }}" 
                    class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 text-slate-600 hover:bg-slate-100">
                     <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Persetujuan Karyawan</span>
+                    <span>Pengajuan Karyawan</span>
                     @if ($pendingApprovalsCount > 0)
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
                         {{ $pendingApprovalsCount }}
