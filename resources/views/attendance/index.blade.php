@@ -591,9 +591,8 @@
                         </label>
                         <div class="relative">
                             <select name="attendance_type" x-model="attendanceType" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
-                                <option value="office">Di Kantor (Office)</option>
-                                <option value="field">Tugas Lapangan (Field / SPK)</option>
-                                <option value="remote">Remote / WFH</option>
+                                <option value="office">Kantor</option>
+                                <option value="field">Dinas Luar</option>
                             </select>
                         </div>
                     </div>
@@ -606,7 +605,7 @@
                         </label>
                         <textarea name="notes" rows="2" 
                                   :required="attendanceType !== 'office'"
-                                  placeholder="Contoh: Pekerjaan maintenance / instalasi ODP di lapangan..."
+                                  placeholder="Contoh: Pekerjaan dinas luar / kunjungan lokasi..."
                                   class="w-full text-xs text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 px-3.5 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition resize-none"></textarea>
                     </div>
 

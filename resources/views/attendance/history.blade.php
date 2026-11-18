@@ -695,9 +695,8 @@
                             </label>
                             <select name="requested_attendance_type" required
                                     class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs sm:text-sm text-slate-800 focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer">
-                                <option value="office">Kantor (Office)</option>
-                                <option value="field">Lapangan (Field)</option>
-                                <option value="remote">Remote (WFH)</option>
+                                <option value="office">Kantor</option>
+                                <option value="field">Dinas Luar</option>
                             </select>
                         </div>
                     </div>
