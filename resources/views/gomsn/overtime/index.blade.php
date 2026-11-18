@@ -121,6 +121,20 @@
             </div>
         </div>
 
+        <!-- Action Toolbar: Tombol Ajukan Lembur (Di Atas Card Filter) -->
+        @if ($isHrd || ! $isAtasan)
+        <div class="flex items-center justify-end">
+            <a href="{{ route('gomsn.overtime.create') }}" 
+               class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
+               style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>Ajukan Lembur</span>
+            </a>
+        </div>
+        @endif
+
         <!-- ============================================================== -->
         <!-- 1. TOP FILTER BAR (PERSIS GAMBAR 1 DENGAN PERIODE, CARI, DIVISI, EXPORT) -->
         <!-- ============================================================== -->
@@ -227,42 +241,28 @@
                     @endif
                 </div>
 
-                <!-- Action Buttons: Ajukan Lembur, Filter, & Excel Export -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto sm:self-end pt-1 sm:pt-0">
-                    <!-- Tombol Buat Pengajuan Lembur (Berada di atas Filter) -->
-                    @if ($isHrd || ! $isAtasan)
-                    <a href="{{ route('gomsn.overtime.create') }}" 
-                       class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
-                       style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                <!-- Action Buttons: Filter & Excel Export -->
+                <div class="flex items-center gap-2 w-full sm:w-auto sm:self-end pt-1 sm:pt-0">
+                    <!-- Tombol Filter Gradient -->
+                    <button type="submit" 
+                            class="flex-1 sm:flex-initial py-2.5 px-4 sm:px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
+                            style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
-                        <span>Ajukan Lembur</span>
+                        <span>Filter</span>
+                    </button>
+
+                    @if ($canExport)
+                    <!-- Tombol Export Excel Hijau (Khusus Atasan / HRD / Finance / Admin) -->
+                    <a href="{{ route('gomsn.overtime.index', array_merge(request()->query(), ['export' => 'excel', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun])) }}" 
+                       title="Export Data ke Excel/CSV"
+                       class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center shrink-0 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                     </a>
                     @endif
-
-                    <div class="flex items-center gap-2 flex-1 sm:flex-initial">
-                        <!-- Tombol Filter Gradient -->
-                        <button type="submit" 
-                                class="flex-1 sm:flex-initial py-2.5 px-4 sm:px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
-                                style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                            <span>Filter</span>
-                        </button>
-
-                        @if ($canExport)
-                        <!-- Tombol Export Excel Hijau (Khusus Atasan / HRD / Finance / Admin) -->
-                        <a href="{{ route('gomsn.overtime.index', array_merge(request()->query(), ['export' => 'excel', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun])) }}" 
-                           title="Export Data ke Excel/CSV"
-                           class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition flex items-center justify-center shrink-0 cursor-pointer">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                        </a>
-                        @endif
-                    </div>
                 </div>
             </form>
 
