@@ -51,6 +51,7 @@ class OvertimeController extends Controller
         $isFinance = $user->hasRole('finance');
         $isHrd = $user->hasRole('hrd');
         $isSuperAdmin = $user->hasRole(['super_admin', 'admin']);
+        $canFilterDivisi = ($isSuperAdmin || $isHrd || $isFinance);
 
         $rawBulan = $request->input('bulan');
         $isFilterUnprocessed = ($rawBulan === 'unprocessed' || $rawBulan === 'pending');
@@ -100,8 +101,8 @@ class OvertimeController extends Controller
             });
         }
 
-        // Filter Divisi
-        if ($request->filled('divisi') && $selectedDivisi !== 'all' && $selectedDivisi !== 'Semua Divisi') {
+        // Filter Divisi (Khusus SuperAdmin, HRD, dan Finance. Atasan hanya menangani bawahan se-divisinya)
+        if ($canFilterDivisi && $request->filled('divisi') && $selectedDivisi !== 'all' && $selectedDivisi !== 'Semua Divisi') {
             $baseQuery->whereHas('user', function ($q) use ($selectedDivisi) {
                 $q->whereRaw('LOWER(division) = ?', [strtolower($selectedDivisi)]);
             });
@@ -263,7 +264,8 @@ class OvertimeController extends Controller
             'pendingPerMonth',
             'unprocessedPreviousCount',
             'unprocessedTotalCount',
-            'previousMonthsWithPending'
+            'previousMonthsWithPending',
+            'canFilterDivisi'
         ));
     }
 

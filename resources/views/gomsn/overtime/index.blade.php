@@ -17,6 +17,7 @@
         $searchKaryawan = $searchKaryawan ?? '';
         $selectedDivisi = $selectedDivisi ?? 'all';
         $divisions = $divisions ?? ['Teknik', 'NOC', 'Umum', 'Finance', 'HRD'];
+        $canFilterDivisi = $canFilterDivisi ?? ($isSuperAdmin || $isHrd || $isFinance);
         $totalNominalLembur = $totalNominalLembur ?? 0;
         $totalCountLembur = $totalCountLembur ?? 0;
         $viewMode = $viewMode ?? 'karyawan';
@@ -131,7 +132,14 @@
                     <input type="hidden" name="view_mode" value="{{ $viewMode }}">
                 @endif
 
-                <div class="grid grid-cols-1 {{ empty($selectedUserId) ? 'sm:grid-cols-3' : 'sm:grid-cols-2 max-w-2xl' }} gap-4 flex-1">
+                @php
+                    if ($canFilterDivisi) {
+                        $gridColsClass = empty($selectedUserId) ? 'sm:grid-cols-3' : 'sm:grid-cols-2 max-w-2xl';
+                    } else {
+                        $gridColsClass = empty($selectedUserId) ? 'sm:grid-cols-2 max-w-2xl' : 'sm:grid-cols-1 max-w-md';
+                    }
+                @endphp
+                <div class="grid grid-cols-1 {{ $gridColsClass }} gap-4 flex-1">
                     <!-- PERIODE -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5 flex items-center justify-between">
@@ -197,7 +205,8 @@
                     </div>
                     @endif
 
-                    <!-- DIVISI -->
+                    @if ($canFilterDivisi)
+                    <!-- DIVISI (Khusus SuperAdmin, HRD, dan Finance. Atasan hanya menangani staf se-divisinya) -->
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">
                             Divisi
@@ -211,6 +220,7 @@
                             @endforeach
                         </select>
                     </div>
+                    @endif
                 </div>
 
                 <!-- Action Buttons: Filter & Excel Export -->
@@ -280,14 +290,14 @@
                         <span class="text-[11px] text-amber-800">
                             Periode tertunda: 
                             @foreach ($previousMonthsWithPending as $pm)
-                                <a href="{{ route('gomsn.overtime.index', ['bulan' => $pm['month'], 'tahun' => $pm['year'], 'divisi' => $selectedDivisi, 'view_mode' => $viewMode]) }}" class="underline hover:text-amber-950 font-bold">
+                                <a href="{{ route('gomsn.overtime.index', array_filter(['bulan' => $pm['month'], 'tahun' => $pm['year'], 'divisi' => $canFilterDivisi ? $selectedDivisi : null, 'view_mode' => $viewMode])) }}" class="underline hover:text-amber-950 font-bold">
                                     {{ $pm['name'] }} ({{ $pm['count'] }})
                                 </a>@if(!$loop->last), @endif
                             @endforeach
                         </span>
                     </div>
                 </div>
-                <a href="{{ route('gomsn.overtime.index', ['bulan' => 'unprocessed', 'divisi' => $selectedDivisi, 'view_mode' => $viewMode]) }}" 
+                <a href="{{ route('gomsn.overtime.index', array_filter(['bulan' => 'unprocessed', 'divisi' => $canFilterDivisi ? $selectedDivisi : null, 'view_mode' => $viewMode])) }}" 
                    class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-2xs transition flex items-center gap-1.5 shrink-0 whitespace-nowrap self-start sm:self-auto cursor-pointer">
                     <span>Lihat Semua yang Belum Diproses ({{ $unprocessedTotalCount }})</span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -574,7 +584,7 @@
             @if ($selectedUserId)
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3.5">
-                    <a href="{{ route('gomsn.overtime.index', ['bulan' => $isFilterUnprocessed ? 'unprocessed' : $selectedBulan, 'tahun' => $selectedTahun, 'divisi' => $selectedDivisi, 'view_mode' => $viewMode]) }}" 
+                    <a href="{{ route('gomsn.overtime.index', array_filter(['bulan' => $isFilterUnprocessed ? 'unprocessed' : $selectedBulan, 'tahun' => $selectedTahun, 'divisi' => $canFilterDivisi ? $selectedDivisi : null, 'view_mode' => $viewMode])) }}" 
                        class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold transition cursor-pointer shadow-xs self-start">
                         <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
