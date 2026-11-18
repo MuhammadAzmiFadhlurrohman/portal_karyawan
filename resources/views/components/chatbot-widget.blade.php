@@ -293,7 +293,7 @@
                     this.scrollToBottom();
                 }
             },
-            toggleVoiceInput() {
+            async toggleVoiceInput() {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) {
                     if (window.Swal) {
@@ -315,6 +315,38 @@
                     this.isListening = false;
                     return;
                 }
+
+                // Handshake audio device via getUserMedia
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    try {
+                        const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        testStream.getTracks().forEach(track => track.stop());
+                    } catch (micErr) {
+                        console.warn('[Chatbot-Voice] getUserMedia check failed:', micErr);
+                        let detail = 'Periksa izin mikrofon di Windows Settings (Privacy & Security -> Microphone) dan pastikan headset/mic terpasang.';
+                        if (window.Swal) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Izin Mikrofon Windows Terkunci',
+                                html: `<div class="text-left text-xs leading-relaxed space-y-2">
+                                    <p>Izin mikrofon browser sudah aktif, namun sistem Windows membatasi akses audio.</p>
+                                    <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 mt-2">
+                                        <b>Solusi di Windows:</b>
+                                        <ol class="list-decimal pl-4 mt-1 space-y-1 text-[11px]">
+                                            <li>Buka <b>Windows Settings</b> (<kbd>Win + I</kbd>) &rarr; <b>Privacy &amp; Security</b> &rarr; <b>Microphone</b>.</li>
+                                            <li>Pastikan <b>"Microphone access"</b> dan <b>"Let desktop apps access your microphone"</b> aktif (ON).</li>
+                                        </ol>
+                                    </div>
+                                </div>`,
+                                confirmButtonColor: '#155E63'
+                            });
+                        } else {
+                            alert(detail);
+                        }
+                        return;
+                    }
+                }
+
                 try {
                     this.speechRecognizer = new SpeechRecognition();
                     this.speechRecognizer.lang = 'id-ID';
@@ -339,9 +371,9 @@
                         if (event.error === 'not-allowed' || event.error === 'permission-denied') {
                             if (window.Swal) {
                                 Swal.fire({
-                                    icon: 'error',
-                                    title: 'Akses Mikrofon Ditolak',
-                                    text: 'Silakan izinkan akses mikrofon di browser Anda.',
+                                    icon: 'warning',
+                                    title: 'Akses Mikrofon Ditolak Sistem',
+                                    text: 'Izin di Chrome sudah aktif, namun sistem Windows belum mengizinkan akses mikrofon untuk aplikasi desktop. Silakan periksa Windows Settings -> Privacy -> Microphone.',
                                     confirmButtonColor: '#155E63'
                                 });
                             }
