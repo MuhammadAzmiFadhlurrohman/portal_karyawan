@@ -983,6 +983,35 @@
             color: #0D9488 !important;
             background: rgba(240, 253, 250, 0.95) !important;
         }
+        .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text {
+            border-radius: 9999px !important;
+            width: 40px !important;
+            height: 40px !important;
+            background: #FFFFFF !important;
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.09) !important;
+            color: #64748B !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            transition: all 0.15s ease !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text:hover {
+            color: #0D9488 !important;
+            background: rgba(240, 253, 250, 0.95) !important;
+            border-color: rgba(20, 184, 166, 0.4) !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text.is-recording {
+            background: #FFF1F2 !important;
+            border-color: #FDA4AF !important;
+            color: #E11D48 !important;
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.22), 0 3px 12px rgba(244, 63, 94, 0.28) !important;
+        }
+        .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text svg {
+            width: 1.1rem !important;
+            height: 1.1rem !important;
+        }
         .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
             border-radius: 9999px !important;
             width: 40px !important;
@@ -1529,8 +1558,8 @@
                             id="btn-attachment-toggle"
                             onclick="toggleAttachmentMenu(event)"
                             title="Lampirkan Dokumen / Media / Kamera / Lokasi"
-                            class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition cursor-pointer shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                            class="w-10 h-10 rounded-full bg-white border border-slate-200/95 shadow-[0_3px_12px_rgba(0,0,0,0.09)] hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                     </button>
 
                     <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
@@ -1614,7 +1643,7 @@
 
                 <!-- Text & Location Input Box Container (Matching Image 1) -->
                 <div id="chat-input-container"
-                     class="flex-1 rounded-xl border border-slate-300/90 bg-white px-3 py-1.5 transition-all flex flex-col justify-center min-h-[38px] shadow-2xs min-w-0">
+                     class="flex-1 rounded-full border border-slate-300/90 bg-white px-4 py-1.5 transition-all flex flex-col justify-center min-h-[40px] shadow-[0_3px_12px_rgba(0,0,0,0.09)] min-w-0">
                     <div class="relative flex items-center min-w-0">
                         <input type="text"
                                name="message"
@@ -1734,9 +1763,9 @@
                         id="btn-voice-to-text"
                         onclick="toggleVoiceRecognition()"
                         title="Bicara untuk Mengetik (Voice-to-Text)"
-                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
+                        class="w-10 h-10 rounded-full bg-white border border-slate-200/95 shadow-[0_3px_12px_rgba(0,0,0,0.09)] hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
                     <!-- Mic Normal Icon -->
-                    <svg id="mic-icon-normal" class="w-4 h-4 text-slate-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg id="mic-icon-normal" class="w-4.5 h-4.5 text-slate-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
                     </svg>
                     <!-- Mic Active (Recording Pulse) -->
@@ -1748,9 +1777,9 @@
                 <button type="button"
                         id="btn-quick-chat-submit"
                         onclick="handleChatFormSubmit(event)"
-                        class="w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-md shadow-teal-950/20 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+                        class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-[0_3px_12px_rgba(13,148,136,0.42)] hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    <svg class="w-4 h-4 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    <svg class="w-4.5 h-4.5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
                     </div>
                 </div>
@@ -4156,8 +4185,8 @@ function startVoiceRecognition() {
         // Umpan balik visual instan tanpa delay
         isRecordingVoice = true;
         if (micBtn) {
-            micBtn.classList.remove('bg-slate-100', 'text-slate-600');
-            micBtn.classList.add('bg-rose-50', 'text-rose-600', 'border', 'border-rose-300', 'shadow-xs');
+            micBtn.classList.remove('text-slate-600', 'bg-white');
+            micBtn.classList.add('bg-rose-50', 'text-rose-600', 'border-rose-300', 'is-recording');
         }
         if (micNormal) {
             micNormal.classList.remove('text-slate-600');
@@ -4264,8 +4293,8 @@ function stopVoiceRecognition() {
     const chatInput = document.getElementById('quick-chat-input');
 
     if (micBtn) {
-        micBtn.classList.remove('bg-rose-50', 'text-rose-600', 'border', 'border-rose-300', 'shadow-xs');
-        micBtn.classList.add('bg-slate-100', 'text-slate-600');
+        micBtn.classList.remove('bg-rose-50', 'text-rose-600', 'border-rose-300', 'is-recording');
+        micBtn.classList.add('text-slate-600', 'bg-white');
     }
     if (micNormal) {
         micNormal.classList.remove('text-rose-600', 'animate-pulse');
