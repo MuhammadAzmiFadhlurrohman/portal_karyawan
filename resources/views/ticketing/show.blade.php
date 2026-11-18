@@ -2192,7 +2192,7 @@
                     @csrf
                     <div>
                         <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Deskripsi Titik Tiang / Span *</label>
-                        <input type="text" name="location_name" required placeholder="Contoh: Tiang PT MSN No. 12 Depan RSUD" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                        <input type="text" name="nama_titik" required placeholder="Contoh: Tiang PT MSN No. 12 Depan RSUD" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -2213,11 +2213,23 @@
                     <div class="space-y-2 pt-2">
                         @foreach($tiket->repairPoints as $rp)
                             <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                                <div>
-                                    <span class="font-bold text-slate-800">{{ $rp->location_name }}</span>
+                                <div class="min-w-0 pr-2">
+                                    <span class="font-bold text-slate-800 block truncate">{{ $rp->nama_titik ?: ($rp->location_name ?: 'Titik Perbaikan') }}</span>
+                                    @if($rp->jenis_kerusakan)
+                                        <span class="text-[10px] text-teal-700 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-semibold inline-block my-0.5">{{ $rp->jenis_kerusakan }}</span>
+                                    @endif
                                     <p class="text-[11px] font-mono text-slate-400">{{ $rp->latitude }}, {{ $rp->longitude }}</p>
                                 </div>
-                                <a href="https://maps.google.com/?q={{ $rp->latitude }},{{ $rp->longitude }}" target="_blank" class="text-teal-600 font-bold hover:underline">Maps &rarr;</a>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="https://maps.google.com/?q={{ $rp->latitude }},{{ $rp->longitude }}" target="_blank" class="text-teal-600 font-bold hover:underline">Maps &rarr;</a>
+                                    <form method="POST" action="{{ route('tickets.repair-points.destroy', $rp) }}" onsubmit="return confirm('Hapus titik perbaikan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-6 h-6 rounded bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition cursor-pointer" title="Hapus titik">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         @endforeach
                     </div>

@@ -160,6 +160,7 @@ Route::middleware('auth')->group(function (): void {
     // Technical Assets & Materials (§7.6, AC-06)
     Route::post('/tickets/{tiket}/materials', [TechnicalAssetController::class, 'useMaterial'])->name('tickets.materials.use');
     Route::post('/tickets/{tiket}/repair-points', [TechnicalAssetController::class, 'storeRepairPoint'])->name('tickets.repair-points.store');
+    Route::delete('/tickets/repair-points/{repairPoint}', [TechnicalAssetController::class, 'destroyRepairPoint'])->name('tickets.repair-points.destroy');
     Route::post('/tickets/{tiket}/joint-closures', [TechnicalAssetController::class, 'storeJointClosure'])->name('tickets.joint-closures.store');
     Route::post('/tickets/joint-closures/{jointClosure}/cores', [TechnicalAssetController::class, 'storeClosureCore'])->name('tickets.closure-cores.store');
     Route::post('/tickets/{tiket}/maneuvers', [TechnicalAssetController::class, 'storeCoreManeuver'])->name('tickets.maneuvers.store');

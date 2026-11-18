@@ -67,6 +67,9 @@ class TechnicalAssetController extends Controller
     {
         Gate::authorize('update', $tiket);
 
+        $namaTitik = $request->input('nama_titik') ?: $request->input('location_name');
+        $request->merge(['nama_titik' => $namaTitik]);
+
         $validated = $request->validate([
             'nama_titik' => ['required', 'string', 'max:150'],
             'latitude' => ['nullable', 'numeric'],
@@ -87,6 +90,22 @@ class TechnicalAssetController extends Controller
         }
 
         return redirect()->route('tickets.show', $tiket)->with('success', 'Titik perbaikan berhasil dicatat.');
+    }
+
+    /**
+     * Delete Repair Point.
+     */
+    public function destroyRepairPoint(Request $request, RepairPoint $repairPoint): RedirectResponse|JsonResponse
+    {
+        Gate::authorize('update', $repairPoint->ticket);
+        $tiket = $repairPoint->ticket;
+        $repairPoint->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Titik perbaikan berhasil dihapus.']);
+        }
+
+        return redirect()->route('tickets.show', $tiket)->with('success', 'Titik perbaikan berhasil dihapus.');
     }
 
     /**
