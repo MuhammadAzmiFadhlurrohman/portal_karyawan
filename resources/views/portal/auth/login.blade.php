@@ -148,30 +148,36 @@
             }
             .wave-mobile {
                 display: block !important;
-                height: 46px !important;
+                height: 48px !important;
             }
             .login-wrap {
                 flex-direction: column !important;
                 height: 100vh !important;
                 height: 100dvh !important;
                 max-height: 100dvh !important;
-                overflow: hidden !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
             }
             .login-panel-left {
                 width: 100% !important;
-                min-height: 0 !important;
-                height: auto !important;
-                padding: 18px 20px 70px 20px !important;
+                height: 41% !important;
+                min-height: 285px !important;
+                flex: 0 0 auto !important;
+                padding: 20px 20px 58px 20px !important;
+                justify-content: space-around !important;
             }
             .login-panel-right {
                 width: 100% !important;
                 height: auto !important;
                 flex: 1 !important;
-                justify-content: flex-start !important;
-                padding: 12px 20px 20px 20px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 16px 24px 20px 24px !important;
                 margin-top: 0 !important;
                 z-index: 25 !important;
-                overflow: hidden !important;
+                overflow-y: auto !important;
             }
         }
     </style>
@@ -350,14 +356,14 @@
         <!-- ============================================================== -->
         <div class="login-panel-right">
             
-            <div class="w-full max-w-[420px] sm:max-w-[440px] mx-auto relative z-10">
+            <div class="w-full max-w-[420px] sm:max-w-[440px] mx-auto my-auto relative z-10">
                 
                 <!-- Heading Masuk ke Akun -->
-                <div class="mb-3 sm:mb-6 text-center">
+                <div class="mb-3.5 sm:mb-6 text-center">
                     <h2 class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                         Masuk ke Akun
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
                         Silakan masukkan kredensial akun Anda untuk login.
                     </p>
                 </div>
@@ -504,6 +510,16 @@
                     </div>
                 </form>
 
+            </div>
+
+            <!-- Footer Hak Cipta & Keamanan Portal (Mengisi Bagian Bawah Layar HP) -->
+            <div class="w-full text-center pt-3 pb-1 relative z-10 select-none">
+                <p class="text-[11px] text-slate-400 font-medium inline-flex items-center gap-1.5 justify-center">
+                    <svg class="w-3.5 h-3.5 text-teal-600/70 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>GoMSN Secure Portal &bull; PT Media Solusi Network</span>
+                </p>
             </div>
         </div>
     </div>
