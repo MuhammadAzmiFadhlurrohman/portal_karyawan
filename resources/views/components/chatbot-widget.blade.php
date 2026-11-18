@@ -2,11 +2,59 @@
      class="font-sans"
      :class="{ 'opacity-0 pointer-events-none': typeof bottomSheetOpen !== 'undefined' && bottomSheetOpen }"
      x-data="chatbotWidget()">
+
+    <style>
+        .chatbot-docked-tab {
+            position: fixed !important;
+            right: 0 !important;
+            bottom: 86px !important;
+            z-index: 50 !important;
+            width: 38px !important;
+            padding-top: 10px !important;
+            padding-bottom: 12px !important;
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+            background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important;
+            border-top-left-radius: 16px !important;
+            border-bottom-left-radius: 16px !important;
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            box-shadow: -4px 6px 20px rgba(2, 40, 54, 0.4), -1px 2px 4px rgba(20, 184, 166, 0.2) !important;
+            border-left: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+            border-top: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+            border-bottom: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+            border-right: none !important;
+        }
+        .chatbot-modal-box {
+            position: fixed !important;
+            right: 12px !important;
+            bottom: 86px !important;
+            z-index: 60 !important;
+        }
+        @media (min-width: 640px) {
+            .chatbot-docked-tab {
+                bottom: 48px !important;
+            }
+            .chatbot-modal-box {
+                right: 56px !important;
+                bottom: 48px !important;
+            }
+        }
+        @media (min-width: 768px) {
+            .chatbot-docked-tab {
+                bottom: 32px !important;
+            }
+            .chatbot-modal-box {
+                right: 56px !important;
+                bottom: 32px !important;
+            }
+        }
+    </style>
+
     <!-- Docked Side-Tab Trigger Button (Matching Image) -->
     <button @click="toggleChat()" 
             type="button"
-            class="fixed right-0 bottom-[82px] sm:bottom-12 md:bottom-8 z-40 text-white flex flex-col items-center justify-center transition-all duration-300 group hover:-translate-x-1 active:scale-95 focus:outline-none cursor-pointer select-none"
-            style="width: 38px; padding-top: 10px; padding-bottom: 12px; padding-left: 4px; padding-right: 4px; background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important; border-top-left-radius: 16px; border-bottom-left-radius: 16px; border-top-right-radius: 0; border-bottom-right-radius: 0; box-shadow: -4px 6px 20px rgba(2, 40, 54, 0.4), -1px 2px 4px rgba(20, 184, 166, 0.2); border-left: 1.5px solid rgba(255, 255, 255, 0.25); border-top: 1.5px solid rgba(255, 255, 255, 0.25); border-bottom: 1.5px solid rgba(255, 255, 255, 0.15); border-right: none;"
+            class="chatbot-docked-tab text-white flex flex-col items-center justify-center transition-all duration-300 group hover:-translate-x-1 active:scale-95 focus:outline-none cursor-pointer select-none"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
         
@@ -46,7 +94,7 @@
          x-transition:leave="transition-all duration-200 ease-[cubic-bezier(0.4,0,1,1)]"
          x-transition:leave-start="opacity-100 translate-y-0 translate-x-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-6 translate-x-3 scale-90"
-         class="origin-bottom-right fixed right-3 bottom-[82px] sm:right-14 sm:bottom-12 md:bottom-8 bg-white rounded-3xl shadow-[0_22px_50px_rgba(2,40,54,0.35)] border border-slate-200/90 flex flex-col overflow-hidden z-50"
+         class="chatbot-modal-box origin-bottom-right bg-white rounded-3xl shadow-[0_22px_50px_rgba(2,40,54,0.35)] border border-slate-200/90 flex flex-col overflow-hidden"
          style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 95px); display: none;">
         
         <!-- Header -->
