@@ -280,7 +280,11 @@
                             </div>
 
                             <!-- Division Badge -->
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 shrink-0">
+                            @php
+                                $divStyle = \App\Models\User::getDivisionBadgeStyle($row['division'] ?? 'Umum');
+                            @endphp
+                            <span style="background-color: {{ $divStyle['bg'] }}; color: {{ $divStyle['text'] }}; border: 1px solid {{ $divStyle['border'] }};"
+                                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold shrink-0 shadow-2xs">
                                 {{ $row['division'] }}
                             </span>
                         </div>
@@ -432,7 +436,11 @@
 
                                 <!-- DIVISI -->
                                 <td class="py-3.5 px-5 whitespace-nowrap">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                                    @php
+                                        $divStyleTable = \App\Models\User::getDivisionBadgeStyle($row['division'] ?? 'Umum');
+                                    @endphp
+                                    <span style="background-color: {{ $divStyleTable['bg'] }}; color: {{ $divStyleTable['text'] }}; border: 1px solid {{ $divStyleTable['border'] }};"
+                                          class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold shadow-2xs">
                                         {{ $row['division'] }}
                                     </span>
                                 </td>

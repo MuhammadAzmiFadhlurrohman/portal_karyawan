@@ -128,6 +128,123 @@ class User extends Authenticatable
     }
 
     /**
+     * Get color styling for each division and role badge.
+     *
+     * @return array{bg: string, text: string, border: string, class: string}
+     */
+    public static function getDivisionBadgeStyle(?string $divisionOrRole): array
+    {
+        $normalized = strtolower(trim((string) $divisionOrRole));
+
+        if (empty($normalized)) {
+            return [
+                'bg' => '#F1F5F9',
+                'text' => '#475569',
+                'border' => '#E2E8F0',
+                'class' => 'bg-slate-100 text-slate-700 border-slate-200',
+            ];
+        }
+
+        // Teknik / Lapangan -> Warm Orange
+        if (str_contains($normalized, 'teknik') || str_contains($normalized, 'teknisi') || str_contains($normalized, 'field')) {
+            return [
+                'bg' => '#FFEDD5',
+                'text' => '#C2410C',
+                'border' => '#FED7AA',
+                'class' => 'bg-orange-100 text-orange-800 border-orange-200',
+            ];
+        }
+
+        // IT & Sistem -> Modern Indigo
+        if (str_contains($normalized, 'it') || str_contains($normalized, 'sistem') || str_contains($normalized, 'system') || str_contains($normalized, 'dev') || str_contains($normalized, 'programmer')) {
+            return [
+                'bg' => '#EEF2FF',
+                'text' => '#4338CA',
+                'border' => '#C7D2FE',
+                'class' => 'bg-indigo-100 text-indigo-800 border-indigo-200',
+            ];
+        }
+
+        // NOC -> Sky Blue
+        if (str_contains($normalized, 'noc')) {
+            return [
+                'bg' => '#E0F2FE',
+                'text' => '#0369A1',
+                'border' => '#BAE6FD',
+                'class' => 'bg-sky-100 text-sky-800 border-sky-200',
+            ];
+        }
+
+        // Finance & Akuntansi -> Emerald Green
+        if (str_contains($normalized, 'finance') || str_contains($normalized, 'keuangan') || str_contains($normalized, 'akuntansi') || str_contains($normalized, 'kasir')) {
+            return [
+                'bg' => '#ECFDF5',
+                'text' => '#047857',
+                'border' => '#A7F3D0',
+                'class' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+            ];
+        }
+
+        // HRD & Human Capital -> Coral Rose
+        if (str_contains($normalized, 'hrd') || str_contains($normalized, 'human') || str_contains($normalized, 'personalia') || str_contains($normalized, 'hc')) {
+            return [
+                'bg' => '#FFE4E6',
+                'text' => '#BE123C',
+                'border' => '#FECDD3',
+                'class' => 'bg-rose-100 text-rose-800 border-rose-200',
+            ];
+        }
+
+        // Operasional -> Brand Teal
+        if (str_contains($normalized, 'operasional') || str_contains($normalized, 'ops')) {
+            return [
+                'bg' => '#CCFBF1',
+                'text' => '#0F766E',
+                'border' => '#99F6E4',
+                'class' => 'bg-teal-100 text-teal-800 border-teal-200',
+            ];
+        }
+
+        // Direksi & Executive -> Royal Purple
+        if (str_contains($normalized, 'direksi') || str_contains($normalized, 'executive') || str_contains($normalized, 'direktur') || str_contains($normalized, 'general manager') || str_contains($normalized, 'gm')) {
+            return [
+                'bg' => '#F3E8FF',
+                'text' => '#6B21A8',
+                'border' => '#E9D5FF',
+                'class' => 'bg-purple-100 text-purple-800 border-purple-200',
+            ];
+        }
+
+        // Dispatch -> Golden Amber
+        if (str_contains($normalized, 'dispatch')) {
+            return [
+                'bg' => '#FEF3C7',
+                'text' => '#B45309',
+                'border' => '#FDE68A',
+                'class' => 'bg-amber-100 text-amber-800 border-amber-200',
+            ];
+        }
+
+        // Default / Umum / Petugas -> Slate Gray
+        return [
+            'bg' => '#F1F5F9',
+            'text' => '#475569',
+            'border' => '#E2E8F0',
+            'class' => 'bg-slate-100 text-slate-700 border-slate-200',
+        ];
+    }
+
+    /**
+     * Get division badge styling for this user instance.
+     *
+     * @return array{bg: string, text: string, border: string, class: string}
+     */
+    public function getDivisionBadgeStyleAttribute(): array
+    {
+        return self::getDivisionBadgeStyle($this->chat_badge);
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function supervisor(): BelongsTo

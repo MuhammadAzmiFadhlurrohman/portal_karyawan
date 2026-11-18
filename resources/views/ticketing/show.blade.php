@@ -1251,8 +1251,11 @@
                                     <span class="font-bold text-[11px] {{ $isSelf ? 'text-teal-950' : 'text-slate-800' }} truncate">
                                         {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}
                                     </span>
-                                    <span style="{{ $isSelf ? 'background-color: #D6E8FF; color: #0369A1;' : 'background-color: #F1F5F9; color: #475569;' }}"
-                                          class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
+                                    @php
+                                        $divBadge = \App\Models\User::getDivisionBadgeStyle($roleLabel);
+                                    @endphp
+                                    <span style="background-color: {{ $divBadge['bg'] }}; color: {{ $divBadge['text'] }}; border: 1px solid {{ $divBadge['border'] }};"
+                                          class="px-1.5 py-0.5 rounded-full text-[8.5px] font-bold tracking-wide shrink-0 leading-none shadow-2xs">
                                         {{ str_replace('_', ' ', $roleLabel) }}
                                     </span>
                                 </div>
@@ -3613,6 +3616,35 @@ function switchTab(tabId) {
     }
 }
 
+function getDivisionBadgeStyle(divisionOrRole) {
+    const raw = String(divisionOrRole || '').toLowerCase().trim();
+    if (raw.includes('teknik') || raw.includes('teknisi') || raw.includes('field')) {
+        return { bg: '#FFEDD5', text: '#C2410C', border: '#FED7AA' };
+    }
+    if (raw.includes('it') || raw.includes('sistem') || raw.includes('system') || raw.includes('dev') || raw.includes('programmer')) {
+        return { bg: '#EEF2FF', text: '#4338CA', border: '#C7D2FE' };
+    }
+    if (raw.includes('noc')) {
+        return { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' };
+    }
+    if (raw.includes('finance') || raw.includes('keuangan') || raw.includes('akuntansi') || raw.includes('kasir')) {
+        return { bg: '#ECFDF5', text: '#047857', border: '#A7F3D0' };
+    }
+    if (raw.includes('hrd') || raw.includes('human') || raw.includes('personalia') || raw.includes('hc')) {
+        return { bg: '#FFE4E6', text: '#BE123C', border: '#FECDD3' };
+    }
+    if (raw.includes('operasional') || raw.includes('ops')) {
+        return { bg: '#CCFBF1', text: '#0F766E', border: '#99F6E4' };
+    }
+    if (raw.includes('direksi') || raw.includes('executive') || raw.includes('direktur') || raw.includes('general manager') || raw.includes('gm')) {
+        return { bg: '#F3E8FF', text: '#6B21A8', border: '#E9D5FF' };
+    }
+    if (raw.includes('dispatch')) {
+        return { bg: '#FEF3C7', text: '#B45309', border: '#FDE68A' };
+    }
+    return { bg: '#F1F5F9', text: '#475569', border: '#E2E8F0' };
+}
+
 async function handleChatFormSubmit(e) {
     if (e) {
         if (typeof e.preventDefault === 'function') e.preventDefault();
@@ -3710,13 +3742,15 @@ async function handleChatFormSubmit(e) {
             </div>
         `;
 
+        const selfBadgeStyle = getDivisionBadgeStyle(authUserBadge);
+
         bubble.innerHTML = `
             <div style="background-color: #EAF4FE; border: 1px solid #CFE4FC; box-shadow: 0 1px 2px rgba(0,0,0,0.05); max-width: min(80%, 380px); min-width: 140px;"
                  class="rounded-xl rounded-tr-xs px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs space-y-1 relative new-chat-highlight-self">
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-1.5 min-w-0">
                         <span class="font-bold text-[11px] text-teal-950 truncate">Anda</span>
-                        <span style="background-color: #D6E8FF; color: #0369A1;" class="px-1.5 py-0.5 rounded-full text-[8.5px] font-semibold tracking-wide shrink-0 leading-none">
+                        <span style="background-color: ${selfBadgeStyle.bg}; color: ${selfBadgeStyle.text}; border: 1px solid ${selfBadgeStyle.border};" class="px-1.5 py-0.5 rounded-full text-[8.5px] font-bold tracking-wide shrink-0 leading-none shadow-2xs">
                             ${escapeChatHtml(authUserBadge)}
                         </span>
                     </div>
