@@ -841,15 +841,15 @@
             }
             100% {
                 opacity: 0;
-                transform: scale(0.95) translateY(10px);
-                filter: blur(2px);
+                transform: scale(0.97) translateY(4px);
+                filter: blur(1px);
             }
         }
 
         @keyframes chatFsSettle {
             0% {
-                opacity: 0.88;
-                transform: scale(0.985);
+                opacity: 0.95;
+                transform: scale(0.99);
             }
             100% {
                 opacity: 1;
@@ -1069,6 +1069,9 @@
              onclick="toggleChatFullscreen()"
              class="hidden"
              title="Tutup Tampilan Penuh (Esc)"></div>
+
+        <!-- Placeholder to prevent layout shift & page height collapse during Full Size mode -->
+        <div id="chat-fs-placeholder" class="hidden rounded-3xl" aria-hidden="true"></div>
 
         <div id="ticket-chat-container" class="ticket-chat-card bg-white rounded-3xl border border-slate-200/80 shadow-xs flex flex-col relative"
              style="overflow: visible !important;">
@@ -4590,8 +4593,9 @@ function getLiveGpsCoordinates() {
     );
 }
 
-// Toggle Chat Fullscreen Mode (Zoom Full Size) with Smooth Animation
+// Toggle Chat Fullscreen Mode (Zoom Full Size) with Smooth In-Place Transition
 let isChatFullscreenTransitioning = false;
+let savedChatScrollY = null;
 
 function toggleChatFullscreen() {
     if (isChatFullscreenTransitioning) return;
@@ -4603,13 +4607,26 @@ function toggleChatFullscreen() {
     const minimizeIcon = document.getElementById('icon-fs-minimize');
     const fsLabel = document.getElementById('fs_label');
     const backdrop = document.getElementById('chat-fs-backdrop');
+    const placeholder = document.getElementById('chat-fs-placeholder');
 
     const willBeFullscreen = !chatCard.classList.contains('is-chat-fullscreen');
 
     if (willBeFullscreen) {
         isChatFullscreenTransitioning = true;
 
-        // 1. Show backdrop with smooth fade-in
+        // 1. Simpan posisi scroll vertikal chat sebelum fullscreen & pasang placeholder
+        const offset = window.innerWidth < 768 ? 65 : 80;
+        const currentRect = chatCard.getBoundingClientRect();
+        const currentScroll = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+        savedChatScrollY = Math.max(0, currentRect.top + currentScroll - offset);
+
+        if (placeholder) {
+            placeholder.style.height = (chatCard.offsetHeight || 500) + 'px';
+            placeholder.style.width = '100%';
+            placeholder.classList.remove('hidden');
+        }
+
+        // 2. Tampilkan backdrop dengan smooth fade-in
         if (backdrop) {
             backdrop.classList.remove('hidden');
             requestAnimationFrame(() => {
@@ -4617,13 +4634,13 @@ function toggleChatFullscreen() {
             });
         }
 
-        // 2. Add entering animation and fullscreen classes
+        // 3. Masuk ke mode fullscreen
         chatCard.classList.remove('chat-fs-exiting', 'chat-fs-settling');
         chatCard.classList.add('is-chat-fullscreen', 'chat-fs-entering');
         chatCard.style.height = '100dvh';
         document.body.style.overflow = 'hidden';
 
-        // 3. Update button UI
+        // 4. Update button UI
         if (expandIcon) expandIcon.classList.add('hidden');
         if (minimizeIcon) {
             minimizeIcon.classList.remove('hidden');
@@ -4632,7 +4649,7 @@ function toggleChatFullscreen() {
         }
         if (fsLabel) fsLabel.innerText = 'Kecilkan';
 
-        // 4. Clean up enter animation class after completion
+        // 5. Bersihkan class animasi masuk
         setTimeout(() => {
             chatCard.classList.remove('chat-fs-entering');
             isChatFullscreenTransitioning = false;
@@ -4640,16 +4657,21 @@ function toggleChatFullscreen() {
     } else {
         isChatFullscreenTransitioning = true;
 
-        // 1. Animate backdrop fade-out
+        // 1. Kunci posisi scroll halaman agar sudah langsung berada di posisi chat (tidak ke atas)
+        if (typeof savedChatScrollY === 'number' && savedChatScrollY >= 0) {
+            window.scrollTo({ top: savedChatScrollY, behavior: 'instant' });
+        }
+
+        // 2. Animasi fade-out backdrop
         if (backdrop) {
             backdrop.classList.remove('is-visible');
         }
 
-        // 2. Add smooth exiting animation
+        // 3. Animasi keluar halus
         chatCard.classList.remove('chat-fs-entering');
         chatCard.classList.add('chat-fs-exiting');
 
-        // 3. Update button UI
+        // 4. Update button UI
         if (expandIcon) {
             expandIcon.classList.remove('hidden');
             expandIcon.classList.add('scale-75');
@@ -4658,24 +4680,29 @@ function toggleChatFullscreen() {
         if (minimizeIcon) minimizeIcon.classList.add('hidden');
         if (fsLabel) fsLabel.innerText = 'Full Size';
 
-        // 4. Remove fullscreen after exit animation finishes
+        // 5. Selesai animasi keluar: langsung berada di posisi chat tanpa scroll dari atas ke bawah
         setTimeout(() => {
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+
             chatCard.classList.remove('is-chat-fullscreen', 'chat-fs-exiting');
             if (backdrop) backdrop.classList.add('hidden');
             document.body.style.overflow = '';
             adjustChatHeight();
 
-            // Settle animation back in page layout
+            // Settle halus pada posisi container
             chatCard.classList.add('chat-fs-settling');
             setTimeout(() => {
                 chatCard.classList.remove('chat-fs-settling');
-            }, 250);
+            }, 200);
 
-            // Pastikan tetap di tab Kronologis (chat) dan scroll ke chat container
-            switchTab('tab-chronology');
-            setTimeout(() => {
-                chatCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 50);
+            // Kunci viewport secara instan di posisi chatCard (tidak meloncat ke atas baru ke bawah)
+            if (typeof savedChatScrollY === 'number' && savedChatScrollY >= 0) {
+                window.scrollTo({ top: savedChatScrollY, behavior: 'instant' });
+            } else {
+                chatCard.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
 
             isChatFullscreenTransitioning = false;
         }, 220);
