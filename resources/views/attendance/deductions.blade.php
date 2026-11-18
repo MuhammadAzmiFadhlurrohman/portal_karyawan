@@ -46,23 +46,13 @@
         <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-3.5">
             <!-- Left: Back Button & Info Chips -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2.5 w-full lg:w-auto">
-                <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-                    <a href="{{ route('attendance.history', ['month' => $month, 'year' => $year]) }}" 
-                       class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer">
-                        <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                        <span class="truncate">Riwayat Absen</span>
-                    </a>
-
-                    <a href="{{ route('attendance.leaves') }}" 
-                       class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer">
-                        <svg class="w-4 h-4 text-teal-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span class="truncate">Manajemen Cuti</span>
-                    </a>
-                </div>
+                <a href="{{ route('attendance.history', ['month' => $month, 'year' => $year]) }}" 
+                   class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer w-full sm:w-auto">
+                    <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span class="truncate">Riwayat Absen</span>
+                </a>
 
                 @if (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage'))
                 <a href="{{ route('attendance.reports') }}" 
