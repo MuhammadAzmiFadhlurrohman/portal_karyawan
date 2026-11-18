@@ -1,29 +1,42 @@
 <div id="chatbot-widget-container" 
-     class="fixed bottom-[78px] right-3.5 sm:right-6 md:bottom-6 md:right-6 z-30 font-sans transition-all duration-300"
-     :class="{ 'opacity-0 pointer-events-none scale-75': typeof bottomSheetOpen !== 'undefined' && bottomSheetOpen }"
+     class="font-sans"
+     :class="{ 'opacity-0 pointer-events-none': typeof bottomSheetOpen !== 'undefined' && bottomSheetOpen }"
      x-data="chatbotWidget()">
-    <!-- Floating Trigger Button -->
+    <!-- Docked Side-Tab Trigger Button (Matching Image) -->
     <button @click="toggleChat()" 
             type="button"
-            class="rounded-full text-white flex items-center justify-center transition-transform transform hover:scale-105 active:scale-95 focus:outline-none cursor-pointer"
-            style="width: 52px; height: 52px; min-width: 52px; min-height: 52px; background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(21, 94, 99, 0.45), 0 8px 10px -6px rgba(24, 196, 196, 0.3); border: none;"
+            class="fixed right-0 top-1/2 -translate-y-1/2 z-40 text-white flex flex-col items-center justify-center transition-all duration-200 group hover:-translate-x-1 active:scale-95 focus:outline-none cursor-pointer select-none"
+            style="width: 38px; padding-top: 10px; padding-bottom: 12px; padding-left: 4px; padding-right: 4px; background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important; border-top-left-radius: 16px; border-bottom-left-radius: 16px; border-top-right-radius: 0; border-bottom-right-radius: 0; box-shadow: -4px 6px 20px rgba(2, 40, 54, 0.4), -1px 2px 4px rgba(20, 184, 166, 0.2); border-left: 1.5px solid rgba(255, 255, 255, 0.25); border-top: 1.5px solid rgba(255, 255, 255, 0.25); border-bottom: 1.5px solid rgba(255, 255, 255, 0.15); border-right: none;"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
-        <!-- Robot Icon Sesuai Request -->
-        <svg x-show="!isOpen" style="width: 30px; height: 30px;" viewBox="0 0 24 24" fill="#ffffff">
-            <!-- Top Antenna -->
-            <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
-            <!-- Left Ear -->
-            <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-            <!-- Right Ear -->
-            <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-            <!-- Head with Eye & Mouth Cutouts -->
-            <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+        
+        <!-- Top Chevron Icon (< when closed, > when open) -->
+        <svg x-show="!isOpen" class="w-3.5 h-3.5 text-white/90 group-hover:-translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
-        <!-- Close (X) Icon -->
-        <svg x-show="isOpen" class="w-6 h-6 text-white" fill="none" stroke="#ffffff" stroke-width="2.5" viewBox="0 0 24 24" style="display: none;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        <svg x-show="isOpen" class="w-3.5 h-3.5 text-white/90 group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24" style="display: none;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
         </svg>
+
+        <!-- Robot Icon Sesuai Gambar -->
+        <div class="my-1.5 shrink-0">
+            <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="#ffffff">
+                <!-- Top Antenna -->
+                <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                <!-- Left Ear -->
+                <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                <!-- Right Ear -->
+                <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                <!-- Head with Eye & Mouth Cutouts -->
+                <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+            </svg>
+        </div>
+
+        <!-- Vertical Text CHATBOT -->
+        <span class="text-[9.5px] sm:text-[10px] font-extrabold tracking-widest text-white uppercase select-none leading-none mt-0.5"
+              style="writing-mode: vertical-rl; letter-spacing: 0.12em;">
+            CHATBOT
+        </span>
     </button>
 
     <!-- Chat Window Modal -->
@@ -34,8 +47,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-         class="fixed right-3 bottom-[114px] sm:right-6 md:right-6 md:bottom-20 bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden mb-2 z-50"
-         style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 130px); display: none;">
+         class="fixed right-3 sm:right-14 top-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden z-50"
+         style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 80px); display: none;">
         
         <!-- Header -->
         <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
