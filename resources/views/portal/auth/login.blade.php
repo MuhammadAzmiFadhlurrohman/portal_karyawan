@@ -265,7 +265,7 @@
                 flex-direction: column !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 14px 24px 12px 24px !important;
+                padding: 8px 24px 12px 24px !important;
                 margin-top: 0 !important;
                 z-index: 25 !important;
                 overflow: hidden !important;
@@ -490,14 +490,14 @@
         <!-- ============================================================== -->
         <div class="login-panel-right">
             
-            <div class="w-full max-w-[380px] sm:max-w-[420px] mx-auto my-auto relative z-10">
+            <div class="w-full max-w-[380px] sm:max-w-[420px] mx-auto mt-1 sm:my-auto mb-auto relative z-10">
                 
                 <!-- Heading Masuk ke Akun -->
                 <div class="mb-2 sm:mb-4 text-center">
-                    <h2 class="font-heading text-lg sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    <h2 class="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                         Masuk ke Akun
                     </h2>
-                    <p class="text-[10.5px] sm:text-xs text-slate-500 mt-0.5">
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
                         Silakan masukkan kredensial akun Anda untuk login.
                     </p>
                 </div>
