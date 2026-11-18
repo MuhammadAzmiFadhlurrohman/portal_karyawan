@@ -172,6 +172,99 @@
         .kpi-card-footer{padding-top:12px;border-top:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;font-size:11px}
         .kpi-btn-cta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 14px;border-radius:14px;background:#e6fcf5;color:#0ca678;border:1px solid #c3fae8;font-size:11.5px;font-weight:700;transition:all .15s ease;text-decoration:none}
         .kpi-btn-cta:hover{background:#c3fae8}
+
+        /* Kalender Kehadiran Bulanan (Self-contained 7-column grid to ensure it never breaks) */
+        .cal-grid-7 {
+            display: grid !important;
+            grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+            gap: 6px !important;
+            width: 100% !important;
+        }
+        @media (min-width: 640px) {
+            .cal-grid-7 {
+                gap: 8px !important;
+            }
+        }
+        .cal-day-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 2px 0;
+        }
+        .cal-tile {
+            aspect-ratio: 1 / 1 !important;
+            width: 100% !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            user-select: none !important;
+            box-sizing: border-box !important;
+            transition: transform .15s ease, box-shadow .15s ease !important;
+            cursor: pointer !important;
+        }
+        @media (min-width: 640px) {
+            .cal-tile {
+                border-radius: 14px !important;
+                font-size: 14px !important;
+            }
+        }
+        .cal-tile:hover {
+            transform: scale(1.06) !important;
+            z-index: 2 !important;
+        }
+        .cal-tile-present {
+            background-color: #ecfdf5 !important;
+            color: #047857 !important;
+            border: 1px solid #a7f3d0 !important;
+        }
+        .cal-tile-late {
+            background-color: #fffbeb !important;
+            color: #b45309 !important;
+            border: 1px solid #fde68a !important;
+        }
+        .cal-tile-absent {
+            background-color: #fef2f2 !important;
+            color: #ef4444 !important;
+            border: 1px solid #fecaca !important;
+        }
+        .cal-tile-off {
+            background-color: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .cal-tile-future {
+            background-color: #ffffff !important;
+            color: #94a3b8 !important;
+            border: 1px dashed #cbd5e1 !important;
+        }
+        .cal-tile-today {
+            box-shadow: 0 0 0 2.5px #3b82f6 !important;
+            border-color: transparent !important;
+        }
+        .cal-dot-today {
+            position: absolute !important;
+            top: 3px !important;
+            right: 3px !important;
+            width: 5px !important;
+            height: 5px !important;
+            border-radius: 9999px !important;
+            background-color: #2563eb !important;
+        }
+        @media (min-width: 640px) {
+            .cal-dot-today {
+                top: 4px !important;
+                right: 4px !important;
+                width: 6px !important;
+                height: 6px !important;
+            }
+        }
     </style>
     <div class="hh">
         <!-- SVG Futuristic Background Geometry (Diagonal Bars, Concentric Orbit Rings, Grid Dots) -->
@@ -916,21 +1009,21 @@
                     </div>
 
                     <!-- Day Names Row (SEN, SEL, RAB, KAM, JUM, SAB, MIN) -->
-                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2 text-center mb-2">
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">SEN</span>
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">SEL</span>
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">RAB</span>
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">KAM</span>
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">JUM</span>
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">SAB</span>
-                        <span class="text-[10.5px] sm:text-xs font-bold text-slate-400 tracking-wider">MIN</span>
+                    <div class="cal-grid-7 mb-2">
+                        <span class="cal-day-header">SEN</span>
+                        <span class="cal-day-header">SEL</span>
+                        <span class="cal-day-header">RAB</span>
+                        <span class="cal-day-header">KAM</span>
+                        <span class="cal-day-header">JUM</span>
+                        <span class="cal-day-header">SAB</span>
+                        <span class="cal-day-header">MIN</span>
                     </div>
 
                     <!-- Day Tiles Grid (7 Columns) -->
-                    <div class="grid grid-cols-7 gap-1.5 sm:gap-2 text-center">
+                    <div class="cal-grid-7">
                         <!-- Empty offset slots before day 1 -->
                         @for ($i = 0; $i < $monthlyCalendar['empty_slots']; $i++)
-                            <div class="aspect-square"></div>
+                            <div class="cal-tile border-transparent pointer-events-none" style="visibility:hidden;"></div>
                         @endfor
 
                         <!-- Month Days -->
@@ -942,24 +1035,24 @@
                                 // Color state rules:
                                 // Hijau = hadir, Kuning = terlambat, Merah = alpa, Abu = libur, Putih = belum terlewat
                                 if ($status === 'present') {
-                                    $tileStyle = 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold hover:bg-emerald-100/80';
+                                    $tileClass = 'cal-tile-present';
                                 } elseif ($status === 'late') {
-                                    $tileStyle = 'bg-amber-50 text-amber-700 border border-amber-200 font-semibold hover:bg-amber-100/80';
+                                    $tileClass = 'cal-tile-late';
                                 } elseif ($status === 'absent') {
-                                    $tileStyle = 'bg-[#fef2f2] text-[#ef4444] border border-[#fecaca] font-semibold hover:bg-rose-100/80';
+                                    $tileClass = 'cal-tile-absent';
                                 } elseif ($status === 'off') {
-                                    $tileStyle = 'bg-[#f1f5f9] text-[#94a3b8] border border-[#e2e8f0] font-medium hover:bg-slate-200/60';
+                                    $tileClass = 'cal-tile-off';
                                 } else { // future / belum terlewat
-                                    $tileStyle = 'bg-white text-[#94a3b8] border border-dashed border-[#e2e8f0] font-medium';
+                                    $tileClass = 'cal-tile-future';
                                 }
 
-                                $todayRing = $isToday ? 'ring-2 ring-blue-500 ring-offset-1 border-transparent shadow-xs' : '';
+                                $todayClass = $isToday ? 'cal-tile-today' : '';
                             @endphp
-                            <div class="aspect-square rounded-xl sm:rounded-2xl flex items-center justify-center relative select-none transition-transform duration-150 hover:scale-105 cursor-pointer {{ $tileStyle }} {{ $todayRing }}"
+                            <div class="cal-tile {{ $tileClass }} {{ $todayClass }}"
                                  title="{{ $dayItem['date_formatted'] }}: {{ $dayItem['label'] }}{{ $isToday ? ' (Hari Ini)' : '' }}">
-                                <span class="text-xs sm:text-sm">{{ $dayItem['day'] }}</span>
+                                <span>{{ $dayItem['day'] }}</span>
                                 @if ($isToday)
-                                    <span class="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                    <span class="cal-dot-today"></span>
                                 @endif
                             </div>
                         @endforeach
