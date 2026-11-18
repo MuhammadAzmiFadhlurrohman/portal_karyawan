@@ -143,8 +143,63 @@
             </div>
         @endif
 
-        <!-- 4 Summary Metric Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        @php
+            $totalHadir = $stats['total_hadir'] ?? 0;
+            $totalTerlambat = $stats['total_terlambat'] ?? 0;
+            $totalAlpa = $stats['total_alpa'] ?? collect($dailyRecords)->where('status', 'absent')->count();
+            $totalLibur = $stats['total_libur'] ?? collect($dailyRecords)->where('status', 'holiday')->count();
+        @endphp
+
+        <!-- MOBILE VIEW: 4 Compact Metric Cards (Persis Gambar 2: Hadir, Terlambat, Alpa, Libur) -->
+        <div class="sm:hidden grid grid-cols-4 gap-2">
+            <!-- 1. Hadir -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg class="w-4.5 h-4.5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <span class="text-base font-black text-slate-800 leading-tight mt-1.5">{{ $totalHadir }}</span>
+                <span class="text-[10px] font-semibold text-slate-500 mt-0.5">Hadir</span>
+            </div>
+
+            <!-- 2. Terlambat -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                    <svg class="w-4.5 h-4.5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <span class="text-base font-black text-slate-800 leading-tight mt-1.5">{{ $totalTerlambat }}</span>
+                <span class="text-[10px] font-semibold text-slate-500 mt-0.5">Terlambat</span>
+            </div>
+
+            <!-- 3. Alpa -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4l16 16"/>
+                    </svg>
+                </div>
+                <span class="text-base font-black text-slate-800 leading-tight mt-1.5">{{ $totalAlpa }}</span>
+                <span class="text-[10px] font-semibold text-slate-500 mt-0.5">Alpa</span>
+            </div>
+
+            <!-- 4. Libur -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-2xs p-2 flex flex-col items-center justify-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                    <svg class="w-4.5 h-4.5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <span class="text-base font-black text-slate-800 leading-tight mt-1.5">{{ $totalLibur }}</span>
+                <span class="text-[10px] font-semibold text-slate-500 mt-0.5">Libur</span>
+            </div>
+        </div>
+
+        <!-- DESKTOP VIEW: 4 Summary Metric Cards (hidden sm:grid) -->
+        <div class="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
             <!-- Total Hadir -->
             <div class="rounded-2xl bg-white border border-slate-200/80 p-4 sm:p-5 shadow-2xs hover:shadow-xs transition">
                 <div class="flex items-center justify-between mb-2">

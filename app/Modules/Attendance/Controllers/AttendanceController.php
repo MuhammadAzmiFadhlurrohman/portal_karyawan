@@ -269,6 +269,9 @@ class AttendanceController extends Controller
                 ->get();
         }
 
+        $totalAlpa = collect($dailyRecords)->where('status', 'absent')->count();
+        $totalLibur = collect($dailyRecords)->where('status', 'holiday')->count();
+
         return view('attendance.history', [
             'currentUser' => $currentUser,
             'targetUser' => $targetUser,
@@ -286,6 +289,8 @@ class AttendanceController extends Controller
                 'total_terlambat' => $totalTerlambat,
                 'total_menit_terlambat' => $totalMenitTerlambat,
                 'total_jam_kerja' => $totalJamKerja,
+                'total_alpa' => $totalAlpa,
+                'total_libur' => $totalLibur,
             ],
         ]);
     }
