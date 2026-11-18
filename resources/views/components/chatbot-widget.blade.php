@@ -5,21 +5,20 @@
     <!-- Docked Side-Tab Trigger Button (Matching Image) -->
     <button @click="toggleChat()" 
             type="button"
-            class="fixed right-0 top-1/2 -translate-y-1/2 z-40 text-white flex flex-col items-center justify-center transition-all duration-200 group hover:-translate-x-1 active:scale-95 focus:outline-none cursor-pointer select-none"
+            class="fixed right-0 bottom-[82px] sm:bottom-12 md:bottom-8 z-40 text-white flex flex-col items-center justify-center transition-all duration-300 group hover:-translate-x-1 active:scale-95 focus:outline-none cursor-pointer select-none"
             style="width: 38px; padding-top: 10px; padding-bottom: 12px; padding-left: 4px; padding-right: 4px; background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important; border-top-left-radius: 16px; border-bottom-left-radius: 16px; border-top-right-radius: 0; border-bottom-right-radius: 0; box-shadow: -4px 6px 20px rgba(2, 40, 54, 0.4), -1px 2px 4px rgba(20, 184, 166, 0.2); border-left: 1.5px solid rgba(255, 255, 255, 0.25); border-top: 1.5px solid rgba(255, 255, 255, 0.25); border-bottom: 1.5px solid rgba(255, 255, 255, 0.15); border-right: none;"
             title="Tanya Asisten Mandiri PT MSN"
             aria-label="Buka Chatbot Asisten">
         
-        <!-- Top Chevron Icon (< when closed, > when open) -->
-        <svg x-show="!isOpen" class="w-3.5 h-3.5 text-white/90 group-hover:-translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
+        <!-- Top Chevron Icon (Smoothly rotates 180deg when open) -->
+        <svg class="w-3.5 h-3.5 text-white/90 transition-transform duration-300 shrink-0"
+             :class="isOpen ? 'rotate-180 translate-x-0.5' : 'group-hover:-translate-x-0.5'"
+             fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-        </svg>
-        <svg x-show="isOpen" class="w-3.5 h-3.5 text-white/90 group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24" style="display: none;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
         </svg>
 
         <!-- Robot Icon Sesuai Gambar -->
-        <div class="my-1.5 shrink-0">
+        <div class="my-1.5 shrink-0 transition-transform duration-200 group-hover:scale-110">
             <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="#ffffff">
                 <!-- Top Antenna -->
                 <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
@@ -41,14 +40,14 @@
 
     <!-- Chat Window Modal -->
     <div x-show="isOpen" 
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 translate-y-4 scale-95"
-         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-         x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-         class="fixed right-3 sm:right-14 top-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden z-50"
-         style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 80px); display: none;">
+         x-transition:enter="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+         x-transition:enter-start="opacity-0 translate-y-8 translate-x-4 scale-90"
+         x-transition:enter-end="opacity-100 translate-y-0 translate-x-0 scale-100"
+         x-transition:leave="transition-all duration-200 ease-[cubic-bezier(0.4,0,1,1)]"
+         x-transition:leave-start="opacity-100 translate-y-0 translate-x-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-6 translate-x-3 scale-90"
+         class="origin-bottom-right fixed right-3 bottom-[82px] sm:right-14 sm:bottom-12 md:bottom-8 bg-white rounded-3xl shadow-[0_22px_50px_rgba(2,40,54,0.35)] border border-slate-200/90 flex flex-col overflow-hidden z-50"
+         style="width: 390px; max-width: calc(100vw - 1.5rem); height: 520px; max-height: calc(100vh - 95px); display: none;">
         
         <!-- Header -->
         <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
