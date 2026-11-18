@@ -3,6 +3,7 @@
 namespace App\Modules\Ticketing\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClosureCore;
 use App\Models\CoreManeuver;
 use App\Models\JointClosure;
 use App\Models\RepairPoint;

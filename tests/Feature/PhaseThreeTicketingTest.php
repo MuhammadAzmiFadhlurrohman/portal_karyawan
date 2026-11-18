@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ClosureCore;
 use App\Models\JointClosure;
 use App\Models\MasterMaterial;
 use App\Models\TicketAssignee;
@@ -564,5 +565,74 @@ class PhaseThreeTicketingTest extends TestCase
         $filterRes = $this->actingAs($teknisi)->get(route('tickets.index', ['assigned' => 'me']));
         $filterRes->assertOk();
         $filterRes->assertSee('BDG-20261116-BADGE1');
+    }
+
+    /**
+     * Test storing Joint Closure with matrix cores saves successfully without Class Not Found error.
+     */
+    public function test_store_joint_closure_with_closure_cores_matrix(): void
+    {
+        $teknisi = User::query()->where('username', 'teknisi1')->firstOrFail();
+        $noc = User::query()->where('username', 'helpdesk')->firstOrFail();
+
+        $tiket = Tiket::query()->create([
+            'no_tiket' => 'BDG-20261118-JC01',
+            'kategori_tiket' => 'BACKBONE',
+            'priority' => 'P1',
+            'status' => 'PROSES',
+            'sla_target_minutes' => 240,
+            'backbone_segment' => 'BDG-CBR',
+            'wilayah' => 'Bandung',
+            'tipe_penanganan' => 'Joint Closure',
+            'tanggal_open' => now(),
+            'created_by' => $noc->id,
+        ]);
+
+        TicketAssignee::query()->create([
+            'tiket_id' => $tiket->id,
+            'user_id' => $teknisi->id,
+            'role_in_team' => 'LEAD',
+            'assigned_by' => $noc->id,
+            'assigned_at' => now(),
+        ]);
+
+        $coresMatrix = [
+            [
+                'tube_asal' => 'Tube 1',
+                'core_asal' => 1,
+                'tube_jumper' => 'Tube 1',
+                'core_jumper' => 1,
+                'status' => 'TERHUBUNG',
+                'loss' => 0.02,
+            ],
+            [
+                'tube_asal' => 'Tube 1',
+                'core_asal' => 2,
+                'tube_jumper' => 'Tube 1',
+                'core_jumper' => 2,
+                'status' => 'TERHUBUNG',
+                'loss' => 0.05,
+            ],
+        ];
+
+        $response = $this->actingAs($teknisi)->post(route('tickets.joint-closures.store', $tiket), [
+            'nama_closure' => 'JC-SPAN-14',
+            'kapasitas_core' => 24,
+            'tipe_closure' => 'DOME',
+            'penempatan_fisik' => 'POLE',
+            'latitude' => -6.9175,
+            'longitude' => 107.6191,
+            'cores' => json_encode($coresMatrix),
+        ]);
+
+        $response->assertRedirect(route('tickets.show', $tiket));
+        $response->assertSessionHas('success');
+
+        $jc = JointClosure::query()->where('tiket_id', $tiket->id)->firstOrFail();
+        $this->assertEquals('JC-SPAN-14', $jc->nama_closure);
+
+        $cores = ClosureCore::query()->where('joint_closure_id', $jc->id)->get();
+        $this->assertCount(2, $cores);
+        $this->assertEquals('TERHUBUNG', $cores->first()->status_core);
     }
 }
