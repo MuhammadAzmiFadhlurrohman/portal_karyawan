@@ -183,11 +183,33 @@ class ChatbotService
                 'label' => '📦 Buka Stok Barang Gudang',
                 'url' => route('gomsn.inventory.index'),
             ],
+            'tugas_operasional_tasks' => [
+                'label' => '📋 Buka Tugas Operasional',
+                'url' => route('gomsn.tasks.index'),
+            ],
             'tiket_aktif_saya',
             'buka_tiket_gangguan',
+            'resume_pekerjaan_tiket',
+            'penanganan_core_joint_closure',
+            'pemakaian_material_tiket',
+            'chat_koordinasi_tiket',
+            'closing_dan_berita_acara_bast',
+            'dispatch_penugasan_tim',
             'stop_clock_aturan' => [
                 'label' => '🎫 Buka Halaman Tiketing',
                 'url' => route('tickets.index'),
+            ],
+            'tipe_absen_kantor_dinas_luar' => [
+                'label' => '📍 Buka Halaman Absen',
+                'url' => route('attendance.index'),
+            ],
+            'kalender_absensi_dashboard' => [
+                'label' => '🏠 Buka Dashboard',
+                'url' => route('portal.hub'),
+            ],
+            'rekap_absensi_karyawan' => [
+                'label' => '📊 Buka Rekap Absensi',
+                'url' => route('attendance.employee-recap'),
             ],
             'kpi_teknisi' => [
                 'label' => '📊 Buka Analitik KPI Teknisi',
@@ -201,7 +223,8 @@ class ChatbotService
                 'label' => '💵 Buka Keuangan Absen',
                 'url' => route('attendance.deductions'),
             ],
-            'leaderboard_karyawan' => [
+            'leaderboard_karyawan',
+            'warna_divisi_badge' => [
                 'label' => '🏆 Buka Leaderboard Kehadiran',
                 'url' => route('attendance.leaderboard'),
             ],
@@ -280,6 +303,16 @@ class ChatbotService
             'ga' => 'tidak',
             'enggak' => 'tidak',
             'tdk' => 'tidak',
+            'dl' => 'dinas luar',
+            'dinasluar' => 'dinas luar',
+            'jointclosure' => 'joint closure',
+            'jointing' => 'jointing',
+            'splising' => 'splicing',
+            'beritaacara' => 'berita acara',
+            'todo' => 'tasks',
+            'todolist' => 'tasks',
+            'subtugas' => 'subtask',
+            'stt' => 'voice to text',
         ];
 
         foreach ($synonyms as $from => $to) {
@@ -327,7 +360,9 @@ class ChatbotService
             'shift', 'jadwal', 'tiket', 'gangguan', 'backbone', 'broadband', 'sla',
             'kpi', 'olt', 'pon', 'odp', 'potongan', 'alpa', 'telat', 'leaderboard',
             'foto', 'profil', 'password', 'sidik', 'jari', 'approve', 'excel', 'sisa',
-            'kuota', 'dokter',
+            'kuota', 'dokter', 'resume', 'joint', 'closure', 'jc', 'core', 'splicing',
+            'manuver', 'material', 'bast', 'berita', 'acara', 'dispatch', 'dinas', 'luar',
+            'kalender', 'task', 'tugas', 'subtask', 'mic', 'suara', 'voice', 'divisi',
         ];
 
         return in_array($token, $subjects, true);
@@ -464,22 +499,25 @@ class ChatbotService
             'Cara approve pengajuan absen karyawan',
             'Bagaimana cara approve pengajuan dana?',
             'Cara approve pengajuan lembur',
-            'Bagaimana cara absen masuk & pulang?',
+            'Cara isi resume pekerjaan tiket',
+            'Bagaimana cara absen dinas luar?',
             'Status pengajuan saya',
         ] : [
             'Bagaimana cara absen masuk & pulang?',
+            'Bagaimana cara absen dinas luar?',
+            'Cara isi resume pekerjaan tiket',
             'Bagaimana cara mengajukan dana?',
             'Bagaimana cara membuat pengajuan lembur?',
             'Apakah cuti saya masih ada?',
-            'Bagaimana cara mengajukan sakit?',
-            'Bagaimana cara mengajukan koreksi absen?',
+            'Cara catat penanganan core & joint closure',
+            'Bagaimana cara membuat tugas operasional (tasks)?',
         ];
 
         // Jika tidak ada kecocokan yang memadai
         if ($bestScore < 0.75 || ! $bestIntent) {
             $fallback = $isApprover
-                ? "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Cara approve pengajuan absen karyawan\"\n• \"Bagaimana cara approve pengajuan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Status pengajuan saya\""
-                : "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Bagaimana jika absen tidak bisa diverifikasi?\"\n• \"Cara tukar jadwal shift\"";
+                ? "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Cara approve pengajuan absen karyawan\"\n• \"Bagaimana cara approve pengajuan dana?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Bagaimana cara absen dinas luar?\"\n• \"Status pengajuan saya\""
+                : "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara absen dinas luar?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Cara catat penanganan core & joint closure\"\n• \"Bagaimana cara membuat tugas operasional?\"";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,

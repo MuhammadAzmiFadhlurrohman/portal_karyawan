@@ -203,6 +203,12 @@
             <button @click="askPreset('Bagaimana cara absen masuk dan pulang?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
                 📍 Cara Absen
             </button>
+            <button @click="askPreset('Bagaimana cara absen dinas luar?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
+                🚗 Dinas Luar
+            </button>
+            <button @click="askPreset('Bagaimana cara isi resume pekerjaan tiket?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
+                📄 Resume Tiket
+            </button>
             <button @click="askPreset('Bagaimana cara mengajukan dana?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
                 💰 Pengajuan Dana
             </button>
@@ -217,6 +223,15 @@
             </button>
             <button @click="askPreset('Bagaimana cara membuat pengajuan lembur?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
                 💼 Klaim Lembur
+            </button>
+            <button @click="askPreset('Bagaimana cara catat penanganan core dan joint closure?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
+                🔌 Core & JC
+            </button>
+            <button @click="askPreset('Bagaimana cara membuat tugas operasional tasks?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
+                📋 Tugas / Tasks
+            </button>
+            <button @click="askPreset('Bagaimana cara melihat kalender absensi di dashboard?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
+                🗓️ Kalender Absen
             </button>
             <button @click="askPreset('Bagaimana cara tukar shift jadwal?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
                 📅 Tukar Shift

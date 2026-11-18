@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 
 class ChatbotKnowledgeSeeder extends Seeder
 {
-    public const KNOWLEDGE_VERSION = 'v3.1';
+    public const KNOWLEDGE_VERSION = 'v4.0';
 
     /**
      * Get the complete array of built-in chatbot intents with specific topics,
@@ -25,19 +25,29 @@ class ChatbotKnowledgeSeeder extends Seeder
                 'intent_key' => 'sapaan_halo',
                 'category' => 'umum',
                 'keywords' => ['halo', 'hai', 'hi', 'hello', 'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam', 'assalamualaikum', 'permisi', 'ping', 'tes'],
-                'response_text' => "Halo! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nSaya memahami seluruh alur kerja di aplikasi ini. Anda bisa bertanya langsung dengan bahasa sehari-hari, misalnya:\n• \"Gimana cara absen masuk dan pulang?\"\n• \"Bagaimana cara mengajukan dana atau barang?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Bagaimana jika absen wajah tidak bisa diverifikasi?\"",
+                'response_text' => "Halo! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nSaya memahami seluruh alur kerja dan fitur terbaru di aplikasi ini. Anda bisa bertanya langsung dengan bahasa sehari-hari atau menggunakan fitur Voice-to-Text (Mic), misalnya:\n• \"Gimana cara isi resume pekerjaan tiket?\"\n• \"Bagaimana cara absen dinas luar?\"\n• \"Bagaimana cara mengajukan dana atau barang?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara catat penanganan core & joint closure?\"",
             ],
             [
                 'intent_key' => 'ucapan_terima_kasih',
                 'category' => 'umum',
                 'keywords' => ['terima kasih', 'makasih', 'thanks', 'thank you', 'nuhun', 'mantap', 'oke siap', 'ok makasih'],
-                'response_text' => "Sama-sama! Senang bisa membantu Anda. 😊 Jika ada hal lain terkait absensi, pengajuan dana, lembur, cuti, jadwal, atau tiketing yang ingin ditanyakan, silakan ketik kapan saja ya!",
+                'response_text' => "Sama-sama! Senang bisa membantu Anda. 😊 Jika ada hal lain terkait absensi, pengajuan dana, lembur, cuti, jadwal, tiketing, atau tugas operasional yang ingin ditanyakan, silakan ketik atau gunakan tombol mikrofon kapan saja ya!",
             ],
             [
                 'intent_key' => 'siapa_kamu_menu',
                 'category' => 'umum',
-                'keywords' => ['siapa kamu', 'kamu siapa', 'bisa bantu apa', 'fitur apa saja', 'menu apa saja', 'panduan aplikasi', 'cara pakai aplikasi', 'bantuan aplikasi', 'info aplikasi'],
-                'response_text' => "Saya adalah Asisten Virtual Resmi PT Media Cepat Indonesia (MSN).\n\nBerikut modul utama di aplikasi ini yang bisa saya bantu jelaskan & arahkan:\n1. 📍 Absensi & Biometrik (Clock-in wajah, GPS radius 50m, Koreksi Absen)\n2. 📅 Jadwal Kerja & Shift (Tukar shift, Backup shift, Aturan jeda 11 jam)\n3. 🌴 Cuti & Izin (Cek sisa cuti, Ajukan cuti/sakit, Approval cuti)\n4. ⏰ Lembur / Overtime (Buat pengajuan lembur, Approval Atasan & Pencairan Finance)\n5. 💰 Pengajuan Operasional GOMSN (Kasbon Dana, Beli Barang, Stok Gudang)\n6. 🎫 Tiketing Gangguan & KPI Teknisi (Backbone BDG, Broadband BRD, Stop Clock)\n7. 🌐 Jaringan FTTH (Data OLT, PON, ODP & Pelanggan)\n8. 💵 Keuangan Absen & Leaderboard Kedisiplinan",
+                'keywords' => ['siapa kamu', 'kamu siapa', 'bisa bantu apa', 'fitur apa saja', 'menu apa saja', 'panduan aplikasi', 'cara pakai aplikasi', 'bantuan aplikasi', 'info aplikasi', 'halaman apa saja'],
+                'response_text' => "Saya adalah Asisten Virtual Resmi PT Media Cepat Indonesia (MSN).\n\nBerikut modul dan fitur lengkap di aplikasi yang bisa saya bantu jelaskan & arahkan:\n1. 📍 Absensi & Biometrik (Absen Kantor, Absen Dinas Luar, Liveness Wajah, GPS 50m, Koreksi Absen, Kalender Absen Dashboard)\n2. 📅 Jadwal Kerja & Shift (Tukar shift, Backup shift, Aturan jeda 11 jam)\n3. 🌴 Cuti, Izin & Sakit (Cek kuota sisa cuti, Izin khusus, Cuti sakit SKD, Approval bertingkat)\n4. ⏰ Lembur / Overtime (Buat pengajuan lembur, Foto bukti, Approval Atasan & Pencairan Finance)\n5. 💰 Pengajuan Operasional GOMSN (DANA/Kasbon, BELI Barang, STOK Gudang, Approval 3 Tahap, Export Excel)\n6. 📋 Tugas Operasional (GOMSN Tasks, Checklist Subtask, Prioritas, Kolaborasi Tim)\n7. 🎫 Tiketing Gangguan & Lapangan (Backbone BDG, Broadband BRD, Stop Clock, Penugasan Tim, Live Chat WhatsApp, Resume Pekerjaan, Penanganan Core & JC, Material Tiket, BAST Cetak Berita Acara)\n8. 🌐 Jaringan FTTH (Data OLT, PON, ODP, Koordinat Maps & Pelanggan)\n9. 💵 Keuangan Absen, Rekap Karyawan & Leaderboard Kedisiplinan dengan Badge Warna Divisi\n10. 👤 Profil, Login Sidik Jari (WebAuthn Passkey), dan Voice-to-Text Microphone",
+            ],
+            [
+                'intent_key' => 'voice_to_text_fitur',
+                'category' => 'umum',
+                'keywords' => [
+                    'voice to text', 'ketik suara', 'bicara otomatis', 'fitur mic',
+                    'tombol mic', 'bicara jadi teks', 'input suara', 'speech to text',
+                    'cara pakai mic', 'rekam suara chat', 'ngomong otomatis nulis',
+                ],
+                'response_text' => "Fitur Voice-to-Text (Ketik Otomatis dengan Suara):\n• Tersedia pada kolom input Chatbot maupun Live Chat Tiket Gangguan (tombol mikrofon bulat di sebelah tombol kirim).\n• Cara Menggunakan:\n   1. Klik tombol mikrofon (ikon mic akan aktif berdenyut).\n   2. Jika muncul peringatan izin browser, pilih 'Allow / Izinkan' akses mikrofon.\n   3. Berbicaralah dengan suara jelas dalam bahasa Indonesia.\n   4. Ucapan Anda akan langsung tertulis otomatis di kolom input secara real-time!\n   5. Setelah selesai, klik tombol Kirim (pesawat kertas).",
             ],
 
             // ==========================================
@@ -104,6 +114,35 @@ class ChatbotKnowledgeSeeder extends Seeder
                     'approval absen',
                 ],
                 'response_text' => "Cara Approve Pengajuan Koreksi Absen (Khusus Atasan & Admin):\n1. Buka menu 'Pengajuan Absen' di sidebar.\n2. Tinjau daftar pengajuan koreksi kehadiran dari anggota divisi Anda (lihat jam asal, jam usulan, alasan, serta bukti lampiran).\n3. Klik tombol 'Setujui & Perbarui Absen' untuk menyetujui (data absensi karyawan akan otomatis diperbarui), atau klik 'Tolak Pengajuan' disertai alasan penolakan.",
+            ],
+            [
+                'intent_key' => 'tipe_absen_kantor_dinas_luar',
+                'category' => 'absensi',
+                'keywords' => [
+                    'tipe absen', 'jenis absen', 'absen kantor', 'absen dinas luar',
+                    'dinas luar', 'absen di luar kantor', 'absen dinas', 'absen tugas luar',
+                    'cara absen dinas', 'perbedaan absen kantor dan dinas luar',
+                ],
+                'response_text' => "Pilihan Tipe Absensi Portal MSN (Telah Disederhanakan):\nSistem presensi kini hanya memiliki 2 pilihan praktis:\n1. 🏢 Absen Kantor: Untuk karyawan yang bekerja di kantor. Wajib berada dalam radius 50m dari kantor terdaftar dan verifikasi biometrik wajah.\n2. 🚗 Absen Dinas Luar: Untuk karyawan yang bertugas di luar kantor/lapangan, meeting klien, atau instalasi. Wajib mengambil foto selfie di lokasi tugas; titik GPS koordinat Anda akan otomatis tersimpan.",
+            ],
+            [
+                'intent_key' => 'kalender_absensi_dashboard',
+                'category' => 'absensi',
+                'keywords' => [
+                    'kalender absen', 'kalender absensi', 'kalender di dashboard', 'warna kalender absen',
+                    'arti warna kalender', 'cek kalender hadir', 'rekap absen bulanan', 'kalender kehadiran',
+                ],
+                'response_text' => "Fitur Kalender Absensi Interaktif (Dashboard):\n• Tampil langsung di halaman Home/Dashboard berupa kalender bulanan 7 kolom (Senin s/d Minggu).\n• Arti Kode Warna Tanggal:\n   • 🟢 Hijau: Hadir tepat waktu sesuai jam kerja.\n   • 🟡 Kuning: Hadir terlambat (tercatat menit keterlambatan).\n   • 🔵 Biru: Izin, Sakit dengan SKD, atau Cuti resmi.\n   • 🔴 Merah: Alpa / Tidak hadir tanpa keterangan.\n   • ⚪ Abu-abu: Hari Libur nasional / Shift Off.\n• Anda dapat mengklik tanggal tertentu untuk melihat jam clock-in dan clock-out Anda.",
+            ],
+            [
+                'intent_key' => 'rekap_absensi_karyawan',
+                'category' => 'absensi',
+                'keywords' => [
+                    'rekap absensi', 'rekapitulasi absen', 'laporan absen karyawan',
+                    'rekap kehadiran', 'download rekap absen', 'rekap karyawan',
+                    'total hadir karyawan', 'laporan bulanan absensi',
+                ],
+                'response_text' => "Rekapitulasi Absensi Karyawan (Admin, HRD & Atasan):\n• Buka menu 'Rekap Absensi' di sidebar.\n• Menampilkan ringkasan total hari kerja, jumlah hadir tepat waktu, keterlambatan, cuti/izin/sakit, dan total potongan per karyawan.\n• Dilengkapi filter divisi, pencarian karyawan, dan tombol Export Excel rekap bulanan.",
             ],
 
             // ==========================================
@@ -265,6 +304,16 @@ class ChatbotKnowledgeSeeder extends Seeder
                 ],
                 'response_text' => "Manajemen Stok Barang Gudang:\n• Buka menu 'Stok Barang' di sidebar.\n• Menampilkan sisa stok material (ONT, Kabel Dropcore, Patchcord, Adaptor, Closure, dll).\n• Finance dan Admin dapat melakukan penambahan stok (Restock), penyesuaian (Adjust), serta melihat riwayat keluar-masuk barang.",
             ],
+            [
+                'intent_key' => 'tugas_operasional_tasks',
+                'category' => 'gomsn',
+                'keywords' => [
+                    'tugas operasional', 'tasks', 'gomsn tasks', 'to do list',
+                    'buat task', 'tambah tugas', 'checklist tugas', 'subtask',
+                    'proyek tugas', 'kelola tugas', 'tugas saya',
+                ],
+                'response_text' => "Manajemen Tugas Operasional (GOMSN Tasks):\n• Buka menu 'Tugas Operasional' di sidebar.\n• Fitur Utama:\n   1. Buat Task: Tentukan judul tugas, divisi, penanggung jawab (assignee), prioritas, dan tanggal deadline.\n   2. Checklist Subtask: Pecah pekerjaan besar menjadi sub-langkah kecil yang bisa dicentang satu per satu.\n   3. Kolaborasi: Tambahkan komentar diskusi dan pantau status tugas (To Do, In Progress, Review, Done).",
+            ],
 
             // ==========================================
             // 6. TIKETING & GANGGUAN JARINGAN
@@ -286,6 +335,68 @@ class ChatbotKnowledgeSeeder extends Seeder
                     'tiket baru', 'input tiket', 'tiket backbone', 'tiket broadband',
                 ],
                 'response_text' => "Cara Membuat & Menangani Tiket Gangguan:\n1. Buka halaman 'Tiketing', lalu klik '+ Buat Tiket Baru'.\n2. Pilih kategori tiket:\n   • Backbone (Kode BDG-): Gangguan infrastruktur jalur utama/distribusi.\n   • Broadband (Kode BRD-): Gangguan pelanggan FTTH/rumahan.\n3. Tentukan prioritas SLA (P1 s/d P4) dan pilih teknisi yang ditugaskan.\n4. Teknisi wajib mengisi update kronologi berkala hingga perbaikan selesai (Closing Tiket).",
+            ],
+            [
+                'intent_key' => 'resume_pekerjaan_tiket',
+                'category' => 'tiket',
+                'keywords' => [
+                    'resume pekerjaan', 'input resume pekerjaan', 'cara isi resume pekerjaan', 'form resume pekerjaan',
+                    'isi resume', 'tutup resume', 'closing awal tiket', 'laporan resume pekerjaan',
+                    'temuan masalah lapangan', 'tindakan perbaikan', 'problem action resume', 'tim om teknisi',
+                    'daftar teknisi lapangan', 'tambah anggota tim resume', 'catatan tambahan resume',
+                ],
+                'response_text' => "Cara Mengisi Resume Pekerjaan Lapangan:\n1. Buka halaman detail Tiket Gangguan yang sedang Anda tangani.\n2. Klik Tab 'Resume' lalu tekan tombol 'Input Resume Baru' (atau 'Edit Resume Pekerjaan').\n3. Isi formulir modal popup:\n   • Team OM / Daftar Nama Teknis Lapangan: Masukkan nama-nama teknisi yang bekerja (klik '+ Tambah Anggota Team' jika lebih dari 1 orang).\n   • Problem / Temuan Masalah di Lapangan: Tuliskan kondisi nyata titik putus/gangguan (misal: kabel ditarik truk span KM 12+400).\n   • Action / Tindakan Perbaikan: Uraikan perbaikan fisik (misal: jumper kabel 150m, pasang 2 New JC, dsb).\n   • Tipe Penanganan Fisik / Core: Indikator penanganan Jointing & Manuver.\n   • Catatan Tambahan (Opsional): Informasi hasil pengujian redaman / info khusus.\n4. Klik 'Simpan Resume' untuk menyimpan data dan mengajukan closing awal ke NOC.",
+            ],
+            [
+                'intent_key' => 'penanganan_core_joint_closure',
+                'category' => 'tiket',
+                'keywords' => [
+                    'penanganan core', 'joint closure', 'jc', 'manuver core', 'jointing core',
+                    'splicing', 'splicing core', 'pasang jc baru', 'bypass core', 'tube core',
+                    'warna core', 'core putus', 'sambung core', 'jointing lurus',
+                ],
+                'response_text' => "Fitur Penanganan Core & Joint Closure (JC):\n• Dikelola di Tab 'Penanganan Core & JC' pada detail tiket.\n• Pemasangan Joint Closure (JC): Catat lokasi tiang/manhole, tipe JC (Dome/Inline), kapasitas tray, dan foto JC sebelum & sesudah.\n• Manuver & Splicing Core: Dokumentasikan pemetaan core in ke core out, penomoran tube & warna core (Biru, Oranye, Hijau, Coklat, Abu-abu, Putih, dll), serta status sambungan (Through, Branch, atau Dead End).",
+            ],
+            [
+                'intent_key' => 'pemakaian_material_tiket',
+                'category' => 'tiket',
+                'keywords' => [
+                    'material tiket', 'pemakaian material', 'catat material tiket', 'kabel dropcore',
+                    'patchcord tiket', 'pigtail tiket', 'closure tiket', 'adaptor optik',
+                    'material lapangan', 'pemakaian barang tiket',
+                ],
+                'response_text' => "Pencatatan Material Tiket Lapangan:\n1. Pada halaman detail tiket, buka Tab 'Material Terpakai'.\n2. Klik tombol '+ Tambah Material', pilih jenis material (Dropcore, JC, Fast Connector, Pigtail, dll) dan masukkan jumlah yang digunakan.\n3. Material yang dicatat akan otomatis mengurangi kuota stok gudang dan langsung tercantum di Berita Acara Penyelesaian Gangguan (BAST).",
+            ],
+            [
+                'intent_key' => 'chat_koordinasi_tiket',
+                'category' => 'tiket',
+                'keywords' => [
+                    'chat tiket', 'kronologis tiket', 'koordinasi tiket', 'share lokasi tiket',
+                    'kirim gps tiket', 'voice to text tiket', 'balas chat tiket', 'quote chat tiket',
+                    'hapus pesan tiket', 'edit pesan tiket', 'live chat tiket', 'koordinasi lapangan',
+                ],
+                'response_text' => "Fitur Live Chat & Koordinasi Tiket (WhatsApp-Style):\n• Tab 'Kronologis' pada tiket berfungsi seperti grup chat WhatsApp interaktif antara Teknisi Lapangan dan NOC.\n• Fitur Utama:\n   1. 📍 Kirim Lokasi: Bagikan titik GPS live lokasi perbaikan secara akurat.\n   2. 📷 Lampiran Foto & Video: Kirim dokumentasi kondisi kerusakan dan hasil perbaikan.\n   3. 🎙️ Voice-to-Text: Tekan tombol mic untuk mengetik pesan otomatis dengan suara tanpa repot mengetik.\n   4. 💬 Reply Quote: Balas pesan tertentu dengan menekan menu titik tiga (⋮) pada bubble pesan.\n   5. 🔍 Tampilan Penuh (Full Size): Perbesar chat ke layar penuh dengan transisi mulus.",
+            ],
+            [
+                'intent_key' => 'closing_dan_berita_acara_bast',
+                'category' => 'tiket',
+                'keywords' => [
+                    'closing tiket', 'verifikasi closing', 'berita acara tiket', 'bast tiket',
+                    'cetak bast', 'cetak berita acara', 'download bast', 'tiket selesai',
+                    'verifikasi noc', 'link pulih', 'link restore',
+                ],
+                'response_text' => "Alur Closing Tiket & Cetak Berita Acara (BAST):\n1. Teknisi mengisi Resume Pekerjaan & mencatat redaman sesudah perbaikan, lalu mengajukan closing awal (status: PENDING_VERIFIKASI).\n2. NOC memeriksa redaman optik dan memastikan link traffic pelanggan sudah UP kembali.\n3. NOC mengklik 'Verifikasi Closing' untuk menutup tiket secara resmi (status: CLOSE).\n4. Setelah tiket CLOSE, tombol 'Cetak Berita Acara (PDF)' akan aktif untuk mengunduh dokumen resmi BAST lengkap dengan rincian gangguan, durasi SLA, kronologis, dan foto dokumentasi.",
+            ],
+            [
+                'intent_key' => 'dispatch_penugasan_tim',
+                'category' => 'tiket',
+                'keywords' => [
+                    'dispatch tiket', 'dispatch tim', 'dispatch tim teknisi', 'dispatch teknisi',
+                    'tugaskan tim', 'penugasan teknisi', 'penugasan tim', 'lead teknisi',
+                    'tunjuk teknisi', 'pic tiket', 'atasan teknik tugaskan tim', 'tim om tiket',
+                    'cara dispatch', 'cara tugaskan teknisi',
+                ],
+                'response_text' => "Penugasan Tim Teknisi (Dispatching Tiket):\n• Khusus Atasan Teknik / Manager Teknis: Tombol 'Tugaskan Tim' tampil di bagian atas header tiket yang belum memiliki PIC.\n• Pilih Lead Teknisi (PIC Utama) dan centang teknisi pendamping (Crew Lapangan).\n• Setelah disimpan, nama tim akan otomatis muncul di info tiket dan notifikasi penugasan terkirim ke WhatsApp/Chat kronologis tiket.",
             ],
             [
                 'intent_key' => 'stop_clock_aturan',
@@ -337,6 +448,15 @@ class ChatbotKnowledgeSeeder extends Seeder
                     'top absensi', 'juara absen', 'ranking karyawan',
                 ],
                 'response_text' => "Leaderboard Kehadiran Karyawan:\nMenampilkan peringkat kedisiplinan karyawan PT MSN berdasarkan persentase kehadiran tertinggi, ketepatan waktu clock-in, dan konsistensi bulanan.",
+            ],
+            [
+                'intent_key' => 'warna_divisi_badge',
+                'category' => 'hris',
+                'keywords' => [
+                    'warna divisi', 'arti warna divisi', 'badge divisi', 'perbedaan warna divisi',
+                    'divisi teknik', 'divisi it', 'divisi noc', 'warna badge', 'warna divisi masing-masing',
+                ],
+                'response_text' => "Arti Warna Badge Divisi di Portal MSN:\n• 🟠 Oranye (Warm Orange): Divisi Teknik / Teknisi Lapangan\n• 🟣 Indigo / Violet: Divisi IT & Sistem\n• 🔵 Sky Blue: Divisi NOC (Network Operation Center)\n• 🟢 Emerald Green: Divisi Finance & Akuntansi\n• 🔴 Coral Rose: Divisi HRD & Human Capital\n• 🟢 Toska / Teal: Divisi Operasional\n• 🟣 Royal Purple: Direksi & Eksekutif\n• 🟡 Amber: Dispatcher / Penugasan\n• ⚪ Slate Gray: Divisi Umum & Staf Lainnya",
             ],
 
             // ==========================================
