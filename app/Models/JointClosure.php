@@ -36,4 +36,19 @@ class JointClosure extends Model
     {
         return $this->hasMany(ClosureCore::class, 'joint_closure_id');
     }
+
+    public function getClosureCodeAttribute(): string
+    {
+        return $this->nama_closure;
+    }
+
+    public function getCapacityCoresAttribute(): int
+    {
+        return (int) $this->kapasitas_core;
+    }
+
+    public function getLocationDescriptionAttribute(): ?string
+    {
+        return $this->repairPoint?->nama_titik;
+    }
 }

@@ -2703,91 +2703,1066 @@ function dispatchTeamModal() {
     </div>
 </div>
 
-<!-- Modal Tambah Joint Closure -->
-<div id="modal-jc" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-        <div class="px-6 py-5 text-white flex items-center justify-between"
+<script>
+function jointClosureModal() {
+    return {
+        namaClosure: '',
+        jenisClosure: 'DOME',
+        penempatanFisik: 'POLE',
+        lat: '',
+        lng: '',
+        isGpsLoading: false,
+        isNewCut: false,
+        kapasitasAsal: 24,
+        jumlahTubeAsal: 2,
+        kapasitasJumper: 24,
+        jumlahTubeJumper: 2,
+        activeTubeAsal: 1,
+        activeTubeJumper: 1,
+        colors: [
+            { num: 1, name: 'Biru', hex: '#3b82f6' },
+            { num: 2, name: 'Oranye', hex: '#f97316' },
+            { num: 3, name: 'Hijau', hex: '#22c55e' },
+            { num: 4, name: 'Cokelat', hex: '#a16207' },
+            { num: 5, name: 'Abu-abu', hex: '#94a3b8' },
+            { num: 6, name: 'Putih', hex: '#f8fafc', isWhite: true },
+            { num: 7, name: 'Merah', hex: '#ef4444' },
+            { num: 8, name: 'Hitam', hex: '#0f172a', isBlack: true },
+            { num: 9, name: 'Kuning', hex: '#eab308' },
+            { num: 10, name: 'Ungu', hex: '#a855f7' },
+            { num: 11, name: 'Pink', hex: '#ec4899' },
+            { num: 12, name: 'Toska', hex: '#06b6d4' }
+        ],
+        matrix: [
+            {
+                tube_asal: 'Tube 1',
+                core_asal: 1,
+                core_asal_label: 'Core 1 (Biru)',
+                tube_jumper: 'Tube 1',
+                core_jumper: 1,
+                core_jumper_label: 'Core 1 (Biru)',
+                status: 'TERHUBUNG',
+                loss: 0.02
+            }
+        ],
+
+        getGps() {
+            if (!navigator.geolocation) {
+                alert('Geolocation tidak didukung oleh browser ini.');
+                return;
+            }
+            this.isGpsLoading = true;
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    this.lat = pos.coords.latitude.toFixed(6);
+                    this.lng = pos.coords.longitude.toFixed(6);
+                    this.isGpsLoading = false;
+                },
+                (err) => {
+                    alert('Gagal mengambil GPS: ' + err.message);
+                    this.isGpsLoading = false;
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        },
+
+        openMap() {
+            if (this.lat && this.lng) {
+                window.open(`https://www.google.com/maps?q=${this.lat},${this.lng}`, '_blank');
+            } else {
+                alert('Silakan ambil atau masukkan koordinat GPS terlebih dahulu.');
+            }
+        },
+
+        getColor(num) {
+            return this.colors.find(c => c.num === Number(num)) || { num: num, name: 'Core ' + num, hex: '#94a3b8' };
+        },
+
+        isConnected(tubeNum, coreNum, isJumper = false) {
+            const tubeStr = 'Tube ' + tubeNum;
+            if (!isJumper) {
+                return this.matrix.some(m => m.tube_asal === tubeStr && Number(m.core_asal) === Number(coreNum));
+            } else {
+                return this.matrix.some(m => (m.tube_jumper || m.tube_tujuan) === tubeStr && Number(m.core_jumper || m.core_tujuan) === Number(coreNum));
+            }
+        },
+
+        togglePort(coreNum) {
+            const tubeAsalStr = 'Tube ' + this.activeTubeAsal;
+            const existingIdx = this.matrix.findIndex(m => m.tube_asal === tubeAsalStr && Number(m.core_asal) === Number(coreNum));
+            if (existingIdx >= 0) {
+                this.matrix.splice(existingIdx, 1);
+            } else {
+                const color = this.getColor(coreNum);
+                this.matrix.push({
+                    tube_asal: tubeAsalStr,
+                    core_asal: Number(coreNum),
+                    core_asal_label: `Core ${coreNum} (${color.name})`,
+                    tube_jumper: 'Tube ' + this.activeTubeJumper,
+                    core_jumper: Number(coreNum),
+                    core_jumper_label: `Core ${coreNum} (${color.name})`,
+                    status: 'TERHUBUNG',
+                    loss: 0.02
+                });
+            }
+        },
+
+        connectAll1to1() {
+            const tubeAsalStr = 'Tube ' + this.activeTubeAsal;
+            const tubeJumperStr = 'Tube ' + this.activeTubeJumper;
+            for (let i = 1; i <= 12; i++) {
+                const existingIdx = this.matrix.findIndex(m => m.tube_asal === tubeAsalStr && Number(m.core_asal) === i);
+                const color = this.getColor(i);
+                if (existingIdx >= 0) {
+                    this.matrix[existingIdx].tube_jumper = tubeJumperStr;
+                    this.matrix[existingIdx].core_jumper = i;
+                    this.matrix[existingIdx].core_jumper_label = `Core ${i} (${color.name})`;
+                } else {
+                    this.matrix.push({
+                        tube_asal: tubeAsalStr,
+                        core_asal: i,
+                        core_asal_label: `Core ${i} (${color.name})`,
+                        tube_jumper: tubeJumperStr,
+                        core_jumper: i,
+                        core_jumper_label: `Core ${i} (${color.name})`,
+                        status: 'TERHUBUNG',
+                        loss: 0.02
+                    });
+                }
+            }
+        },
+
+        swapTubes() {
+            const temp = this.activeTubeAsal;
+            this.activeTubeAsal = this.activeTubeJumper;
+            this.activeTubeJumper = temp;
+        },
+
+        resetConnections() {
+            if (confirm('Reset seluruh daftar sambungan core?')) {
+                this.matrix = [];
+            }
+        },
+
+        removeRow(index) {
+            this.matrix.splice(index, 1);
+        },
+
+        addManualRow() {
+            const nextCore = (this.matrix.length % 12) + 1;
+            const color = this.getColor(nextCore);
+            this.matrix.push({
+                tube_asal: 'Tube ' + this.activeTubeAsal,
+                core_asal: nextCore,
+                core_asal_label: `Core ${nextCore} (${color.name})`,
+                tube_jumper: 'Tube ' + this.activeTubeJumper,
+                core_jumper: nextCore,
+                core_jumper_label: `Core ${nextCore} (${color.name})`,
+                status: 'TERHUBUNG',
+                loss: 0.02
+            });
+        }
+    };
+}
+
+function coreManeuverModal() {
+    return {
+        titikLokasi: '',
+        tipeLokasi: 'CLOSURE LAPANGAN (JC)',
+        statusAlokasi: 'SESUDAH',
+        sifatManuver: 'SEMENTARA',
+        titikNormalisasi: '',
+        statusCoreAset: 'TERPAKAI (TRAFFIC AKTIF)',
+        keterangan: '',
+        kapasitasAsal: 24,
+        jumlahTubeAsal: 2,
+        kapasitasTujuan: 24,
+        jumlahTubeTujuan: 2,
+        activeTubeAsal: 1,
+        activeTubeTujuan: 1,
+        selectedSource: null,
+        colors: [
+            { num: 1, name: 'Biru', hex: '#3b82f6' },
+            { num: 2, name: 'Oranye', hex: '#f97316' },
+            { num: 3, name: 'Hijau', hex: '#22c55e' },
+            { num: 4, name: 'Cokelat', hex: '#a16207' },
+            { num: 5, name: 'Abu-abu', hex: '#94a3b8' },
+            { num: 6, name: 'Putih', hex: '#f8fafc', isWhite: true },
+            { num: 7, name: 'Merah', hex: '#ef4444' },
+            { num: 8, name: 'Hitam', hex: '#0f172a', isBlack: true },
+            { num: 9, name: 'Kuning', hex: '#eab308' },
+            { num: 10, name: 'Ungu', hex: '#a855f7' },
+            { num: 11, name: 'Pink', hex: '#ec4899' },
+            { num: 12, name: 'Toska', hex: '#06b6d4' }
+        ],
+        connections: [
+            {
+                tube_asal: 'Tube 1',
+                core_asal: 1,
+                core_asal_name: 'Biru',
+                tube_tujuan: 'Tube 1',
+                core_tujuan: 1,
+                core_tujuan_name: 'Biru'
+            }
+        ],
+
+        getColor(num) {
+            return this.colors.find(c => c.num === Number(num)) || { num: num, name: 'Core ' + num, hex: '#94a3b8' };
+        },
+
+        isSourceConnected(tubeNum, coreNum) {
+            const tubeStr = 'Tube ' + tubeNum;
+            return this.connections.some(c => c.tube_asal === tubeStr && Number(c.core_asal) === Number(coreNum));
+        },
+
+        isTargetConnected(tubeNum, coreNum) {
+            const tubeStr = 'Tube ' + tubeNum;
+            return this.connections.some(c => c.tube_tujuan === tubeStr && Number(c.core_tujuan) === Number(coreNum));
+        },
+
+        selectSourcePort(coreNum) {
+            if (this.selectedSource && this.selectedSource.tube === this.activeTubeAsal && this.selectedSource.core === coreNum) {
+                this.selectedSource = null;
+            } else {
+                this.selectedSource = { tube: this.activeTubeAsal, core: coreNum };
+            }
+        },
+
+        selectTargetPort(coreNum) {
+            if (!this.selectedSource) {
+                this.selectedSource = { tube: this.activeTubeAsal, core: coreNum };
+                return;
+            }
+            const sTubeStr = 'Tube ' + this.selectedSource.tube;
+            const tTubeStr = 'Tube ' + this.activeTubeTujuan;
+            const sCore = this.selectedSource.core;
+            const tCore = coreNum;
+            const sColor = this.getColor(sCore);
+            const tColor = this.getColor(tCore);
+
+            const existingIdx = this.connections.findIndex(c => c.tube_asal === sTubeStr && Number(c.core_asal) === Number(sCore));
+            if (existingIdx >= 0) {
+                this.connections[existingIdx] = {
+                    tube_asal: sTubeStr,
+                    core_asal: sCore,
+                    core_asal_name: sColor.name,
+                    tube_tujuan: tTubeStr,
+                    core_tujuan: tCore,
+                    core_tujuan_name: tColor.name
+                };
+            } else {
+                this.connections.push({
+                    tube_asal: sTubeStr,
+                    core_asal: sCore,
+                    core_asal_name: sColor.name,
+                    tube_tujuan: tTubeStr,
+                    core_tujuan: tCore,
+                    core_tujuan_name: tColor.name
+                });
+            }
+            this.selectedSource = null;
+        },
+
+        connectAll1to1() {
+            const sTubeStr = 'Tube ' + this.activeTubeAsal;
+            const tTubeStr = 'Tube ' + this.activeTubeTujuan;
+            for (let i = 1; i <= 12; i++) {
+                const sColor = this.getColor(i);
+                const tColor = this.getColor(i);
+                const existingIdx = this.connections.findIndex(c => c.tube_asal === sTubeStr && Number(c.core_asal) === i);
+                if (existingIdx >= 0) {
+                    this.connections[existingIdx].tube_tujuan = tTubeStr;
+                    this.connections[existingIdx].core_tujuan = i;
+                    this.connections[existingIdx].core_tujuan_name = tColor.name;
+                } else {
+                    this.connections.push({
+                        tube_asal: sTubeStr,
+                        core_asal: i,
+                        core_asal_name: sColor.name,
+                        tube_tujuan: tTubeStr,
+                        core_tujuan: i,
+                        core_tujuan_name: tColor.name
+                    });
+                }
+            }
+        },
+
+        swapTubes() {
+            const temp = this.activeTubeAsal;
+            this.activeTubeAsal = this.activeTubeTujuan;
+            this.activeTubeTujuan = temp;
+        },
+
+        resetConnections() {
+            if (confirm('Reset seluruh daftar manuver core?')) {
+                this.connections = [];
+                this.selectedSource = null;
+            }
+        },
+
+        removeConnection(index) {
+            this.connections.splice(index, 1);
+        },
+
+        get primaryCoreAsal() {
+            if (this.connections.length > 0) return this.connections[0].core_asal;
+            return 1;
+        },
+
+        get primaryCoreTujuan() {
+            if (this.connections.length > 0) return this.connections[0].core_tujuan;
+            return 1;
+        },
+
+        get summaryCoreDialihkan() {
+            if (this.connections.length === 0) return 'Belum ada core yang disambungkan';
+            return this.connections.map(c => `T${String(c.tube_asal).replace('Tube ', '')}C${c.core_asal} ➔ T${String(c.tube_tujuan).replace('Tube ', '')}C${c.core_tujuan}`).join(', ');
+        }
+    };
+}
+</script>
+
+<!-- Modal Tambah Joint Closure (JC) & Sambungan Kabel -->
+<div id="modal-jc" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+     x-data="jointClosureModal()">
+    <div class="bg-slate-50 dark:bg-slate-900 rounded-3xl max-w-5xl w-full shadow-2xl border border-teal-800/40 overflow-hidden my-auto animate-in fade-in zoom-in duration-200">
+        <!-- Header -->
+        <div class="px-6 py-4.5 text-white flex items-center justify-between border-b border-teal-500/20"
              style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
-            <h3 class="font-heading font-extrabold text-base text-white">Tambah Joint Closure (JC)</h3>
-            <button type="button" onclick="closeJcModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-heading font-extrabold text-base text-white tracking-wide flex items-center gap-2">
+                        Tambah Data Joint Closure (JC) & Sambungan Kabel
+                    </h3>
+                    <p class="text-[11px] text-teal-200/80 font-normal">Pencatatan penempatan closure fisik, kapasitas kabel eksisting, jumper & matrix splicing fiber</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeJcModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg transition">&times;</button>
         </div>
 
-        <form method="POST" action="{{ route('tickets.joint-closures.store', $tiket) }}" class="p-6 space-y-4 text-xs">
+        <form method="POST" action="{{ route('tickets.joint-closures.store', $tiket) }}" class="p-5 sm:p-6 max-h-[82vh] overflow-y-auto space-y-5 custom-scrollbar">
             @csrf
-            <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Kode / Nama Closure *</label>
-                <input type="text" name="closure_code" required placeholder="Contoh: JC-SRE-01 / DOME-24C" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Tipe Closure *</label>
-                    <select name="closure_type" required class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
-                        <option value="DOME">Dome (Kubah)</option>
-                        <option value="INLINE">Inline (Horizontal)</option>
-                    </select>
+            <input type="hidden" name="kapasitas_core" :value="kapasitasAsal">
+
+            <!-- 1. IDENTITAS & LOKASI FISIK CLOSURE -->
+            <div class="bg-white dark:bg-slate-800/90 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-3.5">
+                <div class="flex items-center gap-2 text-rose-500 font-extrabold text-xs uppercase tracking-wider">
+                    <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>1. IDENTITAS & LOKASI FISIK CLOSURE</span>
                 </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Kapasitas Core *</label>
-                    <input type="number" name="capacity_cores" required value="24" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+                    <div class="md:col-span-6">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Nama / Kode Closure <span class="text-rose-500">*</span></label>
+                        <input type="text" name="nama_closure" x-model="namaClosure" required placeholder="Contoh: JC-01, JC Tiang Span 14"
+                               class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Jenis Closure <span class="text-rose-500">*</span></label>
+                        <select name="tipe_closure" x-model="jenisClosure" required
+                                class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                            <option value="DOME">DOME (Kubah)</option>
+                            <option value="INLINE">INLINE (Horizontal)</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Penempatan Fisik <span class="text-rose-500">*</span></label>
+                        <select name="penempatan_fisik" x-model="penempatanFisik" required
+                                class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                            <option value="POLE">POLE (Tiang Udara)</option>
+                            <option value="MANHOLE">MANHOLE (Bawah Tanah)</option>
+                            <option value="WALL">WALL (Dinding Gedung)</option>
+                            <option value="RACK">RACK (ODF Rack)</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Deskripsi Lokasi Span</label>
-                <input type="text" name="location_description" placeholder="Contoh: Tiang PT MSN No. 12 Depan Alfamart" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 pt-1">
+                    <div class="md:col-span-7 space-y-1">
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 text-[11px]">
+                                <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                                    <circle cx="12" cy="12" r="3" stroke-width="2"/>
+                                </svg>
+                                Koordinat GPS Lokasi Closure
+                            </label>
+                            <button type="button" @click="getGps()" :disabled="isGpsLoading" class="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 inline-flex items-center gap-1 cursor-pointer">
+                                <svg class="w-3.5 h-3.5" :class="isGpsLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span x-text="isGpsLoading ? 'Mengambil GPS...' : 'Ambil GPS Saya'"></span>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-12 gap-2">
+                            <div class="col-span-5 flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-2 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">Lat</span>
+                                <input type="text" name="latitude" x-model="lat" placeholder="-6.xxxxxx"
+                                       class="w-full text-xs rounded-r-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div class="col-span-5 flex items-center">
+                                <span class="inline-flex items-center px-2.5 py-2 rounded-l-xl border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">Lng</span>
+                                <input type="text" name="longitude" x-model="lng" placeholder="107.xxxxxx"
+                                       class="w-full text-xs rounded-r-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                            </div>
+                            <div class="col-span-2">
+                                <button type="button" @click="openMap()" title="Buka di Maps"
+                                        class="w-full h-full flex items-center justify-center rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
+                                    <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 012.5 15.488V4.724a2 2 0 012.947-1.789L9 4m0 16l6-3m-6 3V4m6 16l5.447-2.724A2 2 0 0021.5 15.488V4.724a2 2 0 00-2.947-1.789L15 4m0 16V4m0 0L9 4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-5 flex items-center p-3 rounded-xl border border-amber-200/60 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20">
+                        <label class="flex items-start gap-3 cursor-pointer select-none">
+                            <input type="checkbox" name="is_new_cut" x-model="isNewCut" value="1"
+                                   class="mt-1 w-4 h-4 rounded text-teal-600 focus:ring-teal-500 border-slate-300">
+                            <div>
+                                <span class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    Tandai Penambahan Aset Baru (New Cut)
+                                </span>
+                                <span class="block text-[10.5px] text-slate-500 dark:text-slate-400">Centang jika ada pemasangan closure fisik baru di span ini.</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="closeJcModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
-                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    Simpan JC
+            <!-- 2. SPESIFIKASI KABEL & KAPASITAS -->
+            <div class="bg-white dark:bg-slate-800/90 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-3.5">
+                <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-extrabold text-xs uppercase tracking-wider">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    <span>2. SPESIFIKASI KABEL & KAPASITAS</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Kabel Asal / Eksisting -->
+                    <div class="p-3.5 rounded-xl border border-blue-200 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20 space-y-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-600 text-white font-extrabold text-[10px] uppercase tracking-wider">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                            </svg>
+                            KABEL ASAL / EKSISTING
+                        </span>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Kapasitas Kabel <span class="text-rose-500">*</span></label>
+                                <select name="kapasitas_kabel_asal" x-model.number="kapasitasAsal" @change="jumlahTubeAsal = Math.max(1, Math.ceil(kapasitasAsal / 12))"
+                                        class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2 text-slate-800 dark:text-slate-100">
+                                    <option value="12">12 Core</option>
+                                    <option value="24">24 Core</option>
+                                    <option value="48">48 Core</option>
+                                    <option value="96">96 Core</option>
+                                    <option value="144">144 Core</option>
+                                    <option value="288">288 Core</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Jumlah Tube <span class="text-rose-500">*</span></label>
+                                <input type="number" min="1" max="24" name="jumlah_tube_asal" x-model.number="jumlahTubeAsal"
+                                       class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2 text-slate-800 dark:text-slate-100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kabel Jumper / Distribusi -->
+                    <div class="p-3.5 rounded-xl border border-cyan-200 dark:border-cyan-900/40 bg-cyan-50/40 dark:bg-cyan-950/20 space-y-2.5">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-teal-600 text-white font-extrabold text-[10px] uppercase tracking-wider">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                            </svg>
+                            KABEL JUMPER / DISTRIBUSI
+                        </span>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Kapasitas Kabel <span class="text-rose-500">*</span></label>
+                                <select name="kapasitas_kabel_jumper" x-model.number="kapasitasJumper" @change="jumlahTubeJumper = Math.max(1, Math.ceil(kapasitasJumper / 12))"
+                                        class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2 text-slate-800 dark:text-slate-100">
+                                    <option value="12">12 Core</option>
+                                    <option value="24">24 Core</option>
+                                    <option value="48">48 Core</option>
+                                    <option value="96">96 Core</option>
+                                    <option value="144">144 Core</option>
+                                    <option value="288">288 Core</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Jumlah Tube <span class="text-rose-500">*</span></label>
+                                <input type="number" min="1" max="24" name="jumlah_tube_jumper" x-model.number="jumlahTubeJumper"
+                                       class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 p-2 text-slate-800 dark:text-slate-100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. VISUAL FIBER PATCHER (JOINTING LURUS) -->
+            <div class="rounded-2xl p-4 sm:p-5 shadow-2xl border border-teal-500/30 text-slate-100 space-y-4"
+                 style="background: linear-gradient(180deg, #021a24 0%, #03212c 100%);">
+                <!-- Patcher Header -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-800">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-extrabold tracking-wide">
+                        <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Visual Fiber Patcher (Jointing Lurus)
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="connectAll1to1()" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                            <span>+ Sambung (1:1)</span>
+                        </button>
+                        <button type="button" @click="swapTubes()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <span>Swap T1 ↔ T2</span>
+                        </button>
+                        <button type="button" @click="resetConnections()" class="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/50 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notice banner -->
+                <div class="px-3 py-2 rounded-xl bg-teal-950/40 border border-teal-500/20 text-teal-300 text-[11px] flex items-center justify-center gap-2 text-center">
+                    <span>⚡ Klik port core (C1-C12) untuk langsung menyambung 1-ke-1 secara otomatis</span>
+                </div>
+
+                <!-- Canvas Columns -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                    <!-- Left: KABEL ASAL (INPUT) -->
+                    <div class="lg:col-span-5 bg-slate-950/60 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between pb-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span class="font-extrabold text-xs text-slate-200 uppercase tracking-wide">Kabel Asal (Input)</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-md bg-slate-800 text-[10.5px] font-mono text-slate-300" x-text="kapasitasAsal + ' Core (' + jumlahTubeAsal + 'T)'"></span>
+                        </div>
+
+                        <!-- Tube Tabs -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                            <template x-for="t in jumlahTubeAsal" :key="t">
+                                <button type="button" @click="activeTubeAsal = t"
+                                        :class="activeTubeAsal === t ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30' : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'"
+                                        class="px-3 py-1 rounded-lg text-[11px] font-mono transition cursor-pointer"
+                                        x-text="'Tube ' + t"></button>
+                            </template>
+                        </div>
+
+                        <!-- Ports Grid (2 Columns: C1/C2, C3/C4, ...) -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="c in colors" :key="c.num">
+                                <button type="button" @click="togglePort(c.num)"
+                                        :class="isConnected(activeTubeAsal, c.num) ? 'border-teal-400/80 bg-teal-950/60 shadow-[0_0_10px_rgba(20,184,166,0.3)] text-white' : 'border-slate-800/90 bg-slate-900/90 text-slate-300 hover:border-slate-700 hover:bg-slate-800'"
+                                        class="flex items-center justify-between px-2.5 py-2 rounded-xl border text-[11px] font-semibold transition group cursor-pointer">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ backgroundColor: c.hex, border: c.isWhite ? '1px solid #94a3b8' : (c.isBlack ? '1px solid #475569' : 'none') }"></span>
+                                        <span class="font-mono truncate" x-text="'C' + c.num + ' ' + c.name"></span>
+                                    </div>
+                                    <template x-if="isConnected(activeTubeAsal, c.num)">
+                                        <span class="w-4 h-4 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-[10px] font-bold">✓</span>
+                                    </template>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Middle Indicator -->
+                    <div class="lg:col-span-2 flex flex-col items-center justify-center py-2 space-y-2">
+                        <div class="hidden lg:flex items-center gap-1 text-slate-600 font-mono text-xs">
+                            <span>○</span>
+                            <span class="tracking-widest">········</span>
+                            <span>○</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[11px] font-bold font-mono tracking-wide shadow-sm flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            <span x-text="matrix.length + ' Sambungan Aktif'"></span>
+                        </span>
+                    </div>
+
+                    <!-- Right: KABEL JUMPER (OUTPUT) -->
+                    <div class="lg:col-span-5 bg-slate-950/60 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between pb-1">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                                <span class="font-extrabold text-xs text-slate-200 uppercase tracking-wide">Kabel Jumper (Output)</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-md bg-slate-800 text-[10.5px] font-mono text-slate-300" x-text="kapasitasJumper + ' Core (' + jumlahTubeJumper + 'T)'"></span>
+                        </div>
+
+                        <!-- Tube Tabs -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                            <template x-for="t in jumlahTubeJumper" :key="t">
+                                <button type="button" @click="activeTubeJumper = t"
+                                        :class="activeTubeJumper === t ? 'bg-teal-600 text-white font-bold shadow-md shadow-teal-500/30' : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'"
+                                        class="px-3 py-1 rounded-lg text-[11px] font-mono transition cursor-pointer"
+                                        x-text="'Tube ' + t"></button>
+                            </template>
+                        </div>
+
+                        <!-- Ports Grid -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="c in colors" :key="c.num">
+                                <div :class="isConnected(activeTubeJumper, c.num, true) ? 'border-teal-400/80 bg-teal-950/60 shadow-[0_0_10px_rgba(20,184,166,0.3)] text-white' : 'border-slate-800/90 bg-slate-900/90 text-slate-300'"
+                                     class="flex items-center justify-between px-2.5 py-2 rounded-xl border text-[11px] font-semibold transition">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ backgroundColor: c.hex, border: c.isWhite ? '1px solid #94a3b8' : (c.isBlack ? '1px solid #475569' : 'none') }"></span>
+                                        <span class="font-mono truncate" x-text="'C' + c.num + ' ' + c.name"></span>
+                                    </div>
+                                    <template x-if="isConnected(activeTubeJumper, c.num, true)">
+                                        <span class="w-4 h-4 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-[10px] font-bold">✓</span>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Connection Chips -->
+                <div class="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center flex-wrap gap-2 text-xs">
+                        <span class="text-teal-400 font-bold flex items-center gap-1.5 mr-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            Sambungan Aktif:
+                        </span>
+                        <template x-for="(row, idx) in matrix" :key="idx">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-teal-500/40 text-teal-200 text-[11px] font-mono shadow-sm">
+                                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ backgroundColor: getColor(row.core_asal).hex }"></span>
+                                <span x-text="'T' + String(row.tube_asal).replace('Tube ', '') + 'C' + row.core_asal + ' (' + getColor(row.core_asal).name + ') ➜ T' + String(row.tube_jumper).replace('Tube ', '') + 'C' + row.core_jumper + ' (' + getColor(row.core_jumper).name + ')'"></span>
+                                <button type="button" @click="removeRow(idx)" class="w-3.5 h-3.5 rounded-full hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 flex items-center justify-center font-bold ml-1 transition cursor-pointer">&times;</button>
+                            </span>
+                        </template>
+                        <template x-if="matrix.length === 0">
+                            <span class="text-slate-500 text-xs italic">Belum ada core yang disambung. Klik port di atas untuk menyambung.</span>
+                        </template>
+                    </div>
+                    <div class="text-teal-400 font-bold text-xs font-mono" x-text="matrix.length + ' Core Terhubung'"></div>
+                </div>
+            </div>
+
+            <!-- 4. DAFTAR CORE YANG DISAMBUNG / MATRIX -->
+            <div class="bg-white dark:bg-slate-800/90 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center gap-2 text-slate-800 dark:text-slate-100 font-bold text-xs">
+                        <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Daftar Core yang Disambung / Matrix:</span>
+                    </div>
+                    <button type="button" @click="addManualRow()" class="px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700/70 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                        <span>+ Tambah Baris Manual</span>
+                    </button>
+                </div>
+
+                <!-- Hidden input to send matrix array as JSON -->
+                <input type="hidden" name="cores" :value="JSON.stringify(matrix)">
+
+                <div class="space-y-2">
+                    <template x-for="(row, idx) in matrix" :key="idx">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/50">
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Tube Asal</label>
+                                <input type="text" x-model="row.tube_asal" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Core Asal</label>
+                                <input type="text" x-model="row.core_asal_label" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Tube Jumper</label>
+                                <input type="text" x-model="row.tube_jumper" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Core Jumper</label>
+                                <input type="text" x-model="row.core_jumper_label" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Status</label>
+                                <select x-model="row.status" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                                    <option value="TERHUBUNG">TERHUBUNG</option>
+                                    <option value="PUTUS / LOSS">PUTUS / LOSS</option>
+                                    <option value="CADANGAN / SPARE">CADANGAN / SPARE</option>
+                                    <option value="RUSAK">RUSAK</option>
+                                </select>
+                            </div>
+                            <div class="sm:col-span-1">
+                                <label class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Loss (dB)</label>
+                                <input type="number" step="0.01" x-model.number="row.loss" class="w-full text-xs rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 p-1.5">
+                            </div>
+                            <div class="sm:col-span-1 flex justify-center pt-3 sm:pt-0">
+                                <button type="button" @click="removeRow(idx)" title="Hapus sambungan"
+                                        class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 flex items-center justify-center transition cursor-pointer">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="matrix.length === 0">
+                        <div class="p-6 text-center text-slate-400 text-xs border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+                            Belum ada baris matrix. Klik salah satu port pada Visual Fiber Patcher di atas atau gunakan tombol "+ Tambah Baris Manual".
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="closeJcModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer">
+                    ✕ Batal
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition cursor-pointer"
+                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <span>Simpan Data Joint Closure</span>
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Tambah Manuver Core -->
-<div id="modal-maneuver" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-        <div class="px-6 py-5 text-white flex items-center justify-between"
+<!-- Modal Tambah Record Manuver Core -->
+<div id="modal-maneuver" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+     x-data="coreManeuverModal()">
+    <div class="bg-slate-50 dark:bg-slate-900 rounded-3xl max-w-5xl w-full shadow-2xl border border-teal-800/40 overflow-hidden my-auto animate-in fade-in zoom-in duration-200">
+        <!-- Header -->
+        <div class="px-6 py-4.5 text-white flex items-center justify-between border-b border-teal-500/20"
              style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
-            <h3 class="font-heading font-extrabold text-base text-white">Catat Manuver Core Fiber Optik</h3>
-            <button type="button" onclick="closeManeuverModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shadow-inner">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-heading font-extrabold text-base text-white tracking-wide">
+                        Tambah Record Manuver Core
+                    </h3>
+                    <p class="text-[11px] text-teal-200/80 font-normal">Splicing, Bypassing & Pengalihan Core Fiber Optik</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeManeuverModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg transition">&times;</button>
         </div>
 
-        <form method="POST" action="{{ route('tickets.maneuvers.store', $tiket) }}" class="p-6 space-y-4 text-xs">
+        <form method="POST" action="{{ route('tickets.maneuvers.store', $tiket) }}" class="p-5 sm:p-6 max-h-[82vh] overflow-y-auto space-y-5 custom-scrollbar">
             @csrf
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Tube Asal *</label>
-                    <input type="text" name="tube_source" required placeholder="Tube 1 (Biru)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+
+            <!-- 1. LOKASI & STATUS MANUVER -->
+            <div class="bg-white dark:bg-slate-800/90 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-3.5">
+                <div class="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-extrabold text-xs uppercase tracking-wider">
+                    <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                    </svg>
+                    <span>1. LOKASI & STATUS MANUVER</span>
                 </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Core Asal *</label>
-                    <input type="text" name="core_source" required placeholder="Core 3 (Hijau)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+                    <div class="md:col-span-7">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Titik / Lokasi Manuver <span class="text-rose-500">*</span></label>
+                        <input type="text" name="segmen" x-model="titikLokasi" required placeholder="CONTOH: JC-01, OTB-POP-BDG, FAT-04"
+                               class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                    </div>
+                    <div class="md:col-span-5">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Tipe Lokasi Aset <span class="text-rose-500">*</span></label>
+                        <select name="tipe_lokasi" x-model="tipeLokasi" required
+                                class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                            <option value="CLOSURE LAPANGAN (JC)">CLOSURE LAPANGAN (JC)</option>
+                            <option value="OTB/ODF">OTB / ODF</option>
+                            <option value="FAT/ODP">FAT / ODP</option>
+                            <option value="ODC">ODC</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 pt-1">
+                    <!-- Status Alokasi -->
+                    <div class="md:col-span-6 space-y-1.5">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 text-[11px]">Status Alokasi <span class="text-rose-500">*</span></label>
+                        <input type="hidden" name="status_alokasi" :value="statusAlokasi">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" @click="statusAlokasi = 'SEBELUM'"
+                                    :class="statusAlokasi === 'SEBELUM' ? 'bg-slate-700 text-white font-bold border-slate-600 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'"
+                                    class="px-3 py-2.5 rounded-xl border text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>SEBELUM</span>
+                            </button>
+                            <button type="button" @click="statusAlokasi = 'SESUDAH'"
+                                    :class="statusAlokasi === 'SESUDAH' ? 'bg-teal-700 text-white font-bold border-teal-600 shadow-sm' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'"
+                                    class="px-3 py-2.5 rounded-xl border text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>SESUDAH</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sifat Manuver -->
+                    <div class="md:col-span-6 space-y-1.5">
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 text-[11px]">Sifat Manuver <span class="text-rose-500">*</span></label>
+                        <input type="hidden" name="sifat_manuver" :value="sifatManuver">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" @click="sifatManuver = 'SEMENTARA'"
+                                    :class="sifatManuver === 'SEMENTARA' ? 'bg-amber-400 hover:bg-amber-400 text-slate-950 font-extrabold border-amber-500 shadow-md shadow-amber-500/20' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'"
+                                    class="px-3 py-2.5 rounded-xl border text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>SEMENTARA</span>
+                            </button>
+                            <button type="button" @click="sifatManuver = 'PERMANEN'"
+                                    :class="sifatManuver === 'PERMANEN' ? 'bg-teal-600 hover:bg-teal-500 text-white font-extrabold border-teal-500 shadow-md shadow-teal-500/20' : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'"
+                                    class="px-3 py-2.5 rounded-xl border text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"/>
+                                </svg>
+                                <span>PERMANEN</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Tube Tujuan *</label>
-                    <input type="text" name="tube_target" required placeholder="Tube 2 (Orange)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+            <!-- 2. VISUAL FIBER PATCHER (MANUVER) -->
+            <div class="rounded-2xl p-4 sm:p-5 shadow-2xl border border-teal-500/30 text-slate-100 space-y-4"
+                 style="background: linear-gradient(180deg, #021a24 0%, #03212c 100%);">
+                <!-- Patcher Header -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-800">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-xs font-extrabold tracking-wide">
+                        <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Visual Fiber Patcher
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="connectAll1to1()" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                            <span>+ Sambung (1:1)</span>
+                        </button>
+                        <button type="button" @click="swapTubes()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <span>Swap T1 ↔ T2</span>
+                        </button>
+                        <button type="button" @click="resetConnections()" class="px-3 py-1.5 rounded-lg bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/50 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            <span>Reset</span>
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Core Tujuan *</label>
-                    <input type="text" name="core_target" required placeholder="Core 1 (Biru)" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+
+                <!-- Notice banner -->
+                <div class="px-3 py-2 rounded-xl bg-teal-950/40 border border-teal-500/20 text-teal-300 text-[11px] flex items-center justify-center gap-2 text-center">
+                    <span>⚡ Tap Port Asal (Kiri) ➔ Tap Port Tujuan (Kanan)</span>
+                </div>
+
+                <!-- Canvas Columns -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                    <!-- Left: ASAL (INPUT) -->
+                    <div class="lg:col-span-5 bg-slate-950/60 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between pb-1">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                                </svg>
+                                <span class="font-extrabold text-xs text-slate-200 uppercase tracking-wide">ASAL (INPUT)</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-md bg-slate-800 text-[10.5px] font-mono text-slate-300" x-text="kapasitasAsal + ' Core (' + jumlahTubeAsal + 'T)'"></span>
+                        </div>
+
+                        <!-- Tube Tabs -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                            <template x-for="t in jumlahTubeAsal" :key="t">
+                                <button type="button" @click="activeTubeAsal = t"
+                                        :class="activeTubeAsal === t ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30' : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'"
+                                        class="px-3 py-1 rounded-lg text-[11px] font-mono transition cursor-pointer"
+                                        x-text="'Tube ' + t"></button>
+                            </template>
+                        </div>
+
+                        <!-- Ports Grid -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="c in colors" :key="c.num">
+                                <button type="button" @click="selectSourcePort(c.num)"
+                                        :class="{
+                                            'ring-2 ring-amber-400 bg-amber-950/60 text-amber-100 border-amber-400 animate-pulse': selectedSource && selectedSource.tube === activeTubeAsal && selectedSource.core === c.num,
+                                            'border-teal-400/80 bg-teal-950/60 text-white shadow-[0_0_10px_rgba(20,184,166,0.3)]': isSourceConnected(activeTubeAsal, c.num) && !(selectedSource && selectedSource.tube === activeTubeAsal && selectedSource.core === c.num),
+                                            'border-slate-800/90 bg-slate-900/90 text-slate-300 hover:border-slate-700 hover:bg-slate-800': !isSourceConnected(activeTubeAsal, c.num) && !(selectedSource && selectedSource.tube === activeTubeAsal && selectedSource.core === c.num)
+                                        }"
+                                        class="flex items-center justify-between px-2.5 py-2 rounded-xl border text-[11px] font-semibold transition group cursor-pointer">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ backgroundColor: c.hex, border: c.isWhite ? '1px solid #94a3b8' : (c.isBlack ? '1px solid #475569' : 'none') }"></span>
+                                        <span class="font-mono truncate" x-text="'C' + c.num + ' ' + c.name"></span>
+                                    </div>
+                                    <template x-if="isSourceConnected(activeTubeAsal, c.num)">
+                                        <span class="w-4 h-4 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-[10px] font-bold">✓</span>
+                                    </template>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Middle Indicator -->
+                    <div class="lg:col-span-2 flex flex-col items-center justify-center py-2 space-y-2">
+                        <div class="hidden lg:flex items-center gap-1 text-slate-600 font-mono text-xs">
+                            <span>○</span>
+                            <span class="tracking-widest">········</span>
+                            <span>○</span>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-teal-500/20 border border-teal-500/40 text-teal-300 text-[11px] font-bold font-mono tracking-wide shadow-sm flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            <span x-text="connections.length + ' Sambungan Aktif'"></span>
+                        </span>
+                    </div>
+
+                    <!-- Right: TUJUAN (OUTPUT) -->
+                    <div class="lg:col-span-5 bg-slate-950/60 rounded-2xl p-3.5 border border-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between pb-1">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                                </svg>
+                                <span class="font-extrabold text-xs text-slate-200 uppercase tracking-wide">TUJUAN (OUTPUT)</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-md bg-slate-800 text-[10.5px] font-mono text-slate-300" x-text="kapasitasTujuan + ' Core (' + jumlahTubeTujuan + 'T)'"></span>
+                        </div>
+
+                        <!-- Tube Tabs -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                            <template x-for="t in jumlahTubeTujuan" :key="t">
+                                <button type="button" @click="activeTubeTujuan = t"
+                                        :class="activeTubeTujuan === t ? 'bg-teal-600 text-white font-bold shadow-md shadow-teal-500/30' : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'"
+                                        class="px-3 py-1 rounded-lg text-[11px] font-mono transition cursor-pointer"
+                                        x-text="'Tube ' + t"></button>
+                            </template>
+                        </div>
+
+                        <!-- Ports Grid -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <template x-for="c in colors" :key="c.num">
+                                <button type="button" @click="selectTargetPort(c.num)"
+                                        :class="isTargetConnected(activeTubeTujuan, c.num) ? 'border-teal-400/80 bg-teal-950/60 shadow-[0_0_10px_rgba(20,184,166,0.3)] text-white' : 'border-slate-800/90 bg-slate-900/90 text-slate-300 hover:border-teal-500/60 hover:bg-slate-800'"
+                                        class="flex items-center justify-between px-2.5 py-2 rounded-xl border text-[11px] font-semibold transition group cursor-pointer">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ backgroundColor: c.hex, border: c.isWhite ? '1px solid #94a3b8' : (c.isBlack ? '1px solid #475569' : 'none') }"></span>
+                                        <span class="font-mono truncate" x-text="'C' + c.num + ' ' + c.name"></span>
+                                    </div>
+                                    <template x-if="isTargetConnected(activeTubeTujuan, c.num)">
+                                        <span class="w-4 h-4 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-[10px] font-bold">✓</span>
+                                    </template>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Connection Chips -->
+                <div class="pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center flex-wrap gap-2 text-xs">
+                        <span class="text-teal-400 font-bold flex items-center gap-1.5 mr-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                            Sambungan Aktif:
+                        </span>
+                        <template x-for="(conn, idx) in connections" :key="idx">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-teal-500/40 text-teal-200 text-[11px] font-mono shadow-sm">
+                                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ backgroundColor: getColor(conn.core_asal).hex }"></span>
+                                <span x-text="'T' + String(conn.tube_asal).replace('Tube ', '') + 'C' + conn.core_asal + ' (' + conn.core_asal_name + ') ➜ T' + String(conn.tube_tujuan).replace('Tube ', '') + 'C' + conn.core_tujuan + ' (' + conn.core_tujuan_name + ')'"></span>
+                                <button type="button" @click="removeConnection(idx)" class="w-3.5 h-3.5 rounded-full hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 flex items-center justify-center font-bold ml-1 transition cursor-pointer">&times;</button>
+                            </span>
+                        </template>
+                        <template x-if="connections.length === 0">
+                            <span class="text-slate-500 text-xs italic">Belum ada manuver yang dicatat. Tap port Asal lalu tap port Tujuan.</span>
+                        </template>
+                    </div>
+                    <div class="text-teal-400 font-bold text-xs font-mono" x-text="connections.length + ' Core Terhubung'"></div>
                 </div>
             </div>
 
-            <div>
-                <label class="block font-bold text-slate-700 mb-1.5 uppercase tracking-wider text-[10px]">Alasan Manuver *</label>
-                <input type="text" name="reason" required placeholder="Core asal putus di span 14-15, bypass ke spare" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+            <!-- 3. DETAIL TAMBAHAN & ALASAN -->
+            <div class="bg-white dark:bg-slate-800/90 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700/60 shadow-sm space-y-3.5">
+                <div class="flex items-center gap-2 text-slate-800 dark:text-slate-100 font-bold text-xs">
+                    <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span>Detail Tambahan & Alasan Manuver</span>
+                </div>
+
+                <!-- Hidden inputs for form submit -->
+                <input type="hidden" name="core_asal" :value="primaryCoreAsal">
+                <input type="hidden" name="core_tujuan" :value="primaryCoreTujuan">
+                <input type="hidden" name="connections" :value="JSON.stringify(connections)">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Core yang Dialihkan</label>
+                        <div class="p-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900/60 text-xs text-slate-800 dark:text-slate-200 font-mono"
+                             x-text="summaryCoreDialihkan"></div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Titik Normalisasi / Estimasi Waktu</label>
+                        <input type="text" name="titik_normalisasi" x-model="titikNormalisasi" placeholder="Misal: Normalisasi saat span pengganti terpasang"
+                               class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Status Core Aset</label>
+                        <select name="status_core_aset" x-model="statusCoreAset"
+                                class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                            <option value="TERPAKAI (TRAFFIC AKTIF)">TERPAKAI (TRAFFIC AKTIF)</option>
+                            <option value="CADANGAN / SPARE">CADANGAN / SPARE</option>
+                            <option value="LOSS TINGGI">LOSS TINGGI</option>
+                            <option value="RUSAK / PUTUS">RUSAK / PUTUS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1 text-[11px]">Alasan / Keterangan Manuver <span class="text-rose-500">*</span></label>
+                        <input type="text" name="alasan" x-model="keterangan" required placeholder="Contoh: Core putus di Span 14-15, dialihkan ke Core cadangan"
+                               class="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/60 p-2.5 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-teal-500">
+                    </div>
+                </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="closeManeuverModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl">Batal</button>
-                <button type="submit" class="px-5 py-2 rounded-xl text-white font-bold bg-purple-600 hover:bg-purple-700">
-                    Simpan Manuver
+            <!-- Footer Action -->
+            <div class="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="closeManeuverModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition cursor-pointer">
+                    ✕ Batal
+                </button>
+                <button type="submit" class="px-6 py-2.5 rounded-xl text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition cursor-pointer"
+                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>Simpan Manuver Core</span>
                 </button>
             </div>
         </form>

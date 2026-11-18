@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <!-- Action Toolbar: Tombol Ajukan Lembur (Di Atas Card Filter) -->
+        {{-- Action Toolbar: Tombol Ajukan Permohonan Lembur --}}
         @if ($isHrd || ! $isAtasan)
         <div class="flex items-center justify-end">
             <a href="{{ route('gomsn.overtime.create') }}" 
