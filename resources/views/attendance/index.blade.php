@@ -45,7 +45,7 @@
         @endphp
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-        <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_8px_28px_rgba(2,43,58,0.28)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 sm:gap-4 select-none"
+        <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_8px_28px_rgba(2,43,58,0.28)] p-4 sm:py-5 sm:px-6 flex items-center justify-between gap-3.5 sm:gap-4 select-none"
              style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
             
             <!-- Ambient Glow Orbs & Gloss Highlights -->
@@ -54,8 +54,8 @@
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
             <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
 
-            <!-- Left: Glowing Attendance Icon + Page Name -->
-            <div class="relative z-10 flex items-start sm:items-center gap-3.5 min-w-0">
+            <!-- Glowing Attendance Icon + Page Name -->
+            <div class="relative z-10 flex items-center gap-3.5 min-w-0">
                 <div class="w-11 h-11 rounded-2xl bg-white/12 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                     <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -71,47 +71,6 @@
                         Absensi biometrik wajah &amp; lokasi GPS
                     </p>
                 </div>
-            </div>
-
-            <!-- Right: Employee Identity Card (Full Width on Mobile, Compact on Desktop) -->
-            <div class="relative z-10 w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-3.5 py-2.5 text-white shrink-0 shadow-xs">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="relative shrink-0">
-                        @if ($user->avatar_url)
-                            <img src="{{ $user->avatar_url }}" 
-                                 alt="" 
-                                 class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-cyan-300/50 shadow-sm" 
-                                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
-                            <div style="display: none;" class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-300/50 text-white items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                                {{ $user->initials }}
-                            </div>
-                        @else
-                            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#18C4C4] to-[#155E63] border-2 border-cyan-300/50 text-white flex items-center justify-center text-xs sm:text-sm font-bold shadow-sm shrink-0">
-                                {{ $user->initials }}
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="text-left leading-tight min-w-0">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-xs sm:text-sm text-white tracking-tight truncate max-w-[160px] sm:max-w-[200px]">
-                                {{ strtoupper($user->name) }}
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-1.5 mt-1 text-[10px] sm:text-[11px] text-teal-100/90">
-                            <span class="font-mono font-semibold text-cyan-200">{{ $user->employee_code }}</span>
-                            @if ($user->division)
-                                <span class="text-white/40">&bull;</span>
-                                <span class="truncate">{{ $user->division }}</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-400/20 text-emerald-200 border border-emerald-400/35 shrink-0">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>{{ $user->is_active ? 'Aktif' : 'Non-Aktif' }}</span>
-                </span>
             </div>
         </div>
 
