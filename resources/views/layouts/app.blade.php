@@ -1229,7 +1229,7 @@
                 <path d="M 0 58 C 45 22 85 50 144 14 L 144 58 Z" fill="#0d9488"/>
             </svg>
 
-            <!-- 1. PRESENSI -->
+            <!-- 1. PRESENSI / ABSEN -->
             <a href="{{ route('attendance.index') }}" 
                @click="currentTab = 'presensi'"
                class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
@@ -1240,7 +1240,7 @@
                 </svg>
                 <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
                       :class="isActive('presensi') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
-                    Presensi
+                    Absen
                 </span>
                 <div class="h-1 flex items-center justify-center mt-1">
                     <span x-show="isActive('presensi')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>

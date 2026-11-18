@@ -327,18 +327,6 @@
                             <span>Absen Pulang Sekarang</span>
                         </button>
                     @endif
-
-                    <!-- Re-enroll Biometrics Option -->
-                    <div class="text-center pt-1">
-                        <button type="button" 
-                                @click="openEnrollModal()" 
-                                class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal-700 hover:text-teal-900 transition underline underline-offset-2 cursor-pointer">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                            <span>Perbarui / Daftar Ulang Wajah</span>
-                        </button>
-                    </div>
                 @endif
             </div>
             @endif
