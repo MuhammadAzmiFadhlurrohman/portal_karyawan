@@ -5176,8 +5176,31 @@ async function handleChatFormSubmit(e) {
         bubble.id = tempRowId;
         
         let mediaNotice = '';
-        if (hasMedia) {
-            mediaNotice = `<div class="p-1.5 rounded-lg bg-sky-100/70 text-sky-800 text-[10.5px] font-semibold flex items-center gap-1.5">
+        let localMediaPreviewUrl = null;
+        const attachedPhotoFile = (mediaInput && mediaInput.files && mediaInput.files[0]) || null;
+        const attachedVideoFile = (videoInput && videoInput.files && videoInput.files[0]) || null;
+
+        if (attachedPhotoFile && attachedPhotoFile.type && attachedPhotoFile.type.startsWith('image/')) {
+            try {
+                localMediaPreviewUrl = URL.createObjectURL(attachedPhotoFile);
+            } catch (e) {}
+
+            mediaNotice = `
+                <div class="chat-media-preview-container pt-0.5">
+                    <div style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                         class="block group relative shadow-2xs bg-slate-100 text-left">
+                        <img src="${localMediaPreviewUrl}"
+                             alt="Bukti Foto"
+                             style="width: 100%; height: 118px; object-fit: cover; display: block;">
+                        <div class="upload-badge absolute bottom-1.5 right-1.5 bg-black/65 backdrop-blur-xs text-white text-[9.5px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                            <svg class="w-3 h-3 animate-spin text-teal-300" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span>Mengunggah...</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (hasMedia) {
+            mediaNotice = `<div class="chat-media-preview-container p-1.5 rounded-lg bg-sky-100/70 text-sky-800 text-[10.5px] font-semibold flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 text-sky-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="3" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
                 <span>Mengunggah berkas media...</span>
             </div>`;
@@ -5305,8 +5328,42 @@ async function handleChatFormSubmit(e) {
                 bubbleBox.dataset.read = 'Belum dibaca';
                 bubbleBox.dataset.lat = chron.latitude || '';
                 bubbleBox.dataset.lng = chron.longitude || '';
-                bubbleBox.dataset.photo = data.photo_url || (chron.photo_path ? `/storage/${chron.photo_path}` : '');
+                const finalPhotoUrl = data.photo_url || (chron.photo_path ? `/storage/${chron.photo_path}` : (localMediaPreviewUrl || ''));
+                bubbleBox.dataset.photo = finalPhotoUrl;
                 bubbleBox.dataset.category = chron.category || 'LAIN';
+
+                // Langsung update container media: hilangkan spinner loading dan jadikan foto permanen interaktif
+                const mediaContainer = bubbleBox.querySelector('.chat-media-preview-container');
+                if (mediaContainer) {
+                    if (finalPhotoUrl) {
+                        mediaContainer.innerHTML = `
+                            <button type="button"
+                                    onclick="openImageLightbox('${finalPhotoUrl}', 'Foto Dokumentasi - Anda')"
+                                    style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                                    class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
+                                <img src="${finalPhotoUrl}"
+                                     alt="Bukti Foto"
+                                     loading="lazy"
+                                     style="width: 100%; height: 118px; object-fit: cover; display: block;"
+                                     class="group-hover:scale-105 transition duration-200">
+                                <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
+                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                    <span>Perbesar &rarr;</span>
+                                </div>
+                            </button>
+                        `;
+                    } else if (data.video_url) {
+                        mediaContainer.innerHTML = `
+                            <div class="pt-0.5" style="width: 220px; max-width: 100%;">
+                                <video controls class="rounded-xl border border-slate-200 w-full" style="max-height: 160px;">
+                                    <source src="${data.video_url}" type="video/mp4">
+                                </video>
+                            </div>
+                        `;
+                    } else {
+                        mediaContainer.remove();
+                    }
+                }
 
                 const statusSpan = bubbleBox.querySelector('.status-indicator');
                 if (statusSpan) {
@@ -5420,23 +5477,92 @@ function updateAttachmentLabel(fileInput) {
     }
 }
 
+// Fast client-side image compression for mobile uploads (< 400KB payload)
+async function compressImageIfNeeded(file, maxDimension = 1600, quality = 0.82) {
+    if (!file || !file.type || !file.type.startsWith('image/') || file.type === 'image/gif') {
+        return file;
+    }
+    // Jika ukuran file sudah di bawah 450 KB, tidak perlu kompres lagi
+    if (file.size <= 450 * 1024) {
+        return file;
+    }
+
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                let width = img.width;
+                let height = img.height;
+                if (width > maxDimension || height > maxDimension) {
+                    if (width > height) {
+                        height = Math.round((height * maxDimension) / width);
+                        width = maxDimension;
+                    } else {
+                        width = Math.round((width * maxDimension) / height);
+                        height = maxDimension;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(
+                    (blob) => {
+                        if (blob && blob.size < file.size) {
+                            const cleanName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+                            const compressedFile = new File([blob], cleanName, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            console.log(`[Photo Optimizer] Compressed: ${(file.size/1024).toFixed(0)}KB -> ${(compressedFile.size/1024).toFixed(0)}KB`);
+                            resolve(compressedFile);
+                        } else {
+                            resolve(file);
+                        }
+                    },
+                    'image/jpeg',
+                    quality
+                );
+            };
+            img.onerror = () => resolve(file);
+            img.src = e.target.result;
+        };
+        reader.onerror = () => resolve(file);
+        reader.readAsDataURL(file);
+    });
+}
+
 // Handlers for WhatsApp-style attachment menu options
-function handleFileChosen(input, typeName) {
+async function handleFileChosen(input, typeName) {
     const label = document.getElementById('attachment-name');
     const photoChip = document.getElementById('photo-attached-preview');
     const photoText = document.getElementById('photo-preview-text');
     const mediaInput = document.getElementById('input_upload_media');
 
     if (input.files && input.files.length > 0) {
-        const file = input.files[0];
-        // If camera plain was picked, transfer file into the form input
-        if (input.id === 'input_camera_plain' && mediaInput) {
-            const dt = new DataTransfer();
-            dt.items.add(file);
+        let file = input.files[0];
+
+        if (file.type && file.type.startsWith('image/')) {
+            if (label) label.innerText = '⚙️ Mengoptimalkan foto...';
+            if (photoText) photoText.innerText = '⚙️ Mengompres foto...';
+            if (photoChip) photoChip.classList.remove('hidden');
+            file = await compressImageIfNeeded(file);
+        }
+
+        // Transfer compressed file into the actual form input
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        if (mediaInput) {
             mediaInput.files = dt.files;
         }
-        if (label) label.innerText = '📎 ' + typeName + ': ' + file.name;
-        if (photoText) photoText.innerText = '📷 ' + typeName + ': ' + file.name;
+
+        const sizeKb = Math.round(file.size / 1024);
+        if (label) label.innerText = '📎 ' + typeName + ' (' + sizeKb + ' KB)';
+        if (photoText) photoText.innerText = '📷 ' + typeName + ': ' + file.name + ' (' + sizeKb + ' KB)';
         if (photoChip) photoChip.classList.remove('hidden');
     }
 }
@@ -5582,16 +5708,37 @@ function processGpsWatermark(fileInput) {
     const file = fileInput.files[0];
     const reader = new FileReader();
 
+    const label = document.getElementById('attachment-name');
+    const photoChip = document.getElementById('photo-attached-preview');
+    const photoText = document.getElementById('photo-preview-text');
+    if (label) label.innerText = '📸 Memproses Watermark GPS...';
+    if (photoText) photoText.innerText = '📸 Menyiapkan Watermark GPS...';
+    if (photoChip) photoChip.classList.remove('hidden');
+
     reader.onload = function(e) {
         const img = new Image();
         img.onload = async function() {
+            // Skala foto jika lebih besar dari 1600px agar upload di HP sangat cepat (< 350 KB)
+            let targetWidth = img.width;
+            let targetHeight = img.height;
+            const maxDim = 1600;
+            if (targetWidth > maxDim || targetHeight > maxDim) {
+                if (targetWidth > targetHeight) {
+                    targetHeight = Math.round((targetHeight * maxDim) / targetWidth);
+                    targetWidth = maxDim;
+                } else {
+                    targetWidth = Math.round((targetWidth * maxDim) / targetHeight);
+                    targetHeight = maxDim;
+                }
+            }
+
             const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
             const ctx = canvas.getContext('2d');
 
-            // 1. Draw original photo
-            ctx.drawImage(img, 0, 0);
+            // 1. Draw original photo scaled
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
             // 2. Coordinates & Date (Matching User Reference Image)
             const latVal = parseFloat(document.getElementById('chron_lat')?.value);
@@ -5617,11 +5764,10 @@ function processGpsWatermark(fileInput) {
             const addressLines = currentGpsAddressLines.length > 0 ? currentGpsAddressLines : ['Kota Bandung', 'Jawa Barat'];
 
             // 3. Watermark Text Configuration (Right-aligned, bottom-right corner)
-            // Increased font size and spacing for much clearer visibility
-            const fontSize = Math.max(20, Math.round(img.width * 0.032));
+            const fontSize = Math.max(18, Math.round(targetWidth * 0.032));
             const lineHeight = Math.round(fontSize * 1.4);
-            const marginX = Math.round(img.width * 0.045);
-            const marginY = Math.round(img.height * 0.045);
+            const marginX = Math.round(targetWidth * 0.045);
+            const marginY = Math.round(targetHeight * 0.045);
 
             ctx.font = '700 ' + fontSize + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
             ctx.textAlign = 'right';
@@ -5632,11 +5778,10 @@ function processGpsWatermark(fileInput) {
             addressLines.forEach(l => lines.push(l));
 
             const totalHeight = (lines.length - 1) * lineHeight;
-            const startY = img.height - marginY - totalHeight;
+            const startY = targetHeight - marginY - totalHeight;
 
             lines.forEach((line, idx) => {
                 const lineY = startY + (idx * lineHeight);
-                // Strong dark outline & shadow for crystal clear contrast on any background
                 ctx.save();
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
                 ctx.shadowBlur = Math.round(fontSize * 0.35);
@@ -5646,16 +5791,16 @@ function processGpsWatermark(fileInput) {
                 ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
                 ctx.lineWidth = Math.max(3, Math.round(fontSize * 0.18));
                 ctx.lineJoin = 'round';
-                ctx.strokeText(line, img.width - marginX, lineY);
+                ctx.strokeText(line, targetWidth - marginX, lineY);
 
                 // Crisp pure white text
                 ctx.fillStyle = '#FFFFFF';
-                ctx.fillText(line, img.width - marginX, lineY);
+                ctx.fillText(line, targetWidth - marginX, lineY);
                 ctx.restore();
             });
 
             // 4. Draw Official MSN Logo on top-right (Same logo as browser tab: logo-msn2.png)
-            const logoSize = Math.max(64, Math.round(img.width * 0.09));
+            const logoSize = Math.max(54, Math.round(targetWidth * 0.09));
             const logoImg = new Image();
             logoImg.crossOrigin = 'anonymous';
             logoImg.onload = function() {
@@ -5664,35 +5809,37 @@ function processGpsWatermark(fileInput) {
                 ctx.shadowBlur = 8;
                 ctx.shadowOffsetX = 0;
                 ctx.shadowOffsetY = 3;
-                ctx.drawImage(logoImg, img.width - marginX - logoSize, marginY, logoSize, logoSize);
+                ctx.drawImage(logoImg, targetWidth - marginX - logoSize, marginY, logoSize, logoSize);
                 ctx.restore();
                 finalizeWatermarkedCanvas();
             };
             logoImg.onerror = function() {
                 // Fallback to stylized network icon if image load fails
-                drawWatermarkNetworkIcon(ctx, img.width - marginX, marginY, logoSize);
+                drawWatermarkNetworkIcon(ctx, targetWidth - marginX, marginY, logoSize);
                 finalizeWatermarkedCanvas();
             };
             logoImg.src = '{{ asset('assets/logo/logo-msn2.png') }}';
 
             function finalizeWatermarkedCanvas() {
-                // 5. Convert canvas to Blob & assign to input
+                // 5. Convert canvas to Blob & assign to input (0.84 quality for lightweight super-fast upload)
                 canvas.toBlob(function(blob) {
-                    const watermarkedFile = new File([blob], 'GPS_' + file.name, { type: 'image/jpeg' });
+                    const cleanName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+                    const watermarkedFile = new File([blob], 'GPS_' + cleanName, { type: 'image/jpeg' });
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(watermarkedFile);
                     const mediaInput = document.getElementById('input_upload_media');
                     if (mediaInput) {
                         mediaInput.files = dataTransfer.files;
                     }
+                    const sizeKb = Math.round(blob.size / 1024);
                     const label = document.getElementById('attachment-name');
-                    if (label) label.innerText = '📸 Watermark GPS Siap';
+                    if (label) label.innerText = '📸 Watermark GPS Siap (' + sizeKb + ' KB)';
 
                     const photoChip = document.getElementById('photo-attached-preview');
                     const photoText = document.getElementById('photo-preview-text');
-                    if (photoText) photoText.innerText = '📸 Watermark GPS: ' + file.name;
+                    if (photoText) photoText.innerText = '📸 Watermark GPS: ' + cleanName + ' (' + sizeKb + ' KB)';
                     if (photoChip) photoChip.classList.remove('hidden');
-                }, 'image/jpeg', 0.92);
+                }, 'image/jpeg', 0.84);
             }
         };
         img.src = e.target.result;
