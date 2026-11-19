@@ -540,21 +540,20 @@
                                         <button type="button" 
                                                 @click="toggleStatus()"
                                                 :title="isPaid ? 'Status: Dibayar. Klik untuk ubah ke Belum.' : 'Status: Belum. Klik untuk ubah ke Dibayar.'"
-                                                class="group inline-flex items-center gap-1.5 py-0.5 px-2.5 rounded-full border transition-all shadow-2xs cursor-pointer select-none"
-                                                :class="isPaid ? 'bg-emerald-50 border-emerald-300 hover:bg-emerald-100/80' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'">
+                                                class="group inline-flex items-center gap-2 py-0.5 px-1 rounded-full cursor-pointer select-none transition hover:opacity-90">
                                             
-                                            <!-- Switch Track & Knob (Presisi: 28px lebar, 16px tinggi, knob 12px) -->
-                                            <span class="relative inline-flex shrink-0 rounded-full transition-colors duration-200 ease-in-out p-0.5"
-                                                  style="width: 28px; height: 16px; min-width: 28px; max-width: 28px;"
-                                                  :style="isPaid ? 'background-color: #10b981;' : 'background-color: #cbd5e1;'">
-                                                <span class="pointer-events-none inline-block rounded-full bg-white shadow-xs transition-transform duration-200 ease-in-out"
-                                                      style="width: 12px; height: 12px;"
-                                                      :style="isPaid ? 'transform: translateX(12px);' : 'transform: translateX(0px);'"></span>
+                                            <!-- iOS Style Toggle Switch (Persis Gambar) -->
+                                            <span class="relative inline-flex shrink-0 rounded-full transition-colors duration-250 ease-in-out p-0.5"
+                                                  style="width: 38px; height: 22px; min-width: 38px; border-radius: 9999px;"
+                                                  :style="isPaid ? 'background-color: #22c55e;' : 'background-color: #cbd5e1;'">
+                                                <span class="pointer-events-none inline-block rounded-full bg-white transition-transform duration-250 ease-in-out"
+                                                      style="width: 18px; height: 18px; border-radius: 9999px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+                                                      :style="isPaid ? 'transform: translateX(16px);' : 'transform: translateX(0px);'"></span>
                                             </span>
 
                                             <!-- Label Status: Belum vs Dibayar -->
-                                            <span class="text-[10px] leading-none"
-                                                  :class="isPaid ? 'text-emerald-700 font-extrabold' : 'text-slate-600 font-bold'"
+                                            <span class="text-xs font-bold leading-none tracking-tight"
+                                                  :class="isPaid ? 'text-emerald-600 font-extrabold' : 'text-slate-500'"
                                                   x-text="isPaid ? 'Dibayar' : 'Belum'">
                                                 {{ $stat['is_paid'] ? 'Dibayar' : 'Belum' }}
                                             </span>
