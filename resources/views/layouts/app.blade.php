@@ -201,13 +201,13 @@
             <nav id="desktop-sidebar-nav"
                  @scroll.passive="sessionStorage.setItem('gomsn_sb_scroll', $el.scrollTop)"
                  @click="if ($event.target.closest('a')) sessionStorage.setItem('gomsn_sb_scroll', $el.scrollTop)"
-                 class="flex-1 overflow-y-auto px-3 py-3.5 space-y-4 sidebar-scroll text-sm relative z-10">
+                 class="flex-1 overflow-y-auto px-3 py-3.5 space-y-4 sidebar-scroll text-[13px] relative z-10">
                 
                 <!-- Portal Hub Utama -->
                 <div>
                     <a href="{{ route('portal.hub') }}"
                        @if (request()->routeIs('portal.hub')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ request()->routeIs('portal.hub') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white font-medium hover:bg-white/15' }}">
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all {{ request()->routeIs('portal.hub') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white font-medium hover:bg-white/15' }}">
                         <svg class="w-4.5 h-4.5 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         <span>Dashboard</span>
                         @if (request()->routeIs('portal.hub'))
@@ -293,7 +293,7 @@
                 <div class="space-y-1">
                     <div class="pt-2.5 pb-1 px-3 flex items-center justify-between text-white/90 select-none">
                         <div class="flex items-center gap-2 flex-1">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
                                 PENGAJUAN &amp; LEMBUR
                             </span>
                             <div class="h-px flex-1 bg-white/15"></div>
@@ -304,7 +304,7 @@
                         <!-- 1. Pengajuan Saya (Mandiri) -->
                         <a href="{{ route('gomsn.pengajuan.index') }}"
                            @if (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 {{ (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4.5 h-4.5 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             <span>{{ $navCanApprovePengajuan ? 'Pengajuan Saya' : 'Pengajuan' }}</span>
                             @if (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create'))
@@ -316,13 +316,13 @@
                         @if ($navCanApprovePengajuan)
                         <a href="{{ route('gomsn.pengajuan.approvals') }}"
                            @if (request()->routeIs('gomsn.pengajuan.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4.5 h-4.5 shrink-0 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white' : 'text-amber-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Pengajuan Karyawan</span>
                             </div>
                             @if ($navPendingAtasanCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 shadow-xs">
                                 {{ $navPendingAtasanCount }}
                             </span>
                             @endif
@@ -333,13 +333,13 @@
                         @if ($navCanApproveKoreksi)
                         <a href="{{ route('attendance.corrections.approvals') }}"
                            @if (request()->routeIs('attendance.corrections.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4.5 h-4.5 shrink-0 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white' : 'text-emerald-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                                 <span>Pengajuan Absen</span>
                             </div>
                             @if ($navPendingKoreksiCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 shadow-xs">
                                 {{ $navPendingKoreksiCount }}
                             </span>
                             @endif
@@ -356,7 +356,7 @@
                         <!-- Khusus HRD: Tombol Lembur Saya (Pengajuan & Riwayat Milik Sendiri) -->
                         <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'saya']) }}"
                            @if ($isOvertimeSaya) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ $isOvertimeSaya ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 {{ $isOvertimeSaya ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4.5 h-4.5 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>Lembur Saya</span>
@@ -368,13 +368,13 @@
                         @elseif (! $navIsHrdOnly)
                         <a href="{{ route('gomsn.overtime.index') }}"
                            @if ($isOvertimeRoute) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ $isOvertimeRoute ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 {{ $isOvertimeRoute ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4.5 h-4.5 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span>{{ $navIsAtasan ? 'Pengajuan Lembur' : 'Lembur' }}</span>
                             </div>
                             @if ($navPendingLemburCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900 shadow-xs">
                                 {{ $navPendingLemburCount }}
                             </span>
                             @elseif ($isOvertimeRoute)
@@ -387,7 +387,7 @@
                         @if ($navIsFinance)
                         <a href="{{ route('gomsn.inventory.index') }}"
                            @if (request()->routeIs('gomsn.inventory.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.inventory.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                           class="flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.inventory.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4.5 h-4.5 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                 <span>Stok Barang</span>
