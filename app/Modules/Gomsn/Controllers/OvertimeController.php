@@ -663,11 +663,11 @@ class OvertimeController extends Controller
                 return response()->json([
                     'success' => true,
                     'is_paid' => true,
-                    'message' => "Status lembur {$nama} berhasil ditandai SUDAH DIBAYAR (ON).",
+                    'message' => "Status lembur {$nama} berhasil ditandai Dibayar.",
                 ]);
             }
 
-            return back()->with('status', "Status lembur {$nama} berhasil ditandai SUDAH DIBAYAR (ON).");
+            return back()->with('status', "Status lembur {$nama} berhasil ditandai Dibayar.");
         } else {
             $updated = (clone $query)
                 ->where('status', 'paid')
@@ -682,11 +682,11 @@ class OvertimeController extends Controller
                 return response()->json([
                     'success' => true,
                     'is_paid' => false,
-                    'message' => "Status lembur {$nama} berhasil diubah menjadi BELUM DIBAYAR (OFF).",
+                    'message' => "Status lembur {$nama} diubah menjadi Belum Dibayar.",
                 ]);
             }
 
-            return back()->with('status', "Status lembur {$nama} berhasil diubah menjadi BELUM DIBAYAR (OFF).");
+            return back()->with('status', "Status lembur {$nama} diubah menjadi Belum Dibayar.");
         }
     }
 }

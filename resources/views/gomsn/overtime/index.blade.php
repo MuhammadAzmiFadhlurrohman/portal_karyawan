@@ -56,8 +56,62 @@
                 alasan: item.alasan
             };
             this.editModalOpen = true;
+        },
+        toast: { show: false, message: '', type: 'success' },
+        showToast(msg, type = 'success') {
+            this.toast.message = msg;
+            this.toast.type = type;
+            this.toast.show = true;
+            setTimeout(() => { this.toast.show = false; }, 3500);
+            if (window.Swal) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3500,
+                    timerProgressBar: true,
+                    icon: type,
+                    title: msg
+                });
+            }
         }
-    }">
+    }"
+    @overtime-toast.window="showToast($event.detail.message, $event.detail.type || 'success')">
+
+        <!-- Floating Alert Toast Notification -->
+        <div x-show="toast.show"
+             x-cloak
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 -translate-y-4 scale-95"
+             class="fixed top-5 right-5 z-50 max-w-sm w-full pointer-events-none select-none">
+            <div class="bg-white/95 backdrop-blur-md rounded-2xl p-3.5 shadow-2xl border flex items-center gap-3 pointer-events-auto"
+                 :class="toast.type === 'error' ? 'border-rose-300 shadow-rose-900/10' : 'border-emerald-300 shadow-teal-900/10'">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                     :class="toast.type === 'error' ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-700'">
+                    <template x-if="toast.type !== 'error'">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </template>
+                    <template x-if="toast.type === 'error'">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </template>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Status Pembayaran</span>
+                    <span class="text-xs font-bold text-slate-800 block truncate" x-text="toast.message"></span>
+                </div>
+                <button type="button" @click="toast.show = false" class="text-slate-400 hover:text-slate-600 p-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
@@ -463,7 +517,7 @@
                                     {{ $isFilterUnprocessed ? 'Semua Periode' : ($bulanNames[$selectedBulan] ?? 'November') . ' ' . $selectedTahun }}
                                 </span>
                                 @if ($isHrd)
-                                    <!-- Tombol Toggle ON / OFF Pembayaran Lembur Karyawan (Khusus Role HRD, Tanpa Refresh) -->
+                                    <!-- Tombol Toggle Status Pembayaran Lembur Karyawan: Belum / Dibayar (Khusus Role HRD, Tanpa Refresh) -->
                                     <div x-data="{
                                         isPaid: {{ $stat['is_paid'] ? 'true' : 'false' }},
                                         loading: false,
@@ -490,11 +544,19 @@
                                                 const data = await res.json();
                                                 if (data && data.success) {
                                                     this.isPaid = data.is_paid;
+                                                    window.dispatchEvent(new CustomEvent('overtime-toast', {
+                                                        detail: { message: data.message, type: 'success' }
+                                                    }));
                                                 } else {
-                                                    console.error(data?.message || 'Gagal mengubah status');
+                                                    window.dispatchEvent(new CustomEvent('overtime-toast', {
+                                                        detail: { message: data?.message || 'Gagal mengubah status', type: 'error' }
+                                                    }));
                                                 }
                                             } catch (err) {
                                                 console.error(err);
+                                                window.dispatchEvent(new CustomEvent('overtime-toast', {
+                                                    detail: { message: 'Terjadi kesalahan jaringan.', type: 'error' }
+                                                }));
                                             } finally {
                                                 this.loading = false;
                                             }
@@ -503,7 +565,7 @@
                                         <button type="button" 
                                                 @click="toggleStatus()"
                                                 :disabled="loading"
-                                                :title="isPaid ? 'Status: ON (Sudah Dibayarkan). Klik untuk ubah ke OFF.' : 'Status: OFF (Belum Dibayarkan). Klik untuk ubah ke ON.'"
+                                                :title="isPaid ? 'Status: Dibayar. Klik untuk ubah ke Belum.' : 'Status: Belum. Klik untuk ubah ke Dibayar.'"
                                                 class="group inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full border text-[9.5px] transition-all shadow-2xs cursor-pointer select-none"
                                                 :class="isPaid ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'"
                                                 :style="loading ? 'opacity: 0.6; cursor: wait;' : ''">
@@ -515,11 +577,11 @@
                                                       :class="isPaid ? 'translate-x-2.5' : 'translate-x-0'"></span>
                                             </span>
 
-                                            <!-- Label ON / OFF -->
+                                            <!-- Label Status: Belum vs Dibayar -->
                                             <span class="font-extrabold leading-none text-[9.5px]"
-                                                  :class="isPaid ? 'text-emerald-700' : 'text-slate-500'"
-                                                  x-text="isPaid ? 'ON' : 'OFF'">
-                                                {{ $stat['is_paid'] ? 'ON' : 'OFF' }}
+                                                  :class="isPaid ? 'text-emerald-700' : 'text-slate-600'"
+                                                  x-text="isPaid ? 'Dibayar' : 'Belum'">
+                                                {{ $stat['is_paid'] ? 'Dibayar' : 'Belum' }}
                                             </span>
                                         </button>
                                     </div>
