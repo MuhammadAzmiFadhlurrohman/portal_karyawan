@@ -1398,26 +1398,28 @@
                                                 <span>Simpan ke Dokumentasi</span>
                                             </button>
 
-                                            <!-- 4. Balas -->
-                                            <button type="button"
-                                                    onclick="replyToMessage({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
-                                                <span>Balas</span>
-                                            </button>
-
-                                            @if($isSelf || auth()->user()?->hasRole('admin'))
-                                                <!-- 5. Edit -->
+                                            @if(!in_array($tiket->status, ['CLOSE', 'CANCELLED'], true))
+                                                <!-- 4. Balas -->
                                                 <button type="button"
-                                                        onclick="editMessage({{ $chron->id }})"
+                                                        onclick="replyToMessage({{ $chron->id }})"
                                                         class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                    <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                                    <span>Edit</span>
+                                                    <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                                    <span>Balas</span>
                                                 </button>
+
+                                                @if($isSelf || auth()->user()?->hasRole('admin'))
+                                                    <!-- 5. Edit -->
+                                                    <button type="button"
+                                                            onclick="editMessage({{ $chron->id }})"
+                                                            class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                                                        <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                        <span>Edit</span>
+                                                    </button>
+                                                @endif
                                             @endif
                                         </div>
 
-                                        @if($isSelf || auth()->user()?->hasRole('admin'))
+                                        @if(!in_array($tiket->status, ['CLOSE', 'CANCELLED'], true) && ($isSelf || auth()->user()?->hasRole('admin')))
                                             <div class="pt-1">
                                                 <!-- 6. Hapus -->
                                                 <button type="button"
@@ -1577,6 +1579,17 @@
                 </button>
             </div>
 
+            @if(in_array($tiket->status, ['CLOSE', 'CANCELLED'], true))
+            <!-- Banner Tiket Ditutup (Closing Selesai) -->
+            <div class="p-3.5 bg-slate-100/90 border-t border-slate-200 text-center text-xs text-slate-600 font-semibold flex items-center justify-center gap-2 select-none shrink-0 shadow-2xs">
+                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <span>Tiket telah berstatus <strong class="text-slate-800">{{ $tiket->status }}</strong>. Pengiriman kronologis &amp; update koordinasi lapangan telah ditutup.</span>
+            </div>
+            @else
             @can('update', $tiket)
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
             <div class="chat-quick-templates-bar px-3 sm:px-4 py-1.5 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
@@ -1892,6 +1905,7 @@
                 <span>Mode Hanya Baca: Anda tidak memiliki hak akses mengirim koordinasi pada tiket ini (Khusus PIC &amp; Tim Penanganan).</span>
             </div>
             @endcan
+            @endif
         </div>
     </div>
 
@@ -4937,6 +4951,7 @@ async function handleChatFormSubmit(e) {
     }
 
     const form = document.getElementById('quick-chat-form');
+    if (!form) return false;
     const input = document.getElementById('quick-chat-input');
     const msg = input ? input.value.trim() : '';
     const lat = document.getElementById('chron_lat')?.value;

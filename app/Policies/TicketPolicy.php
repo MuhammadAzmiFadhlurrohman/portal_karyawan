@@ -43,6 +43,11 @@ class TicketPolicy
      */
     public function update(User $user, Tiket $tiket): bool
     {
+        // Closed or cancelled tickets are permanently locked from modifications/chronologies (§7.2, AC-08)
+        if (in_array($tiket->status, ['CLOSE', 'CANCELLED'], true)) {
+            return false;
+        }
+
         if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo', 'helpdesk']) || $user->isAtasan()) {
             return true;
         }

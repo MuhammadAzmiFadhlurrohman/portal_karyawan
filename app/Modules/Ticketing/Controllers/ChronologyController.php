@@ -25,6 +25,17 @@ class ChronologyController extends Controller
      */
     public function store(Request $request, Tiket $tiket): RedirectResponse|JsonResponse
     {
+        // Tiket yang sudah CLOSE atau CANCELLED tidak boleh ditambah kronologis lagi
+        if (in_array($tiket->status, ['CLOSE', 'CANCELLED'], true)) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tiket sudah ditutup (' . $tiket->status . '). Tidak dapat mengirim update kronologis lagi.',
+                ], 422);
+            }
+            return back()->with('error', 'Tiket sudah ditutup (' . $tiket->status . '). Tidak dapat mengirim update kronologis lagi.');
+        }
+
         // AC-05: Non-assigned technician write attempt is rejected with 403!
         Gate::authorize('update', $tiket);
 
@@ -126,6 +137,10 @@ class ChronologyController extends Controller
      */
     public function update(Request $request, TicketChronology $chronology): RedirectResponse|JsonResponse
     {
+        if ($chronology->ticket && in_array($chronology->ticket->status, ['CLOSE', 'CANCELLED'], true)) {
+            abort(403, 'Tiket sudah ditutup (' . $chronology->ticket->status . '). Kronologis tidak dapat diubah.');
+        }
+
         $user = $request->user();
         $isAdmin = $user && ($user->hasRole('admin') || ($user->role ?? '') === 'admin');
         if (! $user || ($user->id !== $chronology->user_id && ! $isAdmin)) {
@@ -156,6 +171,10 @@ class ChronologyController extends Controller
      */
     public function destroy(Request $request, TicketChronology $chronology): RedirectResponse|JsonResponse
     {
+        if ($chronology->ticket && in_array($chronology->ticket->status, ['CLOSE', 'CANCELLED'], true)) {
+            abort(403, 'Tiket sudah ditutup (' . $chronology->ticket->status . '). Kronologis tidak dapat dihapus.');
+        }
+
         $user = $request->user();
         $isAdmin = $user && ($user->hasRole('admin') || ($user->role ?? '') === 'admin');
         if (! $user || ($user->id !== $chronology->user_id && ! $isAdmin)) {
