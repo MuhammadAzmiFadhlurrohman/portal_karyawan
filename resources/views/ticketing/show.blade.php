@@ -1141,13 +1141,35 @@
                 
                 <!-- Full Width Conversation Stream Container -->
                 <div id="chat-stream-container" class="w-full space-y-1.5 sm:space-y-2">
-                    <!-- Date divider (WhatsApp Floating Pill) -->
-                    <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none">
-                        <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto">
-                            <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span>{{ $tiket->tanggal_open ? $tiket->tanggal_open->isoFormat('dddd, D MMMM Y') : 'Hari Ini' }}</span>
-                        </span>
-                    </div>
+                    @php
+                        $formatDateDivider = function ($dateTime) {
+                            if (!$dateTime) return 'Hari Ini';
+                            $c = $dateTime instanceof \Carbon\CarbonInterface ? $dateTime : \Carbon\Carbon::parse($dateTime);
+                            if ($c->isToday()) {
+                                return 'Hari Ini';
+                            }
+                            if ($c->isYesterday()) {
+                                return 'Kemarin';
+                            }
+                            return $c->isoFormat('dddd, D MMMM Y');
+                        };
+
+                        $currentDateGroup = null;
+                        $initialDate = $tiket->tanggal_open ?? $tiket->created_at;
+                        $initialDateKey = $initialDate ? $initialDate->format('Y-m-d') : null;
+                    @endphp
+
+                    @if($initialDateKey)
+                        @php $currentDateGroup = $initialDateKey; @endphp
+                        <!-- Date divider (WhatsApp Floating Pill) -->
+                        <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider" data-date="{{ $initialDateKey }}">
+                            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto"
+                                  title="{{ $initialDate->isoFormat('dddd, D MMMM Y') }}">
+                                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span>{{ $formatDateDivider($initialDate) }}</span>
+                            </span>
+                        </div>
+                    @endif
 
                     <!-- Initial Ticket Creation System Note -->
                     <div class="flex justify-start items-start gap-1.5 sm:gap-2 my-1">
@@ -1177,6 +1199,20 @@
 
                     <!-- Dispatch Note if available -->
                     @if($lead)
+                        @php
+                            $dispatchDate = $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at) : null;
+                            $dispatchDateKey = $dispatchDate ? $dispatchDate->format('Y-m-d') : null;
+                        @endphp
+                        @if($dispatchDateKey && $dispatchDateKey !== $currentDateGroup)
+                            @php $currentDateGroup = $dispatchDateKey; @endphp
+                            <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider" data-date="{{ $dispatchDateKey }}">
+                                <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto"
+                                      title="{{ $dispatchDate->isoFormat('dddd, D MMMM Y') }}">
+                                    <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <span>{{ $formatDateDivider($dispatchDate) }}</span>
+                                </span>
+                            </div>
+                        @endif
                         <div class="flex justify-start items-start gap-1.5 sm:gap-2 my-1">
                             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 border border-amber-300 shadow-2xs flex items-center justify-center bg-amber-500 text-white select-none mt-0.5"
                                  title="Manager Teknis / Atasan">
@@ -1202,6 +1238,23 @@
 
                 <!-- Chronology Entries List -->
                 @forelse($tiket->chronologies as $chron)
+                    @php
+                        $chronDate = $chron->created_at;
+                        $chronDateKey = $chronDate ? $chronDate->format('Y-m-d') : null;
+                    @endphp
+
+                    @if($chronDateKey && $chronDateKey !== $currentDateGroup)
+                        @php $currentDateGroup = $chronDateKey; @endphp
+                        <!-- WhatsApp Date Divider for Chronology Group -->
+                        <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider" data-date="{{ $chronDateKey }}">
+                            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto"
+                                  title="{{ $chronDate->isoFormat('dddd, D MMMM Y') }}">
+                                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span>{{ $formatDateDivider($chronDate) }}</span>
+                            </span>
+                        </div>
+                    @endif
+
                     @php
                         $isSelf = auth()->check() && $chron->user_id === auth()->id();
                         $roleLabel = $chron->user?->chat_badge ?? ($chron->user?->division ?: ($chron->category ?? 'Petugas'));
@@ -4374,6 +4427,53 @@ function showChatToast(text, icon = '✓') {
     }, 2500);
 }
 
+// WhatsApp Dynamic Date Divider ensure helper
+function ensureChatDateDivider(targetDateStr) {
+    const stream = document.getElementById('chat-stream-container');
+    if (!stream) return;
+
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    let dateKey = todayKey;
+    if (targetDateStr && typeof targetDateStr === 'string' && targetDateStr.length >= 10 && targetDateStr.includes('-')) {
+        dateKey = targetDateStr.substring(0, 10);
+    }
+
+    const allDividers = stream.querySelectorAll('.chat-date-divider');
+    const lastDivider = allDividers.length > 0 ? allDividers[allDividers.length - 1] : null;
+
+    if (!lastDivider || lastDivider.dataset.date !== dateKey) {
+        let label = 'Hari Ini';
+        if (dateKey !== todayKey) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yestKey = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+            if (dateKey === yestKey) {
+                label = 'Kemarin';
+            } else {
+                try {
+                    const parts = dateKey.split('-');
+                    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                    label = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                } catch (e) {
+                    label = dateKey;
+                }
+            }
+        }
+
+        const div = document.createElement('div');
+        div.className = 'flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider';
+        div.dataset.date = dateKey;
+        div.innerHTML = `
+            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto">
+                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>${label}</span>
+            </span>
+        `;
+        stream.appendChild(div);
+    }
+}
+
 function toggleMessageMenu(id, e) {
     if (e) {
         e.preventDefault();
@@ -4855,9 +4955,9 @@ async function handleChatFormSubmit(e) {
                     </div>
                     <div class="relative shrink-0 msg-menu-container">
                         <button type="button"
-                                class="w-4 h-4 -mr-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 flex items-center justify-center transition cursor-pointer"
+                                class="w-6 h-6 rounded-lg text-slate-600 hover:text-slate-900 bg-slate-200/70 hover:bg-slate-300/90 border border-slate-300/50 shadow-2xs flex items-center justify-center transition cursor-pointer"
                                 title="Pilihan pesan">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-3.5 h-3.5 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                             </svg>
                         </button>
@@ -4878,6 +4978,7 @@ async function handleChatFormSubmit(e) {
             </div>
             ${selfAvatarHtml}
         `;
+        ensureChatDateDivider();
         stream.appendChild(bubble);
         if (scrollBox) {
             scrollBox.scrollTop = scrollBox.scrollHeight;
@@ -6201,6 +6302,7 @@ function renderIncomingLiveMessage(data) {
     row.innerHTML = data.is_self ? (bubbleBox + avatarBox) : (avatarBox + bubbleBox);
 
     const wasNearBottom = isChatNearBottom(scrollBox, 80);
+    ensureChatDateDivider(data.created_at || null);
     stream.appendChild(row);
 
     // Auto scroll down smoothly when user is already near bottom or sent the message themselves
