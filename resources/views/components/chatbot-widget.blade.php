@@ -137,6 +137,21 @@
                 height: 600px !important;
             }
         }
+
+        /* Typing cursor animation */
+        @keyframes chatbotCursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .chatbot-typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background-color: #155E63;
+            margin-left: 2px;
+            vertical-align: -0.15em;
+            animation: chatbotCursorBlink 0.8s infinite;
+        }
     </style>
 
     <!-- Docked Side-Tab Trigger Button (Only visible when chat is closed) -->
@@ -258,11 +273,14 @@
                     <div :class="msg.sender === 'user' 
                                 ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 max-w-[85%] shadow-xs' 
                                 : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[88%] shadow-xs'">
-                        <p x-text="msg.text" class="leading-relaxed whitespace-pre-line"></p>
+                        <p class="leading-relaxed whitespace-pre-line">
+                            <span x-text="msg.text"></span>
+                            <span x-show="msg.isTyping" class="chatbot-typing-cursor"></span>
+                        </p>
 
                         <!-- Action Button Menuju Halaman Terkait -->
-                        <template x-if="msg.action_url && msg.action_label">
-                            <div class="mt-2 pt-2 border-t border-slate-100">
+                        <template x-if="!msg.isTyping && msg.action_url && msg.action_label">
+                            <div class="mt-2 pt-2 border-t border-slate-100 transition-opacity duration-300">
                                 <a :href="msg.action_url"
                                    style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;"
                                    class="inline-flex items-center justify-between w-full px-3 py-2 rounded-xl text-white font-semibold text-[11px] shadow-xs hover:opacity-95 transition-all group">
@@ -277,8 +295,13 @@
                 </div>
             </template>
             <div x-show="loading" class="flex justify-start">
-                <div class="bg-white border border-slate-200 text-slate-500 rounded-2xl px-3 py-2 text-xs flex items-center gap-2 shadow-xs">
-                    <span class="animate-pulse">Mengetik balasan...</span>
+                <div class="bg-white border border-slate-200 text-slate-500 rounded-2xl rounded-tl-none px-3.5 py-2 text-xs flex items-center gap-2 shadow-xs">
+                    <div class="flex items-center gap-1 py-0.5">
+                        <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                        <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                        <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 font-medium">Asisten sedang mengetik...</span>
                 </div>
             </div>
         </div>
@@ -371,6 +394,7 @@
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed) && parsed.length > 0) {
+                    parsed.forEach(m => { m.isTyping = false; });
                     initialMessages = parsed;
                 }
             }
@@ -384,6 +408,7 @@
             inputQuery: '',
             isListening: false,
             speechRecognizer: null,
+            activeTypingInterval: null,
             messages: initialMessages,
             init() {
                 if (this.isOpen) {
@@ -508,6 +533,57 @@
                     }, 350);
                 }
             },
+            clearActiveTyping() {
+                if (this.activeTypingInterval) {
+                    clearInterval(this.activeTypingInterval);
+                    this.activeTypingInterval = null;
+                }
+                this.messages.forEach(m => {
+                    if (m.isTyping) {
+                        m.isTyping = false;
+                    }
+                });
+            },
+            typeMessage(fullText, msgObj, onComplete) {
+                this.clearActiveTyping();
+                msgObj.isTyping = true;
+                msgObj.text = '';
+
+                const totalLength = fullText.length;
+                let chunkSize = 1;
+                let delay = 18;
+
+                if (totalLength > 500) {
+                    chunkSize = Math.max(4, Math.ceil(totalLength / 100));
+                    delay = 10;
+                } else if (totalLength > 200) {
+                    chunkSize = 3;
+                    delay = 14;
+                } else if (totalLength > 80) {
+                    chunkSize = 2;
+                    delay = 16;
+                } else {
+                    chunkSize = 1;
+                    delay = 20;
+                }
+
+                let currentIndex = 0;
+                this.activeTypingInterval = setInterval(() => {
+                    currentIndex = Math.min(currentIndex + chunkSize, totalLength);
+                    msgObj.text = fullText.slice(0, currentIndex);
+                    this.scrollToBottom();
+
+                    if (currentIndex >= totalLength) {
+                        clearInterval(this.activeTypingInterval);
+                        this.activeTypingInterval = null;
+                        msgObj.isTyping = false;
+                        msgObj.text = fullText;
+                        this.saveMessages();
+                        this.scrollToBottom();
+                        if (onComplete) onComplete();
+                    }
+                }, delay);
+            },
             closeChat() {
                 this.isOpen = false;
                 try {
@@ -515,6 +591,7 @@
                 } catch (e) {}
             },
             clearChat() {
+                this.clearActiveTyping();
                 this.messages = [
                     {
                         sender: 'bot',
@@ -545,7 +622,8 @@
                 const text = this.inputQuery.trim();
                 if (!text || this.loading) return;
 
-                this.messages.push({ sender: 'user', text: text });
+                this.clearActiveTyping();
+                this.messages.push({ sender: 'user', text: text, isTyping: false });
                 this.saveMessages();
                 this.inputQuery = '';
                 this.loading = true;
@@ -564,29 +642,35 @@
                     });
 
                     const resJson = await response.json();
+                    this.loading = false;
+
                     if (resJson && resJson.data && resJson.data.response) {
-                        this.messages.push({
+                        const botMsg = {
                             sender: 'bot',
-                            text: resJson.data.response,
+                            text: '',
+                            isTyping: true,
                             action_url: resJson.data.action_url || null,
                             action_label: resJson.data.action_label || null
-                        });
+                        };
+                        this.messages.push(botMsg);
+                        this.typeMessage(resJson.data.response, botMsg);
                     } else {
-                        this.messages.push({ sender: 'bot', text: 'Maaf, terjadi kendala saat memproses balasan.' });
+                        const errorMsg = { sender: 'bot', text: '', isTyping: true };
+                        this.messages.push(errorMsg);
+                        this.typeMessage('Maaf, terjadi kendala saat memproses balasan.', errorMsg);
                     }
                 } catch (e) {
-                    this.messages.push({ sender: 'bot', text: 'Maaf, terjadi kesalahan koneksi jaringan.' });
-                } finally {
-                    this.saveMessages();
                     this.loading = false;
-                    this.scrollToBottom();
+                    const errorMsg = { sender: 'bot', text: '', isTyping: true };
+                    this.messages.push(errorMsg);
+                    this.typeMessage('Maaf, terjadi kesalahan koneksi jaringan.', errorMsg);
                 }
             },
             scrollToBottom() {
-                setTimeout(() => {
+                this.$nextTick(() => {
                     const box = document.getElementById('chatbot-messages');
                     if (box) box.scrollTop = box.scrollHeight;
-                }, 100);
+                });
             }
         };
     }
