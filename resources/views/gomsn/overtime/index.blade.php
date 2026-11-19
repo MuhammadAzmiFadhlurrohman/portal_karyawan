@@ -462,7 +462,32 @@
                                     </svg>
                                     {{ $isFilterUnprocessed ? 'Semua Periode' : ($bulanNames[$selectedBulan] ?? 'November') . ' ' . $selectedTahun }}
                                 </span>
-                                @if ($stat['pending_count'] > 0 && ! $isHrd)
+                                @if ($isHrd)
+                                    <!-- Tombol Toggle ON / OFF Pembayaran Lembur Karyawan (Khusus Role HRD) -->
+                                    <form method="POST" action="{{ route('gomsn.overtime.toggle-payment') }}" class="inline-flex items-center m-0">
+                                        @csrf
+                                        <input type="hidden" name="user_id" value="{{ $cardUser->id }}">
+                                        <input type="hidden" name="bulan" value="{{ $selectedBulan }}">
+                                        <input type="hidden" name="tahun" value="{{ $selectedTahun }}">
+                                        <input type="hidden" name="target_status" value="{{ $stat['is_paid'] ? 'unpaid' : 'paid' }}">
+                                        
+                                        <button type="submit" 
+                                                onclick="return confirm('Ubah status pembayaran lembur {{ addslashes($cardUser->name) }} menjadi {{ $stat['is_paid'] ? 'BELUM DIBAYAR (OFF)' : 'SUDAH DIBAYAR (ON)' }}?')"
+                                                title="Status: {{ $stat['is_paid'] ? 'Sudah Dibayarkan (ON)' : 'Belum Dibayarkan (OFF)' }}. Klik untuk mengubah."
+                                                class="group inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full border text-[9.5px] transition-all shadow-2xs cursor-pointer select-none {{ $stat['is_paid'] ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200' }}">
+                                            
+                                            <!-- Switch Track & Knob -->
+                                            <span class="relative inline-flex h-3.5 w-6 shrink-0 rounded-full transition-colors duration-200 ease-in-out p-0.5 {{ $stat['is_paid'] ? 'bg-emerald-500' : 'bg-slate-300' }}">
+                                                <span class="pointer-events-none inline-block h-2.5 w-2.5 rounded-full bg-white shadow-xs transform transition duration-200 ease-in-out {{ $stat['is_paid'] ? 'translate-x-2.5' : 'translate-x-0' }}"></span>
+                                            </span>
+
+                                            <!-- Label ON / OFF -->
+                                            <span class="font-extrabold leading-none">
+                                                {{ $stat['is_paid'] ? 'Dibayar' : 'Belum' }}
+                                            </span>
+                                        </button>
+                                    </form>
+                                @elseif ($stat['pending_count'] > 0)
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black text-amber-900 bg-amber-100 border border-amber-300 shadow-2xs shrink-0 animate-pulse">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                         {{ $stat['pending_count'] }} Menunggu
@@ -523,8 +548,19 @@
                             <!-- Total Uang -->
                             <div class="min-w-0 flex-1">
                                 <div class="text-[8px] font-bold text-teal-800 uppercase tracking-wider leading-none">TOTAL UANG</div>
-                                <div class="text-[12.5px] font-black text-teal-950 truncate leading-tight mt-0.5">
-                                    Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}
+                                <div class="text-[12.5px] font-black text-teal-950 truncate leading-tight mt-0.5 flex items-center gap-1.5">
+                                    <span>Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}</span>
+                                    @if ($isHrd)
+                                        @if ($stat['is_paid'])
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                Lunas
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                Belum
+                                            </span>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
 

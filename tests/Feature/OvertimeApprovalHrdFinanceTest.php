@@ -166,5 +166,50 @@ class OvertimeApprovalHrdFinanceTest extends TestCase
         $responseApprove = $this->actingAs($hrd)->post(route('gomsn.overtime.approve', $lemburPending->id));
         $responseApprove->assertStatus(403);
     }
+
+    public function test_hrd_can_toggle_payment_status_for_employee(): void
+    {
+        $hrd = User::factory()->create(['division' => 'HRD']);
+        $hrd->assignRole('hrd');
+
+        $karyawan = User::factory()->create(['division' => 'Teknik']);
+        $karyawan->assignRole('karyawan');
+
+        $currentDate = Carbon::now();
+        $lembur = Lembur::create([
+            'nomor_lembur' => 'LBR-TOGGLE-001',
+            'user_id' => $karyawan->id,
+            'tanggal' => $currentDate->toDateString(),
+            'jam_mulai' => $currentDate->copy()->setTime(17, 0),
+            'jam_selesai' => $currentDate->copy()->setTime(20, 0),
+            'durasi_menit' => 180,
+            'alasan' => 'Tugas lembur selesai',
+            'status' => 'approved_atasan',
+        ]);
+
+        // Toggle to PAID (ON)
+        $responseOn = $this->actingAs($hrd)->post(route('gomsn.overtime.toggle-payment'), [
+            'user_id' => $karyawan->id,
+            'bulan' => $currentDate->month,
+            'tahun' => $currentDate->year,
+            'target_status' => 'paid',
+        ]);
+        $responseOn->assertRedirect();
+        $lembur->refresh();
+        $this->assertEquals('paid', $lembur->status);
+        $this->assertNotNull($lembur->paid_at);
+
+        // Toggle back to UNPAID (OFF)
+        $responseOff = $this->actingAs($hrd)->post(route('gomsn.overtime.toggle-payment'), [
+            'user_id' => $karyawan->id,
+            'bulan' => $currentDate->month,
+            'tahun' => $currentDate->year,
+            'target_status' => 'unpaid',
+        ]);
+        $responseOff->assertRedirect();
+        $lembur->refresh();
+        $this->assertEquals('approved_atasan', $lembur->status);
+        $this->assertNull($lembur->paid_at);
+    }
 }
 

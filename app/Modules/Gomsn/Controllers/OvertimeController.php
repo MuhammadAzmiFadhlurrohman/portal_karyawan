@@ -201,6 +201,11 @@ class OvertimeController extends Controller
                     continue;
                 }
                 $totalNominal = $items->sum(fn ($i) => (int) $i->nominal);
+                $paidCount = $items->where('status', 'paid')->count();
+                $unpaidCount = $items->where('status', 'approved_atasan')->count();
+                // is_paid: semua lembur karyawan yang disetujui sudah lunas/dibayarkan
+                $isPaid = ($items->count() > 0 && $unpaidCount === 0 && $paidCount > 0);
+
                 $employeeStats[] = [
                     'user' => $employeeUser,
                     'total_days' => $items->pluck('tanggal')->map(fn ($d) => Carbon::parse($d)->toDateString())->unique()->count(),
@@ -209,6 +214,9 @@ class OvertimeController extends Controller
                     'pending_count' => $pendingStatus ? $items->where('status', $pendingStatus)->count() : 0,
                     'approved_count' => $items->whereIn('status', ['approved_atasan', 'paid'])->count(),
                     'rejected_count' => $items->where('status', 'rejected')->count(),
+                    'is_paid' => $isPaid,
+                    'paid_count' => $paidCount,
+                    'unpaid_count' => $unpaidCount,
                 ];
             }
 
@@ -600,6 +608,66 @@ class OvertimeController extends Controller
                 ->with('success', "Lembur {$lembur->nomor_lembur} berhasil ditandai telah dibayar.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle payment status for an employee's overtime in a specific month/year.
+     * Allowed for HRD, Finance, and Super Admin.
+     */
+    public function togglePayment(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user->hasRole(['hrd', 'super_admin', 'admin', 'finance'])) {
+            abort(403, 'Anda tidak memiliki hak otorisasi untuk mengubah status pembayaran lembur.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => ['required', 'exists:users,id'],
+            'bulan' => ['nullable'],
+            'tahun' => ['nullable', 'integer'],
+            'target_status' => ['required', 'in:paid,unpaid'],
+        ]);
+
+        $targetUserId = (int) $validated['user_id'];
+        $rawBulan = $validated['bulan'] ?? null;
+        $tahun = (int) ($validated['tahun'] ?: Carbon::now()->year);
+        $targetStatus = $validated['target_status'];
+
+        $query = Lembur::query()->where('user_id', $targetUserId);
+
+        if ($rawBulan && $rawBulan !== 'unprocessed' && $rawBulan !== 'pending') {
+            $query->whereMonth('tanggal', (int) $rawBulan)->whereYear('tanggal', $tahun);
+        } else {
+            $query->whereYear('tanggal', $tahun);
+        }
+
+        $karyawan = \App\Models\User::find($targetUserId);
+        $nama = $karyawan ? $karyawan->name : 'Karyawan';
+
+        if ($targetStatus === 'paid') {
+            $updated = (clone $query)
+                ->where('status', 'approved_atasan')
+                ->update([
+                    'status' => 'paid',
+                    'paid_at' => Carbon::now(),
+                    'paid_by' => $user->id,
+                    'payment_reference' => 'PAY-HRD-' . Carbon::now()->format('Ymd') . '-' . rand(1000, 9999),
+                ]);
+
+            return back()->with('status', "Status lembur {$nama} berhasil ditandai SUDAH DIBAYAR (ON).");
+        } else {
+            $updated = (clone $query)
+                ->where('status', 'paid')
+                ->update([
+                    'status' => 'approved_atasan',
+                    'paid_at' => null,
+                    'paid_by' => null,
+                    'payment_reference' => null,
+                ]);
+
+            return back()->with('status', "Status lembur {$nama} berhasil diubah menjadi BELUM DIBAYAR (OFF).");
         }
     }
 }

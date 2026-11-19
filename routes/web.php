@@ -207,6 +207,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/gomsn/overtime/{lembur}/approve', [OvertimeController::class, 'approve'])->name('gomsn.overtime.approve');
     Route::post('/gomsn/overtime/{lembur}/reject', [OvertimeController::class, 'reject'])->name('gomsn.overtime.reject');
     Route::post('/gomsn/overtime/{lembur}/pay', [OvertimeController::class, 'pay'])->name('gomsn.overtime.pay');
+    Route::post('/gomsn/overtime/toggle-payment', [OvertimeController::class, 'togglePayment'])->name('gomsn.overtime.toggle-payment');
 
     // Penugasan Kerja / Tasks (§8.3)
     Route::get('/gomsn/tasks', [TaskController::class, 'index'])->name('gomsn.tasks.index');
