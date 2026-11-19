@@ -1370,7 +1370,8 @@
 
                                     <!-- WhatsApp Dropdown Menu (matching Image 2) -->
                                     <div id="msg-dropdown-{{ $chron->id }}"
-                                         class="msg-action-dropdown hidden absolute {{ $isSelf ? 'right-0' : 'left-0 sm:right-auto' }} bottom-full mb-1.5 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                                         style="bottom: calc(100% + 6px); top: auto; right: 0;"
+                                         class="msg-action-dropdown hidden absolute right-0 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
                                         
                                         <div class="space-y-0.5 pb-1">
                                             <!-- 1. Salin -->
@@ -4576,9 +4577,11 @@ function toggleMessageMenu(id, e) {
     closeAllMessageMenus();
 
     if (!wasOpen && targetDropdown) {
-        // Always open upwards above the chat bubble (di atas chat)
-        targetDropdown.classList.remove('top-full', 'mt-1', 'mt-1.5');
-        targetDropdown.classList.add('bottom-full', 'mb-1.5');
+        // Explicitly force opening upwards above the 3-dots
+        targetDropdown.style.bottom = 'calc(100% + 6px)';
+        targetDropdown.style.top = 'auto';
+        targetDropdown.style.right = '0px';
+        targetDropdown.style.left = 'auto';
         targetDropdown.classList.remove('hidden');
     }
 }
@@ -5138,7 +5141,8 @@ async function handleChatFormSubmit(e) {
                             </svg>
                         </button>
                         <div id="msg-dropdown-${chron.id}"
-                             class="msg-action-dropdown hidden absolute right-0 bottom-full mb-1.5 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                             style="bottom: calc(100% + 6px); top: auto; right: 0;"
+                             class="msg-action-dropdown hidden absolute right-0 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
                             <div class="space-y-0.5 pb-1">
                                 <button type="button" onclick="copyMessageText(${chron.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
                                     <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
@@ -6354,7 +6358,8 @@ function renderIncomingLiveMessage(data) {
                         </svg>
                     </button>
                     <div id="msg-dropdown-${data.id}"
-                         class="msg-action-dropdown hidden absolute ${data.is_self ? 'right-0' : 'left-0 sm:right-auto'} bottom-full mb-1.5 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                         style="bottom: calc(100% + 6px); top: auto; right: 0;"
+                         class="msg-action-dropdown hidden absolute right-0 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
                         <div class="space-y-0.5 pb-1">
                             <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
                                 <span>Salin</span>
