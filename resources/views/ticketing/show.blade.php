@@ -5689,18 +5689,23 @@ function drawWatermarkNetworkIcon(ctx, rightX, topY, size) {
     ctx.save();
     const cx = rightX - size / 2;
     const cy = topY + size / 2;
-    const radius = size * 0.12;
+    const radius = size * 0.14;
 
-    const n1x = cx - size * 0.15;
-    const n1y = cy - size * 0.25;
-    const n2x = cx - size * 0.35;
-    const n2y = cy + size * 0.35;
-    const n3x = cx + size * 0.35;
-    const n3y = cy - size * 0.05;
+    const n1x = cx - size * 0.12;
+    const n1y = cy - size * 0.22;
+    const n2x = cx - size * 0.32;
+    const n2y = cy + size * 0.32;
+    const n3x = cx + size * 0.34;
+    const n3y = cy - size * 0.02;
+
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 2;
 
     // Connecting cyan lines
-    ctx.strokeStyle = 'rgba(24, 196, 196, 0.85)';
-    ctx.lineWidth = Math.max(2, size * 0.06);
+    ctx.strokeStyle = '#0EA5E9';
+    ctx.lineWidth = Math.max(3, size * 0.08);
     ctx.beginPath();
     ctx.moveTo(n2x, n2y);
     ctx.lineTo(n1x, n1y);
@@ -5708,22 +5713,15 @@ function drawWatermarkNetworkIcon(ctx, rightX, topY, size) {
     ctx.stroke();
 
     // Draw nodes
-    [ [n1x, n1y], [n2x, n2y], [n3x, n3y] ].forEach(([nx, ny]) => {
+    [ [n1x, n1y, '#0284C7'], [n2x, n2y, '#0369A1'], [n3x, n3y, '#38BDF8'] ].forEach(([nx, ny, col]) => {
         ctx.beginPath();
         ctx.arc(nx, ny, radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(2, 40, 54, 0.55)';
+        ctx.fillStyle = col;
         ctx.fill();
-        ctx.strokeStyle = '#18C4C4';
-        ctx.lineWidth = Math.max(2, size * 0.06);
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = Math.max(2, size * 0.04);
         ctx.stroke();
     });
-
-    // Wifi arc above top node
-    ctx.beginPath();
-    ctx.arc(n1x, n1y, radius * 2.1, Math.PI * 1.25, Math.PI * 1.75);
-    ctx.strokeStyle = '#5EEAD4';
-    ctx.lineWidth = Math.max(1.5, size * 0.05);
-    ctx.stroke();
 
     ctx.restore();
 }
@@ -5824,26 +5822,38 @@ function processGpsWatermark(fileInput) {
                 ctx.restore();
             });
 
-            // 4. Draw Official MSN Logo on top-right (Same logo as browser tab: logo-msn2.png)
-            const logoSize = Math.max(54, Math.round(targetWidth * 0.09));
+@php
+    $msnLogoBase64 = '';
+    $logoFile = public_path('assets/logo/logo-msn2.png');
+    if (file_exists($logoFile)) {
+        $msnLogoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoFile));
+    }
+@endphp
+            // 4. Draw Official MSN Logo on top-right (Base64 embedded for instant, zero-CORS rendering with natural aspect ratio)
+            const logoWidth = Math.max(90, Math.round(targetWidth * 0.13));
             const logoImg = new Image();
-            logoImg.crossOrigin = 'anonymous';
             logoImg.onload = function() {
+                const aspect = (logoImg.naturalHeight || 399) / (logoImg.naturalWidth || 489);
+                const logoHeight = Math.round(logoWidth * aspect);
+                const logoX = targetWidth - marginX - logoWidth;
+                const logoY = marginY;
+
                 ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-                ctx.shadowBlur = 8;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                ctx.shadowBlur = Math.round(logoWidth * 0.06);
                 ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 3;
-                ctx.drawImage(logoImg, targetWidth - marginX - logoSize, marginY, logoSize, logoSize);
+                ctx.shadowOffsetY = Math.round(logoWidth * 0.02);
+                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
                 ctx.restore();
                 finalizeWatermarkedCanvas();
             };
             logoImg.onerror = function() {
                 // Fallback to stylized network icon if image load fails
-                drawWatermarkNetworkIcon(ctx, targetWidth - marginX, marginY, logoSize);
+                drawWatermarkNetworkIcon(ctx, targetWidth - marginX, marginY, logoWidth);
                 finalizeWatermarkedCanvas();
             };
-            logoImg.src = '{{ asset('assets/logo/logo-msn2.png') }}';
+            const logoBase64 = @json($msnLogoBase64);
+            logoImg.src = logoBase64 || '{{ asset('assets/logo/logo-msn2.png') }}';
 
             function finalizeWatermarkedCanvas() {
                 // 5. Convert canvas to Blob & assign to input (0.84 quality for lightweight super-fast upload)
