@@ -7,7 +7,10 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 
 class TicketStateMachine
@@ -39,6 +42,22 @@ class TicketStateMachine
             throw new Exception('Terdapat Stop Clock berdurasi lebih dari 120 menit yang belum disetujui oleh Manager Teknis/Helpdesk (AC-07).');
         }
 
+        // Defensive self-healing: Ensure team_members and catatan_tambahan columns exist on unmigrated databases
+        if (! Schema::hasColumn('tiket', 'team_members') || ! Schema::hasColumn('tiket', 'catatan_tambahan')) {
+            try {
+                Schema::table('tiket', function (Blueprint $table): void {
+                    if (! Schema::hasColumn('tiket', 'team_members')) {
+                        $table->json('team_members')->nullable()->after('action_taken');
+                    }
+                    if (! Schema::hasColumn('tiket', 'catatan_tambahan')) {
+                        $table->text('catatan_tambahan')->nullable()->after('action_taken');
+                    }
+                });
+            } catch (\Throwable $e) {
+                Log::warning('Auto-migration for tiket columns failed: '.$e->getMessage());
+            }
+        }
+
         // Populate any closing attributes provided
         if (isset($closingData['problem_temuan'])) {
             $tiket->problem_temuan = $closingData['problem_temuan'];
@@ -46,11 +65,11 @@ class TicketStateMachine
         if (isset($closingData['action_taken'])) {
             $tiket->action_taken = $closingData['action_taken'];
         }
-        if (isset($closingData['team_members'])) {
+        if (isset($closingData['team_members']) && Schema::hasColumn('tiket', 'team_members')) {
             $cleanMembers = array_values(array_filter(array_map('trim', (array) $closingData['team_members'])));
             $tiket->team_members = ! empty($cleanMembers) ? $cleanMembers : null;
         }
-        if (isset($closingData['catatan_tambahan'])) {
+        if (isset($closingData['catatan_tambahan']) && Schema::hasColumn('tiket', 'catatan_tambahan')) {
             $tiket->catatan_tambahan = $closingData['catatan_tambahan'];
         }
         if (isset($closingData['redaman_sebelum'])) {

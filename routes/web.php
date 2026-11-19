@@ -239,4 +239,25 @@ Route::middleware('auth')->group(function (): void {
 
     // Chatbot Asisten API (§5.8)
     Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('api.chatbot.ask');
+
+    // System Utilities / Migrations Runner
+    Route::match(['get', 'post'], '/portal/system/migrate', function () {
+        if (! auth()->user()->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
+            abort(403, 'Akses terbatas untuk Administrator & NOC.');
+        }
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            $output = \Illuminate\Support\Facades\Artisan::output();
+            return response()->json([
+                'success' => true,
+                'message' => 'Database migration successfully executed.',
+                'output' => $output,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Migration failed: '.$e->getMessage(),
+            ], 500);
+        }
+    })->name('portal.system.migrate');
 });

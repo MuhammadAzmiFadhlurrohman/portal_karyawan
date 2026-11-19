@@ -16,10 +16,12 @@ use App\Modules\Ticketing\Services\TicketStateMachine;
 use App\Modules\Ticketing\Services\TechnicalAssetService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class TicketController extends Controller
@@ -139,6 +141,22 @@ class TicketController extends Controller
     public function show(Request $request, Tiket $tiket): View
     {
         Gate::authorize('view', $tiket);
+
+        // Defensive self-healing for unmigrated database instances
+        if (! Schema::hasColumn('tiket', 'team_members') || ! Schema::hasColumn('tiket', 'catatan_tambahan')) {
+            try {
+                Schema::table('tiket', function (Blueprint $table): void {
+                    if (! Schema::hasColumn('tiket', 'team_members')) {
+                        $table->json('team_members')->nullable()->after('action_taken');
+                    }
+                    if (! Schema::hasColumn('tiket', 'catatan_tambahan')) {
+                        $table->text('catatan_tambahan')->nullable()->after('action_taken');
+                    }
+                });
+            } catch (\Throwable) {
+                // Ignore alter errors if db user lacks permissions
+            }
+        }
 
         // Mark incoming chronologies as read (§WhatsApp read receipt)
         if ($request->user()) {

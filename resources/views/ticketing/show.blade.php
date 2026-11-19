@@ -1851,7 +1851,7 @@
                         <span class="text-[10px] uppercase font-bold text-slate-400">Team OM / Daftar Nama Teknis Lapangan</span>
                         <div class="flex flex-wrap items-center gap-2">
                             @php
-                                $displayMembers = ($tiket->team_members && count($tiket->team_members) > 0)
+                                $displayMembers = (!empty($tiket->team_members) && is_array($tiket->team_members) && count($tiket->team_members) > 0)
                                     ? $tiket->team_members
                                     : ($tiket->assignees->count() > 0 ? $tiket->assignees->pluck('name')->values()->all() : ['Ricky']);
                             @endphp
@@ -3907,7 +3907,7 @@ function coreManeuverModal() {
 @php
     $modalInitialMembers = old('team_members');
     if (!is_array($modalInitialMembers) || empty($modalInitialMembers)) {
-        $modalInitialMembers = ($tiket->team_members && count($tiket->team_members) > 0)
+        $modalInitialMembers = (!empty($tiket->team_members) && is_array($tiket->team_members) && count($tiket->team_members) > 0)
             ? array_values($tiket->team_members)
             : ($tiket->assignees->count() > 0 ? array_values($tiket->assignees->pluck('name')->all()) : ['Ricky']);
     }
