@@ -93,26 +93,31 @@
             }
         }
 
-        /* Chat Window Modal Box - Symmetrical, Clean, Modern */
+        [x-cloak] {
+            display: none !important;
+        }
+        .chatbot-modal-box[style*="display: none"] {
+            display: none !important;
+        }
+        .chatbot-docked-tab[style*="display: none"] {
+            display: none !important;
+        }
+
+        /* Chat Window Modal Box - Floating Symmetrical Popup */
         .chatbot-modal-box {
             position: fixed !important;
+            right: 8px !important;
+            bottom: 86px !important;
             z-index: 60 !important;
-            display: flex !important;
-            flex-direction: column !important;
+            width: 390px !important;
+            max-width: calc(100vw - 16px) !important;
+            height: 520px !important;
+            max-height: calc(100vh - 100px) !important;
             background: #ffffff !important;
             overflow: hidden !important;
+            border-radius: 24px !important;
             border: 1px solid rgba(226, 232, 240, 0.95) !important;
-        }
-        @media (max-width: 639.98px) {
-            .chatbot-modal-box {
-                inset-inline: 12px !important;
-                bottom: 16px !important;
-                top: auto !important;
-                height: calc(100dvh - 84px) !important;
-                max-height: 580px !important;
-                border-radius: 24px !important;
-                box-shadow: 0 20px 50px -10px rgba(2, 40, 54, 0.38) !important;
-            }
+            box-shadow: 0 20px 50px -10px rgba(2, 40, 54, 0.38) !important;
         }
         @media (min-width: 640px) {
             .chatbot-modal-box {
@@ -134,28 +139,16 @@
         }
     </style>
 
-    <!-- Soft Mobile Backdrop (Tap to close) -->
-    <div x-show="isOpen"
-         x-transition:enter="transition-opacity duration-300 ease-out"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity duration-200 ease-in"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         @click="closeChat()"
-         class="sm:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-55 pointer-events-auto"
-         style="display: none;">
-    </div>
-
     <!-- Docked Side-Tab Trigger Button (Only visible when chat is closed) -->
-    <button x-show="!isOpen"
+    <button x-cloak
+            x-show="!isOpen"
             x-transition:enter="transition-all duration-300 ease-out"
             x-transition:enter-start="opacity-0 translate-x-4"
             x-transition:enter-end="opacity-100 translate-x-0"
             x-transition:leave="transition-all duration-200 ease-in"
             x-transition:leave-start="opacity-100 translate-x-0"
             x-transition:leave-end="opacity-0 translate-x-4"
-            @click="toggleChat()" 
+            @click.stop="toggleChat()" 
             type="button"
             class="chatbot-docked-tab text-white flex flex-col items-center justify-center focus:outline-none cursor-pointer select-none group"
             title="Tanya Asisten Mandiri PT MSN"
@@ -185,15 +178,16 @@
     </button>
 
     <!-- Chat Window Modal Box -->
-    <div x-show="isOpen"
+    <div x-cloak
+         x-show="isOpen"
          x-transition:enter="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
          x-transition:enter-start="opacity-0 translate-y-6 scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 scale-100"
          x-transition:leave="transition-all duration-200 ease-in"
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-6 scale-95"
-         class="chatbot-modal-box"
-         @click.outside="if (window.innerWidth >= 640) closeChat()"
+         class="chatbot-modal-box flex flex-col origin-bottom-right"
+         @click.outside="closeChat()"
          @keydown.escape.window="closeChat()"
          style="display: none;">
         
@@ -235,7 +229,7 @@
             <!-- Action Buttons (Sampah & Tutup X) -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 relative z-10">
                 <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
-                <button @click="clearChat()" 
+                <button @click.stop.prevent="clearChat()" 
                         type="button" 
                         class="chatbot-header-btn is-trash"
                         title="Hapus Riwayat Chat"
@@ -245,7 +239,7 @@
                     </svg>
                 </button>
                 <!-- Tombol Tutup Chat -->
-                <button @click="closeChat()" 
+                <button @click.stop.prevent="closeChat()" 
                         type="button" 
                         class="chatbot-header-btn is-close"
                         title="Tutup Chat"
