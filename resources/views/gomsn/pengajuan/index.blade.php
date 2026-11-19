@@ -228,95 +228,106 @@
                 </div>
             </div>
 
-            <!-- 2. Filter Bar Toolbar & Search Combined -->
+            <!-- 2. Filter Bar Toolbar & Search Combined (Modern & Terpadu) -->
             <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
-                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-2.5">
-                    @if(request('search'))
-                        <input type="hidden" name="search" value="{{ request('search') }}">
+                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-3">
+                    @if(request('tab'))
+                        <input type="hidden" name="tab" value="{{ request('tab') }}">
                     @endif
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2">
-                        <!-- Dropdown Semua Jenis -->
-                        <select name="jenis" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
-                            <option value="">Semua Jenis</option>
-                            <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok</option>
-                            <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Dana</option>
-                            <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Beli</option>
-                            <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
-                        </select>
-
-                        <!-- Dropdown Semua Divisi -->
-                        <select name="divisi" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
-                            <option value="">Semua Divisi</option>
-                            @foreach ($divisions as $div)
-                                <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
-                            @endforeach
-                        </select>
-
-                        <!-- Dropdown Bulan -->
-                        <select name="bulan" class="w-full lg:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
-                            <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
-                            @foreach ($monthsList as $mNum => $mLabel)
-                                <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
-                            @endforeach
-                        </select>
-
-                        <!-- Dropdown Tahun -->
-                        <select name="tahun" class="w-full lg:w-28 text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700">
-                            <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
-                            @for ($y = date('Y') + 1; $y >= 2024; $y--)
-                                <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
-                            @endfor
-                        </select>
-
-                        <!-- Tombol Filter / Refresh / Export -->
-                        <div class="col-span-2 sm:col-span-4 lg:col-auto flex flex-wrap items-center gap-2">
-                            <button type="submit" class="flex-1 sm:flex-initial bg-[#2563EB] hover:bg-blue-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                                <span>Tampilkan</span>
-                            </button>
-
-                            <a href="{{ route('gomsn.pengajuan.index') }}" class="flex-1 sm:flex-initial bg-slate-600 hover:bg-slate-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                <span>Refresh</span>
-                            </a>
-
-                            @if ($isSuperAdmin || $isFinance || $isAtasan)
-                            <button type="submit" name="export" value="excel" title="Export Excel" class="flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold p-2 sm:px-3.5 sm:py-2 rounded-xl inline-flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer">
-                                <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    <!-- Row 1: Search Input Bar -->
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" name="search" value="{{ request('search', request('q')) }}" 
+                                   placeholder="Cari ID / Nomor Pengajuan / Nama Karyawan / Keperluan..."
+                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 pl-9 pr-4 py-2 text-slate-700 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
-                                <span class="hidden sm:inline">Export Excel</span>
-                            </button>
+                            </div>
+                        </div>
+                        <button type="submit"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
+                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Cari</span>
+                        </button>
+                    </div>
+
+                    <!-- Row 2: Filters Dropdown & Actions -->
+                    <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-slate-100">
+                        <div class="flex flex-wrap items-center gap-2 flex-1">
+                            <!-- Dropdown Semua Jenis -->
+                            <select name="jenis" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="">Semua Jenis</option>
+                                <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok</option>
+                                <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Dana</option>
+                                <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Beli</option>
+                                <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
+                            </select>
+
+                            <!-- Dropdown Semua Divisi -->
+                            <select name="divisi" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="">Semua Divisi</option>
+                                @foreach ($divisions as $div)
+                                    <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                                @endforeach
+                            </select>
+
+                            <!-- Filter Status -->
+                            <select name="status" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="">Semua Status</option>
+                                <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
+                                <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
+                                <option value="dicairkan" {{ request('status') === 'dicairkan' ? 'selected' : '' }}>Dicairkan</option>
+                                <option value="menunggu_bukti" {{ request('status') === 'menunggu_bukti' ? 'selected' : '' }}>Verifikasi Nota</option>
+                                <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                            </select>
+
+                            <!-- Dropdown Bulan -->
+                            <select name="bulan" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
+                                @foreach ($monthsList as $mNum => $mLabel)
+                                    <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
+                                @endforeach
+                            </select>
+
+                            <!-- Dropdown Tahun -->
+                            <select name="tahun" onchange="this.form.submit()" class="text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3 focus:ring-teal-500 focus:border-teal-500 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
+                                @for ($y = date('Y') + 1; $y >= 2024; $y--)
+                                    <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
+                                @endfor
+                            </select>
+
+                            <!-- Reset Button -->
+                            @if(request('search') || request('jenis') || request('divisi') || request('status') || (request('bulan') && request('bulan') !== (string)date('n')) || (request('tahun') && request('tahun') !== (string)date('Y')))
+                            <a href="{{ route('gomsn.pengajuan.index', request('tab') ? ['tab' => request('tab')] : []) }}"
+                               class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition shadow-2xs"
+                               title="Reset Semua Filter">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>Reset</span>
+                            </a>
                             @endif
                         </div>
 
-                        <div class="hidden xl:flex items-center gap-1.5 text-xs text-slate-500 font-medium ml-auto shrink-0">
-                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
-                            </svg>
-                            <span x-text="timeString">Senin, {{ date('d F Y') }} WIB</span>
+                        <!-- Right side: Export & Info -->
+                        <div class="flex items-center gap-2.5 ml-auto">
+                            @if ($isSuperAdmin || $isFinance || $isAtasan)
+                            <button type="submit" name="export" value="excel" title="Export Excel" 
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Export Excel</span>
+                            </button>
+                            @endif
                         </div>
                     </div>
-                </form>
-
-                <!-- Search Form -->
-                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex items-center gap-2 pt-2 border-t border-slate-100">
-                    @if(request('jenis')) <input type="hidden" name="jenis" value="{{ request('jenis') }}"> @endif
-                    @if(request('divisi')) <input type="hidden" name="divisi" value="{{ request('divisi') }}"> @endif
-                    <input type="hidden" name="bulan" value="{{ $curSelectedMonth }}">
-                    <input type="hidden" name="tahun" value="{{ $curSelectedYear }}">
-
-                    <div class="relative flex-1">
-                        <input type="text" name="search" value="{{ request('search') }}" 
-                               placeholder="Cari ID / Nomor Pengajuan / Nama Karyawan / Keperluan..."
-                               class="w-full text-xs rounded-xl border-slate-200 bg-slate-50/70 py-2 px-3.5 focus:ring-teal-500 focus:border-teal-500 placeholder-slate-400">
-                    </div>
-                    <button type="submit" style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;" class="hover:opacity-90 text-white text-xs font-bold px-4 py-2 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition shrink-0 cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <span>Cari</span>
-                    </button>
                 </form>
             </div>
 
@@ -710,17 +721,41 @@
             </div>
             @endif
 
-            <!-- Filter Bar Standar -->
-            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <!-- Filter Bar Standar (Modern, Rapi & Lengkap) -->
+            <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+                <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-3">
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
                     @endif
 
-                    <!-- Dropdowns Row -->
-                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 flex-1">
-                        @if ($isSuperAdmin || $isFinance)
-                            <select name="jenis" onchange="this.form.submit()" class="col-span-2 sm:col-span-1 w-full sm:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs">
+                    <!-- Row 1: Search Input Bar -->
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" name="search" value="{{ request('search', request('q')) }}" 
+                                   placeholder="Cari ID / Nomor Pengajuan / Nama Karyawan / Keperluan..."
+                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 pl-9 pr-4 py-2 text-slate-700 transition">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <button type="submit"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
+                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <span>Cari</span>
+                        </button>
+                    </div>
+
+                    <!-- Row 2: Filters Dropdown & Actions -->
+                    <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-slate-100">
+                        <div class="flex flex-wrap items-center gap-2 flex-1">
+                            <!-- Filter Jenis -->
+                            <select name="jenis" onchange="this.form.submit()" 
+                                    class="text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
                                 <option value="">Semua Jenis</option>
                                 <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
                                 <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
@@ -728,14 +763,9 @@
                                 <option value="PERMINTAAN" {{ request('jenis') === 'PERMINTAAN' ? 'selected' : '' }}>Permintaan</option>
                             </select>
 
-                            <select name="divisi" onchange="this.form.submit()" class="col-span-2 sm:col-span-1 w-full sm:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs">
-                                <option value="">Semua Divisi</option>
-                                @foreach (($divisions ?? collect()) as $div)
-                                    <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
-                                @endforeach
-                            </select>
-
-                            <select name="status" onchange="this.form.submit()" class="col-span-2 sm:col-span-1 w-full sm:w-40 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs">
+                            <!-- Filter Status -->
+                            <select name="status" onchange="this.form.submit()" 
+                                    class="text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
                                 <option value="">Semua Status</option>
                                 <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                                 <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
@@ -746,41 +776,64 @@
                                 <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
                                 <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                             </select>
-                        @endif
 
-                        <!-- Filter Bulan -->
-                        <select name="bulan" onchange="this.form.submit()" class="w-full sm:w-36 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
-                            <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
-                            @foreach ($monthsList as $mNum => $mLabel)
-                                <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
-                            @endforeach
-                        </select>
+                            @if ($isSuperAdmin || $isFinance)
+                            <!-- Filter Divisi -->
+                            <select name="divisi" onchange="this.form.submit()" 
+                                    class="text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="">Semua Divisi</option>
+                                @foreach (($divisions ?? collect()) as $div)
+                                    <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
+                                @endforeach
+                            </select>
+                            @endif
 
-                        <!-- Filter Tahun -->
-                        <select name="tahun" onchange="this.form.submit()" class="w-full sm:w-28 text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
-                            <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
-                            @for ($y = date('Y') + 1; $y >= 2024; $y--)
-                                <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
-                            @endfor
-                        </select>
-                    </div>
+                            <!-- Filter Bulan -->
+                            <select name="bulan" onchange="this.form.submit()" 
+                                    class="text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
+                                @foreach ($monthsList as $mNum => $mLabel)
+                                    <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
+                                @endforeach
+                            </select>
 
-                    <!-- Meta info & Export Action -->
-                    <div class="flex items-center justify-between sm:justify-end gap-3 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100 shrink-0">
-                        <span class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
-                            <span>Total <strong class="text-slate-800 font-bold">{{ $pengajuanList->total() }}</strong> pengajuan</span>
-                        </span>
+                            <!-- Filter Tahun -->
+                            <select name="tahun" onchange="this.form.submit()" 
+                                    class="text-xs rounded-xl border-slate-200 bg-slate-50/70 focus:ring-teal-500 focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer">
+                                <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
+                                @for ($y = date('Y') + 1; $y >= 2024; $y--)
+                                    <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
+                                @endfor
+                            </select>
 
-                        @if ($isSuperAdmin || $isFinance || $isAtasan)
-                        <button type="submit" name="export" value="excel" title="Export Excel" 
-                                class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold py-2 px-3 sm:px-3.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer shrink-0">
-                            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <span>Export Excel</span>
-                        </button>
-                        @endif
+                            <!-- Reset Filter Button (if filtered) -->
+                            @if(request('search') || request('jenis') || request('status') || request('divisi') || (request('bulan') && request('bulan') !== (string)date('n')) || (request('tahun') && request('tahun') !== (string)date('Y')))
+                            <a href="{{ route('gomsn.pengajuan.index', request('tab') ? ['tab' => request('tab')] : []) }}"
+                               class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition shadow-2xs"
+                               title="Reset Semua Filter">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>Reset</span>
+                            </a>
+                            @endif
+                        </div>
+
+                        <!-- Right side: Total counter & Export -->
+                        <div class="flex items-center gap-2.5 ml-auto">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs">
+                                <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+                                <span>Total <strong class="text-slate-800 font-extrabold">{{ $pengajuanList->total() }}</strong> pengajuan</span>
+                            </span>
+
+                            @if ($isSuperAdmin || $isFinance || $isAtasan)
+                            <button type="submit" name="export" value="excel" title="Export Excel" 
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span class="hidden sm:inline">Export Excel</span>
+                            </button>
+                            @endif
+                        </div>
                     </div>
                 </form>
             </div>
