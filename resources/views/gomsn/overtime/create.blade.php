@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="w-full space-y-6 pb-12">
+    <div class="max-w-4xl mx-auto w-full space-y-6 pb-12">
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 select-none"
              style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
@@ -64,44 +64,71 @@
         @endif
 
         <!-- Overtime Form Card (Premium Design Matching Pengajuan) -->
-        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden"
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden"
              x-data="overtimeForm()"
              x-init="init()">
             
             <!-- Card Header Accent -->
-            <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-5 py-3.5 flex items-center justify-between text-white">
-                <div class="flex items-center gap-2 font-bold text-xs sm:text-sm">
-                    <span class="text-[#18C4C4] font-extrabold">#</span>
+            <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-6 py-4 sm:py-4.5 flex items-center justify-between text-white">
+                <div class="flex items-center gap-2.5 font-bold text-sm sm:text-base">
+                    <span class="text-[#18C4C4] font-extrabold text-base sm:text-lg">#</span>
                     <span>Informasi &amp; Jadwal Jam Lembur</span>
                 </div>
-                <span class="text-[11px] font-semibold text-teal-100/90 bg-white/10 px-2.5 py-1 rounded-full">
+                <span class="text-xs font-semibold text-teal-100/90 bg-white/10 px-3 py-1 rounded-full border border-white/15 shadow-2xs">
                     Form Mandiri
                 </span>
             </div>
 
-            <form method="POST" action="{{ route('gomsn.overtime.store') }}" class="p-5 sm:p-8 space-y-6">
+            <form method="POST" action="{{ route('gomsn.overtime.store') }}" class="p-6 sm:p-9 space-y-6 sm:space-y-7">
                 @csrf
 
-                <!-- Tanggal Lembur -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">
-                        Tanggal Lembur <span class="text-rose-500">*</span>
-                    </label>
-                    <div class="relative max-w-md">
-                        <input type="date"
-                               name="tanggal"
-                               x-model="tanggal"
-                               @change="checkAttendance()"
-                               required
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
+                <!-- Row 1: Tanggal Lembur & Jenis Lembur in 2 Columns -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                    <!-- Tanggal Lembur -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-slate-800 tracking-wide">
+                            Tanggal Lembur <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="date"
+                                   name="tanggal"
+                                   x-model="tanggal"
+                                   @change="checkAttendance()"
+                                   required
+                                   class="w-full text-sm sm:text-base rounded-xl border-slate-300 py-3 px-4 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold cursor-pointer" />
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            Pastikan Anda sudah melakukan absensi masuk pada tanggal yang dipilih.
+                        </p>
                     </div>
-                    <p class="text-[11px] text-slate-500">
-                        Pastikan Anda sudah melakukan absensi masuk pada tanggal yang dipilih.
-                    </p>
 
+                    <!-- Jenis Lembur -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-slate-800 tracking-wide">
+                            Jenis Lembur <span class="text-rose-500">*</span>
+                        </label>
+                        <div>
+                            <select name="jenis_lembur"
+                                    x-model="jenisLembur"
+                                    required
+                                    class="w-full text-sm sm:text-base rounded-xl border-slate-300 py-3 px-4 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold cursor-pointer">
+                                <option value="">-- Pilih Jenis Lembur --</option>
+                                <option value="Lembur">Lembur</option>
+                                <option value="Piket Hari Libur">Piket Hari Libur</option>
+                                <option value="Piket Hari Kerja">Piket Hari Kerja</option>
+                            </select>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            Pilih klasifikasi lembur sesuai penugasan kerja Anda.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Alert Boxes for Attendance (Full Width) -->
+                <div>
                     <!-- Checking Indicator -->
-                    <div x-show="checking" x-cloak class="mt-2.5 p-3 bg-teal-50/60 border border-teal-200/80 rounded-xl flex items-center gap-2.5 text-xs text-teal-800">
-                        <svg class="animate-spin h-4 w-4 text-teal-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <div x-show="checking" x-cloak class="p-3.5 sm:p-4 bg-teal-50/70 border border-teal-200/80 rounded-xl flex items-center gap-3 text-xs sm:text-sm text-teal-800">
+                        <svg class="animate-spin h-5 w-5 text-teal-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -111,15 +138,15 @@
                     <!-- No Attendance Alert -->
                     <div x-show="!checking && attendanceChecked && !hasAttendance" 
                          x-cloak 
-                         class="mt-2.5 p-3 bg-rose-50/80 border border-rose-200 rounded-xl flex items-center gap-2.5 shadow-2xs">
-                        <div class="w-6 h-6 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold">
+                         class="p-4 bg-rose-50/90 border border-rose-200 rounded-xl flex items-start gap-3 shadow-xs">
+                        <div class="w-7 h-7 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0 text-sm font-bold mt-0.5">
                             ✕
                         </div>
                         <div class="min-w-0 flex-1">
-                            <div class="text-xs font-bold text-rose-800">
+                            <div class="text-sm font-bold text-rose-800">
                                 <span x-text="attendanceData.message || 'Belum Ada Data Absensi'">Belum Ada Data Absensi</span>
                             </div>
-                            <p class="text-[11px] text-rose-600 mt-0.5" x-text="attendanceData.subtext || 'Silakan absen sebelum mengajukan lembur.'">
+                            <p class="text-xs sm:text-sm text-rose-600 mt-0.5" x-text="attendanceData.subtext || 'Silakan absen sebelum mengajukan lembur.'">
                                 Silakan absen sebelum mengajukan lembur.
                             </p>
                         </div>
@@ -128,94 +155,76 @@
                     <!-- Attendance Verified Box -->
                     <div x-show="!checking && attendanceChecked && hasAttendance" 
                          x-cloak 
-                         class="mt-3 p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-start gap-3 shadow-2xs">
-                        <div class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
+                         class="p-4 bg-emerald-50/90 border border-emerald-200 rounded-xl flex items-start gap-3 shadow-xs">
+                        <div class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 text-sm font-bold mt-0.5">
                             ✓
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                            <div class="text-sm font-bold text-emerald-800 flex items-center gap-1.5">
                                 <span x-text="attendanceData.message">Absensi terverifikasi</span>
                             </div>
-                            <p class="text-[11px] text-emerald-600 mt-0.5" x-text="attendanceData.subtext"></p>
+                            <p class="text-xs sm:text-sm text-emerald-600 mt-0.5" x-text="attendanceData.subtext"></p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Jenis Lembur -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">
-                        Jenis Lembur <span class="text-rose-500">*</span>
-                    </label>
-                    <div class="max-w-md">
-                        <select name="jenis_lembur"
-                                x-model="jenisLembur"
-                                required
-                                class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold">
-                            <option value="">-- Pilih Jenis Lembur --</option>
-                            <option value="Lembur">Lembur</option>
-                            <option value="Piket Hari Libur">Piket Hari Libur</option>
-                            <option value="Piket Hari Kerja">Piket Hari Kerja</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Jam Mulai & Jam Selesai -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                <!-- Row 2: Jam Mulai & Jam Selesai -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-slate-800 tracking-wide">
                             Jam Mulai Lembur <span class="text-rose-500">*</span>
                         </label>
                         <input type="time"
                                name="jam_mulai"
                                x-model="jamMulai"
                                required
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
+                               class="w-full text-sm sm:text-base rounded-xl border-slate-300 py-3 px-4 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold cursor-pointer" />
                     </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-slate-800 tracking-wide">
                             Jam Selesai Lembur <span class="text-rose-500">*</span>
                         </label>
                         <input type="time"
                                name="jam_selesai"
                                x-model="jamSelesai"
                                required
-                               class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold" />
+                               class="w-full text-sm sm:text-base rounded-xl border-slate-300 py-3 px-4 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 font-semibold cursor-pointer" />
                     </div>
                 </div>
 
-                <!-- Alasan Lembur with Character Counter -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-bold text-slate-700 tracking-wide">
+                <!-- Row 3: Alasan Lembur with Character Counter -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-800 tracking-wide">
                         Alasan &amp; Rincian Pekerjaan Lembur <span class="text-rose-500">*</span>
                     </label>
                     <textarea name="alasan"
-                              rows="4"
+                              rows="5"
                               maxlength="100"
                               x-model="alasan"
                               required
                               placeholder="Jelaskan alasan dan rincian pekerjaan yang dilakukan selama jam lembur..."
-                              class="w-full text-xs rounded-xl border-slate-300 p-3.5 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 placeholder-slate-400"></textarea>
-                    <div class="flex items-center justify-between text-[11px] text-slate-500">
+                              class="w-full text-sm sm:text-base rounded-xl border-slate-300 p-4 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-xs text-slate-800 placeholder-slate-400"></textarea>
+                    <div class="flex items-center justify-between text-xs text-slate-500">
                         <span>Maksimal 100 karakter</span>
                         <span class="font-bold text-slate-700" x-text="(alasan ? alasan.length : 0) + '/100 karakter'">0/100 karakter</span>
                     </div>
                 </div>
 
                 <!-- Tombol Simpan Lembur -->
-                <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div class="text-[11px] text-slate-500">
+                <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-xs sm:text-sm text-slate-500">
                         Pastikan semua informasi telah benar sebelum diajukan untuk proses approval atasan.
                     </div>
-                    <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div class="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                         <a href="{{ route('gomsn.overtime.index') }}"
-                           class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs text-center transition">
+                           class="px-5 py-3 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm text-center transition">
                             Batal
                         </a>
                         <button type="submit"
                                 :disabled="!canSubmit"
                                 :class="canSubmit ? 'opacity-100 hover:opacity-90 shadow-md cursor-pointer' : 'opacity-50 cursor-not-allowed'"
                                 style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
-                                class="px-6 py-2.5 text-white font-bold text-xs rounded-xl inline-flex items-center justify-center gap-2 transition duration-200">
+                                class="px-7 py-3 text-white font-bold text-sm rounded-xl inline-flex items-center justify-center gap-2 transition duration-200">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
@@ -224,7 +233,7 @@
                     </div>
                 </div>
 
-                <div x-show="!hasAttendance && attendanceChecked" x-cloak class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-center text-xs text-rose-700 font-semibold">
+                <div x-show="!hasAttendance && attendanceChecked" x-cloak class="p-3 bg-rose-50 border border-rose-200 rounded-xl text-center text-xs sm:text-sm text-rose-700 font-semibold">
                     Pengajuan dinonaktifkan: belum ada data absensi pada tanggal ini.
                 </div>
             </form>
