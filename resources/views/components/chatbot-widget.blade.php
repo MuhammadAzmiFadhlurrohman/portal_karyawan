@@ -48,7 +48,7 @@
             border-bottom: 1.5px solid rgba(255, 255, 255, 0.2) !important;
             border-right: none !important;
             pointer-events: auto !important;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease !important;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, filter 0.2s ease !important;
         }
         @media (min-width: 640px) {
             .chatbot-docked-tab {
@@ -60,11 +60,69 @@
                 padding-right: 8px !important;
             }
         }
+        /* Pada mobile saat chat terbuka, sembunyikan tab docked agar tidak bertumpuk di latar belakang */
+        @media (max-width: 639.98px) {
+            .chatbot-slide-drawer.is-open .chatbot-docked-tab {
+                opacity: 0 !important;
+                pointer-events: none !important;
+                visibility: hidden !important;
+            }
+        }
         .chatbot-slide-drawer.is-closed .chatbot-docked-tab:hover {
             transform: translateX(-4px) !important;
         }
         .chatbot-slide-drawer.is-open .chatbot-docked-tab:hover {
             filter: brightness(1.1) !important;
+        }
+
+        /* Header Action Buttons (Sampah & Tutup X) - Anti gepeng & proporsional di mobile */
+        .chatbot-header-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            min-height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 12px !important;
+            background: rgba(255, 255, 255, 0.16) !important;
+            border: 1px solid rgba(255, 255, 255, 0.28) !important;
+            color: #ffffff !important;
+            transition: all 0.2s ease !important;
+            cursor: pointer !important;
+            flex-shrink: 0 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+        }
+        .chatbot-header-btn:hover {
+            background: rgba(255, 255, 255, 0.28) !important;
+            color: #ffffff !important;
+            transform: translateY(-1px) !important;
+        }
+        .chatbot-header-btn:active {
+            transform: scale(0.92) !important;
+        }
+        .chatbot-header-btn.is-trash:hover {
+            background: rgba(239, 68, 68, 0.85) !important;
+            border-color: rgba(248, 113, 113, 0.6) !important;
+        }
+        .chatbot-header-btn svg {
+            width: 19px !important;
+            height: 19px !important;
+            stroke-width: 2.2 !important;
+            display: block !important;
+        }
+        @media (min-width: 640px) {
+            .chatbot-header-btn {
+                width: 38px !important;
+                height: 38px !important;
+                min-width: 38px !important;
+                min-height: 38px !important;
+                border-radius: 14px !important;
+            }
+            .chatbot-header-btn svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
         }
 
         /* Chat Window Modal Box */
@@ -153,62 +211,63 @@
              :aria-hidden="!isOpen">
             
             <!-- Header -->
-            <div class="px-4.5 py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
+            <div class="px-3.5 py-3 sm:px-4 sm:py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
                  style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
             
-            <!-- Subtle decorative background glow -->
-            <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                <!-- Subtle decorative background glow -->
+                <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
-            <div class="flex items-center gap-3 relative z-10 min-w-0">
-                <!-- Avatar with online indicator -->
-                <div class="relative shrink-0">
-                    <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-white shadow-inner">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="#ffffff">
-                            <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
-                            <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                            <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                            <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                <div class="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0 flex-1 mr-2">
+                    <!-- Avatar with online indicator -->
+                    <div class="relative shrink-0">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-white shadow-inner">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="#ffffff">
+                                <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                                <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                                <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                                <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                            </svg>
+                        </div>
+                        <!-- Online Pulse Dot -->
+                        <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-[#155E63]"></span>
+                        </span>
+                    </div>
+
+                    <!-- Title & Subtitle -->
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <h3 class="font-heading font-bold text-xs sm:text-sm text-white tracking-tight leading-snug truncate" style="color: #ffffff !important;">Asisten Mandiri PT MSN</h3>
+                            <span class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-400/25 text-emerald-200 border border-emerald-400/30 shrink-0">AI</span>
+                        </div>
+                        <p class="text-[10px] sm:text-[11px] text-teal-100/90 leading-tight mt-0.5 truncate" style="color: rgba(204, 251, 241, 0.9) !important;">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons (Sampah & Tutup X) -->
+                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 relative z-10">
+                    <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
+                    <button @click="clearChat()" 
+                            type="button" 
+                            class="chatbot-header-btn is-trash"
+                            title="Hapus Riwayat Chat"
+                            aria-label="Hapus Riwayat Chat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
-                    </div>
-                    <!-- Online Pulse Dot -->
-                    <span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-[#155E63]"></span>
-                    </span>
+                    </button>
+                    <!-- Tombol Tutup Chat -->
+                    <button @click="closeChat()" 
+                            type="button" 
+                            class="chatbot-header-btn is-close"
+                            title="Tutup Chat"
+                            aria-label="Tutup Chat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
-
-                <!-- Title & Subtitle -->
-                <div class="min-w-0">
-                    <div class="flex items-center gap-1.5">
-                        <h3 class="font-heading font-bold text-[13.5px] sm:text-sm text-white tracking-tight leading-snug truncate" style="color: #ffffff !important;">Asisten Mandiri PT MSN</h3>
-                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">AI</span>
-                    </div>
-                    <p class="text-[11px] text-teal-100/90 leading-tight mt-0.5 truncate" style="color: rgba(204, 251, 241, 0.9) !important;">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-2 shrink-0 relative z-10">
-                <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
-                <button @click="clearChat()" 
-                        type="button" 
-                        class="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
-                        title="Hapus Riwayat Chat"
-                        aria-label="Hapus Riwayat Chat">
-                    <svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </button>
-                <!-- Tombol Tutup Chat -->
-                <button @click="closeChat()" 
-                        type="button" 
-                        class="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
-                        title="Tutup Chat"
-                        aria-label="Tutup Chat">
-                    <svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
             </div>
         </div>
 
