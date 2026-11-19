@@ -15,7 +15,11 @@
         $crew = $tiket->assignees->where('pivot.role_in_team', 'member');
 
         // Prerequisites calculation for Closing Readiness Checklist (matching Image 2)
-        $hasResume = !empty(trim((string)$tiket->problem_temuan)) && !empty(trim((string)$tiket->action_taken));
+        $isBroadband = ($tiket->kategori_tiket === 'BROADBAND');
+        $hasBasicResume = !empty(trim((string)$tiket->problem_temuan)) && !empty(trim((string)$tiket->action_taken));
+        $hasOptical = !$isBroadband || ($tiket->redaman_sesudah !== null && (float)$tiket->redaman_sesudah >= -40.0 && (float)$tiket->redaman_sesudah <= 0.0);
+        $hasResume = $hasBasicResume && $hasOptical;
+
         $hasPhoto = $tiket->chronologies->whereNotNull('photo_path')->isNotEmpty() || $tiket->chronologies->where('category', 'SELESAI')->isNotEmpty();
         $hasRepairOrJc = $tiket->repairPoints->isNotEmpty() || $tiket->jointClosures->isNotEmpty();
         $hasJcOrManeuver = $tiket->jointClosures->isNotEmpty() || $tiket->coreManeuvers->isNotEmpty();
@@ -695,7 +699,15 @@
                     <div class="min-w-0 flex-1">
                         <h4 class="font-heading font-extrabold text-[11px] sm:text-xs text-slate-800 truncate">1. Resume Kerja</h4>
                         <p class="text-[10px] sm:text-[11px] mt-0.5 truncate {{ $hasResume ? 'text-emerald-700 font-semibold' : 'text-slate-400' }}">
-                            {{ $hasResume ? 'Sudah Lengkap' : 'Belum diisi lengkap' }}
+                            @if($hasResume)
+                                Sudah Lengkap
+                            @elseif(!$hasBasicResume)
+                                Belum diisi lengkap
+                            @elseif(!$hasOptical)
+                                Redaman sesudah wajib diisi
+                            @else
+                                Belum diisi lengkap
+                            @endif
                         </p>
                     </div>
                 </div>
@@ -1955,13 +1967,20 @@
                     </div>
                     @endif
 
-                    @if($tiket->redaman_sebelum || $tiket->redaman_sesudah)
+                    @if($tiket->redaman_sebelum !== null || $tiket->redaman_sesudah !== null)
                     <!-- Pengukuran Redaman Optik -->
                     <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-1 md:col-span-2">
                         <span class="text-[10px] uppercase font-bold text-slate-400">Pengukuran Redaman Optik</span>
                         <p class="text-xs sm:text-sm font-mono font-bold text-slate-800">
-                            Sebelum: <span class="text-rose-600">{{ $tiket->redaman_sebelum ?? '-' }} dBm</span> &bull; 
-                            Sesudah: <span class="text-emerald-600">{{ $tiket->redaman_sesudah ?? '-' }} dBm</span>
+                            Sebelum: <span class="text-rose-600">{{ $tiket->redaman_sebelum !== null ? $tiket->redaman_sebelum . ' dBm' : '-' }}</span> &bull; 
+                            Sesudah: <span class="text-emerald-600">{{ $tiket->redaman_sesudah !== null ? $tiket->redaman_sesudah . ' dBm' : '-' }}</span>
+                        </p>
+                    </div>
+                    @elseif($isBroadband)
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1 md:col-span-2">
+                        <span class="text-[10px] uppercase font-bold text-amber-600">Pengukuran Redaman Optik</span>
+                        <p class="text-xs sm:text-sm text-amber-850 font-semibold">
+                            ⚠️ Nilai redaman sesudah belum dicatat. Silakan klik <button type="button" onclick="openResumeModal()" class="text-teal-700 underline font-bold cursor-pointer">Edit Resume Pekerjaan</button> untuk mengisi redaman sesudah agar dapat melakukan Closing Awal.
                         </p>
                     </div>
                     @endif
@@ -4084,10 +4103,70 @@ function coreManeuverModal() {
                               class="w-full p-3.5 rounded-2xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 outline-none transition leading-relaxed">{{ old('catatan_tambahan', $tiket->catatan_tambahan) }}</textarea>
                 </div>
 
-                <!-- Hidden Optical Measurement & Status Preservation -->
-                <input type="hidden" name="redaman_sebelum" value="{{ old('redaman_sebelum', $tiket->redaman_sebelum) }}">
-                <input type="hidden" name="redaman_sesudah" value="{{ old('redaman_sesudah', $tiket->redaman_sesudah) }}">
-                <input type="hidden" name="has_link_up" value="{{ $tiket->has_link_up ? 1 : 0 }}">
+                <!-- 6. Pengukuran Redaman Optik (dBm) -->
+                <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <label class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <span>Pengukuran Redaman Optik (dBm)</span>
+                        </label>
+                        <span class="text-[10.5px] text-slate-500 font-medium">Rentang standar: <b>-40.00</b> s.d. <b>0.00 dBm</b></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <!-- Redaman Sebelum -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                                Redaman Sebelum (dBm) <span class="text-slate-400 font-normal">(Opsional)</span>
+                            </label>
+                            <div class="relative">
+                                <input type="number"
+                                       step="0.01"
+                                       min="-60"
+                                       max="10"
+                                       name="redaman_sebelum"
+                                       value="{{ old('redaman_sebelum', $tiket->redaman_sebelum) }}"
+                                       placeholder="Contoh: -28.50"
+                                       class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 outline-none transition font-mono">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-mono pointer-events-none">dBm</span>
+                            </div>
+                        </div>
+
+                        <!-- Redaman Sesudah -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-700 mb-1">
+                                Redaman Sesudah (dBm) @if($isBroadband)<span class="text-rose-500 font-bold">* (Wajib Broadband)</span>@else<span class="text-slate-400 font-normal">(Opsional)</span>@endif
+                            </label>
+                            <div class="relative">
+                                <input type="number"
+                                       step="0.01"
+                                       min="-40"
+                                       max="0"
+                                       @if($isBroadband) required @endif
+                                       name="redaman_sesudah"
+                                       value="{{ old('redaman_sesudah', $tiket->redaman_sesudah) }}"
+                                       placeholder="Contoh: -18.50"
+                                       class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm text-slate-800 outline-none transition font-mono">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-mono pointer-events-none">dBm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($tiket->kategori_tiket === 'BACKBONE')
+                        <div class="pt-2 border-t border-slate-200/80">
+                            <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox"
+                                       name="has_link_up"
+                                       value="1"
+                                       {{ old('has_link_up', $tiket->has_link_up) ? 'checked' : '' }}
+                                       class="w-4 h-4 rounded text-teal-600 border-slate-300 focus:ring-teal-500">
+                                <span class="text-xs font-semibold text-slate-700">Konfirmasi Pemulihan Link (LINK UP Restored)</span>
+                            </label>
+                        </div>
+                    @else
+                        <input type="hidden" name="has_link_up" value="{{ $tiket->has_link_up ? 1 : 1 }}">
+                    @endif
+                </div>
             </div>
 
             <!-- Footer -->

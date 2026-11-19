@@ -513,7 +513,7 @@ class TicketController extends Controller
             $result = $this->stateMachine->submitClosingAwal($tiket, $request->user(), $validated);
 
             if (! $result['prerequisites']['passed']) {
-                $errMessage = 'Closing Awal ditolak karena prasyarat belum terpenuhi (AC-06): '.implode('; ', $result['prerequisites']['missing']);
+                $errMessage = 'Resume disimpan, tetapi Closing Awal belum dapat diajukan karena prasyarat belum lengkap (AC-06): '.implode('; ', $result['prerequisites']['missing']);
                 if ($request->wantsJson()) {
                     return response()->json([
                         'success' => false,
