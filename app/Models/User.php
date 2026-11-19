@@ -328,6 +328,7 @@ class User extends Authenticatable
                 \Illuminate\Support\Facades\Storage::disk('public')->exists($cleanPath)
                 || file_exists(public_path('storage/' . $cleanPath))
                 || file_exists(public_path($cleanPath))
+                || file_exists(base_path('../gomsn/uploads/foto_profil/' . basename($cleanPath)))
             ) {
                 return route('portal.user.avatar', [
                     'user' => $this->id,

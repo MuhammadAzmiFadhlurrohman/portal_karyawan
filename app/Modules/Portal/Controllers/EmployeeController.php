@@ -516,6 +516,12 @@ class EmployeeController extends Controller
             ]);
         }
 
+        if (file_exists(base_path('../gomsn/uploads/foto_profil/' . basename($cleanPath)))) {
+            return response()->file(base_path('../gomsn/uploads/foto_profil/' . basename($cleanPath)), [
+                'Cache-Control' => 'public, max-age=86400',
+            ]);
+        }
+
         abort(404);
     }
 
