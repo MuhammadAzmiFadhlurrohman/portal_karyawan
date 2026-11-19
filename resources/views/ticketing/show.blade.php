@@ -967,7 +967,7 @@
             border-top: none !important;
             border-bottom: none !important;
             padding-top: 0.25rem !important;
-            padding-bottom: 0.2rem !important;
+            padding-bottom: 0.25rem !important;
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
         }
@@ -982,8 +982,33 @@
         .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
             background: transparent !important;
             border-top: none !important;
-            padding: 0.2rem 0.75rem 0.55rem 0.75rem !important;
-            padding-bottom: max(0.55rem, env(safe-area-inset-bottom)) !important;
+            padding: 0.2rem 0.75rem 0.85rem 0.75rem !important;
+            padding-bottom: calc(max(0.85rem, env(safe-area-inset-bottom)) + 0.35rem) !important;
+        }
+
+        /* Mobile Fullscreen: Mengapung ke atas agar tidak terlalu menempel ke tepi bawah layar HP */
+        @media (max-width: 767.98px) {
+            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
+                padding-top: 0.35rem !important;
+                padding-bottom: 0.35rem !important;
+                padding-left: 0.85rem !important;
+                padding-right: 0.85rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
+                padding-top: 0.25rem !important;
+                padding-left: 0.85rem !important;
+                padding-right: 0.85rem !important;
+                padding-bottom: calc(max(1.15rem, env(safe-area-inset-bottom)) + 0.45rem) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #chat-input-container {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text {
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
+                box-shadow: 0 4px 16px rgba(13, 148, 136, 0.45) !important;
+            }
         }
         .ticket-chat-card.is-chat-fullscreen #quick-chat-form .chat-form-inner {
             padding: 0 !important;
