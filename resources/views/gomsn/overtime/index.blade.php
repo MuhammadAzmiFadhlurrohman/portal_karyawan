@@ -483,14 +483,19 @@
                                     {{ $isFilterUnprocessed ? 'Semua Periode' : ($bulanNames[$selectedBulan] ?? 'November') . ' ' . $selectedTahun }}
                                 </span>
                                 @if ($isHrd)
-                                    <!-- Tombol Toggle Status Pembayaran Lembur Karyawan: Belum / Dibayar (Khusus Role HRD, Tanpa Refresh) -->
+                                    <!-- Tombol Toggle Status Pembayaran Lembur Karyawan: Belum / Dibayar (Khusus Role HRD, Instan Tanpa Refresh) -->
                                     <div x-data="{
                                         isPaid: {{ $stat['is_paid'] ? 'true' : 'false' }},
                                         loading: false,
                                         async toggleStatus() {
                                             if (this.loading) return;
+                                            
+                                            // 1. Optimistic UI Update: Langsung ubah state seketika (0 ms) tanpa menunggu network
+                                            const previousState = this.isPaid;
+                                            this.isPaid = !this.isPaid;
+                                            const nextStatus = this.isPaid ? 'paid' : 'unpaid';
                                             this.loading = true;
-                                            const nextStatus = !this.isPaid ? 'paid' : 'unpaid';
+
                                             try {
                                                 const res = await fetch('{{ route('gomsn.overtime.toggle-payment') }}', {
                                                     method: 'POST',
@@ -514,12 +519,16 @@
                                                         detail: { message: data.message, type: 'success' }
                                                     }));
                                                 } else {
+                                                    // Rollback jika response server gagal
+                                                    this.isPaid = previousState;
                                                     window.dispatchEvent(new CustomEvent('overtime-toast', {
                                                         detail: { message: data?.message || 'Gagal mengubah status', type: 'error' }
                                                     }));
                                                 }
                                             } catch (err) {
                                                 console.error(err);
+                                                // Rollback jika terjadi network error
+                                                this.isPaid = previousState;
                                                 window.dispatchEvent(new CustomEvent('overtime-toast', {
                                                     detail: { message: 'Terjadi kesalahan jaringan.', type: 'error' }
                                                 }));
@@ -530,17 +539,15 @@
                                     }" class="inline-flex items-center m-0">
                                         <button type="button" 
                                                 @click="toggleStatus()"
-                                                :disabled="loading"
                                                 :title="isPaid ? 'Status: Dibayar. Klik untuk ubah ke Belum.' : 'Status: Belum. Klik untuk ubah ke Dibayar.'"
                                                 class="group inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full border text-[9.5px] transition-all shadow-2xs cursor-pointer select-none"
-                                                :class="isPaid ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'"
-                                                :style="loading ? 'opacity: 0.6; cursor: wait;' : ''">
+                                                :class="isPaid ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'">
                                             
-                                            <!-- Switch Track & Knob -->
-                                            <span class="relative inline-flex h-3.5 w-6 shrink-0 rounded-full transition-colors duration-200 ease-in-out p-0.5"
-                                                  :class="isPaid ? 'bg-emerald-500' : 'bg-slate-300'">
-                                                <span class="pointer-events-none inline-block h-2.5 w-2.5 rounded-full bg-white shadow-xs transform transition duration-200 ease-in-out"
-                                                      :class="isPaid ? 'translate-x-2.5' : 'translate-x-0'"></span>
+                                            <!-- Switch Track & Knob (Pasti Kiri saat Belum, Kanan saat Dibayar) -->
+                                            <span class="relative inline-flex h-4 w-7.5 shrink-0 rounded-full transition-colors duration-200 ease-in-out p-0.5"
+                                                  :style="isPaid ? 'background-color: #10b981;' : 'background-color: #cbd5e1;'">
+                                                <span class="pointer-events-none inline-block h-3 w-3 rounded-full bg-white shadow-xs transition-transform duration-200 ease-in-out"
+                                                      :style="isPaid ? 'transform: translateX(14px);' : 'transform: translateX(0px);'"></span>
                                             </span>
 
                                             <!-- Label Status: Belum vs Dibayar -->
