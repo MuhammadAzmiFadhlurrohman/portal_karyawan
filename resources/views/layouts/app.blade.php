@@ -329,23 +329,8 @@
                         </a>
                         @endif
 
-                        <!-- 3. Pengajuan Absen (Khusus HRD: Approve Cuti & Izin Karyawan) -->
-                        @if ($isHrdRole)
-                        <a href="{{ route('attendance.leaves.approvals') }}"
-                           @if (request()->routeIs('attendance.leaves.approvals*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
-                           class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.leaves.approvals*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                            <div class="flex items-center gap-3">
-                                <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('attendance.leaves.approvals*') ? 'text-white' : 'text-emerald-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                                <span>Pengajuan Absen</span>
-                            </div>
-                            @if ($navPendingLeaveHrdCount > 0)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-400 text-slate-900 shadow-xs">
-                                {{ $navPendingLeaveHrdCount }}
-                            </span>
-                            @endif
-                        </a>
-                        @elseif ($navCanApproveKoreksi)
-                        <!-- Khusus Atasan & Admin: Koreksi Kehadiran Mandiri Karyawan -->
+                        <!-- 3. Pengajuan Absen (Khusus Atasan & Admin: Koreksi Kehadiran Mandiri Karyawan) -->
+                        @if ($navCanApproveKoreksi)
                         <a href="{{ route('attendance.corrections.approvals') }}"
                            @if (request()->routeIs('attendance.corrections.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
