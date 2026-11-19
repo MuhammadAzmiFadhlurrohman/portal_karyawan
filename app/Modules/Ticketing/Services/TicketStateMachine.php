@@ -189,11 +189,6 @@ class TicketStateMachine
             throw new Exception("Hanya tiket berstatus PENDING_VERIFIKASI yang dapat diverifikasi (Status saat ini: {$tiket->status}).");
         }
 
-        // Separation of duties check (§4.3)
-        if ($tiket->closing_awal_by && $tiket->closing_awal_by === $verifier->id) {
-            throw new Exception('Pemisahan tugas (§4.3): Pelaku verifikasi akhir Helpdesk tidak boleh sama dengan teknisi yang melakukan closing awal.');
-        }
-
         return DB::transaction(function () use ($tiket, $verifier, $closeTime): Tiket {
             $now = $closeTime ?? Carbon::now();
             $openTime = $tiket->tanggal_open ?? $tiket->created_at;

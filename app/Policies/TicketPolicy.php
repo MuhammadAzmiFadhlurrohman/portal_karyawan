@@ -118,15 +118,22 @@ class TicketPolicy
      */
     public function verifyClose(User $user, Tiket $tiket): bool
     {
-        if (! $user->can('ticket.verify_close') && ! $user->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
-            return false;
+        // 1. Management, Supervisors, NOC, Helpdesk, and Admins can always verify and close tickets
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo', 'helpdesk']) || $user->isAtasan()) {
+            return true;
         }
 
-        // Separation of duties (§4.3): cannot verify own closing awal
-        if ($tiket->closing_awal_by && $tiket->closing_awal_by === $user->id) {
-            return false;
+        // 2. Explicit permission check
+        if ($user->can('ticket.verify_close')) {
+            return true;
         }
 
-        return true;
+        // 3. Assigned technicians on this ticket
+        if ($tiket->ticketAssignees()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // 4. Any technician from Teknik division
+        return $user->division === 'Teknik' || $user->hasRole(['teknisi', 'karyawan_teknik']);
     }
 }

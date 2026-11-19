@@ -573,7 +573,7 @@ class TicketController extends Controller
      */
     public function rejectClosing(Request $request, Tiket $tiket): RedirectResponse|JsonResponse
     {
-        if (! $request->user()->can('ticket.verify_close') && ! $request->user()->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
+        if (! $request->user()->can('ticket.verify_close') && ! $request->user()->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo', 'helpdesk']) && ! $request->user()->isAtasan() && $request->user()->division !== 'Teknik') {
             abort(403, 'Anda tidak memiliki hak akses untuk menolak closing verifikasi.');
         }
 
