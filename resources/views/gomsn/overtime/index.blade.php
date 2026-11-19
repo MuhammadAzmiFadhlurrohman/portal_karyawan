@@ -419,13 +419,11 @@
                     box-sizing: border-box !important;
                     flex-shrink: 0 !important;
                     cursor: pointer !important;
+                    background-color: #cbd5e1 !important;
                     transition: background-color 0.25s ease-in-out !important;
                 }
                 .ios-switch-track.is-paid {
                     background-color: #22c55e !important;
-                }
-                .ios-switch-track.is-unpaid {
-                    background-color: #cbd5e1 !important;
                 }
                 .ios-switch-knob {
                     display: block !important;
@@ -444,9 +442,6 @@
                 }
                 .ios-switch-track.is-paid .ios-switch-knob {
                     transform: translateX(12px) !important;
-                }
-                .ios-switch-track.is-unpaid .ios-switch-knob {
-                    transform: translateX(0px) !important;
                 }
             </style>
 
@@ -588,8 +583,8 @@
                                                 class="group inline-flex items-center gap-1.5 py-0.5 px-0.5 rounded-full cursor-pointer select-none transition hover:opacity-90">
                                             
                                             <!-- iOS Style Toggle Switch (Compact & Pas Proporsinya) -->
-                                            <span class="ios-switch-track {{ $stat['is_paid'] ? 'is-paid' : 'is-unpaid' }}"
-                                                  :class="isPaid ? 'is-paid' : 'is-unpaid'">
+                                            <span class="ios-switch-track"
+                                                  :class="{ 'is-paid': isPaid }">
                                                 <span class="ios-switch-knob"></span>
                                             </span>
 
