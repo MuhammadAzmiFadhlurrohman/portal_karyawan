@@ -29,19 +29,14 @@ class OvertimeController extends Controller
         }
 
         return $user->can('gomsn.lembur.approve')
-            || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin', 'hrd']);
+            || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']);
     }
 
     /**
      * Display list of overtime requests (§8.2).
-     * For Atasan: Displays overtime submissions from employees of the same division that need approval.
-     * For regular employee: Displays their own overtime submissions.
-     */
-    /**
-     * Display list of overtime requests (§8.2).
      * For Atasan: Displays overtime submissions from employees of the same division.
-     * For HRD & Finance: Reviews & approves overtime that has been approved by atasan.
-     * For HRD: Can also create and view overtime for themselves.
+     * For HRD: Views overtime approved by atasan and can submit personal overtime.
+     * For Finance: Reviews & approves overtime that has been approved by atasan for payment.
      * For regular employee: Displays their own overtime submissions.
      */
     public function index(Request $request): View|\Symfony\Component\HttpFoundation\StreamedResponse
@@ -70,12 +65,13 @@ class OvertimeController extends Controller
             // Finance mengapprove / membayar pengajuan lembur yang sudah disetujui atasan
             $baseQuery->whereIn('status', ['approved_atasan', 'paid']);
         } elseif ($isHrd && ! $isSuperAdmin) {
-            // HRD mengapprove/melihat lembur karyawan, atau jika mode 'saya' menampilkan lembur miliknya sendiri
+            // HRD tidak melakukan approve, hanya memonitor lembur yang sudah disetujui atasan (atau lembur miliknya sendiri pada mode 'saya')
             if ($viewMode === 'saya') {
                 $baseQuery->where('user_id', $user->id);
             } else {
-                // Mode 'karyawan': khusus lembur seluruh staf / karyawan (tidak mencampur lembur milik HRD sendiri)
-                $baseQuery->where('user_id', '!=', $user->id);
+                // Mode 'karyawan': khusus melihat lembur seluruh staf yang sudah disetujui atasan
+                $baseQuery->where('user_id', '!=', $user->id)
+                    ->whereIn('status', ['approved_atasan', 'paid']);
             }
         } elseif ($isAtasan && ! $isSuperAdmin && ! $isFinance) {
             // Atasan HANYA melihat pengajuan lembur milik bawahan
@@ -114,8 +110,15 @@ class OvertimeController extends Controller
             $baseQuery->where('status', $request->input('status'));
         }
 
-        // Status pending yang relevan dengan peran pengguna
-        $pendingStatus = ($isFinance && ! $isSuperAdmin) ? 'approved_atasan' : 'pending';
+        // Status pending yang relevan dengan peran pengguna untuk aksi persetujuan/pembayaran
+        if ($isHrd && ! $isSuperAdmin && $viewMode !== 'saya') {
+            // HRD tidak melakukan approve lembur karyawan, jadi tidak ada antrean pending approval
+            $pendingStatus = null;
+        } elseif ($isFinance && ! $isSuperAdmin) {
+            $pendingStatus = 'approved_atasan';
+        } else {
+            $pendingStatus = 'pending';
+        }
 
         $bulanNames = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -124,7 +127,11 @@ class OvertimeController extends Controller
         ];
 
         // Cek semua pengajuan lembur yang belum diproses di seluruh scope
-        $allPendingLemburs = (clone $baseQuery)->where('status', $pendingStatus)->get(['id', 'tanggal', 'user_id', 'status']);
+        if ($pendingStatus) {
+            $allPendingLemburs = (clone $baseQuery)->where('status', $pendingStatus)->get(['id', 'tanggal', 'user_id', 'status']);
+        } else {
+            $allPendingLemburs = collect();
+        }
         
         $pendingPerMonth = $allPendingLemburs
             ->groupBy(fn ($item) => Carbon::parse($item->tanggal)->format('Y-n'))
@@ -154,7 +161,7 @@ class OvertimeController extends Controller
 
         // Filter Periode Bulan & Tahun (atau Semua yang Belum Diproses)
         if ($isFilterUnprocessed) {
-            $monthBaseQuery = (clone $baseQuery)->where('status', $pendingStatus);
+            $monthBaseQuery = $pendingStatus ? (clone $baseQuery)->where('status', $pendingStatus) : (clone $baseQuery);
         } else {
             $monthBaseQuery = (clone $baseQuery)
                 ->whereYear('tanggal', $selectedTahun)
@@ -173,12 +180,12 @@ class OvertimeController extends Controller
         if ($selectedUserId) {
             $userMonthQuery = (clone $monthBaseQuery)->where('user_id', $selectedUserId);
             $totalLemburCount = (clone $userMonthQuery)->count();
-            $menungguCount = (clone $userMonthQuery)->where('status', $pendingStatus)->count();
+            $menungguCount = $pendingStatus ? (clone $userMonthQuery)->where('status', $pendingStatus)->count() : 0;
             $disetujuiCount = (clone $userMonthQuery)->whereIn('status', ['approved_atasan', 'paid'])->count();
             $ditolakCount = (clone $userMonthQuery)->where('status', 'rejected')->count();
         } else {
             $totalLemburCount = (clone $monthBaseQuery)->count();
-            $menungguCount = (clone $monthBaseQuery)->where('status', $pendingStatus)->count();
+            $menungguCount = $pendingStatus ? (clone $monthBaseQuery)->where('status', $pendingStatus)->count() : 0;
             $disetujuiCount = (clone $monthBaseQuery)->whereIn('status', ['approved_atasan', 'paid'])->count();
             $ditolakCount = (clone $monthBaseQuery)->where('status', 'rejected')->count();
         }
@@ -199,13 +206,13 @@ class OvertimeController extends Controller
                     'total_days' => $items->pluck('tanggal')->map(fn ($d) => Carbon::parse($d)->toDateString())->unique()->count(),
                     'total_count' => $items->count(),
                     'total_nominal' => $totalNominal,
-                    'pending_count' => $items->where('status', $pendingStatus)->count(),
+                    'pending_count' => $pendingStatus ? $items->where('status', $pendingStatus)->count() : 0,
                     'approved_count' => $items->whereIn('status', ['approved_atasan', 'paid'])->count(),
                     'rejected_count' => $items->where('status', 'rejected')->count(),
                 ];
             }
 
-            // Prioritaskan urutan karyawan yang memiliki pengajuan menunggu persetujuan
+            // Prioritaskan urutan karyawan yang memiliki pengajuan menunggu persetujuan (jika relevan)
             usort($employeeStats, function ($a, $b) {
                 if ($b['pending_count'] === $a['pending_count']) {
                     return $b['total_count'] <=> $a['total_count'];
@@ -504,11 +511,16 @@ class OvertimeController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->can('gomsn.lembur.approve') && ! $user->hasRole(['super_admin', 'admin', 'hrd', 'atasan', 'atasan_teknik', 'atasan_noc', 'atasan_umum', 'manager_teknisi'])) {
+        // HRD tidak melakukan approve lembur karyawan (wewenang atasan langsung)
+        if ($user->hasRole('hrd') && ! $user->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'HRD tidak memiliki hak approval lembur karyawan. Persetujuan dilakukan oleh atasan langsung.');
+        }
+
+        if (! $user->can('gomsn.lembur.approve') && ! $user->hasRole(['super_admin', 'admin', 'atasan', 'atasan_teknik', 'atasan_noc', 'atasan_umum', 'manager_teknisi'])) {
             abort(403, 'Anda tidak memiliki hak otorisasi persetujuan lembur.');
         }
 
-        if (! $user->hasRole(['super_admin', 'admin', 'hrd'])) {
+        if (! $user->hasRole(['super_admin', 'admin'])) {
             $isSameDivision = $lembur->user && $lembur->user->division && $user->division && strtolower($lembur->user->division) === strtolower($user->division);
             $isDesignated = $lembur->atasan_id === $user->id;
 
@@ -534,11 +546,16 @@ class OvertimeController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->can('gomsn.lembur.approve') && ! $user->hasRole(['super_admin', 'admin', 'hrd', 'atasan', 'atasan_teknik', 'atasan_noc', 'atasan_umum', 'manager_teknisi'])) {
+        // HRD tidak melakukan reject lembur karyawan (wewenang atasan langsung)
+        if ($user->hasRole('hrd') && ! $user->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'HRD tidak memiliki hak penolakan lembur karyawan. Penolakan dilakukan oleh atasan langsung.');
+        }
+
+        if (! $user->can('gomsn.lembur.approve') && ! $user->hasRole(['super_admin', 'admin', 'atasan', 'atasan_teknik', 'atasan_noc', 'atasan_umum', 'manager_teknisi'])) {
             abort(403, 'Anda tidak memiliki hak otorisasi penolakan lembur.');
         }
 
-        if (! $user->hasRole(['super_admin', 'admin', 'hrd'])) {
+        if (! $user->hasRole(['super_admin', 'admin'])) {
             $isSameDivision = $lembur->user && $lembur->user->division && $user->division && strtolower($lembur->user->division) === strtolower($user->division);
             $isDesignated = $lembur->atasan_id === $user->id;
 

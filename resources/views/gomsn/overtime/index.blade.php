@@ -96,7 +96,7 @@
                             @if ($viewMode === 'saya')
                                 <span>Pengajuan Lembur Saya Sendiri</span>
                             @else
-                                <span>Manajemen &amp; Approval Lembur Karyawan</span>
+                                <span>Rekapitulasi Lembur Karyawan</span>
                             @endif
                         @elseif ($isAtasan)
                             <span>Persetujuan Lembur Karyawan</span>
@@ -111,7 +111,7 @@
                             @if ($viewMode === 'saya')
                                 Monitoring dan riwayat pengajuan lembur pribadi Anda serta status approval atasan &amp; pencairan.
                             @else
-                                Monitoring rekapitulasi pengajuan lembur seluruh divisi staf dan proses verifikasi akhir HRD.
+                                Monitoring rekapitulasi pengajuan lembur seluruh divisi staf yang telah disetujui atasan.
                             @endif
                         @else
                             Monitoring data jam lembur, verifikasi pekerjaan lapangan, dan transparansi perhitungan uang lembur.
@@ -162,7 +162,7 @@
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 tracking-wider uppercase mb-1.5 flex items-center justify-between">
                             <span>Periode</span>
-                            @if ($unprocessedPreviousCount > 0)
+                            @if ($unprocessedPreviousCount > 0 && ! $isHrd)
                                 <span class="text-[10px] text-amber-600 font-bold lowercase tracking-normal flex items-center gap-1 animate-pulse" title="Ada pengajuan tertunda di bulan sebelumnya">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                     {{ $unprocessedPreviousCount }} blm diproses
@@ -170,9 +170,11 @@
                             @endif
                         </label>
                         <select name="bulan" onchange="this.form.submit()" class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 font-medium text-slate-800 shadow-xs cursor-pointer">
+                            @if (! $isHrd && $unprocessedTotalCount > 0)
                             <option value="unprocessed" {{ $isFilterUnprocessed ? 'selected' : '' }}>
-                                🚨 Semua Belum Diproses @if ($unprocessedTotalCount > 0) ({{ $unprocessedTotalCount }} Pengajuan) @endif
+                                🚨 Semua Belum Diproses ({{ $unprocessedTotalCount }} Pengajuan)
                             </option>
+                            @endif
                             <optgroup label="Bulan di Tahun {{ $selectedTahun }}">
                                 @foreach ($bulanNames as $mNum => $mName)
                                     @php
@@ -180,11 +182,11 @@
                                         $pCount = $pendingPerMonth[$key] ?? ($pendingPerMonth instanceof \Illuminate\Support\Collection ? $pendingPerMonth->get($key, 0) : 0);
                                     @endphp
                                     <option value="{{ $mNum }}" {{ (! $isFilterUnprocessed && $selectedBulan == $mNum) ? 'selected' : '' }}>
-                                        {{ $mName }} {{ $selectedTahun }} @if ($pCount > 0) (⚠️ {{ $pCount }} belum diproses) @endif
+                                        {{ $mName }} {{ $selectedTahun }} @if ($pCount > 0 && ! $isHrd) (⚠️ {{ $pCount }} belum diproses) @endif
                                     </option>
                                 @endforeach
                             </optgroup>
-                            @if (! empty($previousMonthsWithPending))
+                            @if (! empty($previousMonthsWithPending) && ! $isHrd)
                                 @php
                                     $outsideYearMonths = array_filter($previousMonthsWithPending, fn($pm) => $pm['year'] != $selectedTahun);
                                 @endphp
@@ -266,13 +268,13 @@
                 </div>
             </form>
 
-            <!-- Mode Switcher Khusus HRD (Approval Karyawan vs Lembur Saya Sendiri) -->
+            <!-- Mode Switcher Khusus HRD (Rekapitulasi Karyawan vs Lembur Saya Sendiri) -->
             @if ($isHrd)
             <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
                 <div class="inline-flex items-center p-1 bg-slate-100/80 rounded-xl text-xs font-semibold">
                     <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'karyawan', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun]) }}" 
                        class="px-3.5 py-1.5 rounded-lg transition {{ $viewMode !== 'saya' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
-                        Approval Lembur Karyawan (Disetujui Atasan)
+                        Lembur Karyawan (Disetujui Atasan)
                     </a>
                     <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'saya', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun]) }}" 
                        class="px-3.5 py-1.5 rounded-lg transition {{ $viewMode === 'saya' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
@@ -280,13 +282,13 @@
                     </a>
                 </div>
                 <div class="text-[11px] text-slate-500">
-                    Role HRD memiliki wewenang approval lembur karyawan &amp; pengajuan mandiri.
+                    Role HRD memonitor rekapitulasi lembur karyawan yang telah disetujui atasan &amp; pengajuan mandiri.
                 </div>
             </div>
             @endif
 
-            <!-- Notifikasi & Shortcut jika ada Lembur Bulan Sebelumnya yang Belum Diproses -->
-            @if ($unprocessedPreviousCount > 0 && ! $isFilterUnprocessed)
+            <!-- Notifikasi & Shortcut jika ada Lembur Bulan Sebelumnya yang Belum Diproses (Khusus Atasan / Admin / Finance yang perlu memproses) -->
+            @if ($unprocessedPreviousCount > 0 && ! $isFilterUnprocessed && ! $isHrd)
             <div class="mt-4 pt-3.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50/90 border border-amber-200/90 rounded-xl p-3 text-xs">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <span class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
@@ -330,8 +332,8 @@
                 </span>
             </div>
 
-            <!-- Card Alert Summary di Atas Grid Jika Ada Lembur yang Perlu Disetujui -->
-            @if ($menungguCount > 0)
+            <!-- Card Alert Summary di Atas Grid Jika Ada Lembur yang Perlu Disetujui (Atasan / Finance / Admin) -->
+            @if ($menungguCount > 0 && ! $isHrd)
             <div class="py-2.5 px-3.5 sm:px-4 rounded-2xl border border-amber-300/80 bg-gradient-to-r from-amber-50 via-orange-50/40 to-amber-50 flex items-center justify-between gap-3 shadow-2xs">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
@@ -486,7 +488,7 @@
                                     </svg>
                                     {{ $isFilterUnprocessed ? 'Semua Periode' : ($bulanNames[$selectedBulan] ?? 'November') . ' ' . $selectedTahun }}
                                 </span>
-                                @if ($stat['pending_count'] > 0)
+                                @if ($stat['pending_count'] > 0 && ! $isHrd)
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black text-amber-900 bg-amber-100 border border-amber-300 shadow-2xs shrink-0 animate-pulse">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                         {{ $stat['pending_count'] }} Menunggu
@@ -553,7 +555,7 @@
                             </div>
 
                             <!-- Tombol Detail / Setujui -->
-                            @if ($stat['pending_count'] > 0)
+                            @if ($stat['pending_count'] > 0 && ! $isHrd)
                             <a href="{{ route('gomsn.overtime.index', ['bulan' => $isFilterUnprocessed ? 'unprocessed' : $selectedBulan, 'tahun' => $selectedTahun, 'user_id' => $cardUser->id, 'view_mode' => $viewMode]) }}"
                                class="px-2.5 py-1.5 rounded-full text-white text-[10.5px] font-extrabold shadow-xs hover:opacity-95 transition-all transform active:scale-95 shrink-0 whitespace-nowrap flex items-center gap-1"
                                style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%) !important;">
@@ -747,8 +749,8 @@
                                     </button>
                                 @endif
 
-                                <!-- HRD / Atasan Approval Button -->
-                                @if (($isHrd || $isSuperAdmin || $isAtasan) && $item->status === 'pending' && $item->user_id !== auth()->id())
+                                <!-- Atasan Approval Button (HRD tidak melakukan approve) -->
+                                @if (($isSuperAdmin || $isAtasan) && ! $isHrd && $item->status === 'pending' && $item->user_id !== auth()->id())
                                     <form method="POST" action="{{ route('gomsn.overtime.approve', $item->id) }}" class="inline">
                                         @csrf
                                         <button type="submit" 
@@ -867,8 +869,8 @@
                                             </button>
                                         @endif
 
-                                        <!-- HRD / Atasan Approval Button -->
-                                        @if (($isHrd || $isSuperAdmin || $isAtasan) && $item->status === 'pending' && $item->user_id !== auth()->id())
+                                        <!-- Atasan Approval Button (HRD tidak melakukan approve) -->
+                                        @if (($isSuperAdmin || $isAtasan) && ! $isHrd && $item->status === 'pending' && $item->user_id !== auth()->id())
                                             <form method="POST" action="{{ route('gomsn.overtime.approve', $item->id) }}" class="inline">
                                                 @csrf
                                                 <button type="submit" 

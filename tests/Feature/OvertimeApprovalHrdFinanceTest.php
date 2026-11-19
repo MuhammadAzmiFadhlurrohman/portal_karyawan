@@ -122,5 +122,49 @@ class OvertimeApprovalHrdFinanceTest extends TestCase
         $this->assertEquals('TRF-BCA-987654', $lembur->payment_reference);
         $this->assertEquals($finance->id, $lembur->paid_by);
     }
+
+    public function test_hrd_cannot_approve_employee_overtime_and_only_views_approved_overtime(): void
+    {
+        $hrd = User::factory()->create(['division' => 'HRD']);
+        $hrd->assignRole('hrd');
+
+        $karyawan = User::factory()->create(['division' => 'Teknik']);
+        $karyawan->assignRole('karyawan');
+
+        // Lembur status pending (belum disetujui atasan)
+        $lemburPending = Lembur::create([
+            'nomor_lembur' => 'LBR-PENDING-001',
+            'user_id' => $karyawan->id,
+            'tanggal' => Carbon::now()->toDateString(),
+            'jam_mulai' => Carbon::now()->setTime(17, 0),
+            'jam_selesai' => Carbon::now()->setTime(19, 0),
+            'durasi_menit' => 120,
+            'alasan' => 'Tugas pending',
+            'status' => 'pending',
+        ]);
+
+        // Lembur status approved_atasan
+        $lemburApproved = Lembur::create([
+            'nomor_lembur' => 'LBR-APPROVED-002',
+            'user_id' => $karyawan->id,
+            'tanggal' => Carbon::now()->toDateString(),
+            'jam_mulai' => Carbon::now()->setTime(17, 0),
+            'jam_selesai' => Carbon::now()->setTime(20, 0),
+            'durasi_menit' => 180,
+            'alasan' => 'Tugas approved atasan',
+            'status' => 'approved_atasan',
+        ]);
+
+        // HRD mengakses index: tidak boleh melihat lembur pending, hanya lembur approved
+        $responseHrd = $this->actingAs($hrd)->get(route('gomsn.overtime.index'));
+        $responseHrd->assertStatus(200);
+        $responseHrd->assertDontSee('Terdapat 1 pengajuan lembur yang perlu disetujui');
+        $responseHrd->assertDontSee('Setujui (1)');
+        $responseHrd->assertDontSee('blm diproses');
+
+        // HRD mencoba approve lembur pending: harus 403 Forbidden
+        $responseApprove = $this->actingAs($hrd)->post(route('gomsn.overtime.approve', $lemburPending->id));
+        $responseApprove->assertStatus(403);
+    }
 }
 
