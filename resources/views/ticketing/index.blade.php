@@ -74,194 +74,196 @@
         </div>
     @endif
 
-    <!-- KPI Metric Stats Cards: 6 Cards (Total, Open, Proses, Close, > SLA, <= SLA) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2.5 sm:gap-3.5">
-        <!-- 1. TOTAL -->
-        <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-3.5 sm:p-4 flex flex-col justify-between">
-            <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #2563eb;"></div>
-            <!-- Watermark -->
-            <div class="absolute -bottom-2 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #2563eb;">
-                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center justify-between relative z-10">
-                <span class="text-[11px] font-extrabold tracking-wider text-slate-500 uppercase">TOTAL</span>
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
-                     style="background-color: #eff6ff; border-color: #dbeafe; color: #2563eb;">
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
-                        <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+    <!-- KPI Metric Stats Cards: 6 Cards in 1 Baris (Total, Open, Proses, Close, > SLA, <= SLA) -->
+    <div class="overflow-x-auto pb-1 -mx-2 px-2 sm:mx-0 sm:px-0" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <div class="grid grid-cols-6 gap-2 sm:gap-2.5 min-w-[700px] lg:min-w-0">
+            <!-- 1. TOTAL -->
+            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #2563eb;"></div>
+                <!-- Watermark -->
+                <div class="absolute -bottom-1 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #2563eb;">
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                     </svg>
                 </div>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-2 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-2xl sm:text-[28px] font-black text-slate-900 tracking-tight leading-none">
-                        {{ number_format($stats['total'] ?? 0) }}
-                    </span>
-                    <span class="text-xs font-semibold text-slate-400 ml-1.5">tiket</span>
+                <!-- Top Row -->
+                <div class="flex items-center justify-between relative z-10">
+                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider text-slate-500 uppercase">TOTAL</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
+                         style="background-color: #eff6ff; border-color: #dbeafe; color: #2563eb;">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/>
+                            <path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
                 </div>
-                <p class="text-[11px] font-medium text-slate-400 mt-1 truncate">Keseluruhan</p>
+                <!-- Value & Label -->
+                <div class="mt-1.5 relative z-10">
+                    <div class="flex items-baseline">
+                        <span class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                            {{ number_format($stats['total'] ?? 0) }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-slate-400 ml-1">tiket</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Keseluruhan</p>
+                </div>
             </div>
-        </div>
 
-        <!-- 2. OPEN -->
-        <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-3.5 sm:p-4 flex flex-col justify-between">
-            <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #ef4444;"></div>
-            <!-- Watermark -->
-            <div class="absolute -bottom-2 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #ef4444;">
-                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="9"/>
-                    <path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center justify-between relative z-10">
-                <span class="text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">OPEN</span>
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
-                     style="background-color: #fef2f2; border-color: #fee2e2; color: #ef4444;">
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            <!-- 2. OPEN -->
+            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #ef4444;"></div>
+                <!-- Watermark -->
+                <div class="absolute -bottom-1 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #ef4444;">
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9"/>
+                        <path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
                     </svg>
                 </div>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-2 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-2xl sm:text-[28px] font-black tracking-tight leading-none" style="color: #dc2626;">
-                        {{ number_format($stats['open'] ?? 0) }}
-                    </span>
-                    <span class="text-xs font-semibold text-rose-400 ml-1.5">tiket</span>
+                <!-- Top Row -->
+                <div class="flex items-center justify-between relative z-10">
+                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">OPEN</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
+                         style="background-color: #fef2f2; border-color: #fee2e2; color: #ef4444;">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
                 </div>
-                <p class="text-[11px] font-medium text-rose-600/75 mt-1 truncate">Belum ditangani</p>
+                <!-- Value & Label -->
+                <div class="mt-1.5 relative z-10">
+                    <div class="flex items-baseline">
+                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
+                            {{ number_format($stats['open'] ?? 0) }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-rose-400 ml-1">tiket</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate">Belum ditangani</p>
+                </div>
             </div>
-        </div>
 
-        <!-- 3. PROSES -->
-        <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-3.5 sm:p-4 flex flex-col justify-between">
-            <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #f59e0b;"></div>
-            <!-- Watermark -->
-            <div class="absolute -bottom-2 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #f59e0b;">
-                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center justify-between relative z-10">
-                <span class="text-[11px] font-extrabold tracking-wider uppercase" style="color: #d97706;">PROSES</span>
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
-                     style="background-color: #fffbeb; border-color: #fef3c7; color: #f59e0b;">
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <!-- 3. PROSES -->
+            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #f59e0b;"></div>
+                <!-- Watermark -->
+                <div class="absolute -bottom-1 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #f59e0b;">
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
                 </div>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-2 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-2xl sm:text-[28px] font-black tracking-tight leading-none" style="color: #d97706;">
-                        {{ number_format($stats['proses'] ?? 0) }}
-                    </span>
-                    <span class="text-xs font-semibold text-amber-500/80 ml-1.5">tiket</span>
+                <!-- Top Row -->
+                <div class="flex items-center justify-between relative z-10">
+                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #d97706;">PROSES</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
+                         style="background-color: #fffbeb; border-color: #fef3c7; color: #f59e0b;">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
                 </div>
-                <p class="text-[11px] font-medium text-amber-700/75 mt-1 truncate">Sedang perbaikan</p>
+                <!-- Value & Label -->
+                <div class="mt-1.5 relative z-10">
+                    <div class="flex items-baseline">
+                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #d97706;">
+                            {{ number_format($stats['proses'] ?? 0) }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-amber-500/80 ml-1">tiket</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-medium text-amber-700/75 mt-0.5 truncate">Sedang perbaikan</p>
+                </div>
             </div>
-        </div>
 
-        <!-- 4. CLOSE -->
-        <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-3.5 sm:p-4 flex flex-col justify-between">
-            <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #10b981;"></div>
-            <!-- Watermark -->
-            <div class="absolute -bottom-2 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #10b981;">
-                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center justify-between relative z-10">
-                <span class="text-[11px] font-extrabold tracking-wider uppercase" style="color: #059669;">CLOSE</span>
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
-                     style="background-color: #f0fdf4; border-color: #dcfce7; color: #10b981;">
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            <!-- 4. CLOSE -->
+            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #10b981;"></div>
+                <!-- Watermark -->
+                <div class="absolute -bottom-1 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #10b981;">
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-2 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-2xl sm:text-[28px] font-black tracking-tight leading-none" style="color: #059669;">
-                        {{ number_format($stats['close'] ?? ($stats['selesai'] ?? 0)) }}
-                    </span>
-                    <span class="text-xs font-semibold text-emerald-500/80 ml-1.5">tiket</span>
+                <!-- Top Row -->
+                <div class="flex items-center justify-between relative z-10">
+                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #059669;">CLOSE</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
+                         style="background-color: #f0fdf4; border-color: #dcfce7; color: #10b981;">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
                 </div>
-                <p class="text-[11px] font-medium text-emerald-700/75 mt-1 truncate">Selesai &amp; normal</p>
+                <!-- Value & Label -->
+                <div class="mt-1.5 relative z-10">
+                    <div class="flex items-baseline">
+                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #059669;">
+                            {{ number_format($stats['close'] ?? ($stats['selesai'] ?? 0)) }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-emerald-500/80 ml-1">tiket</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-medium text-emerald-700/75 mt-0.5 truncate">Selesai &amp; normal</p>
+                </div>
             </div>
-        </div>
 
-        <!-- 5. > SLA -->
-        <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-3.5 sm:p-4 flex flex-col justify-between">
-            <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #ef4444;"></div>
-            <!-- Watermark -->
-            <div class="absolute -bottom-2 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #ef4444;">
-                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <circle cx="12" cy="13" r="8"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M10 2h4M12 2v3"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center justify-between relative z-10">
-                <span class="text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">&gt; SLA</span>
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
-                     style="background-color: #fef2f2; border-color: #fee2e2; color: #ef4444;">
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            <!-- 5. > SLA -->
+            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #ef4444;"></div>
+                <!-- Watermark -->
+                <div class="absolute -bottom-1 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #ef4444;">
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <circle cx="12" cy="13" r="8"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M10 2h4M12 2v3"/>
                     </svg>
                 </div>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-2 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-2xl sm:text-[28px] font-black tracking-tight leading-none" style="color: #dc2626;">
-                        {{ number_format($stats['sla_lebih'] ?? 0) }}
-                    </span>
-                    <span class="text-xs font-semibold text-rose-400 ml-1.5">tiket</span>
+                <!-- Top Row -->
+                <div class="flex items-center justify-between relative z-10">
+                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">&gt; SLA</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
+                         style="background-color: #fef2f2; border-color: #fee2e2; color: #ef4444;">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
                 </div>
-                <p class="text-[11px] font-medium text-rose-600/75 mt-1 truncate">&gt; Target SLA</p>
+                <!-- Value & Label -->
+                <div class="mt-1.5 relative z-10">
+                    <div class="flex items-baseline">
+                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
+                            {{ number_format($stats['sla_lebih'] ?? 0) }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-rose-400 ml-1">tiket</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate">&gt; Target SLA</p>
+                </div>
             </div>
-        </div>
 
-        <!-- 6. <= SLA -->
-        <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-3.5 sm:p-4 flex flex-col justify-between">
-            <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #0d9488;"></div>
-            <!-- Watermark -->
-            <div class="absolute -bottom-2 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #0d9488;">
-                <svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center justify-between relative z-10">
-                <span class="text-[11px] font-extrabold tracking-wider uppercase" style="color: #0f766e;">&le; SLA</span>
-                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
-                     style="background-color: #f0fdfa; border-color: #ccfbf1; color: #0d9488;">
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <!-- 6. <= SLA -->
+            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #0d9488;"></div>
+                <!-- Watermark -->
+                <div class="absolute -bottom-1 -right-1 pointer-events-none opacity-[0.06] group-hover:opacity-[0.10] transition-opacity" style="color: #0d9488;">
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                     </svg>
                 </div>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-2 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-2xl sm:text-[28px] font-black tracking-tight leading-none" style="color: #0f766e;">
-                        {{ number_format($stats['sla_tepat'] ?? 0) }}
-                    </span>
-                    <span class="text-xs font-semibold text-teal-500/80 ml-1.5">tiket</span>
+                <!-- Top Row -->
+                <div class="flex items-center justify-between relative z-10">
+                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #0f766e;">&le; SLA</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center border shadow-2xs shrink-0"
+                         style="background-color: #f0fdfa; border-color: #ccfbf1; color: #0d9488;">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
                 </div>
-                <p class="text-[11px] font-medium text-teal-700/75 mt-1 truncate">&le; Target SLA</p>
+                <!-- Value & Label -->
+                <div class="mt-1.5 relative z-10">
+                    <div class="flex items-baseline">
+                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #0f766e;">
+                            {{ number_format($stats['sla_tepat'] ?? 0) }}
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-teal-500/80 ml-1">tiket</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] font-medium text-teal-700/75 mt-0.5 truncate">&le; Target SLA</p>
+                </div>
             </div>
         </div>
     </div>
