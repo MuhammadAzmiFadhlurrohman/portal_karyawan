@@ -403,6 +403,51 @@
                         max-height: 155px !important;
                     }
                 }
+                /* iOS Style Toggle Switch (Pasti Terlihat & Tidak Akan Collapsed) */
+                .ios-switch-track {
+                    position: relative !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    width: 44px !important;
+                    min-width: 44px !important;
+                    max-width: 44px !important;
+                    height: 24px !important;
+                    min-height: 24px !important;
+                    max-height: 24px !important;
+                    border-radius: 9999px !important;
+                    padding: 2px !important;
+                    box-sizing: border-box !important;
+                    flex-shrink: 0 !important;
+                    cursor: pointer !important;
+                    transition: background-color 0.25s ease-in-out !important;
+                }
+                .ios-switch-track.is-paid {
+                    background-color: #22c55e !important;
+                }
+                .ios-switch-track.is-unpaid {
+                    background-color: #cbd5e1 !important;
+                }
+                .ios-switch-knob {
+                    display: block !important;
+                    width: 20px !important;
+                    min-width: 20px !important;
+                    max-width: 20px !important;
+                    height: 20px !important;
+                    min-height: 20px !important;
+                    max-height: 20px !important;
+                    border-radius: 9999px !important;
+                    background-color: #ffffff !important;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+                    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    pointer-events: none !important;
+                    transform: translateX(0px) !important;
+                }
+                .ios-switch-track.is-paid .ios-switch-knob {
+                    transform: translateX(20px) !important;
+                }
+                .ios-switch-track.is-unpaid .ios-switch-knob {
+                    transform: translateX(0px) !important;
+                }
             </style>
 
             <!-- Grid Kartu Karyawan (3 Kolom Sempurna) -->
@@ -542,17 +587,14 @@
                                                 :title="isPaid ? 'Status: Dibayar. Klik untuk ubah ke Belum.' : 'Status: Belum. Klik untuk ubah ke Dibayar.'"
                                                 class="group inline-flex items-center gap-2 py-0.5 px-1 rounded-full cursor-pointer select-none transition hover:opacity-90">
                                             
-                                            <!-- iOS Style Toggle Switch (Persis Gambar) -->
-                                            <span class="relative inline-flex shrink-0 rounded-full transition-colors duration-250 ease-in-out p-0.5"
-                                                  style="width: 38px; height: 22px; min-width: 38px; border-radius: 9999px;"
-                                                  :style="isPaid ? 'background-color: #22c55e;' : 'background-color: #cbd5e1;'">
-                                                <span class="pointer-events-none inline-block rounded-full bg-white transition-transform duration-250 ease-in-out"
-                                                      style="width: 18px; height: 18px; border-radius: 9999px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
-                                                      :style="isPaid ? 'transform: translateX(16px);' : 'transform: translateX(0px);'"></span>
+                                            <!-- iOS Style Toggle Switch (Pasti Muncul Ukuran Penuh Sesuai Gambar) -->
+                                            <span class="ios-switch-track {{ $stat['is_paid'] ? 'is-paid' : 'is-unpaid' }}"
+                                                  :class="isPaid ? 'is-paid' : 'is-unpaid'">
+                                                <span class="ios-switch-knob"></span>
                                             </span>
 
                                             <!-- Label Status: Belum vs Dibayar -->
-                                            <span class="text-xs font-bold leading-none tracking-tight"
+                                            <span class="text-xs font-bold leading-none tracking-tight select-none"
                                                   :class="isPaid ? 'text-emerald-600 font-extrabold' : 'text-slate-500'"
                                                   x-text="isPaid ? 'Dibayar' : 'Belum'">
                                                 {{ $stat['is_paid'] ? 'Dibayar' : 'Belum' }}
