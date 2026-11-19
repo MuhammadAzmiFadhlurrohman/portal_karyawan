@@ -190,15 +190,19 @@ class AttendanceController extends Controller
             if ($att) {
                 if ($att->status === 'absent') {
                     $status = 'absent';
-                } elseif (in_array($att->status, ['leave', 'cuti', 'izin', 'sakit'], true)) {
-                    $status = 'leave';
+                } elseif (in_array($att->status, ['sick', 'sakit'], true) || str_contains(strtolower($att->notes ?? ''), 'sick') || str_contains(strtolower($att->notes ?? ''), 'sakit')) {
+                    $status = 'sick';
+                } elseif (in_array($att->status, ['izin', 'special'], true) || str_contains(strtolower($att->notes ?? ''), 'izin') || str_contains(strtolower($att->notes ?? ''), 'special')) {
+                    $status = 'izin';
+                } elseif (in_array($att->status, ['leave', 'cuti'], true)) {
+                    $status = $leave && $leave->leave_type === 'sick' ? 'sick' : ($leave && $leave->leave_type === 'special' ? 'izin' : 'leave');
                 } elseif ($att->status === 'late' || $lateMinutes > 0) {
                     $status = 'late';
                 } else {
                     $status = 'present';
                 }
             } elseif ($leave) {
-                $status = 'leave';
+                $status = $leave->leave_type === 'sick' ? 'sick' : ($leave->leave_type === 'special' ? 'izin' : 'leave');
             } elseif ($isScheduledHoliday || $isCalendarHoliday) {
                 $status = 'holiday';
             } elseif (! $isFuture) {
@@ -250,7 +254,11 @@ class AttendanceController extends Controller
                 'late_minutes' => $lateMinutes,
                 'alpa_index' => $alpaIndex,
                 'deduction_amount' => $deductionAmount,
-                'notes' => $att?->notes ?? ($leave ? "Cuti / Izin ({$leave->leave_type})" : ($holiday?->name ?? null)),
+                'notes' => $att?->notes ?? ($leave ? match ($leave->leave_type) {
+                    'sick' => 'Sakit: ' . $leave->reason,
+                    'annual' => 'Cuti Tahunan: ' . $leave->reason,
+                    default => 'Izin: ' . $leave->reason,
+                } : ($holiday?->name ?? null)),
                 'shift_name' => $shiftObj?->name ?? ($status === 'holiday' ? 'Libur' : 'Shift Pagi'),
                 'shift_hours' => $status === 'holiday' ? '-' : "{$shiftStart} - {$shiftEnd}",
                 'shift_label' => $shiftLabel,

@@ -279,7 +279,9 @@
                         $isAbsent = $row['status'] === 'absent';
                         $isPresent = $row['status'] === 'present';
                         $isLate = $row['status'] === 'late';
-                        $isLeave = $row['status'] === 'leave';
+                        $isSick = in_array($row['status'], ['sick', 'sakit']) || str_contains(strtolower($row['notes'] ?? ''), 'sakit') || str_contains(strtolower($row['notes'] ?? ''), 'sick');
+                        $isIzin = in_array($row['status'], ['izin', 'special']) || str_contains(strtolower($row['notes'] ?? ''), 'izin');
+                        $isLeave = in_array($row['status'], ['leave', 'cuti']) && ! $isSick && ! $isIzin;
                     @endphp
                     <div class="transition-colors" :class="openDay === {{ $row['day'] }} ? 'bg-slate-50/40' : 'bg-white'">
                         <!-- Summary Row (Tap to Toggle Dropdown) -->
@@ -309,8 +311,12 @@
                                     </div>
                                 @elseif ($isLibur)
                                     <span class="text-xs italic text-slate-400">Libur</span>
+                                @elseif ($isSick)
+                                    <span class="text-xs italic text-amber-600">{{ $row['notes'] ?? 'Sakit' }}</span>
+                                @elseif ($isIzin)
+                                    <span class="text-xs italic text-indigo-600">{{ $row['notes'] ?? 'Izin' }}</span>
                                 @elseif ($isLeave)
-                                    <span class="text-xs italic text-sky-600">{{ $row['notes'] ?? 'Cuti / Izin' }}</span>
+                                    <span class="text-xs italic text-teal-600">{{ $row['notes'] ?? 'Cuti' }}</span>
                                 @elseif ($row['is_future'])
                                     <span class="text-xs italic text-slate-400">Belum berlangsung</span>
                                 @else
@@ -341,9 +347,17 @@
                                         </svg>
                                         <span>Terlambat</span>
                                     </span>
+                                @elseif ($isSick)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80">
+                                        <span>Sakit</span>
+                                    </span>
+                                @elseif ($isIzin)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
+                                        <span>Izin</span>
+                                    </span>
                                 @elseif ($isLeave)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200/80">
-                                        <span>Cuti/Izin</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200/80">
+                                        <span>Cuti</span>
                                     </span>
                                 @elseif ($isAbsent)
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200/60">
@@ -482,7 +496,9 @@
                                 $isAbsent = $row['status'] === 'absent';
                                 $isPresent = $row['status'] === 'present';
                                 $isLate = $row['status'] === 'late';
-                                $isLeave = $row['status'] === 'leave';
+                                $isSick = in_array($row['status'], ['sick', 'sakit']) || str_contains(strtolower($row['notes'] ?? ''), 'sakit') || str_contains(strtolower($row['notes'] ?? ''), 'sick');
+                                $isIzin = in_array($row['status'], ['izin', 'special']) || str_contains(strtolower($row['notes'] ?? ''), 'izin');
+                                $isLeave = in_array($row['status'], ['leave', 'cuti']) && ! $isSick && ! $isIzin;
                             @endphp
                             <tr class="hover:bg-slate-50/60 transition {{ $isLibur ? 'bg-slate-50/30' : '' }}">
                                 <td class="py-3.5 px-5 whitespace-nowrap">
@@ -573,9 +589,17 @@
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                 Terlambat
                                             </span>
+                                        @elseif ($isSick)
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                Sakit
+                                            </span>
+                                        @elseif ($isIzin)
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                Izin
+                                            </span>
                                         @elseif ($isLeave)
-                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                                                Cuti / Izin
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                                Cuti
                                             </span>
                                         @elseif ($isAbsent)
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">

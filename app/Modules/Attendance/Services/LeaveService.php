@@ -328,9 +328,15 @@ class LeaveService
                 'supervisor_approved_at' => $leave->supervisor_approved_at ?? now(),
             ]);
 
-            // Mark attendance records for those dates as `leave`
+            // Mark attendance records for those dates with appropriate status
             $cursor = $leave->start_date->copy()->startOfDay();
             $endDay = $leave->end_date->copy()->startOfDay();
+            $attStatus = $leave->leave_type === 'sick' ? 'sick' : ($leave->leave_type === 'annual' ? 'cuti' : 'leave');
+            $notePrefix = match ($leave->leave_type) {
+                'sick' => 'Sakit',
+                'annual' => 'Cuti Tahunan',
+                default => 'Izin Khusus',
+            };
             while ($cursor->lte($endDay)) {
                 $dtStr = $cursor->toDateString();
                 $existingAtt = Attendance::query()
@@ -340,16 +346,16 @@ class LeaveService
 
                 if ($existingAtt) {
                     $existingAtt->update([
-                        'status' => 'leave',
-                        'notes' => "Cuti ({$leave->leave_type}): {$leave->reason}",
+                        'status' => $attStatus,
+                        'notes' => "{$notePrefix}: {$leave->reason}",
                     ]);
                 } else {
                     Attendance::query()->create([
                         'user_id' => $employee->id,
                         'date' => $dtStr,
-                        'status' => 'leave',
+                        'status' => $attStatus,
                         'source' => 'manual',
-                        'notes' => "Cuti ({$leave->leave_type}): {$leave->reason}",
+                        'notes' => "{$notePrefix}: {$leave->reason}",
                     ]);
                 }
                 $cursor->addDay();
@@ -399,7 +405,7 @@ class LeaveService
             if ($wasApproved) {
                 Attendance::query()
                     ->where('user_id', $leave->user_id)
-                    ->where('status', 'leave')
+                    ->whereIn('status', ['leave', 'sick', 'cuti', 'izin', 'special'])
                     ->whereDate('date', '>=', $leave->start_date->toDateString())
                     ->whereDate('date', '<=', $leave->end_date->toDateString())
                     ->forceDelete();

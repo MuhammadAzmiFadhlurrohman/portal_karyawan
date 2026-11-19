@@ -273,8 +273,31 @@ class EmployeeAttendanceRecapController extends Controller
             $lateText = null;
             $potonganBadge = null;
 
+            // Check if there is an approved leave on this date
+            $matchingLeave = $leaves->first(function ($l) use ($cDate) {
+                return $cDate->betweenIncluded(
+                    Carbon::parse($l->start_date)->startOfDay(),
+                    Carbon::parse($l->end_date)->startOfDay()
+                );
+            });
+
             if ($att) {
                 $status = $att->status; // present, late, alpa, leave, etc.
+                if (in_array(strtolower($status), ['leave', 'cuti', 'izin', 'sakit', 'sick', 'special'])) {
+                    if ($matchingLeave) {
+                        $status = match ($matchingLeave->leave_type) {
+                            'sick' => 'sakit',
+                            'annual' => 'cuti',
+                            default => 'izin',
+                        };
+                    } elseif (str_contains(strtolower($att->notes ?? ''), 'sick') || str_contains(strtolower($att->notes ?? ''), 'sakit') || in_array(strtolower($status), ['sick', 'sakit'])) {
+                        $status = 'sakit';
+                    } elseif (str_contains(strtolower($att->notes ?? ''), 'special') || str_contains(strtolower($att->notes ?? ''), 'izin') || in_array(strtolower($status), ['izin', 'special'])) {
+                        $status = 'izin';
+                    } else {
+                        $status = 'cuti';
+                    }
+                }
                 if ($att->clock_in_at) {
                     $clockIn = $att->clock_in_at->timezone('Asia/Jakarta')->format('H:i:s');
                 }
@@ -287,6 +310,12 @@ class EmployeeAttendanceRecapController extends Controller
                     $lateText = $hours > 0 ? "{$hours} jam {$mins} menit" : "{$mins} menit";
                 }
                 $photoPath = $att->photo_in_primary_path ?: $att->photo_out_path;
+            } elseif ($matchingLeave) {
+                $status = match ($matchingLeave->leave_type) {
+                    'sick' => 'sakit',
+                    'annual' => 'cuti',
+                    default => 'izin',
+                };
             } elseif ($isSunday) {
                 $status = 'Libur';
             } elseif ($cDate->isPast() && ! $isSunday) {

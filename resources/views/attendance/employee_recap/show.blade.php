@@ -212,6 +212,15 @@
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 font-semibold border border-rose-200/50">
                     <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Alpa
                 </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 font-semibold border border-amber-200/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Sakit
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 font-semibold border border-teal-200/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Cuti
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 font-semibold border border-indigo-200/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Izin
+                </span>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-semibold border border-slate-200/60">
                     <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Libur
                 </span>
@@ -240,10 +249,13 @@
                             $isRowAlpa = in_array($statusLower, ['alpa']);
                             $isRowLate = in_array($statusLower, ['late', 'terlambat']);
                             $isRowHadir = in_array($statusLower, ['present', 'hadir']);
+                            $isRowSakit = in_array($statusLower, ['sakit', 'sick']) || str_contains($statusLower, 'sakit') || str_contains($statusLower, 'sick');
+                            $isRowCuti = in_array($statusLower, ['cuti', 'annual', 'leave']) || str_contains($statusLower, 'cuti') || str_contains($statusLower, 'tahunan');
+                            $isRowIzin = in_array($statusLower, ['izin', 'special']) || str_contains($statusLower, 'izin');
                             $isWeekend = in_array(strtolower($row['day_name']), ['minggu', 'sabtu', 'sunday', 'saturday']);
                             $isSunday = in_array(strtolower($row['day_name']), ['minggu', 'sunday']);
                         @endphp
-                        <tr class="transition-colors hover:bg-slate-50/80 {{ $isRowLibur ? 'bg-slate-50/30' : ($isRowAlpa ? 'bg-rose-50/20' : '') }}">
+                        <tr class="transition-colors hover:bg-slate-50/80 {{ $isRowLibur ? 'bg-slate-50/30' : ($isRowAlpa ? 'bg-rose-50/20' : ($isRowSakit ? 'bg-amber-50/20' : '')) }}">
                             <!-- Tanggal & Hari -->
                             <td class="py-3 px-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2.5">
@@ -340,6 +352,21 @@
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                         Terlambat
                                     </span>
+                                @elseif ($isRowSakit)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-bold border border-amber-200/70 shadow-2xs">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Sakit
+                                    </span>
+                                @elseif ($isRowCuti)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 text-[11px] font-bold border border-teal-200/70 shadow-2xs">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                        Cuti
+                                    </span>
+                                @elseif ($isRowIzin)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 text-[11px] font-bold border border-indigo-200/70 shadow-2xs">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                        Izin
+                                    </span>
                                 @elseif ($isRowAlpa)
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 text-[11px] font-bold border border-rose-200/70 shadow-2xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
@@ -352,7 +379,7 @@
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-50 text-slate-600 text-[11px] font-semibold border border-slate-200/60">
-                                        {{ ucfirst($row['status']) }}
+                                        {{ strtolower($row['status']) === 'leave' ? 'Cuti' : ucfirst($row['status']) }}
                                     </span>
                                 @endif
                             </td>
