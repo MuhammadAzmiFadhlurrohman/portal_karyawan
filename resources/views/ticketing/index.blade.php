@@ -74,160 +74,170 @@
         </div>
     @endif
 
-    <!-- KPI Metric Stats Cards: 6 Cards in 1 Baris (Total, Open, Proses, Close, > SLA, <= SLA) -->
-    <div class="overflow-x-auto pb-1 -mx-2 px-2 sm:mx-0 sm:px-0" style="scrollbar-width: none; -ms-overflow-style: none;">
-        <div class="gap-2 sm:gap-2.5 min-w-[680px] lg:min-w-0"
-             style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));">
-            <!-- 1. TOTAL -->
-            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #2563eb;"></div>
-                <!-- Card Icon -->
-                <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #2563eb;">
-                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                </div>
-                <!-- Top Row -->
-                <div class="flex items-center relative z-10">
-                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider text-slate-500 uppercase">TOTAL</span>
-                </div>
-                <!-- Value & Label -->
-                <div class="mt-1.5 relative z-10">
-                    <div class="flex items-baseline">
-                        <span class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none">
-                            {{ number_format($stats['total'] ?? 0) }}
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-semibold text-slate-400 ml-1">tiket</span>
-                    </div>
-                    <p class="text-[10px] sm:text-[11px] font-medium text-slate-400 mt-0.5 truncate">Keseluruhan</p>
-                </div>
+    <!-- KPI Metric Stats Cards: Responsive Grid (Mobile: 2 Baris x 3 Kolom, Desktop: 1 Baris x 6 Kolom) -->
+    <style>
+        .kpi-ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+        @media (min-width: 768px) {
+            .kpi-ticket-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 0.625rem;
+            }
+        }
+    </style>
+    <div class="kpi-ticket-grid w-full">
+        <!-- 1. TOTAL -->
+        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #2563eb;"></div>
+            <!-- Card Icon -->
+            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #2563eb;">
+                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
             </div>
-
-            <!-- 2. OPEN -->
-            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #ef4444;"></div>
-                <!-- Card Icon -->
-                <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #ef4444;">
-                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="9"/>
-                        <path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
-                    </svg>
-                </div>
-                <!-- Top Row -->
-                <div class="flex items-center relative z-10">
-                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">OPEN</span>
-                </div>
-                <!-- Value & Label -->
-                <div class="mt-1.5 relative z-10">
-                    <div class="flex items-baseline">
-                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
-                            {{ number_format($stats['open'] ?? 0) }}
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-semibold text-rose-400 ml-1">tiket</span>
-                    </div>
-                    <p class="text-[10px] sm:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate">Belum ditangani</p>
-                </div>
+            <!-- Top Row -->
+            <div class="flex items-center relative z-10">
+                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider text-slate-500 uppercase">TOTAL</span>
             </div>
-
-            <!-- 3. PROSES -->
-            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #f59e0b;"></div>
-                <!-- Card Icon -->
-                <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #f59e0b;">
-                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
+            <!-- Value & Label -->
+            <div class="mt-1 sm:mt-1.5 relative z-10">
+                <div class="flex items-baseline">
+                    <span class="text-base sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-none">
+                        {{ number_format($stats['total'] ?? 0) }}
+                    </span>
+                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-slate-400 ml-0.5 sm:ml-1">tiket</span>
                 </div>
-                <!-- Top Row -->
-                <div class="flex items-center relative z-10">
-                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #d97706;">PROSES</span>
-                </div>
-                <!-- Value & Label -->
-                <div class="mt-1.5 relative z-10">
-                    <div class="flex items-baseline">
-                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #d97706;">
-                            {{ number_format($stats['proses'] ?? 0) }}
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-semibold text-amber-500/80 ml-1">tiket</span>
-                    </div>
-                    <p class="text-[10px] sm:text-[11px] font-medium text-amber-700/75 mt-0.5 truncate">Sedang perbaikan</p>
-                </div>
+                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-slate-400 mt-0.5 truncate leading-tight">Keseluruhan</p>
             </div>
+        </div>
 
-            <!-- 4. CLOSE -->
-            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #10b981;"></div>
-                <!-- Card Icon -->
-                <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #10b981;">
-                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <!-- Top Row -->
-                <div class="flex items-center relative z-10">
-                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #059669;">CLOSE</span>
-                </div>
-                <!-- Value & Label -->
-                <div class="mt-1.5 relative z-10">
-                    <div class="flex items-baseline">
-                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #059669;">
-                            {{ number_format($stats['close'] ?? ($stats['selesai'] ?? 0)) }}
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-semibold text-emerald-500/80 ml-1">tiket</span>
-                    </div>
-                    <p class="text-[10px] sm:text-[11px] font-medium text-emerald-700/75 mt-0.5 truncate">Selesai &amp; normal</p>
-                </div>
+        <!-- 2. OPEN -->
+        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #ef4444;"></div>
+            <!-- Card Icon -->
+            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #ef4444;">
+                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
+                </svg>
             </div>
-
-            <!-- 5. > SLA -->
-            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #ef4444;"></div>
-                <!-- Card Icon -->
-                <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #ef4444;">
-                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <circle cx="12" cy="13" r="8"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M10 2h4M12 2v3"/>
-                    </svg>
-                </div>
-                <!-- Top Row -->
-                <div class="flex items-center relative z-10">
-                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">&gt; SLA</span>
-                </div>
-                <!-- Value & Label -->
-                <div class="mt-1.5 relative z-10">
-                    <div class="flex items-baseline">
-                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
-                            {{ number_format($stats['sla_lebih'] ?? 0) }}
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-semibold text-rose-400 ml-1">tiket</span>
-                    </div>
-                    <p class="text-[10px] sm:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate">&gt; Target SLA</p>
-                </div>
+            <!-- Top Row -->
+            <div class="flex items-center relative z-10">
+                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">OPEN</span>
             </div>
+            <!-- Value & Label -->
+            <div class="mt-1 sm:mt-1.5 relative z-10">
+                <div class="flex items-baseline">
+                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
+                        {{ number_format($stats['open'] ?? 0) }}
+                    </span>
+                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-rose-400 ml-0.5 sm:ml-1">tiket</span>
+                </div>
+                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate leading-tight">Belum ditangani</p>
+            </div>
+        </div>
 
-            <!-- 6. <= SLA -->
-            <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
-                <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #0d9488;"></div>
-                <!-- Card Icon -->
-                <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #0d9488;">
-                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
+        <!-- 3. PROSES -->
+        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #f59e0b;"></div>
+            <!-- Card Icon -->
+            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #f59e0b;">
+                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+            </div>
+            <!-- Top Row -->
+            <div class="flex items-center relative z-10">
+                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #d97706;">PROSES</span>
+            </div>
+            <!-- Value & Label -->
+            <div class="mt-1 sm:mt-1.5 relative z-10">
+                <div class="flex items-baseline">
+                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #d97706;">
+                        {{ number_format($stats['proses'] ?? 0) }}
+                    </span>
+                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-amber-500/80 ml-0.5 sm:ml-1">tiket</span>
                 </div>
-                <!-- Top Row -->
-                <div class="flex items-center relative z-10">
-                    <span class="text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase" style="color: #0f766e;">&le; SLA</span>
+                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-amber-700/75 mt-0.5 truncate leading-tight">Sedang perbaikan</p>
+            </div>
+        </div>
+
+        <!-- 4. CLOSE -->
+        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #10b981;"></div>
+            <!-- Card Icon -->
+            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #10b981;">
+                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <!-- Top Row -->
+            <div class="flex items-center relative z-10">
+                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #059669;">CLOSE</span>
+            </div>
+            <!-- Value & Label -->
+            <div class="mt-1 sm:mt-1.5 relative z-10">
+                <div class="flex items-baseline">
+                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #059669;">
+                        {{ number_format($stats['close'] ?? ($stats['selesai'] ?? 0)) }}
+                    </span>
+                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-emerald-500/80 ml-0.5 sm:ml-1">tiket</span>
                 </div>
-                <!-- Value & Label -->
-                <div class="mt-1.5 relative z-10">
-                    <div class="flex items-baseline">
-                        <span class="text-xl sm:text-2xl font-black tracking-tight leading-none" style="color: #0f766e;">
-                            {{ number_format($stats['sla_tepat'] ?? 0) }}
-                        </span>
-                        <span class="text-[10px] sm:text-xs font-semibold text-teal-500/80 ml-1">tiket</span>
-                    </div>
-                    <p class="text-[10px] sm:text-[11px] font-medium text-teal-700/75 mt-0.5 truncate">&le; Target SLA</p>
+                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-emerald-700/75 mt-0.5 truncate leading-tight">Selesai &amp; normal</p>
+            </div>
+        </div>
+
+        <!-- 5. > SLA -->
+        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #ef4444;"></div>
+            <!-- Card Icon -->
+            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #ef4444;">
+                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <circle cx="12" cy="13" r="8"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M10 2h4M12 2v3"/>
+                </svg>
+            </div>
+            <!-- Top Row -->
+            <div class="flex items-center relative z-10">
+                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">&gt; SLA</span>
+            </div>
+            <!-- Value & Label -->
+            <div class="mt-1 sm:mt-1.5 relative z-10">
+                <div class="flex items-baseline">
+                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
+                        {{ number_format($stats['sla_lebih'] ?? 0) }}
+                    </span>
+                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-rose-400 ml-0.5 sm:ml-1">tiket</span>
                 </div>
+                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate leading-tight">&gt; Target SLA</p>
+            </div>
+        </div>
+
+        <!-- 6. <= SLA -->
+        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #0d9488;"></div>
+            <!-- Card Icon -->
+            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #0d9488;">
+                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <!-- Top Row -->
+            <div class="flex items-center relative z-10">
+                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #0f766e;">&le; SLA</span>
+            </div>
+            <!-- Value & Label -->
+            <div class="mt-1 sm:mt-1.5 relative z-10">
+                <div class="flex items-baseline">
+                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #0f766e;">
+                        {{ number_format($stats['sla_tepat'] ?? 0) }}
+                    </span>
+                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-teal-500/80 ml-0.5 sm:ml-1">tiket</span>
+                </div>
+                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-teal-700/75 mt-0.5 truncate leading-tight">&le; Target SLA</p>
             </div>
         </div>
     </div>
