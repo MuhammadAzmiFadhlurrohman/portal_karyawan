@@ -211,180 +211,281 @@
                 </p>
             </div>
         @else
-            <div class="space-y-4">
+            <!-- Desktop Table View (hidden md:block) -->
+            <div class="hidden md:block overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xs">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-50/90 border-b border-slate-200/80 text-slate-600 font-bold uppercase tracking-wider text-[11px]">
+                                <th class="py-3.5 px-4">Karyawan</th>
+                                <th class="py-3.5 px-3">Jenis Pengajuan</th>
+                                <th class="py-3.5 px-3">Periode &amp; Durasi</th>
+                                <th class="py-3.5 px-3">Alasan</th>
+                                <th class="py-3.5 px-3">Lampiran / Bukti</th>
+                                <th class="py-3.5 px-3">Status &amp; Tracking</th>
+                                <th class="py-3.5 px-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            @foreach ($leaves as $item)
+                                @php
+                                    $emp = $item->user;
+                                    $isPending = in_array($item->status, ['pending_hrd', 'pending_supervisor']);
+                                @endphp
+                                <tr class="hover:bg-slate-50/70 transition">
+                                    <!-- Karyawan -->
+                                    <td class="py-3.5 px-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-[#155E63] font-black flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-2xs">
+                                                @if ($emp?->avatar_url)
+                                                    <img src="{{ $emp->avatar_url }}" alt="" class="w-full h-full object-cover">
+                                                @else
+                                                    <span>{{ strtoupper(substr($emp?->name ?? 'U', 0, 2)) }}</span>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                                    <span>{{ $emp?->name }}</span>
+                                                    <span class="text-[11px] font-mono font-medium text-slate-400">({{ $emp?->employee_code }})</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
+                                                    <span class="font-semibold text-teal-700">{{ $emp?->division ?? '-' }}</span>
+                                                    <span>&bull;</span>
+                                                    <span class="font-mono text-slate-400">{{ $item->created_at?->translatedFormat('d M Y, H:i') ?? '-' }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Jenis Pengajuan -->
+                                    <td class="py-3.5 px-3 whitespace-nowrap">
+                                        @if ($item->leave_type === 'annual')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                                Cuti Tahunan
+                                            </span>
+                                        @elseif ($item->leave_type === 'sick')
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Cuti Sakit
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                                Izin Khusus
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Periode & Durasi -->
+                                    <td class="py-3.5 px-3 whitespace-nowrap">
+                                        <div class="font-medium text-slate-800 flex items-center gap-1.5 font-mono text-[11px]">
+                                            <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                            <span>{{ $item->start_date->format('d M Y') }}</span>
+                                            @if ($item->start_date->ne($item->end_date))
+                                                <span class="text-slate-400">&mdash;</span>
+                                                <span>{{ $item->end_date->format('d M Y') }}</span>
+                                            @endif
+                                        </div>
+                                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-teal-100/80 text-teal-800 font-mono text-[10px] font-bold">
+                                            {{ $item->working_days }} Hari Kerja
+                                        </span>
+                                    </td>
+
+                                    <!-- Alasan Pengajuan -->
+                                    <td class="py-3.5 px-3 max-w-xs">
+                                        <p class="text-slate-700 italic text-xs leading-snug line-clamp-2" title="{{ $item->reason }}">
+                                            "{{ $item->reason }}"
+                                        </p>
+                                    </td>
+
+                                    <!-- Lampiran / Bukti -->
+                                    <td class="py-3.5 px-3 whitespace-nowrap">
+                                        @if ($item->attachment_path)
+                                            <a href="{{ route('attendance.leaves.attachment', $item) }}" 
+                                               target="_blank" 
+                                               class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 hover:bg-teal-100 text-xs font-semibold transition shadow-2xs hover:shadow-xs">
+                                                <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                                <span>Bukti / Surat</span>
+                                                <svg class="w-3 h-3 text-teal-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            </a>
+                                        @else
+                                            <span class="text-slate-400 text-xs italic">&mdash;</span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Status & Tracking -->
+                                    <td class="py-3.5 px-3 whitespace-nowrap">
+                                        @if ($isPending)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs animate-pulse">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Menunggu HRD
+                                            </span>
+                                        @elseif ($item->status === 'approved')
+                                            <div>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                                    <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                    Disetujui HRD
+                                                </span>
+                                                <div class="text-[10px] text-slate-500 mt-0.5">
+                                                    {{ $item->hrdApprover?->name ?? 'HRD' }} &bull; {{ $item->hrd_approved_at?->translatedFormat('d M Y') ?? '-' }}
+                                                </div>
+                                            </div>
+                                        @elseif ($item->status === 'rejected')
+                                            <div>
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                                    <svg class="w-3 h-3 text-rose-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    Ditolak
+                                                </span>
+                                                @if ($item->rejected_reason)
+                                                    <div class="text-[10px] text-rose-600 italic max-w-[150px] truncate mt-0.5" title="{{ $item->rejected_reason }}">
+                                                        "{{ $item->rejected_reason }}"
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
+                                                {{ ucfirst($item->status) }}
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Aksi -->
+                                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                        @if ($isPending)
+                                            <div class="inline-flex items-center justify-end gap-1.5">
+                                                <!-- Tombol Tolak -->
+                                                <button type="button" 
+                                                        @click="rejectActionUrl = '{{ route('attendance.leaves.reject', $item) }}'; selectedLeaveId = {{ $item->id }}; rejectModalOpen = true"
+                                                        class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold transition shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer">
+                                                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    <span>Tolak</span>
+                                                </button>
+
+                                                <!-- Tombol Setujui -->
+                                                <form method="POST" action="{{ route('attendance.leaves.approve-hrd', $item) }}" class="inline-block">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan cuti/izin ini? Saldo cuti akan disesuaikan otomatis.')"
+                                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer">
+                                                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                        <span>Setujui</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <span class="text-slate-400 text-xs font-medium italic">Selesai</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile Card View (md:hidden) -->
+            <div class="md:hidden space-y-3.5">
                 @foreach ($leaves as $item)
                     @php
                         $emp = $item->user;
                         $isPending = in_array($item->status, ['pending_hrd', 'pending_supervisor']);
                     @endphp
-                    <div class="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-xs hover:border-teal-200 transition-all space-y-4">
+                    <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs space-y-3">
                         
-                        <!-- Card Header: Profile, Badges, & Actions -->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-100">
-                            
-                            <!-- Profile Info -->
-                            <div class="flex items-center gap-3">
-                                <div class="w-11 h-11 rounded-2xl bg-teal-50 border border-teal-100 text-[#155E63] font-black flex items-center justify-center text-sm shrink-0 overflow-hidden shadow-2xs">
+                        <!-- Header: Profile & Badges -->
+                        <div class="flex items-start justify-between gap-2.5 pb-2.5 border-b border-slate-100">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-[#155E63] font-black flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-2xs">
                                     @if ($emp?->avatar_url)
                                         <img src="{{ $emp->avatar_url }}" alt="" class="w-full h-full object-cover">
                                     @else
                                         <span>{{ strtoupper(substr($emp?->name ?? 'U', 0, 2)) }}</span>
                                     @endif
                                 </div>
-                                <div>
-                                    <div class="font-heading font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
-                                        <span>{{ $emp?->name }}</span>
-                                        <span class="text-xs font-mono font-medium text-slate-400">({{ $emp?->employee_code }})</span>
+                                <div class="min-w-0">
+                                    <div class="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                                        {{ $emp?->name }}
+                                        <span class="text-[10px] font-mono text-slate-400">({{ $emp?->employee_code }})</span>
                                     </div>
-                                    <div class="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
-                                        <span class="inline-flex items-center gap-1 font-semibold text-teal-700">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                            Divisi: {{ $emp?->division ?? '-' }}
-                                        </span>
-                                        <span>&bull;</span>
-                                        <span class="font-mono text-slate-400">Diajukan: {{ $item->created_at?->translatedFormat('d M Y, H:i') ?? '-' }}</span>
+                                    <div class="text-[11px] text-teal-700 font-medium truncate mt-0.5">
+                                        {{ $emp?->division ?? '-' }}
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Badges Status & Jenis -->
-                            <div class="flex flex-wrap items-center gap-2">
-                                <!-- Badge Jenis Pengajuan -->
+                            <!-- Badges -->
+                            <div class="shrink-0 text-right">
                                 @if ($item->leave_type === 'annual')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
                                         Cuti Tahunan
                                     </span>
                                 @elseif ($item->leave_type === 'sick')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                         Cuti Sakit
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                                         Izin Khusus
                                     </span>
                                 @endif
-
-                                <!-- Badge Status -->
-                                @if ($isPending)
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs animate-pulse">
-                                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                        Menunggu Persetujuan HRD
-                                    </span>
-                                @elseif ($item->status === 'approved')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
-                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                        Disetujui HRD
-                                    </span>
-                                @elseif ($item->status === 'rejected')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
-                                        <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        Ditolak
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                                        {{ ucfirst($item->status) }}
-                                    </span>
-                                @endif
                             </div>
                         </div>
 
-                        <!-- Card Body: Date Range, Reason, & Attachment -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50/70 p-4 rounded-xl border border-slate-200/60">
-                            <!-- Tanggal & Durasi -->
-                            <div>
-                                <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                                    Periode &amp; Durasi
-                                </span>
-                                <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
-                                    <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <span>{{ $item->start_date->format('d M Y') }} &mdash; {{ $item->end_date->format('d M Y') }}</span>
-                                </div>
-                                <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-teal-100/80 text-teal-800 font-mono text-[11px] font-bold">
-                                    {{ $item->working_days }} Hari Kerja
-                                </span>
+                        <!-- Details -->
+                        <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-200/60 text-xs space-y-2">
+                            <div class="flex items-center justify-between text-slate-700 font-mono text-[11px]">
+                                <span class="text-slate-500 font-sans">Periode:</span>
+                                <span class="font-bold text-slate-800">{{ $item->start_date->format('d M') }} &mdash; {{ $item->end_date->format('d M Y') }} ({{ $item->working_days }} hari)</span>
                             </div>
-
-                            <!-- Alasan Pengajuan -->
-                            <div class="md:col-span-1">
-                                <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                                    Alasan Pengajuan
-                                </span>
-                                <p class="text-xs text-slate-700 leading-relaxed italic">
-                                    "{{ $item->reason }}"
-                                </p>
+                            <div class="text-slate-700 italic text-xs">
+                                <span class="text-slate-500 not-italic font-sans text-[11px] block mb-0.5">Alasan:</span>
+                                "{{ $item->reason }}"
                             </div>
-
-                            <!-- Lampiran Dokumen / Surat Dokter -->
-                            <div>
-                                <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                                    Lampiran / Bukti
-                                </span>
-                                @if ($item->attachment_path)
+                            @if ($item->attachment_path)
+                                <div class="pt-1 border-t border-slate-200/60">
                                     <a href="{{ route('attendance.leaves.attachment', $item) }}" 
                                        target="_blank" 
-                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-teal-300 text-teal-700 hover:bg-teal-50 text-xs font-bold shadow-2xs hover:shadow-xs transition">
-                                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                        <span>Buka Surat / Bukti</span>
-                                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                       class="inline-flex items-center gap-1 text-teal-700 font-bold hover:underline text-[11px]">
+                                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                        <span>Buka Surat / Bukti Pendukung &rarr;</span>
                                     </a>
-                                @else
-                                    <span class="text-xs text-slate-400 italic">Tidak ada lampiran</span>
-                                @endif
-                            </div>
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Footer: Log & Action Buttons -->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
-                            
-                            <!-- Tracking Status / Approval Log -->
-                            <div class="text-xs text-slate-500">
-                                @if ($item->status === 'approved')
-                                    <span class="text-emerald-700 font-semibold flex items-center gap-1">
-                                        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                        Disetujui oleh: <strong>{{ $item->hrdApprover?->name ?? 'HRD' }}</strong> pada {{ $item->hrd_approved_at?->translatedFormat('d M Y, H:i') ?? '-' }}
+                        <!-- Footer: Status & Actions -->
+                        <div class="flex items-center justify-between gap-2 pt-1">
+                            <div>
+                                @if ($isPending)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        Menunggu HRD
+                                    </span>
+                                @elseif ($item->status === 'approved')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                        Disetujui
                                     </span>
                                 @elseif ($item->status === 'rejected')
-                                    <div class="space-y-0.5">
-                                        <span class="text-rose-700 font-semibold flex items-center gap-1">
-                                            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                            Ditolak oleh: <strong>{{ $item->rejectedBy?->name ?? 'HRD' }}</strong>
-                                        </span>
-                                        @if ($item->rejected_reason)
-                                            <p class="text-rose-600 text-[11px] italic pl-5">Alasan: "{{ $item->rejected_reason }}"</p>
-                                        @endif
-                                    </div>
-                                @else
-                                    <span class="text-amber-700 font-medium flex items-center gap-1">
-                                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        Menunggu tindak lanjut dari HRD
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                        Ditolak
                                     </span>
                                 @endif
                             </div>
 
-                            <!-- Tombol Aksi (Hanya muncul jika Pending) -->
                             @if ($isPending)
-                                <div class="flex items-center gap-2">
-                                    <!-- Tombol Tolak -->
+                                <div class="flex items-center gap-1.5">
                                     <button type="button" 
                                             @click="rejectActionUrl = '{{ route('attendance.leaves.reject', $item) }}'; selectedLeaveId = {{ $item->id }}; rejectModalOpen = true"
-                                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-rose-200 bg-white hover:bg-rose-50 text-rose-700 text-xs font-bold transition shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer">
-                                        <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        <span>Tolak</span>
+                                            class="px-2.5 py-1.5 rounded-lg border border-rose-200 bg-white text-rose-700 text-xs font-bold">
+                                        Tolak
                                     </button>
-
-                                    <!-- Tombol Setujui -->
                                     <form method="POST" action="{{ route('attendance.leaves.approve-hrd', $item) }}">
                                         @csrf
                                         <button type="submit" 
-                                                onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan cuti/izin ini? Saldo cuti akan disesuaikan otomatis.')"
-                                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer">
-                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                            <span>Setujui (Approve)</span>
+                                                onclick="return confirm('Setujui pengajuan cuti/izin ini?')"
+                                                class="px-3 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-bold">
+                                            Setujui
                                         </button>
                                     </form>
                                 </div>
@@ -393,11 +494,11 @@
 
                     </div>
                 @endforeach
+            </div>
 
-                <!-- Pagination -->
-                <div class="pt-4">
-                    {{ $leaves->links() }}
-                </div>
+            <!-- Pagination -->
+            <div class="pt-4">
+                {{ $leaves->links() }}
             </div>
         @endif
 
