@@ -4,35 +4,13 @@
      x-data="chatbotWidget()">
 
     <style>
-        .chatbot-slide-drawer {
+        /* Docked Side-Tab Trigger Button (Pinned on right edge of screen when chat is closed) */
+        .chatbot-docked-tab {
             position: fixed !important;
             right: 0 !important;
             bottom: 86px !important;
-            z-index: 60 !important;
-            display: flex !important;
-            align-items: flex-end !important;
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            pointer-events: none !important;
-        }
-        @media (min-width: 640px) {
-            .chatbot-slide-drawer {
-                bottom: 28px !important;
-            }
-        }
-        .chatbot-slide-drawer.is-closed {
-            transform: translateX(100%) !important;
-        }
-        .chatbot-slide-drawer.is-open {
-            transform: translateX(0) !important;
-        }
-
-        /* Docked Side-Tab Trigger Button (attached to left edge of modal box) */
-        .chatbot-docked-tab {
-            position: absolute !important;
-            right: 100% !important;
-            bottom: 16px !important;
-            z-index: 65 !important;
-            width: 38px !important;
+            z-index: 50 !important;
+            width: 34px !important;
             padding-top: 10px !important;
             padding-bottom: 12px !important;
             padding-left: 5px !important;
@@ -42,40 +20,30 @@
             border-bottom-left-radius: 16px !important;
             border-top-right-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
-            box-shadow: -4px 6px 18px rgba(2, 40, 54, 0.4) !important;
+            box-shadow: -4px 6px 18px rgba(2, 40, 54, 0.35) !important;
             border-left: 1.5px solid rgba(255, 255, 255, 0.3) !important;
             border-top: 1.5px solid rgba(255, 255, 255, 0.3) !important;
             border-bottom: 1.5px solid rgba(255, 255, 255, 0.2) !important;
             border-right: none !important;
-            pointer-events: auto !important;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, filter 0.2s ease !important;
+            cursor: pointer !important;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease !important;
         }
         @media (min-width: 640px) {
             .chatbot-docked-tab {
-                width: 42px !important;
-                bottom: 28px !important;
+                width: 38px !important;
+                bottom: 36px !important;
                 padding-top: 12px !important;
                 padding-bottom: 14px !important;
                 padding-left: 6px !important;
                 padding-right: 8px !important;
             }
         }
-        /* Pada mobile saat chat terbuka, sembunyikan tab docked agar tidak bertumpuk di latar belakang */
-        @media (max-width: 639.98px) {
-            .chatbot-slide-drawer.is-open .chatbot-docked-tab {
-                opacity: 0 !important;
-                pointer-events: none !important;
-                visibility: hidden !important;
-            }
-        }
-        .chatbot-slide-drawer.is-closed .chatbot-docked-tab:hover {
+        .chatbot-docked-tab:hover {
             transform: translateX(-4px) !important;
-        }
-        .chatbot-slide-drawer.is-open .chatbot-docked-tab:hover {
             filter: brightness(1.1) !important;
         }
 
-        /* Header Action Buttons (Sampah & Tutup X) - Anti gepeng & proporsional di mobile */
+        /* Header Action Buttons (Sampah & Tutup X) */
         .chatbot-header-btn {
             width: 36px !important;
             height: 36px !important;
@@ -106,8 +74,8 @@
             border-color: rgba(248, 113, 113, 0.6) !important;
         }
         .chatbot-header-btn svg {
-            width: 19px !important;
-            height: 19px !important;
+            width: 18px !important;
+            height: 18px !important;
             stroke-width: 2.2 !important;
             display: block !important;
         }
@@ -125,149 +93,167 @@
             }
         }
 
-        /* Chat Window Modal Box */
+        /* Chat Window Modal Box - Symmetrical, Clean, Modern */
         .chatbot-modal-box {
-            position: relative !important;
-            width: calc(100vw - 46px) !important;
-            max-width: 400px !important;
-            height: 520px !important;
-            max-height: calc(100vh - 100px) !important;
-            pointer-events: auto !important;
-            background: #ffffff !important;
-            border-top-left-radius: 24px !important;
-            border-bottom-left-radius: 24px !important;
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-            box-shadow: -12px 16px 50px rgba(2, 40, 54, 0.4) !important;
-            border-left: 1px solid rgba(226, 232, 240, 0.9) !important;
-            border-top: 1px solid rgba(226, 232, 240, 0.9) !important;
-            border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
-            border-right: none !important;
+            position: fixed !important;
+            z-index: 60 !important;
             display: flex !important;
             flex-direction: column !important;
+            background: #ffffff !important;
             overflow: hidden !important;
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+        }
+        @media (max-width: 639.98px) {
+            .chatbot-modal-box {
+                inset-inline: 12px !important;
+                bottom: 16px !important;
+                top: auto !important;
+                height: calc(100dvh - 84px) !important;
+                max-height: 580px !important;
+                border-radius: 24px !important;
+                box-shadow: 0 20px 50px -10px rgba(2, 40, 54, 0.38) !important;
+            }
         }
         @media (min-width: 640px) {
             .chatbot-modal-box {
-                width: 440px !important;
-                max-width: 440px !important;
+                right: 28px !important;
+                bottom: 28px !important;
+                width: 420px !important;
+                max-width: calc(100vw - 48px) !important;
                 height: 580px !important;
-                max-height: calc(100vh - 70px) !important;
+                max-height: calc(100vh - 56px) !important;
+                border-radius: 28px !important;
+                box-shadow: 0 24px 60px -15px rgba(2, 40, 54, 0.35) !important;
             }
         }
         @media (min-width: 1024px) {
             .chatbot-modal-box {
-                width: 460px !important;
-                max-width: 460px !important;
-                height: 620px !important;
-                max-height: calc(100vh - 60px) !important;
+                width: 440px !important;
+                height: 600px !important;
             }
         }
     </style>
 
-    <!-- Slide-out Drawer Container (Slides in/out from right edge) -->
-    <div class="chatbot-slide-drawer is-closed"
-         :class="isOpen ? 'is-open' : 'is-closed'"
-         @click.outside="if (isOpen) closeChat()"
-         @keydown.escape.window="if (isOpen) closeChat()">
+    <!-- Soft Mobile Backdrop (Tap to close) -->
+    <div x-show="isOpen"
+         x-transition:enter="transition-opacity duration-300 ease-out"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity duration-200 ease-in"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="closeChat()"
+         class="sm:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-55 pointer-events-auto"
+         style="display: none;">
+    </div>
 
-        <!-- Docked Side-Tab Trigger Button (Sitting on the left edge of modal) -->
-        <button @click="toggleChat()" 
-                type="button"
-                class="chatbot-docked-tab text-white flex flex-col items-center justify-center focus:outline-none cursor-pointer select-none group"
-                title="Tanya Asisten Mandiri PT MSN"
-                aria-label="Buka Chatbot Asisten">
-            
-            <!-- Top Chevron Icon (Smoothly rotates 180deg to point right when open) -->
-            <svg class="w-3.5 h-3.5 text-white/95 transition-transform duration-300 shrink-0"
-                 :class="isOpen ? 'rotate-180 translate-x-0.5' : 'group-hover:-translate-x-0.5'"
-                 fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    <!-- Docked Side-Tab Trigger Button (Only visible when chat is closed) -->
+    <button x-show="!isOpen"
+            x-transition:enter="transition-all duration-300 ease-out"
+            x-transition:enter-start="opacity-0 translate-x-4"
+            x-transition:enter-end="opacity-100 translate-x-0"
+            x-transition:leave="transition-all duration-200 ease-in"
+            x-transition:leave-start="opacity-100 translate-x-0"
+            x-transition:leave-end="opacity-0 translate-x-4"
+            @click="toggleChat()" 
+            type="button"
+            class="chatbot-docked-tab text-white flex flex-col items-center justify-center focus:outline-none cursor-pointer select-none group"
+            title="Tanya Asisten Mandiri PT MSN"
+            aria-label="Buka Chatbot Asisten">
+        
+        <!-- Top Chevron Icon -->
+        <svg class="w-3.5 h-3.5 text-white/95 transition-transform duration-300 shrink-0 group-hover:-translate-x-0.5"
+             fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+        </svg>
+
+        <!-- Robot Icon -->
+        <div class="my-1.5 shrink-0 transition-transform duration-200 group-hover:scale-110">
+            <svg style="width: 19px; height: 19px;" viewBox="0 0 24 24" fill="#ffffff">
+                <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
             </svg>
+        </div>
 
-            <!-- Robot Icon Sesuai Gambar -->
-            <div class="my-1.5 shrink-0 transition-transform duration-200 group-hover:scale-110">
-                <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="#ffffff">
-                    <!-- Top Antenna -->
-                    <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
-                    <!-- Left Ear -->
-                    <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                    <!-- Right Ear -->
-                    <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                    <!-- Head with Eye & Mouth Cutouts -->
-                    <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
-                </svg>
+        <!-- Vertical Text CHATBOT -->
+        <span class="text-[9px] font-black tracking-widest text-white uppercase select-none leading-none mt-1"
+              style="writing-mode: vertical-rl; letter-spacing: 0.12em;">
+            CHATBOT
+        </span>
+    </button>
+
+    <!-- Chat Window Modal Box -->
+    <div x-show="isOpen"
+         x-transition:enter="transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+         x-transition:enter-start="opacity-0 translate-y-6 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition-all duration-200 ease-in"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-6 scale-95"
+         class="chatbot-modal-box"
+         @click.outside="if (window.innerWidth >= 640) closeChat()"
+         @keydown.escape.window="closeChat()"
+         style="display: none;">
+        
+        <!-- Header -->
+        <div class="px-3.5 py-3 sm:px-4 sm:py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
+             style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
+        
+            <!-- Subtle decorative background glow -->
+            <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+            <div class="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0 flex-1 mr-2">
+                <!-- Avatar with online indicator -->
+                <div class="relative shrink-0">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-white shadow-inner">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="#ffffff">
+                            <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                            <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                            <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                            <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                        </svg>
+                    </div>
+                    <!-- Online Pulse Dot -->
+                    <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-[#155E63]"></span>
+                    </span>
+                </div>
+
+                <!-- Title & Subtitle -->
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-1.5">
+                        <h3 class="font-heading font-bold text-xs sm:text-sm text-white tracking-tight leading-snug truncate" style="color: #ffffff !important;">Asisten Mandiri PT MSN</h3>
+                        <span class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-400/25 text-emerald-200 border border-emerald-400/30 shrink-0">AI</span>
+                    </div>
+                    <p class="text-[10px] sm:text-[11px] text-teal-100/90 leading-tight mt-0.5 truncate" style="color: rgba(204, 251, 241, 0.9) !important;">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
+                </div>
             </div>
 
-            <!-- Vertical Text CHATBOT -->
-            <span class="text-[9px] sm:text-[9.5px] font-black tracking-widest text-white uppercase select-none leading-none mt-1"
-                  style="writing-mode: vertical-rl; letter-spacing: 0.12em;">
-                CHATBOT
-            </span>
-        </button>
-
-        <!-- Chat Window Modal Box -->
-        <div class="chatbot-modal-box"
-             :aria-hidden="!isOpen">
-            
-            <!-- Header -->
-            <div class="px-3.5 py-3 sm:px-4 sm:py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
-                 style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
-            
-                <!-- Subtle decorative background glow -->
-                <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-
-                <div class="flex items-center gap-2.5 sm:gap-3 relative z-10 min-w-0 flex-1 mr-2">
-                    <!-- Avatar with online indicator -->
-                    <div class="relative shrink-0">
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center text-white shadow-inner">
-                            <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="#ffffff">
-                                <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
-                                <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                                <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
-                                <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
-                            </svg>
-                        </div>
-                        <!-- Online Pulse Dot -->
-                        <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-[#155E63]"></span>
-                        </span>
-                    </div>
-
-                    <!-- Title & Subtitle -->
-                    <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-1.5">
-                            <h3 class="font-heading font-bold text-xs sm:text-sm text-white tracking-tight leading-snug truncate" style="color: #ffffff !important;">Asisten Mandiri PT MSN</h3>
-                            <span class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-400/25 text-emerald-200 border border-emerald-400/30 shrink-0">AI</span>
-                        </div>
-                        <p class="text-[10px] sm:text-[11px] text-teal-100/90 leading-tight mt-0.5 truncate" style="color: rgba(204, 251, 241, 0.9) !important;">Bantuan cepat HRIS, Tiketing &amp; Operasional</p>
-                    </div>
-                </div>
-
-                <!-- Action Buttons (Sampah & Tutup X) -->
-                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 relative z-10">
-                    <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
-                    <button @click="clearChat()" 
-                            type="button" 
-                            class="chatbot-header-btn is-trash"
-                            title="Hapus Riwayat Chat"
-                            aria-label="Hapus Riwayat Chat">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                    <!-- Tombol Tutup Chat -->
-                    <button @click="closeChat()" 
-                            type="button" 
-                            class="chatbot-header-btn is-close"
-                            title="Tutup Chat"
-                            aria-label="Tutup Chat">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
+            <!-- Action Buttons (Sampah & Tutup X) -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 relative z-10">
+                <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
+                <button @click="clearChat()" 
+                        type="button" 
+                        class="chatbot-header-btn is-trash"
+                        title="Hapus Riwayat Chat"
+                        aria-label="Hapus Riwayat Chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
+                <!-- Tombol Tutup Chat -->
+                <button @click="closeChat()" 
+                        type="button" 
+                        class="chatbot-header-btn is-close"
+                        title="Tutup Chat"
+                        aria-label="Tutup Chat">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -347,31 +333,30 @@
         </div>
 
         <!-- Input Bar -->
-        <form @submit.prevent="sendMessage()" class="p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
+        <form @submit.prevent="sendMessage()" class="p-2.5 sm:p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
             <input type="text" 
                    id="chatbot-input-query"
                    x-ref="chatInput"
                    x-model="inputQuery" 
                    :placeholder="isListening ? '🎙️ Mendengarkan suara Anda...' : 'Ketik pertanyaan Anda...'" 
-                   class="flex-1 bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 outline-none transition"
+                   class="flex-1 bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none transition"
                    :disabled="loading" />
             <button type="button" 
                     @click="toggleVoiceInput()"
                     :title="isListening ? 'Berhenti mendengarkan' : 'Bicara untuk mengetik (Voice-to-Text)'"
                     :class="isListening ? 'bg-rose-50 text-rose-600 border border-rose-300' : 'bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488]'"
-                    class="h-8 w-8 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
-                <svg class="w-4 h-4" :class="isListening ? 'text-rose-600 animate-pulse' : 'text-slate-600'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    class="h-9 w-9 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
+                <svg class="w-4.5 h-4.5" :class="isListening ? 'text-rose-600 animate-pulse' : 'text-slate-600'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
                 </svg>
                 <span x-show="isListening" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
             </button>
             <button type="submit" 
                     :disabled="loading || !inputQuery.trim()" 
-                    class="h-8 px-3.5 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs flex items-center justify-center transition cursor-pointer shrink-0">
+                    class="h-9 px-4 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs flex items-center justify-center transition cursor-pointer shrink-0 active:scale-95">
                 Kirim
             </button>
         </form>
-    </div>
     </div>
 </div>
 
@@ -399,13 +384,8 @@
             console.warn('Gagal membaca riwayat chat dari storage', e);
         }
 
-        let isInitiallyOpen = false;
-        try {
-            isInitiallyOpen = localStorage.getItem(storageKeyOpen) === '1';
-        } catch (e) {}
-
         return {
-            isOpen: isInitiallyOpen,
+            isOpen: false,
             loading: false,
             inputQuery: '',
             isListening: false,
