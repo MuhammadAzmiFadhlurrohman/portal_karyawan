@@ -184,8 +184,8 @@ class ChatbotService
                 'url' => route('gomsn.inventory.index'),
             ],
             'tugas_operasional_tasks' => [
-                'label' => '📋 Buka Tugas Operasional',
-                'url' => route('gomsn.tasks.index'),
+                'label' => '🎫 Buka Halaman Tiketing & Penugasan',
+                'url' => route('tickets.index'),
             ],
             'tiket_aktif_saya',
             'buka_tiket_gangguan',

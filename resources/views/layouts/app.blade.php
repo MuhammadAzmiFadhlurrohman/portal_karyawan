@@ -908,8 +908,8 @@
             $navTabActive = 'presensi';
         } elseif (request()->routeIs('gomsn.pengajuan.*')) {
             $navTabActive = 'pengajuan';
-        } elseif (request()->routeIs('gomsn.tasks.*') || request()->routeIs('tickets.*')) {
-            $navTabActive = 'tugas';
+        } elseif (request()->routeIs('tickets.*')) {
+            $navTabActive = 'tiket';
         } elseif (request()->routeIs('portal.hub') || request()->routeIs('dashboard')) {
             $navTabActive = 'home';
         }

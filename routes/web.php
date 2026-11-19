@@ -13,7 +13,6 @@ use App\Modules\Gomsn\Controllers\KpiReportController;
 use App\Modules\Gomsn\Controllers\NetworkOdpController;
 use App\Modules\Gomsn\Controllers\OvertimeController;
 use App\Modules\Gomsn\Controllers\PengajuanController;
-use App\Modules\Gomsn\Controllers\TaskController;
 use App\Modules\Portal\Controllers\AuthController;
 use App\Modules\Portal\Controllers\EmployeeController;
 use App\Modules\Portal\Controllers\PortalHubController;
@@ -212,12 +211,8 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/gomsn/overtime/{lembur}/pay', [OvertimeController::class, 'pay'])->name('gomsn.overtime.pay');
     Route::post('/gomsn/overtime/toggle-payment', [OvertimeController::class, 'togglePayment'])->name('gomsn.overtime.toggle-payment');
 
-    // Penugasan Kerja / Tasks (§8.3)
-    Route::get('/gomsn/tasks', [TaskController::class, 'index'])->name('gomsn.tasks.index');
-    Route::post('/gomsn/tasks', [TaskController::class, 'store'])->name('gomsn.tasks.store');
-    Route::post('/gomsn/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('gomsn.tasks.status');
-    Route::post('/gomsn/tasks/subtasks/{subtask}/toggle', [TaskController::class, 'toggleSubtask'])->name('gomsn.tasks.subtasks.toggle');
-    Route::post('/gomsn/tasks/{task}/comments', [TaskController::class, 'addComment'])->name('gomsn.tasks.comments.store');
+    // Penugasan Kerja / Tasks (Dialihkan terpusat ke Halaman Tiketing)
+    Route::redirect('/gomsn/tasks', '/tickets')->name('gomsn.tasks.index');
 
     // Analitik MTTR & KPI Teknisi (§7.7, §11.1)
     Route::get('/gomsn/analytics/kpi', [KpiReportController::class, 'index'])->name('gomsn.analytics.kpi');
