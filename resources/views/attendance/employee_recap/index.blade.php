@@ -178,25 +178,23 @@
             gap: 12px !important;
         }
         .emp-attendance-photo-panel {
-            width: 110px !important;
-            min-width: 110px !important;
-            max-width: 110px !important;
-            min-height: 200px !important;
+            width: 108px !important;
+            min-width: 108px !important;
+            max-width: 108px !important;
             border-radius: 18px 18px 45px 18px !important;
             flex-shrink: 0 !important;
             position: relative !important;
             overflow: hidden !important;
             display: flex !important;
-            align-items: flex-end !important;
+            align-items: center !important;
             justify-content: center !important;
             background: linear-gradient(145deg, #029990 0%, #038078 45%, #015c57 100%) !important;
         }
         .emp-attendance-photo-img {
             width: 100% !important;
             height: 100% !important;
-            max-height: 200px !important;
-            object-fit: contain !important;
-            object-position: center bottom !important;
+            object-fit: cover !important;
+            object-position: center 12% !important;
             display: block !important;
             pointer-events: none !important;
             filter: drop-shadow(0 8px 14px rgba(0,0,0,0.32)) !important;
@@ -211,11 +209,7 @@
                 width: 96px !important;
                 min-width: 96px !important;
                 max-width: 96px !important;
-                min-height: 185px !important;
                 border-radius: 16px 16px 36px 16px !important;
-            }
-            .emp-attendance-photo-img {
-                max-height: 185px !important;
             }
         }
     </style>
@@ -341,7 +335,7 @@
                             </div>
                             <div>
                                 <span class="text-xs font-bold text-slate-700 block leading-tight">{{ $c['cuti_terpakai'] }}</span>
-                                <span class="text-[8.5px] font-semibold text-slate-400 uppercase tracking-wider block truncate">CUTI TERPAKAI</span>
+                                <span class="text-[8.5px] font-semibold text-slate-400 uppercase tracking-wider block truncate">TERPAKAI</span>
                             </div>
                             <div>
                                 <span class="text-xs font-bold text-rose-600 block leading-tight truncate" title="Rp {{ number_format($c['total_potongan'], 0, ',', '.') }}">
