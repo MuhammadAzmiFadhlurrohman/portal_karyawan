@@ -12,7 +12,7 @@ class TicketPolicy
      */
     public function view(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo']) || $user->isAtasan()) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo', 'helpdesk']) || $user->isAtasan()) {
             return true;
         }
 
@@ -21,7 +21,19 @@ class TicketPolicy
             return true;
         }
 
-        return $tiket->ticketAssignees()->where('user_id', $user->id)->exists();
+        if ($tiket->ticketAssignees()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        if (!empty($tiket->team_members) && is_array($tiket->team_members)) {
+            foreach ($tiket->team_members as $member) {
+                if (strcasecmp(trim((string)$member), trim($user->name)) === 0) {
+                    return true;
+                }
+            }
+        }
+
+        return $user->division === 'Teknik' || $user->hasRole(['teknisi', 'karyawan_teknik']);
     }
 
     /**
@@ -31,12 +43,29 @@ class TicketPolicy
      */
     public function update(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo']) || $user->isAtasan()) {
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo', 'helpdesk']) || $user->isAtasan()) {
             return true;
         }
 
         // Technicians can only write if they are assigned to this ticket's team (AC-05)
-        return $tiket->ticketAssignees()->where('user_id', $user->id)->exists();
+        if ($tiket->ticketAssignees()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        if (!empty($tiket->team_members) && is_array($tiket->team_members)) {
+            foreach ($tiket->team_members as $member) {
+                if (strcasecmp(trim((string)$member), trim($user->name)) === 0) {
+                    return true;
+                }
+            }
+        }
+
+        // If ticket has no assignees yet, allow technician from Teknik division to write
+        if ($tiket->ticketAssignees()->doesntExist()) {
+            return $user->division === 'Teknik' || $user->hasRole(['teknisi', 'karyawan_teknik']);
+        }
+
+        return false;
     }
 
     /**
@@ -44,11 +73,29 @@ class TicketPolicy
      */
     public function closingAwal(User $user, Tiket $tiket): bool
     {
-        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi'])) {
+        // 1. Management, Supervisors, NOC, Helpdesk, and Admins can always coordinate and submit/save resume
+        if ($user->hasRole(['super_admin', 'admin', 'manager_teknisi', 'noc', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum', 'ceo', 'helpdesk']) || $user->isAtasan()) {
             return true;
         }
 
-        return $tiket->ticketAssignees()->where('user_id', $user->id)->exists();
+        // 2. Technicians assigned in ticket_assignees
+        if ($tiket->ticketAssignees()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        // 3. Technicians listed in team_members (saved or submitted)
+        $allMembers = array_merge(
+            is_array($tiket->team_members) ? $tiket->team_members : [],
+            is_array(request('team_members')) ? request('team_members') : []
+        );
+        foreach ($allMembers as $member) {
+            if (!empty($member) && strcasecmp(trim((string)$member), trim($user->name)) === 0) {
+                return true;
+            }
+        }
+
+        // 4. Any technician in Teknik division handling the ticket
+        return $user->division === 'Teknik' || $user->hasRole(['teknisi', 'karyawan_teknik']);
     }
 
     /**

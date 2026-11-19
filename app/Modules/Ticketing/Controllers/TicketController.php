@@ -534,7 +534,7 @@ class TicketController extends Controller
             }
 
             return redirect()->route('tickets.show', $tiket)->with('success', "Closing Awal tiket {$tiket->no_tiket} berhasil diajukan untuk verifikasi.");
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
             }
@@ -559,7 +559,7 @@ class TicketController extends Controller
             }
 
             return redirect()->route('tickets.show', $tiket)->with('success', $msg);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
             }
@@ -590,7 +590,7 @@ class TicketController extends Controller
             }
 
             return redirect()->route('tickets.show', $tiket)->with('success', $msg);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
             }
@@ -616,7 +616,7 @@ class TicketController extends Controller
             $this->stateMachine->reopen($tiket, $request->user(), $validated['reason']);
 
             return redirect()->route('tickets.show', $tiket)->with('success', "Tiket {$tiket->no_tiket} berhasil di-reopen.");
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->route('tickets.show', $tiket)->withErrors(['reopen' => $e->getMessage()]);
         }
     }
@@ -638,7 +638,7 @@ class TicketController extends Controller
             $this->stateMachine->cancel($tiket, $request->user(), $validated['reason']);
 
             return redirect()->route('tickets.show', $tiket)->with('success', "Tiket {$tiket->no_tiket} berhasil dibatalkan.");
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->route('tickets.show', $tiket)->withErrors(['cancel' => $e->getMessage()]);
         }
     }

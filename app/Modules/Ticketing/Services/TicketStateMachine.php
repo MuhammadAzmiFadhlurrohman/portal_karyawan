@@ -28,8 +28,8 @@ class TicketStateMachine
      */
     public function submitClosingAwal(Tiket $tiket, User $technician, array $closingData = []): array
     {
-        if ($tiket->status !== 'PROSES') {
-            throw new Exception("Closing Awal hanya dapat dilakukan dari status PROSES (Status saat ini: {$tiket->status}).");
+        if (! in_array($tiket->status, ['PROSES', 'PENDING_VERIFIKASI'])) {
+            throw new Exception("Closing Awal hanya dapat dilakukan dari status PROSES atau PENDING_VERIFIKASI (Status saat ini: {$tiket->status}).");
         }
 
         // Active Stop Clock check (§7.2)
@@ -83,6 +83,19 @@ class TicketStateMachine
         }
         $tiket->save();
 
+        // Auto-assign technician if not already in ticket_assignees
+        if ($technician->hasRole(['teknisi', 'karyawan_teknik']) || $technician->division === 'Teknik') {
+            if ($tiket->ticketAssignees()->where('user_id', $technician->id)->doesntExist()) {
+                $hasLead = $tiket->ticketAssignees()->where('role_in_team', 'lead')->exists();
+                $tiket->ticketAssignees()->create([
+                    'user_id' => $technician->id,
+                    'role_in_team' => $hasLead ? 'member' : 'lead',
+                    'assigned_by' => $technician->id,
+                    'assigned_at' => Carbon::now('Asia/Jakarta'),
+                ]);
+            }
+        }
+
         // Check closing prerequisites (§7.6, AC-06)
         $prereqs = $this->assetService->checkClosingPrerequisites($tiket);
         if (! $prereqs['passed']) {
@@ -94,27 +107,31 @@ class TicketStateMachine
 
         DB::transaction(function () use ($tiket, $technician): void {
             $now = Carbon::now('Asia/Jakarta');
+            $wasPending = ($tiket->status === 'PENDING_VERIFIKASI');
+
             $tiket->status = 'PENDING_VERIFIKASI';
-            $tiket->pending_verification_at = $now;
+            $tiket->pending_verification_at = $tiket->pending_verification_at ?? $now;
             $tiket->closing_awal_by = $technician->id;
             $tiket->closing_awal_at = $now;
             $tiket->save();
 
-            $tiket->statusHistories()->create([
-                'from_status' => 'PROSES',
-                'to_status' => 'PENDING_VERIFIKASI',
-                'changed_by' => $technician->id,
-                'reason' => 'Closing Awal disubmit oleh teknisi lapangan',
-                'created_at' => $now,
-            ]);
+            if (! $wasPending) {
+                $tiket->statusHistories()->create([
+                    'from_status' => 'PROSES',
+                    'to_status' => 'PENDING_VERIFIKASI',
+                    'changed_by' => $technician->id,
+                    'reason' => 'Closing Awal disubmit oleh teknisi lapangan',
+                    'created_at' => $now,
+                ]);
 
-            AuditLogger::record(
-                action: 'ticket.closing_awal.submit',
-                auditable: $tiket,
-                newValues: ['status' => 'PENDING_VERIFIKASI'],
-                reason: "Closing Awal diajukan oleh {$technician->name}",
-                actorId: $technician->id
-            );
+                AuditLogger::record(
+                    action: 'ticket.closing_awal.submit',
+                    auditable: $tiket,
+                    newValues: ['status' => 'PENDING_VERIFIKASI'],
+                    reason: "Closing Awal diajukan oleh {$technician->name}",
+                    actorId: $technician->id
+                );
+            }
         });
 
         return [
