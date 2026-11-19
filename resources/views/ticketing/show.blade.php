@@ -1350,9 +1350,9 @@
                                 <div class="relative shrink-0">
                                     <button type="button"
                                             onclick="toggleMessageMenu({{ $chron->id }}, event)"
-                                            class="w-6 h-6 rounded-lg text-slate-600 hover:text-slate-900 bg-slate-200/70 hover:bg-slate-300/90 border border-slate-300/50 shadow-2xs flex items-center justify-center transition cursor-pointer active:scale-95"
+                                            class="w-6 h-6 rounded-md text-slate-500 hover:text-slate-800 hover:bg-black/5 flex items-center justify-center transition cursor-pointer active:scale-95"
                                             title="Pilihan pesan">
-                                        <svg class="w-3.5 h-3.5 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-4 h-4 text-slate-600 hover:text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                                         </svg>
                                     </button>
@@ -4565,21 +4565,10 @@ function toggleMessageMenu(id, e) {
     closeAllMessageMenus();
 
     if (!wasOpen && targetDropdown) {
-        // Default to opening upwards (ke atas)
+        // Always open upwards above the chat bubble (di atas chat)
         targetDropdown.classList.remove('top-full', 'mt-1', 'mt-1.5');
         targetDropdown.classList.add('bottom-full', 'mb-1.5');
         targetDropdown.classList.remove('hidden');
-
-        // If clipped by top boundary of chat container, flip downwards gracefully
-        const chatBox = document.getElementById('chat-stream-box');
-        if (chatBox) {
-            const rect = targetDropdown.getBoundingClientRect();
-            const chatBoxRect = chatBox.getBoundingClientRect();
-            if (rect.top < chatBoxRect.top + 8) {
-                targetDropdown.classList.remove('bottom-full', 'mb-1.5');
-                targetDropdown.classList.add('top-full', 'mt-1.5');
-            }
-        }
     }
 }
 
@@ -5034,9 +5023,9 @@ async function handleChatFormSubmit(e) {
                     </div>
                     <div class="relative shrink-0 msg-menu-container">
                         <button type="button"
-                                class="w-6 h-6 rounded-lg text-slate-600 hover:text-slate-900 bg-slate-200/70 hover:bg-slate-300/90 border border-slate-300/50 shadow-2xs flex items-center justify-center transition cursor-pointer"
+                                class="w-6 h-6 rounded-md text-slate-500 hover:text-slate-800 hover:bg-black/5 flex items-center justify-center transition cursor-pointer"
                                 title="Pilihan pesan">
-                            <svg class="w-3.5 h-3.5 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-4 h-4 text-slate-600 hover:text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                             </svg>
                         </button>
@@ -5129,9 +5118,9 @@ async function handleChatFormSubmit(e) {
                     menuContainer.innerHTML = `
                         <button type="button"
                                 onclick="toggleMessageMenu(${chron.id}, event)"
-                                class="w-6 h-6 rounded-lg text-slate-600 hover:text-slate-900 bg-slate-200/70 hover:bg-slate-300/90 border border-slate-300/50 shadow-2xs flex items-center justify-center transition cursor-pointer active:scale-95"
+                                class="w-6 h-6 rounded-md text-slate-500 hover:text-slate-800 hover:bg-black/5 flex items-center justify-center transition cursor-pointer active:scale-95"
                                 title="Pilihan pesan">
-                            <svg class="w-3.5 h-3.5 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-4 h-4 text-slate-600 hover:text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                             </svg>
                         </button>
@@ -6333,9 +6322,9 @@ function renderIncomingLiveMessage(data) {
                 <div class="relative shrink-0">
                     <button type="button"
                             onclick="toggleMessageMenu(${data.id}, event)"
-                            class="w-6 h-6 rounded-lg text-slate-600 hover:text-slate-900 bg-slate-200/70 hover:bg-slate-300/90 border border-slate-300/50 shadow-2xs flex items-center justify-center transition cursor-pointer active:scale-95"
+                            class="w-6 h-6 rounded-md text-slate-500 hover:text-slate-800 hover:bg-black/5 flex items-center justify-center transition cursor-pointer active:scale-95"
                             title="Pilihan pesan">
-                        <svg class="w-3.5 h-3.5 text-slate-700" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-4 h-4 text-slate-600 hover:text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
                         </svg>
                     </button>
