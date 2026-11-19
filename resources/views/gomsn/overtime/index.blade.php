@@ -93,11 +93,7 @@
                         @if ($isFinance)
                             <span>Rekapitulasi &amp; Pembayaran Lembur</span>
                         @elseif ($isHrd)
-                            @if ($viewMode === 'saya')
-                                <span>Pengajuan Lembur Saya Sendiri</span>
-                            @else
-                                <span>Rekapitulasi Lembur Karyawan</span>
-                            @endif
+                            <span>Rekapitulasi Lembur Karyawan</span>
                         @elseif ($isAtasan)
                             <span>Persetujuan Lembur Karyawan</span>
                         @else
@@ -108,11 +104,7 @@
                         @if ($isFinance)
                             Berikut adalah ringkasan seluruh aktivitas keuangan &amp; pembayaran lembur karyawan real-time.
                         @elseif ($isHrd)
-                            @if ($viewMode === 'saya')
-                                Monitoring dan riwayat pengajuan lembur pribadi Anda serta status approval atasan &amp; pencairan.
-                            @else
-                                Monitoring rekapitulasi pengajuan lembur seluruh divisi staf yang telah disetujui atasan.
-                            @endif
+                            Monitoring rekapitulasi pengajuan lembur seluruh divisi staf yang telah disetujui atasan.
                         @else
                             Monitoring data jam lembur, verifikasi pekerjaan lapangan, dan transparansi perhitungan uang lembur.
                         @endif
@@ -268,24 +260,6 @@
                 </div>
             </form>
 
-            <!-- Mode Switcher Khusus HRD (Rekapitulasi Karyawan vs Lembur Saya Sendiri) -->
-            @if ($isHrd)
-            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
-                <div class="inline-flex items-center p-1 bg-slate-100/80 rounded-xl text-xs font-semibold">
-                    <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'karyawan', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun]) }}" 
-                       class="px-3.5 py-1.5 rounded-lg transition {{ $viewMode !== 'saya' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
-                        Lembur Karyawan (Disetujui Atasan)
-                    </a>
-                    <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'saya', 'bulan' => $selectedBulan, 'tahun' => $selectedTahun]) }}" 
-                       class="px-3.5 py-1.5 rounded-lg transition {{ $viewMode === 'saya' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600 hover:text-slate-900' }}">
-                        Pengajuan Lembur Saya Sendiri
-                    </a>
-                </div>
-                <div class="text-[11px] text-slate-500">
-                    Role HRD memonitor rekapitulasi lembur karyawan yang telah disetujui atasan &amp; pengajuan mandiri.
-                </div>
-            </div>
-            @endif
 
             <!-- Notifikasi & Shortcut jika ada Lembur Bulan Sebelumnya yang Belum Diproses (Khusus Atasan / Admin / Finance yang perlu memproses) -->
             @if ($unprocessedPreviousCount > 0 && ! $isFilterUnprocessed && ! $isHrd)
