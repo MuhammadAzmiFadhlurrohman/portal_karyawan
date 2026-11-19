@@ -235,7 +235,7 @@
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9.5 8.5h-2v1.5h2v1.5h-2V16H4V9h3.5c.8 0 1.5.7 1.5 1.5v1c0 .8-.7 1.5-1.5 1.5zm5 4.5h-3.5V9H14c.8 0 1.5.7 1.5 1.5v4c0 .8-.7 1.5-1.5 1.5zm4.5-4.5H17v1.5h2V14h-2v2h-1.5V9H19c.8 0 1.5.7 1.5 1.5v1c0 .8-.7 1.5-1.5 1.5z"/></svg>
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="font-bold text-slate-800 leading-tight">PDF Internal (Lengkap)</div>
+                                    <div class="font-bold text-slate-800 leading-tight">PDF Internal</div>
                                     <div class="text-[10px] text-slate-400 font-normal truncate">Data teknis, mapping core &amp; kronologis</div>
                                 </div>
                             </a>
@@ -245,7 +245,7 @@
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="font-bold text-slate-800 leading-tight">PDF Pelanggan (Customer)</div>
+                                    <div class="font-bold text-slate-800 leading-tight">PDF Pelanggan</div>
                                     <div class="text-[10px] text-slate-400 font-normal truncate">Berita Acara resmi, akar masalah &amp; foto</div>
                                 </div>
                             </a>
