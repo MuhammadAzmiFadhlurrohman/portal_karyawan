@@ -188,24 +188,24 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center gap-1.5 shrink-0 relative z-10">
+            <div class="flex items-center gap-2 shrink-0 relative z-10">
                 <!-- Tombol Hapus Riwayat Chat Langsung Tanpa Alert -->
                 <button @click="clearChat()" 
                         type="button" 
-                        class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
+                        class="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
                         title="Hapus Riwayat Chat"
                         aria-label="Hapus Riwayat Chat">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
                 </button>
                 <!-- Tombol Tutup Chat -->
                 <button @click="closeChat()" 
                         type="button" 
-                        class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
+                        class="w-9.5 h-9.5 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 text-teal-100 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 shadow-2xs active:scale-95"
                         title="Tutup Chat"
                         aria-label="Tutup Chat">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <svg class="w-4.5 h-4.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
