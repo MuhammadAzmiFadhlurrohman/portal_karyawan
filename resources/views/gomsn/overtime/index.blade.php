@@ -472,7 +472,6 @@
                                         <input type="hidden" name="target_status" value="{{ $stat['is_paid'] ? 'unpaid' : 'paid' }}">
                                         
                                         <button type="submit" 
-                                                onclick="return confirm('Ubah status pembayaran lembur {{ addslashes($cardUser->name) }} menjadi {{ $stat['is_paid'] ? 'BELUM DIBAYAR (OFF)' : 'SUDAH DIBAYAR (ON)' }}?')"
                                                 title="Status: {{ $stat['is_paid'] ? 'Sudah Dibayarkan (ON)' : 'Belum Dibayarkan (OFF)' }}. Klik untuk mengubah."
                                                 class="group inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full border text-[9.5px] transition-all shadow-2xs cursor-pointer select-none {{ $stat['is_paid'] ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200' }}">
                                             
