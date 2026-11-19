@@ -4485,8 +4485,8 @@ function coreManeuverModal() {
              onclick="event.stopPropagation()">
     </div>
 
-    <!-- Bottom Instruction Pill -->
-    <div class="flex justify-center pb-1 z-20 shrink-0 pointer-events-none">
+    <!-- Bottom Instruction Pill (Disembunyikan di Mobile, Khusus Desktop) -->
+    <div class="hidden sm:flex justify-center pb-1 z-20 shrink-0 pointer-events-none">
         <div style="background-color: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.12);"
              class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-medium text-slate-300 shadow-lg backdrop-blur-md pointer-events-auto">
             <span>Klik dua kali foto untuk Zoom &bull; Klik area gelap atau tekan</span>
