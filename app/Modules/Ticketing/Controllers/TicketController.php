@@ -89,10 +89,12 @@ class TicketController extends Controller
         $stats = [
             'total' => Tiket::count(),
             'open' => Tiket::where('status', 'OPEN')->count(),
-            'proses' => Tiket::where('status', 'PROSES')->count(),
+            'proses' => Tiket::whereIn('status', ['PROSES', 'PENDING_VERIFIKASI'])->count(),
             'pending_verifikasi' => Tiket::where('status', 'PENDING_VERIFIKASI')->count(),
+            'close' => Tiket::where('status', 'CLOSE')->count(),
             'selesai' => Tiket::where('status', 'CLOSE')->count(),
-            'sla_tepat' => Tiket::where('status', 'CLOSE')->where('sla_status', 'TEPAT')->count(),
+            'sla_lebih' => Tiket::where('sla_status', 'LEBIH')->count(),
+            'sla_tepat' => Tiket::where('sla_status', 'TEPAT')->count(),
         ];
 
         return view('ticketing.index', compact('tickets', 'technicians', 'slaMatrix', 'stats'));
