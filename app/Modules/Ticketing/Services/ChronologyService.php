@@ -64,7 +64,7 @@ class ChronologyService
         ): TicketChronology {
             // Find last chronology before this one
             /** @var TicketChronology|null $lastChronology */
-            $lastChronology = $tiket->chronologies()->latest('id')->first();
+            $lastChronology = $tiket->chronologies()->reorder()->latest('id')->first();
 
             // Resolve cached reverse geocoded address if lat/lng given
             $address = null;
@@ -156,15 +156,17 @@ class ChronologyService
             return 'NORMAL';
         }
 
-        $currentTime = $now ?? Carbon::now('Asia/Jakarta');
-        $lastChronology = $tiket->chronologies()->latest('created_at')->first();
+        $currentTime = $now ?? Carbon::now();
+        $lastChronology = $tiket->relationLoaded('chronologies') && $tiket->chronologies->isNotEmpty()
+            ? $tiket->chronologies->last()
+            : $tiket->chronologies()->reorder()->latest('id')->first();
         $referenceTime = $lastChronology?->created_at ?? $tiket->first_response_at ?? $tiket->tanggal_open;
 
         if (! $referenceTime) {
             return 'NORMAL';
         }
 
-        $elapsed = (int) $referenceTime->diffInMinutes($currentTime);
+        $elapsed = (int) abs($referenceTime->diffInMinutes($currentTime));
 
         if ($elapsed <= 20) {
             return 'NORMAL';

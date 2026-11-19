@@ -37,7 +37,7 @@ class HandoverService
             $now = Carbon::now('Asia/Jakarta');
 
             // Build auto-summary (§7.5)
-            $lastChronology = $tiket->chronologies()->latest('created_at')->first();
+            $lastChronology = $tiket->chronologies()->reorder()->latest('id')->first();
             $activeStop = $tiket->activeStopClock;
             $stopStatus = $activeStop ? "Stop Clock AKTIF ({$activeStop->reason})" : 'Tidak ada Stop Clock aktif';
             $lastAction = $lastChronology ? "Kronologis terakhir [{$lastChronology->category}]: {$lastChronology->message}" : 'Belum ada kronologis';

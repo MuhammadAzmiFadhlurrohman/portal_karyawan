@@ -618,8 +618,19 @@
     <!-- ========================================================================= -->
     <!-- 5. OVERDUE COMPLIANCE ALERT (30-Min SOP Interval - matching Image 2) -->
     <!-- ========================================================================= -->
-    @if($intervalStatus === 'OVERDUE' && $tiket->status !== 'CLOSE' && $tiket->status !== 'CANCELLED')
-        <div class="rounded-2xl p-4 sm:p-5 bg-rose-50 border-2 border-rose-300 shadow-sm space-y-3">
+    @php
+        $lastChron = $tiket->relationLoaded('chronologies') && $tiket->chronologies->isNotEmpty()
+            ? $tiket->chronologies->last()
+            : $tiket->chronologies()->reorder()->latest('id')->first();
+        $refTime = $lastChron?->created_at ?? $tiket->first_response_at ?? $tiket->tanggal_open;
+        $isIntervalOverdue = false;
+        if ($refTime && in_array($tiket->status, ['PROSES', 'OPEN'], true) && !$tiket->activeStopClock()->exists()) {
+            $diffMins = (int) abs($refTime->diffInMinutes(now()));
+            $isIntervalOverdue = ($diffMins > 30);
+        }
+    @endphp
+    @if($isIntervalOverdue && $tiket->status !== 'CLOSE' && $tiket->status !== 'CANCELLED')
+        <div id="overdue-interval-alert" class="rounded-2xl p-4 sm:p-5 bg-rose-50 border-2 border-rose-300 shadow-sm space-y-3 transition-all duration-300">
             <div class="flex items-center gap-2 text-rose-800">
                 <span class="w-3 h-3 rounded-full bg-rose-600 animate-ping"></span>
                 <h3 class="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-rose-900">
@@ -627,12 +638,12 @@
                 </h3>
             </div>
             <p class="text-xs text-rose-700">
-                Terakhir update: <strong class="text-rose-900">{{ $tiket->chronologies->last()?->created_at?->diffForHumans() ?? 'Belum ada update' }}</strong> &bull; SOP interval koordinasi teknisi maksimal 30 menit.
+                Terakhir update: <strong class="text-rose-900">{{ $lastChron?->created_at?->diffForHumans() ?? 'Belum ada update' }}</strong> &bull; SOP interval koordinasi teknisi maksimal 30 menit.
             </p>
             <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
                 <div class="flex items-center gap-4 text-xs font-mono">
                     <span class="px-3 py-1 rounded-xl bg-white border border-rose-200 text-rose-800 font-bold">
-                        TERAKHIR: {{ $tiket->chronologies->last()?->created_at?->format('H:i') ?? '-' }} WIB
+                        TERAKHIR: {{ $lastChron?->created_at ? $lastChron->created_at->timezone('Asia/Jakarta')->format('H:i') : '-' }} WIB
                     </span>
                     <span class="px-3 py-1 rounded-xl bg-white border border-rose-200 text-slate-700">
                         STATUS: OVERDUE INTERVAL
@@ -5082,6 +5093,8 @@ async function handleChatFormSubmit(e) {
             highestChronologyId = Math.max(highestChronologyId, chron.id);
         }
 
+        dismissOverdueAlert();
+
         // Transition pending clock icon -> double grey checkmark (Terkirim) like WhatsApp
         const tempBubbleRow = document.getElementById(tempRowId);
         if (tempBubbleRow && chron) {
@@ -6176,9 +6189,21 @@ function updateReadReceiptsUpTo(maxReadId) {
     });
 }
 
+function dismissOverdueAlert() {
+    const alertBox = document.getElementById('overdue-interval-alert');
+    if (alertBox) {
+        alertBox.style.opacity = '0';
+        alertBox.style.transform = 'translateY(-8px)';
+        setTimeout(() => {
+            alertBox.remove();
+        }, 300);
+    }
+}
+
 function handleIncomingLivePayload(data) {
     if (!data || !data.id) return;
     highestChronologyId = Math.max(highestChronologyId, data.id);
+    dismissOverdueAlert();
 
     // If message already rendered (e.g. self optimistic message), ignore
     if (document.getElementById('chron-row-' + data.id)) {
