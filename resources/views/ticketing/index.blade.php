@@ -482,7 +482,7 @@
                 </div>
 
                 <!-- Card Footer: PIC & Detail Action -->
-                <div class="bg-slate-50/70 px-3.5 py-2.5 pl-4 sm:px-4 sm:pl-4.5 border-t border-slate-100 flex items-center justify-between gap-2 text-[11px]">
+                <div class="bg-slate-50/70 px-3.5 py-2.5 pl-4 sm:px-4 sm:py-3 sm:pl-4.5 border-t border-slate-100 flex items-center justify-between gap-3 text-[11px]">
                     <div class="flex items-center gap-1.5 min-w-0">
                         <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         <span class="text-slate-700 font-semibold truncate max-w-[140px] text-[11px]">
@@ -496,10 +496,10 @@
                     </div>
 
                     <a href="{{ route('tickets.show', $ticket) }}"
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs text-white shadow-xs shadow-teal-950/20 hover:shadow-md hover:brightness-105 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shrink-0"
+                       class="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl font-extrabold text-xs sm:text-[13px] text-white shadow-sm shadow-teal-950/20 hover:shadow-md hover:shadow-teal-600/30 hover:brightness-105 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shrink-0"
                        style="background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);">
                         <span>Detail</span>
-                        <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                        <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                     </a>
                 </div>
             </div>
