@@ -389,6 +389,19 @@ class ChatbotService
 
         // Typos & synonym normalization
         $synonyms = [
+            'haii' => 'hai',
+            'haiii' => 'hai',
+            'haloo' => 'halo',
+            'halooo' => 'halo',
+            'helo' => 'halo',
+            'heloo' => 'halo',
+            'helooo' => 'halo',
+            'oy' => 'halo',
+            'woi' => 'halo',
+            'hei' => 'hai',
+            'heyy' => 'hai',
+            'hey' => 'hai',
+            'p' => 'ping',
             'gimana' => 'bagaimana',
             'gmn' => 'bagaimana',
             'bgmn' => 'bagaimana',
@@ -685,7 +698,10 @@ class ChatbotService
 
                 // Short greetings need whole-word match
                 if ($intent->category === 'umum' && mb_strlen($kwNorm) <= 6) {
-                    if (preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)) {
+                    if (
+                        preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
+                        || preg_match('/\b' . preg_quote($kwNorm, '/') . '\b/u', $normMessage)
+                    ) {
                         if (count($userTokens) <= 2) {
                             $intentScore = max($intentScore, 2.5);
                         } else {

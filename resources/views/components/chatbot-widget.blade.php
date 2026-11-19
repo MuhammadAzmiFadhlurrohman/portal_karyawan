@@ -411,6 +411,7 @@
             activeTypingInterval: null,
             messages: initialMessages,
             init() {
+                this.messages.forEach(m => { m.isTyping = false; });
                 if (this.isOpen) {
                     this.scrollToBottom();
                 }
@@ -544,17 +545,26 @@
                     }
                 });
             },
-            typeMessage(fullText, msgObj, onComplete) {
+            typeMessage(fullText, msgIndex, onComplete) {
                 this.clearActiveTyping();
-                msgObj.isTyping = true;
-                msgObj.text = '';
+                if (typeof msgIndex !== 'number' || !this.messages[msgIndex]) return;
 
-                const totalLength = fullText.length;
+                const textToType = typeof fullText === 'string' ? fullText : String(fullText || '');
+                const totalLength = textToType.length;
+
+                this.messages[msgIndex].isTyping = true;
+                this.messages[msgIndex].text = '';
+
+                if (totalLength === 0) {
+                    this.messages[msgIndex].isTyping = false;
+                    return;
+                }
+
                 let chunkSize = 1;
                 let delay = 18;
 
                 if (totalLength > 500) {
-                    chunkSize = Math.max(4, Math.ceil(totalLength / 100));
+                    chunkSize = Math.max(4, Math.ceil(totalLength / 80));
                     delay = 10;
                 } else if (totalLength > 200) {
                     chunkSize = 3;
@@ -568,16 +578,26 @@
                 }
 
                 let currentIndex = 0;
+                const box = document.getElementById('chatbot-messages');
+
                 this.activeTypingInterval = setInterval(() => {
+                    if (!this.messages[msgIndex]) {
+                        this.clearActiveTyping();
+                        return;
+                    }
+
                     currentIndex = Math.min(currentIndex + chunkSize, totalLength);
-                    msgObj.text = fullText.slice(0, currentIndex);
-                    this.scrollToBottom();
+                    this.messages[msgIndex].text = textToType.slice(0, currentIndex);
+
+                    if (box) {
+                        box.scrollTop = box.scrollHeight;
+                    }
 
                     if (currentIndex >= totalLength) {
                         clearInterval(this.activeTypingInterval);
                         this.activeTypingInterval = null;
-                        msgObj.isTyping = false;
-                        msgObj.text = fullText;
+                        this.messages[msgIndex].isTyping = false;
+                        this.messages[msgIndex].text = textToType;
                         this.saveMessages();
                         this.scrollToBottom();
                         if (onComplete) onComplete();
@@ -645,25 +665,25 @@
                     this.loading = false;
 
                     if (resJson && resJson.data && resJson.data.response) {
-                        const botMsg = {
+                        this.messages.push({
                             sender: 'bot',
                             text: '',
                             isTyping: true,
                             action_url: resJson.data.action_url || null,
                             action_label: resJson.data.action_label || null
-                        };
-                        this.messages.push(botMsg);
-                        this.typeMessage(resJson.data.response, botMsg);
+                        });
+                        const newMsgIndex = this.messages.length - 1;
+                        this.typeMessage(resJson.data.response, newMsgIndex);
                     } else {
-                        const errorMsg = { sender: 'bot', text: '', isTyping: true };
-                        this.messages.push(errorMsg);
-                        this.typeMessage('Maaf, terjadi kendala saat memproses balasan.', errorMsg);
+                        this.messages.push({ sender: 'bot', text: '', isTyping: true });
+                        const newMsgIndex = this.messages.length - 1;
+                        this.typeMessage('Maaf, terjadi kendala saat memproses balasan.', newMsgIndex);
                     }
                 } catch (e) {
                     this.loading = false;
-                    const errorMsg = { sender: 'bot', text: '', isTyping: true };
-                    this.messages.push(errorMsg);
-                    this.typeMessage('Maaf, terjadi kesalahan koneksi jaringan.', errorMsg);
+                    this.messages.push({ sender: 'bot', text: '', isTyping: true });
+                    const newMsgIndex = this.messages.length - 1;
+                    this.typeMessage('Maaf, terjadi kesalahan koneksi jaringan.', newMsgIndex);
                 }
             },
             scrollToBottom() {
