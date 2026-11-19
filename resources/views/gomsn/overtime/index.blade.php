@@ -113,8 +113,8 @@
             </div>
         </div>
 
-        {{-- Action Toolbar: Tombol Ajukan Permohonan Lembur --}}
-        @if ($isHrd || ! $isAtasan)
+        {{-- Action Toolbar: Tombol Ajukan Permohonan Lembur (Hanya untuk Karyawan Mandiri, Tidak Muncul di Halaman Monitoring/Rekap Lembur Karyawan) --}}
+        @if (! $isHrd && ! $isAtasan && ! $isFinance && ! $isSuperAdmin)
         <div class="flex items-center justify-end">
             <a href="{{ route('gomsn.overtime.create') }}" 
                class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
@@ -756,7 +756,7 @@
                         <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-1 leading-relaxed">
                             Tidak ada data rincian lembur untuk periode yang dipilih.
                         </p>
-                        @if ($isHrd || ! $isAtasan)
+                        @if (! $isHrd && ! $isAtasan && ! $isFinance && ! $isSuperAdmin)
                             <a href="{{ route('gomsn.overtime.create') }}" class="inline-flex items-center gap-1.5 mt-3.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                 <span>Ajukan Lembur Sekarang</span>
