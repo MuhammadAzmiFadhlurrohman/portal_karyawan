@@ -2333,7 +2333,38 @@
                     <span class="text-xs font-bold font-mono text-slate-400">{{ $tiket->repairPoints->count() }} Titik</span>
                 </div>
 
-                <form method="POST" action="{{ route('tickets.repair-points.store', $tiket) }}" class="space-y-3 text-xs">
+                <form method="POST" action="{{ route('tickets.repair-points.store', $tiket) }}" 
+                      x-data="{ 
+                          lat: '', 
+                          lng: '', 
+                          isGpsLoading: false, 
+                          getGps() {
+                              this.isGpsLoading = true;
+                              const applyCoords = (la, ln) => {
+                                  this.lat = Number(la).toFixed(6);
+                                  this.lng = Number(ln).toFixed(6);
+                                  this.isGpsLoading = false;
+                              };
+                              if (!navigator.geolocation) {
+                                  fetch('https://ipwho.is/').then(r=>r.json()).then(d=>{ if(d.latitude) applyCoords(d.latitude, d.longitude); else this.isGpsLoading=false; }).catch(()=>{ this.isGpsLoading = false; });
+                                  return;
+                              }
+                              navigator.geolocation.getCurrentPosition(
+                                  (pos) => applyCoords(pos.coords.latitude, pos.coords.longitude),
+                                  () => {
+                                      navigator.geolocation.getCurrentPosition(
+                                          (fb) => applyCoords(fb.coords.latitude, fb.coords.longitude),
+                                          () => {
+                                              fetch('https://ipwho.is/').then(r=>r.json()).then(d=>{ if(d.latitude) applyCoords(d.latitude, d.longitude); else this.isGpsLoading=false; }).catch(()=>{ this.isGpsLoading=false; });
+                                          },
+                                          { enableHighAccuracy: false, timeout: 8000 }
+                                      );
+                                  },
+                                  { enableHighAccuracy: true, timeout: 5000 }
+                              );
+                          }
+                      }"
+                      class="space-y-3 text-xs">
                     @csrf
                     <div>
                         <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Deskripsi Titik Tiang / Span *</label>
@@ -2341,12 +2372,19 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Latitude *</label>
-                            <input type="number" step="any" name="latitude" required placeholder="-6.917464" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Latitude *</label>
+                                <button type="button" @click="getGps()" :disabled="isGpsLoading" class="text-[10px] font-bold text-teal-600 hover:text-teal-700 inline-flex items-center gap-1 cursor-pointer">
+                                    <span x-text="isGpsLoading ? 'Mendeteksi...' : 'Ambil GPS'"></span>
+                                </button>
+                            </div>
+                            <input type="number" step="any" name="latitude" x-model="lat" required placeholder="-6.917464" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-700 mb-1 uppercase tracking-wider text-[10px]">Longitude *</label>
-                            <input type="number" step="any" name="longitude" required placeholder="107.619122" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Longitude *</label>
+                            </div>
+                            <input type="number" step="any" name="longitude" x-model="lng" required placeholder="107.619122" class="w-full text-xs rounded-xl border border-slate-300 p-2.5">
                         </div>
                     </div>
                     <button type="submit" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-xs transition">
@@ -2917,6 +2955,10 @@ function jointClosureModal() {
         lat: '',
         lng: '',
         isGpsLoading: false,
+        gpsStatus: '',
+        gpsError: '',
+        gpsAddress: '',
+        gpsAccuracy: null,
         isNewCut: false,
         kapasitasAsal: 24,
         jumlahTubeAsal: 2,
@@ -2951,31 +2993,139 @@ function jointClosureModal() {
             }
         ],
 
-        getGps() {
+        init() {
+            window.addEventListener('jc-modal-opened', () => {
+                if (!this.lat || !this.lng) {
+                    this.getGps(false, false);
+                }
+            });
+        },
+
+        getGps(openMapAfter = false, showAlertOnError = true) {
+            this.isGpsLoading = true;
+            this.gpsStatus = 'Mendeteksi koordinat GPS...';
+            this.gpsError = '';
+
+            const applyCoords = (pos, source) => {
+                const latNum = pos.coords.latitude;
+                const lngNum = pos.coords.longitude;
+                const acc = Math.round(pos.coords.accuracy || 10);
+                this.lat = latNum.toFixed(6);
+                this.lng = lngNum.toFixed(6);
+                this.gpsAccuracy = acc;
+                this.isGpsLoading = false;
+                this.gpsStatus = `✓ Terdeteksi via ${source} (Akurasi ~${acc}m)`;
+                this.fetchAddress(latNum, lngNum);
+                if (openMapAfter) {
+                    window.open(`https://www.google.com/maps?q=${this.lat},${this.lng}`, '_blank');
+                }
+            };
+
             if (!navigator.geolocation) {
-                alert('Geolocation tidak didukung oleh browser ini.');
+                // Fallback langsung ke Jaringan IP jika browser tidak mendukung geolocation / konteks HTTP
+                this.fetchFromIpFallback(openMapAfter, showAlertOnError);
                 return;
             }
-            this.isGpsLoading = true;
+
+            // 1. Coba High Accuracy (GPS Satelit)
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    this.lat = pos.coords.latitude.toFixed(6);
-                    this.lng = pos.coords.longitude.toFixed(6);
-                    this.isGpsLoading = false;
-                },
+                (pos) => applyCoords(pos, 'GPS'),
                 (err) => {
-                    alert('Gagal mengambil GPS: ' + err.message);
-                    this.isGpsLoading = false;
+                    console.warn('GPS satelit tidak terkunci/timeout, mencoba via jaringan/Wi-Fi...', err);
+                    // 2. Fallback ke Network / Wi-Fi
+                    navigator.geolocation.getCurrentPosition(
+                        (fallbackPos) => applyCoords(fallbackPos, 'Jaringan/Wi-Fi'),
+                        (fallbackErr) => {
+                            console.warn('Network location gagal, fallback ke IP Geolocation...', fallbackErr);
+                            // 3. Fallback ke IP Geolocation (pasti dapat lokasi)
+                            this.fetchFromIpFallback(openMapAfter, showAlertOnError);
+                        },
+                        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
+                    );
                 },
-                { enableHighAccuracy: true, timeout: 10000 }
+                { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
             );
+        },
+
+        async fetchFromIpFallback(openMapAfter = false, showAlertOnError = true) {
+            this.gpsStatus = 'Mendeteksi via Jaringan IP...';
+            try {
+                const res = await fetch('https://ipwho.is/');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.success && data.latitude && data.longitude) {
+                        this.lat = Number(data.latitude).toFixed(6);
+                        this.lng = Number(data.longitude).toFixed(6);
+                        this.gpsAccuracy = 1000;
+                        this.isGpsLoading = false;
+                        this.gpsStatus = '✓ Terdeteksi via Jaringan IP (' + (data.city || 'Regional') + ')';
+                        this.gpsAddress = [data.city, data.region, data.country].filter(Boolean).join(', ');
+                        if (openMapAfter) {
+                            window.open(`https://www.google.com/maps?q=${this.lat},${this.lng}`, '_blank');
+                        }
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('IP fallback ipwho.is failed:', e);
+            }
+
+            try {
+                const res2 = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client?localityLanguage=id');
+                if (res2.ok) {
+                    const d = await res2.json();
+                    if (d && d.latitude && d.longitude) {
+                        this.lat = Number(d.latitude).toFixed(6);
+                        this.lng = Number(d.longitude).toFixed(6);
+                        this.gpsAccuracy = 1500;
+                        this.isGpsLoading = false;
+                        this.gpsStatus = '✓ Terdeteksi via Jaringan IP (' + (d.city || d.locality || 'Regional') + ')';
+                        this.gpsAddress = [d.locality, d.city, d.principalSubdivision].filter(Boolean).join(', ');
+                        if (openMapAfter) {
+                            window.open(`https://www.google.com/maps?q=${this.lat},${this.lng}`, '_blank');
+                        }
+                        return;
+                    }
+                }
+            } catch (e2) {
+                console.warn('IP fallback BigDataCloud failed:', e2);
+            }
+
+            this.isGpsLoading = false;
+            this.gpsError = 'Gagal mendeteksi lokasi otomatis. Silakan periksa izin lokasi browser atau masukkan koordinat secara manual.';
+            this.gpsStatus = '';
+            if (showAlertOnError) alert(this.gpsError);
+        },
+
+        async fetchAddress(lat, lng) {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.display_name) {
+                        this.gpsAddress = data.display_name;
+                        return;
+                    }
+                }
+            } catch (e) {}
+
+            try {
+                const res2 = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=id`);
+                if (res2.ok) {
+                    const d = await res2.json();
+                    const parts = [d.locality, d.city, d.principalSubdivision].filter(Boolean);
+                    if (parts.length) {
+                        this.gpsAddress = parts.join(', ');
+                    }
+                }
+            } catch (e) {}
         },
 
         openMap() {
             if (this.lat && this.lng) {
                 window.open(`https://www.google.com/maps?q=${this.lat},${this.lng}`, '_blank');
             } else {
-                alert('Silakan ambil atau masukkan koordinat GPS terlebih dahulu.');
+                this.getGps(true, true);
             }
         },
 
@@ -3300,11 +3450,11 @@ function coreManeuverModal() {
                                 </svg>
                                 <span>Koordinat GPS Lokasi Closure</span>
                             </label>
-                            <button type="button" @click="getGps()" :disabled="isGpsLoading" class="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 inline-flex items-center gap-1 cursor-pointer">
-                                <svg class="w-3.5 h-3.5" :class="isGpsLoading ? 'animate-spin' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <button type="button" @click="getGps(false, true)" :disabled="isGpsLoading" class="text-[11px] font-bold text-teal-600 dark:text-teal-400 hover:text-teal-700 inline-flex items-center gap-1 cursor-pointer disabled:opacity-50">
+                                <svg class="w-3.5 h-3.5" :class="isGpsLoading ? 'animate-spin text-amber-500' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span x-text="isGpsLoading ? 'Mengambil GPS...' : 'Ambil GPS Saya'"></span>
+                                <span x-text="isGpsLoading ? 'Mendeteksi...' : 'Ambil GPS Saya'"></span>
                             </button>
                         </div>
                         <div class="flex items-center gap-2">
@@ -3324,6 +3474,33 @@ function coreManeuverModal() {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A2 2 0 012.5 15.488V4.724a2 2 0 012.947-1.789L9 4m0 16l6-3m-6 3V4m6 16l5.447-2.724A2 2 0 0021.5 15.488V4.724a2 2 0 00-2.947-1.789L15 4m0 16V4m0 0L9 4"/>
                                 </svg>
                             </button>
+                        </div>
+
+                        <!-- Status & Geocoding Feedback -->
+                        <div x-show="isGpsLoading" class="flex items-center gap-1.5 text-[10.5px] text-amber-600 dark:text-amber-400 pt-0.5">
+                            <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span x-text="gpsStatus || 'Sedang mencari koordinat lokasi...'"></span>
+                        </div>
+
+                        <div x-show="gpsStatus && !isGpsLoading" class="p-2 rounded-lg bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 text-[10.5px] space-y-0.5">
+                            <div class="flex items-center justify-between text-teal-700 dark:text-teal-300 font-semibold">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <span x-text="gpsStatus"></span>
+                                </span>
+                            </div>
+                            <div x-show="gpsAddress" class="text-slate-600 dark:text-slate-400 text-[10px] flex items-start gap-1 pt-0.5">
+                                <span class="shrink-0 text-slate-400">📍</span>
+                                <span x-text="gpsAddress" class="line-clamp-2"></span>
+                            </div>
+                        </div>
+
+                        <div x-show="gpsError && !isGpsLoading" class="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 text-[10.5px] text-rose-700 dark:text-rose-300 flex items-center justify-between">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <span x-text="gpsError"></span>
+                            </span>
+                            <button type="button" @click="getGps(false, true)" class="font-bold underline text-[10px] ml-2 shrink-0">Coba Lagi</button>
                         </div>
                     </div>
 
@@ -5849,7 +6026,10 @@ function openDispatchModal() { document.getElementById('modal-dispatch').classLi
 function closeDispatchModal() { document.getElementById('modal-dispatch').classList.add('hidden'); }
 function openStopClockModal() { document.getElementById('modal-stopclock').classList.remove('hidden'); }
 function closeStopClockModal() { document.getElementById('modal-stopclock').classList.add('hidden'); }
-function openJcModal() { document.getElementById('modal-jc').classList.remove('hidden'); }
+function openJcModal() { 
+    document.getElementById('modal-jc').classList.remove('hidden'); 
+    window.dispatchEvent(new CustomEvent('jc-modal-opened'));
+}
 function closeJcModal() { document.getElementById('modal-jc').classList.add('hidden'); }
 function openManeuverModal() { document.getElementById('modal-maneuver').classList.remove('hidden'); }
 function closeManeuverModal() { document.getElementById('modal-maneuver').classList.add('hidden'); }
@@ -5861,32 +6041,54 @@ function getLiveGpsCoordinates() {
     const label = document.getElementById('gps_label');
     const preview = document.getElementById('gps-attached-preview');
     const previewText = document.getElementById('gps-preview-text');
+    if (label) label.innerText = 'Mencari...';
+
+    const applyLiveCoords = (lat, lng, acc, src) => {
+        const accVal = Math.min(9999, Math.max(0, Math.round(acc * 100) / 100));
+        const latInput = document.getElementById('chron_lat');
+        const lngInput = document.getElementById('chron_lng');
+        const accInput = document.getElementById('chron_acc');
+        if (latInput) latInput.value = lat;
+        if (lngInput) lngInput.value = lng;
+        if (accInput) accInput.value = accVal;
+        if (label) label.innerText = `✓ ${Number(lat).toFixed(3)}, ${Number(lng).toFixed(3)}`;
+        if (previewText) previewText.innerText = `GPS: ${Number(lat).toFixed(6)}, ${Number(lng).toFixed(6)} (${src})`;
+        if (preview) preview.classList.remove('hidden');
+        const btn = document.getElementById('gps_action_btn');
+        if (btn) {
+            btn.classList.add('bg-emerald-500/30', 'text-emerald-200', 'border-emerald-400/40');
+        }
+    };
+
+    const fallbackIp = () => {
+        fetch('https://ipwho.is/').then(r=>r.json()).then(d => {
+            if (d && d.success && d.latitude) {
+                applyLiveCoords(d.latitude, d.longitude, 1000, 'IP');
+            } else {
+                alert('Gagal mendeteksi lokasi GPS atau Jaringan.');
+                if (label) label.innerText = 'GPS';
+            }
+        }).catch(() => {
+            alert('Gagal mendeteksi lokasi.');
+            if (label) label.innerText = 'GPS';
+        });
+    };
+
     if (!navigator.geolocation) {
-        alert('Browser Anda tidak mendukung Geolocation.');
+        fallbackIp();
         return;
     }
-    if (label) label.innerText = 'GPS...';
-    navigator.geolocation.getCurrentPosition(
-        (pos) => {
-            const rawAcc = pos.coords.accuracy || 10;
-            const acc = Math.min(9999, Math.max(0, Math.round(rawAcc * 100) / 100));
 
-            document.getElementById('chron_lat').value = pos.coords.latitude;
-            document.getElementById('chron_lng').value = pos.coords.longitude;
-            document.getElementById('chron_acc').value = acc;
-            if (label) label.innerText = `✓ GPS (${pos.coords.latitude.toFixed(3)}, ${pos.coords.longitude.toFixed(3)})`;
-            if (previewText) previewText.innerText = `GPS: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`;
-            if (preview) preview.classList.remove('hidden');
-            const btn = document.getElementById('gps_action_btn');
-            if (btn) {
-                btn.classList.add('bg-emerald-500/30', 'text-emerald-200', 'border-emerald-400/40');
-            }
+    navigator.geolocation.getCurrentPosition(
+        (pos) => applyLiveCoords(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy || 10, 'GPS Satelit'),
+        () => {
+            navigator.geolocation.getCurrentPosition(
+                (fallbackPos) => applyLiveCoords(fallbackPos.coords.latitude, fallbackPos.coords.longitude, fallbackPos.coords.accuracy || 50, 'Jaringan/Wi-Fi'),
+                () => fallbackIp(),
+                { enableHighAccuracy: false, timeout: 8000 }
+            );
         },
-        (err) => {
-            alert('Gagal mengambil lokasi GPS: ' + err.message);
-            if (label) label.innerText = 'GPS';
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 5000 }
     );
 }
 
