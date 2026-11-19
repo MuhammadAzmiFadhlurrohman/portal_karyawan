@@ -481,8 +481,8 @@
                                             </span>
 
                                             <!-- Label ON / OFF -->
-                                            <span class="font-extrabold leading-none">
-                                                {{ $stat['is_paid'] ? 'Dibayar' : 'Belum' }}
+                                            <span class="font-extrabold leading-none text-[9.5px] {{ $stat['is_paid'] ? 'text-emerald-700' : 'text-slate-500' }}">
+                                                {{ $stat['is_paid'] ? 'ON' : 'OFF' }}
                                             </span>
                                         </button>
                                     </form>
@@ -547,19 +547,8 @@
                             <!-- Total Uang -->
                             <div class="min-w-0 flex-1">
                                 <div class="text-[8px] font-bold text-teal-800 uppercase tracking-wider leading-none">TOTAL UANG</div>
-                                <div class="text-[12.5px] font-black text-teal-950 truncate leading-tight mt-0.5 flex items-center gap-1.5">
-                                    <span>Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}</span>
-                                    @if ($isHrd)
-                                        @if ($stat['is_paid'])
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                Lunas
-                                            </span>
-                                        @else
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                Belum
-                                            </span>
-                                        @endif
-                                    @endif
+                                <div class="text-[12.5px] font-black text-teal-950 truncate leading-tight mt-0.5">
+                                    Rp {{ number_format($stat['total_nominal'], 0, ',', '.') }}
                                 </div>
                             </div>
 
