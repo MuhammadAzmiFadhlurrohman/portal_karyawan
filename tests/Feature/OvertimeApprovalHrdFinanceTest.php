@@ -187,26 +187,28 @@ class OvertimeApprovalHrdFinanceTest extends TestCase
             'status' => 'approved_atasan',
         ]);
 
-        // Toggle to PAID (ON)
-        $responseOn = $this->actingAs($hrd)->post(route('gomsn.overtime.toggle-payment'), [
+        // Toggle to PAID (ON) via JSON/AJAX without page reload
+        $responseOn = $this->actingAs($hrd)->postJson(route('gomsn.overtime.toggle-payment'), [
             'user_id' => $karyawan->id,
             'bulan' => $currentDate->month,
             'tahun' => $currentDate->year,
             'target_status' => 'paid',
         ]);
-        $responseOn->assertRedirect();
+        $responseOn->assertStatus(200);
+        $responseOn->assertJson(['success' => true, 'is_paid' => true]);
         $lembur->refresh();
         $this->assertEquals('paid', $lembur->status);
         $this->assertNotNull($lembur->paid_at);
 
-        // Toggle back to UNPAID (OFF)
-        $responseOff = $this->actingAs($hrd)->post(route('gomsn.overtime.toggle-payment'), [
+        // Toggle back to UNPAID (OFF) via JSON/AJAX without page reload
+        $responseOff = $this->actingAs($hrd)->postJson(route('gomsn.overtime.toggle-payment'), [
             'user_id' => $karyawan->id,
             'bulan' => $currentDate->month,
             'tahun' => $currentDate->year,
             'target_status' => 'unpaid',
         ]);
-        $responseOff->assertRedirect();
+        $responseOff->assertStatus(200);
+        $responseOff->assertJson(['success' => true, 'is_paid' => false]);
         $lembur->refresh();
         $this->assertEquals('approved_atasan', $lembur->status);
         $this->assertNull($lembur->paid_at);

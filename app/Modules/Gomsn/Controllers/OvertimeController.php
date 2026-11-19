@@ -615,11 +615,14 @@ class OvertimeController extends Controller
      * Toggle payment status for an employee's overtime in a specific month/year.
      * Allowed for HRD, Finance, and Super Admin.
      */
-    public function togglePayment(Request $request): RedirectResponse
+    public function togglePayment(Request $request): RedirectResponse|JsonResponse
     {
         $user = $request->user();
 
         if (! $user->hasRole(['hrd', 'super_admin', 'admin', 'finance'])) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Anda tidak memiliki hak otorisasi untuk mengubah status pembayaran lembur.'], 403);
+            }
             abort(403, 'Anda tidak memiliki hak otorisasi untuk mengubah status pembayaran lembur.');
         }
 
@@ -656,6 +659,14 @@ class OvertimeController extends Controller
                     'payment_reference' => 'PAY-HRD-' . Carbon::now()->format('Ymd') . '-' . rand(1000, 9999),
                 ]);
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'is_paid' => true,
+                    'message' => "Status lembur {$nama} berhasil ditandai SUDAH DIBAYAR (ON).",
+                ]);
+            }
+
             return back()->with('status', "Status lembur {$nama} berhasil ditandai SUDAH DIBAYAR (ON).");
         } else {
             $updated = (clone $query)
@@ -666,6 +677,14 @@ class OvertimeController extends Controller
                     'paid_by' => null,
                     'payment_reference' => null,
                 ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'is_paid' => false,
+                    'message' => "Status lembur {$nama} berhasil diubah menjadi BELUM DIBAYAR (OFF).",
+                ]);
+            }
 
             return back()->with('status', "Status lembur {$nama} berhasil diubah menjadi BELUM DIBAYAR (OFF).");
         }

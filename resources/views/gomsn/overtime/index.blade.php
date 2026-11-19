@@ -463,29 +463,66 @@
                                     {{ $isFilterUnprocessed ? 'Semua Periode' : ($bulanNames[$selectedBulan] ?? 'November') . ' ' . $selectedTahun }}
                                 </span>
                                 @if ($isHrd)
-                                    <!-- Tombol Toggle ON / OFF Pembayaran Lembur Karyawan (Khusus Role HRD) -->
-                                    <form method="POST" action="{{ route('gomsn.overtime.toggle-payment') }}" class="inline-flex items-center m-0">
-                                        @csrf
-                                        <input type="hidden" name="user_id" value="{{ $cardUser->id }}">
-                                        <input type="hidden" name="bulan" value="{{ $selectedBulan }}">
-                                        <input type="hidden" name="tahun" value="{{ $selectedTahun }}">
-                                        <input type="hidden" name="target_status" value="{{ $stat['is_paid'] ? 'unpaid' : 'paid' }}">
-                                        
-                                        <button type="submit" 
-                                                title="Status: {{ $stat['is_paid'] ? 'Sudah Dibayarkan (ON)' : 'Belum Dibayarkan (OFF)' }}. Klik untuk mengubah."
-                                                class="group inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full border text-[9.5px] transition-all shadow-2xs cursor-pointer select-none {{ $stat['is_paid'] ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200' }}">
+                                    <!-- Tombol Toggle ON / OFF Pembayaran Lembur Karyawan (Khusus Role HRD, Tanpa Refresh) -->
+                                    <div x-data="{
+                                        isPaid: {{ $stat['is_paid'] ? 'true' : 'false' }},
+                                        loading: false,
+                                        async toggleStatus() {
+                                            if (this.loading) return;
+                                            this.loading = true;
+                                            const nextStatus = !this.isPaid ? 'paid' : 'unpaid';
+                                            try {
+                                                const res = await fetch('{{ route('gomsn.overtime.toggle-payment') }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Accept': 'application/json',
+                                                        'X-Requested-With': 'XMLHttpRequest'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        user_id: {{ $cardUser->id }},
+                                                        bulan: '{{ $selectedBulan }}',
+                                                        tahun: '{{ $selectedTahun }}',
+                                                        target_status: nextStatus
+                                                    })
+                                                });
+                                                const data = await res.json();
+                                                if (data && data.success) {
+                                                    this.isPaid = data.is_paid;
+                                                } else {
+                                                    console.error(data?.message || 'Gagal mengubah status');
+                                                }
+                                            } catch (err) {
+                                                console.error(err);
+                                            } finally {
+                                                this.loading = false;
+                                            }
+                                        }
+                                    }" class="inline-flex items-center m-0">
+                                        <button type="button" 
+                                                @click="toggleStatus()"
+                                                :disabled="loading"
+                                                :title="isPaid ? 'Status: ON (Sudah Dibayarkan). Klik untuk ubah ke OFF.' : 'Status: OFF (Belum Dibayarkan). Klik untuk ubah ke ON.'"
+                                                class="group inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full border text-[9.5px] transition-all shadow-2xs cursor-pointer select-none"
+                                                :class="isPaid ? 'bg-emerald-50 border-emerald-300 text-emerald-800 hover:bg-emerald-100' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'"
+                                                :style="loading ? 'opacity: 0.6; cursor: wait;' : ''">
                                             
                                             <!-- Switch Track & Knob -->
-                                            <span class="relative inline-flex h-3.5 w-6 shrink-0 rounded-full transition-colors duration-200 ease-in-out p-0.5 {{ $stat['is_paid'] ? 'bg-emerald-500' : 'bg-slate-300' }}">
-                                                <span class="pointer-events-none inline-block h-2.5 w-2.5 rounded-full bg-white shadow-xs transform transition duration-200 ease-in-out {{ $stat['is_paid'] ? 'translate-x-2.5' : 'translate-x-0' }}"></span>
+                                            <span class="relative inline-flex h-3.5 w-6 shrink-0 rounded-full transition-colors duration-200 ease-in-out p-0.5"
+                                                  :class="isPaid ? 'bg-emerald-500' : 'bg-slate-300'">
+                                                <span class="pointer-events-none inline-block h-2.5 w-2.5 rounded-full bg-white shadow-xs transform transition duration-200 ease-in-out"
+                                                      :class="isPaid ? 'translate-x-2.5' : 'translate-x-0'"></span>
                                             </span>
 
                                             <!-- Label ON / OFF -->
-                                            <span class="font-extrabold leading-none text-[9.5px] {{ $stat['is_paid'] ? 'text-emerald-700' : 'text-slate-500' }}">
+                                            <span class="font-extrabold leading-none text-[9.5px]"
+                                                  :class="isPaid ? 'text-emerald-700' : 'text-slate-500'"
+                                                  x-text="isPaid ? 'ON' : 'OFF'">
                                                 {{ $stat['is_paid'] ? 'ON' : 'OFF' }}
                                             </span>
                                         </button>
-                                    </form>
+                                    </div>
                                 @elseif ($stat['pending_count'] > 0)
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black text-amber-900 bg-amber-100 border border-amber-300 shadow-2xs shrink-0 animate-pulse">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
