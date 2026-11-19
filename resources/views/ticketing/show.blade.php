@@ -1184,11 +1184,11 @@
 
                     @if($initialDateKey)
                         @php $currentDateGroup = $initialDateKey; @endphp
-                        <!-- Date divider (WhatsApp Floating Pill) -->
-                        <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider" data-date="{{ $initialDateKey }}">
-                            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto"
+                        <!-- Date divider (WhatsApp Date Pill) -->
+                        <div class="flex justify-center my-2.5 py-0.5 pointer-events-none chat-date-divider" data-date="{{ $initialDateKey }}">
+                            <span class="px-3 py-1 rounded-xl text-[10.5px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-slate-200/70 backdrop-blur-xs flex items-center gap-1.5 pointer-events-auto"
                                   title="{{ $initialDate->isoFormat('dddd, D MMMM Y') }}">
-                                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span>{{ $formatDateDivider($initialDate) }}</span>
                             </span>
                         </div>
@@ -1228,10 +1228,10 @@
                         @endphp
                         @if($dispatchDateKey && $dispatchDateKey !== $currentDateGroup)
                             @php $currentDateGroup = $dispatchDateKey; @endphp
-                            <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider" data-date="{{ $dispatchDateKey }}">
-                                <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto"
+                            <div class="flex justify-center my-2.5 py-0.5 pointer-events-none chat-date-divider" data-date="{{ $dispatchDateKey }}">
+                                <span class="px-3 py-1 rounded-xl text-[10.5px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-slate-200/70 backdrop-blur-xs flex items-center gap-1.5 pointer-events-auto"
                                       title="{{ $dispatchDate->isoFormat('dddd, D MMMM Y') }}">
-                                    <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     <span>{{ $formatDateDivider($dispatchDate) }}</span>
                                 </span>
                             </div>
@@ -1269,10 +1269,10 @@
                     @if($chronDateKey && $chronDateKey !== $currentDateGroup)
                         @php $currentDateGroup = $chronDateKey; @endphp
                         <!-- WhatsApp Date Divider for Chronology Group -->
-                        <div class="flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider" data-date="{{ $chronDateKey }}">
-                            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto"
+                        <div class="flex justify-center my-2.5 py-0.5 pointer-events-none chat-date-divider" data-date="{{ $chronDateKey }}">
+                            <span class="px-3 py-1 rounded-xl text-[10.5px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-slate-200/70 backdrop-blur-xs flex items-center gap-1.5 pointer-events-auto"
                                   title="{{ $chronDate->isoFormat('dddd, D MMMM Y') }}">
-                                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span>{{ $formatDateDivider($chronDate) }}</span>
                             </span>
                         </div>
@@ -4552,11 +4552,11 @@ function ensureChatDateDivider(targetDateStr) {
         }
 
         const div = document.createElement('div');
-        div.className = 'flex justify-center sticky top-0 z-10 py-1 pointer-events-none chat-date-divider';
+        div.className = 'flex justify-center my-2.5 py-0.5 pointer-events-none chat-date-divider';
         div.dataset.date = dateKey;
         div.innerHTML = `
-            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_2px_rgba(0,0,0,0.12)] border border-slate-200/60 backdrop-blur-xs flex items-center gap-1 pointer-events-auto">
-                <svg class="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="px-3 py-1 rounded-xl text-[10.5px] font-semibold bg-white/95 text-slate-600 shadow-[0_1px_3px_rgba(0,0,0,0.08)] border border-slate-200/70 backdrop-blur-xs flex items-center gap-1.5 pointer-events-auto">
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span>${label}</span>
             </span>
         `;
