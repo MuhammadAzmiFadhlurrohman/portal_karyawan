@@ -112,6 +112,8 @@
                     <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5 leading-snug">
                         @if ($isFinance)
                             <span>Rekapitulasi &amp; Pembayaran Lembur</span>
+                        @elseif ($isHrd && $viewMode === 'saya')
+                            <span>Lembur Saya</span>
                         @elseif ($isHrd)
                             <span>Rekapitulasi Lembur Karyawan</span>
                         @elseif ($isAtasan)
@@ -123,6 +125,8 @@
                     <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
                         @if ($isFinance)
                             Berikut adalah ringkasan seluruh aktivitas keuangan &amp; pembayaran lembur karyawan real-time.
+                        @elseif ($isHrd && $viewMode === 'saya')
+                            Kelola riwayat pengajuan lembur pribadi, pantau persetujuan atasan, dan transparansi uang lembur.
                         @elseif ($isHrd)
                             Monitoring rekapitulasi pengajuan lembur seluruh divisi staf yang telah disetujui atasan.
                         @else
@@ -131,11 +135,31 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Right: Action Button Ajukan Lembur (Bisa diakses oleh Karyawan & HRD) -->
+            @if ((! $isAtasan && ! $isFinance && ! $isSuperAdmin) || $isHrd || ($viewMode === 'saya'))
+            <div class="relative z-10 flex items-center gap-2 shrink-0">
+                <a href="{{ route('gomsn.overtime.create') }}" 
+                   class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-teal-950/20 hover:opacity-95 active:scale-95 transition cursor-pointer whitespace-nowrap border border-white/20"
+                   style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Ajukan Lembur</span>
+                </a>
+            </div>
+            @endif
         </div>
 
-        {{-- Action Toolbar: Tombol Ajukan Permohonan Lembur (Hanya untuk Karyawan Mandiri, Tidak Muncul di Halaman Monitoring/Rekap Lembur Karyawan) --}}
-        @if (! $isHrd && ! $isAtasan && ! $isFinance && ! $isSuperAdmin)
-        <div class="flex items-center justify-end">
+        {{-- Action Toolbar: Tombol Ajukan Permohonan Lembur --}}
+        @if ((! $isAtasan && ! $isFinance && ! $isSuperAdmin) || $isHrd || ($viewMode === 'saya'))
+        <div class="flex items-center justify-between sm:justify-end gap-3">
+            @if ($isHrd && $viewMode === 'saya')
+            <div class="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                <span>Mode: Lembur Pribadi HRD</span>
+            </div>
+            @endif
             <a href="{{ route('gomsn.overtime.create') }}" 
                class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-teal-900/10 hover:opacity-95 transition cursor-pointer whitespace-nowrap"
                style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
@@ -890,7 +914,7 @@
                         <p class="text-[11px] text-slate-400 max-w-xs mx-auto mt-1 leading-relaxed">
                             Tidak ada data rincian lembur untuk periode yang dipilih.
                         </p>
-                        @if (! $isHrd && ! $isAtasan && ! $isFinance && ! $isSuperAdmin)
+                        @if ((! $isAtasan && ! $isFinance && ! $isSuperAdmin) || $isHrd || ($viewMode === 'saya'))
                             <a href="{{ route('gomsn.overtime.create') }}" class="inline-flex items-center gap-1.5 mt-3.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                 <span>Ajukan Lembur Sekarang</span>
@@ -1006,7 +1030,17 @@
                             @empty
                             <tr>
                                 <td colspan="8" class="p-8 text-center text-slate-400 text-xs">
-                                    Tidak ada data rincian lembur untuk karyawan ini pada periode yang dipilih.
+                                    <div class="max-w-sm mx-auto space-y-2.5">
+                                        <p>Tidak ada data rincian lembur untuk periode yang dipilih.</p>
+                                        @if ((! $isAtasan && ! $isFinance && ! $isSuperAdmin) || $isHrd || ($viewMode === 'saya'))
+                                        <div>
+                                            <a href="{{ route('gomsn.overtime.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-xs hover:opacity-95 transition" style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                                <span>Ajukan Lembur Sekarang</span>
+                                            </a>
+                                        </div>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @endforelse
