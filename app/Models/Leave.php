@@ -81,4 +81,12 @@ class Leave extends Model
     {
         return $this->belongsTo(User::class, 'hrd_approved_by');
     }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function rejectedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
 }

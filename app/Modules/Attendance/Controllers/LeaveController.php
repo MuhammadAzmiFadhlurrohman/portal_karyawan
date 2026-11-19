@@ -9,8 +9,10 @@ use App\Models\User;
 use App\Modules\Attendance\Services\LeaveService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\Response;
 
 class LeaveController extends Controller
 {
@@ -62,6 +64,85 @@ class LeaveController extends Controller
         ]);
     }
 
+    public function approvals(Request $request): View
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $isHrdAuthorized = $user->can('attendance.employee.manage') 
+            || $user->can('attendance.leave.approve') 
+            || $user->hasRole(['hrd', 'super_admin', 'admin']);
+
+        abort_unless($isHrdAuthorized, 403, 'Akses khusus HRD dan Manajemen.');
+
+        $status = (string) $request->input('status', 'pending');
+        $search = (string) $request->input('search', '');
+        $divisi = (string) $request->input('divisi', 'all');
+        $leaveType = (string) $request->input('type', 'all');
+
+        $query = Leave::query()
+            ->with(['user', 'supervisorApprover', 'hrdApprover', 'rejectedBy']);
+
+        if ($status === 'pending') {
+            $query->whereIn('status', ['pending_hrd', 'pending_supervisor']);
+        } elseif ($status === 'approved') {
+            $query->where('status', 'approved');
+        } elseif ($status === 'rejected') {
+            $query->where('status', 'rejected');
+        }
+
+        if ($search !== '') {
+            $query->whereHas('user', function ($uq) use ($search) {
+                $uq->where('name', 'like', "%{$search}%")
+                   ->orWhere('employee_code', 'like', "%{$search}%");
+            });
+        }
+
+        if ($divisi !== 'all' && $divisi !== '') {
+            $query->whereHas('user', function ($uq) use ($divisi) {
+                $uq->where('division', $divisi);
+            });
+        }
+
+        if ($leaveType !== 'all' && $leaveType !== '') {
+            $query->where('leave_type', $leaveType);
+        }
+
+        $leaves = $query->latest('id')->paginate(15)->withQueryString();
+
+        $pendingCount = Leave::query()
+            ->whereIn('status', ['pending_hrd', 'pending_supervisor'])
+            ->count();
+
+        $approvedCount = Leave::query()
+            ->where('status', 'approved')
+            ->count();
+
+        $rejectedCount = Leave::query()
+            ->where('status', 'rejected')
+            ->count();
+
+        $divisions = User::query()
+            ->whereNotNull('division')
+            ->where('division', '!=', '')
+            ->distinct()
+            ->pluck('division')
+            ->sort()
+            ->values();
+
+        return view('attendance.leaves.approvals', [
+            'user' => $user,
+            'leaves' => $leaves,
+            'status' => $status,
+            'search' => $search,
+            'divisi' => $divisi,
+            'leaveType' => $leaveType,
+            'pendingCount' => $pendingCount,
+            'approvedCount' => $approvedCount,
+            'rejectedCount' => $rejectedCount,
+            'divisions' => $divisions,
+        ]);
+    }
+
     public function store(Request $request, LeaveService $leaveService): RedirectResponse
     {
         /** @var User $user */
@@ -83,7 +164,7 @@ class LeaveController extends Controller
                 'reason' => (string) $validated['reason'],
             ], $request->file('attachment'));
 
-            return back()->with('status', 'Pengajuan cuti berhasil dikirim dan menunggu persetujuan Atasan (§5.4).');
+            return back()->with('status', 'Pengajuan cuti/izin berhasil dikirim dan menunggu persetujuan HRD.');
         } catch (InvalidArgumentException $e) {
             return back()->withErrors(['leave' => $e->getMessage()])->withInput();
         }
@@ -108,15 +189,61 @@ class LeaveController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        abort_unless($user->can('attendance.employee.manage') || $user->can('attendance.leave.approve'), 403);
+        abort_unless($user->can('attendance.employee.manage') || $user->can('attendance.leave.approve') || $user->hasRole(['hrd', 'super_admin', 'admin']), 403);
 
         try {
             $leaveService->approveByHrd($leave, $user);
 
-            return back()->with('status', 'Cuti disetujui final oleh HRD dan saldo cuti telah diperbarui (§5.4).');
+            return back()->with('status', 'Pengajuan cuti/izin berhasil disetujui dan saldo cuti telah diperbarui.');
         } catch (InvalidArgumentException $e) {
             return back()->withErrors(['leave' => $e->getMessage()]);
         }
+    }
+
+    public function reject(Request $request, Leave $leave, LeaveService $leaveService): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        abort_unless($user->can('attendance.employee.manage') || $user->can('attendance.leave.approve') || $user->hasRole(['hrd', 'super_admin', 'admin']), 403);
+
+        $validated = $request->validate([
+            'rejected_reason' => ['required', 'string', 'min:3', 'max:500'],
+        ]);
+
+        try {
+            $leaveService->rejectByHrd($leave, $user, (string) $validated['rejected_reason']);
+
+            return back()->with('status', 'Pengajuan cuti/izin berhasil ditolak.');
+        } catch (InvalidArgumentException $e) {
+            return back()->withErrors(['leave' => $e->getMessage()]);
+        }
+    }
+
+    public function downloadAttachment(Request $request, Leave $leave): Response
+    {
+        /** @var User $user */
+        $user = $request->user();
+        abort_unless(
+            $user->id === $leave->user_id || 
+            $user->can('attendance.employee.manage') || 
+            $user->can('attendance.leave.approve') ||
+            $user->hasRole(['hrd', 'super_admin', 'admin']),
+            403
+        );
+
+        if (! $leave->attachment_path) {
+            abort(404, 'Lampiran tidak ditemukan.');
+        }
+
+        if (Storage::disk('private')->exists($leave->attachment_path)) {
+            return Storage::disk('private')->response($leave->attachment_path);
+        }
+
+        if (Storage::disk('public')->exists($leave->attachment_path)) {
+            return Storage::disk('public')->response($leave->attachment_path);
+        }
+
+        abort(404, 'File lampiran tidak tersedia di server storage.');
     }
 
     public function cancel(Request $request, Leave $leave, LeaveService $leaveService): RedirectResponse

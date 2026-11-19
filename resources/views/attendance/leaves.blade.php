@@ -584,7 +584,7 @@
                         <div>
                             <h3 class="!text-white font-bold text-base leading-tight" 
                                 x-text="leaveType === 'sick' ? 'Pengajuan Izin & Sakit' : 'Pengajuan Cuti Karyawan'"></h3>
-                            <p class="text-xs text-teal-100/90 mt-0.5">Diteruskan berjenjang ke Atasan dan HRD</p>
+                            <p class="text-xs text-teal-100/90 mt-0.5">Diteruskan dan disetujui langsung oleh HRD</p>
                         </div>
                     </div>
                     <button type="button" @click="showModal = false" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer">

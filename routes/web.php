@@ -108,9 +108,12 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/attendance/swaps/{shiftSwap}/reject', [ShiftSwapController::class, 'reject'])->name('attendance.swaps.reject');
 
     Route::get('/attendance/leaves', [LeaveController::class, 'index'])->name('attendance.leaves');
+    Route::get('/attendance/leaves/approvals', [LeaveController::class, 'approvals'])->name('attendance.leaves.approvals');
     Route::post('/attendance/leaves', [LeaveController::class, 'store'])->name('attendance.leaves.store');
+    Route::get('/attendance/leaves/{leave}/attachment', [LeaveController::class, 'downloadAttachment'])->name('attendance.leaves.attachment');
     Route::post('/attendance/leaves/{leave}/approve-supervisor', [LeaveController::class, 'approveSupervisor'])->name('attendance.leaves.approve-supervisor');
     Route::post('/attendance/leaves/{leave}/approve-hrd', [LeaveController::class, 'approveHrd'])->name('attendance.leaves.approve-hrd');
+    Route::post('/attendance/leaves/{leave}/reject', [LeaveController::class, 'reject'])->name('attendance.leaves.reject');
     Route::post('/attendance/leaves/{leave}/cancel', [LeaveController::class, 'cancel'])->name('attendance.leaves.cancel');
     Route::post('/attendance/leaves/override-balance', [LeaveController::class, 'overrideBalance'])->name('attendance.leaves.override-balance');
 

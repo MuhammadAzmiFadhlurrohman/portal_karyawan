@@ -209,7 +209,7 @@ class LeaveService
             'working_days' => $workingDays,
             'reason' => $payload['reason'],
             'attachment_path' => $attachmentPath,
-            'status' => 'pending_supervisor',
+            'status' => 'pending_hrd',
             'is_alpa_conversion' => false,
         ]);
 
@@ -238,8 +238,8 @@ class LeaveService
             throw new InvalidArgumentException('Pengaju tidak diperbolehkan menyetujui pengajuan cutinya sendiri (AC-10).');
         }
 
-        if ($leave->status !== 'pending_supervisor') {
-            throw new InvalidArgumentException("Pengajuan cuti tidak dalam status menunggu persetujuan Atasan (status: {$leave->status}).");
+        if (! in_array($leave->status, ['pending_supervisor', 'pending_hrd'], true)) {
+            throw new InvalidArgumentException("Pengajuan cuti tidak dalam status menunggu persetujuan (status: {$leave->status}).");
         }
 
         $leave->update([
@@ -253,6 +253,36 @@ class LeaveService
             auditable: $leave,
             newValues: ['status' => 'pending_hrd'],
             reason: 'Disetujui oleh Atasan',
+            actorId: $actor->id
+        );
+
+        return $leave;
+    }
+
+    /**
+     * Rejection by HRD.
+     */
+    public function rejectByHrd(Leave $leave, User $actor, string $reason): Leave
+    {
+        if ($leave->user_id === $actor->id) {
+            throw new InvalidArgumentException('Pengaju tidak diperbolehkan menolak pengajuan cutinya sendiri.');
+        }
+
+        if (! in_array($leave->status, ['pending_supervisor', 'pending_hrd'], true)) {
+            throw new InvalidArgumentException("Pengajuan cuti sudah diproses sebelumnya (status: {$leave->status}).");
+        }
+
+        $leave->update([
+            'status' => 'rejected',
+            'rejected_by' => $actor->id,
+            'rejected_reason' => $reason,
+        ]);
+
+        AuditLogger::record(
+            action: 'leave.rejected_by_hrd',
+            auditable: $leave,
+            newValues: ['status' => 'rejected', 'rejected_reason' => $reason],
+            reason: $reason,
             actorId: $actor->id
         );
 
