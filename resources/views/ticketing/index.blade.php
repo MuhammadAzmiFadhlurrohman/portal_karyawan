@@ -76,7 +76,8 @@
 
     <!-- KPI Metric Stats Cards: 6 Cards in 1 Baris (Total, Open, Proses, Close, > SLA, <= SLA) -->
     <div class="overflow-x-auto pb-1 -mx-2 px-2 sm:mx-0 sm:px-0" style="scrollbar-width: none; -ms-overflow-style: none;">
-        <div class="grid grid-cols-6 gap-2 sm:gap-2.5 min-w-[700px] lg:min-w-0">
+        <div class="gap-2 sm:gap-2.5 min-w-[680px] lg:min-w-0"
+             style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));">
             <!-- 1. TOTAL -->
             <div class="relative bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2.5 sm:p-3 flex flex-col justify-between">
                 <div class="absolute top-0 left-0 right-0 h-[3px]" style="background-color: #2563eb;"></div>
