@@ -943,10 +943,24 @@ class ChatbotService
                 similar_text($normMessage, $kwNorm, $pct);
                 $simScore = ($overlap * 10) + ($pct / 5);
 
+                $category = mb_strtolower((string) $intent->category);
+                foreach ($userTokens as $ut) {
+                    if (
+                        ($category === 'absensi' && in_array($ut, ['absen', 'kehadiran', 'checkin', 'checkout', 'biometrik', 'gps', 'koreksi', 'alpa', 'telat', 'jadwal', 'shift'], true))
+                        || ($category === 'cuti' && in_array($ut, ['cuti', 'izin', 'sakit', 'libur'], true))
+                        || ($category === 'lembur' && in_array($ut, ['lembur', 'spk'], true))
+                        || ($category === 'pengajuan' && in_array($ut, ['kasbon', 'dana', 'beli', 'barang', 'stok', 'uang', 'material'], true))
+                        || ($category === 'tiketing' && in_array($ut, ['tiket', 'gangguan', 'noc', 'sla', 'redaman'], true))
+                        || ($category === 'jaringan' && in_array($ut, ['olt', 'pon', 'odp', 'port', 'core', 'closure'], true))
+                    ) {
+                        $simScore += 15.0;
+                    }
+                }
+
                 if ($isSunda && $isSundaIntent) {
-                    $simScore *= 1.3;
+                    $simScore *= 2.0;
                 } elseif (! $isSunda && $isSundaIntent) {
-                    $simScore *= 0.7;
+                    $simScore *= 0.1;
                 }
 
                 if ($simScore > $maxSim && $overlap > 0) {
@@ -1485,7 +1499,7 @@ class ChatbotService
                 'matched_intent' => 'q98_proteksi_prompt_injection',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Jadwal shift kerja saya hari ini dan besok', 'Berapa sisa saldo cuti tahunan saya saat ini?'],
+                'suggestions' => null,
             ];
         }
 
@@ -1504,7 +1518,7 @@ class ChatbotService
                 'matched_intent' => 'q94_proteksi_pii_gaji_rekening',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Berapa total potongan dan denda saya pada periode berjalan ini?'],
+                'suggestions' => null,
             ];
         }
 
@@ -1517,7 +1531,7 @@ class ChatbotService
                 'matched_intent' => 'sunda_189_out_of_scope_kuliner',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?'],
+                'suggestions' => null,
             ];
         }
 
@@ -1542,7 +1556,7 @@ class ChatbotService
                 'matched_intent' => 'q96_out_of_scope_umum',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Bagaimana cara mengajukan lembur?'],
+                'suggestions' => null,
             ];
         }
 
@@ -1558,7 +1572,7 @@ class ChatbotService
                 'matched_intent' => 'q97_guardrail_topik_pekerjaan',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Bagaimana cara membuat Tiket Gangguan baru?', 'Bagaimana cara mengajukan kasbon operasional?', 'Jadwal shift kerja saya hari ini dan besok'],
+                'suggestions' => null,
             ];
         }
 
@@ -1584,7 +1598,7 @@ class ChatbotService
                 'matched_intent' => 'q95_pencegahan_halusinasi_nik',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Jadwal shift kerja saya hari ini dan besok'],
+                'suggestions' => null,
             ];
         }
 
@@ -1603,7 +1617,7 @@ class ChatbotService
                 'matched_intent' => 'q92_penolakan_approval_chat',
                 'action_url' => route('gomsn.overtime.index'),
                 'action_label' => '💼 Buka Halaman Lembur',
-                'suggestions' => ['Bagaimana cara mengajukan lembur?', 'Cek status pengajuan terakhir saya'],
+                'suggestions' => null,
             ];
         }
 
@@ -1771,7 +1785,7 @@ class ChatbotService
                     'matched_intent' => $networkResult['matched_intent'],
                     'action_url' => $networkResult['action_url'],
                     'action_label' => $networkResult['action_label'],
-                    'suggestions' => $suggestions,
+                    'suggestions' => null,
                 ];
             }
         }
@@ -2314,7 +2328,7 @@ class ChatbotService
             'matched_intent' => $bestIntent->intent_key,
             'action_url' => $actionLink['url'] ?? null,
             'action_label' => $actionLink['label'] ?? null,
-            'suggestions' => $suggestions,
+            'suggestions' => null,
         ];
     }
 }
