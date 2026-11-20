@@ -152,6 +152,22 @@
             vertical-align: -0.15em;
             animation: chatbotCursorBlink 0.8s infinite;
         }
+
+        /* Clean Single Border on Chatbot Input (Prevents global focus-visible double outline) */
+        #chatbot-input-query {
+            outline: none !important;
+            outline-offset: 0 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: none !important;
+        }
+        #chatbot-input-query:focus,
+        #chatbot-input-query:focus-visible {
+            outline: none !important;
+            outline-offset: 0 !important;
+            border-color: #0d9488 !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.14) !important;
+        }
     </style>
 
     <!-- Docked Side-Tab Trigger Button (Only visible when chat is closed) -->
@@ -267,12 +283,31 @@
         </div>
 
         <!-- Chat History -->
-        <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
+        @php
+            $chatUserAvatarUrl = auth()->check() ? auth()->user()->avatar_url : null;
+            $chatUserInitials = auth()->check() ? (auth()->user()->initials ?? strtoupper(substr(auth()->user()->name ?? 'U', 0, 2))) : 'U';
+        @endphp
+        <div id="chatbot-messages" class="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-3.5 bg-slate-50 text-xs">
             <template x-for="(msg, index) in messages" :key="index">
-                <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                <div :class="msg.sender === 'user' ? 'flex items-start justify-end gap-2' : 'flex items-start justify-start gap-2'">
+                    
+                    <!-- Bot Circular Avatar (WhatsApp style) -->
+                    <template x-if="msg.sender !== 'user'">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white shadow-xs shrink-0 mt-0.5 border border-teal-600/20"
+                             style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%) !important;">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="#ffffff">
+                                <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                                <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                                <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                                <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                            </svg>
+                        </div>
+                    </template>
+
+                    <!-- Message Bubble -->
                     <div :class="msg.sender === 'user' 
-                                ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 max-w-[85%] shadow-xs' 
-                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[88%] shadow-xs'">
+                                ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 max-w-[78%] shadow-xs' 
+                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[82%] shadow-xs'">
                         <p class="leading-relaxed whitespace-pre-line">
                             <span x-text="msg.text"></span>
                             <span x-show="msg.isTyping" class="chatbot-typing-cursor"></span>
@@ -292,9 +327,39 @@
                             </div>
                         </template>
                     </div>
+
+                    <!-- User Circular Avatar (WhatsApp style) -->
+                    <template x-if="msg.sender === 'user'">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 mt-0.5 shadow-xs ring-1 ring-slate-200">
+                            @if ($chatUserAvatarUrl)
+                                <img src="{{ $chatUserAvatarUrl }}"
+                                     alt="Profil Saya"
+                                     onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
+                                     class="w-full h-full object-cover rounded-full">
+                                <div style="display: none;" class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold text-[10px]">
+                                    {{ $chatUserInitials }}
+                                </div>
+                            @else
+                                <div class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-[10px]">
+                                    {{ $chatUserInitials }}
+                                </div>
+                            @endif
+                        </div>
+                    </template>
                 </div>
             </template>
-            <div x-show="loading" class="flex justify-start">
+
+            <!-- Loading Indicator with Bot Avatar -->
+            <div x-show="loading" class="flex items-start justify-start gap-2">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white shadow-xs shrink-0 mt-0.5 border border-teal-600/20"
+                     style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%) !important;">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="#ffffff">
+                        <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
+                        <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                        <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
+                        <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
+                    </svg>
+                </div>
                 <div class="bg-white border border-slate-200 text-slate-500 rounded-2xl rounded-tl-none px-3.5 py-2 text-xs flex items-center gap-2 shadow-xs">
                     <div class="flex items-center gap-1 py-0.5">
                         <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
@@ -356,7 +421,7 @@
                    x-ref="chatInput"
                    x-model="inputQuery" 
                    :placeholder="isListening ? '🎙️ Mendengarkan suara Anda...' : 'Ketik pertanyaan Anda...'" 
-                   class="flex-1 bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-600 focus:ring-1 focus:ring-teal-600 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none transition"
+                   class="flex-1 bg-slate-50 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs text-slate-800 placeholder-slate-400 transition"
                    :disabled="loading" />
             <button type="button" 
                     @click="toggleVoiceInput()"
