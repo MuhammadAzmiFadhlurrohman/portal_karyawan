@@ -69,6 +69,30 @@ class PersonalScheduleAndShiftSwapTest extends TestCase
         $response->assertSee(strtoupper($this->admin->name));
         $response->assertSee('Jadwal Saya');
         $response->assertSee('Kelola Periode Bulan');
+        $response->assertDontSee('Kalender & Custom Jadwal');
+    }
+
+    public function test_admin_defaults_to_kelola_periode_bulan_without_kalender_custom_tab(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('attendance.schedules'));
+
+        $response->assertOk();
+        $response->assertViewHas('viewMode', 'list');
+        $response->assertSee('Kelola Periode Bulan');
+        $response->assertSee('Jadwal Kerja Karyawan');
+        $response->assertDontSee('Kalender & Custom Jadwal');
+
+        // Drill-down ke jadwal karyawan per bulan tetap berfungsi tanpa tab Kalender & Custom Jadwal
+        $userView = $this->actingAs($this->admin)->get(route('attendance.schedules', [
+            'view' => 'user',
+            'user_id' => $this->karyawan->id,
+            'year' => 2026,
+            'month' => 11,
+        ]));
+
+        $userView->assertOk();
+        $userView->assertViewHas('viewMode', 'user');
+        $userView->assertDontSee('Kalender & Custom Jadwal');
     }
 
     public function test_hrd_only_sees_own_schedule_and_cannot_manage_schedule(): void

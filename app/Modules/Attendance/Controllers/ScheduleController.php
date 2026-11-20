@@ -65,9 +65,9 @@ class ScheduleController extends Controller
             $view = 'personal';
         }
 
-        // Jika role Admin membuka Jadwal Kerja tanpa parameter view, arahkan langsung ke Kalender & Custom Jadwal
-        if (! $view && $canManageSchedule) {
-            $view = 'user';
+        // Jika role Admin membuka Jadwal Kerja tanpa parameter view, arahkan default ke Kelola Periode Bulan
+        if (! $view && $canManageSchedule && ! ($request->has('year') && $request->has('month'))) {
+            $view = 'list';
         }
 
         // -------------------------------------------------------------------------
