@@ -396,28 +396,29 @@
                 font-size: 10.5px !important;
             }
             .chatbot-input-bar {
-                padding: 8px 10px !important;
-                gap: 6px !important;
+                padding: 10px 12px !important;
+                gap: 8px !important;
             }
             #chatbot-input-query {
-                padding: 6.5px 10px !important;
-                font-size: 11.5px !important;
-                border-radius: 10px !important;
+                padding: 8.5px 12px !important;
+                font-size: 13px !important;
+                border-radius: 12px !important;
+                min-height: 40px !important;
             }
             .chatbot-input-bar button[type="button"] {
-                width: 32px !important;
-                height: 32px !important;
-                border-radius: 10px !important;
+                width: 38px !important;
+                height: 38px !important;
+                border-radius: 12px !important;
             }
             .chatbot-input-bar button[type="button"] svg {
-                width: 15px !important;
-                height: 15px !important;
+                width: 17px !important;
+                height: 17px !important;
             }
             .chatbot-input-bar button[type="submit"] {
-                height: 32px !important;
-                padding: 0 12px !important;
-                font-size: 11.5px !important;
-                border-radius: 10px !important;
+                height: 38px !important;
+                padding: 0 14px !important;
+                font-size: 12.5px !important;
+                border-radius: 12px !important;
             }
         }
 
@@ -717,27 +718,27 @@
         </div>
 
         <!-- Input Bar -->
-        <form @submit.prevent="sendMessage()" class="chatbot-input-bar p-2.5 sm:p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
+        <form @submit.prevent="sendMessage()" class="chatbot-input-bar p-3 sm:p-3.5 bg-white border-t border-slate-200 flex items-center gap-2 shrink-0">
             <input type="text" 
                    id="chatbot-input-query"
                    x-ref="chatInput"
                    x-model="inputQuery" 
                    :placeholder="isListening ? '🎙️ Mendengarkan suara Anda...' : 'Ketik pertanyaan Anda...'" 
-                   class="flex-1 min-w-0 bg-slate-50 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs text-slate-800 placeholder-slate-400 transition"
+                   class="flex-1 min-w-0 bg-slate-50 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 transition"
                    :disabled="loading" />
             <button type="button" 
                     @click="toggleVoiceInput()"
                     :title="isListening ? 'Berhenti mendengarkan' : 'Bicara untuk mengetik (Voice-to-Text)'"
                     :class="isListening ? 'bg-rose-50 text-rose-600 border border-rose-300' : 'bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488]'"
-                    class="h-9 w-9 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
-                <svg class="w-4.5 h-4.5" :class="isListening ? 'text-rose-600 animate-pulse' : 'text-slate-600'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    class="h-10 w-10 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
+                <svg class="w-5 h-5" :class="isListening ? 'text-rose-600 animate-pulse' : 'text-slate-600'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
                 </svg>
                 <span x-show="isListening" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
             </button>
             <button type="submit" 
                     :disabled="loading || !inputQuery.trim()" 
-                    class="h-9 px-4 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs flex items-center justify-center transition cursor-pointer shrink-0 active:scale-95">
+                    class="h-10 px-4 sm:px-5 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs sm:text-sm flex items-center justify-center transition cursor-pointer shrink-0 active:scale-95">
                 Kirim
             </button>
         </form>
