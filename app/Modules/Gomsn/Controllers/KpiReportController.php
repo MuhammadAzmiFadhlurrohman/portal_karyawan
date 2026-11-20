@@ -26,6 +26,10 @@ class KpiReportController extends Controller
         $startDate = $request->filled('start_date') ? Carbon::parse($request->input('start_date'))->startOfDay() : Carbon::now()->startOfMonth();
         $endDate = $request->filled('end_date') ? Carbon::parse($request->input('end_date'))->endOfDay() : Carbon::now()->endOfMonth();
 
+        if ($startDate->gt($endDate)) {
+            [$startDate, $endDate] = [$endDate->copy()->startOfDay(), $startDate->copy()->endOfDay()];
+        }
+
         // 1. Overall MTTR & SLA Statistics
         $closedTickets = Tiket::query()
             ->where('status', 'CLOSE')
@@ -62,16 +66,26 @@ class KpiReportController extends Controller
             ];
         }
 
-        // Sort descending by score (nulls last)
+        // Sort descending by score (nulls last), then total tickets desc, then name asc
         usort($kpiList, function ($a, $b) {
             $scoreA = $a['data']['score'] ?? -1;
             $scoreB = $b['data']['score'] ?? -1;
 
-            return $scoreB <=> $scoreA;
+            if ($scoreA !== $scoreB) {
+                return $scoreB <=> $scoreA;
+            }
+
+            $ticketsCmp = ($b['data']['total_tickets'] ?? 0) <=> ($a['data']['total_tickets'] ?? 0);
+            if ($ticketsCmp !== 0) {
+                return $ticketsCmp;
+            }
+
+            return strcasecmp((string) ($a['user']->name ?? ''), (string) ($b['user']->name ?? ''));
         });
 
         return view('gomsn.analytics.kpi', compact(
             'totalClosed',
+            'onTimeCount',
             'slaComplianceRate',
             'avgMttr',
             'kpiList',
