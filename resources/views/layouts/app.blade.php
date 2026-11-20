@@ -414,7 +414,8 @@
                     $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
                     $isKelolaKaryawanActive = request()->routeIs('attendance.employee-recap*', 'portal.employees.*', 'attendance.reports*');
 
-                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.network.*') || request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
+                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.network.*');
+                    $isLainnyaActive = request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
 
                     $isNocRole = $sidebarUser && ($sidebarUser->hasRole(['noc', 'atasan_noc', 'karyawan_noc']) || str_contains(strtolower($sidebarUser->division ?? ''), 'noc'));
                 @endphp
@@ -428,6 +429,8 @@
                     @include('layouts.partials.sidebar-absensi')
                     @include('layouts.partials.sidebar-tiketing')
                 @endif
+
+                @include('layouts.partials.sidebar-lainnya')
             </nav>
 
             <!-- Instant Synchronous Sidebar State & Scroll Restoration (Zero Jump / Zero Refresh) -->
@@ -446,6 +449,9 @@
                         @if ($isTiketingActive)
                             sessionStorage.setItem('gomsn_sb_tiketing', '1');
                         @endif
+                        @if ($isLainnyaActive)
+                            sessionStorage.setItem('gomsn_sb_lainnya', '1');
+                        @endif
 
                         var elAbsensi = document.getElementById('sb-menu-absensi');
                         if (elAbsensi && sessionStorage.getItem('gomsn_sb_absensi') === '1') {
@@ -458,6 +464,10 @@
                         var elTiketing = document.getElementById('sb-menu-tiketing');
                         if (elTiketing && sessionStorage.getItem('gomsn_sb_tiketing') === '1') {
                             elTiketing.style.display = '';
+                        }
+                        var elLainnya = document.getElementById('sb-menu-lainnya');
+                        if (elLainnya && sessionStorage.getItem('gomsn_sb_lainnya') === '1') {
+                            elLainnya.style.display = '';
                         }
 
                         var savedScroll = sessionStorage.getItem('gomsn_sb_scroll');
@@ -1500,7 +1510,7 @@
                 @endif
 
                 <!-- KATEGORI 3: PEKERJAAN & LAPANGAN -->
-                <div x-show="!sheetSearch || 'tiket noc gangguan tugas lapangan kpi laporan teknisi perangkat sesi olt pon odp jaringan fiber pelanggan'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
+                <div x-show="!sheetSearch || 'tiket noc gangguan tugas lapangan olt pon odp jaringan fiber pelanggan'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-rose-500 to-pink-500"></span>
@@ -1535,7 +1545,19 @@
                                 </span>
                             @endif
                         </a>
+                    </div>
+                </div>
 
+                <!-- KATEGORI 4: LAINNYA (KPI, Perangkat, Akun & Pengaturan) -->
+                <div x-show="!sheetSearch || 'lainnya kpi laporan teknisi perangkat sesi profil akun karyawan sdm pengaturan radius absen audit log keluar logout'.includes(sheetSearch.toLowerCase())" class="space-y-2.5 pt-0.5">
+                    <div class="flex items-center justify-between pt-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-slate-600 to-slate-400"></span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Lainnya</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 font-medium">Sistem &amp; Pengaturan</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5">
                         <a href="{{ route('gomsn.analytics.kpi') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-indigo-400 hover:bg-indigo-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -1557,19 +1579,7 @@
                             </div>
                         </a>
                         @endhasrole
-                    </div>
-                </div>
 
-                <!-- KATEGORI 4: AKUN & PENGATURAN -->
-                <div x-show="!sheetSearch || 'profil akun pengaturan radius absen audit log keluar logout'.includes(sheetSearch.toLowerCase())" class="space-y-2.5 pt-0.5">
-                    <div class="flex items-center justify-between pt-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-slate-600 to-slate-400"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Akun &amp; Pengaturan</span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 font-medium">Sistem</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5">
                         <a href="{{ route('portal.profile') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
