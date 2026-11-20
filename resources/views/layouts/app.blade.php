@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#155E63">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Portal MSN">
     <link rel="icon" type="image/png" href="{{ asset('assets/logo/logo-msn2.png') }}">
     <link rel="shortcut icon" href="{{ asset('assets/logo/logo-msn2.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('assets/logo/logo-msn2.png') }}">

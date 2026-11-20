@@ -265,6 +265,171 @@
                 height: 6px !important;
             }
         }
+
+        /* GoMSN Sculpted Ocean Teal PWA Install Banner */
+        .pwa-banner {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            border: 1px solid rgba(45, 212, 191, .28);
+            background: linear-gradient(100deg, #022029 0%, #053540 35%, #094f5c 70%, #0d6270 100%);
+            box-shadow: 0 12px 28px -8px rgba(2, 32, 41, .45), inset 0 1px 0 rgba(94, 234, 212, .24);
+            color: #ffffff;
+            user-select: none;
+        }
+        .pwa-banner.is-hidden {
+            display: none !important;
+        }
+        .pwa-rim {
+            position: absolute;
+            top: 0;
+            left: 24px;
+            right: 24px;
+            height: 1.5px;
+            background: linear-gradient(90deg, transparent, rgba(94, 234, 212, .65), transparent);
+            pointer-events: none;
+        }
+        .pwa-glow {
+            position: absolute;
+            right: -30px;
+            top: -40px;
+            width: 220px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(24, 196, 196, .16);
+            filter: blur(42px);
+            pointer-events: none;
+        }
+        .pwa-wave-svg {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            height: 100%;
+            width: 55%;
+            opacity: .36;
+            pointer-events: none;
+        }
+        .pwa-left {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+            flex: 1;
+        }
+        .pwa-phone {
+            width: 34px;
+            height: 56px;
+            border-radius: 10px;
+            background: #071b21;
+            border: 1.5px solid rgba(94, 234, 212, .4);
+            padding: 3px;
+            flex-shrink: 0;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, .38), 0 0 14px rgba(20, 184, 166, .22);
+            display: flex;
+            align-items: stretch;
+            justify-content: stretch;
+        }
+        .pwa-phone-screen {
+            flex: 1;
+            border-radius: 6.5px;
+            background: #ffffff;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 3px 3px;
+            overflow: hidden;
+        }
+        .pwa-phone-notch {
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 11px;
+            height: 2.5px;
+            border-radius: 999px;
+            background: #0f172a;
+        }
+        .pwa-phone-screen img {
+            width: 100%;
+            height: auto;
+            max-height: 28px;
+            object-fit: contain;
+            display: block;
+        }
+        .pwa-text {
+            min-width: 0;
+        }
+        .pwa-title {
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+        }
+        .pwa-sub {
+            font-size: 12px;
+            color: rgba(204, 251, 241, .82);
+            margin: 3px 0 0;
+            line-height: 1.4;
+        }
+        .pwa-cta {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);
+            border: 1px solid rgba(153, 246, 228, .42);
+            box-shadow: 0 6px 18px -4px rgba(20, 184, 166, .58), inset 0 1px 0 rgba(255, 255, 255, .32);
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+        }
+        .pwa-cta:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 22px -4px rgba(24, 196, 196, .68), inset 0 1px 0 rgba(255, 255, 255, .4);
+        }
+        .pwa-cta:active {
+            transform: scale(.98);
+        }
+        .pwa-cta:disabled {
+            opacity: .75;
+            cursor: wait;
+            transform: none;
+        }
+        @media (max-width: 639px) {
+            .pwa-banner {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 14px 16px;
+                gap: 12px;
+                border-radius: 20px;
+            }
+            .pwa-cta {
+                width: 100%;
+                min-height: 40px;
+            }
+        }
     </style>
     <div class="hh">
         <!-- SVG Futuristic Background Geometry (Diagonal Bars, Concentric Orbit Rings, Grid Dots) -->
@@ -410,6 +575,74 @@
                         void n.offsetHeight;
                         n.style.animation = '';
                     });
+                }
+            });
+        })();
+    </script>
+
+    <!-- PWA App Install Banner (GoMSN Ocean Teal Theme) -->
+    <section id="pwa-install-banner" class="pwa-banner hub-anim-d2" aria-label="Pasang Aplikasi Mobile PT MSN">
+        <div class="pwa-rim" aria-hidden="true"></div>
+        <div class="pwa-glow" aria-hidden="true"></div>
+        <svg class="pwa-wave-svg" viewBox="0 0 360 90" fill="none" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 0 90 C 90 25 190 70 360 12 L 360 90 Z" fill="url(#pwaBannerWave)"/>
+            <path d="M 45 90 C 135 20 225 58 360 22" stroke="rgba(94, 234, 212, 0.4)" stroke-width="1.4" fill="none"/>
+            <defs>
+                <linearGradient id="pwaBannerWave" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.08"/>
+                    <stop offset="65%" stop-color="#2dd4bf" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="#5eead4" stop-opacity="0.32"/>
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <div class="pwa-left">
+            <div class="pwa-phone" aria-hidden="true">
+                <div class="pwa-phone-screen">
+                    <span class="pwa-phone-notch"></span>
+                    <img src="{{ asset('assets/logo/logo-msn2.png') }}" alt="">
+                </div>
+            </div>
+            <div class="pwa-text">
+                <h2 class="pwa-title">Aplikasi Mobile PT MSN</h2>
+                <p class="pwa-sub">Pasang aplikasi untuk akses cepat, praktis, dan notifikasi langsung di HP.</p>
+            </div>
+        </div>
+
+        <button type="button" id="pwa-install-btn" class="pwa-cta">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            <span>Pasang Aplikasi</span>
+        </button>
+    </section>
+    <script>
+        (function () {
+            var banner = document.getElementById('pwa-install-banner');
+            var btn = document.getElementById('pwa-install-btn');
+            if (!banner || !btn) return;
+
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || window.__pwaIsInstalled;
+            if (isStandalone) {
+                banner.classList.add('is-hidden');
+                return;
+            }
+
+            window.addEventListener('pwa:installed', function () {
+                banner.classList.add('is-hidden');
+            });
+
+            btn.addEventListener('click', async function () {
+                btn.disabled = true;
+                try {
+                    if (typeof window.triggerPwaInstall === 'function') {
+                        var outcome = await window.triggerPwaInstall();
+                        if (outcome === 'accepted' || outcome === 'installed') {
+                            banner.classList.add('is-hidden');
+                        }
+                    }
+                } finally {
+                    btn.disabled = false;
                 }
             });
         })();

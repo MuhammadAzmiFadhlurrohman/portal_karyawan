@@ -50,6 +50,79 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// PWA Install Prompt Handling & Cross-Browser Trigger
+window.__pwaInstallPrompt = null;
+window.__pwaIsInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    window.__pwaInstallPrompt = e;
+    window.dispatchEvent(new CustomEvent('pwa:install-ready'));
+});
+
+window.addEventListener('appinstalled', () => {
+    window.__pwaInstallPrompt = null;
+    window.__pwaIsInstalled = true;
+    window.dispatchEvent(new CustomEvent('pwa:installed'));
+});
+
+window.triggerPwaInstall = async () => {
+    if (window.__pwaIsInstalled) {
+        window.showToast?.('info', 'Aplikasi Mobile PT MSN sudah terpasang di perangkat Anda.');
+        return 'installed';
+    }
+
+    const promptEvent = window.__pwaInstallPrompt;
+    if (promptEvent) {
+        await promptEvent.prompt();
+        const choice = await promptEvent.userChoice;
+        window.__pwaInstallPrompt = null;
+        if (choice && choice.outcome === 'accepted') {
+            window.showToast?.('success', 'Aplikasi Mobile PT MSN sedang dipasang di perangkat Anda!');
+        }
+        return choice?.outcome || 'dismissed';
+    }
+
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const guideHtml = isIos
+        ? `<div class="text-left text-xs sm:text-sm text-slate-600 space-y-2 leading-relaxed">
+                <p class="font-medium text-slate-700">Untuk memasang aplikasi di <strong>iOS Safari</strong>:</p>
+                <ol class="list-decimal list-inside space-y-1.5 bg-teal-50/70 border border-teal-200 rounded-xl p-3 text-slate-700">
+                    <li>Ketuk ikon <strong>Bagikan (Share)</strong> di bilah bawah Safari.</li>
+                    <li>Pilih menu <strong>"Tambah ke Layar Utama"</strong> (<em>Add to Home Screen</em>).</li>
+                    <li>Ketuk <strong>"Tambah"</strong> di pojok kanan atas layar.</li>
+                </ol>
+           </div>`
+        : `<div class="text-left text-xs sm:text-sm text-slate-600 space-y-2 leading-relaxed">
+                <p class="font-medium text-slate-700">Untuk memasang aplikasi dari browser <strong>Android / Desktop</strong>:</p>
+                <ol class="list-decimal list-inside space-y-1.5 bg-teal-50/70 border border-teal-200 rounded-xl p-3 text-slate-700">
+                    <li>Ketuk ikon menu <strong>(&vellip;)</strong> atau ikon <strong>Install</strong> di bilah alamat browser.</li>
+                    <li>Pilih <strong>"Install aplikasi"</strong> atau <strong>"Tambahkan ke Layar Utama"</strong>.</li>
+                    <li>Konfirmasi dengan mengetuk tombol <strong>Install</strong>.</li>
+                </ol>
+           </div>`;
+
+    if (window.Swal) {
+        await window.Swal.fire({
+            icon: 'info',
+            title: 'Pasang Aplikasi Mobile PT MSN',
+            html: guideHtml,
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#0D9488',
+            backdrop: 'rgba(2, 32, 41, 0.65)',
+            customClass: {
+                popup: 'rounded-3xl shadow-2xl border border-slate-200 font-sans p-6 select-none',
+                title: 'font-bold text-base sm:text-lg text-slate-900',
+                confirmButton: 'px-6 py-2.5 rounded-xl font-bold text-xs text-white shadow-md cursor-pointer',
+            },
+        });
+    } else {
+        window.showToast?.('info', 'Buka menu browser Anda lalu pilih "Install aplikasi" atau "Tambahkan ke Layar Utama".');
+    }
+
+    return isIos ? 'ios' : 'manual';
+};
+
 // Live Network & Offline Sync Indicator (§10.3)
 function updateConnectionBadge() {
     const badge = document.getElementById('network-status-badge');
