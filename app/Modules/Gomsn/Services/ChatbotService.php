@@ -21,15 +21,19 @@ class ChatbotService
 {
     /**
      * Ensure knowledge base intents are always up-to-date in database
-     * when KNOWLEDGE_VERSION changes, without needing manual seeder runs.
+     * when KNOWLEDGE_VERSION changes, and remove stale legacy intents.
      */
     protected function ensureKnowledgeInitialized(): void
     {
         $versionKey = 'chatbot_knowledge_synced_version';
         $currentVersion = ChatbotKnowledgeSeeder::KNOWLEDGE_VERSION;
+        $defaultIntents = ChatbotKnowledgeSeeder::getDefaultIntents();
 
-        if (Cache::get($versionKey) !== $currentVersion || ChatbotIntent::query()->count() < count(ChatbotKnowledgeSeeder::getDefaultIntents())) {
-            foreach (ChatbotKnowledgeSeeder::getDefaultIntents() as $in) {
+        if (Cache::get($versionKey) !== $currentVersion || ChatbotIntent::query()->count() !== count($defaultIntents)) {
+            $validKeys = array_column($defaultIntents, 'intent_key');
+            ChatbotIntent::query()->whereNotIn('intent_key', $validKeys)->delete();
+
+            foreach ($defaultIntents as $in) {
                 ChatbotIntent::query()->updateOrCreate(
                     ['intent_key' => $in['intent_key']],
                     array_merge($in, ['is_active' => true])
@@ -56,49 +60,31 @@ class ChatbotService
             || $this->canManageEmployee($user);
     }
 
-    /**
-     * Check if user can approve attendance corrections.
-     */
     protected function canApproveAbsen(?User $user): bool
     {
         return $user && ($user->hasRole(['super_admin', 'admin', 'hrd', 'manager', 'supervisor']) || $user->can('attendance.correction.approve'));
     }
 
-    /**
-     * Check if user can approve leaves.
-     */
     protected function canApproveCuti(?User $user): bool
     {
         return $user && ($user->hasRole(['super_admin', 'admin', 'hrd', 'manager', 'supervisor']) || $user->can('attendance.leaves.approve'));
     }
 
-    /**
-     * Check if user can approve overtime.
-     */
     protected function canApproveLembur(?User $user): bool
     {
         return $user && ($user->hasRole(['super_admin', 'admin', 'hrd', 'manager', 'supervisor', 'finance']) || $user->can('overtime.approve'));
     }
 
-    /**
-     * Check if user can approve operational fund/item requests.
-     */
     protected function canApprovePengajuanDana(?User $user): bool
     {
         return $user && ($user->hasRole(['super_admin', 'admin', 'manager', 'supervisor', 'direksi', 'finance']) || $user->can('pengajuan.approve'));
     }
 
-    /**
-     * Check if user can manage employee data.
-     */
     protected function canManageEmployee(?User $user): bool
     {
         return $user && ($user->hasRole(['super_admin', 'admin', 'hrd']) || $user->can('attendance.employee.manage'));
     }
 
-    /**
-     * Check if user is HRD or Administrator.
-     */
     protected function isHrdOrAdmin(?User $user): bool
     {
         if (! $user) {
@@ -112,267 +98,154 @@ class ChatbotService
     }
 
     /**
-     * Resolve action button (Label & URL) for a matched intent so the user can jump directly to the page.
+     * Resolve action button (Label & URL) for a matched intent.
      *
      * @return ?array{label: string, url: string}
      */
     protected function resolveActionLink(string $intentKey, ?User $user = null): ?array
     {
         return match ($intentKey) {
-            'status_absen_hari_ini',
-            'alur_cara_absen',
-            'panduan_biometrik_gps',
-            'troubleshooting_gps',
-            'troubleshooting_biometrik',
-            'liveness_wajah',
-            'tipe_absen_kantor_dinas_luar',
-            'radius_geofencing',
-            'offline_absen_sinkronisasi',
-            'absen_offline_kendala_jaringan',
-            'alur_absen_dinas_luar',
-            'fungsi_tombol_refresh_absensi',
-            'kendala_absen_ditolak' => [
+            'q1_status_checkin_hari_ini',
+            'q3_cara_absen_biometrik_gps',
+            'q4_troubleshooting_gps',
+            'q5_troubleshooting_biometrik',
+            'q9_aturan_absen_luar_kantor',
+            'q12_sinkronisasi_absensi_realtime',
+            'q13_absen_offline_kendala_jaringan',
+            'q79_fungsi_tombol_refresh_absensi' => [
                 'label' => '📍 Buka Halaman Absen',
                 'url' => route('attendance.index'),
             ],
-            'riwayat_absen_kemarin',
-            'rekap_kehadiran_7_hari',
-            'cara_melihat_log_bulan_lalu',
-            'melihat_titik_gps_absen',
-            'koreksi_absensi',
-            'koreksi_absensi_approval_flow',
-            'batas_koreksi_absen' => [
-                'label' => '📝 Buka Riwayat & Koreksi Absen',
+            'q2_riwayat_checkin_kemarin',
+            'q8_prosedur_koreksi_absen',
+            'q10_rekap_kehadiran_7_hari',
+            'q11_cara_lihat_log_bulan_lalu',
+            'q14_total_hari_kerja_efektif',
+            'q87_cek_riwayat_dan_potongan_typo' => [
+                'label' => '📝 Buka Riwayat Absen Saya',
                 'url' => route('attendance.history'),
             ],
-            'approval_pengajuan_absen' => $this->canApproveAbsen($user)
-                ? [
-                    'label' => '✅ Buka Persetujuan Pengajuan Absen',
-                    'url' => route('attendance.corrections.approvals'),
-                ]
-                : [
-                    'label' => '📝 Buka Riwayat Absen Saya',
-                    'url' => route('attendance.history'),
-                ],
-            'jadwal_shift_hari_ini_besok',
-            'cara_cek_kalender_shift',
-            'tukar_shift_aturan',
-            'backup_shift_aturan',
-            'aturan_jeda_shift',
-            'aturan_absensi_hari_libur',
-            'total_hari_kerja_efektif',
-            'jadwal_piket_standby_weekend' => [
-                'label' => '📅 Buka Jadwal Kerja',
+            'q15_aturan_absensi_hari_libur',
+            'q16_jadwal_shift_hari_ini_besok',
+            'q17_cara_cek_kalender_shift',
+            'q18_kebijakan_tukar_shift' => [
+                'label' => '📅 Buka Jadwal Kerja Saya',
                 'url' => route('attendance.schedules'),
             ],
-            'sisa_cuti',
-            'cara_ajukan_sakit',
-            'cara_ajukan_cuti',
-            'hak_izin_sakit_berbayar',
-            'syarat_dokumen_izin_sakit',
-            'syarat_surat_dokter_sakit',
-            'h_minus_pengajuan_cuti',
-            'ketentuan_cuti_khusus',
-            'cara_batalkan_cuti',
-            'pembatalan_cuti_disetujui',
-            'perbedaan_jenis_cuti_izin',
-            'aturan_hangus_sisa_cuti',
-            'kebijakan_sisa_cuti_hangus',
-            'cuti_mendadak_multi_turn' => [
-                'label' => '🌴 Buka Halaman Cuti & Izin',
+            'q19_sisa_saldo_cuti',
+            'q20_langkah_ajukan_cuti',
+            'q21_sla_batas_pengajuan_cuti',
+            'q22_syarat_dokumen_izin_sakit',
+            'q23_cara_cek_approval_izin',
+            'q24_pembatalan_cuti_disetujui',
+            'q29_perbedaan_jenis_cuti_izin',
+            'q30_aturan_hangus_sisa_cuti',
+            'q89_cuti_mendadak_multi_turn' => [
+                'label' => '🌴 Buka Cuti & Izin Saya',
                 'url' => route('attendance.leaves'),
             ],
-            'cara_approve_cuti',
-            'cara_cek_approval_cuti' => $this->canApproveCuti($user)
-                ? [
-                    'label' => '✅ Buka Persetujuan Cuti Karyawan',
-                    'url' => route('attendance.leaves'),
-                ]
-                : [
-                    'label' => '🌴 Ajukan Cuti & Izin Saya',
-                    'url' => route('attendance.leaves'),
-                ],
-            'cara_ajukan_lembur',
-            'lembur_backdate_aturan',
-            'syarat_spk_lembur',
-            'cara_akses_dokumen_spk',
-            'batas_waktu_klaim_lembur' => [
-                'label' => '⏰ Buat Pengajuan Lembur',
-                'url' => route('gomsn.overtime.create'),
+            'q6_batas_toleransi_terlambat',
+            'q7_rekap_terlambat_bulan_ini',
+            'q25_penjelasan_nominal_potongan',
+            'q26_formula_hitung_potongan',
+            'q27_total_potongan_denda_saya',
+            'q28_alur_sanggahan_potongan',
+            'q59_integrasi_potongan_ke_payroll',
+            'q76_lokasi_menu_potongan_denda',
+            'q90_efek_terlambat_gaji_leaderboard' => [
+                'label' => '💵 Buka Potongan Absen Saya',
+                'url' => route('attendance.deductions'),
             ],
-            'cara_approve_lembur',
-            'antrean_approval_lembur_hari_ini',
-            'monitoring_lembur_karyawan' => $this->canApproveLembur($user)
-                ? [
-                    'label' => '💼 Buka Persetujuan Lembur',
-                    'url' => route('gomsn.overtime.index'),
-                ]
-                : [
-                    'label' => '⏰ Buat Pengajuan Lembur',
-                    'url' => route('gomsn.overtime.create'),
-                ],
-            'pencairan_lembur',
-            'total_jam_lembur_saya',
-            'tarif_upah_lembur',
-            'pejabat_approval_lembur',
-            'alasan_lembur_ditolak',
-            'aturan_lembur_hari_libur' => [
-                'label' => '💼 Buka Halaman Lembur',
-                'url' => route('gomsn.overtime.index'),
-            ],
-            'alur_pengajuan_operasional',
-            'alur_pengajuan_kasbon',
-            'cara_pengajuan_pembelian_barang',
-            'cara_pengajuan_permintaan_stok',
-            'cara_minta_stok_gudang' => [
-                'label' => '💰 Buat Pengajuan Dana / Barang',
+            'q31_cara_ajukan_kasbon',
+            'q34_langkah_pengajuan_beli_barang',
+            'q35_cara_permintaan_stok_material' => [
+                'label' => '💰 Buat Pengajuan Baru',
                 'url' => route('gomsn.pengajuan.create'),
             ],
-            'status_pengajuan_saya',
-            'export_excel_pengajuan',
-            'revisi_pengajuan_pending',
-            'edit_pengajuan_reject',
-            'cara_upload_nota_lpj',
-            'tenggat_lpj_operasional',
-            'format_bukti_nota_file',
-            'perbedaan_reimburse_advance',
-            'prosedur_settlement_kasbon',
-            'struktur_menu_pengajuan_operasional',
-            'cara_search_layanan_kasbon',
-            'plafon_limit_kasbon' => [
+            'q32_batas_maksimal_kasbon',
+            'q33_prosedur_settlement_kasbon',
+            'q36_cek_status_pengajuan_terakhir',
+            'q37_hierarki_approval_pembelian',
+            'q45_revisi_pengajuan_pending',
+            'q77_struktur_menu_pengajuan_operasional',
+            'q83_cara_search_layanan_kasbon' => [
                 'label' => '📋 Buka Pengajuan Saya',
                 'url' => route('gomsn.pengajuan.index'),
             ],
-            'tahapan_approval_pengajuan',
-            'hierarki_approval_pembelian' => $this->canApprovePengajuanDana($user)
-                ? [
-                    'label' => '✅ Buka Persetujuan Karyawan',
-                    'url' => route('gomsn.pengajuan.approvals'),
-                ]
-                : [
-                    'label' => '📋 Buka Pengajuan Saya',
-                    'url' => route('gomsn.pengajuan.index'),
-                ],
-            'stok_barang_gudang',
-            'permintaan_stok_dari_tiket' => [
-                'label' => '📦 Buka Stok Barang Gudang',
-                'url' => route('gomsn.inventory.index'),
+            'q38_cara_ajukan_lembur',
+            'q39_syarat_spk_lembur',
+            'q41_batas_waktu_klaim_lembur' => [
+                'label' => '⏰ Ajukan Lembur',
+                'url' => route('gomsn.overtime.create'),
             ],
-            'buka_tiket_gangguan',
-            'jumlah_tiket_open_hari_ini',
-            'tiket_aktif_saya',
-            'tiket_critical_unassigned',
-            'teknisi_tugas_prioritas_tinggi',
-            'resume_pekerjaan_tiket',
-            'penanganan_core_joint_closure',
-            'catat_repair_point_kabel',
-            'pemakaian_material_tiket',
-            'chat_koordinasi_tiket',
-            'closing_dan_berita_acara_bast',
-            'dispatch_penugasan_tim',
-            'stop_clock_aturan',
-            'isi_kronologi_tiket',
-            'update_progres_tiket',
-            'mekanisme_handover_tiket',
-            'prosedur_spk_tiket_noc',
-            'syarat_bukti_closing_tiket',
-            'alur_eskalasi_sla_tiket',
-            'cari_riwayat_tiket_pelanggan',
-            'perbedaan_tiket_noc_vs_pasang_baru',
-            'perbedaan_menu_tiket_navigasi',
-            'sisa_sla_tiket_aktif' => [
-                'label' => '🎫 Buka Halaman Tiketing',
+            'q40_cara_akses_dokumen_spk',
+            'q42_total_jam_lembur_bulan_ini',
+            'q43_alasan_lembur_ditolak',
+            'q44_aturan_lembur_hari_libur',
+            'q53_monitoring_lembur_karyawan',
+            'q54_antrean_approval_lembur_hari_ini' => [
+                'label' => '💼 Buka Halaman Lembur',
+                'url' => route('gomsn.overtime.index'),
+            ],
+            'q46_company_ringkasan_absensi_hari_ini',
+            'q47_daftar_karyawan_sakit_hari_ini',
+            'q48_daftar_karyawan_terlambat_hari_ini',
+            'q51_unduh_rekap_absensi_potongan',
+            'q52_divisi_kehadiran_tertinggi' => [
+                'label' => '📊 Buka Absen Karyawan',
+                'url' => route('attendance.employee-recap'),
+            ],
+            'q49_cara_cari_kontak_karyawan',
+            'q50_cari_karyawan_berdasarkan_nik',
+            'q57_cara_ubah_status_aktif_karyawan',
+            'q58_onboarding_karyawan_baru',
+            'q60_total_karyawan_aktif_headcount',
+            'q84_menu_khusus_divisi_hrd' => $this->canManageEmployee($user)
+                ? [
+                    'label' => '👥 Buka Data Karyawan',
+                    'url' => route('portal.employees.index'),
+                ]
+                : null,
+            'q55_kriteria_penilaian_leaderboard',
+            'q56_top_5_leaderboard_disiplin' => [
+                'label' => '🏆 Buka Leaderboard',
+                'url' => route('attendance.leaderboard'),
+            ],
+            'q61_cara_buat_tiket_gangguan',
+            'q62_jumlah_tiket_open_hari_ini',
+            'q63_update_progres_tiket',
+            'q67_prosedur_spk_tiket_noc',
+            'q68_syarat_bukti_closing_tiket',
+            'q69_alur_eskalasi_sla_tiket',
+            'q70_cari_riwayat_tiket_pelanggan',
+            'q71_permintaan_stok_dari_tiket',
+            'q73_teknisi_tugas_prioritas_tinggi',
+            'q74_perbedaan_tiket_noc_vs_pasang_baru',
+            'q82_perbedaan_menu_tiket_navigasi',
+            'extra_resume_pekerjaan_tiket',
+            'extra_core_joint_closure',
+            'extra_tugas_operasional_tasks',
+            'extra_tiket_aktif_saya' => [
+                'label' => '🎫 Buka Tiket Gangguan',
                 'url' => route('tickets.index'),
             ],
-            'manajemen_jaringan_odp',
-            'informasi_menu_olt_pon_odp',
-            'cara_cek_odp_pelanggan',
-            'arti_status_port_pon_olt',
-            'cek_kapasitas_port_odp',
-            'cara_input_koordinat_odp',
-            'manuver_traffic_optik' => [
+            'q64_informasi_menu_olt_pon_odp',
+            'q65_cara_cek_odp_pelanggan',
+            'q66_arti_status_port_pon_olt',
+            'q72_cek_kapasitas_port_odp',
+            'q75_cara_input_koordinat_odp' => [
                 'label' => '🌐 Buka Jaringan OLT, PON & ODP',
                 'url' => route('gomsn.network.index'),
             ],
-            'potongan_keuangan_absen',
-            'total_potongan_denda_saya',
-            'rekap_terlambat_saya',
-            'toleransi_keterlambatan',
-            'batas_toleransi_keterlambatan',
-            'penjelasan_nominal_potongan',
-            'formula_hitung_potongan',
-            'alur_sanggahan_potongan',
-            'nominal_denda_alpa',
-            'lokasi_menu_potongan_denda',
-            'navigasi_slip_dan_potongan',
-            'efek_terlambat_gaji_leaderboard',
-            'cara_kunci_periode_potongan',
-            'integrasi_potongan_ke_payroll' => [
-                'label' => '💵 Buka Keuangan & Potongan Absen',
-                'url' => route('attendance.deductions'),
-            ],
-            'leaderboard_karyawan',
-            'kriteria_penilaian_leaderboard',
-            'top_5_leaderboard_disiplin',
-            'warna_divisi_badge' => [
-                'label' => '🏆 Buka Leaderboard Kehadiran',
-                'url' => route('attendance.leaderboard'),
-            ],
-            'kpi_teknisi' => [
-                'label' => '📊 Buka Analitik KPI Teknisi',
-                'url' => route('gomsn.analytics.kpi'),
-            ],
-            'kalender_absensi_dashboard',
-            'cara_buka_semua_layanan_portal' => [
+            'q78_cara_buka_semua_layanan_portal',
+            'extra_kalender_absensi_dashboard' => [
                 'label' => '🏠 Buka Dashboard',
                 'url' => route('portal.hub'),
             ],
-            'company_rekap_absensi_hari_ini',
-            'daftar_karyawan_sakit_hari_ini',
-            'daftar_karyawan_terlambat_hari_ini',
-            'divisi_kehadiran_tertinggi',
-            'rekap_absensi_karyawan',
-            'unduh_rekap_absensi_potongan',
-            'cara_export_excel_absensi' => [
-                'label' => '📊 Buka Rekap Absensi Karyawan',
-                'url' => route('attendance.employee-recap'),
-            ],
-            'ganti_foto_profil',
-            'cara_login_sidik_jari',
-            'prosedur_reset_password_lupa',
-            'navigasi_ubah_password_biometrik' => [
-                'label' => '👤 Buka Halaman Profile',
+            'q80_cara_ganti_foto_profil',
+            'q81_prosedur_reset_password_lupa' => [
+                'label' => '👤 Buka Profil Saya',
                 'url' => route('portal.profile'),
-            ],
-            'manajemen_data_karyawan',
-            'cara_tambah_karyawan_baru',
-            'cara_nonaktifkan_karyawan_resign',
-            'cara_ubah_kuota_cuti_karyawan',
-            'cara_reset_wajah_karyawan',
-            'cara_cari_kontak_karyawan',
-            'cari_karyawan_berdasarkan_nik',
-            'cara_ubah_status_aktif_karyawan',
-            'onboarding_karyawan_baru',
-            'total_karyawan_aktif_headcount',
-            'menu_khusus_divisi_hrd',
-            'navigasi_daftar_kontak_rekan' => $this->canManageEmployee($user)
-                ? [
-                    'label' => '👥 Buka Kelola Data Karyawan',
-                    'url' => route('portal.employees.index'),
-                ]
-                : [
-                    'label' => '👤 Buka Halaman Profile',
-                    'url' => route('portal.profile'),
-                ],
-            'navigasi_audit_log_perangkat' => [
-                'label' => '🔒 Buka Sesi & Perangkat Akun',
-                'url' => route('portal.sessions'),
-            ],
-            'navigasi_kalender_libur_nasional',
-            'navigasi_unduh_sop_formulir',
-            'kontak_it_support_error' => [
-                'label' => '🏠 Buka Portal Hub',
-                'url' => route('portal.hub'),
             ],
             default => null,
         };
@@ -384,6 +257,14 @@ class ChatbotService
     protected function normalizeText(string $text): string
     {
         $clean = mb_strtolower(trim($text));
+
+        // Pre-normalize hyphenated terms before stripping punctuation
+        $clean = str_replace(
+            ['real-time', 'check-in', 'check-out', 'non-aktif', 'company-wide', 'carry-over', 'password-nya', 'langkah-langkah'],
+            ['realtime', 'check in', 'check out', 'non aktif', 'company wide', 'carry over', 'passwordnya', 'langkah langkah'],
+            $clean
+        );
+
         // Replace punctuation with space
         $clean = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $clean) ?? $clean;
 
@@ -407,18 +288,13 @@ class ChatbotService
             'bgmn' => 'bagaimana',
             'caranya' => 'cara',
             'crnya' => 'cara',
+            'absennya' => 'absen',
+            'mengurusnya' => 'mengurus',
+            'penolakannya' => 'penolakan',
+            'passwordnya' => 'password',
+            'efeknya' => 'efek',
             'ngajuin' => 'mengajukan',
-            'pengajuan' => 'pengajuan',
-            'ajukan' => 'mengajukan',
-            'bikin' => 'membuat',
-            'buat' => 'membuat',
-            'uang' => 'dana',
-            'duit' => 'dana',
-            'reimbursement' => 'reimburse',
-            'cutiku' => 'cuti saya',
-            'absenku' => 'absen saya',
-            'presensi' => 'absen',
-            'kehadiran' => 'absen',
+            'ajukan' => 'ajukan',
             'rwayat' => 'riwayat',
             'absn' => 'absen',
             'sy' => 'saya',
@@ -427,27 +303,12 @@ class ChatbotService
             'bsk' => 'besok',
             'dn' => 'dan',
             'jg' => 'juga',
-            'cekin' => 'clock in',
-            'cekout' => 'clock out',
-            'check in' => 'clock in',
-            'check out' => 'clock out',
+            'cekin' => 'check in',
+            'cekout' => 'check out',
             'overtime' => 'lembur',
-            'lemburan' => 'lembur',
-            'tukeran' => 'tukar',
-            'gantian' => 'tukar',
-            'acc' => 'approve',
-            'setujui' => 'approve',
-            'disetujui' => 'approve',
-            'menyetujui' => 'approve',
-            'persetujuan' => 'approve',
-            'vertifikasi' => 'verifikasi',
-            'verif' => 'verifikasi',
-            'diverifikasi' => 'verifikasi',
-            'divertifikasi' => 'verifikasi',
             'poto' => 'foto',
             'photo' => 'foto',
             'profile' => 'profil',
-            'sandi' => 'password',
             'brp' => 'berapa',
             'kpn' => 'kapan',
             'knp' => 'kenapa',
@@ -458,16 +319,6 @@ class ChatbotService
             'ga' => 'tidak',
             'enggak' => 'tidak',
             'tdk' => 'tidak',
-            'dl' => 'dinas luar',
-            'dinasluar' => 'dinas luar',
-            'jointclosure' => 'joint closure',
-            'jointing' => 'jointing',
-            'splising' => 'splicing',
-            'beritaacara' => 'berita acara',
-            'todo' => 'tasks',
-            'todolist' => 'tasks',
-            'subtugas' => 'subtask',
-            'stt' => 'voice to text',
         ];
 
         foreach ($synonyms as $from => $to) {
@@ -489,7 +340,8 @@ class ChatbotService
             'ini', 'itu', 'sih', 'dong', 'deh', 'ya', 'yah', 'kak', 'min',
             'pak', 'bu', 'bos', 'apakah', 'kalau', 'kalo', 'bila', 'jika', 'mau',
             'ingin', 'pengen', 'tanya', 'nanya', 'tolong', 'mohon', 'bantu',
-            'bagaimana', 'cara', 'bisa', 'ada', 'masih',
+            'bagaimana', 'cara', 'bisa', 'ada', 'masih', 'saya', 'apa', 'saja',
+            'aplikasi', 'gomsn', 'sistem', 'menu', 'dalam', 'saat', 'oleh',
         ];
 
         $words = explode(' ', $normalizedText);
@@ -505,28 +357,29 @@ class ChatbotService
     }
 
     /**
-     * High-value domain subject words that carry 3x weight when matching intents.
+     * High-value domain subject words that carry higher weight when matching intents.
      */
     protected function isSubjectKeyword(string $token): bool
     {
         $subjects = [
-            'cuti', 'sakit', 'lembur', 'dana', 'kasbon', 'barang', 'stok', 'absen',
-            'wajah', 'verifikasi', 'radius', 'gps', 'koreksi', 'lupa', 'tukar', 'backup',
-            'shift', 'jadwal', 'tiket', 'gangguan', 'backbone', 'broadband', 'sla',
-            'kpi', 'olt', 'pon', 'odp', 'potongan', 'alpa', 'telat', 'leaderboard',
-            'foto', 'profil', 'password', 'sidik', 'jari', 'approve', 'excel', 'sisa',
-            'kuota', 'dokter', 'resume', 'joint', 'closure', 'jc', 'core', 'splicing',
-            'manuver', 'material', 'bast', 'berita', 'acara', 'dispatch', 'dinas', 'luar',
-            'kalender', 'task', 'tugas', 'subtask', 'mic', 'suara', 'voice', 'divisi',
-            'kemarin', 'efektif', 'standby', 'piket', 'denda', 'spk', 'settlement',
-            'headcount', 'onboarding', 'payroll', 'rekening', 'gaji', 'piala', 'hacker',
+            'cuti', 'sakit', 'lembur', 'dana', 'kasbon', 'barang', 'beli', 'stok', 'absen', 'absensi',
+            'wajah', 'biometrik', 'verifikasi', 'radius', 'gps', 'koreksi', 'lupa', 'tukar', 'backup',
+            'shift', 'jadwal', 'tiket', 'gangguan', 'backbone', 'broadband', 'sla', 'eskalasi',
+            'kpi', 'olt', 'pon', 'odp', 'potongan', 'denda', 'alpa', 'telat', 'terlambat', 'keterlambatan',
+            'leaderboard', 'foto', 'profil', 'password', 'sandi', 'approve', 'persetujuan', 'sisa', 'saldo',
+            'kuota', 'dokter', 'resume', 'joint', 'closure', 'jc', 'core', 'splicing', 'redaman',
+            'manuver', 'material', 'bast', 'dispatch', 'dinas', 'luar', 'lapangan', 'kalender',
+            'divisi', 'kemarin', 'efektif', 'spk', 'settlement', 'pelunasan', 'pertanggungjawaban',
+            'headcount', 'onboarding', 'payroll', 'rekening', 'gaji', 'nik', 'realtime', 'offline',
+            'internet', 'jaringan', 'mati', 'refresh', 'home', 'kontak', 'support', 'error', 'sanggahan',
+            'hangus', 'diakumulasi', 'ditolak', 'pending', 'mengedit', 'port', 'kapasitas', 'koordinat',
         ];
 
         return in_array($token, $subjects, true);
     }
 
     /**
-     * Process message from user and return personalized response + navigation button.
+     * Process message from user and return concise, accurate response + navigation button.
      *
      * @return array{response: string, confidence: float, matched_intent: ?string, action_url: ?string, action_label: ?string, suggestions: list<string>}
      */
@@ -539,32 +392,35 @@ class ChatbotService
         $userTokens = $this->extractTokens($normMessage);
 
         // ==========================================
-        // EARLY GUARDRAILS & EDGE CASES
+        // EARLY GUARDRAILS & EDGE CASES (Q92 - Q99)
         // ==========================================
 
         // 1. Empty or Punctuation Only (Q99)
         if (preg_match('/^[?\s.!,\-_:;]+$/u', $rawClean) || mb_strlen($rawClean) < 2) {
-            $fallback = "Pesan yang Anda kirimkan belum jelas atau hanya berupa tanda baca. Silakan ketik pertanyaan Anda dengan kata kunci yang jelas, misalnya:\n• \"Bagaimana cara absen?\"\n• \"Berapa sisa cuti saya?\"\n• \"Bagaimana cara mengajukan kasbon?\"\n• \"Cara membuat pengajuan lembur\"";
+            $resp = "Maaf, pesan yang Anda kirimkan tidak valid atau belum jelas. Silakan ketik pertanyaan singkat terkait layanan GOMSN, misalnya: \"Hari ini saya sudah check-in atau belum?\", \"Berapa sisa saldo cuti saya?\", atau \"Bagaimana cara mengajukan lembur?\".";
             return [
-                'response' => $fallback,
+                'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'penanganan_input_tidak_valid',
+                'matched_intent' => 'q99_input_tidak_valid',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Bagaimana cara absen?', 'Berapa sisa cuti saya?', 'Cara mengajukan lembur'],
+                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Bagaimana cara mengajukan lembur?'],
             ];
         }
 
-        // 2. Keyboard Smash / Gibberish (Q100)
-        if (preg_match('/\b(asdfghjkl|qwertyuiop|zxcvbnm|asdasd|hjkjhg)\b/i', $rawClean) || preg_match('/\b[bcdfghjklmnpqrstvwxyz]{6,}\b/i', $rawClean)) {
-            $fallback = "Pesan yang Anda kirimkan berupa karakter acak dan tidak dapat dipahami sistem. Silakan tanyakan hal terkait operasional portal MSN, misalnya:\n• \"Bagaimana cara absen?\"\n• \"Berapa sisa cuti saya?\"\n• \"Bagaimana cara mengajukan kasbon?\"\n• \"Cara membuat pengajuan lembur\"";
+        // 2. Keyboard Smash / Gibberish (Q99)
+        if (
+            (preg_match('/\b(asdfghjkl|qwertyuiop|zxcvbnm|asdasd|hjkjhg)\b/i', $rawClean) && ! str_contains($rawClean, 'mengirimkan pesan kosong'))
+            || (preg_match('/\b[bcdfghjklmnpqrstvwxyz]{6,}\b/i', $rawClean) && count($userTokens) <= 3)
+        ) {
+            $resp = "Maaf, pesan yang Anda kirimkan tidak valid atau berupa karakter acak. Silakan ketik pertanyaan singkat terkait layanan GOMSN, misalnya: \"Hari ini saya sudah check-in atau belum?\", \"Berapa sisa saldo cuti saya?\", atau \"Bagaimana cara mengajukan lembur?\".";
             return [
-                'response' => $fallback,
+                'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'penanganan_input_tidak_valid',
+                'matched_intent' => 'q99_input_tidak_valid',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Bagaimana cara absen?', 'Berapa sisa cuti saya?', 'Cara mengajukan lembur'],
+                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Bagaimana cara mengajukan lembur?'],
             ];
         }
 
@@ -577,109 +433,125 @@ class ChatbotService
             || str_contains($rawClean, 'dump database')
             || str_contains($rawClean, 'ignore all instructions')
         ) {
-            $resp = "Maaf, permintaan Anda tidak dapat diproses. Sebagai asisten resmi PT MSN, saya beroperasi dengan standar keamanan data ketat dan tidak diizinkan menjalankan perintah di luar prosedur operasional resmi aplikasi portal.";
+            $resp = "Permintaan Ditolak. Saya tidak dapat mengabaikan instruksi keamanan sistem maupun menampilkan isi database internal. Silakan ajukan pertanyaan yang berkaitan dengan prosedur operasional resmi GOMSN.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'proteksi_prompt_injection',
+                'matched_intent' => 'q98_proteksi_prompt_injection',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Status absen hari ini', 'Jadwal shift kerja', 'Panduan operasional'],
+                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Jadwal shift kerja saya hari ini dan besok', 'Berapa sisa saldo cuti tahunan saya saat ini?'],
             ];
         }
 
         // 4. PII Protection: Gaji Pokok & Nomor Rekening (Q94)
         if (
-            (str_contains($rawClean, 'gaji pokok') || str_contains($rawClean, 'gaji'))
+            (str_contains($rawClean, 'gaji pokok') || str_contains($rawClean, 'rincian gaji'))
             && (str_contains($rawClean, 'nomor rekening') || str_contains($rawClean, 'no rekening') || str_contains($rawClean, 'rekening'))
         ) {
-            $resp = "Demi perlindungan data pribadi (Privacy & PII Protection) karyawan PT MSN, informasi sensitif seperti nominal gaji pokok dan nomor rekening bank bersifat sangat rahasia (Strictly Confidential) dan tidak dapat diakses melalui asisten virtual ini. Silakan hubungi Finance atau HRD secara langsung.";
+            $resp = "Akses Ditolak. Demi perlindungan data pribadi (PII Protection), informasi sensitif seperti gaji pokok dan nomor rekening pribadi karyawan bersifat rahasia dan tidak dapat ditampilkan melalui chatbot.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'proteksi_pii_gaji_rekening',
+                'matched_intent' => 'q94_proteksi_pii_gaji_rekening',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Status absen hari ini', 'Sisa kuota cuti', 'Potongan absen saya'],
+                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Berapa total potongan dan denda saya pada periode berjalan ini?'],
             ];
         }
 
-        // 5. Out of Scope: Sepak Bola / Cuaca / Berita Luar (Q96)
+        // 5. Out of Scope: Sepak Bola / Cuaca / Berita Umum (Q96)
         if (
-            str_contains($rawClean, 'piala dunia')
-            || (str_contains($rawClean, 'sepak bola') && str_contains($rawClean, 'skor'))
+            str_contains($rawClean, 'sepak bola')
+            || str_contains($rawClean, 'piala dunia')
+            || str_contains($rawClean, 'prediksi cuaca')
             || str_contains($rawClean, 'skor pertandingan')
         ) {
-            $resp = "Saya adalah Asisten Virtual internal PT MSN yang dirancang khusus untuk memandu operasional perusahaan, absensi, cuti, lembur, dan penanganan tiket gangguan jaringan optik. Saya tidak dapat menjawab pertanyaan seputar berita umum, olahraga, atau topik di luar lingkup kerja MSN.";
+            $resp = "Maaf, pertanyaan tersebut berada di luar cakupan layanan saya. Saya adalah Asisten Virtual internal GOMSN PT Media Solusi Network yang khusus membantu informasi seputar absensi, jadwal kerja, cuti, pengajuan operasional, dan tiket gangguan.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'out_of_scope_olahraga_cuaca',
+                'matched_intent' => 'q96_out_of_scope_umum',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Cara absen dinas luar', 'Cara isi resume tiket', 'Berapa sisa cuti saya'],
+                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Bagaimana cara mengajukan lembur?'],
             ];
         }
 
-        // 6. Out of Scope: Coding Machine Learning & Artikel Marketing (Q97)
+        // 6. Out of Scope: Coding & Artikel Marketing (Q97)
         if (
-            (str_contains($rawClean, 'kode program') || str_contains($rawClean, 'python'))
-            && (str_contains($rawClean, 'machine learning') || str_contains($rawClean, 'artikel marketing'))
+            (str_contains($rawClean, 'kode program') || str_contains($rawClean, 'python') || str_contains($rawClean, 'artikel marketing'))
+            && (str_contains($rawClean, 'artikel marketing') || str_contains($rawClean, 'machine learning') || str_contains($rawClean, 'tidak berhubungan'))
         ) {
-            $resp = "Saya berfokus pada informasi alur kerja, panduan portal, dan operasional PT MSN. Untuk penulisan kode program kustom atau pembuatan artikel marketing eksternal, silakan gunakan perangkat lunak pengembangan dan konsultasikan dengan divisi terkait.";
+            $resp = "Maaf, saya tidak dapat membuatkan kode program umum atau artikel marketing di luar konteks pekerjaan portal. Saya dirancang khusus untuk membantu operasional internal dan panduan penggunaan aplikasi GOMSN.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'guardrail_kode_artikel_luar',
+                'matched_intent' => 'q97_guardrail_topik_pekerjaan',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Cara buat tiket gangguan', 'Alur pengajuan kasbon', 'Panduan jadwal kerja'],
+                'suggestions' => ['Bagaimana cara membuat Tiket Gangguan baru?', 'Bagaimana cara mengajukan kasbon operasional?', 'Jadwal shift kerja saya hari ini dan besok'],
             ];
         }
 
-        // 7. Non-existent NIK Explicit Query (Q95)
+        // 7. Explicit NIK Lookup & Hallucination Prevention (Q50 & Q95)
         if (preg_match('/\b(kr\d{4,}|\d{10,16})\b/i', $rawClean, $nikMatches)) {
             $checkedNik = strtoupper($nikMatches[1]);
-            $exists = User::query()
+            $foundUser = User::query()
                 ->where('nik', $checkedNik)
                 ->orWhere('employee_code', $checkedNik)
-                ->exists();
-            if (! $exists && (str_contains($rawClean, 'cari') || str_contains($rawClean, 'data') || str_contains($rawClean, 'status'))) {
-                $resp = "Karyawan dengan NIK {$checkedNik} tidak ditemukan di dalam sistem database PT MSN. Pastikan format NIK atau nomor identitas yang Anda masukkan sudah benar.";
+                ->first();
+
+            if (! $foundUser) {
+                $resp = "Data tidak ditemukan. Karyawan dengan NIK {$checkedNik} tidak terdaftar di dalam database sistem GOMSN PT Media Solusi Network. Pastikan kembali nomor NIK yang Anda masukkan sudah benar.";
                 return [
                     'response' => $resp,
                     'confidence' => 1.0,
-                    'matched_intent' => 'pencegahan_halusinasi_nik',
+                    'matched_intent' => 'q95_pencegahan_halusinasi_nik',
                     'action_url' => $this->canManageEmployee($user) ? route('portal.employees.index') : null,
                     'action_label' => $this->canManageEmployee($user) ? '👥 Buka Data Karyawan' : null,
-                    'suggestions' => ['Data karyawan', 'Cek jadwal kerja', 'Status absen'],
+                    'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Jadwal shift kerja saya hari ini dan besok'],
+                ];
+            }
+
+            if (str_contains($rawClean, 'divisi') || str_contains($rawClean, 'status')) {
+                $statusAktif = $foundUser->is_active ? 'Aktif' : 'Non-Aktif';
+                $resp = "Data Karyawan NIK {$checkedNik}:\n• Nama: {$foundUser->name}\n• Divisi: " . ($foundUser->division ?? '-') . "\n• Jabatan: " . ($foundUser->position ?? '-') . "\n• Status Akun: {$statusAktif}";
+                return [
+                    'response' => $resp,
+                    'confidence' => 1.0,
+                    'matched_intent' => 'q50_cari_karyawan_berdasarkan_nik',
+                    'action_url' => $this->canManageEmployee($user) ? route('portal.employees.index') : null,
+                    'action_label' => $this->canManageEmployee($user) ? '👥 Buka Data Karyawan' : null,
+                    'suggestions' => ['Hari ini saya sudah check-in atau belum?'],
                 ];
             }
         }
 
         // 8. Chat Approval Prohibition (Q92)
         if (
-            (str_contains($rawClean, 'setujui') || str_contains($rawClean, 'approve'))
-            && str_contains($rawClean, 'chat ini')
+            (str_contains($rawClean, 'menyetujui') || str_contains($rawClean, 'setujui') || str_contains($rawClean, 'approve'))
+            && (str_contains($rawClean, 'lewat chat ini') || str_contains($rawClean, 'melalui chat ini') || str_contains($rawClean, 'di chat ini'))
         ) {
-            $resp = "Persetujuan (approval) tidak dapat dilakukan secara langsung melalui pesan teks chat asisten virtual. Sistem persetujuan PT MSN mewajibkan otorisasi resmi melalui menu Approval yang tersedia di portal agar tercatat secara sah di Audit Trail sistem. Silakan buka menu persetujuan terkait untuk menyetujui atau menolak permohonan.";
+            $resp = "Tidak bisa. Saya hanya asisten informasi dan tidak memiliki wewenang mengeksekusi persetujuan (approval). Proses approval lembur maupun cuti wajib dilakukan langsung oleh Atasan/HRD melalui menu persetujuan resmi di portal.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
-                'matched_intent' => 'penolakan_eksekusi_approval_chat',
-                'action_url' => route('attendance.leaves'),
-                'action_label' => '🌴 Buka Persetujuan Cuti',
-                'suggestions' => ['Cara approve pengajuan cuti', 'Cara approve lembur', 'Status pengajuan saya'],
+                'matched_intent' => 'q92_penolakan_approval_chat',
+                'action_url' => route('gomsn.overtime.index'),
+                'action_label' => '💼 Buka Halaman Lembur',
+                'suggestions' => ['Bagaimana cara mengajukan lembur?', 'Cek status pengajuan terakhir saya'],
             ];
         }
 
         // ==========================================
-        // INTENT MATCHING ENGINE
+        // HIGH-PRECISION INTENT MATCHING ENGINE
         // ==========================================
         $intents = ChatbotIntent::query()->where('is_active', true)->get();
 
         $bestIntent = null;
         $bestScore = 0.0;
+        $userTokenCount = max(1, count($userTokens));
 
         foreach ($intents as $intent) {
             $keywords = $intent->keywords ?? [];
@@ -696,46 +568,56 @@ class ChatbotService
                     continue;
                 }
 
-                // Short greetings need whole-word match
-                if ($intent->category === 'umum' && mb_strlen($kwNorm) <= 6) {
+                // 0. Exact full normalized match
+                if ($normMessage === $kwNorm || $rawClean === $kwRaw) {
+                    $intentScore = max($intentScore, 100.0);
+                    break;
+                }
+
+                // Short greetings (<= 6 chars in category umum) require short user query
+                if ($intent->intent_key === 'sapaan_halo' && mb_strlen($kwNorm) <= 6) {
                     if (
                         preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
                         || preg_match('/\b' . preg_quote($kwNorm, '/') . '\b/u', $normMessage)
                     ) {
-                        if (count($userTokens) <= 2) {
-                            $intentScore = max($intentScore, 2.5);
-                        } else {
-                            $intentScore = max($intentScore, 0.3);
+                        if ($userTokenCount <= 2) {
+                            $intentScore = max($intentScore, 15.0);
                         }
                     }
                     continue;
                 }
 
-                // 1. Exact phrase match (whole words) in raw or normalized message
+                $kwTokens = $this->extractTokens($kwNorm);
+                $kwTokenCount = max(1, count($kwTokens));
+
+                // 1. Whole-phrase match inside message, scaled by how much of the user's query it covers
                 if (
                     preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
                     || preg_match('/\b' . preg_quote($kwNorm, '/') . '\b/u', $normMessage)
                 ) {
-                    $kwTokens = $this->extractTokens($kwNorm);
+                    $queryCoverage = min(1.0, $kwTokenCount / $userTokenCount);
                     $subjectBonus = 0.0;
                     foreach ($kwTokens as $kt) {
-                        if ($this->isSubjectKeyword($kt)) {
-                            $subjectBonus += 1.2;
-                        } else {
-                            $subjectBonus += 0.4;
-                        }
+                        $subjectBonus += $this->isSubjectKeyword($kt) ? 1.2 : 0.4;
                     }
-                    $phraseScore = 1.5 + $subjectBonus + (count(explode(' ', $kwNorm)) * 0.35);
+
+                    // Prevent 1-2 word generic keywords from hijacking 6-10 word specific questions
+                    if ($kwTokenCount <= 2 && $userTokenCount >= 4) {
+                        $phraseScore = (1.5 + $subjectBonus) * ($queryCoverage * 0.6);
+                    } else {
+                        $phraseScore = (4.0 + $subjectBonus + ($kwTokenCount * 0.5)) * (0.4 + (0.6 * $queryCoverage));
+                    }
+
                     $intentScore = max($intentScore, $phraseScore);
                     continue;
                 }
 
-                // 2. Weighted Token & Subject Overlap
-                $kwTokens = $this->extractTokens($kwNorm);
+                // 2. Bidirectional Token & Subject Overlap (Keyword Coverage + User Query Coverage)
                 if (! empty($kwTokens) && ! empty($userTokens)) {
                     $matchedWeight = 0.0;
                     $totalKwWeight = 0.0;
                     $matchedSubjectCount = 0;
+                    $matchedTokenCount = 0;
 
                     foreach ($kwTokens as $kt) {
                         $weight = $this->isSubjectKeyword($kt) ? 2.5 : 1.0;
@@ -747,12 +629,10 @@ class ChatbotService
                                 $found = true;
                                 break;
                             }
-                            // Stem match for longer words (>= 5 chars)
                             if (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && (str_starts_with($ut, $kt) || str_starts_with($kt, $ut))) {
                                 $found = true;
                                 break;
                             }
-                            // Typo tolerance (distance 1 for words >= 5 chars)
                             if (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && levenshtein($kt, $ut) <= 1) {
                                 $found = true;
                                 $weight *= 0.9;
@@ -762,6 +642,7 @@ class ChatbotService
 
                         if ($found) {
                             $matchedWeight += $weight;
+                            $matchedTokenCount++;
                             if ($this->isSubjectKeyword($kt)) {
                                 $matchedSubjectCount++;
                             }
@@ -769,12 +650,14 @@ class ChatbotService
                     }
 
                     if ($matchedWeight > 0 && $totalKwWeight > 0) {
-                        $coverage = $matchedWeight / $totalKwWeight;
-                        if ($coverage >= 0.95) {
-                            $tokenScore = 1.4 + ($matchedSubjectCount * 1.1) + (count($kwTokens) * 0.25);
+                        $kwCoverage = $matchedWeight / $totalKwWeight;
+                        $userCoverage = $matchedTokenCount / $userTokenCount;
+
+                        if ($kwCoverage >= 0.85 && $userCoverage >= 0.60) {
+                            $tokenScore = 6.0 + ($kwCoverage * 3.0) + ($userCoverage * 4.0) + ($matchedSubjectCount * 1.2);
                             $intentScore = max($intentScore, $tokenScore);
-                        } elseif ($matchedSubjectCount >= 1 && $coverage >= 0.55) {
-                            $tokenScore = ($coverage * 1.1) + ($matchedSubjectCount * 0.6);
+                        } elseif ($matchedSubjectCount >= 1 && $kwCoverage >= 0.55 && $userCoverage >= 0.40) {
+                            $tokenScore = ($kwCoverage * 2.5) + ($userCoverage * 2.5) + ($matchedSubjectCount * 0.9);
                             $intentScore = max($intentScore, $tokenScore);
                         }
                     }
@@ -787,31 +670,15 @@ class ChatbotService
             }
         }
 
-        // Suggestions for quick follow-up based on user role
-        $isApprover = $this->isAtasanOrManager($user);
-        $suggestions = $isApprover ? [
-            'Bagaimana cara approve pengajuan cuti?',
-            'Cara approve pengajuan absen karyawan',
-            'Bagaimana cara approve pengajuan dana?',
-            'Cara approve pengajuan lembur',
-            'Cara isi resume pekerjaan tiket',
-            'Bagaimana cara absen dinas luar?',
-            'Status pengajuan saya',
-        ] : [
-            'Bagaimana cara absen masuk & pulang?',
-            'Bagaimana cara absen dinas luar?',
-            'Cara isi resume pekerjaan tiket',
-            'Bagaimana cara mengajukan dana?',
-            'Bagaimana cara membuat pengajuan lembur?',
-            'Apakah cuti saya masih ada?',
-            'Cara catat penanganan core & joint closure',
+        $suggestions = [
+            'Hari ini saya sudah check-in atau belum?',
+            'Jadwal shift kerja saya hari ini dan besok masuk jam berapa?',
+            'Berapa sisa saldo cuti tahunan saya saat ini?',
+            'Bagaimana cara mengajukan lembur melalui menu Lembur Saya?',
         ];
 
-        // Jika tidak ada kecocokan yang memadai
-        if ($bestScore < 0.70 || ! $bestIntent) {
-            $fallback = $isApprover
-                ? "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara approve pengajuan cuti?\"\n• \"Cara approve pengajuan absen karyawan\"\n• \"Bagaimana cara approve pengajuan dana?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Bagaimana cara absen dinas luar?\"\n• \"Status pengajuan saya\"\n\nJika butuh bantuan teknis darurat, silakan hubungi Helpdesk NOC."
-                : "Halo! Maaf, saya belum menangkap maksud pertanyaan tersebut secara spesifik. 🙏\n\nCoba tanyakan topik seperti:\n• \"Bagaimana cara absen dinas luar?\"\n• \"Cara isi resume pekerjaan tiket\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Cara catat penanganan core & joint closure\"\n• \"Bagaimana cara membuat tugas operasional?\"\n\nJika butuh bantuan segera, silakan hubungi Helpdesk NOC.";
+        if ($bestScore < 1.50 || ! $bestIntent) {
+            $fallback = "Maaf, saya belum memahami maksud pertanyaan tersebut secara spesifik. Silakan tanyakan langsung seputar absensi, jadwal shift, cuti, potongan, kasbon, lembur, atau tiket gangguan.";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
@@ -828,42 +695,21 @@ class ChatbotService
                 'matched_intent' => null,
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => array_slice($suggestions, 0, 4),
+                'suggestions' => $suggestions,
             ];
         }
 
         // ==========================================
-        // PERSONALIZED & DYNAMIC RESPONSES (§5.8)
+        // CONCISE DYNAMIC RESPONSES
         // ==========================================
         $reply = $bestIntent->response_text;
 
         if ($user) {
-            // RBAC Guard: Non-HRD query for confidential employee contacts (Q93, Q95)
-            if ($bestIntent->intent_key === 'rbac_kontak_rekap_semua_karyawan' || $bestIntent->intent_key === 'uji_akses_kontak_pribadi') {
-                if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Permintaan ditolak. Berdasarkan kebijakan keamanan data dan privasi perusahaan PT MSN, seluruh nomor handphone pribadi dan alamat rumah staf karyawan bersifat rahasia dan terlindungi. Hanya manajemen HRD yang memiliki kewenangan untuk mengakses data kontak lengkap melalui modul Kelola Karyawan.";
-                }
-            } elseif ($bestIntent->intent_key === 'approval_pengajuan_absen' && ! $this->canApproveAbsen($user)) {
-                $reply = "Mohon maaf {$user->name}, fitur persetujuan (approval) koreksi absen hanya dapat dilakukan oleh Atasan Divisi atau Admin.\n\nSebagai karyawan, Anda tidak memiliki akses untuk menyetujui pengajuan. Anda dapat mengajukan koreksi kehadiran Anda sendiri melalui menu 'Riwayat Absen' dan menunggu persetujuan dari atasan.";
-            } elseif ($bestIntent->intent_key === 'cara_approve_cuti' && ! $this->canApproveCuti($user)) {
-                $reply = "Mohon maaf {$user->name}, proses persetujuan (approval) cuti karyawan merupakan kewenangan dari Atasan Langsung dan HRD.\n\nSebagai karyawan, Anda tidak memiliki wewenang untuk menyetujui pengajuan cuti. Anda cukup mengajukan permohonan cuti atau izin sakit melalui menu 'Cuti & Izin' dan menunggu persetujuan dari atasan Anda.";
-            } elseif ($bestIntent->intent_key === 'cara_approve_lembur' && ! $this->canApproveLembur($user)) {
-                $reply = "Mohon maaf {$user->name}, fitur persetujuan (approval) lembur hanya dapat diakses oleh Atasan Divisi (pengesahan tugas) dan Finance (pencairan dana).\n\nSebagai karyawan, Anda tidak memiliki wewenang menyetujui lembur rekan lain. Anda dapat membuat pengajuan lembur Anda sendiri melalui menu 'Lembur'.";
-            } elseif ($bestIntent->intent_key === 'tahapan_approval_pengajuan' && ! $this->canApprovePengajuanDana($user)) {
-                $reply = "Mohon maaf {$user->name}, proses persetujuan (approval) dan pencairan pengajuan operasional dilakukan oleh Atasan Divisi, Direksi, dan Finance.\n\nSebagai karyawan/pemohon, Anda tidak memiliki wewenang untuk menyetujui pengajuan. Anda dapat membuat pengajuan baru atau memantau status pengajuan Anda melalui menu 'Pengajuan Saya'.";
-            } elseif ($bestIntent->intent_key === 'manajemen_data_karyawan' && ! $this->canManageEmployee($user)) {
-                $reply = "Mohon maaf {$user->name}, pengelolaan data karyawan (tambah karyawan, ubah divisi, reset password atau biometrik) merupakan hak akses khusus Admin & HRD.\n\nUntuk melihat atau memperbarui profil pribadi Anda serta mendaftarkan sidik jari, silakan kunjungi menu 'Profile'.";
-            } elseif ($bestIntent->intent_key === 'sapaan_halo') {
-                $reply = "Halo {$user->name}! 👋 Saya Asisten Pintar Portal Karyawan & Operasional PT MSN.\n\nAda yang bisa saya bantu hari ini? Anda bisa bertanya berbagai hal, misalnya:\n• \"Apakah saya sudah absen hari ini?\"\n• \"Bagaimana cara mengajukan dana?\"\n• \"Bagaimana cara membuat pengajuan lembur?\"\n• \"Apakah cuti saya masih ada?\"\n• \"Bagaimana cara mengajukan sakit?\"\n• \"Cara tukar jadwal shift\"";
-            } elseif ($bestIntent->intent_key === 'sisa_cuti') {
-                $balance = LeaveBalance::query()
-                    ->where('user_id', $user->id)
-                    ->where('year', (int) date('Y'))
-                    ->first();
-                $sisa = $balance ? ($balance->remaining_days ?? $balance->remaining_balance ?? 12) : 12;
-                $statusCuti = $sisa > 0 ? "Masih tersedia ({$sisa} hari kerja)" : 'Sudah habis (0 hari)';
-                $reply = "Halo {$user->name}, kuota cuti tahunan Anda untuk tahun " . date('Y') . ":\n• Status: {$statusCuti}\n• Sisa Kuota: {$sisa} hari kerja.\n\nKlik tombol di bawah untuk menuju halaman Cuti & Izin.";
-            } elseif ($bestIntent->intent_key === 'status_absen_hari_ini') {
+            $key = $bestIntent->intent_key;
+
+            if ($key === 'sapaan_halo') {
+                $reply = "Halo {$user->name}! 👋 Saya Asisten Virtual GOMSN. Silakan tanyakan langsung seputar absensi, jadwal shift, cuti, kasbon, lembur, atau tiket gangguan.";
+            } elseif ($key === 'q1_status_checkin_hari_ini') {
                 $att = Attendance::query()
                     ->where('user_id', $user->id)
                     ->whereDate('date', Carbon::now('Asia/Jakarta')->toDateString())
@@ -871,27 +717,27 @@ class ChatbotService
                 $clockIn = $att?->clock_in_at ?? $att?->clock_in;
                 $clockOut = $att?->clock_out_at ?? $att?->clock_out;
                 if ($att && $clockIn) {
-                    $clockInTime = Carbon::parse($clockIn)->timezone('Asia/Jakarta')->format('H:i');
-                    $clockOutStr = $clockOut ? Carbon::parse($clockOut)->timezone('Asia/Jakarta')->format('H:i') . ' WIB' : 'Belum Clock-Out';
-                    $reply = "Halo {$user->name}, status presensi Anda hari ini:\n• Absen Masuk: {$clockInTime} WIB\n• Absen Pulang: {$clockOutStr}\n• Status: " . strtoupper($att->status ?? 'HADIR');
+                    $inTime = Carbon::parse($clockIn)->timezone('Asia/Jakarta')->format('H:i');
+                    $outTime = $clockOut ? Carbon::parse($clockOut)->timezone('Asia/Jakarta')->format('H:i') . ' WIB' : 'Belum Check-Out';
+                    $st = strtoupper($att->status ?? 'HADIR');
+                    $reply = "Hari ini Anda sudah check-in pada pukul {$inTime} WIB (Status: {$st}, Check-Out: {$outTime}).";
                 } else {
-                    $reply = "Halo {$user->name}, Anda tercatat BELUM melakukan Absen Masuk untuk hari ini. Silakan klik tombol di bawah untuk menuju halaman Absen.";
+                    $reply = "Hari ini Anda tercatat belum melakukan check-in. Silakan buka menu Absen untuk melakukan presensi.";
                 }
-            } elseif ($bestIntent->intent_key === 'riwayat_absen_kemarin') {
-                $yesterday = Carbon::yesterday('Asia/Jakarta')->toDateString();
-                $att = Attendance::query()->where('user_id', $user->id)->whereDate('date', $yesterday)->first();
-                if ($att && ($att->clock_out_at || $att->clock_out)) {
-                    $in = Carbon::parse($att->clock_in_at ?? $att->clock_in)->timezone('Asia/Jakarta')->format('H:i');
-                    $out = Carbon::parse($att->clock_out_at ?? $att->clock_out)->timezone('Asia/Jakarta')->format('H:i');
-                    $dur = $att->work_duration_minutes ?? 0;
-                    $reply = "Halo {$user->name}, riwayat absensi Anda kemarin (" . Carbon::yesterday('Asia/Jakarta')->translatedFormat('d F Y') . "):\n• Absen Masuk: {$in} WIB\n• Absen Pulang: {$out} WIB\n• Status: " . strtoupper($att->status ?? 'HADIR') . "\n• Durasi Kerja: {$dur} menit.";
-                } elseif ($att && ($att->clock_in_at || $att->clock_in)) {
-                    $in = Carbon::parse($att->clock_in_at ?? $att->clock_in)->timezone('Asia/Jakarta')->format('H:i');
-                    $reply = "Halo {$user->name}, kemarin Anda melakukan Absen Masuk pukul {$in} WIB namun tidak tercatat Absen Pulang (Lupa Clock-out). Silakan ajukan koreksi absen jika diperlukan.";
+            } elseif ($key === 'q2_riwayat_checkin_kemarin') {
+                $yesterday = Carbon::yesterday('Asia/Jakarta');
+                $att = Attendance::query()->where('user_id', $user->id)->whereDate('date', $yesterday->toDateString())->first();
+                $clockIn = $att?->clock_in_at ?? $att?->clock_in;
+                $clockOut = $att?->clock_out_at ?? $att?->clock_out;
+                $tglStr = $yesterday->translatedFormat('d F Y');
+                if ($att && $clockIn) {
+                    $in = Carbon::parse($clockIn)->timezone('Asia/Jakarta')->format('H:i');
+                    $out = $clockOut ? Carbon::parse($clockOut)->timezone('Asia/Jakarta')->format('H:i') . ' WIB' : 'Belum/Lupa Check-Out';
+                    $reply = "Kemarin ({$tglStr}), Anda check-in pukul {$in} WIB dan check-out pukul {$out} (Status: " . strtoupper($att->status ?? 'HADIR') . ").";
                 } else {
-                    $reply = "Halo {$user->name}, tidak tercatat data absensi untuk Anda pada hari kemarin (" . Carbon::yesterday('Asia/Jakarta')->translatedFormat('d F Y') . "). Jika Anda bertugas kemarin, Anda dapat mengajukan perbaikan melalui menu Riwayat & Koreksi Absen.";
+                    $reply = "Tidak tercatat data check-in maupun check-out untuk Anda pada hari kemarin ({$tglStr}).";
                 }
-            } elseif ($bestIntent->intent_key === 'rekap_terlambat_saya') {
+            } elseif ($key === 'q7_rekap_terlambat_bulan_ini') {
                 $cMonth = Carbon::now('Asia/Jakarta')->month;
                 $cYear = Carbon::now('Asia/Jakarta')->year;
                 $lateCount = Attendance::query()
@@ -899,8 +745,7 @@ class ChatbotService
                     ->whereMonth('date', $cMonth)
                     ->whereYear('date', $cYear)
                     ->where(function ($q) {
-                        $q->where('status', 'TERLAMBAT')
-                          ->orWhere('late_minutes', '>', 0);
+                        $q->where('status', 'TERLAMBAT')->orWhere('late_minutes', '>', 0);
                     })
                     ->count();
                 $totalLateMin = (int) Attendance::query()
@@ -908,8 +753,9 @@ class ChatbotService
                     ->whereMonth('date', $cMonth)
                     ->whereYear('date', $cYear)
                     ->sum('late_minutes');
-                $reply = "Halo {$user->name}, rekap keterlambatan Anda bulan " . Carbon::now('Asia/Jakarta')->translatedFormat('F Y') . ":\n• Total Keterlambatan: {$lateCount} kali\n• Akumulasi Menit Terlambat: {$totalLateMin} menit.\n\nSelalu perhatikan jam operasional shift Anda agar tidak terkena penalti potongan.";
-            } elseif ($bestIntent->intent_key === 'rekap_kehadiran_7_hari') {
+                $bln = Carbon::now('Asia/Jakarta')->translatedFormat('F Y');
+                $reply = "Selama bulan ini ({$bln}), Anda tercatat terlambat sebanyak {$lateCount} kali dengan total akumulasi {$totalLateMin} menit.";
+            } elseif ($key === 'q10_rekap_kehadiran_7_hari') {
                 $start7 = Carbon::now('Asia/Jakarta')->subDays(6)->toDateString();
                 $today = Carbon::now('Asia/Jakarta')->toDateString();
                 $attendances7 = Attendance::query()
@@ -917,20 +763,20 @@ class ChatbotService
                     ->whereBetween('date', [$start7, $today])
                     ->orderBy('date', 'desc')
                     ->get();
-                $lines = ["Halo {$user->name}, berikut rekap kehadiran Anda selama 7 hari terakhir:"];
                 if ($attendances7->isEmpty()) {
-                    $lines[] = "• Belum ada catatan absensi dalam 7 hari terakhir.";
+                    $reply = "Belum ada catatan kehadiran dalam 7 hari terakhir.";
                 } else {
+                    $lines = ["Rekap kehadiran 7 hari terakhir Anda:"];
                     foreach ($attendances7 as $a) {
-                        $tgl = Carbon::parse($a->date)->locale('id')->isoFormat('ddd, DD/MM');
+                        $tgl = Carbon::parse($a->date)->translatedFormat('d M Y');
                         $cin = ($a->clock_in_at || $a->clock_in) ? Carbon::parse($a->clock_in_at ?? $a->clock_in)->timezone('Asia/Jakarta')->format('H:i') : '-';
                         $cout = ($a->clock_out_at || $a->clock_out) ? Carbon::parse($a->clock_out_at ?? $a->clock_out)->timezone('Asia/Jakarta')->format('H:i') : '-';
                         $st = strtoupper($a->status ?? 'HADIR');
-                        $lines[] = "• {$tgl}: [{$st}] Masuk: {$cin} WIB | Pulang: {$cout} WIB";
+                        $lines[] = "• {$tgl}: {$st} (In: {$cin} | Out: {$cout})";
                     }
+                    $reply = implode("\n", $lines);
                 }
-                $reply = implode("\n", $lines);
-            } elseif ($bestIntent->intent_key === 'total_hari_kerja_efektif') {
+            } elseif ($key === 'q14_total_hari_kerja_efektif') {
                 $cMonth = Carbon::now('Asia/Jakarta')->month;
                 $cYear = Carbon::now('Asia/Jakarta')->year;
                 $hadirCount = Attendance::query()
@@ -943,19 +789,38 @@ class ChatbotService
                     ->where('user_id', $user->id)
                     ->whereMonth('date', $cMonth)
                     ->whereYear('date', $cYear)
-                    ->whereHas('shift', fn($q) => $q->where('is_day_off', false))
+                    ->whereHas('shift', fn ($q) => $q->where('is_day_off', false))
                     ->count();
                 $target = $scheduledCount > 0 ? $scheduledCount : 22;
-                $reply = "Halo {$user->name}, informasi hari kerja efektif Anda bulan " . Carbon::now('Asia/Jakarta')->translatedFormat('F Y') . ":\n• Hari Kerja Terealisasi: {$hadirCount} hari\n• Total Target Jadwal Kerja: {$target} hari kerja.";
-            } elseif ($bestIntent->intent_key === 'jadwal_shift_hari_ini_besok') {
+                $bln = Carbon::now('Asia/Jakarta')->translatedFormat('F Y');
+                $reply = "Total hari kerja efektif Anda yang tercatat hadir pada bulan {$bln} saat ini adalah {$hadirCount} hari (dari {$target} hari kerja terjadwal).";
+            } elseif ($key === 'q16_jadwal_shift_hari_ini_besok') {
                 $todayStr = Carbon::now('Asia/Jakarta')->toDateString();
                 $tomorrowStr = Carbon::tomorrow('Asia/Jakarta')->toDateString();
                 $schToday = MonthlySchedule::query()->with('shift')->where('user_id', $user->id)->whereDate('date', $todayStr)->first();
                 $schTomorrow = MonthlySchedule::query()->with('shift')->where('user_id', $user->id)->whereDate('date', $tomorrowStr)->first();
-                $shiftTodayName = $schToday?->shift?->name ?? 'Shift Pagi (08:00 - 17:00)';
-                $shiftTomorrowName = $schTomorrow?->shift?->name ?? 'Shift Pagi (08:00 - 17:00)';
-                $reply = "Halo {$user->name}, jadwal kerja Anda:\n• Hari Ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('l, d F Y') . "): {$shiftTodayName}\n• Besok (" . Carbon::tomorrow('Asia/Jakarta')->translatedFormat('l, d F Y') . "): {$shiftTomorrowName}\n\nSilakan cek kalender jadwal lengkap di menu Jadwal Kerja Saya.";
-            } elseif ($bestIntent->intent_key === 'total_potongan_denda_saya') {
+
+                $fmtShift = function ($sch) {
+                    if (! $sch || ! $sch->shift) {
+                        return 'Shift Pagi (08:00 - 17:00 WIB)';
+                    }
+                    if ($sch->shift->is_day_off) {
+                        return 'Libur (OFF)';
+                    }
+                    $start = substr((string) $sch->shift->start_time, 0, 5);
+                    $end = substr((string) $sch->shift->end_time, 0, 5);
+                    return "{$sch->shift->name} ({$start} - {$end} WIB)";
+                };
+
+                $reply = "Jadwal shift kerja Anda:\n• Hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('d M Y') . "): " . $fmtShift($schToday) . "\n• Besok (" . Carbon::tomorrow('Asia/Jakarta')->translatedFormat('d M Y') . "): " . $fmtShift($schTomorrow);
+            } elseif ($key === 'q19_sisa_saldo_cuti') {
+                $balance = LeaveBalance::query()
+                    ->where('user_id', $user->id)
+                    ->where('year', (int) date('Y'))
+                    ->first();
+                $sisa = $balance ? ($balance->remaining_days ?? $balance->remaining_balance ?? 12) : 12;
+                $reply = "Sisa saldo cuti tahunan Anda untuk tahun " . date('Y') . " saat ini adalah {$sisa} hari kerja.";
+            } elseif ($key === 'q27_total_potongan_denda_saya') {
                 $cMonth = Carbon::now('Asia/Jakarta')->month;
                 $cYear = Carbon::now('Asia/Jakarta')->year;
                 $grandTotal = 0.0;
@@ -974,8 +839,26 @@ class ChatbotService
                 $fmtTotal = number_format($grandTotal, 0, ',', '.');
                 $fmtLate = number_format($lateDeduction, 0, ',', '.');
                 $fmtAlpa = number_format($alpaDeduction, 0, ',', '.');
-                $reply = "Halo {$user->name}, rincian estimasi potongan absensi Anda untuk bulan " . Carbon::now('Asia/Jakarta')->translatedFormat('F Y') . ":\n• Total Potongan: Rp {$fmtTotal}\n• Potongan Terlambat: Rp {$fmtLate}\n• Potongan Alpa: Rp {$fmtAlpa}\n\nJika terdapat selisih atau kekeliruan pencatatan, Anda dapat mengajukan sanggahan koreksi melalui menu Potongan Absen Saya.";
-            } elseif ($bestIntent->intent_key === 'total_jam_lembur_saya') {
+                $bln = Carbon::now('Asia/Jakarta')->translatedFormat('F Y');
+                $reply = "Total potongan dan denda absensi Anda pada periode {$bln} adalah Rp {$fmtTotal} (Terlambat: Rp {$fmtLate}, Alpa: Rp {$fmtAlpa}).";
+            } elseif ($key === 'q36_cek_status_pengajuan_terakhir') {
+                $latestPengajuan = Pengajuan::query()
+                    ->where('user_id', $user->id)
+                    ->latest()
+                    ->take(3)
+                    ->get();
+                if ($latestPengajuan->isEmpty()) {
+                    $reply = "Anda belum memiliki riwayat pengajuan kasbon atau pembelian barang.";
+                } else {
+                    $lines = ["Status pengajuan terakhir Anda:"];
+                    foreach ($latestPengajuan as $p) {
+                        $nom = $p->jenis === 'STOK' ? 'Permintaan Stok' : 'Rp ' . number_format((float) $p->total_nominal, 0, ',', '.');
+                        $st = strtoupper(str_replace('_', ' ', $p->status));
+                        $lines[] = "• #{$p->id} ({$p->jenis} - {$nom}): {$st}";
+                    }
+                    $reply = implode("\n", $lines);
+                }
+            } elseif ($key === 'q42_total_jam_lembur_bulan_ini') {
                 $cMonth = Carbon::now('Asia/Jakarta')->month;
                 $cYear = Carbon::now('Asia/Jakarta')->year;
                 $approvedLembur = Lembur::query()
@@ -987,65 +870,63 @@ class ChatbotService
                 $totalMenit = (int) $approvedLembur->sum('durasi_menit');
                 $totalJam = round($totalMenit / 60, 1);
                 $count = $approvedLembur->count();
-                $reply = "Halo {$user->name}, rekap jam lembur Anda yang telah disetujui pada bulan " . Carbon::now('Asia/Jakarta')->translatedFormat('F Y') . ":\n• Total Pengajuan Disetujui: {$count} pengajuan\n• Total Durasi: {$totalJam} jam ({$totalMenit} menit).\n\nUntuk memantau pencairan atau detail rincian, silakan kunjungi menu Lembur Saya.";
-            } elseif ($bestIntent->intent_key === 'company_rekap_absensi_hari_ini') {
+                $bln = Carbon::now('Asia/Jakarta')->translatedFormat('F Y');
+                $reply = "Total jam lembur Anda yang sudah disetujui pada bulan {$bln} adalah {$totalJam} jam ({$totalMenit} menit) dari {$count} pengajuan.";
+            } elseif ($key === 'q46_company_ringkasan_absensi_hari_ini') {
                 if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Mohon maaf {$user->name}, data rekapitulasi kehadiran seluruh karyawan merupakan informasi internal manajemen dan hanya dapat diakses oleh tim HRD & Human Capital atau Administrator.";
+                    $reply = "Akses Ditolak. Ringkasan absensi seluruh karyawan (company-wide) hanya dapat diakses oleh divisi HRD & Human Capital atau Administrator.";
                 } else {
                     $today = Carbon::now('Asia/Jakarta')->toDateString();
                     $totalActive = User::query()->where('is_active', true)->count();
-                    $attendedToday = Attendance::query()->whereDate('date', $today)->whereIn('status', ['HADIR', 'TERLAMBAT'])->count();
-                    $pct = $totalActive > 0 ? round(($attendedToday / $totalActive) * 100, 1) : 0;
-                    $reply = "Halo {$user->name}, rekapitulasi kehadiran seluruh staf MSN per hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('l, d F Y') . "):\n• Total Karyawan Aktif: {$totalActive} orang\n• Karyawan Telah Hadir: {$attendedToday} orang\n• Persentase Kehadiran: {$pct}%\n\nSilakan pantau detail per divisi melalui menu Rekap Absen Karyawan.";
+                    $hadir = Attendance::query()->whereDate('date', $today)->where('status', 'HADIR')->count();
+                    $terlambat = Attendance::query()->whereDate('date', $today)->where(function ($q) {
+                        $q->where('status', 'TERLAMBAT')->orWhere('late_minutes', '>', 0);
+                    })->count();
+                    $sakit = Leave::query()->where('status', 'approved')->whereIn('leave_type', ['sakit', 'sick'])->whereDate('start_date', '<=', $today)->whereDate('end_date', '>=', $today)->count();
+                    $izin = Leave::query()->where('status', 'approved')->whereNotIn('leave_type', ['sakit', 'sick'])->whereDate('start_date', '<=', $today)->whereDate('end_date', '>=', $today)->count();
+                    $reply = "Ringkasan absensi company-wide hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('d M Y') . "):\n• Hadir Tepat Waktu: {$hadir} orang\n• Terlambat: {$terlambat} orang\n• Izin/Cuti: {$izin} orang\n• Sakit: {$sakit} orang\n(Total Karyawan Aktif: {$totalActive} orang).";
                 }
-            } elseif ($bestIntent->intent_key === 'daftar_karyawan_sakit_hari_ini') {
+            } elseif ($key === 'q47_daftar_karyawan_sakit_hari_ini') {
                 if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Mohon maaf {$user->name}, daftar karyawan yang berhalangan atau sakit hanya dapat diakses oleh tim HRD & Human Capital.";
+                    $reply = "Akses Ditolak. Daftar karyawan sakit company-wide hanya dapat diakses oleh divisi HRD & Human Capital.";
                 } else {
                     $today = Carbon::now('Asia/Jakarta')->toDateString();
                     $sickLeaves = Leave::query()
                         ->with('user')
-                        ->whereIn('leave_type', ['sakit', 'sick', 'izin', 'leave'])
+                        ->whereIn('leave_type', ['sakit', 'sick'])
                         ->where('status', 'approved')
                         ->whereDate('start_date', '<=', $today)
                         ->whereDate('end_date', '>=', $today)
                         ->get();
                     if ($sickLeaves->isEmpty()) {
-                        $reply = "Halo {$user->name}, per hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('d F Y') . ") tidak ada karyawan yang tercatat izin sakit.";
+                        $reply = "Hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('d M Y') . ") tidak ada karyawan yang tercatat sakit.";
                     } else {
-                        $lines = ["Halo {$user->name}, berikut daftar karyawan yang izin sakit hari ini:"];
-                        foreach ($sickLeaves as $sl) {
-                            $uName = $sl->user?->name ?? 'Karyawan';
-                            $div = $sl->user?->division ?? '-';
-                            $lines[] = "• {$uName} ({$div}) - Jenis: " . strtoupper($sl->leave_type);
-                        }
-                        $reply = implode("\n", $lines);
+                        $names = $sickLeaves->map(fn ($sl) => ($sl->user?->name ?? 'Karyawan') . ' (' . ($sl->user?->division ?? '-') . ')')->implode(', ');
+                        $reply = "Karyawan yang tercatat sakit hari ini: {$names}.";
                     }
                 }
-            } elseif ($bestIntent->intent_key === 'daftar_karyawan_terlambat_hari_ini') {
+            } elseif ($key === 'q48_daftar_karyawan_terlambat_hari_ini') {
                 if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Mohon maaf {$user->name}, data keterlambatan karyawan hanya dapat diakses oleh tim HRD & Human Capital.";
+                    $reply = "Akses Ditolak. Daftar karyawan terlambat company-wide hanya dapat diakses oleh divisi HRD & Human Capital.";
                 } else {
                     $today = Carbon::now('Asia/Jakarta')->toDateString();
                     $lates = Attendance::query()
                         ->with('user')
                         ->whereDate('date', $today)
-                        ->where('late_minutes', '>', 15)
+                        ->where(function ($q) {
+                            $q->where('status', 'TERLAMBAT')->orWhere('late_minutes', '>', 0);
+                        })
                         ->get();
                     if ($lates->isEmpty()) {
-                        $reply = "Halo {$user->name}, per hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('d F Y') . ") tidak ada karyawan yang terlambat lebih dari 15 menit.";
+                        $reply = "Hari ini (" . Carbon::now('Asia/Jakarta')->translatedFormat('d M Y') . ") tidak ada karyawan yang tercatat terlambat.";
                     } else {
-                        $lines = ["Halo {$user->name}, berikut daftar karyawan yang terlambat >15 menit hari ini:"];
-                        foreach ($lates as $lt) {
-                            $uName = $lt->user?->name ?? 'Karyawan';
-                            $lines[] = "• {$uName} ({$lt->late_minutes} menit)";
-                        }
-                        $reply = implode("\n", $lines);
+                        $list = $lates->map(fn ($lt) => ($lt->user?->name ?? 'Karyawan') . " ({$lt->late_minutes} menit)")->implode(', ');
+                        $reply = "Karyawan yang tercatat terlambat hari ini: {$list}.";
                     }
                 }
-            } elseif ($bestIntent->intent_key === 'divisi_kehadiran_tertinggi') {
+            } elseif ($key === 'q52_divisi_kehadiran_tertinggi') {
                 if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Mohon maaf {$user->name}, informasi statistik per divisi hanya dapat diakses oleh tim HRD & Human Capital.";
+                    $reply = "Akses Ditolak. Statistik kehadiran antar divisi hanya dapat diakses oleh divisi HRD & Human Capital.";
                 } else {
                     $cMonth = Carbon::now('Asia/Jakarta')->month;
                     $cYear = Carbon::now('Asia/Jakarta')->year;
@@ -1059,16 +940,16 @@ class ChatbotService
                         ->groupBy('users.division')
                         ->orderByDesc('total_hadir')
                         ->first();
-                    $divName = $topDiv?->division ?? 'Teknik & Operasional';
+                    $divName = $topDiv?->division ?? 'Teknik';
                     $tot = $topDiv?->total_hadir ?? 0;
-                    $reply = "Halo {$user->name}, divisi dengan tingkat kehadiran tertinggi pada bulan " . Carbon::now('Asia/Jakarta')->translatedFormat('F Y') . " adalah Divisi {$divName} dengan total {$tot} log kehadiran tercatat.";
+                    $reply = "Divisi dengan tingkat kehadiran paling tinggi bulan ini adalah divisi {$divName} ({$tot} kehadiran tercatat).";
                 }
-            } elseif ($bestIntent->intent_key === 'antrean_approval_lembur_hari_ini') {
+            } elseif ($key === 'q54_antrean_approval_lembur_hari_ini') {
                 $pendingLembur = Lembur::query()
                     ->whereIn('status', ['submitted', 'pending', 'menunggu_approval'])
                     ->count();
-                $reply = "Halo {$user->name}, saat ini terdapat {$pendingLembur} pengajuan lembur yang berada dalam antrean menunggu persetujuan (approval) atasan/HRD.";
-            } elseif ($bestIntent->intent_key === 'top_5_leaderboard_disiplin') {
+                $reply = "Saat ini terdapat {$pendingLembur} pengajuan lembur karyawan yang masih menunggu persetujuan.";
+            } elseif ($key === 'q56_top_5_leaderboard_disiplin') {
                 $cMonth = Carbon::now('Asia/Jakarta')->month;
                 $cYear = Carbon::now('Asia/Jakarta')->year;
                 $topUsers = Attendance::query()
@@ -1083,74 +964,63 @@ class ChatbotService
                     ->limit(5)
                     ->get();
                 if ($topUsers->isEmpty()) {
-                    $reply = "Peringkat Leaderboard Disiplin sedang dihitung untuk periode bulan berjalan. Silakan kunjungi menu Leaderboard Kehadiran.";
+                    $reply = "Data peringkat 5 besar Leaderboard periode ini sedang dikalkulasi. Silakan buka menu Leaderboard.";
                 } else {
-                    $lines = ["Halo {$user->name}, berikut 5 besar karyawan dengan kehadiran tepat waktu terbaik bulan ini:"];
-                    $rank = 1;
-                    foreach ($topUsers as $u) {
-                        $lines[] = "{$rank}. {$u->name} ({$u->division}) - {$u->tepat_waktu}x Tepat Waktu";
-                        $rank++;
+                    $lines = ["5 karyawan dengan peringkat disiplin teratas di Leaderboard saat ini:"];
+                    foreach ($topUsers as $idx => $u) {
+                        $rank = $idx + 1;
+                        $lines[] = "{$rank}. {$u->name} ({$u->division}) — {$u->tepat_waktu}x hadir tepat waktu";
                     }
                     $reply = implode("\n", $lines);
                 }
-            } elseif ($bestIntent->intent_key === 'total_karyawan_aktif_headcount') {
+            } elseif ($key === 'q60_total_karyawan_aktif_headcount') {
                 if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Mohon maaf {$user->name}, rincian headcount karyawan perusahaan hanya dapat diakses oleh tim HRD & Human Capital.";
+                    $reply = "Akses Ditolak. Data total headcount karyawan perusahaan hanya dapat diakses oleh divisi HRD & Human Capital.";
                 } else {
                     $totalActive = User::query()->where('is_active', true)->count();
-                    $reply = "Halo {$user->name}, total karyawan aktif yang terdaftar di sistem PT MSN saat ini adalah sebanyak {$totalActive} orang.";
+                    $reply = "Total karyawan aktif di PT Media Solusi Network yang terdaftar di sistem saat ini adalah {$totalActive} orang.";
                 }
-            } elseif ($bestIntent->intent_key === 'jumlah_tiket_open_hari_ini') {
-                $openTickets = Tiket::query()->whereIn('status', ['OPEN', 'PENDING', 'PROSES'])->count();
-                $critical = Tiket::query()->whereIn('status', ['OPEN', 'PROSES'])->whereIn('priority', ['CRITICAL', 'HIGH'])->count();
-                $reply = "Halo {$user->name}, saat ini terdapat {$openTickets} tiket gangguan aktif di lapangan, dengan rincian {$critical} tiket berprioritas Critical / High.";
-            } elseif ($bestIntent->intent_key === 'tiket_aktif_saya') {
+            } elseif ($key === 'q62_jumlah_tiket_open_hari_ini') {
+                $openCount = Tiket::query()->where('status', 'OPEN')->count();
+                $prosesCount = Tiket::query()->whereIn('status', ['PROSES', 'PENDING'])->count();
+                $reply = "Saat ini terdapat {$openCount} tiket gangguan berstatus Terbuka (OPEN) dan {$prosesCount} tiket sedang dalam proses penanganan.";
+            } elseif ($key === 'q73_teknisi_tugas_prioritas_tinggi') {
+                $highTickets = Tiket::query()
+                    ->with('ticketAssignees.user')
+                    ->whereIn('status', ['OPEN', 'PROSES'])
+                    ->whereIn('priority', ['CRITICAL', 'HIGH'])
+                    ->latest()
+                    ->take(3)
+                    ->get();
+                if ($highTickets->isEmpty()) {
+                    $reply = "Saat ini tidak ada tiket gangguan berprioritas tinggi (High/Critical) yang sedang aktif.";
+                } else {
+                    $lines = ["Tim/teknisi yang sedang menangani tiket gangguan prioritas tinggi:"];
+                    foreach ($highTickets as $ht) {
+                        $names = $ht->ticketAssignees->map(fn ($a) => $a->user?->name)->filter()->implode(', ');
+                        $techStr = $names !== '' ? $names : ($ht->team_members ?: 'Menunggu Dispatch NOC');
+                        $lines[] = "• #{$ht->no_tiket} ({$ht->priority}): {$techStr}";
+                    }
+                    $reply = implode("\n", $lines);
+                }
+            } elseif ($key === 'q91_ringkasan_operasional_3_poin') {
+                $today = Carbon::now('Asia/Jakarta')->toDateString();
+                $totalActive = User::query()->where('is_active', true)->count();
+                $attended = Attendance::query()->whereDate('date', $today)->whereIn('status', ['HADIR', 'TERLAMBAT'])->count();
+                $openTickets = Tiket::query()->whereIn('status', ['OPEN', 'PROSES'])->count();
+                $pendingLembur = Lembur::query()->whereIn('status', ['submitted', 'pending'])->count();
+                $pendingPengajuan = Pengajuan::query()->whereIn('status', ['pending', 'menunggu_approval'])->count();
+                $reply = "Ringkasan 3 poin kondisi operasional & absensi hari ini:\n1. Absensi: {$attended} dari {$totalActive} karyawan aktif tercatat sudah hadir.\n2. Tiket Gangguan: Terdapat {$openTickets} tiket gangguan aktif (Open/Proses) yang sedang ditangani.\n3. Antrean Approval: Terdapat {$pendingLembur} pengajuan lembur dan {$pendingPengajuan} pengajuan operasional menunggu persetujuan.";
+            } elseif ($key === 'q93_rbac_kontak_rekap_semua_karyawan') {
+                if (! $this->isHrdOrAdmin($user)) {
+                    $reply = "Akses Ditolak. Data kontak pribadi dan rekapitulasi potongan seluruh karyawan bersifat rahasia serta hanya dapat diakses oleh otoritas HRD & Human Capital atau Administrator.";
+                }
+            } elseif ($key === 'extra_tiket_aktif_saya') {
                 $count = Tiket::query()
                     ->whereHas('ticketAssignees', fn ($q) => $q->where('user_id', $user->id))
                     ->whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
                     ->count();
-                $reply = "Halo {$user->name}, saat ini terdapat {$count} tiket gangguan aktif yang ditugaskan kepada Anda.";
-            } elseif ($bestIntent->intent_key === 'teknisi_tugas_prioritas_tinggi') {
-                $activeCut = Tiket::query()
-                    ->with('ticketAssignees.user')
-                    ->whereIn('status', ['OPEN', 'PROSES'])
-                    ->where(function ($q) {
-                        $q->whereIn('priority', ['CRITICAL', 'HIGH'])
-                          ->orWhere('kategori_tiket', 'LIKE', '%cut%')
-                          ->orWhere('kategori_tiket', 'LIKE', '%backbone%');
-                    })
-                    ->first();
-                if ($activeCut && $activeCut->ticketAssignees->isNotEmpty()) {
-                    $names = $activeCut->ticketAssignees->map(fn($a) => $a->user?->name)->filter()->implode(', ');
-                    $reply = "Teknisi yang saat ini bertugas menangani tiket prioritas tinggi (#{$activeCut->no_tiket} - {$activeCut->kategori_tiket}) adalah: {$names}.";
-                } else {
-                    $reply = "Saat ini seluruh tiket berprioritas tinggi telah terkoordinasi atau sedang dalam pemantauan NOC. Silakan cek menu Tiketing untuk penugasan tim.";
-                }
-            } elseif ($bestIntent->intent_key === 'status_pengajuan_saya') {
-                $latestPengajuan = Pengajuan::query()
-                    ->where('user_id', $user->id)
-                    ->latest()
-                    ->take(3)
-                    ->get();
-
-                if ($latestPengajuan->isEmpty()) {
-                    $reply = "Halo {$user->name}, Anda belum memiliki riwayat pengajuan dana/barang.";
-                } else {
-                    $lines = ["Halo {$user->name}, berikut 3 status pengajuan terbaru Anda:"];
-                    foreach ($latestPengajuan as $p) {
-                        $nom = $p->jenis === 'STOK' ? 'Stok Gudang' : 'Rp ' . number_format((float) $p->total_nominal, 0, ',', '.');
-                        $st = strtoupper(str_replace('_', ' ', $p->status));
-                        $lines[] = "• #{$p->id} ({$p->jenis} - {$nom}): {$st}";
-                    }
-                    $reply = implode("\n", $lines);
-                }
-            } elseif ($bestIntent->intent_key === 'ringkasan_operasional_3_poin') {
-                $attToday = Attendance::query()->where('user_id', $user->id)->whereDate('date', Carbon::now('Asia/Jakarta')->toDateString())->first();
-                $clockIn = $attToday?->clock_in_at ?? $attToday?->clock_in;
-                $absenStr = ($attToday && $clockIn) ? 'Sudah Clock-in (' . Carbon::parse($clockIn)->timezone('Asia/Jakarta')->format('H:i') . ' WIB)' : 'Belum Absen Masuk';
-                $myTickets = Tiket::query()->whereHas('ticketAssignees', fn($q) => $q->where('user_id', $user->id))->whereIn('status', ['OPEN', 'PROSES'])->count();
-                $myPengajuan = Pengajuan::query()->where('user_id', $user->id)->whereIn('status', ['pending', 'menunggu_approval'])->count();
-                $reply = "Halo {$user->name}, berikut ringkasan 3 poin operasional terpenting Anda hari ini:\n1. Presensi Kerja: {$absenStr}.\n2. Tiket Gangguan Aktif: {$myTickets} tiket sedang ditugaskan kepada Anda.\n3. Pengajuan Berjalan: {$myPengajuan} pengajuan dana/barang dalam proses approval.";
+                $reply = "Saat ini terdapat {$count} tiket gangguan aktif yang ditugaskan kepada Anda.";
             }
         }
 
@@ -1171,7 +1041,7 @@ class ChatbotService
             'matched_intent' => $bestIntent->intent_key,
             'action_url' => $actionLink['url'] ?? null,
             'action_label' => $actionLink['label'] ?? null,
-            'suggestions' => array_slice($suggestions, 0, 4),
+            'suggestions' => $suggestions,
         ];
     }
 }
