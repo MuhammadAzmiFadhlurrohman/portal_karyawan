@@ -1341,7 +1341,7 @@
                     Grafik &amp; Analitik Operasional
                 </h2>
                 <p class="text-xs text-slate-400 mt-0.5">
-                    Data tren kehadiran, komposisi pengajuan, dan jam lembur 7 hari terakhir
+                    Data tren dan kalender kehadiran harian
                 </p>
             </div>
             <div class="hidden sm:flex items-center gap-2">
@@ -1352,7 +1352,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
             <!-- Chart 1: Tren Kehadiran 7 Hari Terakhir (Col 7) -->
             <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
                 <div>
@@ -1482,83 +1482,6 @@
                 </div>
             </div>
             @endif
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <!-- Chart 2: Komposisi Pengajuan (Col 4) -->
-            <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-                <div>
-                    <div class="pb-3 mb-3 border-b border-slate-100">
-                        <h3 class="font-heading font-bold text-sm text-slate-800">
-                            Komposisi Status Pengajuan
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Rasio persetujuan kasbon &amp; barang bulan ini
-                        </p>
-                    </div>
-
-                    <div class="relative w-full h-[200px] flex items-center justify-center my-2">
-                        <canvas id="pengajuanDonutChart"></canvas>
-                    </div>
-
-                    <!-- Status Breakdown List -->
-                    <div class="space-y-2 mt-4 text-xs">
-                        <div class="flex items-center justify-between p-2 rounded-xl bg-teal-50/60 border border-teal-100">
-                            <span class="flex items-center gap-2 font-medium text-teal-900">
-                                <span class="h-2 w-2 rounded-full bg-teal-600"></span> Disetujui / Cair
-                            </span>
-                            <strong class="font-bold text-teal-800">{{ $stats['pengajuan']['approved'] }} Item</strong>
-                        </div>
-                        <div class="flex items-center justify-between p-2 rounded-xl bg-amber-50/60 border border-amber-100">
-                            <span class="flex items-center gap-2 font-medium text-amber-900">
-                                <span class="h-2 w-2 rounded-full bg-amber-500"></span> Menunggu Approval
-                            </span>
-                            <strong class="font-bold text-amber-800">{{ $stats['pengajuan']['pending'] }} Item</strong>
-                        </div>
-                        <div class="flex items-center justify-between p-2 rounded-xl bg-rose-50/60 border border-rose-100">
-                            <span class="flex items-center gap-2 font-medium text-rose-900">
-                                <span class="h-2 w-2 rounded-full bg-rose-500"></span> Ditolak
-                            </span>
-                            <strong class="font-bold text-rose-800">{{ $stats['pengajuan']['rejected'] }} Item</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-3 mt-3 border-t border-slate-100 text-center text-xs text-slate-400">
-                    Total {{ $stats['pengajuan']['total'] }} Pengajuan di periode ini
-                </div>
-            </div>
-
-            <!-- Chart 3: Tren Jam Lembur Harian (Col 8) -->
-            <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
-                <div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
-                        <div>
-                            <h3 class="font-heading font-bold text-sm text-slate-800">
-                                Tren Jam Lembur Harian (7 Hari Terakhir)
-                            </h3>
-                            <p class="text-xs text-slate-400 mt-0.5">
-                                Akumulasi total jam lembur yang telah disetujui &amp; diverifikasi per hari
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="px-3 py-1 rounded-lg text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                                Total 7 Hari: {{ array_sum($stats['charts']['lembur']['hours']) }} Jam
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="relative w-full h-[220px] sm:h-[240px]">
-                        <canvas id="overtimeTrendChart"></canvas>
-                    </div>
-                </div>
-                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                    <span>*Data dihitung berdasarkan Surat Perintah Lembur yang telah disetujui</span>
-                    <a href="{{ route('gomsn.overtime.index') }}" class="font-semibold text-indigo-700 hover:underline">
-                        Lihat Lembur &rarr;
-                    </a>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -1815,121 +1738,6 @@
                                     stepSize: 1,
                                     font: { family: chartFontFamily, size: 11 },
                                     color: '#64748B'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // 2. Pengajuan Donut Chart
-            const pengajuanCanvas = document.getElementById('pengajuanDonutChart');
-            if (pengajuanCanvas) {
-                const pengData = @json($stats['charts']['pengajuan']);
-                const totalItems = pengData.data.reduce((a, b) => a + b, 0);
-
-                new Chart(pengajuanCanvas.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: pengData.labels,
-                        datasets: [{
-                            data: totalItems > 0 ? pengData.data : [1],
-                            backgroundColor: totalItems > 0 ? pengData.colors : ['#E2E8F0'],
-                            borderWidth: 2,
-                            borderColor: '#ffffff',
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '70%',
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                enabled: totalItems > 0,
-                                padding: 10,
-                                cornerRadius: 8,
-                                bodyFont: { family: chartFontFamily, size: 12 },
-                                callbacks: {
-                                    label: function(context) {
-                                        const val = context.raw || 0;
-                                        const pct = totalItems > 0 ? Math.round((val / totalItems) * 100) : 0;
-                                        return ` ${context.label}: ${val} (${pct}%)`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // 3. Overtime Trend Chart
-            const lemburCanvas = document.getElementById('overtimeTrendChart');
-            if (lemburCanvas) {
-                const lemburData = @json($stats['charts']['lembur']);
-                const ctx = lemburCanvas.getContext('2d');
-                
-                // Gradient fill
-                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
-                gradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: lemburData.labels,
-                        datasets: [
-                            {
-                                label: 'Jam Lembur Disetujui',
-                                data: lemburData.hours,
-                                borderColor: '#6366F1',
-                                borderWidth: 2.5,
-                                backgroundColor: gradient,
-                                fill: true,
-                                tension: 0.35,
-                                pointBackgroundColor: '#6366F1',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                pointRadius: 4,
-                                pointHoverRadius: 6,
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                padding: 10,
-                                cornerRadius: 8,
-                                bodyFont: { family: chartFontFamily, size: 12 },
-                                callbacks: {
-                                    label: function(context) {
-                                        return ` Durasi: ${context.raw} Jam`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: { display: false },
-                                ticks: { font: { family: chartFontFamily, size: 11 }, color: '#64748B' }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: '#F1F5F9' },
-                                ticks: {
-                                    font: { family: chartFontFamily, size: 11 },
-                                    color: '#64748B',
-                                    callback: function(value) {
-                                        return value + 'j';
-                                    }
                                 }
                             }
                         }
