@@ -602,40 +602,82 @@
             </div>
             <div class="pwa-text">
                 <h2 class="pwa-title">Aplikasi Mobile PT MSN</h2>
-                <p class="pwa-sub">Pasang aplikasi untuk akses cepat, praktis, dan notifikasi langsung di HP.</p>
+                <p id="pwa-banner-sub" class="pwa-sub">Pasang aplikasi untuk akses cepat, praktis, dan notifikasi langsung di HP.</p>
             </div>
         </div>
 
-        <button type="button" id="pwa-install-btn" class="pwa-cta">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
+        <button type="button" id="pwa-install-btn" class="pwa-cta" aria-label="Pasang Aplikasi">
+            <svg id="pwa-btn-icon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
             </svg>
-            <span>Pasang Aplikasi</span>
+            <span id="pwa-btn-text">Pasang Aplikasi</span>
         </button>
     </section>
     <script>
         (function () {
             var banner = document.getElementById('pwa-install-banner');
             var btn = document.getElementById('pwa-install-btn');
+            var btnText = document.getElementById('pwa-btn-text');
+            var btnIcon = document.getElementById('pwa-btn-icon');
+            var subText = document.getElementById('pwa-banner-sub');
             if (!banner || !btn) return;
 
-            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || window.__pwaIsInstalled;
+            // In standalone PWA mode, hide banner because user is already using the installed mobile app
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
             if (isStandalone) {
                 banner.classList.add('is-hidden');
                 return;
             }
 
-            window.addEventListener('pwa:installed', function () {
-                banner.classList.add('is-hidden');
-            });
+            function checkInstalled() {
+                var stored = false;
+                try {
+                    stored = localStorage.getItem('gomsn_pwa_installed') === '1';
+                } catch (e) {}
+                return Boolean(window.__pwaIsInstalled || stored);
+            }
+
+            function updateBannerUI() {
+                if (checkInstalled()) {
+                    banner.classList.remove('is-hidden');
+                    if (btnText) btnText.textContent = 'Buka Aplikasi';
+                    if (subText) subText.textContent = 'Aplikasi sudah terpasang di perangkat Anda. Buka aplikasi untuk akses instan.';
+                    if (btnIcon) {
+                        btnIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>';
+                    }
+                    btn.setAttribute('aria-label', 'Buka Aplikasi Mobile PT MSN');
+                } else {
+                    banner.classList.remove('is-hidden');
+                    if (btnText) btnText.textContent = 'Pasang Aplikasi';
+                    if (subText) subText.textContent = 'Pasang aplikasi untuk akses cepat, praktis, dan notifikasi langsung di HP.';
+                    if (btnIcon) {
+                        btnIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>';
+                    }
+                    btn.setAttribute('aria-label', 'Pasang Aplikasi Mobile PT MSN');
+                }
+            }
+
+            updateBannerUI();
+
+            window.addEventListener('pwa:installed', updateBannerUI);
+            window.addEventListener('pwa:installed-status-changed', updateBannerUI);
 
             btn.addEventListener('click', async function () {
+                if (checkInstalled()) {
+                    if (typeof window.openPwaApp === 'function') {
+                        window.openPwaApp();
+                    } else {
+                        window.location.href = '/?source=pwa_banner_open';
+                    }
+                    return;
+                }
+
                 btn.disabled = true;
                 try {
                     if (typeof window.triggerPwaInstall === 'function') {
                         var outcome = await window.triggerPwaInstall();
                         if (outcome === 'accepted' || outcome === 'installed') {
-                            banner.classList.add('is-hidden');
+                            updateBannerUI();
                         }
                     }
                 } finally {

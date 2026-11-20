@@ -30,6 +30,10 @@ class PwaDashboardBannerTest extends TestCase
         $response->assertSee('Aplikasi Mobile PT MSN');
         $response->assertSee('Pasang aplikasi untuk akses cepat, praktis, dan notifikasi langsung di HP.');
         $response->assertSee('Pasang Aplikasi');
+        $response->assertSee('pwa-btn-text');
+        $response->assertSee('pwa-banner-sub');
+        $response->assertSee('Buka Aplikasi');
+        $response->assertSee('gomsn_pwa_installed');
         $response->assertSee('manifest.webmanifest');
     }
 }

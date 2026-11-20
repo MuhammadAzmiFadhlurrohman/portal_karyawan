@@ -52,7 +52,27 @@ if ('serviceWorker' in navigator) {
 
 // PWA Install Prompt Handling & Cross-Browser Trigger
 window.__pwaInstallPrompt = null;
-window.__pwaIsInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+window.__pwaIsStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+window.__pwaIsInstalled = window.__pwaIsStandalone || (function () {
+    try {
+        return localStorage.getItem('gomsn_pwa_installed') === '1';
+    } catch (e) {
+        return false;
+    }
+})();
+
+// Modern Chromium check for installed related apps (§6.4)
+if ('getInstalledRelatedApps' in navigator) {
+    navigator.getInstalledRelatedApps().then((apps) => {
+        if (apps && apps.length > 0) {
+            window.__pwaIsInstalled = true;
+            try {
+                localStorage.setItem('gomsn_pwa_installed', '1');
+            } catch (e) {}
+            window.dispatchEvent(new CustomEvent('pwa:installed-status-changed'));
+        }
+    }).catch(() => {});
+}
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -63,12 +83,22 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
     window.__pwaInstallPrompt = null;
     window.__pwaIsInstalled = true;
+    try {
+        localStorage.setItem('gomsn_pwa_installed', '1');
+    } catch (e) {}
     window.dispatchEvent(new CustomEvent('pwa:installed'));
 });
 
+window.openPwaApp = () => {
+    window.showToast?.('info', 'Membuka Aplikasi Mobile PT MSN...');
+    setTimeout(() => {
+        window.location.href = '/?source=pwa_banner_open';
+    }, 250);
+};
+
 window.triggerPwaInstall = async () => {
     if (window.__pwaIsInstalled) {
-        window.showToast?.('info', 'Aplikasi Mobile PT MSN sudah terpasang di perangkat Anda.');
+        window.openPwaApp();
         return 'installed';
     }
 
@@ -78,7 +108,12 @@ window.triggerPwaInstall = async () => {
         const choice = await promptEvent.userChoice;
         window.__pwaInstallPrompt = null;
         if (choice && choice.outcome === 'accepted') {
+            window.__pwaIsInstalled = true;
+            try {
+                localStorage.setItem('gomsn_pwa_installed', '1');
+            } catch (e) {}
             window.showToast?.('success', 'Aplikasi Mobile PT MSN sedang dipasang di perangkat Anda!');
+            window.dispatchEvent(new CustomEvent('pwa:installed'));
         }
         return choice?.outcome || 'dismissed';
     }
@@ -103,19 +138,33 @@ window.triggerPwaInstall = async () => {
            </div>`;
 
     if (window.Swal) {
-        await window.Swal.fire({
+        const result = await window.Swal.fire({
             icon: 'info',
             title: 'Pasang Aplikasi Mobile PT MSN',
             html: guideHtml,
-            confirmButtonText: 'Mengerti',
+            confirmButtonText: 'Tutup',
             confirmButtonColor: '#0D9488',
+            showDenyButton: true,
+            denyButtonText: 'Sudah Pasang Aplikasi',
+            denyButtonColor: '#0f766e',
             backdrop: 'rgba(2, 32, 41, 0.65)',
             customClass: {
                 popup: 'rounded-3xl shadow-2xl border border-slate-200 font-sans p-6 select-none',
                 title: 'font-bold text-base sm:text-lg text-slate-900',
-                confirmButton: 'px-6 py-2.5 rounded-xl font-bold text-xs text-white shadow-md cursor-pointer',
+                confirmButton: 'px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-md cursor-pointer',
+                denyButton: 'px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-md cursor-pointer mr-2',
             },
         });
+
+        if (result.isDenied) {
+            window.__pwaIsInstalled = true;
+            try {
+                localStorage.setItem('gomsn_pwa_installed', '1');
+            } catch (e) {}
+            window.dispatchEvent(new CustomEvent('pwa:installed'));
+            window.showToast?.('success', 'Status aplikasi diperbarui: Sudah Terpasang.');
+            return 'installed';
+        }
     } else {
         window.showToast?.('info', 'Buka menu browser Anda lalu pilih "Install aplikasi" atau "Tambahkan ke Layar Utama".');
     }
