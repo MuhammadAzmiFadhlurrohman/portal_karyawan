@@ -780,7 +780,7 @@
                         $durasiStr = "{$hours} jam " . sprintf('%02d mnt', $mins);
                         $uangLembur = (int) $item->nominal;
                     @endphp
-                    <div class="bg-white rounded-2xl border border-slate-200 border-l-[6px] border-l-[#0f766e] shadow-xs hover:shadow-md p-4 sm:p-5 space-y-3.5 transition-all">
+                    <div class="bg-white rounded-2xl border border-slate-200 border-l-[6px]! border-l-[#0f766e]! shadow-xs hover:shadow-md p-4 sm:p-5 space-y-3.5 transition-all overflow-hidden" style="border-left: 6px solid #0f766e !important;">
                         <!-- Top Header: Tanggal Lembur -->
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-[#0f766e] flex flex-col items-center justify-center font-bold shrink-0 shadow-2xs">
