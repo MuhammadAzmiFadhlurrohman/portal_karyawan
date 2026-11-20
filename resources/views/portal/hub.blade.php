@@ -173,6 +173,11 @@
         .kpi-btn-cta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 14px;border-radius:14px;background:#e6fcf5;color:#0ca678;border:1px solid #c3fae8;font-size:11.5px;font-weight:700;transition:all .15s ease;text-decoration:none}
         .kpi-btn-cta:hover{background:#c3fae8}
 
+        /* Donut Chart & Stacked Progress Bar */
+        .kpi-donut-ring{position:relative;width:102px;height:102px;border-radius:9999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px -2px rgba(15,23,42,.08);transition:transform .2s ease,box-shadow .2s ease}
+        .kpi-donut-ring:hover{transform:scale(1.03);box-shadow:0 6px 16px -2px rgba(15,23,42,.12)}
+        .kpi-donut-center{width:70px;height:70px;border-radius:9999px;background:#ffffff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}
+
         /* Kalender Kehadiran Bulanan (Self-contained 7-column grid to ensure it never breaks) */
         .cal-grid-7 {
             display: grid !important;
@@ -692,10 +697,51 @@
         <h2 id="heading-stats-kpi" class="sr-only">Ringkasan Statistik Utama</h2>
         
         @if ($stats['scope']['type'] === 'personal')
-        {{-- TAMPILAN KHUSUS KARYAWAN: PENGAJUAN, LEMBUR, ABSEN --}}
+        {{-- TAMPILAN KHUSUS KARYAWAN: PENGAJUAN, LEMBUR, ABSEN (DONUT CHARTS & STACKED PROGRESS BAR) --}}
+        @php
+            $buildDonutStyle = function ($total, $approved, $rejected, $pending) {
+                $total = (int) $total;
+                $approved = (int) $approved;
+                $rejected = (int) $rejected;
+                $pending = (int) $pending;
+
+                if ($total <= 0) {
+                    return '#e2e8f0';
+                }
+
+                $appDeg = ($approved / $total) * 360;
+                $rejDeg = ($rejected / $total) * 360;
+                $pendDeg = ($pending / $total) * 360;
+
+                $cur = 0;
+                $parts = [];
+                if ($approved > 0) {
+                    $next = round($cur + $appDeg, 1);
+                    $parts[] = "#10b981 {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+                if ($rejected > 0) {
+                    $next = round($cur + $rejDeg, 1);
+                    $parts[] = "#ef4444 {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+                if ($pending > 0) {
+                    $next = round($cur + $pendDeg, 1);
+                    $parts[] = "#f59e0b {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+
+                if ($cur < 360) {
+                    $parts[] = "#cbd5e1 {$cur}deg 360deg";
+                }
+
+                return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : '#e2e8f0';
+            };
+        @endphp
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 hub-stagger">
             
-            <!-- Card 1: Pengajuan (Total, Disetujui, Ditolak, Menunggu) -->
+            <!-- Card 1: Pengajuan Saya (Donut Chart + Vertical Legend) -->
             <div class="kpi-card">
                 <div>
                     <!-- Header -->
@@ -714,41 +760,51 @@
                         </span>
                     </div>
 
-                    <!-- 4 Status Blocks: Total, Disetujui, Ditolak, Menunggu -->
-                    <div class="grid grid-cols-4 gap-2 mb-4">
-                        <!-- Total -->
-                        <div class="kpi-box kpi-box-blue">
-                            <span class="kpi-box-num">{{ $stats['pengajuan']['total'] }}</span>
-                            <span class="kpi-box-label">Total</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    @php
+                        $pTotal = (int) ($stats['pengajuan']['total'] ?? 0);
+                        $pApproved = (int) ($stats['pengajuan']['approved'] ?? 0);
+                        $pRejected = (int) ($stats['pengajuan']['rejected'] ?? 0);
+                        $pPending = (int) ($stats['pengajuan']['pending'] ?? 0);
+                        $donutPengajuan = $buildDonutStyle($pTotal, $pApproved, $pRejected, $pPending);
+                    @endphp
+
+                    <!-- Donut Chart & Vertical Legend -->
+                    <div class="flex items-center gap-4 py-2.5 mb-3">
+                        <!-- Sisi Kiri: Donut Chart -->
+                        <div class="kpi-donut-ring" style="background: {{ $donutPengajuan }};" title="Total Pengajuan: {{ $pTotal }}">
+                            <div class="kpi-donut-center">
+                                <span class="text-2xl font-black text-slate-800 leading-none tracking-tight">{{ $pTotal }}</span>
+                                <span class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total</span>
                             </div>
                         </div>
 
-                        <!-- Disetujui -->
-                        <div class="kpi-box kpi-box-mint">
-                            <span class="kpi-box-num text-emerald-700">{{ $stats['pengajuan']['approved'] }}</span>
-                            <span class="kpi-box-label text-emerald-800">Disetujui</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <!-- Sisi Kanan: Vertical Legend -->
+                        <div class="flex-1 flex flex-col justify-center gap-2 min-w-0">
+                            <!-- Titik Hijau: Disetujui -->
+                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100/90">
+                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-sm shadow-emerald-500/40"></span>
+                                    <span class="truncate">Disetujui</span>
+                                </span>
+                                <span class="font-bold text-emerald-700 text-xs shrink-0 ml-1.5">({{ $pApproved }})</span>
                             </div>
-                        </div>
 
-                        <!-- Ditolak -->
-                        <div class="kpi-box kpi-box-rose">
-                            <span class="kpi-box-num text-rose-700">{{ $stats['pengajuan']['rejected'] }}</span>
-                            <span class="kpi-box-label text-rose-800">Ditolak</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <!-- Titik Merah: Ditolak -->
+                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-rose-50/70 border border-rose-100/90">
+                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 shadow-sm shadow-rose-500/40"></span>
+                                    <span class="truncate">Ditolak</span>
+                                </span>
+                                <span class="font-bold text-rose-700 text-xs shrink-0 ml-1.5">({{ $pRejected }})</span>
                             </div>
-                        </div>
 
-                        <!-- Menunggu -->
-                        <div class="kpi-box kpi-box-amber">
-                            <span class="kpi-box-num text-amber-700">{{ $stats['pengajuan']['pending'] }}</span>
-                            <span class="kpi-box-label text-amber-800">Menunggu</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <!-- Titik Kuning: Menunggu -->
+                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-amber-50/70 border border-amber-100/90">
+                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-sm shadow-amber-500/40"></span>
+                                    <span class="truncate">Menunggu</span>
+                                </span>
+                                <span class="font-bold text-amber-700 text-xs shrink-0 ml-1.5">({{ $pPending }})</span>
                             </div>
                         </div>
                     </div>
@@ -777,7 +833,7 @@
                 </div>
             </div>
 
-            <!-- Card 2: Lembur (Total, Disetujui, Ditolak, Menunggu) -->
+            <!-- Card 2: Lembur Saya (Donut Chart + Vertical Legend) -->
             <div class="kpi-card">
                 <div>
                     <!-- Header -->
@@ -796,41 +852,51 @@
                         </span>
                     </div>
 
-                    <!-- 4 Status Blocks: Total, Disetujui, Ditolak, Menunggu -->
-                    <div class="grid grid-cols-4 gap-2 mb-4">
-                        <!-- Total -->
-                        <div class="kpi-box kpi-box-blue">
-                            <span class="kpi-box-num">{{ $stats['lembur']['total'] }}</span>
-                            <span class="kpi-box-label">Total</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    @php
+                        $lTotal = (int) ($stats['lembur']['total'] ?? 0);
+                        $lApproved = (int) ($stats['lembur']['approved'] ?? 0);
+                        $lRejected = (int) ($stats['lembur']['rejected'] ?? 0);
+                        $lPending = (int) ($stats['lembur']['pending'] ?? 0);
+                        $donutLembur = $buildDonutStyle($lTotal, $lApproved, $lRejected, $lPending);
+                    @endphp
+
+                    <!-- Donut Chart & Vertical Legend -->
+                    <div class="flex items-center gap-4 py-2.5 mb-3">
+                        <!-- Sisi Kiri: Donut Chart -->
+                        <div class="kpi-donut-ring" style="background: {{ $donutLembur }};" title="Total Lembur: {{ $lTotal }}">
+                            <div class="kpi-donut-center">
+                                <span class="text-2xl font-black text-slate-800 leading-none tracking-tight">{{ $lTotal }}</span>
+                                <span class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total</span>
                             </div>
                         </div>
 
-                        <!-- Disetujui -->
-                        <div class="kpi-box kpi-box-mint">
-                            <span class="kpi-box-num text-emerald-700">{{ $stats['lembur']['approved'] }}</span>
-                            <span class="kpi-box-label text-emerald-800">Disetujui</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <!-- Sisi Kanan: Vertical Legend -->
+                        <div class="flex-1 flex flex-col justify-center gap-2 min-w-0">
+                            <!-- Titik Hijau: Disetujui -->
+                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100/90">
+                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-sm shadow-emerald-500/40"></span>
+                                    <span class="truncate">Disetujui</span>
+                                </span>
+                                <span class="font-bold text-emerald-700 text-xs shrink-0 ml-1.5">({{ $lApproved }})</span>
                             </div>
-                        </div>
 
-                        <!-- Ditolak -->
-                        <div class="kpi-box kpi-box-rose">
-                            <span class="kpi-box-num text-rose-700">{{ $stats['lembur']['rejected'] }}</span>
-                            <span class="kpi-box-label text-rose-800">Ditolak</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <!-- Titik Merah: Ditolak -->
+                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-rose-50/70 border border-rose-100/90">
+                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 shadow-sm shadow-rose-500/40"></span>
+                                    <span class="truncate">Ditolak</span>
+                                </span>
+                                <span class="font-bold text-rose-700 text-xs shrink-0 ml-1.5">({{ $lRejected }})</span>
                             </div>
-                        </div>
 
-                        <!-- Menunggu -->
-                        <div class="kpi-box kpi-box-amber">
-                            <span class="kpi-box-num text-amber-700">{{ $stats['lembur']['pending'] }}</span>
-                            <span class="kpi-box-label text-amber-800">Menunggu</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <!-- Titik Kuning: Menunggu -->
+                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-amber-50/70 border border-amber-100/90">
+                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-sm shadow-amber-500/40"></span>
+                                    <span class="truncate">Menunggu</span>
+                                </span>
+                                <span class="font-bold text-amber-700 text-xs shrink-0 ml-1.5">({{ $lPending }})</span>
                             </div>
                         </div>
                     </div>
@@ -859,7 +925,7 @@
                 </div>
             </div>
 
-            <!-- Card 3: Absen (Total Hadir, Tepat Waktu, Tidak Hadir, Total Potongan) -->
+            <!-- Card 3: Absensi Saya (Stacked Progress Bar) -->
             <div class="kpi-card">
                 <div>
                     <!-- Header -->
@@ -879,48 +945,90 @@
                         </span>
                     </div>
 
-                    <!-- 4 Status Blocks: Total Hadir, Tepat Waktu, Tidak Hadir, Total Potongan -->
-                    <div class="grid grid-cols-4 gap-2 mb-4">
-                        <!-- Total Hadir -->
-                        <div class="kpi-box kpi-box-mint">
-                            <span class="kpi-box-num">{{ $stats['absensi']['month_present_days'] }}</span>
-                            <span class="kpi-box-label">Total Hadir</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    @php
+                        $hadir = (int) ($stats['absensi']['month_present_days'] ?? 0);
+                        $tepatWaktu = (int) ($stats['absensi']['month_ontime_days'] ?? $stats['absensi']['today_present'] ?? 0);
+                        $terlambat = max(0, $hadir - $tepatWaktu);
+                        $tidakHadir = (int) ($stats['absensi']['month_absent_days'] ?? 0);
+                        $potonganVal = $stats['absensi']['month_total_deduction'] ?? 0;
+
+                        $totalDays = max(1, $hadir + $tidakHadir);
+                        $tepatPct = round(($tepatWaktu / $totalDays) * 100, 1);
+                        $terlambatPct = round(($terlambat / $totalDays) * 100, 1);
+                        $tidakHadirPct = round(($tidakHadir / $totalDays) * 100, 1);
+                    @endphp
+
+                    <!-- Bagian Atas: Total Hadir & Total Potongan Menonjol -->
+                    <div class="grid grid-cols-2 gap-2.5 mb-3">
+                        <!-- Total Hadir Box -->
+                        <div class="p-2.5 rounded-2xl bg-teal-50/70 border border-teal-100/90 flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-teal-800 uppercase tracking-wider block">Total Hadir</span>
+                                <div class="flex items-baseline gap-1 mt-0.5">
+                                    <span class="text-2xl font-black text-slate-900 leading-none">{{ $hadir }}</span>
+                                    <span class="text-[11px] font-semibold text-teal-700">Hari</span>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-xl bg-teal-100/80 text-teal-700 flex items-center justify-center shrink-0">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             </div>
                         </div>
 
-                        <!-- Tepat Waktu -->
-                        <div class="kpi-box kpi-box-blue">
-                            <span class="kpi-box-num text-blue-700">{{ $stats['absensi']['month_ontime_days'] ?? $stats['absensi']['today_present'] }}</span>
-                            <span class="kpi-box-label text-blue-800">Tepat Waktu</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <!-- Total Potongan Box -->
+                        <div class="p-2.5 rounded-2xl bg-amber-50/70 border border-amber-100/90 flex items-center justify-between">
+                            <div class="min-w-0 pr-1">
+                                <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider block truncate">Total Potongan</span>
+                                <div class="mt-0.5">
+                                    <span class="text-[14px] sm:text-base font-black text-amber-900 leading-none block truncate" title="Rp {{ number_format($potonganVal, 0, ',', '.') }}">
+                                        Rp {{ $potonganVal > 0 ? (strlen((string) (int) $potonganVal) > 6 ? round($potonganVal/1000) . 'k' : number_format($potonganVal, 0, ',', '.')) : '0' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0">
+                                <svg width="15" height="15" class="fill-amber-600 text-amber-600" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Tidak Hadir / Alpa -->
-                        <div class="kpi-box kpi-box-rose">
-                            <span class="kpi-box-num text-rose-700">{{ $stats['absensi']['month_absent_days'] ?? 0 }}</span>
-                            <span class="kpi-box-label text-rose-800">Tidak Hadir</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </div>
+                    <!-- Tengah: Stacked Progress Bar -->
+                    <div class="mb-2">
+                        <div class="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden flex p-0.5 border border-slate-200/80 shadow-inner"
+                             title="Tepat Waktu: {{ $tepatWaktu }} hari, Terlambat: {{ $terlambat }} hari, Tidak Hadir: {{ $tidakHadir }} hari">
+                            @if ($hadir + $tidakHadir === 0)
+                                <div class="h-full w-full bg-slate-200 rounded-full"></div>
+                            @else
+                                @if ($tepatPct > 0)
+                                    <div class="h-full bg-emerald-500 rounded-l-full {{ ($terlambatPct == 0 && $tidakHadirPct == 0) ? 'rounded-r-full' : '' }} transition-all duration-500 shadow-sm"
+                                         style="width: {{ $tepatPct }}%;"></div>
+                                @endif
+                                @if ($terlambatPct > 0)
+                                    <div class="h-full bg-amber-400 {{ $tepatPct == 0 ? 'rounded-l-full' : '' }} {{ $tidakHadirPct == 0 ? 'rounded-r-full' : '' }} transition-all duration-500"
+                                         style="width: {{ $terlambatPct }}%;"></div>
+                                @endif
+                                @if ($tidakHadirPct > 0)
+                                    <div class="h-full bg-rose-500 {{ ($tepatPct == 0 && $terlambatPct == 0) ? 'rounded-l-full' : '' }} rounded-r-full transition-all duration-500"
+                                         style="width: {{ $tidakHadirPct }}%;"></div>
+                                @endif
+                            @endif
                         </div>
+                    </div>
 
-                        <!-- Total Potongan -->
-                        <div class="kpi-box kpi-box-amber">
-                            @php
-                                $potonganVal = $stats['absensi']['month_total_deduction'] ?? 0;
-                            @endphp
-                            <span class="kpi-box-num text-[13px] font-bold text-amber-800 truncate" title="Rp {{ number_format($potonganVal, 0, ',', '.') }}">
-                                {{ $potonganVal > 0 ? (strlen((string) (int) $potonganVal) > 6 ? round($potonganVal/1000) . 'k' : number_format($potonganVal, 0, ',', '.')) : '0' }}
-                            </span>
-                            <span class="kpi-box-label text-amber-900">Total Potong</span>
-                            <div class="kpi-box-icon">
-                                <svg width="14" height="14" class="fill-amber-600 text-amber-600" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </div>
-                        </div>
+                    <!-- Bawah Bar: Label Keterangan -->
+                    <div class="flex items-center justify-between text-xs text-slate-600 mb-3 px-0.5">
+                        <span class="inline-flex items-center gap-1.5 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span>Tepat Waktu: <strong class="text-emerald-700 font-bold">{{ $tepatWaktu }}</strong></span>
+                        </span>
+                        @if ($terlambat > 0)
+                        <span class="inline-flex items-center gap-1.5 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                            <span>Terlambat: <strong class="text-amber-700 font-bold">{{ $terlambat }}</strong></span>
+                        </span>
+                        @endif
+                        <span class="inline-flex items-center gap-1.5 font-medium">
+                            <span class="w-2 h-2 rounded-full {{ $tidakHadir > 0 ? 'bg-rose-500' : 'bg-slate-300' }} shrink-0"></span>
+                            <span>Tidak Hadir: <strong class="{{ $tidakHadir > 0 ? 'text-rose-700' : 'text-slate-500' }} font-bold">{{ $tidakHadir }}</strong></span>
+                        </span>
                     </div>
 
                     <!-- Details Row -->
