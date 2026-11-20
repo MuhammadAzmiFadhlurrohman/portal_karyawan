@@ -48,58 +48,44 @@
             </div>
         </div>
 
-        <!-- Action Toolbar: Navigation, Year Filter & Trigger Modal -->
-        <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <!-- Left: Nav Buttons & Year Filter -->
-            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-                <a href="{{ route('attendance.history') }}" 
-                   class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200/70 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all cursor-pointer">
-                    <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    <span>Riwayat Absen</span>
-                </a>
-
-                @if (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage'))
-                <a href="{{ route('attendance.reports') }}" 
-                   class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-cyan-300 bg-cyan-50/70 hover:bg-cyan-100/70 text-cyan-900 text-xs font-semibold transition cursor-pointer">
-                    <svg class="w-4 h-4 text-cyan-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span>Laporan Absensi</span>
-                </a>
-                @endif
-
-                <!-- Form Filter Tahun -->
-                <form method="GET" action="{{ route('attendance.leaves') }}" class="inline-flex items-center gap-1.5">
-                    <div class="relative flex items-center">
-                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        <input type="number" 
-                               name="year" 
-                               value="{{ $year }}" 
-                               min="2025" 
-                               max="2035" 
-                               title="Filter Tahun"
-                               class="w-24 rounded-xl border border-slate-300 bg-white py-2 pl-8 pr-2.5 text-xs font-mono font-bold text-slate-800 focus:border-teal-600 focus:ring-1 focus:ring-teal-600 outline-none shadow-xs transition">
-                    </div>
-
-                    <button type="submit" 
-                            class="py-2 px-3.5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:opacity-95 transition cursor-pointer"
-                            style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        <!-- Action Toolbar: Filter Periode Tahun & Trigger Modal -->
+        <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <!-- Left: Filter Periode Tahun -->
+            <form method="GET" action="{{ route('attendance.leaves') }}" class="flex items-center gap-2">
+                <div class="relative flex items-center">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-teal-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span>Filter</span>
-                    </button>
-                </form>
-            </div>
+                    </div>
+                    <select name="year" 
+                            id="filter-year-select"
+                            onchange="this.form.submit()"
+                            title="Pilih Tahun"
+                            class="rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-100/70 focus:bg-white pl-9 pr-8 py-2 text-xs font-bold text-slate-800 font-mono shadow-2xs focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer appearance-none">
+                        @for ($y = now()->year - 2; $y <= now()->year + 3; $y++)
+                            <option value="{{ $y }}" @selected($y === (int) $year)>Tahun {{ $y }}</option>
+                        @endfor
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <button type="submit" 
+                        class="h-[34px] px-3.5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:opacity-95 transition cursor-pointer active:scale-95"
+                        style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <span>Filter</span>
+                </button>
+            </form>
 
             <!-- Right: Action Button -->
-            <div class="w-full md:w-auto flex items-center justify-end">
+            <div class="w-full sm:w-auto flex items-center justify-end">
                 <button type="button" 
                         @click="openModal('sick')"
                         class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-white font-bold text-xs shadow-md shadow-teal-900/10 hover:opacity-95 transition active:scale-[0.98] cursor-pointer whitespace-nowrap"
