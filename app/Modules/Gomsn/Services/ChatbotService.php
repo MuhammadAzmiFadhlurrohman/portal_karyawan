@@ -10,7 +10,10 @@ use App\Models\LeaveBalance;
 use App\Models\Lembur;
 use App\Models\MonthlySchedule;
 use App\Models\Odp;
+use App\Models\OdpCustomer;
+use App\Models\Olt;
 use App\Models\Pengajuan;
+use App\Models\Pon;
 use App\Models\Tiket;
 use App\Models\User;
 use App\Modules\Attendance\Services\DeductionService;
@@ -209,6 +212,375 @@ class ChatbotService
             'q100_penutup_terima_kasih' => "Sami-sami! Bingah tiasa ngabantos anjeun. Upami aya deui nu bade ditaroskeun ngeunaan layanan aplikasi GOMSN, mangga taroskeun iraha wae. Wilujeng damel! 😊",
             default => null,
         };
+    }
+
+    /**
+     * Resolve live database queries about OLT, PON, ODP, and FTTH Customers/Users.
+     *
+     * @return ?array{response: string, confidence: float, matched_intent: string, action_url: ?string, action_label: ?string}
+     */
+    protected function resolveNetworkEntityQuery(string $rawClean, string $normMessage, bool $isSunda): ?array
+    {
+        $hasNetworkKeyword = (bool) preg_match('/\b(olt|pon|odp|ftth|nomor internet|no internet|pelanggan|user)\b/iu', $normMessage);
+        if (! $hasNetworkKeyword) {
+            return null;
+        }
+
+        // Skip generic procedural / how-to questions so QA test intents handle them
+        $isProceduralHowTo = (bool) preg_match('/\b(bagaimana cara|kumaha cara|kumaha carana|langkah|prosedur|alur|syarat|apa arti|hartina|indikator warna|kepanjangan|singkatan|glosarium|beda menu|bedana menu|tiket gangguan|kabel dropcore|stok kabel|serial number|sn ont|ekspansi odp|peta navigasi|kolom search|pareum listrik|nomor telepon pelanggan|rekap tiket|titik koordinat odp baru|masang odp anyar|sisa kapasitas port yang tersedia pada odp|kapasitas port yang masih tersedia pada suatu odp|sisa slot port nu masih kosong|mengecek titik odp dan daftar pelanggan|mengecek daftar pelanggan yang terhubung pada suatu odp|ngecek titik odp jeung daftar pelanggan)\b/iu', $normMessage);
+        if ($isProceduralHowTo) {
+            return null;
+        }
+
+        // ---------------------------------------------------------------------
+        // A. Specific OLT Lookup (e.g. "olt msn", "olt bagong", "olt soreang", "olt kopo")
+        // ---------------------------------------------------------------------
+        $olts = Olt::with(['pons.odps.customers'])->get();
+        foreach ($olts as $olt) {
+            $oltNameLower = mb_strtolower(trim($olt->nama_olt));
+            $oltCodeLower = mb_strtolower(trim((string) $olt->kode));
+            $matchedThisOlt = false;
+
+            if ($oltCodeLower !== '' && $oltCodeLower !== 'msn' && preg_match('/\b(olt\s+' . preg_quote($oltCodeLower, '/') . '|' . preg_quote($oltCodeLower, '/') . '\s+olt)\b/iu', $normMessage)) {
+                $matchedThisOlt = true;
+            } elseif ($oltCodeLower === 'msn' && preg_match('/\b(olt\s+msn|data\s+olt\s+msn|detail\s+olt\s+msn|cek\s+olt\s+msn|pon\s+di\s+olt\s+msn|odp\s+di\s+olt\s+msn)\b/iu', $normMessage)) {
+                $matchedThisOlt = true;
+            } elseif (preg_match('/\b' . preg_quote($oltNameLower, '/') . '\b/iu', $normMessage)) {
+                $matchedThisOlt = true;
+            }
+
+            if ($matchedThisOlt && ! preg_match('/\b(user|pelanggan)\b/iu', $normMessage)) {
+                $ponCount = $olt->pons->count();
+                $odpCount = 0;
+                $custCount = 0;
+                $ponLines = [];
+
+                foreach ($olt->pons as $p) {
+                    $pOdps = $p->odps->count();
+                    $odpCount += $pOdps;
+                    $pCusts = $p->odps->sum(fn ($o) => $o->customers->where('status', 'aktif')->count());
+                    $custCount += $pCusts;
+                    $ponLines[] = "• {$p->nama_pon}: {$pOdps}/{$p->port_max} Port ODP ({$pCusts} user aktif)";
+                }
+
+                $header = "Data Infrastruktur {$olt->nama_olt} (Lokasi: " . ($olt->lokasi ?: '-') . "):\n"
+                    . "• Total: {$ponCount} PON | {$odpCount} Titik ODP | {$custCount} Pelanggan Aktif\n\n"
+                    . "Daftar Distribusi PON:";
+
+                return [
+                    'response' => $header . "\n" . implode("\n", $ponLines),
+                    'confidence' => 95.0,
+                    'matched_intent' => 'network_db_olt_detail',
+                    'action_url' => route('gomsn.network.index', ['olt_id' => $olt->id]),
+                    'action_label' => "🌐 Buka {$olt->nama_olt}",
+                ];
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // B. Specific PON Lookup (e.g. "pon 3 ms sufia", "pon 2 ms entin", "pon 4 ms msn")
+        // ---------------------------------------------------------------------
+        $pons = Pon::with(['olt', 'odps.customers'])->get();
+        $bestPon = null;
+        $bestPonLen = 0;
+
+        foreach ($pons as $pon) {
+            $ponFull = mb_strtolower(trim($pon->nama_pon));
+            $ponNorm = $this->normalizeText($ponFull);
+            $parts = array_map('trim', explode('/', $ponFull));
+            $alias = isset($parts[1]) ? $this->normalizeText($parts[1]) : '';
+
+            if ($ponNorm !== '' && mb_strlen($ponNorm) >= 4 && str_contains($normMessage, $ponNorm)) {
+                if (mb_strlen($ponNorm) > $bestPonLen) {
+                    $bestPon = $pon;
+                    $bestPonLen = mb_strlen($ponNorm);
+                }
+            } elseif ($alias !== '' && mb_strlen($alias) >= 5 && str_contains($normMessage, $alias) && str_contains($normMessage, 'pon')) {
+                if (mb_strlen($alias) > $bestPonLen) {
+                    $bestPon = $pon;
+                    $bestPonLen = mb_strlen($alias);
+                }
+            }
+        }
+
+        if ($bestPon) {
+            $olt = $bestPon->olt;
+            $odps = $bestPon->odps;
+            $odpCount = $odps->count();
+            $totalCust = 0;
+            $odpLines = [];
+
+            foreach ($odps as $o) {
+                $cCount = $o->customers->where('status', 'aktif')->count();
+                $totalCust += $cCount;
+                $odpLines[] = "• ODP " . trim($o->nama_odp) . ": {$cCount}/{$o->port_max} Port User ({$cCount} pelanggan)";
+            }
+
+            $oltName = $olt?->nama_olt ?? '-';
+            $resp = "Detail Distribusi {$bestPon->nama_pon} ({$oltName}):\n"
+                . "• Kapasitas Port PON: {$odpCount} / {$bestPon->port_max} ODP Terhubung\n"
+                . "• Total User/Pelanggan: {$totalCust} pelanggan aktif\n"
+                . ($odpLines ? "\nDaftar ODP Terhubung:\n" . implode("\n", $odpLines) : "\nBelum ada ODP terhubung pada PON ini.");
+
+            return [
+                'response' => $resp,
+                'confidence' => 95.0,
+                'matched_intent' => 'network_db_pon_detail',
+                'action_url' => $olt ? route('gomsn.network.pons.show', [$olt->id, $bestPon->id]) : route('gomsn.network.index'),
+                'action_label' => "🌐 Buka {$bestPon->nama_pon}",
+            ];
+        }
+
+        // ---------------------------------------------------------------------
+        // C. Specific ODP Lookup (e.g. "odp indomart", "siapa saja user di odp msn reog", "odp penuh")
+        // ---------------------------------------------------------------------
+        if (str_contains($normMessage, 'odp') && preg_match('/\b(penuh|full|habis|beak)\b/iu', $normMessage) && ! str_contains($normMessage, 'perumahan')) {
+            $allOdps = Odp::with(['pon.olt', 'customers'])->get();
+            $fullOdps = [];
+            foreach ($allOdps as $o) {
+                $used = $o->customers->where('status', 'aktif')->count();
+                if ($o->port_max > 0 && $used >= $o->port_max) {
+                    $fullOdps[] = "• ODP " . trim($o->nama_odp) . " ({$used}/{$o->port_max} Port) — " . ($o->pon?->nama_pon ?? '-') . " / " . ($o->pon?->olt?->nama_olt ?? '-');
+                }
+            }
+
+            if (empty($fullOdps)) {
+                $resp = "Saat ini tidak ada titik ODP yang berstatus Penuh (100% terisi) di database.";
+            } else {
+                $totalFull = count($fullOdps);
+                $slice = array_slice($fullOdps, 0, 12);
+                $resp = "Ditemukan {$totalFull} titik ODP yang kapasitas port-nya sudah Penuh di database:\n" . implode("\n", $slice);
+                if ($totalFull > 12) {
+                    $resp .= "\n...dan " . ($totalFull - 12) . " ODP lainnya. Buka menu Jaringan OLT, PON & ODP untuk detail lengkap.";
+                }
+            }
+
+            return [
+                'response' => $resp,
+                'confidence' => 92.0,
+                'matched_intent' => 'network_db_odp_full_list',
+                'action_url' => route('gomsn.network.index'),
+                'action_label' => '🌐 Buka Jaringan OLT, PON & ODP',
+            ];
+        }
+
+        if (str_contains($normMessage, 'odp') && ! preg_match('/\b(odp mana|di odp mana|ka odp mana|odp naon)\b/iu', $normMessage)) {
+
+            $allOdps = Odp::with(['pon.olt', 'customers'])->get();
+            $matchedOdp = null;
+            $matchedOdpLen = 0;
+
+            foreach ($allOdps as $o) {
+                $oNorm = $this->normalizeText($o->nama_odp);
+                if ($oNorm === '' || mb_strlen($oNorm) < 3) {
+                    continue;
+                }
+                if (preg_match('/\b' . preg_quote($oNorm, '/') . '\b/iu', $normMessage)) {
+                    if (mb_strlen($oNorm) > $matchedOdpLen) {
+                        $matchedOdp = $o;
+                        $matchedOdpLen = mb_strlen($oNorm);
+                    }
+                }
+            }
+
+            if ($matchedOdp) {
+                $pon = $matchedOdp->pon;
+                $olt = $pon?->olt;
+                $activeCustomers = $matchedOdp->customers->where('status', 'aktif')->values();
+                $used = $activeCustomers->count();
+                $max = (int) $matchedOdp->port_max;
+                $sisa = max(0, $max - $used);
+                $coords = ($matchedOdp->latitude && $matchedOdp->longitude)
+                    ? "{$matchedOdp->latitude}, {$matchedOdp->longitude}"
+                    : 'Belum diset';
+
+                $custLines = [];
+                foreach ($activeCustomers->take(15) as $idx => $c) {
+                    $no = $idx + 1;
+                    $noInet = $c->nomor_internet ? " (No. Internet: {$c->nomor_internet})" : '';
+                    $custLines[] = "{$no}. {$c->nama_user}{$noInet}";
+                }
+
+                $odpTitle = trim($matchedOdp->nama_odp);
+                $resp = "Data Detail ODP {$odpTitle}:\n"
+                    . "• OLT / PON: " . ($olt?->nama_olt ?? '-') . " → " . ($pon?->nama_pon ?? '-') . "\n"
+                    . "• Kapasitas Port: {$used} / {$max} Port Terpakai (Sisa {$sisa} port kosong)\n"
+                    . "• Koordinat GPS: {$coords}\n"
+                    . ($custLines
+                        ? "\nDaftar User/Pelanggan Terhubung ({$used} user):\n" . implode("\n", $custLines)
+                        : "\nBelum ada user/pelanggan aktif yang terdaftar pada ODP ini.");
+
+                $actionUrl = ($olt && $pon)
+                    ? route('gomsn.network.odps.show', [$olt->id, $pon->id, $matchedOdp->id])
+                    : route('gomsn.network.index');
+
+                return [
+                    'response' => $resp,
+                    'confidence' => 95.0,
+                    'matched_intent' => 'network_db_odp_detail',
+                    'action_url' => $actionUrl,
+                    'action_label' => "🌐 Buka Detail ODP {$odpTitle}",
+                ];
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // D. Customer / User Lookup (e.g. "user agus odp mana", "agus di olt mana", "no internet 11110524")
+        // ---------------------------------------------------------------------
+        $isCustomerLookup = (bool) (
+            preg_match('/\b(user|pelanggan|customer|nomor internet|no internet)\b/iu', $normMessage)
+            || preg_match('/\b(odp mana|di odp mana|ka odp mana|pon mana|pon berapa|olt mana|di olt mana)\b/iu', $normMessage)
+        );
+
+        if ($isCustomerLookup) {
+            $stripWords = [
+                'user', 'pelanggan', 'customer', 'atas', 'nama', 'ngaran', 'odp', 'pon', 'olt',
+                'mana', 'di', 'dina', 'ka', 'ke', 'ti', 'dari', 'nyambung', 'terhubung', 'masuk',
+                'ikut', 'cek', 'cari', 'neangan', 'data', 'info', 'informasi', 'detail', 'siapa',
+                'saha', 'berapa', 'sabaraha', 'nomor', 'no', 'internet', 'id', 'port', 'lokasi',
+                'alamat', 'status', 'nya', 'na', 'teh', 'mah', 'min', 'tolong', 'cik', 'punten',
+                'tembongkeun', 'pangnempokeun', 'tampilkan', 'lihat', 'ningali', 'ada', 'aya',
+                'yang', 'nu', 'anu', 'apakah', 'dimana', 'jaringan', 'ftth', 'gomsn', 'msn',
+            ];
+
+            $candidate = $normMessage;
+            foreach ($stripWords as $sw) {
+                $candidate = preg_replace('/\b' . preg_quote($sw, '/') . '\b/iu', ' ', $candidate) ?? $candidate;
+            }
+            $candidate = trim(preg_replace('/\s+/', ' ', $candidate) ?? $candidate);
+
+            $genericIgnore = ['tertentu', 'area', 'baru', 'anyar', 'lama', 'aktif', 'semua', 'seluruh', 'sakabeh', 'daftar', 'riwayat', 'tiket', 'gangguan', 'kantor', 'karyawan', 'teknisi', 'staf', 'rumah', 'imah'];
+
+            if (mb_strlen($candidate) >= 3 && ! in_array($candidate, $genericIgnore, true)) {
+                $customers = OdpCustomer::with('odp.pon.olt')
+                    ->where(function ($q) use ($candidate) {
+                        $q->where('nama_user', 'LIKE', "%{$candidate}%")
+                          ->orWhere('nomor_internet', 'LIKE', "%{$candidate}%");
+                    })
+                    ->get();
+
+                if ($customers->isNotEmpty()) {
+                    $count = $customers->count();
+                    if ($count === 1) {
+                        /** @var OdpCustomer $c */
+                        $c = $customers->first();
+                        $odp = $c->odp;
+                        $pon = $odp?->pon;
+                        $olt = $pon?->olt;
+                        $odpName = $odp ? trim($odp->nama_odp) : 'Belum ditautkan';
+                        $ponName = $pon?->nama_pon ?? '-';
+                        $oltName = $olt?->nama_olt ?? ($c->olt_name ?: '-');
+                        $coords = ($odp && $odp->latitude && $odp->longitude)
+                            ? " (Koordinat: {$odp->latitude}, {$odp->longitude})"
+                            : '';
+
+                        $resp = "Data User/Pelanggan Jaringan FTTH:\n"
+                            . "• Nama User: {$c->nama_user}\n"
+                            . "• No. Internet: " . ($c->nomor_internet ?: '-') . "\n"
+                            . "• Terhubung di ODP: {$odpName}{$coords}\n"
+                            . "• Jalur PON: {$ponName}\n"
+                            . "• Perangkat OLT: {$oltName}\n"
+                            . "• Status: " . strtoupper($c->status ?: 'AKTIF');
+
+                        $actionUrl = ($olt && $pon && $odp)
+                            ? route('gomsn.network.odps.show', [$olt->id, $pon->id, $odp->id])
+                            : route('gomsn.network.index');
+
+                        return [
+                            'response' => $resp,
+                            'confidence' => 96.0,
+                            'matched_intent' => 'network_db_customer_lookup',
+                            'action_url' => $actionUrl,
+                            'action_label' => $odp ? "🌐 Buka Detail ODP {$odpName}" : '🌐 Buka Jaringan OLT, PON & ODP',
+                        ];
+                    }
+
+                    $lines = [
+                        $isSunda
+                            ? "Kapanggih {$count} data user/pelanggan kalayan katakunci \"{$candidate}\" dina database jaringan FTTH:"
+                            : "Ditemukan {$count} data user/pelanggan dengan nama/nomor \"{$candidate}\" di database jaringan FTTH:",
+                    ];
+
+                    foreach ($customers->take(15) as $idx => $c) {
+                        $no = $idx + 1;
+                        $odpName = $c->odp ? trim($c->odp->nama_odp) : '-';
+                        $ponName = $c->odp?->pon?->nama_pon ?? '-';
+                        $oltName = $c->odp?->pon?->olt?->nama_olt ?? ($c->olt_name ?: '-');
+                        $noInet = $c->nomor_internet ? " (No. Internet: {$c->nomor_internet})" : '';
+                        $lines[] = "{$no}. {$c->nama_user}{$noInet} → ODP: {$odpName} | {$ponName} | {$oltName}";
+                    }
+
+                    if ($count > 15) {
+                        $lines[] = "...dan " . ($count - 15) . " pelanggan lainnya.";
+                    }
+
+                    $firstC = $customers->first();
+                    $firstOdp = $firstC?->odp;
+                    $firstPon = $firstOdp?->pon;
+                    $firstOlt = $firstPon?->olt;
+                    $actionUrl = ($firstOlt && $firstPon && $firstOdp)
+                        ? route('gomsn.network.odps.show', [$firstOlt->id, $firstPon->id, $firstOdp->id])
+                        : route('gomsn.network.index');
+
+                    return [
+                        'response' => implode("\n", $lines),
+                        'confidence' => 96.0,
+                        'matched_intent' => 'network_db_customer_lookup',
+                        'action_url' => $actionUrl,
+                        'action_label' => '🌐 Buka Modul Jaringan OLT, PON & ODP',
+                    ];
+                }
+
+                if (preg_match('/\b(odp mana|di odp mana|ka odp mana)\b/iu', $normMessage)) {
+                    $resp = $isSunda
+                        ? "Data user/pelanggan kalayan ngaran atawa nomor internet \"{$candidate}\" teu kapanggih dina database ODP jaringan FTTH."
+                        : "Data user/pelanggan dengan nama atau nomor internet \"{$candidate}\" tidak ditemukan di database ODP jaringan FTTH.";
+
+                    return [
+                        'response' => $resp,
+                        'confidence' => 90.0,
+                        'matched_intent' => 'network_db_customer_not_found',
+                        'action_url' => route('gomsn.network.index'),
+                        'action_label' => '🌐 Buka Jaringan OLT, PON & ODP',
+                    ];
+                }
+            }
+        }
+
+        // ---------------------------------------------------------------------
+        // E. Global Network Summary (e.g. "daftar semua olt", "total olt pon odp dan pelanggan")
+        // ---------------------------------------------------------------------
+        if (
+            preg_match('/\b(daftar semua olt|daftar olt|semua olt|sakabeh olt|ringkasan jaringan|statistik jaringan|total olt|jumlah olt)\b/iu', $normMessage)
+            || (str_contains($normMessage, 'olt') && str_contains($normMessage, 'pon') && str_contains($normMessage, 'odp') && preg_match('/\b(berapa|sabaraha|total|jumlah|daftar)\b/iu', $normMessage))
+        ) {
+            $totalOlts = $olts->count();
+            $totalPons = Pon::count();
+            $totalOdps = Odp::count();
+            $totalCusts = OdpCustomer::where('status', 'aktif')->count();
+
+            $oltLines = [];
+            foreach ($olts as $olt) {
+                $pCount = $olt->pons->count();
+                $oCount = $olt->pons->sum(fn ($p) => $p->odps->count());
+                $cCount = $olt->pons->sum(fn ($p) => $p->odps->sum(fn ($o) => $o->customers->where('status', 'aktif')->count()));
+                $oltLines[] = "• {$olt->nama_olt} ({$olt->lokasi}): {$pCount} PON | {$oCount} ODP | {$cCount} Pelanggan";
+            }
+
+            $resp = "Ringkasan Database Infrastruktur Jaringan FTTH PT MSN:\n"
+                . "• Total Keseluruhan: {$totalOlts} OLT | {$totalPons} PON | {$totalOdps} Titik ODP | {$totalCusts} Pelanggan Aktif\n\n"
+                . "Rincian per OLT:\n" . implode("\n", $oltLines);
+
+            return [
+                'response' => $resp,
+                'confidence' => 94.0,
+                'matched_intent' => 'network_db_global_summary',
+                'action_url' => route('gomsn.network.index'),
+                'action_label' => '🌐 Buka Infrastruktur Jaringan FTTH',
+            ];
+        }
+
+        return null;
     }
 
     /**
@@ -957,6 +1329,30 @@ class ChatbotService
             'Berapa sisa saldo cuti tahunan saya saat ini?',
             'Bagaimana cara mengajukan lembur melalui menu Lembur Saya?',
         ];
+
+        // If not an exact 100.0 match to a fixed QA question, check live FTTH Network Database (OLT, PON, ODP, User/Pelanggan)
+        if ($bestScore < 99.0) {
+            $networkResult = $this->resolveNetworkEntityQuery($rawClean, $normMessage, $isSunda);
+            if ($networkResult !== null) {
+                ChatbotLog::query()->create([
+                    'user_id' => $user?->id,
+                    'user_message' => $message,
+                    'matched_intent_key' => $networkResult['matched_intent'],
+                    'confidence_score' => $networkResult['confidence'],
+                    'bot_response' => $networkResult['response'],
+                    'is_answered' => true,
+                ]);
+
+                return [
+                    'response' => $networkResult['response'],
+                    'confidence' => $networkResult['confidence'],
+                    'matched_intent' => $networkResult['matched_intent'],
+                    'action_url' => $networkResult['action_url'],
+                    'action_label' => $networkResult['action_label'],
+                    'suggestions' => $suggestions,
+                ];
+            }
+        }
 
         if ($bestScore < 1.50 || ! $bestIntent) {
             $fallback = $isSunda
