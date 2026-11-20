@@ -229,30 +229,30 @@
             </div>
 
             <!-- 2. Filter Bar Toolbar & Search Combined (Modern & Terpadu) -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3.5">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3.5">
                 <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-3.5">
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
                     @endif
 
                     <!-- Row 1: Search & Actions Header Toolbar -->
-                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
+                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                         <!-- Search Input Bar -->
                         <div class="flex items-center gap-2 flex-1">
                             <div class="relative flex-1">
                                 <input type="text" name="search" value="{{ request('search', request('q')) }}" 
                                        placeholder="Cari ID, pengajuan, nama karyawan, atau keperluan..."
-                                       class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 pl-9 pr-4 py-2.5 text-slate-700 transition outline-none">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                       class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 pl-10 pr-4 py-2.5 sm:py-3 text-slate-800 transition outline-none">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                     </svg>
                                 </div>
                             </div>
                             <button type="submit"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
+                                    class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
                                     style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
-                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                                 <span>Cari</span>
@@ -261,15 +261,15 @@
 
                         <!-- Right side: Total counter & Export Excel -->
                         <div class="flex items-center justify-between md:justify-end gap-2 shrink-0">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-600 shadow-2xs">
                                 <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                                 <span>Total <strong class="text-slate-800 font-extrabold">{{ $pengajuanList->total() }}</strong> data</span>
                             </span>
 
                             @if ($isSuperAdmin || $isFinance || $isAtasan)
                             <button type="submit" name="export" value="excel" title="Export Excel" 
-                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition cursor-pointer shrink-0">
-                                <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 px-3.5 sm:px-4 rounded-xl inline-flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition cursor-pointer shrink-0">
+                                <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
                                 <span>Export Excel</span>
@@ -279,11 +279,11 @@
                     </div>
 
                     <!-- Row 2: Filters Dropdown Grid & Reset -->
-                    <div class="pt-2.5 border-t border-slate-100">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2">
+                    <div class="pt-3 border-t border-slate-100">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2.5">
                             <!-- Dropdown Semua Jenis -->
-                            <div class="col-span-1 lg:w-40">
-                                <select name="jenis" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                            <div class="col-span-1 lg:w-44">
+                                <select name="jenis" onchange="this.form.submit()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="">Semua Jenis</option>
                                     <option value="STOK" {{ request('jenis') === 'STOK' ? 'selected' : '' }}>Stok</option>
                                     <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Dana</option>
@@ -294,7 +294,7 @@
 
                             <!-- Dropdown Semua Divisi -->
                             <div class="col-span-1 lg:w-40">
-                                <select name="divisi" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                                <select name="divisi" onchange="this.form.submit()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="">Semua Divisi</option>
                                     @foreach ($divisions as $div)
                                         <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
@@ -303,8 +303,8 @@
                             </div>
 
                             <!-- Filter Status -->
-                            <div class="col-span-1 lg:w-44">
-                                <select name="status" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                            <div class="col-span-1 lg:w-48">
+                                <select name="status" onchange="this.form.submit()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="">Semua Status</option>
                                     <option value="menunggu_finance" {{ request('status') === 'menunggu_finance' ? 'selected' : '' }}>Menunggu Finance</option>
                                     <option value="menunggu_executive" {{ request('status') === 'menunggu_executive' ? 'selected' : '' }}>Menunggu Executive</option>
@@ -316,8 +316,8 @@
                             </div>
 
                             <!-- Dropdown Bulan -->
-                            <div class="col-span-1 lg:w-36">
-                                <select name="bulan" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                            <div class="col-span-1 lg:w-40">
+                                <select name="bulan" onchange="this.form.submit()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
                                     @foreach ($monthsList as $mNum => $mLabel)
                                         <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
@@ -326,8 +326,8 @@
                             </div>
 
                             <!-- Dropdown Tahun -->
-                            <div class="col-span-1 lg:w-32">
-                                <select name="tahun" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                            <div class="col-span-1 lg:w-36">
+                                <select name="tahun" onchange="this.form.submit()" class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
                                     @for ($y = date('Y') + 1; $y >= 2024; $y--)
                                         <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
@@ -339,9 +339,9 @@
                             @if(request('search') || request('jenis') || request('divisi') || request('status') || (request('bulan') && request('bulan') !== 'all' && request('bulan') !== (string)date('n')) || (request('tahun') && request('tahun') !== 'all' && request('tahun') !== (string)date('Y')))
                             <div class="col-span-2 sm:col-span-1 lg:w-auto">
                                 <a href="{{ route('gomsn.pengajuan.index', request('tab') ? ['tab' => request('tab')] : []) }}"
-                                   class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition shadow-2xs cursor-pointer"
+                                   class="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition shadow-2xs cursor-pointer"
                                    title="Reset Semua Filter">
-                                    <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                     <span>Reset</span>
                                 </a>
                             </div>
@@ -521,8 +521,8 @@
                     </div>
 
                     <!-- MOBILE VIEW: Card Grid (md:hidden) -->
-                    <div class="md:hidden p-3.5 sm:p-5 bg-slate-50/50">
-                        <div class="space-y-3">
+                    <div class="md:hidden p-4 sm:p-5 bg-slate-50/50">
+                        <div class="space-y-4">
                             @foreach ($pengajuanList as $item)
                                 @php
                                     $isApproved = in_array($item->status, ['dicairkan', 'menunggu_bukti', 'selesai']);
@@ -558,16 +558,16 @@
                                     ];
                                 @endphp
 
-                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-teal-300/80 transition-all duration-200 flex flex-col justify-between p-4 gap-3">
+                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-teal-300/80 transition-all duration-200 flex flex-col justify-between p-4 sm:p-5 gap-3.5">
                                     <!-- Top Row: ID & Badges -->
                                     <div>
-                                        <div class="flex items-start justify-between gap-2 mb-3">
+                                        <div class="flex items-start justify-between gap-2.5 mb-3.5">
                                             <div class="min-w-0">
                                                 <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center gap-1.5 text-left group cursor-pointer">
-                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-white bg-teal-50 group-hover:bg-teal-700 border border-teal-200/70 px-2 py-0.5 rounded-lg transition">#{{ $item->id }}</span>
+                                                    <span class="text-sm font-extrabold text-teal-700 group-hover:text-white bg-teal-50 group-hover:bg-teal-700 border border-teal-200/80 px-2.5 py-1 rounded-xl transition">#{{ $item->id }}</span>
                                                 </button>
-                                                <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
-                                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1.5 font-medium">
+                                                    <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
                                                     </svg>
                                                     <span>{{ $item->created_at->format('d M Y, H:i') }} WIB</span>
@@ -576,27 +576,27 @@
 
                                             <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
                                                 @if ($item->jenis === 'STOK')
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">Stok</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-2xs">Stok</span>
                                                 @elseif ($item->jenis === 'DANA')
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white">Dana</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white shadow-2xs">Dana</span>
                                                 @elseif ($item->jenis === 'BELI')
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">Beli</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white shadow-2xs">Beli</span>
                                                 @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white">Permintaan</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-cyan-600 text-white shadow-2xs">Permintaan</span>
                                                 @endif
 
                                                 @if ($isApproved)
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                         Disetujui
                                                     </span>
                                                 @elseif ($isRejected)
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                                         <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                                                         Ditolak
                                                     </span>
                                                 @else
-                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                                         Menunggu
                                                     </span>
@@ -605,30 +605,30 @@
                                         </div>
 
                                         <!-- Applicant & Nominal Box -->
-                                        <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
-                                            <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                                            <div class="flex items-center gap-3 min-w-0">
                                                 @if ($item->user?->avatar_url)
-                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
                                                 @endif
-                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                <div class="w-10 h-10 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-sm flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
                                                     {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
                                                 </div>
                                                 <div class="min-w-0">
-                                                    <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-xs font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
+                                                    <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-sm font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
                                                         {{ $item->user?->name ?? 'Karyawan MSN' }}
                                                     </button>
-                                                    <span class="text-[11px] text-slate-500 block truncate">
+                                                    <span class="text-xs text-slate-500 block truncate mt-0.5">
                                                         {{ $item->user?->employee_code ?? '-' }} &bull; {{ $item->user?->division ?? 'Umum' }}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             <div class="text-right shrink-0">
-                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Nilai</span>
+                                                <span class="text-[11px] uppercase tracking-wider font-bold text-slate-500 block">Nilai</span>
                                                 @if ($item->jenis === 'STOK')
-                                                    <span class="text-xs font-extrabold text-amber-600">Stok Gudang</span>
+                                                    <span class="text-sm font-extrabold text-amber-600">Stok Gudang</span>
                                                 @else
-                                                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                    <span class="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
                                                         Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
                                                     </span>
                                                 @endif
@@ -636,19 +636,19 @@
                                         </div>
 
                                         @if ($item->keperluan)
-                                            <p class="text-xs text-slate-600 line-clamp-2 mt-2.5 leading-relaxed" title="{{ $item->keperluan }}">
-                                                <span class="font-semibold text-slate-500">Keperluan:</span> {{ $item->keperluan }}
+                                            <p class="text-xs sm:text-[13px] text-slate-700 line-clamp-2 mt-3 leading-relaxed" title="{{ $item->keperluan }}">
+                                                <span class="font-bold text-slate-500">Keperluan:</span> {{ $item->keperluan }}
                                             </p>
                                         @endif
                                     </div>
 
                                     <!-- Bottom Actions -->
-                                    <div class="pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2">
+                                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-end gap-2">
                                         <button type="button"
                                                 @click="openModalWith({{ json_encode($modalData) }})"
                                                 style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
-                                                class="w-full sm:w-auto hover:opacity-90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
-                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                class="w-full sm:w-auto hover:opacity-90 text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
@@ -742,30 +742,30 @@
             @endif
 
             <!-- Filter Bar Standar (Modern, Rapi & Lengkap) -->
-            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3.5">
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3.5">
                 <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-3.5">
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
                     @endif
 
                     <!-- Row 1: Search & Actions Header Toolbar -->
-                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
+                    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
                         <!-- Search Input Bar -->
                         <div class="flex items-center gap-2 flex-1">
                             <div class="relative flex-1">
                                 <input type="text" name="search" value="{{ request('search', request('q')) }}" 
                                        placeholder="Cari ID, pengajuan, nama karyawan, atau keperluan..."
-                                       class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 pl-9 pr-4 py-2.5 text-slate-700 transition outline-none">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                       class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 pl-10 pr-4 py-2.5 sm:py-3 text-slate-800 transition outline-none">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                     </svg>
                                 </div>
                             </div>
                             <button type="submit"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
+                                    class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
                                     style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
-                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
                                 <span>Cari</span>
@@ -774,15 +774,15 @@
 
                         <!-- Right side: Total counter & Export -->
                         <div class="flex items-center justify-between md:justify-end gap-2 shrink-0">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs">
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-600 shadow-2xs">
                                 <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                                 <span>Total <strong class="text-slate-800 font-extrabold">{{ $pengajuanList->total() }}</strong> pengajuan</span>
                             </span>
 
                             @if ($isSuperAdmin || $isFinance || $isAtasan)
                             <button type="submit" name="export" value="excel" title="Export Excel" 
-                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 px-3.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition cursor-pointer shrink-0">
-                                <svg class="w-3.5 h-3.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 px-3.5 sm:px-4 rounded-xl inline-flex items-center gap-1.5 shadow-2xs hover:shadow-xs transition cursor-pointer shrink-0">
+                                <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
                                 <span>Export Excel</span>
@@ -792,12 +792,12 @@
                     </div>
 
                     <!-- Row 2: Filters Dropdown Grid & Reset -->
-                    <div class="pt-2.5 border-t border-slate-100">
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2">
+                    <div class="pt-3 border-t border-slate-100">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2.5">
                             <!-- Filter Jenis -->
-                            <div class="col-span-1 lg:w-40">
+                            <div class="col-span-1 lg:w-44">
                                 <select name="jenis" onchange="this.form.submit()" 
-                                        class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="">Semua Jenis</option>
                                     <option value="DANA" {{ request('jenis') === 'DANA' ? 'selected' : '' }}>Kasbon Dana</option>
                                     <option value="BELI" {{ request('jenis') === 'BELI' ? 'selected' : '' }}>Pengadaan (Beli)</option>
@@ -807,9 +807,9 @@
                             </div>
 
                             <!-- Filter Status -->
-                            <div class="col-span-1 lg:w-44">
+                            <div class="col-span-1 lg:w-48">
                                 <select name="status" onchange="this.form.submit()" 
-                                        class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="">Semua Status</option>
                                     <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                                     <option value="menunggu_atasan" {{ request('status') === 'menunggu_atasan' ? 'selected' : '' }}>Menunggu Atasan</option>
@@ -826,7 +826,7 @@
                             <!-- Filter Divisi -->
                             <div class="col-span-1 lg:w-40">
                                 <select name="divisi" onchange="this.form.submit()" 
-                                        class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="">Semua Divisi</option>
                                     @foreach (($divisions ?? collect()) as $div)
                                         <option value="{{ $div }}" {{ request('divisi') === $div ? 'selected' : '' }}>{{ $div }}</option>
@@ -836,9 +836,9 @@
                             @endif
 
                             <!-- Filter Bulan -->
-                            <div class="col-span-1 lg:w-36">
+                            <div class="col-span-1 lg:w-40">
                                 <select name="bulan" onchange="this.form.submit()" 
-                                        class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="all" {{ (string) $curSelectedMonth === 'all' || (string) $curSelectedMonth === '' ? 'selected' : '' }}>Semua Bulan</option>
                                     @foreach ($monthsList as $mNum => $mLabel)
                                         <option value="{{ $mNum }}" {{ (string) $curSelectedMonth === (string) $mNum ? 'selected' : '' }}>{{ $mLabel }}</option>
@@ -847,9 +847,9 @@
                             </div>
 
                             <!-- Filter Tahun -->
-                            <div class="col-span-1 lg:w-32">
+                            <div class="col-span-1 lg:w-36">
                                 <select name="tahun" onchange="this.form.submit()" 
-                                        class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
+                                        class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 py-2.5 px-3 font-semibold text-slate-700 shadow-2xs cursor-pointer transition">
                                     <option value="all" {{ (string) $curSelectedYear === 'all' || (string) $curSelectedYear === '' ? 'selected' : '' }}>Semua Tahun</option>
                                     @for ($y = date('Y') + 1; $y >= 2024; $y--)
                                         <option value="{{ $y }}" {{ (string) $curSelectedYear === (string) $y ? 'selected' : '' }}>{{ $y }}</option>
@@ -861,9 +861,9 @@
                             @if(request('search') || request('jenis') || request('status') || request('divisi') || (request('bulan') && request('bulan') !== 'all' && request('bulan') !== (string)date('n')) || (request('tahun') && request('tahun') !== 'all' && request('tahun') !== (string)date('Y')))
                             <div class="col-span-2 sm:col-span-1 lg:w-auto">
                                 <a href="{{ route('gomsn.pengajuan.index', request('tab') ? ['tab' => request('tab')] : []) }}"
-                                   class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition shadow-2xs cursor-pointer"
+                                   class="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200/80 transition shadow-2xs cursor-pointer"
                                    title="Reset Semua Filter">
-                                    <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                     <span>Reset</span>
                                 </a>
                             </div>
@@ -1051,8 +1051,8 @@
                     </div>
 
                     <!-- MOBILE VIEW: Card Grid (md:hidden) -->
-                    <div class="md:hidden p-3.5 sm:p-5 bg-slate-50/50">
-                        <div class="space-y-3">
+                    <div class="md:hidden p-4 sm:p-5 bg-slate-50/50">
+                        <div class="space-y-4">
                             @foreach ($pengajuanList as $item)
                                 @php
                                     $modalData = [
@@ -1097,16 +1097,16 @@
                                     };
                                 @endphp
 
-                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-teal-300/80 transition-all duration-200 flex flex-col justify-between p-4 gap-3">
+                                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-teal-300/80 transition-all duration-200 flex flex-col justify-between p-4 sm:p-5 gap-3.5">
                                     <div>
                                         <!-- Top Row: Nomor & Badges -->
-                                        <div class="flex items-start justify-between gap-2 mb-3">
+                                        <div class="flex items-start justify-between gap-2.5 mb-3.5">
                                             <div class="min-w-0">
                                                 <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="inline-flex items-center gap-1.5 text-left group cursor-pointer">
-                                                    <span class="text-xs font-extrabold text-teal-700 group-hover:text-white bg-teal-50 group-hover:bg-teal-700 border border-teal-200/70 px-2 py-0.5 rounded-lg transition">#{{ $item->id }}</span>
+                                                    <span class="text-sm font-extrabold text-teal-700 group-hover:text-white bg-teal-50 group-hover:bg-teal-700 border border-teal-200/80 px-2.5 py-1 rounded-xl transition">#{{ $item->id }}</span>
                                                 </button>
-                                                <div class="flex items-center gap-1 text-[11px] text-slate-400 mt-1">
-                                                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1.5 font-medium">
+                                                    <svg class="w-4 h-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
                                                     </svg>
                                                     <span>{{ $item->created_at->format('d M Y, H:i') }} WIB</span>
@@ -1115,16 +1115,16 @@
 
                                             <div class="flex flex-wrap items-center justify-end gap-1.5 shrink-0">
                                                 @if ($item->jenis === 'STOK')
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">Stok</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-2xs">Stok</span>
                                                 @elseif ($item->jenis === 'DANA')
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white">Dana</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white shadow-2xs">Dana</span>
                                                 @elseif ($item->jenis === 'BELI')
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">Beli</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white shadow-2xs">Beli</span>
                                                 @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-600 text-white">Permintaan</span>
+                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-cyan-600 text-white shadow-2xs">Permintaan</span>
                                                 @endif
 
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border {{ $badge }}">
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border {{ $badge }}">
                                                     {{ strtoupper(str_replace('_', ' ', $item->status)) }}
                                                 </span>
                                             </div>
@@ -1132,51 +1132,51 @@
 
                                         <!-- Applicant & Nominal Box -->
                                         @if ($isMyOwnView)
-                                        <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
-                                            <div>
-                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Jenis Keperluan</span>
-                                                <span class="text-xs font-bold text-slate-800 line-clamp-1 mt-0.5">{{ $item->keperluan ?: '-' }}</span>
+                                        <div class="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                                            <div class="min-w-0 flex-1">
+                                                <span class="text-[11px] uppercase tracking-wider font-bold text-slate-500 block">Jenis Keperluan</span>
+                                                <span class="text-sm font-bold text-slate-800 line-clamp-1 mt-0.5">{{ $item->keperluan ?: '-' }}</span>
                                             </div>
                                             <div class="text-right shrink-0">
-                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Total Pengajuan</span>
+                                                <span class="text-[11px] uppercase tracking-wider font-bold text-slate-500 block">Total Pengajuan</span>
                                                 @if ($item->jenis === 'STOK')
-                                                    <span class="text-xs font-extrabold text-amber-600">Stok Gudang</span>
+                                                    <span class="text-sm font-extrabold text-amber-600">Stok Gudang</span>
                                                 @elseif ($item->jenis === 'PERMINTAAN' || $item->jenis === 'BARANG')
-                                                    <span class="text-xs font-extrabold text-cyan-700">Permintaan Barang</span>
+                                                    <span class="text-sm font-extrabold text-cyan-700">Permintaan Barang</span>
                                                 @else
-                                                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                    <span class="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
                                                         Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
                                                     </span>
                                                 @endif
                                             </div>
                                         </div>
                                         @else
-                                        <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-100 flex items-center justify-between gap-3">
-                                            <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="bg-slate-50/90 rounded-xl p-3.5 border border-slate-200/80 flex items-center justify-between gap-3 shadow-2xs">
+                                            <div class="flex items-center gap-3 min-w-0">
                                                 @if ($item->user?->avatar_url)
-                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                                    <img src="{{ $item->user->avatar_url }}" alt="" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
                                                 @endif
-                                                <div class="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
+                                                <div class="w-10 h-10 rounded-xl bg-teal-600/10 text-teal-700 font-bold text-sm flex items-center justify-center shrink-0 border border-teal-500/20" style="{{ $item->user?->avatar_url ? 'display:none;' : '' }}">
                                                     {{ $item->user?->initials ?? strtoupper(substr($item->user?->name ?? 'K', 0, 2)) }}
                                                 </div>
                                                 <div class="min-w-0">
-                                                    <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-xs font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
+                                                    <button type="button" @click="openModalWith({{ json_encode($modalData) }})" class="text-sm font-bold text-slate-800 hover:text-teal-700 truncate block text-left cursor-pointer">
                                                         {{ $item->user?->name ?? 'Karyawan MSN' }}
                                                     </button>
-                                                    <span class="text-[11px] text-slate-500 block truncate">
+                                                    <span class="text-xs text-slate-500 block truncate mt-0.5">
                                                         {{ $item->user?->employee_code ?? '-' }} &bull; {{ $item->user?->division ?? 'Umum' }}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             <div class="text-right shrink-0">
-                                                <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block">Nilai</span>
+                                                <span class="text-[11px] uppercase tracking-wider font-bold text-slate-500 block">Nilai</span>
                                                 @if ($item->jenis === 'STOK')
-                                                    <span class="text-xs font-extrabold text-amber-600">Stok Gudang</span>
+                                                    <span class="text-sm font-extrabold text-amber-600">Stok Gudang</span>
                                                 @elseif ($item->jenis === 'PERMINTAAN' || $item->jenis === 'BARANG')
-                                                    <span class="text-xs font-extrabold text-cyan-700">Permintaan Barang</span>
+                                                    <span class="text-sm font-extrabold text-cyan-700">Permintaan Barang</span>
                                                 @else
-                                                    <span class="text-xs sm:text-sm font-extrabold text-slate-900">
+                                                    <span class="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
                                                         Rp {{ number_format((float) $item->total_nominal, 0, ',', '.') }}
                                                     </span>
                                                 @endif
@@ -1185,17 +1185,17 @@
                                         @endif
 
                                         @if ($item->keperluan)
-                                            <p class="text-xs text-slate-600 line-clamp-2 mt-2.5 leading-relaxed" title="{{ $item->keperluan }}">
-                                                <span class="font-semibold text-slate-500">Keperluan:</span> {{ $item->keperluan }}
+                                            <p class="text-xs sm:text-[13px] text-slate-700 line-clamp-2 mt-3 leading-relaxed" title="{{ $item->keperluan }}">
+                                                <span class="font-bold text-slate-500">Keperluan:</span> {{ $item->keperluan }}
                                             </p>
                                         @endif
                                     </div>
 
                                     <!-- Bottom Actions -->
-                                    <div class="pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2">
+                                    <div class="pt-3 border-t border-slate-200/80 flex items-center justify-end gap-2">
                                         @if ($item->user_id === auth()->id() && in_array($item->status, ['draft', 'menunggu_atasan']) && ! $item->approvals()->where('action', 'approved')->exists())
-                                            <a href="{{ route('gomsn.pengajuan.edit', $item->id) }}" class="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-2xs transition" title="Edit Pengajuan">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            <a href="{{ route('gomsn.pengajuan.edit', $item->id) }}" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-2xs transition" title="Edit Pengajuan">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                                 <span>Edit</span>
                                             </a>
                                         @endif
@@ -1203,8 +1203,8 @@
                                         <button type="button" 
                                                 @click="openModalWith({{ json_encode($modalData) }})"
                                                 style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
-                                                class="flex-1 sm:flex-initial hover:opacity-90 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
-                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                class="flex-1 sm:flex-initial hover:opacity-90 text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-2.5 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                             </svg>
