@@ -26,7 +26,7 @@
         .hh-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11.5px;font-weight:600;background:rgba(2,19,22,.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#e2e8f0;border:1px solid rgba(45,212,191,.25)}
         .hh-pill.ok{background:rgba(2,24,27,.75);color:#fff;border-color:rgba(45,212,191,.45);font-weight:700}
         .hh-dot{width:6.5px;height:6.5px;border-radius:50%;background:#10b981;box-shadow:0 0 10px #10b981}
-        .hh-cta{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:9.5px 20px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);border:1px solid rgba(94,234,212,.35);box-shadow:0 8px 20px -4px rgba(13,148,136,.6),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .15s ease,filter .15s ease}
+        .hh-cta{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;margin-top:16px;padding:9.5px 20px;border-radius:999px;font-size:12px;font-weight:700;color:#fff;text-decoration:none;background:linear-gradient(135deg,#14b8a6 0%,#0d9488 100%);border:1px solid rgba(94,234,212,.35);box-shadow:0 8px 20px -4px rgba(13,148,136,.6),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .15s ease,filter .15s ease}
         .hh-cta:hover{filter:brightness(1.1);transform:translateY(-1px)}
         .hh-cta svg{transition:transform .15s ease}
         .hh-cta:hover svg{transform:translateX(2px)}
@@ -518,16 +518,8 @@
                     @endif
                 </div>
                 <a href="{{ route('portal.profile') }}" class="hh-cta">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                    <span>
-                        @if ($scopeType === 'company')
-                            {{ $stats['scope']['badge'] ?? 'Seluruh Perusahaan' }}
-                        @elseif ($scopeType === 'division')
-                            {{ $stats['scope']['badge'] }}
-                        @else
-                            Statistik Pribadi
-                        @endif
-                    </span>
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span>Profil Saya</span>
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
             </div>
