@@ -96,17 +96,15 @@
         [x-cloak] {
             display: none !important;
         }
-        .chatbot-modal-box[style*="display: none"] {
-            display: none !important;
-        }
-        .chatbot-docked-tab[style*="display: none"] {
+        .chatbot-docked-tab[style*="display: none"],
+        .chatbot-docked-tab[style*="display:none"] {
             display: none !important;
         }
 
         /* Chat Window Modal Box - Floating Symmetrical Popup */
         .chatbot-modal-box {
-            display: flex !important;
-            flex-direction: column !important;
+            display: flex;
+            flex-direction: column;
             position: fixed !important;
             right: 12px !important;
             bottom: 84px !important;
@@ -144,6 +142,10 @@
                 height: 600px !important;
             }
         }
+        .chatbot-modal-box[style*="display: none"],
+        .chatbot-modal-box[style*="display:none"] {
+            display: none !important;
+        }
 
         /* Rigid Sticky Header - NEVER Scrolls Away */
         .chatbot-header-bar {
@@ -164,6 +166,16 @@
             overflow-x: hidden !important;
             overscroll-behavior: contain !important;
             -webkit-overflow-scrolling: touch;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 14px 12px !important;
+            background: #f8fafc !important;
+        }
+        @media (min-width: 640px) {
+            #chatbot-messages {
+                padding: 16px 14px !important;
+            }
         }
 
         /* Rigid Footer & Input Bars */
@@ -174,20 +186,131 @@
             flex-shrink: 0 !important;
         }
 
-        /* Modern Chat Bubble Shapes - Sleek Symmetrical Rounded Cards */
-        .chatbot-bubble-user {
-            background: linear-gradient(135deg, #0e5257 0%, #155E63 100%) !important;
-            color: #ffffff !important;
-            border-radius: 18px !important;
-            box-shadow: 0 1px 3px rgba(2, 40, 54, 0.2) !important;
+        /* Chat Message Rows, Circular Avatars & Proportional Bubbles */
+        .chatbot-msg-row {
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+        .chatbot-msg-row.is-user {
+            justify-content: flex-end !important;
+        }
+        .chatbot-msg-row.is-bot {
+            justify-content: flex-start !important;
         }
 
+        .chatbot-avatar {
+            width: 32px !important;
+            height: 32px !important;
+            min-width: 32px !important;
+            min-height: 32px !important;
+            border-radius: 9999px !important;
+            flex-shrink: 0 !important;
+            margin-top: 2px !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .chatbot-avatar.is-bot {
+            background: linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%) !important;
+            color: #ffffff !important;
+            border: 1.5px solid #ffffff !important;
+            box-shadow: 0 2px 6px rgba(14, 76, 80, 0.22) !important;
+        }
+        .chatbot-avatar.is-user {
+            background: #e2e8f0 !important;
+            border: 1.5px solid #ffffff !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.14) !important;
+        }
+
+        .chatbot-bubble {
+            min-width: 0 !important;
+            border-radius: 16px !important;
+            box-sizing: border-box !important;
+        }
+        .chatbot-bubble-user {
+            max-width: calc(100% - 64px) !important;
+            padding: 9px 14px !important;
+            background: linear-gradient(135deg, #0e5257 0%, #155E63 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(14, 76, 80, 0.22) !important;
+        }
         .chatbot-bubble-bot {
+            max-width: calc(100% - 48px) !important;
+            padding: 10px 14px !important;
             background: #ffffff !important;
             color: #1e293b !important;
-            border: 1px solid rgba(226, 232, 240, 0.95) !important;
-            border-radius: 18px !important;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+        }
+        @media (min-width: 640px) {
+            .chatbot-bubble-user {
+                max-width: 76% !important;
+            }
+            .chatbot-bubble-bot {
+                max-width: 82% !important;
+            }
+        }
+
+        .chatbot-msg-text {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 12.5px !important;
+            line-height: 1.55 !important;
+            color: inherit !important;
+            word-break: break-word !important;
+            overflow-wrap: anywhere !important;
+            white-space: normal !important;
+        }
+        @media (min-width: 640px) {
+            .chatbot-msg-text {
+                font-size: 13px !important;
+            }
+        }
+        .chatbot-msg-content {
+            white-space: pre-line !important;
+        }
+
+        .chatbot-action-wrap {
+            margin-top: 10px !important;
+            padding-top: 9px !important;
+            border-top: 1px solid #f1f5f9 !important;
+        }
+        .chatbot-action-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+            width: 100% !important;
+            padding: 8px 12px !important;
+            border-radius: 10px !important;
+            background: #f0fdfa !important;
+            border: 1px solid #99f6e4 !important;
+            color: #0f5c5c !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            line-height: 1.35 !important;
+            text-decoration: none !important;
+            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease !important;
+        }
+        .chatbot-action-btn:hover {
+            background: #ccfbf1 !important;
+            border-color: #5eead4 !important;
+        }
+        .chatbot-action-btn:active {
+            transform: scale(0.985) !important;
+        }
+
+        .chatbot-suggestions-wrap {
+            margin-top: 10px !important;
+            padding-top: 9px !important;
+            border-top: 1px solid #f1f5f9 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
         }
 
         /* Typing cursor animation */
@@ -340,15 +463,14 @@
             $chatUserAvatarUrl = auth()->check() ? auth()->user()->avatar_url : null;
             $chatUserInitials = auth()->check() ? (auth()->user()->initials ?? strtoupper(substr(auth()->user()->name ?? 'U', 0, 2))) : 'U';
         @endphp
-        <div id="chatbot-messages" class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto overflow-x-hidden space-y-3.5 bg-slate-50/80 text-xs">
+        <div id="chatbot-messages">
             <template x-for="(msg, index) in messages" :key="index">
-                <div :class="msg.sender === 'user' ? 'flex items-start justify-end gap-2 w-full min-w-0' : 'flex items-start justify-start gap-2 w-full min-w-0'">
+                <div :class="msg.sender === 'user' ? 'chatbot-msg-row is-user' : 'chatbot-msg-row is-bot'">
                     
                     <!-- Bot Circular Avatar (WhatsApp style) -->
                     <template x-if="msg.sender !== 'user'">
-                        <div class="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white shadow-xs shrink-0 mt-0.5 border border-teal-600/20 ring-1.5 ring-slate-200/90"
-                             style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%) !important;">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="#ffffff">
+                        <div class="chatbot-avatar is-bot">
+                            <svg style="width: 17px; height: 17px;" viewBox="0 0 24 24" fill="#ffffff">
                                 <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
                                 <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
                                 <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
@@ -358,22 +480,15 @@
                     </template>
 
                     <!-- Message Bubble -->
-                    <div :class="msg.sender === 'user' 
-                                ? 'chatbot-bubble-user px-3.5 py-2 sm:px-4 sm:py-2 max-w-[76%] sm:max-w-[72%] min-w-0' 
-                                : 'chatbot-bubble-bot px-3.5 py-2 sm:px-4 sm:py-2 max-w-[82%] sm:max-w-[78%] min-w-0'">
-                        <p class="leading-relaxed whitespace-pre-line break-words text-[12.5px] sm:text-[13px] text-inherit m-0"
-                           style="word-break: break-word; overflow-wrap: anywhere;">
-                            <span x-text="msg.text"></span>
-                            <span x-show="msg.isTyping" class="chatbot-typing-cursor"></span>
-                        </p>
+                    <div :class="msg.sender === 'user' ? 'chatbot-bubble chatbot-bubble-user' : 'chatbot-bubble chatbot-bubble-bot'">
+                        <p class="chatbot-msg-text"><span class="chatbot-msg-content" x-text="msg.isTyping ? (msg.text || '').trimStart() : (msg.text || '').trim()"></span><span x-show="msg.isTyping" class="chatbot-typing-cursor"></span></p>
 
                         <!-- Action Button Menuju Halaman Terkait -->
                         <template x-if="!msg.isTyping && msg.action_url && msg.action_label">
-                            <div class="mt-2.5 pt-2 border-t border-slate-100">
-                                <a :href="msg.action_url"
-                                   class="inline-flex items-center justify-between w-full px-3 py-2 rounded-xl bg-teal-50/90 hover:bg-teal-100 text-teal-900 border border-teal-200/90 font-medium text-xs shadow-2xs hover:shadow-xs transition-all group active:scale-[0.98]">
-                                    <span class="truncate pr-1.5 flex items-center gap-1.5 font-semibold text-teal-800 text-[11.5px]" x-text="msg.action_label"></span>
-                                    <svg class="w-3.5 h-3.5 shrink-0 transform group-hover:translate-x-0.5 transition-transform text-teal-700" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <div class="chatbot-action-wrap">
+                                <a :href="msg.action_url" class="chatbot-action-btn group">
+                                    <span class="truncate" x-text="msg.action_label"></span>
+                                    <svg style="width: 14px; height: 14px; flex-shrink: 0;" class="transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
                                 </a>
@@ -382,7 +497,7 @@
 
                         <!-- 2 Rekomendasi Pertanyaan Hanya Jika Bot Butuh Klarifikasi / Tidak Mengerti (Tidak Ditampilkan Bila Ada Jawaban/Aksi) -->
                         <template x-if="!msg.isTyping && msg.suggestions && msg.suggestions.length > 0 && !msg.action_url && (!msg.text || (!msg.text.includes('Data Infrastruktur') && !msg.text.includes('Detail Distribusi') && !msg.text.includes('Data Pelanggan')))">
-                            <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1.5 transition-opacity duration-300">
+                            <div class="chatbot-suggestions-wrap transition-opacity duration-300">
                                 <p class="text-[10px] font-semibold text-slate-500 flex items-center gap-1.5 mb-0.5">
                                     <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M11 3a1 1 0 10-2 0v1a1 1 0 002 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.001z"/>
@@ -407,17 +522,17 @@
 
                     <!-- User Circular Avatar (WhatsApp style) -->
                     <template x-if="msg.sender === 'user'">
-                        <div class="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-full overflow-hidden shrink-0 mt-0.5 ring-1.5 ring-slate-200/90 shadow-xs bg-slate-100 flex items-center justify-center">
+                        <div class="chatbot-avatar is-user">
                             @if ($chatUserAvatarUrl)
                                 <img src="{{ $chatUserAvatarUrl }}"
                                      alt="Profil Saya"
                                      onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
-                                     class="w-full h-full object-cover rounded-full">
-                                <div style="display: none;" class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold text-[10px]">
+                                     class="w-full h-full object-cover object-top rounded-full">
+                                <div style="display: none; font-size: 11px;" class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold">
                                     {{ $chatUserInitials }}
                                 </div>
                             @else
-                                <div class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold text-[10px]">
+                                <div style="font-size: 11px;" class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold">
                                     {{ $chatUserInitials }}
                                 </div>
                             @endif
@@ -426,21 +541,17 @@
                 </div>
             </template>
 
-            <!-- Bottom Spacer to ensure last message is fully visible above toolbar -->
-            <div class="h-2 shrink-0"></div>
-
             <!-- Loading Indicator with Bot Avatar -->
-            <div x-show="loading" class="flex items-start justify-start gap-2 w-full min-w-0">
-                <div class="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white shadow-xs shrink-0 mt-0.5 border border-teal-600/20 ring-1.5 ring-slate-200/90"
-                     style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%) !important;">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="#ffffff">
+            <div x-show="loading" class="chatbot-msg-row is-bot">
+                <div class="chatbot-avatar is-bot">
+                    <svg style="width: 17px; height: 17px;" viewBox="0 0 24 24" fill="#ffffff">
                         <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
                         <rect x="2.5" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
                         <rect x="19.3" y="9.2" width="2.2" height="5.6" rx="1.1" fill="#ffffff"/>
                         <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8.5 5H15.5C17.6 5 18.5 5.9 18.5 8V14.8C18.5 16.9 17.6 17.8 15.5 17.8H8.5C6.4 17.8 5.5 16.9 5.5 14.8V8C5.5 5.9 6.4 5 8.5 5ZM8.8 9.8A1.25 1.25 0 108.8 12.3 1.25 1.25 0 108.8 9.8ZM15.2 9.8A1.25 1.25 0 1015.2 12.3 1.25 1.25 0 1015.2 9.8ZM8 14.3H9.6C9.85 14.3 10 14.5 10 14.75C10 15 9.85 15.2 9.6 15.2H8C7.75 15.2 7.55 15 7.55 14.75C7.55 14.5 7.75 14.3 8 14.3ZM11.2 14.3H12.8C13.05 14.3 13.25 14.5 13.25 14.75C13.25 15 13.05 15.2 12.8 15.2H11.2C10.95 15.2 10.75 15 10.75 14.75C10.75 14.5 10.95 14.3 11.2 14.3ZM14.4 14.3H16C16.25 14.3 16.45 14.5 16.45 14.75C16.45 15 16.25 15.2 16 15.2H14.4C14.15 15.2 13.95 15 13.95 14.75C13.95 14.5 14.15 14.3 14.4 14.3Z"/>
                     </svg>
                 </div>
-                <div class="chatbot-bubble-bot px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs flex items-center gap-2">
+                <div class="chatbot-bubble chatbot-bubble-bot flex items-center gap-2" style="padding: 9px 14px;">
                     <div class="flex items-center gap-1 py-0.5">
                         <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
                         <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
@@ -449,6 +560,9 @@
                     <span class="text-[11.5px] text-slate-500 font-medium">Asisten sedang mengetik...</span>
                 </div>
             </div>
+
+            <!-- Bottom Spacer to ensure last message is fully visible above toolbar -->
+            <div style="height: 2px; flex-shrink: 0;"></div>
         </div>
 
         <!-- Quick Suggestions -->
