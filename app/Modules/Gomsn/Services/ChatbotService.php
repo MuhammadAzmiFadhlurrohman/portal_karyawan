@@ -459,6 +459,50 @@ class ChatbotService
                     })
                     ->get();
 
+                // Fuzzy fallback for candidate with typos (e.g. 'aguss' -> 'Agus', 'welly' -> 'Wely', 'saepudn' -> 'Saepudin')
+                if ($customers->isEmpty() && mb_strlen($candidate) >= 3) {
+                    $allCusts = OdpCustomer::query()->select('id', 'nama_user', 'nomor_internet')->get();
+                    $matchedCustIds = [];
+                    $candidateParts = explode(' ', $candidate);
+
+                    foreach ($allCusts as $cust) {
+                        $userTokensLower = preg_split('/[\s,\.\/\-]+/u', mb_strtolower($cust->nama_user));
+                        $isMatch = false;
+
+                        if (count($candidateParts) === 1) {
+                            $cPart = $candidateParts[0];
+                            foreach ($userTokensLower as $ut) {
+                                if ($ut !== '' && ($this->isTypoMatch($cPart, $ut) || (mb_strlen($cPart) >= 4 && mb_strlen($ut) >= 4 && levenshtein($cPart, $ut) <= 1))) {
+                                    $isMatch = true;
+                                    break;
+                                }
+                            }
+                        } else {
+                            // Multiple words in candidate (e.g. 'welly yanto')
+                            $matchedPartCount = 0;
+                            foreach ($candidateParts as $cPart) {
+                                foreach ($userTokensLower as $ut) {
+                                    if ($ut !== '' && ($this->isTypoMatch($cPart, $ut) || (mb_strlen($cPart) >= 4 && mb_strlen($ut) >= 4 && levenshtein($cPart, $ut) <= 1))) {
+                                        $matchedPartCount++;
+                                        break;
+                                    }
+                                }
+                            }
+                            if ($matchedPartCount >= count($candidateParts)) {
+                                $isMatch = true;
+                            }
+                        }
+
+                        if ($isMatch) {
+                            $matchedCustIds[] = $cust->id;
+                        }
+                    }
+
+                    if (! empty($matchedCustIds)) {
+                        $customers = OdpCustomer::with('odp.pon.olt')->whereIn('id', $matchedCustIds)->get();
+                    }
+                }
+
                 if ($customers->isNotEmpty()) {
                     $count = $customers->count();
                     if ($count === 1) {
@@ -840,6 +884,53 @@ class ChatbotService
     }
 
     /**
+     * Determine whether two words are a typo/fuzzy match (1-2 edits or transposition).
+     */
+    protected function isTypoMatch(string $w1, string $w2): bool
+    {
+        if ($w1 === $w2) {
+            return true;
+        }
+
+        $l1 = strlen($w1);
+        $l2 = strlen($w2);
+
+        if (abs($l1 - $l2) > 2) {
+            return false;
+        }
+
+        // Levenshtein distance 1
+        if (levenshtein($w1, $w2) <= 1) {
+            if ($l1 <= 3 && $l2 <= 3) {
+                return $w1[0] === $w2[0];
+            }
+            return true;
+        }
+
+        // Single adjacent transposition (e.g. 'usre' vs 'user', 'jawdal' vs 'jadwal', 'passwrod' vs 'password')
+        if ($l1 === $l2 && $l1 >= 4) {
+            $diffs = [];
+            for ($i = 0; $i < $l1; $i++) {
+                if ($w1[$i] !== $w2[$i]) {
+                    $diffs[] = $i;
+                }
+            }
+            if (count($diffs) === 2 && abs($diffs[0] - $diffs[1]) === 1) {
+                if ($w1[$diffs[0]] === $w2[$diffs[1]] && $w1[$diffs[1]] === $w2[$diffs[0]]) {
+                    return true;
+                }
+            }
+        }
+
+        // For longer words (>= 6 characters), allow Levenshtein distance 2 if starting letter matches
+        if ($l1 >= 6 && $l2 >= 6 && levenshtein($w1, $w2) <= 2) {
+            return $w1[0] === $w2[0];
+        }
+
+        return false;
+    }
+
+    /**
      * Normalize Indonesian & Sundanese words without conflating distinct concepts.
      */
     protected function normalizeText(string $text): string
@@ -872,7 +963,10 @@ class ChatbotService
         // Replace punctuation with space
         $clean = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $clean) ?? $clean;
 
-        // Typos & synonym normalization
+        // Collapse 3+ identical consecutive characters (e.g. 'haiii' -> 'hai', 'cutiiii' -> 'cuti', 'odpppp' -> 'odp')
+        $clean = preg_replace('/(.)\1{2,}/u', '$1', $clean) ?? $clean;
+
+        // Typos, slang & common abbreviation normalization for Indonesian & Basa Sunda
         $synonyms = [
             'haii' => 'hai',
             'haiii' => 'hai',
@@ -887,44 +981,241 @@ class ChatbotService
             'heyy' => 'hai',
             'hey' => 'hai',
             'p' => 'ping',
+            // Pertanyaan & kata ganti
             'gimana' => 'bagaimana',
             'gmn' => 'bagaimana',
             'bgmn' => 'bagaimana',
+            'bgaimana' => 'bagaimana',
+            'bagaimna' => 'bagaimana',
+            'bagaimaba' => 'bagaimana',
             'caranya' => 'cara',
             'crnya' => 'cara',
-            'absennya' => 'absen',
-            'mengurusnya' => 'mengurus',
-            'penolakannya' => 'penolakan',
-            'passwordnya' => 'password',
-            'efeknya' => 'efek',
-            'ngajuin' => 'mengajukan',
-            'rwayat' => 'riwayat',
-            'absn' => 'absen',
+            'cra' => 'cara',
+            'cr' => 'cara',
             'sy' => 'saya',
-            'bln' => 'bulan',
-            'ptongan' => 'potongan',
-            'bsk' => 'besok',
-            'dn' => 'dan',
-            'jng' => 'jeung',
-            'jg' => 'juga',
-            'cekin' => 'check in',
-            'cekout' => 'check out',
-            'overtime' => 'lembur',
-            'poto' => 'foto',
-            'photo' => 'foto',
-            'profile' => 'profil',
+            'ak' => 'aku',
             'brp' => 'berapa',
+            'brpa' => 'berapa',
+            'brapa' => 'berapa',
+            'berpa' => 'berapa',
             'kpn' => 'kapan',
             'knp' => 'kenapa',
+            'mna' => 'mana',
+            'dmn' => 'dimana',
+            'sp' => 'siapa',
+            'spa' => 'siapa',
             'udh' => 'sudah',
             'udah' => 'sudah',
+            'sdh' => 'sudah',
             'blm' => 'belum',
+            'blom' => 'belum',
             'gak' => 'tidak',
             'ga' => 'tidak',
             'nggak' => 'tidak',
             'ngga' => 'tidak',
             'enggak' => 'tidak',
             'tdk' => 'tidak',
+            'bisa' => 'bisa',
+            'bsa' => 'bisa',
+            'bs' => 'bisa',
+            'bntu' => 'bantu',
+            'bntuan' => 'bantuan',
+            'tolong' => 'tolong',
+            'tlong' => 'tolong',
+            'tlng' => 'tolong',
+            'bkin' => 'bikin',
+            'bwt' => 'buat',
+            'dn' => 'dan',
+            'jg' => 'juga',
+            'jng' => 'jeung',
+            'bln' => 'bulan',
+            'thn' => 'tahun',
+            'bsk' => 'besok',
+            'bsok' => 'besok',
+            'esok' => 'besok',
+            'kmaren' => 'kemarin',
+            'kmarin' => 'kemarin',
+            'kemaren' => 'kemarin',
+            'kamrin' => 'kemarin',
+            'kmrn' => 'kemarin',
+            // Presensi & Absensi
+            'absennya' => 'absen',
+            'absn' => 'absen',
+            'abasen' => 'absen',
+            'absenk' => 'absen',
+            'absem' => 'absen',
+            'absrn' => 'absen',
+            'abseni' => 'absen',
+            'absent' => 'absen',
+            'absenng' => 'absen',
+            'absnsi' => 'absensi',
+            'absensii' => 'absensi',
+            'cara check in' => 'cara absen masuk',
+            'cara checkin' => 'cara absen masuk',
+            'cara clock in' => 'cara absen masuk',
+            'checkin' => 'check in',
+            'cekin' => 'check in',
+            'cekinnya' => 'check in',
+            'chek in' => 'check in',
+            'chekin' => 'check in',
+            'checkout' => 'check out',
+            'cekout' => 'check out',
+            'cekoutnya' => 'check out',
+            'chek out' => 'check out',
+            'chekout' => 'check out',
+            'biometik' => 'biometrik',
+            'biometrk' => 'biometrik',
+            'biometrikk' => 'biometrik',
+            'koreks' => 'koreksi',
+            'koreksii' => 'koreksi',
+            'jdwl' => 'jadwal',
+            'jadwl' => 'jadwal',
+            'jadwwal' => 'jadwal',
+            'jawdal' => 'jadwal',
+            'jadual' => 'jadwal',
+            'sift' => 'shift',
+            'syif' => 'shift',
+            'syift' => 'shift',
+            'shif' => 'shift',
+            'tuker' => 'tukar',
+            'tker' => 'tukar',
+            'ptongan' => 'potongan',
+            'potngan' => 'potongan',
+            'potongn' => 'potongan',
+            'potonan' => 'potongan',
+            'ptngan' => 'potongan',
+            'dnda' => 'denda',
+            'dnd' => 'denda',
+            'dendaa' => 'denda',
+            // Cuti, Izin, Lembur, Pengajuan
+            'cutii' => 'cuti',
+            'cuty' => 'cuti',
+            'cuyi' => 'cuti',
+            'cyti' => 'cuti',
+            'cti' => 'cuti',
+            'sakir' => 'sakit',
+            'sakitt' => 'sakit',
+            'skit' => 'sakit',
+            'sakt' => 'sakit',
+            'izn' => 'izin',
+            'izinn' => 'izin',
+            'ijin' => 'izin',
+            'ijn' => 'izin',
+            'doktr' => 'dokter',
+            'dktr' => 'dokter',
+            'dokte' => 'dokter',
+            'dokumn' => 'dokumen',
+            'dokumnen' => 'dokumen',
+            'btas' => 'batas',
+            'overtime' => 'lembur',
+            'lembr' => 'lembur',
+            'lembuur' => 'lembur',
+            'lembu' => 'lembur',
+            'lebur' => 'lembur',
+            'lemburr' => 'lembur',
+            'lmbur' => 'lembur',
+            'lmbr' => 'lembur',
+            'lemburna' => 'lembur',
+            'lemburn' => 'lembur',
+            'kasbn' => 'kasbon',
+            'kazbon' => 'kasbon',
+            'kasboon' => 'kasbon',
+            'kasbom' => 'kasbon',
+            'ksbon' => 'kasbon',
+            'ksbn' => 'kasbon',
+            'pngajuan' => 'pengajuan',
+            'pengajun' => 'pengajuan',
+            'pengajuann' => 'pengajuan',
+            'ngajuin' => 'mengajukan',
+            'aprove' => 'approve',
+            'aprov' => 'approve',
+            'apruval' => 'approval',
+            'oprasional' => 'operasional',
+            'opersional' => 'operasional',
+            'matrial' => 'material',
+            'materil' => 'material',
+            // Tiket, Jaringan FTTH (OLT, PON, ODP, User)
+            'tket' => 'tiket',
+            'tikrt' => 'tiket',
+            'tikett' => 'tiket',
+            'tikeet' => 'tiket',
+            'tikwt' => 'tiket',
+            'tkt' => 'tiket',
+            'tiketna' => 'tiket',
+            'reopn' => 'reopen',
+            'gangun' => 'gangguan',
+            'gangguann' => 'gangguan',
+            'gagguan' => 'gangguan',
+            'gangguyan' => 'gangguan',
+            'ganguan' => 'gangguan',
+            'ggn' => 'gangguan',
+            'usre' => 'user',
+            'usr' => 'user',
+            'userr' => 'user',
+            'pelangan' => 'pelanggan',
+            'pelanggann' => 'pelanggan',
+            'planggan' => 'pelanggan',
+            'plggan' => 'pelanggan',
+            'plnggan' => 'pelanggan',
+            'odpp' => 'odp',
+            'odpe' => 'odp',
+            'poon' => 'pon',
+            'ponn' => 'pon',
+            'oltt' => 'olt',
+            'olte' => 'olt',
+            'pnuh' => 'penuh',
+            'peuh' => 'penuh',
+            'bgong' => 'bagong',
+            'indomrt' => 'indomart',
+            'indomaret' => 'indomart',
+            'kordinat' => 'koordinat',
+            'kordinatna' => 'koordinat',
+            'kordinatnya' => 'koordinat',
+            'koordinatna' => 'koordinat',
+            'kapasits' => 'kapasitas',
+            'kapasitass' => 'kapasitas',
+            'kpasitas' => 'kapasitas',
+            // Akun & Sistem
+            'poto' => 'foto',
+            'photo' => 'foto',
+            'potoo' => 'foto',
+            'profile' => 'profil',
+            'profl' => 'profil',
+            'profle' => 'profil',
+            'passwordnya' => 'password',
+            'pasword' => 'password',
+            'passwrod' => 'password',
+            'paswod' => 'password',
+            'paswrd' => 'password',
+            'pswd' => 'password',
+            'pwd' => 'password',
+            'rwayat' => 'riwayat',
+            'mengurusnya' => 'mengurus',
+            'penolakannya' => 'penolakan',
+            'efeknya' => 'efek',
+            // Sunda
+            'kmha' => 'kumaha',
+            'kumha' => 'kumaha',
+            'crana' => 'carana',
+            'crna' => 'carana',
+            'sbrha' => 'sabaraha',
+            'sabarha' => 'sabaraha',
+            'sbrapa' => 'sabaraha',
+            'kmari' => 'kamari',
+            'isukn' => 'isukan',
+            'ayena' => 'ayeuna',
+            'ges' => 'geus',
+            'acn' => 'acan',
+            'nhn' => 'nuhun',
+            'pnten' => 'punten',
+            'mhun' => 'muhun',
+            'nyambng' => 'nyambung',
+            'benget' => 'beungeut',
+            'gring' => 'gering',
+            'meli' => 'meuli',
+            'nyien' => 'nyieun',
+            'skabeh' => 'sakabeh',
+            'pting' => 'peuting',
         ];
 
         foreach ($synonyms as $from => $to) {
@@ -1277,11 +1568,11 @@ class ChatbotService
                                 $found = true;
                                 break;
                             }
-                            if (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && (str_starts_with($ut, $kt) || str_starts_with($kt, $ut))) {
+                            if (mb_strlen($kt) >= 4 && mb_strlen($ut) >= 4 && (str_starts_with($ut, $kt) || str_starts_with($kt, $ut))) {
                                 $found = true;
                                 break;
                             }
-                            if (mb_strlen($kt) >= 5 && mb_strlen($ut) >= 5 && levenshtein($kt, $ut) <= 1) {
+                            if ($this->isTypoMatch($kt, $ut)) {
                                 $found = true;
                                 $weight *= 0.9;
                                 break;
