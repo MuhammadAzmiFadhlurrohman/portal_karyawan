@@ -105,6 +105,8 @@
 
         /* Chat Window Modal Box - Floating Symmetrical Popup */
         .chatbot-modal-box {
+            display: flex !important;
+            flex-direction: column !important;
             position: fixed !important;
             right: 12px !important;
             bottom: 84px !important;
@@ -116,6 +118,7 @@
             max-height: calc(100vh - 96px) !important;
             background: #ffffff !important;
             overflow: hidden !important;
+            overscroll-behavior: contain !important;
             border-radius: 24px !important;
             border: 1px solid rgba(226, 232, 240, 0.95) !important;
             box-shadow: 0 20px 50px -10px rgba(2, 40, 54, 0.38) !important;
@@ -140,6 +143,35 @@
                 width: 440px !important;
                 height: 600px !important;
             }
+        }
+
+        /* Rigid Sticky Header - NEVER Scrolls Away */
+        .chatbot-header-bar {
+            flex-shrink: 0 !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 30 !important;
+            width: 100% !important;
+        }
+
+        /* Independent Scrollable Message Area */
+        #chatbot-messages {
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+            height: 100% !important;
+            max-height: 100% !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            overscroll-behavior: contain !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Rigid Footer & Input Bars */
+        .chatbot-quick-chips {
+            flex-shrink: 0 !important;
+        }
+        .chatbot-input-bar {
+            flex-shrink: 0 !important;
         }
 
         /* Typing cursor animation */
@@ -222,12 +254,13 @@
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-6 scale-95"
          class="chatbot-modal-box flex flex-col origin-bottom-right"
+         @scroll="$el.scrollTop = 0"
          @click.outside="closeChat()"
          @keydown.escape.window="closeChat()"
          style="display: none;">
         
         <!-- Header -->
-        <div class="px-3.5 py-3 sm:px-4 sm:py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
+        <div class="chatbot-header-bar px-3.5 py-3 sm:px-4 sm:py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
              style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
         
             <!-- Subtle decorative background glow -->
@@ -291,7 +324,7 @@
             $chatUserAvatarUrl = auth()->check() ? auth()->user()->avatar_url : null;
             $chatUserInitials = auth()->check() ? (auth()->user()->initials ?? strtoupper(substr(auth()->user()->name ?? 'U', 0, 2))) : 'U';
         @endphp
-        <div id="chatbot-messages" class="flex-1 p-3 sm:p-4 overflow-y-auto overflow-x-hidden space-y-3 bg-slate-50 text-xs">
+        <div id="chatbot-messages" class="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto overflow-x-hidden space-y-3 bg-slate-50 text-xs">
             <template x-for="(msg, index) in messages" :key="index">
                 <div :class="msg.sender === 'user' ? 'flex items-start justify-end gap-2 w-full min-w-0' : 'flex items-start justify-start gap-2 w-full min-w-0'">
                     
@@ -404,7 +437,7 @@
         </div>
 
         <!-- Quick Suggestions -->
-        <div class="px-3 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto text-[11px] scrollbar-none shrink-0">
+        <div class="chatbot-quick-chips px-3 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto text-[11px] scrollbar-none shrink-0">
             <button @click="askPreset('Bagaimana cara absen masuk dan pulang?')" type="button" class="whitespace-nowrap px-2.5 py-1 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-full font-medium transition cursor-pointer">
                 📍 Cara Absen
             </button>
@@ -447,7 +480,7 @@
         </div>
 
         <!-- Input Bar -->
-        <form @submit.prevent="sendMessage()" class="p-2.5 sm:p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
+        <form @submit.prevent="sendMessage()" class="chatbot-input-bar p-2.5 sm:p-3 bg-white border-t border-slate-200 flex items-center gap-1.5 shrink-0">
             <input type="text" 
                    id="chatbot-input-query"
                    x-ref="chatInput"
@@ -523,9 +556,13 @@
                 try {
                     localStorage.setItem(storageKeyMessages, JSON.stringify(this.messages));
                 } catch(e) {}
-                if (this.isOpen) {
-                    this.scrollToBottom();
-                }
+                this.$nextTick(() => {
+                    const modal = document.querySelector('.chatbot-modal-box');
+                    if (modal && modal.scrollTop !== 0) modal.scrollTop = 0;
+                    if (this.isOpen) {
+                        this.scrollToBottom();
+                    }
+                });
             },
             toggleVoiceInput() {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -641,7 +678,9 @@
                 if (this.isOpen) {
                     this.scrollToBottom();
                     setTimeout(() => {
-                        this.$refs.chatInput?.focus();
+                        const modal = document.querySelector('.chatbot-modal-box');
+                        if (modal && modal.scrollTop !== 0) modal.scrollTop = 0;
+                        this.$refs.chatInput?.focus({ preventScroll: true });
                     }, 350);
                 }
             },
@@ -703,6 +742,8 @@
                     if (box) {
                         box.scrollTop = box.scrollHeight;
                     }
+                    const modal = document.querySelector('.chatbot-modal-box');
+                    if (modal && modal.scrollTop !== 0) modal.scrollTop = 0;
 
                     if (currentIndex >= totalLength) {
                         clearInterval(this.activeTypingInterval);
@@ -802,6 +843,8 @@
             },
             scrollToBottom() {
                 this.$nextTick(() => {
+                    const modal = document.querySelector('.chatbot-modal-box');
+                    if (modal && modal.scrollTop !== 0) modal.scrollTop = 0;
                     const box = document.getElementById('chatbot-messages');
                     if (box) box.scrollTop = box.scrollHeight;
                 });
