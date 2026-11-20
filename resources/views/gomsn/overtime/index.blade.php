@@ -883,7 +883,6 @@
                             </div>
                         </div>
                     </div>
-                    </div>
                 @empty
                     <div class="p-8 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
                         <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 shadow-xs">
