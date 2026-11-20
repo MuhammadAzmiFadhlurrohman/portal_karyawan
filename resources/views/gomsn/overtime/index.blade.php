@@ -733,37 +733,37 @@
             @endif
 
             <!-- 2 Kartu Summary Atas (Mobile: 2-Kolom Ringkas & Proporsional) -->
-            <div class="grid grid-cols-2 gap-2.5 sm:gap-4">
+            <div class="grid grid-cols-2 gap-3 sm:gap-4">
                 <!-- Card 1: TOTAL LEMBUR (Mint / Emerald) -->
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 border-t-2 border-emerald-500">
-                    <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 border-t-2 border-emerald-500">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block truncate">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block truncate">
                             TOTAL LEMBUR
                         </span>
-                        <span class="text-sm sm:text-2xl font-black text-slate-900 block mt-0.5 truncate">
+                        <span class="text-base sm:text-2xl font-black text-slate-900 block mt-0.5 truncate">
                             Rp {{ number_format($totalNominalLembur, 0, ',', '.') }}
                         </span>
                     </div>
                 </div>
 
                 <!-- Card 2: RINCIAN PENGAJUAN (Soft Blue) -->
-                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 border-t-2 border-blue-500">
-                    <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-3.5 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-4 border-t-2 border-blue-500">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block truncate">
+                        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 tracking-wider uppercase block truncate">
                             RINCIAN PENGAJUAN
                         </span>
                         <div class="mt-1">
-                            <span class="px-2 py-0.5 sm:px-2.5 rounded-full text-[10.5px] sm:text-xs font-semibold bg-blue-100 text-blue-700 inline-block">
+                            <span class="px-2.5 py-0.5 sm:px-2.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/70 inline-block">
                                 Lembur: {{ $totalCountLembur }}
                             </span>
                         </div>
@@ -772,7 +772,7 @@
             </div>
 
             <!-- 1. MOBILE VIEW: Overtime Request Cards (sm:hidden) -->
-            <div class="sm:hidden space-y-3">
+            <div class="sm:hidden space-y-3.5">
                 @forelse ($lemburList as $idx => $item)
                     @php
                         $hours = floor($item->durasi_menit / 60);
@@ -780,84 +780,93 @@
                         $durasiStr = "{$hours} jam " . sprintf('%02d mnt', $mins);
                         $uangLembur = (int) $item->nominal;
                     @endphp
-                    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-4 space-y-3">
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 space-y-3.5 transition-all">
                         <!-- Top Header: Tanggal & Uang Lembur Badge -->
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="flex items-center gap-2.5 min-w-0">
-                                <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200/80 text-[#155E63] flex flex-col items-center justify-center font-bold text-xs shrink-0">
-                                    <span class="leading-none text-sm font-extrabold">{{ \Carbon\Carbon::parse($item->tanggal)->format('d') }}</span>
-                                    <span class="text-[9px] uppercase tracking-wider text-teal-600 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('M') }}</span>
+                        <div class="flex items-start justify-between gap-2.5">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-b from-teal-50 to-emerald-50/70 border border-teal-200 text-[#0f766e] flex flex-col items-center justify-center font-bold shrink-0 shadow-2xs">
+                                    <span class="leading-none text-base font-black">{{ \Carbon\Carbon::parse($item->tanggal)->format('d') }}</span>
+                                    <span class="text-[10px] uppercase font-bold tracking-wider text-teal-700 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('M') }}</span>
                                 </div>
                                 <div class="min-w-0">
-                                    <span class="text-xs font-bold text-slate-800 block truncate">
+                                    <span class="text-sm font-bold text-slate-900 block truncate leading-tight">
                                         {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, j F Y') }}
                                     </span>
-                                    <span class="text-[10px] text-slate-400 font-mono block">
+                                    <span class="inline-flex items-center font-mono text-[11px] font-semibold text-slate-500 bg-slate-100 border border-slate-200/80 px-2 py-0.5 rounded-md mt-1">
                                         {{ $item->nomor_lembur }}
                                     </span>
                                 </div>
                             </div>
                             <div class="text-right shrink-0">
-                                <span class="text-xs font-extrabold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-xl inline-block">
+                                <span class="text-xs font-black text-blue-700 bg-blue-50 border border-blue-200/80 px-3 py-1.5 rounded-xl inline-block shadow-2xs">
                                     Rp {{ number_format($uangLembur, 0, ',', '.') }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Time & Duration Pill -->
-                        <div class="flex items-center justify-between bg-slate-50/90 border border-slate-100 rounded-xl px-3 py-2 text-xs">
-                            <div class="flex items-center gap-1.5 text-slate-600">
-                                <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <div class="flex items-center justify-between bg-slate-50/90 border border-slate-200/70 rounded-xl px-3.5 py-2.5 text-xs">
+                            <div class="flex items-center gap-2 text-slate-700">
+                                <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span class="font-medium text-slate-800">
+                                <span class="font-bold text-slate-800 text-[13px]">
                                     {{ \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') }} &ndash; {{ \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') }}
                                 </span>
                             </div>
-                            <span class="font-bold text-slate-700 bg-white border border-slate-200/80 px-2 py-0.5 rounded-lg text-[11px]">
+                            <span class="font-extrabold text-slate-800 bg-white border border-slate-200 shadow-2xs px-2.5 py-1 rounded-lg text-xs inline-flex items-center gap-1">
+                                <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 {{ $durasiStr }}
                             </span>
                         </div>
 
                         <!-- Alasan Section -->
-                        <div class="text-xs">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Alasan Lembur:</span>
-                            <p class="text-slate-700 bg-slate-50/60 p-2.5 rounded-xl border border-slate-100/90 text-xs leading-relaxed break-words">
+                        <div>
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                </svg>
+                                <span>Alasan Lembur</span>
+                            </span>
+                            <div class="text-slate-800 bg-slate-50/70 p-3 rounded-xl border border-slate-200/70 text-[13px] leading-relaxed break-words font-normal">
                                 {{ $item->alasan }}
-                            </p>
+                            </div>
                         </div>
 
                         <!-- Status & Action Footer -->
-                        <div class="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                             <!-- Status Badge -->
                             <div>
                                 @if ($item->status === 'paid')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         <span>Selesai Dibayar</span>
                                     </span>
                                 @elseif ($item->status === 'approved_atasan')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                                        Disetujui Atasan
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200 shadow-2xs">
+                                        <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Disetujui Atasan</span>
                                     </span>
                                 @elseif ($item->status === 'rejected')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                        Ditolak
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs">
+                                        <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <span>Ditolak</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                        Menunggu Approval
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                                        <span>Menunggu Approval</span>
                                     </span>
                                 @endif
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="flex items-center gap-1.5 ml-auto">
+                            <div class="flex items-center gap-2 ml-auto">
                                 <!-- Finance Pay Button -->
                                 @if ($isFinance && $item->status === 'approved_atasan')
                                     <button type="button" 
                                             @click="openPayModal({{ $item->id }}, '{{ $item->nomor_lembur }}', '{{ $item->user->name }}', {{ $uangLembur }})"
-                                            class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                                            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
                                         Bayar Lembur
                                     </button>
                                 @endif
@@ -867,7 +876,7 @@
                                     <form method="POST" action="{{ route('gomsn.overtime.approve', $item->id) }}" class="inline">
                                         @csrf
                                         <button type="submit" 
-                                                class="px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition cursor-pointer" 
+                                                class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition cursor-pointer" 
                                                 onclick="return confirm('Setujui pengajuan lembur ini?')">
                                             Setujui
                                         </button>
@@ -875,7 +884,7 @@
                                     <form method="POST" action="{{ route('gomsn.overtime.reject', $item->id) }}" class="inline">
                                         @csrf
                                         <button type="submit" 
-                                                class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition cursor-pointer" 
+                                                class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition cursor-pointer" 
                                                 onclick="return confirm('Tolak pengajuan lembur ini?')">
                                             Tolak
                                         </button>
@@ -883,6 +892,7 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
                     </div>
                 @empty
                     <div class="p-8 text-center bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
