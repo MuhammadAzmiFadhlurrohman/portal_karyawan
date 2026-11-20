@@ -106,30 +106,30 @@
         /* Chat Window Modal Box - Floating Symmetrical Popup */
         .chatbot-modal-box {
             position: fixed !important;
-            left: 8px !important;
-            right: 8px !important;
-            bottom: 86px !important;
+            right: 12px !important;
+            bottom: 84px !important;
+            left: auto !important;
             z-index: 60 !important;
-            width: auto !important;
-            max-width: 420px !important;
-            margin: 0 auto !important;
+            width: 380px !important;
+            max-width: calc(100vw - 24px) !important;
             height: 520px !important;
-            max-height: calc(100vh - 100px) !important;
+            max-height: calc(100vh - 96px) !important;
             background: #ffffff !important;
             overflow: hidden !important;
             border-radius: 24px !important;
             border: 1px solid rgba(226, 232, 240, 0.95) !important;
             box-shadow: 0 20px 50px -10px rgba(2, 40, 54, 0.38) !important;
+            margin: 0 !important;
         }
         @media (min-width: 640px) {
             .chatbot-modal-box {
+                right: 24px !important;
+                bottom: 24px !important;
                 left: auto !important;
-                right: 28px !important;
-                bottom: 28px !important;
                 width: 420px !important;
                 max-width: calc(100vw - 48px) !important;
                 height: 580px !important;
-                max-height: calc(100vh - 56px) !important;
+                max-height: calc(100vh - 48px) !important;
                 margin: 0 !important;
                 border-radius: 28px !important;
                 box-shadow: 0 24px 60px -15px rgba(2, 40, 54, 0.35) !important;
@@ -332,8 +332,8 @@
                             </div>
                         </template>
 
-                        <!-- 2 Rekomendasi Pertanyaan Jika Bot Butuh Klarifikasi / Tidak Mengerti -->
-                        <template x-if="!msg.isTyping && msg.suggestions && msg.suggestions.length > 0">
+                        <!-- 2 Rekomendasi Pertanyaan Hanya Jika Bot Butuh Klarifikasi / Tidak Mengerti (Tidak Ditampilkan Bila Ada Jawaban/Aksi) -->
+                        <template x-if="!msg.isTyping && msg.suggestions && msg.suggestions.length > 0 && !msg.action_url && (!msg.text || (!msg.text.includes('Data Infrastruktur') && !msg.text.includes('Detail Distribusi') && !msg.text.includes('Data Pelanggan')))">
                             <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1.5 transition-opacity duration-300">
                                 <p class="text-[10px] font-semibold text-slate-500 flex items-center gap-1.5 mb-0.5">
                                     <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -491,7 +491,13 @@
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed) && parsed.length > 0) {
-                    parsed.forEach(m => { m.isTyping = false; });
+                    parsed.forEach(m => {
+                        m.isTyping = false;
+                        // Bersihkan rekomendasi lama pada pesan yang sudah terjawab
+                        if (m.sender === 'bot' && (m.action_url || (m.text && (m.text.includes('Data Infrastruktur') || m.text.includes('Detail Distribusi') || m.text.includes('Data Pelanggan'))))) {
+                            m.suggestions = null;
+                        }
+                    });
                     initialMessages = parsed;
                 }
             }
@@ -508,7 +514,15 @@
             activeTypingInterval: null,
             messages: initialMessages,
             init() {
-                this.messages.forEach(m => { m.isTyping = false; });
+                this.messages.forEach(m => {
+                    m.isTyping = false;
+                    if (m.sender === 'bot' && (m.action_url || (m.text && (m.text.includes('Data Infrastruktur') || m.text.includes('Detail Distribusi') || m.text.includes('Data Pelanggan'))))) {
+                        m.suggestions = null;
+                    }
+                });
+                try {
+                    localStorage.setItem(storageKeyMessages, JSON.stringify(this.messages));
+                } catch(e) {}
                 if (this.isOpen) {
                     this.scrollToBottom();
                 }
