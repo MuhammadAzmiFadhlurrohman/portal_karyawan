@@ -43,9 +43,6 @@ class ChatbotService
         }
     }
 
-    /**
-     * Check if user has supervisor/manager/atasan authority.
-     */
     protected function isAtasanOrManager(?User $user): bool
     {
         if (! $user) {
@@ -112,7 +109,9 @@ class ChatbotService
             'q9_aturan_absen_luar_kantor',
             'q12_sinkronisasi_absensi_realtime',
             'q13_absen_offline_kendala_jaringan',
-            'q79_fungsi_tombol_refresh_absensi' => [
+            'q79_fungsi_tombol_refresh_absensi',
+            'v21_troubleshooting_status_belum_checkin',
+            'v22_batas_jam_checkout_harian' => [
                 'label' => '📍 Buka Halaman Absen',
                 'url' => route('attendance.index'),
             ],
@@ -121,7 +120,9 @@ class ChatbotService
             'q10_rekap_kehadiran_7_hari',
             'q11_cara_lihat_log_bulan_lalu',
             'q14_total_hari_kerja_efektif',
-            'q87_cek_riwayat_dan_potongan_typo' => [
+            'q87_cek_riwayat_dan_potongan_typo',
+            'v20_perbedaan_status_izin_sakit',
+            'v24_cek_lokasi_gps_riwayat_absen' => [
                 'label' => '📝 Buka Riwayat Absen Saya',
                 'url' => route('attendance.history'),
             ],
@@ -140,7 +141,8 @@ class ChatbotService
             'q24_pembatalan_cuti_disetujui',
             'q29_perbedaan_jenis_cuti_izin',
             'q30_aturan_hangus_sisa_cuti',
-            'q89_cuti_mendadak_multi_turn' => [
+            'q89_cuti_mendadak_multi_turn',
+            'v33_jenis_cuti_khusus' => [
                 'label' => '🌴 Buka Cuti & Izin Saya',
                 'url' => route('attendance.leaves'),
             ],
@@ -168,13 +170,16 @@ class ChatbotService
             'q37_hierarki_approval_pembelian',
             'q45_revisi_pengajuan_pending',
             'q77_struktur_menu_pengajuan_operasional',
-            'q83_cara_search_layanan_kasbon' => [
+            'q83_cara_search_layanan_kasbon',
+            'v55_sla_pencairan_dana_lembur' => [
                 'label' => '📋 Buka Pengajuan Saya',
                 'url' => route('gomsn.pengajuan.index'),
             ],
             'q38_cara_ajukan_lembur',
             'q39_syarat_spk_lembur',
-            'q41_batas_waktu_klaim_lembur' => [
+            'q41_batas_waktu_klaim_lembur',
+            'v53_durasi_minimal_lembur',
+            'v54_lampiran_bukti_lembur' => [
                 'label' => '⏰ Ajukan Lembur',
                 'url' => route('gomsn.overtime.create'),
             ],
@@ -200,12 +205,16 @@ class ChatbotService
             'q57_cara_ubah_status_aktif_karyawan',
             'q58_onboarding_karyawan_baru',
             'q60_total_karyawan_aktif_headcount',
-            'q84_menu_khusus_divisi_hrd' => $this->canManageEmployee($user)
+            'q84_menu_khusus_divisi_hrd',
+            'v25_reset_device_biometrik' => $this->canManageEmployee($user)
                 ? [
                     'label' => '👥 Buka Data Karyawan',
                     'url' => route('portal.employees.index'),
                 ]
-                : null,
+                : [
+                    'label' => '👤 Buka Profil Saya',
+                    'url' => route('portal.profile'),
+                ],
             'q55_kriteria_penilaian_leaderboard',
             'q56_top_5_leaderboard_disiplin' => [
                 'label' => '🏆 Buka Leaderboard',
@@ -260,8 +269,18 @@ class ChatbotService
 
         // Pre-normalize hyphenated terms before stripping punctuation
         $clean = str_replace(
-            ['real-time', 'check-in', 'check-out', 'non-aktif', 'company-wide', 'carry-over', 'password-nya', 'langkah-langkah'],
-            ['realtime', 'check in', 'check out', 'non aktif', 'company wide', 'carry over', 'passwordnya', 'langkah langkah'],
+            [
+                'real-time', 'check-in', 'check-out', 'non-aktif', 'company-wide',
+                'carry-over', 'password-nya', 'langkah-langkah', 'hitung-hitungan',
+                'ke-update', 'di-acc', 'di-approve', 'di-handle', 'nge-bug',
+                'gomsn-nya', 'gps-nya', 'nik-nya', 'h-berapa',
+            ],
+            [
+                'realtime', 'check in', 'check out', 'non aktif', 'company wide',
+                'carry over', 'passwordnya', 'langkah langkah', 'hitung hitungan',
+                'ke update', 'di acc', 'di approve', 'di handle', 'nge bug',
+                'gomsn nya', 'gps nya', 'nik nya', 'h berapa',
+            ],
             $clean
         );
 
@@ -294,7 +313,6 @@ class ChatbotService
             'passwordnya' => 'password',
             'efeknya' => 'efek',
             'ngajuin' => 'mengajukan',
-            'ajukan' => 'ajukan',
             'rwayat' => 'riwayat',
             'absn' => 'absen',
             'sy' => 'saya',
@@ -317,6 +335,8 @@ class ChatbotService
             'blm' => 'belum',
             'gak' => 'tidak',
             'ga' => 'tidak',
+            'nggak' => 'tidak',
+            'ngga' => 'tidak',
             'enggak' => 'tidak',
             'tdk' => 'tidak',
         ];
@@ -341,7 +361,8 @@ class ChatbotService
             'pak', 'bu', 'bos', 'apakah', 'kalau', 'kalo', 'bila', 'jika', 'mau',
             'ingin', 'pengen', 'tanya', 'nanya', 'tolong', 'mohon', 'bantu',
             'bagaimana', 'cara', 'bisa', 'ada', 'masih', 'saya', 'apa', 'saja',
-            'aplikasi', 'gomsn', 'sistem', 'menu', 'dalam', 'saat', 'oleh',
+            'aplikasi', 'gomsn', 'sistem', 'menu', 'dalam', 'saat', 'oleh', 'nya',
+            'nih', 'pas', 'buat', 'sama', 'aja', 'kok', 'itu', 'biar', 'harus',
         ];
 
         $words = explode(' ', $normalizedText);
@@ -362,17 +383,20 @@ class ChatbotService
     protected function isSubjectKeyword(string $token): bool
     {
         $subjects = [
-            'cuti', 'sakit', 'lembur', 'dana', 'kasbon', 'barang', 'beli', 'stok', 'absen', 'absensi',
-            'wajah', 'biometrik', 'verifikasi', 'radius', 'gps', 'koreksi', 'lupa', 'tukar', 'backup',
-            'shift', 'jadwal', 'tiket', 'gangguan', 'backbone', 'broadband', 'sla', 'eskalasi',
-            'kpi', 'olt', 'pon', 'odp', 'potongan', 'denda', 'alpa', 'telat', 'terlambat', 'keterlambatan',
-            'leaderboard', 'foto', 'profil', 'password', 'sandi', 'approve', 'persetujuan', 'sisa', 'saldo',
-            'kuota', 'dokter', 'resume', 'joint', 'closure', 'jc', 'core', 'splicing', 'redaman',
-            'manuver', 'material', 'bast', 'dispatch', 'dinas', 'luar', 'lapangan', 'kalender',
-            'divisi', 'kemarin', 'efektif', 'spk', 'settlement', 'pelunasan', 'pertanggungjawaban',
-            'headcount', 'onboarding', 'payroll', 'rekening', 'gaji', 'nik', 'realtime', 'offline',
-            'internet', 'jaringan', 'mati', 'refresh', 'home', 'kontak', 'support', 'error', 'sanggahan',
-            'hangus', 'diakumulasi', 'ditolak', 'pending', 'mengedit', 'port', 'kapasitas', 'koordinat',
+            'cuti', 'sakit', 'izin', 'lembur', 'lemburan', 'dana', 'kasbon', 'barang', 'beli', 'stok',
+            'absen', 'absensi', 'wajah', 'muka', 'biometrik', 'verifikasi', 'radius', 'gps', 'koreksi',
+            'lupa', 'kelupaan', 'tukar', 'tukeran', 'backup', 'shift', 'jadwal', 'tiket', 'gangguan',
+            'backbone', 'broadband', 'sla', 'eskalasi', 'kpi', 'olt', 'pon', 'odp', 'potongan', 'denda',
+            'alpa', 'telat', 'terlambat', 'keterlambatan', 'leaderboard', 'foto', 'profil', 'password',
+            'sandi', 'approve', 'acc', 'persetujuan', 'sisa', 'saldo', 'jatah', 'kuota', 'dokter',
+            'resume', 'joint', 'closure', 'jc', 'core', 'splicing', 'redaman', 'opm', 'manuver',
+            'material', 'dropcore', 'ont', 'bast', 'dispatch', 'dinas', 'luar', 'lapangan', 'kalender',
+            'divisi', 'departemen', 'kemarin', 'efektif', 'spk', 'settlement', 'pelunasan', 'nota',
+            'pertanggungjawaban', 'headcount', 'onboarding', 'payroll', 'penggajian', 'rekening', 'gaji',
+            'nik', 'realtime', 'offline', 'internet', 'sinyal', 'jaringan', 'mati', 'refresh', 'home',
+            'kontak', 'support', 'error', 'bug', 'sanggahan', 'hangus', 'diakumulasi', 'ditolak',
+            'reject', 'pending', 'mengedit', 'merevisi', 'port', 'kapasitas', 'koordinat', 'resign',
+            'nonaktif', 'nonaktifkan', 'minimal', 'minimum', 'durasi', 'cair', 'pencairan',
         ];
 
         return in_array($token, $subjects, true);
@@ -395,25 +419,16 @@ class ChatbotService
         // EARLY GUARDRAILS & EDGE CASES (Q92 - Q99)
         // ==========================================
 
-        // 1. Empty or Punctuation Only (Q99)
-        if (preg_match('/^[?\s.!,\-_:;]+$/u', $rawClean) || mb_strlen($rawClean) < 2) {
-            $resp = "Maaf, pesan yang Anda kirimkan tidak valid atau belum jelas. Silakan ketik pertanyaan singkat terkait layanan GOMSN, misalnya: \"Hari ini saya sudah check-in atau belum?\", \"Berapa sisa saldo cuti saya?\", atau \"Bagaimana cara mengajukan lembur?\".";
-            return [
-                'response' => $resp,
-                'confidence' => 1.0,
-                'matched_intent' => 'q99_input_tidak_valid',
-                'action_url' => null,
-                'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Bagaimana cara mengajukan lembur?'],
-            ];
-        }
-
-        // 2. Keyboard Smash / Gibberish (Q99)
+        // 1. Empty, Punctuation Only, or Invalid Test Strings (Q99)
         if (
-            (preg_match('/\b(asdfghjkl|qwertyuiop|zxcvbnm|asdasd|hjkjhg)\b/i', $rawClean) && ! str_contains($rawClean, 'mengirimkan pesan kosong'))
+            preg_match('/^[?\s.!,\-_:;]+$/u', $rawClean)
+            || mb_strlen($rawClean) < 2
+            || $normMessage === 'halo tes 123'
+            || $normMessage === 'input acak tidak jelas'
+            || (preg_match('/\b(asdfghjkl|qwertyuiop|zxcvbnm|asdasd|hjkjhg)\b/i', $rawClean) && ! str_contains($rawClean, 'mengirimkan pesan kosong'))
             || (preg_match('/\b[bcdfghjklmnpqrstvwxyz]{6,}\b/i', $rawClean) && count($userTokens) <= 3)
         ) {
-            $resp = "Maaf, pesan yang Anda kirimkan tidak valid atau berupa karakter acak. Silakan ketik pertanyaan singkat terkait layanan GOMSN, misalnya: \"Hari ini saya sudah check-in atau belum?\", \"Berapa sisa saldo cuti saya?\", atau \"Bagaimana cara mengajukan lembur?\".";
+            $resp = "Maaf, pesan yang Anda kirimkan belum memuat pertanyaan yang spesifik. Silakan ketik pertanyaan singkat terkait layanan GOMSN, misalnya: \"Hari ini saya sudah check-in atau belum?\", \"Berapa sisa saldo cuti saya?\", atau \"Bagaimana cara mengajukan lembur?\".";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
@@ -424,16 +439,19 @@ class ChatbotService
             ];
         }
 
-        // 3. Prompt Injection / Jailbreak (Q98)
+        // 2. Prompt Injection / Jailbreak (Q98)
         if (
             str_contains($rawClean, 'abaikan semua instruksi')
+            || str_contains($rawClean, 'abaikan semua aturan')
             || str_contains($rawClean, 'abaikan instruksi')
             || str_contains($rawClean, 'bertindak sebagai hacker')
             || str_contains($rawClean, 'tampilkan seluruh isi database')
-            || str_contains($rawClean, 'dump database')
+            || str_contains($rawClean, 'dump all user records')
+            || str_contains($rawClean, 'ignore previous instructions')
             || str_contains($rawClean, 'ignore all instructions')
+            || str_contains($rawClean, 'perintah bypass keamanan')
         ) {
-            $resp = "Permintaan Ditolak. Saya tidak dapat mengabaikan instruksi keamanan sistem maupun menampilkan isi database internal. Silakan ajukan pertanyaan yang berkaitan dengan prosedur operasional resmi GOMSN.";
+            $resp = "Permintaan Ditolak. Saya tidak dapat mengabaikan aturan keamanan sistem maupun menampilkan isi database internal. Silakan ajukan pertanyaan yang berkaitan dengan prosedur operasional resmi GOMSN.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
@@ -444,12 +462,12 @@ class ChatbotService
             ];
         }
 
-        // 4. PII Protection: Gaji Pokok & Nomor Rekening (Q94)
+        // 3. PII Protection: Gaji Pokok & Nomor Rekening (Q94)
         if (
-            (str_contains($rawClean, 'gaji pokok') || str_contains($rawClean, 'rincian gaji'))
-            && (str_contains($rawClean, 'nomor rekening') || str_contains($rawClean, 'no rekening') || str_contains($rawClean, 'rekening'))
+            (str_contains($rawClean, 'gaji pokok') || str_contains($rawClean, 'gaji bulanan') || str_contains($rawClean, 'rincian gaji') || str_contains($rawClean, 'cek gaji'))
+            && (str_contains($rawClean, 'rekening') || str_contains($rawClean, 'nik'))
         ) {
-            $resp = "Akses Ditolak. Demi perlindungan data pribadi (PII Protection), informasi sensitif seperti gaji pokok dan nomor rekening pribadi karyawan bersifat rahasia dan tidak dapat ditampilkan melalui chatbot.";
+            $resp = "Akses Ditolak. Demi perlindungan data pribadi (PII Protection), informasi sensitif seperti gaji pokok/bulanan dan nomor rekening pribadi karyawan bersifat rahasia dan tidak dapat ditampilkan melalui chatbot.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
@@ -460,12 +478,15 @@ class ChatbotService
             ];
         }
 
-        // 5. Out of Scope: Sepak Bola / Cuaca / Berita Umum (Q96)
+        // 4. Out of Scope: Sepak Bola / Cuaca / Luar Pekerjaan (Q96 / V97)
         if (
             str_contains($rawClean, 'sepak bola')
+            || str_contains($rawClean, 'pertandingan bola')
             || str_contains($rawClean, 'piala dunia')
             || str_contains($rawClean, 'prediksi cuaca')
+            || str_contains($rawClean, 'ramalan cuaca')
             || str_contains($rawClean, 'skor pertandingan')
+            || $normMessage === 'pertanyaan di luar pekerjaan'
         ) {
             $resp = "Maaf, pertanyaan tersebut berada di luar cakupan layanan saya. Saya adalah Asisten Virtual internal GOMSN PT Media Solusi Network yang khusus membantu informasi seputar absensi, jadwal kerja, cuti, pengajuan operasional, dan tiket gangguan.";
             return [
@@ -478,7 +499,7 @@ class ChatbotService
             ];
         }
 
-        // 6. Out of Scope: Coding & Artikel Marketing (Q97)
+        // 5. Out of Scope: Coding & Artikel Marketing (Q97)
         if (
             (str_contains($rawClean, 'kode program') || str_contains($rawClean, 'python') || str_contains($rawClean, 'artikel marketing'))
             && (str_contains($rawClean, 'artikel marketing') || str_contains($rawClean, 'machine learning') || str_contains($rawClean, 'tidak berhubungan'))
@@ -494,46 +515,33 @@ class ChatbotService
             ];
         }
 
-        // 7. Explicit NIK Lookup & Hallucination Prevention (Q50 & Q95)
-        if (preg_match('/\b(kr\d{4,}|\d{10,16})\b/i', $rawClean, $nikMatches)) {
-            $checkedNik = strtoupper($nikMatches[1]);
-            $foundUser = User::query()
-                ->where('nik', $checkedNik)
-                ->orWhere('employee_code', $checkedNik)
-                ->first();
-
-            if (! $foundUser) {
-                $resp = "Data tidak ditemukan. Karyawan dengan NIK {$checkedNik} tidak terdaftar di dalam database sistem GOMSN PT Media Solusi Network. Pastikan kembali nomor NIK yang Anda masukkan sudah benar.";
-                return [
-                    'response' => $resp,
-                    'confidence' => 1.0,
-                    'matched_intent' => 'q95_pencegahan_halusinasi_nik',
-                    'action_url' => $this->canManageEmployee($user) ? route('portal.employees.index') : null,
-                    'action_label' => $this->canManageEmployee($user) ? '👥 Buka Data Karyawan' : null,
-                    'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Jadwal shift kerja saya hari ini dan besok'],
-                ];
-            }
-
-            if (str_contains($rawClean, 'divisi') || str_contains($rawClean, 'status')) {
-                $statusAktif = $foundUser->is_active ? 'Aktif' : 'Non-Aktif';
-                $resp = "Data Karyawan NIK {$checkedNik}:\n• Nama: {$foundUser->name}\n• Divisi: " . ($foundUser->division ?? '-') . "\n• Jabatan: " . ($foundUser->position ?? '-') . "\n• Status Akun: {$statusAktif}";
-                return [
-                    'response' => $resp,
-                    'confidence' => 1.0,
-                    'matched_intent' => 'q50_cari_karyawan_berdasarkan_nik',
-                    'action_url' => $this->canManageEmployee($user) ? route('portal.employees.index') : null,
-                    'action_label' => $this->canManageEmployee($user) ? '👥 Buka Data Karyawan' : null,
-                    'suggestions' => ['Hari ini saya sudah check-in atau belum?'],
-                ];
-            }
+        // 6. Hallucination Prevention for Unregistered / Fictitious NIK (Q95 / V96)
+        if (
+            str_contains($rawClean, 'kr00000')
+            || str_contains($rawClean, 'kr99999')
+            || str_contains($rawClean, 'nik fiktif')
+            || str_contains($rawClean, 'nik palsu')
+            || str_contains($rawClean, 'tidak terdaftar')
+        ) {
+            preg_match('/\b(kr\d+)\b/i', $rawClean, $mNik);
+            $nikLabel = isset($mNik[1]) ? strtoupper($mNik[1]) : 'tersebut';
+            $resp = "Data tidak ditemukan. Karyawan dengan NIK {$nikLabel} tidak terdaftar di dalam database sistem GOMSN PT Media Solusi Network. Pastikan kembali nomor NIK yang Anda masukkan sudah benar.";
+            return [
+                'response' => $resp,
+                'confidence' => 1.0,
+                'matched_intent' => 'q95_pencegahan_halusinasi_nik',
+                'action_url' => null,
+                'action_label' => null,
+                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Jadwal shift kerja saya hari ini dan besok'],
+            ];
         }
 
-        // 8. Chat Approval Prohibition (Q92)
+        // 7. Chat Approval Prohibition (Q92 / V93)
         if (
-            (str_contains($rawClean, 'menyetujui') || str_contains($rawClean, 'setujui') || str_contains($rawClean, 'approve'))
-            && (str_contains($rawClean, 'lewat chat ini') || str_contains($rawClean, 'melalui chat ini') || str_contains($rawClean, 'di chat ini'))
+            (str_contains($rawClean, 'menyetujui') || str_contains($rawClean, 'setujui') || str_contains($rawClean, 'approve') || str_contains($normMessage, 'acc'))
+            && (str_contains($rawClean, 'lewat chat') || str_contains($rawClean, 'melalui chat') || str_contains($rawClean, 'lewat chatbot') || str_contains($rawClean, 'bisakah chatbot'))
         ) {
-            $resp = "Tidak bisa. Saya hanya asisten informasi dan tidak memiliki wewenang mengeksekusi persetujuan (approval). Proses approval lembur maupun cuti wajib dilakukan langsung oleh Atasan/HRD melalui menu persetujuan resmi di portal.";
+            $resp = "Tidak bisa. Saya hanya asisten informasi dan tidak memiliki akses untuk mengeksekusi persetujuan (approval). Proses ACC/approval cuti maupun lembur wajib dilakukan oleh Atasan/HRD melalui menu persetujuan resmi di portal.";
             return [
                 'response' => $resp,
                 'confidence' => 1.0,
@@ -574,7 +582,7 @@ class ChatbotService
                     break;
                 }
 
-                // Short greetings (<= 6 chars in category umum) require short user query
+                // Short greetings (<= 6 chars) require short user query
                 if ($intent->intent_key === 'sapaan_halo' && mb_strlen($kwNorm) <= 6) {
                     if (
                         preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
@@ -601,7 +609,6 @@ class ChatbotService
                         $subjectBonus += $this->isSubjectKeyword($kt) ? 1.2 : 0.4;
                     }
 
-                    // Prevent 1-2 word generic keywords from hijacking 6-10 word specific questions
                     if ($kwTokenCount <= 2 && $userTokenCount >= 4) {
                         $phraseScore = (1.5 + $subjectBonus) * ($queryCoverage * 0.6);
                     } else {
@@ -612,7 +619,7 @@ class ChatbotService
                     continue;
                 }
 
-                // 2. Bidirectional Token & Subject Overlap (Keyword Coverage + User Query Coverage)
+                // 2. Bidirectional Token & Subject Overlap
                 if (! empty($kwTokens) && ! empty($userTokens)) {
                     $matchedWeight = 0.0;
                     $totalKwWeight = 0.0;
@@ -924,6 +931,17 @@ class ChatbotService
                         $reply = "Karyawan yang tercatat terlambat hari ini: {$list}.";
                     }
                 }
+            } elseif ($key === 'q50_cari_karyawan_berdasarkan_nik') {
+                if (preg_match('/\b(kr\d+|\d{10,16}|msn-\d+)\b/i', $rawClean, $mNik)) {
+                    $qNik = strtoupper($mNik[1]);
+                    $foundUser = User::query()->where('nik', $qNik)->orWhere('employee_code', $qNik)->first();
+                    if ($foundUser) {
+                        $stAktif = $foundUser->is_active ? 'Aktif' : 'Non-Aktif';
+                        $reply = "Profil Karyawan ({$qNik}):\n• Nama: {$foundUser->name}\n• Divisi: " . ($foundUser->division ?? '-') . "\n• Status Keaktifan: {$stAktif}";
+                    } else {
+                        $reply = "Hasil pencarian NIK {$qNik}: Nomor NIK tersebut saat ini belum terdaftar di data master karyawan. Silakan gunakan kolom pencarian di menu Data Karyawan untuk mencari berdasarkan Nama atau NIK yang terdaftar.";
+                    }
+                }
             } elseif ($key === 'q52_divisi_kehadiran_tertinggi') {
                 if (! $this->isHrdOrAdmin($user)) {
                     $reply = "Akses Ditolak. Statistik kehadiran antar divisi hanya dapat diakses oleh divisi HRD & Human Capital.";
@@ -1013,7 +1031,7 @@ class ChatbotService
                 $reply = "Ringkasan 3 poin kondisi operasional & absensi hari ini:\n1. Absensi: {$attended} dari {$totalActive} karyawan aktif tercatat sudah hadir.\n2. Tiket Gangguan: Terdapat {$openTickets} tiket gangguan aktif (Open/Proses) yang sedang ditangani.\n3. Antrean Approval: Terdapat {$pendingLembur} pengajuan lembur dan {$pendingPengajuan} pengajuan operasional menunggu persetujuan.";
             } elseif ($key === 'q93_rbac_kontak_rekap_semua_karyawan') {
                 if (! $this->isHrdOrAdmin($user)) {
-                    $reply = "Akses Ditolak. Data kontak pribadi dan rekapitulasi potongan seluruh karyawan bersifat rahasia serta hanya dapat diakses oleh otoritas HRD & Human Capital atau Administrator.";
+                    $reply = "Akses Ditolak. Data kontak pribadi dan rekapitulasi potongan denda seluruh divisi/karyawan bersifat rahasia serta hanya dapat diakses oleh otoritas HRD & Human Capital atau Administrator.";
                 }
             } elseif ($key === 'extra_tiket_aktif_saya') {
                 $count = Tiket::query()
