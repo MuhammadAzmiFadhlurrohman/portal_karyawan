@@ -781,38 +781,28 @@
                         $uangLembur = (int) $item->nominal;
 
                         $statusBorder = match($item->status) {
-                            'paid' => 'border-l-4 border-l-emerald-500',
-                            'approved_atasan' => 'border-l-4 border-l-sky-500',
-                            'rejected' => 'border-l-4 border-l-rose-500',
-                            default => 'border-l-4 border-l-amber-500',
+                            'paid' => 'border-emerald-300 border-l-[6px] border-l-emerald-500 bg-gradient-to-br from-emerald-50/20 via-white to-white',
+                            'approved_atasan' => 'border-sky-300 border-l-[6px] border-l-sky-500 bg-gradient-to-br from-sky-50/20 via-white to-white',
+                            'rejected' => 'border-rose-300 border-l-[6px] border-l-rose-500 bg-gradient-to-br from-rose-50/20 via-white to-white',
+                            default => 'border-amber-300 border-l-[6px] border-l-amber-500 bg-gradient-to-br from-amber-50/20 via-white to-white',
                         };
                     @endphp
-                    <div class="bg-white rounded-2xl border border-slate-200 {{ $statusBorder }} shadow-xs hover:shadow-md p-4 sm:p-5 space-y-3.5 transition-all">
-                        <!-- Top Header: Tanggal & Uang Lembur Badge -->
-                        <div class="flex items-start justify-between gap-2.5">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-b from-teal-50 to-emerald-50/70 border-2 border-teal-200/90 text-[#0f766e] flex flex-col items-center justify-center font-bold shrink-0 shadow-2xs">
-                                    <span class="leading-none text-base font-black">{{ \Carbon\Carbon::parse($item->tanggal)->format('d') }}</span>
-                                    <span class="text-[10px] uppercase font-black tracking-wider text-teal-700 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('M') }}</span>
-                                </div>
-                                <div class="min-w-0">
-                                    <span class="text-sm font-bold text-slate-900 block truncate leading-tight">
-                                        {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, j F Y') }}
-                                    </span>
-                                    <span class="inline-flex items-center font-mono text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-300/80 px-2 py-0.5 rounded-md mt-1">
-                                        {{ $item->nomor_lembur }}
-                                    </span>
-                                </div>
+                    <div class="rounded-2xl border-2 {{ $statusBorder }} shadow-sm hover:shadow-md p-4 sm:p-5 space-y-3.5 transition-all">
+                        <!-- Top Header: Tanggal Lembur -->
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-50 border-2 border-teal-300 text-[#0f766e] flex flex-col items-center justify-center font-bold shrink-0 shadow-2xs">
+                                <span class="leading-none text-base font-black">{{ \Carbon\Carbon::parse($item->tanggal)->format('d') }}</span>
+                                <span class="text-[10px] uppercase font-black tracking-wider text-teal-700 mt-0.5">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('M') }}</span>
                             </div>
-                            <div class="text-right shrink-0">
-                                <span class="text-xs font-black text-blue-700 bg-blue-50 border-2 border-blue-200/90 px-3 py-1.5 rounded-xl inline-block shadow-2xs">
-                                    Rp {{ number_format($uangLembur, 0, ',', '.') }}
+                            <div class="min-w-0">
+                                <span class="text-sm font-bold text-slate-900 block truncate leading-tight">
+                                    {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('l, j F Y') }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Time & Duration Pill -->
-                        <div class="flex items-center justify-between bg-slate-50/90 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs shadow-2xs">
+                        <div class="flex items-center justify-between bg-slate-50/90 border-2 border-slate-200 rounded-xl px-3.5 py-2.5 text-xs shadow-2xs">
                             <div class="flex items-center gap-2 text-slate-700">
                                 <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -821,14 +811,14 @@
                                     {{ \Carbon\Carbon::parse($item->jam_mulai)->format('H:i') }} &ndash; {{ \Carbon\Carbon::parse($item->jam_selesai)->format('H:i') }}
                                 </span>
                             </div>
-                            <span class="font-extrabold text-slate-800 bg-white border border-slate-200 shadow-2xs px-2.5 py-1 rounded-lg text-xs inline-flex items-center gap-1">
+                            <span class="font-extrabold text-slate-800 bg-white border-2 border-slate-200 shadow-2xs px-2.5 py-1 rounded-lg text-xs inline-flex items-center gap-1">
                                 <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 {{ $durasiStr }}
                             </span>
                         </div>
 
                         <!-- Alasan Section with Note Border -->
-                        <div class="border border-slate-200 bg-slate-50/70 rounded-xl p-3 space-y-1.5 shadow-2xs">
+                        <div class="border-2 border-slate-200 bg-slate-50/70 rounded-xl p-3 space-y-1.5 shadow-2xs">
                             <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
@@ -841,26 +831,26 @@
                         </div>
 
                         <!-- Status & Action Footer -->
-                        <div class="pt-3 border-t border-slate-200 flex items-center justify-between gap-2 flex-wrap">
+                        <div class="pt-3 border-t-2 border-slate-100 flex items-center justify-between gap-2 flex-wrap">
                             <!-- Status Badge with Stronger Border -->
                             <div>
                                 @if ($item->status === 'paid')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border-2 border-emerald-200 shadow-2xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border-2 border-emerald-300 shadow-2xs">
                                         <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         <span>Selesai Dibayar</span>
                                     </span>
                                 @elseif ($item->status === 'approved_atasan')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 border-2 border-sky-200 shadow-2xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 border-2 border-sky-300 shadow-2xs">
                                         <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         <span>Disetujui Atasan</span>
                                     </span>
                                 @elseif ($item->status === 'rejected')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border-2 border-rose-200 shadow-2xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border-2 border-rose-300 shadow-2xs">
                                         <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                         <span>Ditolak</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border-2 border-amber-200 shadow-2xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border-2 border-amber-300 shadow-2xs">
                                         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                                         <span>Menunggu Approval</span>
                                     </span>
