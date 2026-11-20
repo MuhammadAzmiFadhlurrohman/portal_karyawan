@@ -25,6 +25,8 @@ class PwaDashboardBannerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('pwa-install-banner');
+        $response->assertSee('md:hidden');
+        $response->assertSee('@media (min-width: 768px)');
         $response->assertSee('Aplikasi Mobile PT MSN');
         $response->assertSee('Pasang aplikasi untuk akses cepat, praktis, dan notifikasi langsung di HP.');
         $response->assertSee('Pasang Aplikasi');

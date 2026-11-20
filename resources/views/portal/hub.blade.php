@@ -286,6 +286,11 @@
         .pwa-banner.is-hidden {
             display: none !important;
         }
+        @media (min-width: 768px) {
+            .pwa-banner {
+                display: none !important;
+            }
+        }
         .pwa-rim {
             position: absolute;
             top: 0;
@@ -580,8 +585,8 @@
         })();
     </script>
 
-    <!-- PWA App Install Banner (GoMSN Ocean Teal Theme) -->
-    <section id="pwa-install-banner" class="pwa-banner hub-anim-d2" aria-label="Pasang Aplikasi Mobile PT MSN">
+    <!-- PWA App Install Banner (GoMSN Ocean Teal Theme - Mobile Only) -->
+    <section id="pwa-install-banner" class="pwa-banner md:hidden hub-anim-d2" aria-label="Pasang Aplikasi Mobile PT MSN">
         <div class="pwa-rim" aria-hidden="true"></div>
         <div class="pwa-glow" aria-hidden="true"></div>
         <svg class="pwa-wave-svg" viewBox="0 0 360 90" fill="none" preserveAspectRatio="none" aria-hidden="true">
