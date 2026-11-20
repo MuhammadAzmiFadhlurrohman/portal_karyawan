@@ -314,6 +314,7 @@ class AttendanceController extends Controller
             'pose_left' => ['nullable', 'string'],
             'pose_right' => ['nullable', 'string'],
             'face_descriptor' => ['nullable', 'string'],
+            'anti_spoof_meta' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $poseFront = $validated['pose_front'];
@@ -337,7 +338,8 @@ class AttendanceController extends Controller
             ],
             consentGiven: true,
             ip: (string) $request->ip(),
-            descriptors: $descriptor
+            descriptors: $descriptor,
+            antiSpoofMetaJson: $validated['anti_spoof_meta'] ?? null
         );
 
         return back()->with('status', 'Biometrik wajah (3 pose) berhasil didaftarkan dan dienkripsi sesuai UU PDP No. 27/2022 (§5.1, §10.2).');
@@ -407,6 +409,7 @@ class AttendanceController extends Controller
             'primary_image' => ['nullable', 'string'],
             'challenge_image' => ['nullable', 'string'],
             'face_descriptor' => ['nullable', 'string'],
+            'anti_spoof_meta' => ['nullable', 'string', 'max:2000'],
             'use_manual_fallback' => ['nullable', 'boolean'],
             'notes' => ['nullable', 'string', 'max:500'],
             'ticket_reference' => ['nullable', 'string', 'max:64'],

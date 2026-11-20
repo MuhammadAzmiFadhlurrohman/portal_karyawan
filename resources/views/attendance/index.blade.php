@@ -1,5 +1,6 @@
 <x-layouts.app title="Presensi & Absensi Karyawan">
     <script src="{{ asset('vendor/face-api/face-api.min.js') }}"></script>
+    <script src="{{ asset('js/attendance-screen-detector.js') }}?v={{ filemtime(public_path('js/attendance-screen-detector.js')) }}"></script>
 
     <div class="w-full space-y-4 sm:space-y-5" 
          x-data="attendancePage()"
@@ -370,7 +371,7 @@
                         <!-- Camera preview / Canvas (Lebih Besar) -->
                         <div class="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto">
                             <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] transition-all duration-300 flex items-center justify-center shadow-lg relative"
-                                 :class="cameraActive ? (faceDetected ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-amber-400 ring-4 ring-amber-400/20') : 'border-[#155E63] ring-4 ring-teal-500/20'">
+                                 :class="cameraActive ? (enrollScreenDetected ? 'border-rose-500 ring-4 ring-rose-400/35' : (faceDetected ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-amber-400 ring-4 ring-amber-400/20')) : 'border-[#155E63] ring-4 ring-teal-500/20'">
                                 <video id="enroll-video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]" x-show="cameraActive"></video>
                                 <img :src="photoPreview" x-show="photoPreview && !cameraActive" class="w-full h-full object-cover" alt="Preview Foto">
                                 <canvas id="enroll-canvas" class="hidden"></canvas>
@@ -380,8 +381,8 @@
                                 </div>
                             </div>
                             <span x-show="cameraActive" class="absolute top-2.5 right-2.5 flex h-4 w-4">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="faceDetected ? 'bg-emerald-400' : 'bg-amber-400'"></span>
-                                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white" :class="faceDetected ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="enrollScreenDetected ? 'bg-rose-400' : (faceDetected ? 'bg-emerald-400' : 'bg-amber-400')"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white" :class="enrollScreenDetected ? 'bg-rose-500' : (faceDetected ? 'bg-emerald-500' : 'bg-amber-500')"></span>
                             </span>
                         </div>
 
@@ -398,13 +399,27 @@
                                     <span>✓ Wajah Terdeteksi &amp; Biometrik Siap Disimpan</span>
                                 </span>
                             </template>
-                            <template x-if="!isDetecting && !photoPreview && cameraActive && faceDetected">
-                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span>✓ Wajah Terdeteksi — Klik "Ambil Foto Sekarang"</span>
-                                </span>
+                            <template x-if="!isDetecting && !photoPreview && cameraActive && enrollScreenDetected">
+                                <div class="space-y-1">
+                                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 shadow-2xs">
+                                        <span>🚫 Terdeteksi Layar HP / Foto Digital!</span>
+                                    </span>
+                                    <p class="text-[11px] font-medium text-rose-700"
+                                       x-text="(enrollScreenReason ? enrollScreenReason + '. ' : '') + 'Gunakan wajah asli secara langsung.'"></p>
+                                </div>
                             </template>
-                            <template x-if="!isDetecting && !photoPreview && cameraActive && !faceDetected">
+                            <template x-if="!isDetecting && !photoPreview && cameraActive && !enrollScreenDetected && faceDetected">
+                                <div class="flex flex-wrap items-center justify-center gap-1.5">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <span>✓ Wajah Terdeteksi — Klik "Ambil Foto Sekarang"</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-teal-50 text-[#155E63] border border-teal-200/90 shadow-2xs">
+                                        <span>🛡️ Anti-Layar Aman</span>
+                                    </span>
+                                </div>
+                            </template>
+                            <template x-if="!isDetecting && !photoPreview && cameraActive && !enrollScreenDetected && !faceDetected">
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs">
                                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                                     <span>Posisikan wajah Anda tepat di tengah frame</span>
@@ -429,8 +444,8 @@
                             <button type="button" 
                                     @click="capturePhoto()" 
                                     x-show="cameraActive"
-                                    :disabled="isDetecting"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer disabled:opacity-50">
+                                    :disabled="isDetecting || enrollScreenDetected"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                                 <span x-text="isDetecting ? 'Menganalisis...' : 'Ambil Foto Sekarang'"></span>
                             </button>
@@ -441,6 +456,7 @@
                         <input type="hidden" name="pose_left" :value="poseLeft">
                         <input type="hidden" name="pose_right" :value="poseRight">
                         <input type="hidden" name="face_descriptor" :value="faceDescriptor">
+                        <input type="hidden" name="anti_spoof_meta" :value="enrollAntiSpoofMeta">
                     </div>
 
                     <!-- Consent Checkbox (UU PDP) -->
@@ -509,7 +525,7 @@
                         <!-- Circular Biometric Viewport (Lebih Besar) -->
                         <div class="relative w-48 h-48 sm:w-52 sm:h-52 mx-auto">
                             <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-[3.5px] transition-all duration-300 flex items-center justify-center relative shadow-md"
-                                 :class="clockInCameraActive ? (clockInFaceDetected ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-amber-400 ring-4 ring-amber-400/20') : (clockInVerified ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-[#155E63] ring-4 ring-teal-500/20')">
+                                 :class="clockInCameraActive ? (clockInScreenDetected ? 'border-rose-500 ring-4 ring-rose-400/35' : (clockInLivenessPassed ? 'border-emerald-500 ring-4 ring-emerald-400/30' : (clockInFaceDetected && !clockInMultiFace ? 'border-teal-400 ring-4 ring-teal-400/25' : 'border-amber-400 ring-4 ring-amber-400/20'))) : (clockInVerified ? 'border-emerald-500 ring-4 ring-emerald-400/30' : 'border-[#155E63] ring-4 ring-teal-500/20')">
                                 <video id="clockin-video" autoplay playsinline muted class="w-full h-full object-cover scale-x-[-1]" x-show="clockInCameraActive"></video>
                                 <img :src="clockInPhotoPreview" x-show="clockInPhotoPreview && !clockInCameraActive" class="w-full h-full object-cover" alt="Preview Foto Selfie">
                                 <canvas id="clockin-canvas" class="hidden"></canvas>
@@ -520,12 +536,12 @@
                             </div>
                             <!-- Active Camera Live Indicator Dot -->
                             <span x-show="clockInCameraActive" class="absolute top-2.5 right-2.5 flex h-4 w-4">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="clockInFaceDetected ? 'bg-emerald-400' : 'bg-amber-400'"></span>
-                                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white" :class="clockInFaceDetected ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="clockInScreenDetected ? 'bg-rose-400' : (clockInLivenessPassed ? 'bg-emerald-400' : 'bg-amber-400')"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 border-2 border-white" :class="clockInScreenDetected ? 'bg-rose-500' : (clockInLivenessPassed ? 'bg-emerald-500' : 'bg-amber-500')"></span>
                             </span>
                         </div>
 
-                        <!-- Face Verification Status Badge -->
+                        <!-- Face Verification, Anti-Screen & 3D Liveness Status Badge -->
                         <div>
                             <template x-if="isVerifying">
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-[#155E63] border border-teal-200 shadow-2xs">
@@ -539,13 +555,45 @@
                                     <span x-text="'✓ Wajah Cocok & Terverifikasi (' + clockInMatchPercent + '%)'"></span>
                                 </span>
                             </template>
-                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && clockInFaceDetected">
-                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span>✓ Wajah Terdeteksi — Klik "Ambil Foto Sekarang"</span>
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && clockInScreenDetected">
+                                <div class="rounded-xl bg-rose-50 border border-rose-300 px-3.5 py-2.5 text-left space-y-1 shadow-xs">
+                                    <div class="flex items-center gap-1.5 text-xs font-extrabold text-rose-800">
+                                        <span>🚫 Terdeteksi Layar HP Kedua / Foto Digital!</span>
+                                    </div>
+                                    <p class="text-[11px] text-rose-700 leading-snug"
+                                       x-text="(clockInScreenReason ? clockInScreenReason + '. ' : '') + 'Gunakan wajah asli Anda secara langsung di depan kamera.'"></p>
+                                </div>
+                            </template>
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && !clockInScreenDetected && clockInMultiFace">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs">
+                                    <span>⚠️ Terdeteksi lebih dari 1 wajah. Pastikan hanya wajah Anda di kamera.</span>
                                 </span>
                             </template>
-                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && !clockInFaceDetected">
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && !clockInScreenDetected && !clockInMultiFace && clockInFaceDetected && !clockInLivenessPassed">
+                                <div class="rounded-xl bg-teal-50/90 border border-teal-200 px-3.5 py-2.5 space-y-1 shadow-2xs">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#155E63]">
+                                            <span>🛡️ Verifikasi Wajah Hidup (Liveness 3D)</span>
+                                        </span>
+                                        <button type="button"
+                                                @click="rotateClockInChallenge()"
+                                                class="text-[10.5px] font-semibold text-teal-700 hover:text-teal-900 underline cursor-pointer shrink-0">
+                                            Ganti tantangan
+                                        </button>
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-800"
+                                       x-text="clockInChallengePeakReached && clockInChallenge.type !== 'blink'
+                                           ? '⏳ Tahan... sekarang hadap depan kembali'
+                                           : (clockInChallenge.icon + ' ' + clockInChallenge.label)"></p>
+                                </div>
+                            </template>
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && !clockInScreenDetected && !clockInMultiFace && clockInLivenessPassed">
+                                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span>✓ Liveness 3D &amp; Anti-Layar Aman — Klik "Ambil Foto Sekarang"</span>
+                                </span>
+                            </template>
+                            <template x-if="!isVerifying && !clockInPhotoPreview && clockInCameraActive && !clockInScreenDetected && !clockInMultiFace && !clockInFaceDetected">
                                 <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200/90 shadow-2xs">
                                     <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
                                     <span>Wajah belum terdeteksi. Arahkan kamera ke wajah Anda</span>
@@ -571,8 +619,8 @@
                             <button type="button" 
                                     @click="captureClockInPhoto()" 
                                     x-show="clockInCameraActive"
-                                    :disabled="isVerifying"
-                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer disabled:opacity-50">
+                                    :disabled="isVerifying || clockInScreenDetected || clockInMultiFace || !clockInLivenessPassed"
+                                    class="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-700/20 active:scale-[0.98] transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
                                 <span x-text="isVerifying ? 'Memverifikasi...' : 'Ambil Foto Sekarang'"></span>
                             </button>
@@ -582,6 +630,7 @@
                         <input type="hidden" name="primary_image" :value="clockInPrimaryImage">
                         <input type="hidden" name="challenge_image" :value="clockInChallengeImage">
                         <input type="hidden" name="face_descriptor" :value="clockInFaceDescriptor">
+                        <input type="hidden" name="anti_spoof_meta" :value="clockInAntiSpoofMeta">
                     </div>
 
                     <!-- Attendance Type -->
@@ -751,12 +800,24 @@
                 clockInChallengeImage: '',
                 clockInFaceDescriptor: '',
                 clockInFaceDetected: false,
+                clockInMultiFace: false,
                 clockInVerified: false,
                 clockInMatchPercent: 0,
                 isVerifying: false,
                 clockInScanInterval: null,
+                clockInDetector: null,
+                clockInScreenDetected: false,
+                clockInScreenScore: 0,
+                clockInScreenReason: '',
+                clockInAntiSpoofMeta: '',
+                clockInChallenge: { type: 'blink', label: 'Kedipkan mata Anda 1 kali', icon: '👀' },
+                clockInLivenessPassed: false,
+                clockInChallengePeakReached: false,
+                clockInBaselineEAR: null,
+                clockInBaselineYaw: null,
+                clockInBaselineSamples: 0,
 
-                // Face-api Model states
+                // Face-api Model & Enroll Anti-Spoof states
                 modelsLoaded: false,
                 loadingModels: false,
                 faceDetected: false,
@@ -764,6 +825,11 @@
                 faceDescriptor: '',
                 faceEnrolledLocally: false,
                 enrollScanInterval: null,
+                enrollDetector: null,
+                enrollScreenDetected: false,
+                enrollScreenScore: 0,
+                enrollScreenReason: '',
+                enrollAntiSpoofMeta: '',
                 storedFaceEmbedding: @json($faceEmbedding ?? null),
 
                 // Auto-Detected GPS & Office states
@@ -908,12 +974,68 @@
                     this.showEnrollModal = false;
                 },
 
+                captureSnapshotDataUrl(video) {
+                    const tmpCanvas = document.createElement('canvas');
+                    tmpCanvas.width = video.videoWidth || 320;
+                    tmpCanvas.height = video.videoHeight || 240;
+                    const tmpCtx = tmpCanvas.getContext('2d');
+                    if (tmpCtx) {
+                        tmpCtx.drawImage(video, 0, 0, tmpCanvas.width, tmpCanvas.height);
+                        return tmpCanvas.toDataURL('image/jpeg', 0.85);
+                    }
+                    return '';
+                },
+
+                showScreenSpoofAlert(reasons) {
+                    const list = Array.isArray(reasons) && reasons.length > 0
+                        ? reasons
+                        : ['Terdeteksi tampilan layar HP / foto digital di depan kamera'];
+                    const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+                    const itemsHtml = list.map((r) => `<li>${escapeHtml(r)}</li>`).join('');
+
+                    this.showAlert({
+                        icon: 'error',
+                        title: 'Deteksi Layar HP / Spoofing!',
+                        confirmColor: '#be123c',
+                        confirmText: 'Mengerti',
+                        html: `<div class="space-y-2.5 text-left">
+                            <p class="text-xs sm:text-sm font-semibold text-rose-900 leading-snug text-center">
+                                Sistem mendeteksi percobaan absensi menggunakan <strong>layar HP kedua / foto digital</strong>!
+                            </p>
+                            <ul class="text-xs text-rose-800 bg-rose-50 border border-rose-200 rounded-xl p-3 list-disc list-inside space-y-1">
+                                ${itemsHtml}
+                            </ul>
+                            <p class="text-xs text-slate-500 text-center">
+                                Harap arahkan kamera langsung ke wajah asli Anda.
+                            </p>
+                        </div>`
+                    });
+                },
+
+                rotateClockInChallenge() {
+                    if (window.AttendanceScreenDetector && typeof window.AttendanceScreenDetector.pickRandomChallenge === 'function') {
+                        this.clockInChallenge = window.AttendanceScreenDetector.pickRandomChallenge(this.clockInChallenge?.type);
+                    }
+                    this.clockInLivenessPassed = false;
+                    this.clockInChallengePeakReached = false;
+                    this.clockInBaselineEAR = null;
+                    this.clockInBaselineYaw = null;
+                    this.clockInBaselineSamples = 0;
+                    this.clockInChallengeImage = '';
+                },
+
                 startCamera() {
                     const video = document.getElementById('enroll-video');
                     if (this.enrollScanInterval) {
                         clearInterval(this.enrollScanInterval);
                         this.enrollScanInterval = null;
                     }
+
+                    this.enrollScreenDetected = false;
+                    this.enrollScreenScore = 0;
+                    this.enrollScreenReason = '';
+                    this.enrollAntiSpoofMeta = '';
+                    this.enrollDetector = window.AttendanceScreenDetector ? window.AttendanceScreenDetector.createSession() : null;
 
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
@@ -923,16 +1045,28 @@
                                 this.photoPreview = null;
                                 this.faceDetected = false;
 
-                                // Real-time face detection loop
+                                let scanBusy = false;
+                                // Real-time face + anti-screen detection loop
                                 this.enrollScanInterval = setInterval(async () => {
-                                    if (!this.cameraActive || !video || video.paused || video.ended) return;
+                                    if (scanBusy || !this.cameraActive || !video || video.paused || video.ended) return;
                                     if (typeof faceapi !== 'undefined' && this.modelsLoaded && video.videoWidth > 0) {
+                                        scanBusy = true;
                                         try {
                                             const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }));
                                             this.faceDetected = !!det;
+                                            if (det && this.enrollDetector) {
+                                                const box = det.detection ? det.detection.box : det.box;
+                                                const scan = this.enrollDetector.analyzeFrame(video, box);
+                                                this.enrollScreenScore = scan.score;
+                                                this.enrollScreenDetected = scan.confirmed;
+                                                this.enrollScreenReason = scan.reasons[0] || '';
+                                            } else if (!det) {
+                                                this.enrollScreenDetected = false;
+                                            }
                                         } catch (_) {}
+                                        scanBusy = false;
                                     }
-                                }, 350);
+                                }, 250);
                             })
                             .catch((err) => {
                                 this.cameraActive = false;
@@ -962,6 +1096,7 @@
                         video.srcObject = null;
                     }
                     this.cameraActive = false;
+                    this.enrollScreenDetected = false;
                 },
 
                 async capturePhoto() {
@@ -998,6 +1133,26 @@
                         return;
                     }
 
+                    // Anti-Spoofing 3-frame Capture Burst Verification
+                    let antiSpoofPayload = { screen_detected: false, screen_score: this.enrollScreenScore || 0, avg_score: this.enrollScreenScore || 0 };
+                    if (this.enrollDetector) {
+                        const burst = await this.enrollDetector.analyzeCaptureBurst(video, detection.detection.box, 3, 110);
+                        antiSpoofPayload = {
+                            screen_detected: burst.blocked,
+                            screen_score: burst.maxScore,
+                            avg_score: burst.avgScore,
+                            metrics: burst.metrics,
+                        };
+                        if (burst.blocked) {
+                            this.enrollScreenDetected = true;
+                            this.enrollScreenScore = burst.maxScore;
+                            this.enrollScreenReason = burst.reasons[0] || '';
+                            this.isDetecting = false;
+                            this.showScreenSpoofAlert(burst.reasons);
+                            return;
+                        }
+                    }
+
                     canvas.width = video.videoWidth || 320;
                     canvas.height = video.videoHeight || 240;
                     const ctx = canvas.getContext('2d');
@@ -1009,6 +1164,7 @@
                     this.poseLeft = dataUrl;
                     this.poseRight = dataUrl;
                     this.faceDescriptor = JSON.stringify(Array.from(detection.descriptor));
+                    this.enrollAntiSpoofMeta = JSON.stringify(antiSpoofPayload);
                     this.faceEnrolledLocally = true;
                     this.isDetecting = false;
 
@@ -1037,7 +1193,15 @@
                     this.clockInMatchPercent = 0;
                     this.clockInPhotoPreview = null;
                     this.clockInPrimaryImage = '';
+                    this.clockInChallengeImage = '';
                     this.clockInFaceDescriptor = '';
+                    this.clockInAntiSpoofMeta = '';
+                    this.clockInScreenDetected = false;
+                    this.clockInScreenScore = 0;
+                    this.clockInScreenReason = '';
+                    this.clockInMultiFace = false;
+                    this.clockInLivenessPassed = false;
+                    this.clockInChallengePeakReached = false;
                     this.loadFaceApiModels();
                     this.$nextTick(() => {
                         this.startClockInCamera();
@@ -1094,6 +1258,26 @@
                         this.clockInScanInterval = null;
                     }
 
+                    this.clockInDetector = window.AttendanceScreenDetector ? window.AttendanceScreenDetector.createSession() : null;
+                    if (window.AttendanceScreenDetector && typeof window.AttendanceScreenDetector.pickRandomChallenge === 'function') {
+                        this.clockInChallenge = window.AttendanceScreenDetector.pickRandomChallenge();
+                    }
+                    this.clockInBaselineEAR = null;
+                    this.clockInBaselineYaw = null;
+                    this.clockInBaselineSamples = 0;
+                    this.clockInLivenessPassed = false;
+                    this.clockInChallengePeakReached = false;
+                    this.clockInScreenDetected = false;
+                    this.clockInScreenScore = 0;
+                    this.clockInScreenReason = '';
+                    this.clockInMultiFace = false;
+                    this.clockInChallengeImage = '';
+                    this.clockInVerified = false;
+                    this.clockInMatchPercent = 0;
+                    this.clockInPrimaryImage = '';
+                    this.clockInFaceDescriptor = '';
+                    this.clockInAntiSpoofMeta = '';
+
                     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } })
                             .then((stream) => {
@@ -1102,16 +1286,96 @@
                                 this.clockInPhotoPreview = null;
                                 this.clockInFaceDetected = false;
 
-                                // Real-time face detection scan loop
+                                let scanBusy = false;
+                                // Real-time face + Anti-Screen + 3D Liveness Challenge scan loop
                                 this.clockInScanInterval = setInterval(async () => {
-                                    if (!this.clockInCameraActive || !video || video.paused || video.ended) return;
+                                    if (scanBusy || !this.clockInCameraActive || !video || video.paused || video.ended) return;
                                     if (typeof faceapi !== 'undefined' && this.modelsLoaded && video.videoWidth > 0) {
+                                        scanBusy = true;
                                         try {
-                                            const det = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }));
-                                            this.clockInFaceDetected = !!det;
+                                            const detections = await faceapi
+                                                .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.45 }))
+                                                .withFaceLandmarks();
+
+                                            if (!detections || detections.length === 0) {
+                                                this.clockInFaceDetected = false;
+                                                this.clockInMultiFace = false;
+                                                this.clockInScreenDetected = false;
+                                                scanBusy = false;
+                                                return;
+                                            }
+
+                                            if (detections.length > 1) {
+                                                this.clockInFaceDetected = true;
+                                                this.clockInMultiFace = true;
+                                                this.clockInLivenessPassed = false;
+                                                this.clockInChallengePeakReached = false;
+                                                scanBusy = false;
+                                                return;
+                                            }
+
+                                            this.clockInFaceDetected = true;
+                                            this.clockInMultiFace = false;
+                                            const det = detections[0];
+
+                                            // 1. Passive Screen-Replay Check
+                                            if (this.clockInDetector) {
+                                                const scan = this.clockInDetector.analyzeFrame(video, det.detection.box);
+                                                this.clockInScreenScore = scan.score;
+                                                this.clockInScreenDetected = scan.confirmed;
+                                                this.clockInScreenReason = scan.reasons[0] || '';
+
+                                                if (scan.confirmed) {
+                                                    this.clockInLivenessPassed = false;
+                                                    this.clockInChallengePeakReached = false;
+                                                    this.clockInChallengeImage = '';
+                                                    scanBusy = false;
+                                                    return;
+                                                }
+                                            }
+
+                                            // 2. Active 3D Landmark Liveness Check
+                                            if (!this.clockInLivenessPassed && window.AttendanceScreenDetector) {
+                                                const ear = window.AttendanceScreenDetector.computeEAR(det.landmarks);
+                                                const yaw = window.AttendanceScreenDetector.computeYawRatio(det.landmarks);
+
+                                                if (!this.clockInChallengePeakReached && this.clockInBaselineSamples < 2 && Math.abs(yaw - 0.5) < 0.12) {
+                                                    const n = this.clockInBaselineSamples;
+                                                    this.clockInBaselineEAR = n === 0 ? ear : (this.clockInBaselineEAR * n + ear) / (n + 1);
+                                                    this.clockInBaselineYaw = n === 0 ? yaw : (this.clockInBaselineYaw * n + yaw) / (n + 1);
+                                                    this.clockInBaselineSamples = n + 1;
+                                                }
+
+                                                if (this.clockInBaselineSamples >= 2) {
+                                                    const chType = this.clockInChallenge.type;
+                                                    if (chType === 'blink') {
+                                                        if (!this.clockInChallengePeakReached && ear < this.clockInBaselineEAR * 0.78) {
+                                                            this.clockInChallengePeakReached = true;
+                                                            this.clockInChallengeImage = this.captureSnapshotDataUrl(video);
+                                                        } else if (this.clockInChallengePeakReached && ear > this.clockInBaselineEAR * 0.85) {
+                                                            this.clockInLivenessPassed = true;
+                                                        }
+                                                    } else if (chType === 'turn_left') {
+                                                        if (!this.clockInChallengePeakReached && (yaw >= this.clockInBaselineYaw + 0.095 || yaw >= 0.60)) {
+                                                            this.clockInChallengePeakReached = true;
+                                                            this.clockInChallengeImage = this.captureSnapshotDataUrl(video);
+                                                        } else if (this.clockInChallengePeakReached && Math.abs(yaw - this.clockInBaselineYaw) < 0.08) {
+                                                            this.clockInLivenessPassed = true;
+                                                        }
+                                                    } else if (chType === 'turn_right') {
+                                                        if (!this.clockInChallengePeakReached && (yaw <= this.clockInBaselineYaw - 0.095 || yaw <= 0.40)) {
+                                                            this.clockInChallengePeakReached = true;
+                                                            this.clockInChallengeImage = this.captureSnapshotDataUrl(video);
+                                                        } else if (this.clockInChallengePeakReached && Math.abs(yaw - this.clockInBaselineYaw) < 0.08) {
+                                                            this.clockInLivenessPassed = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         } catch (_) {}
+                                        scanBusy = false;
                                     }
-                                }, 350);
+                                }, 200);
                             })
                             .catch((err) => {
                                 this.clockInCameraActive = false;
@@ -1148,6 +1412,21 @@
                     const canvas = document.getElementById('clockin-canvas');
                     if (!video || !canvas) return;
 
+                    if (this.clockInScreenDetected) {
+                        this.showScreenSpoofAlert(this.clockInScreenReason ? [this.clockInScreenReason] : []);
+                        return;
+                    }
+
+                    if (!this.clockInLivenessPassed) {
+                        this.showAlert({
+                            icon: 'info',
+                            title: 'Verifikasi Liveness Diperlukan',
+                            text: 'Silakan selesaikan tantangan gerakan wajah (' + this.clockInChallenge.label + ') terlebih dahulu sebelum mengambil foto.',
+                            confirmText: 'Mengerti'
+                        });
+                        return;
+                    }
+
                     this.isVerifying = true;
                     if (!this.modelsLoaded) {
                         await this.loadFaceApiModels();
@@ -1176,6 +1455,37 @@
                             confirmText: 'Coba Lagi'
                         });
                         return;
+                    }
+
+                    // 1B. FINAL 3-FRAME ANTI-SCREEN CAPTURE BURST VERIFICATION
+                    let antiSpoofPayload = {
+                        screen_detected: false,
+                        screen_score: this.clockInScreenScore || 0,
+                        avg_score: this.clockInScreenScore || 0,
+                        liveness_passed: true,
+                        challenge_type: this.clockInChallenge.type,
+                    };
+
+                    if (this.clockInDetector) {
+                        const burst = await this.clockInDetector.analyzeCaptureBurst(video, detection.detection.box, 3, 110);
+                        antiSpoofPayload = {
+                            screen_detected: burst.blocked,
+                            screen_score: burst.maxScore,
+                            avg_score: burst.avgScore,
+                            liveness_passed: this.clockInLivenessPassed,
+                            challenge_type: this.clockInChallenge.type,
+                            metrics: burst.metrics,
+                        };
+                        if (burst.blocked) {
+                            this.clockInScreenDetected = true;
+                            this.clockInScreenScore = burst.maxScore;
+                            this.clockInScreenReason = burst.reasons[0] || '';
+                            this.clockInLivenessPassed = false;
+                            this.clockInVerified = false;
+                            this.isVerifying = false;
+                            this.showScreenSpoofAlert(burst.reasons);
+                            return;
+                        }
                     }
 
                     const capturedDescriptor = Array.from(detection.descriptor);
@@ -1213,7 +1523,12 @@
                         return;
                     }
 
-                    // SUCCESS: Match confirmed & verified
+                    // SUCCESS: Match confirmed & verified — ensure real challenge_image is distinct JPEG frame
+                    if (!this.clockInChallengeImage) {
+                        await new Promise((resolve) => setTimeout(resolve, 120));
+                        this.clockInChallengeImage = this.captureSnapshotDataUrl(video);
+                    }
+
                     canvas.width = video.videoWidth || 320;
                     canvas.height = video.videoHeight || 240;
                     const ctx = canvas.getContext('2d');
@@ -1222,8 +1537,8 @@
 
                     this.clockInPhotoPreview = dataUrl;
                     this.clockInPrimaryImage = dataUrl;
-                    this.clockInChallengeImage = 'CHALLENGE_VERIFIED_AUTO';
                     this.clockInFaceDescriptor = JSON.stringify(capturedDescriptor);
+                    this.clockInAntiSpoofMeta = JSON.stringify(antiSpoofPayload);
                     this.clockInVerified = true;
                     this.clockInMatchPercent = matchScorePercent;
                     this.isVerifying = false;

@@ -81,8 +81,12 @@ class FaceRecognitionClient
      * @param  array<int, float>|null  $descriptors
      * @return array{request_id: string, model_version: string, embedding: array<int, float>, quality_score: float, primary_hash: string}
      */
-    public function enroll(User $user, array $posesBase64, ?array $descriptors = null): array
-    {
+    public function enroll(
+        User $user,
+        array $posesBase64,
+        ?array $descriptors = null,
+        ?string $antiSpoofMetaJson = null
+    ): array {
         if (empty($posesBase64)) {
             throw ValidationException::withMessages([
                 'poses' => 'Pendaftaran wajah wajib menyertakan foto wajah yang jelas (§5.1).',
@@ -90,6 +94,7 @@ class FaceRecognitionClient
         }
 
         $raw = $this->decodeAndValidateImage($posesBase64[0], $user);
+        $this->validateScreenAntiSpoof($raw, $user, $antiSpoofMetaJson);
         $primaryHash = hash('sha256', $raw);
 
         // If client-side face-api generated 128-D descriptor
@@ -127,9 +132,11 @@ class FaceRecognitionClient
         FaceTemplate $template,
         string $primaryImageBase64,
         string $challengeImageBase64,
-        ?string $faceDescriptorJson = null
+        ?string $faceDescriptorJson = null,
+        ?string $antiSpoofMetaJson = null
     ): array {
         $rawPrimary = $this->decodeAndValidateImage($primaryImageBase64, $user);
+        $screenScore = $this->validateScreenAntiSpoof($rawPrimary, $user, $antiSpoofMetaJson);
 
         // Optional challenge image consistency check (§5.1)
         if (! empty($challengeImageBase64) && ! str_contains($challengeImageBase64, 'CHALLENGE_VERIFIED_')) {
@@ -197,7 +204,7 @@ class FaceRecognitionClient
                 'request_id' => (string) Str::uuid(),
                 'score' => $score,
                 'match' => true,
-                'liveness_score' => 0.95,
+                'liveness_score' => round(max(0.85, 1.0 - ($screenScore / 200.0)), 4),
             ];
         }
 
@@ -254,6 +261,352 @@ class FaceRecognitionClient
                 // Ignore network failure if local template is already purged
             }
         }
+    }
+
+    /**
+     * Validate client anti-spoof metadata and inspect uploaded pixels for 2nd-phone screen replay.
+     */
+    private function validateScreenAntiSpoof(string $rawBytes, ?User $actor, ?string $antiSpoofMetaJson): int
+    {
+        $clientScore = 0;
+
+        if (! empty($antiSpoofMetaJson)) {
+            $meta = json_decode($antiSpoofMetaJson, true);
+            if (is_array($meta)) {
+                $clientScore = (int) ($meta['screen_score'] ?? 0);
+                if (! empty($meta['screen_detected']) || $clientScore >= 52) {
+                    AuditLogger::record(
+                        action: 'attendance.spoof_attempt_blocked',
+                        auditable: $actor,
+                        newValues: [
+                            'reason' => 'CLIENT_SCREEN_SPOOF_DETECTED',
+                            'client_screen_score' => $clientScore,
+                            'metrics' => $meta['metrics'] ?? null,
+                        ],
+                        reason: 'Percobaan absensi dengan layar HP kedua / foto digital terdeteksi oleh sensor kamera (AC-02).',
+                        actorId: $actor?->id
+                    );
+
+                    throw ValidationException::withMessages([
+                        'image' => 'Ditolak oleh Deteksi Layar Anti-Spoofing: Terdeteksi penggunaan layar HP kedua atau foto digital. Silakan absen dengan wajah asli Anda secara langsung (AC-02).',
+                    ]);
+                }
+            }
+        }
+
+        $serverScore = 0;
+        $im = @imagecreatefromstring($rawBytes);
+        if ($im) {
+            $w = imagesx($im);
+            $h = imagesy($im);
+            if ($w >= 120 && $h >= 120) {
+                $analysis = $this->analyzeImageForScreenSpoof($im);
+                imagedestroy($im);
+
+                $serverScore = $analysis['score'];
+                $signals = [
+                    $analysis['bezel_score'],
+                    $analysis['moire_score'],
+                    $analysis['glare_score'],
+                    $analysis['blue_cast_score'],
+                ];
+                $triggeredCount = count(array_filter($signals, static fn (int $v): bool => $v >= 12));
+
+                if ($serverScore >= 65 && $triggeredCount >= 2) {
+                    AuditLogger::record(
+                        action: 'attendance.spoof_attempt_blocked',
+                        auditable: $actor,
+                        newValues: [
+                            'reason' => 'SERVER_SCREEN_SPOOF_DETECTED',
+                            'server_screen_score' => $serverScore,
+                            'triggered_signals' => $triggeredCount,
+                            'metrics' => $analysis,
+                        ],
+                        reason: "Percobaan absensi ditolak oleh analisis piksel server (skor {$serverScore}/100, {$triggeredCount} sinyal layar terdeteksi — AC-02).",
+                        actorId: $actor?->id
+                    );
+
+                    throw ValidationException::withMessages([
+                        'image' => 'Ditolak oleh Deteksi Layar Anti-Spoofing Server: Terdeteksi penggunaan layar HP kedua atau foto digital. Silakan absen dengan wajah asli Anda secara langsung (AC-02).',
+                    ]);
+                }
+            } else {
+                imagedestroy($im);
+            }
+        }
+
+        return max($clientScore, $serverScore);
+    }
+
+    /**
+     * Multi-signal PHP GD image analysis for rectangular screen bezel, RGB Moire, glare, and cool backlight.
+     *
+     * @param  resource|\GdImage  $im
+     * @return array{score: int, bezel_score: int, moire_score: int, glare_score: int, blue_cast_score: int}
+     */
+    private function analyzeImageForScreenSpoof($im): array
+    {
+        $w = imagesx($im);
+        $h = imagesy($im);
+
+        $gridW = 120;
+        $gridH = 90;
+        $grid = imagecreatetruecolor($gridW, $gridH);
+        imagecopyresampled($grid, $im, 0, 0, 0, 0, $gridW, $gridH, $w, $h);
+
+        // 1. Rectangular bezel perimeter scan on resampled 120x90 grid
+        $left = $this->scanBezelSide($grid, $gridW, $gridH, 3, 29, 8, 81, 1, true);
+        $right = $this->scanBezelSide($grid, $gridW, $gridH, 91, 116, 8, 81, -1, true);
+        $top = $this->scanBezelSide($grid, $gridW, $gridH, 3, 21, 16, 103, 1, false);
+        $bottom = $this->scanBezelSide($grid, $gridW, $gridH, 69, 86, 16, 103, -1, false);
+
+        $sides = [$left, $right, $top, $bottom];
+        $strongSides = 0;
+        $emissiveSides = 0;
+        $maxContinuity = 0.0;
+        foreach ($sides as $s) {
+            if ($s['continuity'] >= 0.56) {
+                $strongSides++;
+            }
+            if ($s['emissive']) {
+                $emissiveSides++;
+            }
+            if ($s['continuity'] > $maxContinuity) {
+                $maxContinuity = $s['continuity'];
+            }
+        }
+        $oppositeSides = ($left['continuity'] >= 0.56 && $right['continuity'] >= 0.56)
+            || ($top['continuity'] >= 0.56 && $bottom['continuity'] >= 0.56);
+
+        $bezelScore = 0;
+        if ($strongSides >= 3) {
+            $bezelScore = $emissiveSides >= 2 ? 42 : 40;
+        } elseif ($strongSides === 2 && ($oppositeSides || $emissiveSides >= 1)) {
+            $bezelScore = 28;
+        } elseif ($strongSides === 2) {
+            $bezelScore = 20;
+        } elseif ($emissiveSides >= 1 && $maxContinuity >= 0.70) {
+            $bezelScore = 15;
+        }
+
+        // 2. Native 1:1 Moire & subpixel chromatic ripple check in central face zone
+        $moireScore = $this->computeServerMoireScore($im, $w, $h);
+
+        // 3 & 4. Glass specular glare + cool-blue screen cast & dark backlight floor on 120x90 grid
+        $glarePixels = 0;
+        $glareTotal = 0;
+        $sumR = 0;
+        $sumB = 0;
+        $midCount = 0;
+        for ($y = 18; $y < 72; $y++) {
+            for ($x = 24; $x < 96; $x++) {
+                $rgb = imagecolorat($grid, $x, $y);
+                $r = ($rgb >> 16) & 0xFF;
+                $g = ($rgb >> 8) & 0xFF;
+                $b = $rgb & 0xFF;
+                $lum = 0.299 * $r + 0.587 * $g + 0.114 * $b;
+
+                $glareTotal++;
+                if ($r > 238 && $g > 238 && $b > 238 && (max($r, $g, $b) - min($r, $g, $b)) < 14) {
+                    $glarePixels++;
+                }
+                if ($lum >= 60.0 && $lum <= 220.0) {
+                    $sumR += $r;
+                    $sumB += $b;
+                    $midCount++;
+                }
+            }
+        }
+
+        $darkCount = 0;
+        $bluishDarkCount = 0;
+        for ($y = 4; $y < 86; $y++) {
+            for ($x = 4; $x < 116; $x++) {
+                $rgb = imagecolorat($grid, $x, $y);
+                $r = ($rgb >> 16) & 0xFF;
+                $g = ($rgb >> 8) & 0xFF;
+                $b = $rgb & 0xFF;
+                $lum = 0.299 * $r + 0.587 * $g + 0.114 * $b;
+                if ($lum < 75.0) {
+                    $darkCount++;
+                    if ($b > $r + 7) {
+                        $bluishDarkCount++;
+                    }
+                }
+            }
+        }
+        imagedestroy($grid);
+
+        $glareRatio = $glareTotal > 0 ? ($glarePixels / $glareTotal) : 0.0;
+        $glareScore = 0;
+        if ($glareRatio >= 0.055) {
+            $glareScore = 22;
+        } elseif ($glareRatio >= 0.025) {
+            $glareScore = 13;
+        } elseif ($glareRatio >= 0.012) {
+            $glareScore = 6;
+        }
+
+        $blueCastScore = 0;
+        if ($midCount > 30 && $sumR > 0) {
+            $blueRedRatio = $sumB / $sumR;
+            if ($blueRedRatio >= 0.94) {
+                $blueCastScore += 12;
+            } elseif ($blueRedRatio >= 0.87) {
+                $blueCastScore += 6;
+            }
+        }
+        if ($darkCount > 25) {
+            $bluishDarkRatio = $bluishDarkCount / $darkCount;
+            if ($bluishDarkRatio >= 0.25) {
+                $blueCastScore += 10;
+            } elseif ($bluishDarkRatio >= 0.14) {
+                $blueCastScore += 5;
+            }
+        }
+        $blueCastScore = min(20, $blueCastScore);
+
+        $score = min(100, $bezelScore + $moireScore + $glareScore + $blueCastScore);
+
+        return [
+            'score' => $score,
+            'bezel_score' => $bezelScore,
+            'moire_score' => $moireScore,
+            'glare_score' => $glareScore,
+            'blue_cast_score' => $blueCastScore,
+        ];
+    }
+
+    /**
+     * Scan a candidate vertical or horizontal bezel band for straight emissive screen edges.
+     *
+     * @param  resource|\GdImage  $grid
+     * @return array{continuity: float, emissive: bool}
+     */
+    private function scanBezelSide($grid, int $gridW, int $gridH, int $pStart, int $pEnd, int $spanStart, int $spanEnd, int $innerDir, bool $vertical): array
+    {
+        $bestContinuity = 0.0;
+        $bestEmissive = false;
+        $spanLen = max(1, $spanEnd - $spanStart);
+
+        for ($p = $pStart; $p <= $pEnd; $p++) {
+            $edgeHits = 0;
+            $polarityHits = 0;
+            $dropSum = 0.0;
+
+            for ($s = $spanStart; $s < $spanEnd; $s++) {
+                if ($vertical) {
+                    $lInner = $this->pixelLuma($grid, max(0, min($gridW - 1, $p + $innerDir * 2)), $s);
+                    $lOuter = $this->pixelLuma($grid, max(0, min($gridW - 1, $p - $innerDir * 2)), $s);
+                } else {
+                    $lInner = $this->pixelLuma($grid, $s, max(0, min($gridH - 1, $p + $innerDir * 2)));
+                    $lOuter = $this->pixelLuma($grid, $s, max(0, min($gridH - 1, $p - $innerDir * 2)));
+                }
+
+                $diff = $lInner - $lOuter;
+                if (abs($diff) >= 24.0) {
+                    $edgeHits++;
+                    if ($diff >= 14.0) {
+                        $polarityHits++;
+                        $dropSum += $diff;
+                    }
+                }
+            }
+
+            $continuity = $edgeHits / $spanLen;
+            $polarityRatio = $edgeHits > 0 ? ($polarityHits / $edgeHits) : 0.0;
+            $meanDrop = $polarityHits > 0 ? ($dropSum / $polarityHits) : 0.0;
+
+            if ($continuity > $bestContinuity) {
+                $bestContinuity = $continuity;
+            }
+            if ($continuity >= 0.52 && $polarityRatio >= 0.58 && $meanDrop >= 16.0) {
+                $bestEmissive = true;
+            }
+        }
+
+        return ['continuity' => $bestContinuity, 'emissive' => $bestEmissive];
+    }
+
+    /**
+     * Measure native-resolution chromatic Moire ripple inside smooth central pixels.
+     *
+     * @param  resource|\GdImage  $im
+     */
+    private function computeServerMoireScore($im, int $w, int $h): int
+    {
+        $x0 = max(0, (int) ($w * 0.30));
+        $x1 = min($w - 3, (int) ($w * 0.70));
+        $y0 = max(0, (int) ($h * 0.30));
+        $y1 = min($h - 1, (int) ($h * 0.70));
+        $yStep = max(2, (int) ($h / 160));
+
+        $smoothCount = 0;
+        $reversals = 0;
+        $highChroma = 0;
+
+        for ($y = $y0; $y < $y1; $y += $yStep) {
+            for ($x = $x0; $x <= $x1; $x++) {
+                $c0 = imagecolorat($im, $x, $y);
+                $c1 = imagecolorat($im, $x + 1, $y);
+                $c2 = imagecolorat($im, $x + 2, $y);
+
+                $r0 = ($c0 >> 16) & 0xFF; $g0 = ($c0 >> 8) & 0xFF; $b0 = $c0 & 0xFF;
+                $r1 = ($c1 >> 16) & 0xFF; $g1 = ($c1 >> 8) & 0xFF; $b1 = $c1 & 0xFF;
+                $r2 = ($c2 >> 16) & 0xFF; $g2 = ($c2 >> 8) & 0xFF; $b2 = $c2 & 0xFF;
+
+                $l0 = 0.299 * $r0 + 0.587 * $g0 + 0.114 * $b0;
+                $l1 = 0.299 * $r1 + 0.587 * $g1 + 0.114 * $b1;
+                $l2 = 0.299 * $r2 + 0.587 * $g2 + 0.114 * $b2;
+
+                if (abs($l1 - $l0) < 18.0 && abs($l2 - $l1) < 18.0) {
+                    $smoothCount++;
+                    $dRg1 = ($r1 - $g1) - ($r0 - $g0);
+                    $dRg2 = ($r2 - $g2) - ($r1 - $g1);
+                    $dBg1 = ($b1 - $g1) - ($b0 - $g0);
+                    $dBg2 = ($b2 - $g2) - ($b1 - $g1);
+
+                    if (($dRg1 * $dRg2) < -18 || ($dBg1 * $dBg2) < -18) {
+                        $reversals++;
+                    }
+                    if ((abs($dRg1) + abs($dBg1)) > 14) {
+                        $highChroma++;
+                    }
+                }
+            }
+        }
+
+        if ($smoothCount < 40) {
+            return 0;
+        }
+
+        $moireRate = $reversals / $smoothCount;
+        $chromaRate = $highChroma / $smoothCount;
+
+        if ($moireRate >= 0.22 || ($moireRate >= 0.14 && $chromaRate >= 0.28)) {
+            return 30;
+        }
+        if ($moireRate >= 0.14 || $chromaRate >= 0.22) {
+            return 18;
+        }
+        if ($moireRate >= 0.09) {
+            return 10;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param  resource|\GdImage  $im
+     */
+    private function pixelLuma($im, int $x, int $y): float
+    {
+        $rgb = imagecolorat($im, $x, $y);
+        $r = ($rgb >> 16) & 0xFF;
+        $g = ($rgb >> 8) & 0xFF;
+        $b = $rgb & 0xFF;
+
+        return 0.299 * $r + 0.587 * $g + 0.114 * $b;
     }
 
     private function decodeAndValidateImage(string $base64Image, ?User $actor = null): string

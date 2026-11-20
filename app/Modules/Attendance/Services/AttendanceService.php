@@ -30,7 +30,7 @@ class AttendanceService
      * @param  array<int, string>  $posesBase64
      * @param  array<int, float>|null  $descriptors
      */
-    public function enrollUserFace(User $user, array $posesBase64, bool $consentGiven, string $ip, ?array $descriptors = null): FaceTemplate
+    public function enrollUserFace(User $user, array $posesBase64, bool $consentGiven, string $ip, ?array $descriptors = null, ?string $antiSpoofMetaJson = null): FaceTemplate
     {
         if (! $consentGiven) {
             throw ValidationException::withMessages([
@@ -38,7 +38,7 @@ class AttendanceService
             ]);
         }
 
-        $result = $this->faceClient->enroll($user, $posesBase64, $descriptors);
+        $result = $this->faceClient->enroll($user, $posesBase64, $descriptors, $antiSpoofMetaJson);
 
         $referencePath = 'biometrics/ref_'.$user->id.'_'.Str::random(24).'.txt';
         Storage::disk('private')->put($referencePath, $posesBase64[0]);
@@ -253,7 +253,8 @@ class AttendanceService
                 template: $template,
                 primaryImageBase64: (string) $data['primary_image'],
                 challengeImageBase64: (string) ($data['challenge_image'] ?? ''),
-                faceDescriptorJson: ! empty($data['face_descriptor']) ? (string) $data['face_descriptor'] : null
+                faceDescriptorJson: ! empty($data['face_descriptor']) ? (string) $data['face_descriptor'] : null,
+                antiSpoofMetaJson: ! empty($data['anti_spoof_meta']) ? (string) $data['anti_spoof_meta'] : null
             );
 
             if (! $verifyResult['match']) {
