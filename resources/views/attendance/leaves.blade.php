@@ -49,9 +49,9 @@
         </div>
 
         <!-- Action Toolbar: Filter Periode Tahun & Trigger Modal -->
-        <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="rounded-2xl border border-slate-200/80 bg-white p-3 sm:px-5 sm:py-3.5 shadow-2xs flex flex-row items-center justify-between gap-2.5 sm:gap-4">
             <!-- Left: Filter Periode Tahun -->
-            <form method="GET" action="{{ route('attendance.leaves') }}" class="flex items-center gap-2">
+            <form method="GET" action="{{ route('attendance.leaves') }}" class="flex items-center gap-2 shrink-0">
                 <div class="relative flex items-center">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-teal-600">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -61,8 +61,8 @@
                     <select name="year" 
                             id="filter-year-select"
                             onchange="this.form.submit()"
-                            title="Pilih Tahun"
-                            class="rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-100/70 focus:bg-white pl-9 pr-8 py-2 text-xs font-bold text-slate-800 font-mono shadow-2xs focus:border-[#155E63] focus:ring-1 focus:ring-[#155E63] outline-none transition cursor-pointer appearance-none">
+                            title="Pilih Periode Tahun"
+                            class="rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/70 focus:bg-white pl-9 pr-8 py-2.5 text-xs sm:text-sm font-bold text-slate-800 font-mono shadow-2xs focus:border-[#155E63] focus:ring-2 focus:ring-[#155E63]/20 outline-none transition cursor-pointer appearance-none">
                         @for ($y = now()->year - 2; $y <= now()->year + 3; $y++)
                             <option value="{{ $y }}" @selected($y === (int) $year)>Tahun {{ $y }}</option>
                         @endfor
@@ -73,22 +73,13 @@
                         </svg>
                     </div>
                 </div>
-
-                <button type="submit" 
-                        class="h-[34px] px-3.5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:opacity-95 transition cursor-pointer active:scale-95"
-                        style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
-                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <span>Filter</span>
-                </button>
             </form>
 
             <!-- Right: Action Button -->
-            <div class="w-full sm:w-auto flex items-center justify-end">
+            <div class="flex items-center justify-end">
                 <button type="button" 
                         @click="openModal('sick')"
-                        class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-white font-bold text-xs shadow-md shadow-teal-900/10 hover:opacity-95 transition active:scale-[0.98] cursor-pointer whitespace-nowrap"
+                        class="inline-flex items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-900/10 hover:opacity-95 transition active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0"
                         style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
                     <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
