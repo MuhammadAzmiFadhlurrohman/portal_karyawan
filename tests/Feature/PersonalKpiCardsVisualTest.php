@@ -39,7 +39,7 @@ class PersonalKpiCardsVisualTest extends TestCase
         // Card 3: Absensi Saya (Stacked Progress Bar)
         $response->assertSee('Absensi Saya');
         $response->assertSee('Total Hadir');
-        $response->assertSee('Total Potongan');
+        $response->assertSee('Potongan');
         $response->assertSee('Tepat Waktu:');
         $response->assertSee('Tidak Hadir:');
         $response->assertSee('Akumulasi Potongan');

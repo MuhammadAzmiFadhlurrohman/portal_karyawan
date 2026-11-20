@@ -173,10 +173,45 @@
         .kpi-btn-cta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 14px;border-radius:14px;background:#e6fcf5;color:#0ca678;border:1px solid #c3fae8;font-size:11.5px;font-weight:700;transition:all .15s ease;text-decoration:none}
         .kpi-btn-cta:hover{background:#c3fae8}
 
-        /* Donut Chart & Stacked Progress Bar */
-        .kpi-donut-ring{position:relative;width:102px;height:102px;border-radius:9999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px -2px rgba(15,23,42,.08);transition:transform .2s ease,box-shadow .2s ease}
-        .kpi-donut-ring:hover{transform:scale(1.03);box-shadow:0 6px 16px -2px rgba(15,23,42,.12)}
-        .kpi-donut-center{width:70px;height:70px;border-radius:9999px;background:#ffffff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}
+        /* Donut Chart & Stacked Progress Bar (Refined Executive Polish) */
+        .kpi-donut-wrap{display:flex;align-items:center;gap:16px;padding:6px 0 14px}
+        .kpi-donut-ring{position:relative;width:98px;height:98px;border-radius:9999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px -4px rgba(15,23,42,.10);transition:transform .2s ease,box-shadow .2s ease}
+        .kpi-donut-ring:hover{transform:scale(1.03);box-shadow:0 8px 20px -4px rgba(15,23,42,.14)}
+        .kpi-donut-center{width:68px;height:68px;border-radius:9999px;background:#ffffff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 1px 4px rgba(15,23,42,.06)}
+        .kpi-donut-num{font-size:22px;font-weight:800;color:#0f172a;line-height:1;letter-spacing:-0.02em}
+        .kpi-donut-lbl{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-top:3px}
+
+        .kpi-legend-list{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+        .kpi-legend-item{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:10px;background:#f8fafc;border:1px solid #f1f5f9;font-size:11.5px;transition:background .15s ease}
+        .kpi-legend-item:hover{background:#f1f5f9}
+        .kpi-legend-left{display:flex;align-items:center;gap:8px;min-width:0;color:#475569;font-weight:600}
+        .kpi-legend-dot{width:8px;height:8px;border-radius:9999px;flex-shrink:0}
+        .kpi-legend-dot-green{background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.16)}
+        .kpi-legend-dot-red{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
+        .kpi-legend-dot-amber{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.18)}
+        .kpi-legend-val{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:9999px;min-width:24px;text-align:center;flex-shrink:0;margin-left:6px}
+        .kpi-legend-val-green{background:#ecfdf5;color:#047857}
+        .kpi-legend-val-red{background:#fff1f2;color:#be123c}
+        .kpi-legend-val-amber{background:#fffbeb;color:#b45309}
+
+        .kpi-abs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+        .kpi-abs-box{padding:10px 12px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+        .kpi-abs-box-teal{background:#f0fdfa;border:1px solid #ccfbf1}
+        .kpi-abs-box-amber{background:#fffbeb;border:1px solid #fef3c7}
+        .kpi-abs-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;display:block;line-height:1.2}
+        .kpi-abs-val-row{display:flex;align-items:baseline;gap:4px;margin-top:4px}
+        .kpi-abs-num{font-size:20px;font-weight:800;color:#0f172a;line-height:1;letter-spacing:-0.02em}
+        .kpi-abs-unit{font-size:11px;font-weight:600;color:#0f766e}
+        .kpi-abs-money{font-size:14px;font-weight:800;color:#92400e;line-height:1.1;margin-top:5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .kpi-abs-icon{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .kpi-abs-icon-teal{background:#ccfbf1;color:#0f766e}
+        .kpi-abs-icon-amber{background:#fef3c7;color:#d97706}
+
+        .kpi-pbar-track{height:10px;width:100%;background:#f1f5f9;border-radius:9999px;overflow:hidden;display:flex;gap:2px;padding:1px;border:1px solid #e2e8f0;margin-bottom:10px}
+        .kpi-pbar-seg{height:100%;border-radius:9999px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+        .kpi-pbar-legend{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:11px;color:#64748b;margin-bottom:12px}
+        .kpi-pbar-item{display:inline-flex;align-items:center;gap:5px;font-weight:500}
+        .kpi-pbar-dot{width:7px;height:7px;border-radius:9999px;flex-shrink:0}
 
         /* Kalender Kehadiran Bulanan (Self-contained 7-column grid to ensure it never breaks) */
         .cal-grid-7 {
@@ -769,42 +804,39 @@
                     @endphp
 
                     <!-- Donut Chart & Vertical Legend -->
-                    <div class="flex items-center gap-4 py-2.5 mb-3">
+                    <div class="kpi-donut-wrap">
                         <!-- Sisi Kiri: Donut Chart -->
                         <div class="kpi-donut-ring" style="background: {{ $donutPengajuan }};" title="Total Pengajuan: {{ $pTotal }}">
                             <div class="kpi-donut-center">
-                                <span class="text-2xl font-black text-slate-800 leading-none tracking-tight">{{ $pTotal }}</span>
-                                <span class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total</span>
+                                <span class="kpi-donut-num">{{ $pTotal }}</span>
+                                <span class="kpi-donut-lbl">Total</span>
                             </div>
                         </div>
 
                         <!-- Sisi Kanan: Vertical Legend -->
-                        <div class="flex-1 flex flex-col justify-center gap-2 min-w-0">
-                            <!-- Titik Hijau: Disetujui -->
-                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100/90">
-                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-sm shadow-emerald-500/40"></span>
+                        <div class="kpi-legend-list">
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-green"></span>
                                     <span class="truncate">Disetujui</span>
                                 </span>
-                                <span class="font-bold text-emerald-700 text-xs shrink-0 ml-1.5">({{ $pApproved }})</span>
+                                <span class="kpi-legend-val kpi-legend-val-green">{{ $pApproved }}</span>
                             </div>
 
-                            <!-- Titik Merah: Ditolak -->
-                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-rose-50/70 border border-rose-100/90">
-                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 shadow-sm shadow-rose-500/40"></span>
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-red"></span>
                                     <span class="truncate">Ditolak</span>
                                 </span>
-                                <span class="font-bold text-rose-700 text-xs shrink-0 ml-1.5">({{ $pRejected }})</span>
+                                <span class="kpi-legend-val kpi-legend-val-red">{{ $pRejected }}</span>
                             </div>
 
-                            <!-- Titik Kuning: Menunggu -->
-                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-amber-50/70 border border-amber-100/90">
-                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-sm shadow-amber-500/40"></span>
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-amber"></span>
                                     <span class="truncate">Menunggu</span>
                                 </span>
-                                <span class="font-bold text-amber-700 text-xs shrink-0 ml-1.5">({{ $pPending }})</span>
+                                <span class="kpi-legend-val kpi-legend-val-amber">{{ $pPending }}</span>
                             </div>
                         </div>
                     </div>
@@ -861,42 +893,39 @@
                     @endphp
 
                     <!-- Donut Chart & Vertical Legend -->
-                    <div class="flex items-center gap-4 py-2.5 mb-3">
+                    <div class="kpi-donut-wrap">
                         <!-- Sisi Kiri: Donut Chart -->
                         <div class="kpi-donut-ring" style="background: {{ $donutLembur }};" title="Total Lembur: {{ $lTotal }}">
                             <div class="kpi-donut-center">
-                                <span class="text-2xl font-black text-slate-800 leading-none tracking-tight">{{ $lTotal }}</span>
-                                <span class="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider mt-1">Total</span>
+                                <span class="kpi-donut-num">{{ $lTotal }}</span>
+                                <span class="kpi-donut-lbl">Total</span>
                             </div>
                         </div>
 
                         <!-- Sisi Kanan: Vertical Legend -->
-                        <div class="flex-1 flex flex-col justify-center gap-2 min-w-0">
-                            <!-- Titik Hijau: Disetujui -->
-                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100/90">
-                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 shadow-sm shadow-emerald-500/40"></span>
+                        <div class="kpi-legend-list">
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-green"></span>
                                     <span class="truncate">Disetujui</span>
                                 </span>
-                                <span class="font-bold text-emerald-700 text-xs shrink-0 ml-1.5">({{ $lApproved }})</span>
+                                <span class="kpi-legend-val kpi-legend-val-green">{{ $lApproved }}</span>
                             </div>
 
-                            <!-- Titik Merah: Ditolak -->
-                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-rose-50/70 border border-rose-100/90">
-                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0 shadow-sm shadow-rose-500/40"></span>
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-red"></span>
                                     <span class="truncate">Ditolak</span>
                                 </span>
-                                <span class="font-bold text-rose-700 text-xs shrink-0 ml-1.5">({{ $lRejected }})</span>
+                                <span class="kpi-legend-val kpi-legend-val-red">{{ $lRejected }}</span>
                             </div>
 
-                            <!-- Titik Kuning: Menunggu -->
-                            <div class="flex items-center justify-between text-xs py-1 px-2.5 rounded-xl bg-amber-50/70 border border-amber-100/90">
-                                <span class="flex items-center gap-2 font-medium text-slate-700 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0 shadow-sm shadow-amber-500/40"></span>
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-amber"></span>
                                     <span class="truncate">Menunggu</span>
                                 </span>
-                                <span class="font-bold text-amber-700 text-xs shrink-0 ml-1.5">({{ $lPending }})</span>
+                                <span class="kpi-legend-val kpi-legend-val-amber">{{ $lPending }}</span>
                             </div>
                         </div>
                     </div>
@@ -958,76 +987,69 @@
                         $tidakHadirPct = round(($tidakHadir / $totalDays) * 100, 1);
                     @endphp
 
-                    <!-- Bagian Atas: Total Hadir & Total Potongan Menonjol -->
-                    <div class="grid grid-cols-2 gap-2.5 mb-3">
+                    <!-- Bagian Atas: Total Hadir & Potongan Menonjol -->
+                    <div class="kpi-abs-grid">
                         <!-- Total Hadir Box -->
-                        <div class="p-2.5 rounded-2xl bg-teal-50/70 border border-teal-100/90 flex items-center justify-between">
-                            <div>
-                                <span class="text-[10px] font-bold text-teal-800 uppercase tracking-wider block">Total Hadir</span>
-                                <div class="flex items-baseline gap-1 mt-0.5">
-                                    <span class="text-2xl font-black text-slate-900 leading-none">{{ $hadir }}</span>
-                                    <span class="text-[11px] font-semibold text-teal-700">Hari</span>
+                        <div class="kpi-abs-box kpi-abs-box-teal">
+                            <div class="min-w-0">
+                                <span class="kpi-abs-lbl" style="color:#0f766e;">Total Hadir</span>
+                                <div class="kpi-abs-val-row">
+                                    <span class="kpi-abs-num">{{ $hadir }}</span>
+                                    <span class="kpi-abs-unit">Hari</span>
                                 </div>
                             </div>
-                            <div class="w-8 h-8 rounded-xl bg-teal-100/80 text-teal-700 flex items-center justify-center shrink-0">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            <div class="kpi-abs-icon kpi-abs-icon-teal">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             </div>
                         </div>
 
                         <!-- Total Potongan Box -->
-                        <div class="p-2.5 rounded-2xl bg-amber-50/70 border border-amber-100/90 flex items-center justify-between">
-                            <div class="min-w-0 pr-1">
-                                <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider block truncate">Total Potongan</span>
-                                <div class="mt-0.5">
-                                    <span class="text-[14px] sm:text-base font-black text-amber-900 leading-none block truncate" title="Rp {{ number_format($potonganVal, 0, ',', '.') }}">
-                                        Rp {{ $potonganVal > 0 ? (strlen((string) (int) $potonganVal) > 6 ? round($potonganVal/1000) . 'k' : number_format($potonganVal, 0, ',', '.')) : '0' }}
-                                    </span>
-                                </div>
+                        <div class="kpi-abs-box kpi-abs-box-amber">
+                            <div class="min-w-0">
+                                <span class="kpi-abs-lbl" style="color:#b45309;">Potongan</span>
+                                <span class="kpi-abs-money" title="Rp {{ number_format($potonganVal, 0, ',', '.') }}">
+                                    Rp {{ $potonganVal > 0 ? (strlen((string) (int) $potonganVal) > 6 ? round($potonganVal/1000) . 'k' : number_format($potonganVal, 0, ',', '.')) : '0' }}
+                                </span>
                             </div>
-                            <div class="w-8 h-8 rounded-xl bg-amber-100/80 text-amber-700 flex items-center justify-center shrink-0">
-                                <svg width="15" height="15" class="fill-amber-600 text-amber-600" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <div class="kpi-abs-icon kpi-abs-icon-amber">
+                                <svg width="14" height="14" class="fill-amber-600 text-amber-600" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tengah: Stacked Progress Bar -->
-                    <div class="mb-2">
-                        <div class="h-3.5 w-full bg-slate-100 rounded-full overflow-hidden flex p-0.5 border border-slate-200/80 shadow-inner"
-                             title="Tepat Waktu: {{ $tepatWaktu }} hari, Terlambat: {{ $terlambat }} hari, Tidak Hadir: {{ $tidakHadir }} hari">
-                            @if ($hadir + $tidakHadir === 0)
-                                <div class="h-full w-full bg-slate-200 rounded-full"></div>
-                            @else
-                                @if ($tepatPct > 0)
-                                    <div class="h-full bg-emerald-500 rounded-l-full {{ ($terlambatPct == 0 && $tidakHadirPct == 0) ? 'rounded-r-full' : '' }} transition-all duration-500 shadow-sm"
-                                         style="width: {{ $tepatPct }}%;"></div>
-                                @endif
-                                @if ($terlambatPct > 0)
-                                    <div class="h-full bg-amber-400 {{ $tepatPct == 0 ? 'rounded-l-full' : '' }} {{ $tidakHadirPct == 0 ? 'rounded-r-full' : '' }} transition-all duration-500"
-                                         style="width: {{ $terlambatPct }}%;"></div>
-                                @endif
-                                @if ($tidakHadirPct > 0)
-                                    <div class="h-full bg-rose-500 {{ ($tepatPct == 0 && $terlambatPct == 0) ? 'rounded-l-full' : '' }} rounded-r-full transition-all duration-500"
-                                         style="width: {{ $tidakHadirPct }}%;"></div>
-                                @endif
+                    <div class="kpi-pbar-track"
+                         title="Tepat Waktu: {{ $tepatWaktu }} hari, Terlambat: {{ $terlambat }} hari, Tidak Hadir: {{ $tidakHadir }} hari">
+                        @if ($hadir + $tidakHadir === 0)
+                            <div class="kpi-pbar-seg" style="width:100%; background:#e2e8f0;"></div>
+                        @else
+                            @if ($tepatPct > 0)
+                                <div class="kpi-pbar-seg" style="width: {{ $tepatPct }}%; background: linear-gradient(90deg, #10b981, #059669);"></div>
                             @endif
-                        </div>
+                            @if ($terlambatPct > 0)
+                                <div class="kpi-pbar-seg" style="width: {{ $terlambatPct }}%; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                            @endif
+                            @if ($tidakHadirPct > 0)
+                                <div class="kpi-pbar-seg" style="width: {{ $tidakHadirPct }}%; background: linear-gradient(90deg, #fb7185, #e11d48);"></div>
+                            @endif
+                        @endif
                     </div>
 
                     <!-- Bawah Bar: Label Keterangan -->
-                    <div class="flex items-center justify-between text-xs text-slate-600 mb-3 px-0.5">
-                        <span class="inline-flex items-center gap-1.5 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                            <span>Tepat Waktu: <strong class="text-emerald-700 font-bold">{{ $tepatWaktu }}</strong></span>
+                    <div class="kpi-pbar-legend">
+                        <span class="kpi-pbar-item">
+                            <span class="kpi-pbar-dot" style="background:#10b981;"></span>
+                            <span>Tepat Waktu: <strong style="color:#047857; font-weight:700;">{{ $tepatWaktu }}</strong></span>
                         </span>
                         @if ($terlambat > 0)
-                        <span class="inline-flex items-center gap-1.5 font-medium">
-                            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
-                            <span>Terlambat: <strong class="text-amber-700 font-bold">{{ $terlambat }}</strong></span>
+                        <span class="kpi-pbar-item">
+                            <span class="kpi-pbar-dot" style="background:#f59e0b;"></span>
+                            <span>Terlambat: <strong style="color:#b45309; font-weight:700;">{{ $terlambat }}</strong></span>
                         </span>
                         @endif
-                        <span class="inline-flex items-center gap-1.5 font-medium">
-                            <span class="w-2 h-2 rounded-full {{ $tidakHadir > 0 ? 'bg-rose-500' : 'bg-slate-300' }} shrink-0"></span>
-                            <span>Tidak Hadir: <strong class="{{ $tidakHadir > 0 ? 'text-rose-700' : 'text-slate-500' }} font-bold">{{ $tidakHadir }}</strong></span>
+                        <span class="kpi-pbar-item">
+                            <span class="kpi-pbar-dot" style="background:{{ $tidakHadir > 0 ? '#e11d48' : '#cbd5e1' }};"></span>
+                            <span>Tidak Hadir: <strong style="color:{{ $tidakHadir > 0 ? '#be123c' : '#64748b' }}; font-weight:700;">{{ $tidakHadir }}</strong></span>
                         </span>
                     </div>
 
