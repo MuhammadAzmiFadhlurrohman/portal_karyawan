@@ -359,18 +359,9 @@
 
                     <!-- Message Bubble -->
                     <div :class="msg.sender === 'user' 
-                                ? 'chatbot-bubble-user px-3.5 py-2 sm:px-4 sm:py-2.5 max-w-[76%] sm:max-w-[72%] min-w-0' 
-                                : 'chatbot-bubble-bot px-3.5 py-2.5 sm:px-4 sm:py-3 max-w-[82%] sm:max-w-[78%] min-w-0'">
-                        
-                        <!-- Header Pengirim Pesan Bot -->
-                        <template x-if="msg.sender !== 'user'">
-                            <div class="flex items-center gap-1.5 mb-1 pb-1 border-b border-slate-100">
-                                <span class="text-[10.5px] font-bold text-[#155E63]">Asisten Mandiri</span>
-                                <span class="px-1.5 py-0.2 rounded text-[8.5px] font-extrabold bg-teal-50 text-teal-700 border border-teal-200/60 leading-none">AI</span>
-                            </div>
-                        </template>
-
-                        <p class="leading-relaxed whitespace-pre-line break-words text-[12.5px] sm:text-[13px] text-inherit"
+                                ? 'chatbot-bubble-user px-3.5 py-2 sm:px-4 sm:py-2 max-w-[76%] sm:max-w-[72%] min-w-0' 
+                                : 'chatbot-bubble-bot px-3.5 py-2 sm:px-4 sm:py-2 max-w-[82%] sm:max-w-[78%] min-w-0'">
+                        <p class="leading-relaxed whitespace-pre-line break-words text-[12.5px] sm:text-[13px] text-inherit m-0"
                            style="word-break: break-word; overflow-wrap: anywhere;">
                             <span x-text="msg.text"></span>
                             <span x-show="msg.isTyping" class="chatbot-typing-cursor"></span>
