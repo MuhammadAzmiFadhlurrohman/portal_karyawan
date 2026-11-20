@@ -188,7 +188,7 @@
 
         /* Chat Message Rows, Circular Avatars & Proportional Bubbles */
         .chatbot-msg-row {
-            display: flex !important;
+            display: flex;
             align-items: flex-start !important;
             gap: 8px !important;
             width: 100% !important;
@@ -199,6 +199,10 @@
         }
         .chatbot-msg-row.is-bot {
             justify-content: flex-start !important;
+        }
+        .chatbot-msg-row[style*="display: none"],
+        .chatbot-msg-row[style*="display:none"] {
+            display: none !important;
         }
 
         .chatbot-avatar {
@@ -542,7 +546,7 @@
             </template>
 
             <!-- Loading Indicator with Bot Avatar -->
-            <div x-show="loading" class="chatbot-msg-row is-bot">
+            <div x-cloak x-show="loading" class="chatbot-msg-row is-bot" style="display: none;">
                 <div class="chatbot-avatar is-bot">
                     <svg style="width: 17px; height: 17px;" viewBox="0 0 24 24" fill="#ffffff">
                         <rect x="10.8" y="1.8" width="2.4" height="3.4" rx="1.2" fill="#ffffff"/>
