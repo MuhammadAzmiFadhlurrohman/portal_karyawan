@@ -884,6 +884,136 @@ class ChatbotService
     }
 
     /**
+     * Get the top 2 closest recommended questions when the chatbot cannot understand or needs clarification.
+     *
+     * @param list<string> $userTokens
+     * @return list<string>
+     */
+    protected function getTopTwoRecommendations(string $rawClean, string $normMessage, array $userTokens, bool $isSunda): array
+    {
+        $intents = ChatbotIntent::query()->where('is_active', true)->get();
+        $scored = [];
+
+        $ignoredKeys = [
+            'q99_input_tidak_valid',
+            'q98_proteksi_prompt_injection',
+            'q94_proteksi_pii_gaji_rekening',
+            'q95_pencegahan_halusinasi_nik',
+            'q96_out_of_scope_umum',
+            'q97_guardrail_topik_pekerjaan',
+            'sunda_189_out_of_scope_kuliner',
+        ];
+
+        foreach ($intents as $intent) {
+            $key = $intent->intent_key;
+            if (in_array($key, $ignoredKeys, true)) {
+                continue;
+            }
+
+            $isSundaIntent = str_starts_with($key, 'sunda_');
+            $keywords = $intent->keywords ?? [];
+            if (empty($keywords)) {
+                continue;
+            }
+
+            $maxSim = 0.0;
+            $bestKw = $keywords[0];
+
+            foreach ($keywords as $kw) {
+                $kwNorm = $this->normalizeText($kw);
+                $kwTokens = $this->extractTokens($kwNorm);
+                if (empty($kwTokens)) {
+                    continue;
+                }
+
+                $overlap = 0;
+                foreach ($kwTokens as $kt) {
+                    foreach ($userTokens as $ut) {
+                        if ($kt === $ut || $this->isTypoMatch($kt, $ut)) {
+                            $overlap += $this->isSubjectKeyword($kt) ? 3 : 1;
+                            break;
+                        }
+                    }
+                }
+
+                if (str_contains($normMessage, $kwNorm) || str_contains($kwNorm, $normMessage)) {
+                    $overlap += 3;
+                }
+
+                similar_text($normMessage, $kwNorm, $pct);
+                $simScore = ($overlap * 10) + ($pct / 5);
+
+                if ($isSunda && $isSundaIntent) {
+                    $simScore *= 1.3;
+                } elseif (! $isSunda && $isSundaIntent) {
+                    $simScore *= 0.7;
+                }
+
+                if ($simScore > $maxSim && $overlap > 0) {
+                    $maxSim = $simScore;
+                }
+            }
+
+            if ($maxSim > 0) {
+                // Find a well-formed question for this intent (>= 3 words)
+                $chosenQuestion = $keywords[0];
+                foreach ($keywords as $kwCandidate) {
+                    if (mb_strlen($kwCandidate) >= 15 && count(explode(' ', $kwCandidate)) >= 3) {
+                        $chosenQuestion = $kwCandidate;
+                        break;
+                    }
+                }
+
+                $scored[] = [
+                    'intent_key' => $key,
+                    'score' => $maxSim,
+                    'question' => $chosenQuestion,
+                ];
+            }
+        }
+
+        usort($scored, fn ($a, $b) => $b['score'] <=> $a['score']);
+
+        $recommendations = [];
+        $seen = [];
+        foreach ($scored as $item) {
+            $q = trim($item['question']);
+            $formatted = mb_strtoupper(mb_substr($q, 0, 1)) . mb_substr($q, 1);
+            if (! str_ends_with($formatted, '?') && ! str_ends_with($formatted, '.')) {
+                $formatted .= '?';
+            }
+            $lowKey = mb_strtolower($formatted);
+            if (! isset($seen[$lowKey])) {
+                $seen[$lowKey] = true;
+                $recommendations[] = $formatted;
+                if (count($recommendations) >= 2) {
+                    break;
+                }
+            }
+        }
+
+        if (count($recommendations) < 2) {
+            $defaults = $isSunda ? [
+                'Min, urang poe ieu geus check-in acan nya?',
+                'Sisa cuti taunan urang ayeuna kari sabaraha poe deui nya?',
+            ] : [
+                'Hari ini saya sudah check-in atau belum?',
+                'Berapa sisa saldo cuti tahunan saya saat ini?',
+            ];
+            foreach ($defaults as $d) {
+                if (! in_array($d, $recommendations, true)) {
+                    $recommendations[] = $d;
+                    if (count($recommendations) >= 2) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return array_slice($recommendations, 0, 2);
+    }
+
+    /**
      * Determine whether two words are a typo/fuzzy match (1-2 edits or transposition).
      */
     protected function isTypoMatch(string $w1, string $w2): bool
@@ -1316,9 +1446,10 @@ class ChatbotService
             || (preg_match('/\b(asdfghjkl|qwertyuiop|zxcvbnm|asdasd|hjkjhg|asdfgh)\b/i', $rawClean) && ! str_contains($rawClean, 'mengirimkan pesan kosong'))
             || (preg_match('/\b[bcdfghjklmnpqrstvwxyz]{6,}\b/i', $rawClean) && count($userTokens) <= 3 && ! $isSunda)
         ) {
+            $recommendations = $this->getTopTwoRecommendations($rawClean, $normMessage, $userTokens, $isSunda);
             $resp = ($isSunda || str_contains($rawClean, 'wkwkwk'))
-                ? "Punten, pesen nu dikirim teu jelas atawa mangrupa karakter acak. Mangga ketik patarosan singget ngeunaan layanan GOMSN, contona: \"Urang poe ieu geus check-in acan?\", \"Sisa cuti urang sabaraha?\", atawa \"Kumaha cara ngajukeun lembur?\"."
-                : "Maaf, pesan yang Anda kirimkan belum memuat pertanyaan yang spesifik. Silakan ketik pertanyaan singkat terkait layanan GOMSN, misalnya: \"Hari ini saya sudah check-in atau belum?\", \"Berapa sisa saldo cuti saya?\", atau \"Bagaimana cara mengajukan lembur?\".";
+                ? "Punten, pesen nu dikirim teu jelas atawa mangrupa karakter acak. Mangga pilih salah sahiji rekomendasi patarosan di handap ieu:"
+                : "Maaf, pesan yang Anda kirimkan belum memuat pertanyaan yang spesifik. Silakan pilih salah satu rekomendasi pertanyaan di bawah ini:";
 
             return [
                 'response' => $resp,
@@ -1326,7 +1457,7 @@ class ChatbotService
                 'matched_intent' => 'q99_input_tidak_valid',
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => ['Hari ini saya sudah check-in atau belum?', 'Berapa sisa saldo cuti tahunan saya saat ini?', 'Bagaimana cara mengajukan lembur?'],
+                'suggestions' => $recommendations,
             ];
         }
 
@@ -1646,9 +1777,11 @@ class ChatbotService
         }
 
         if ($bestScore < 1.50 || ! $bestIntent) {
+            $recommendations = $this->getTopTwoRecommendations($rawClean, $normMessage, $userTokens, $isSunda);
+
             $fallback = $isSunda
-                ? "Punten, abdi teu acan ngartos maksad patarosan eta sacara spesifik. Mangga taroskeun langsung perkawis absensi, jadwal shift, cuti, potongan, kasbon, lembur, atawa tiket gangguan."
-                : "Maaf, saya belum memahami maksud pertanyaan tersebut secara spesifik. Silakan tanyakan langsung seputar absensi, jadwal shift, cuti, potongan, kasbon, lembur, atau tiket gangguan.";
+                ? "Punten, abdi teu acan ngartos maksad patarosan eta sacara spesifik. Mangga pilih salah sahiji rekomendasi patarosan di handap ieu anu saluyu sareng kabutuhan anjeun:"
+                : "Maaf, saya belum memahami maksud pertanyaan tersebut secara spesifik. Silakan pilih salah satu rekomendasi pertanyaan di bawah ini yang paling mendekati:";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
@@ -1665,7 +1798,7 @@ class ChatbotService
                 'matched_intent' => null,
                 'action_url' => null,
                 'action_label' => null,
-                'suggestions' => $suggestions,
+                'suggestions' => $recommendations,
             ];
         }
 

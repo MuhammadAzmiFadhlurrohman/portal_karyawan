@@ -326,6 +326,30 @@
                                 </a>
                             </div>
                         </template>
+
+                        <!-- 2 Rekomendasi Pertanyaan Jika Bot Butuh Klarifikasi / Tidak Mengerti -->
+                        <template x-if="!msg.isTyping && msg.suggestions && msg.suggestions.length > 0">
+                            <div class="mt-2.5 pt-2 border-t border-slate-100 flex flex-col gap-1.5 transition-opacity duration-300">
+                                <p class="text-[10px] font-semibold text-slate-500 flex items-center gap-1.5 mb-0.5">
+                                    <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M11 3a1 1 0 10-2 0v1a1 1 0 002 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.001z"/>
+                                    </svg>
+                                    <span>Rekomendasi pertanyaan:</span>
+                                </p>
+                                <template x-for="(sug, sIdx) in msg.suggestions.slice(0, 2)" :key="sIdx">
+                                    <button type="button"
+                                            @click="askPreset(sug)"
+                                            class="w-full text-left px-2.5 py-1.5 rounded-xl bg-teal-50/90 hover:bg-teal-100 text-teal-900 border border-teal-200/90 transition-all flex items-center justify-between group cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.98]">
+                                        <span class="text-[11px] font-medium leading-snug truncate pr-1.5 text-teal-900" x-text="sug"></span>
+                                        <span class="shrink-0 w-4.5 h-4.5 rounded-lg bg-teal-600/10 group-hover:bg-teal-600 group-hover:text-white text-teal-700 flex items-center justify-center transition-colors">
+                                            <svg class="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
                     </div>
 
                     <!-- User Circular Avatar (WhatsApp style) -->
@@ -735,7 +759,10 @@
                             text: '',
                             isTyping: true,
                             action_url: resJson.data.action_url || null,
-                            action_label: resJson.data.action_label || null
+                            action_label: resJson.data.action_label || null,
+                            suggestions: (resJson.data.suggestions && Array.isArray(resJson.data.suggestions) && resJson.data.suggestions.length > 0)
+                                ? resJson.data.suggestions.slice(0, 2)
+                                : null
                         });
                         const newMsgIndex = this.messages.length - 1;
                         this.typeMessage(resJson.data.response, newMsgIndex);
