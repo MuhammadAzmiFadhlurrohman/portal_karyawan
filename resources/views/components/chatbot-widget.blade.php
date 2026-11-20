@@ -106,11 +106,13 @@
         /* Chat Window Modal Box - Floating Symmetrical Popup */
         .chatbot-modal-box {
             position: fixed !important;
+            left: 8px !important;
             right: 8px !important;
             bottom: 86px !important;
             z-index: 60 !important;
-            width: 390px !important;
-            max-width: calc(100vw - 16px) !important;
+            width: auto !important;
+            max-width: 420px !important;
+            margin: 0 auto !important;
             height: 520px !important;
             max-height: calc(100vh - 100px) !important;
             background: #ffffff !important;
@@ -121,12 +123,14 @@
         }
         @media (min-width: 640px) {
             .chatbot-modal-box {
+                left: auto !important;
                 right: 28px !important;
                 bottom: 28px !important;
                 width: 420px !important;
                 max-width: calc(100vw - 48px) !important;
                 height: 580px !important;
                 max-height: calc(100vh - 56px) !important;
+                margin: 0 !important;
                 border-radius: 28px !important;
                 box-shadow: 0 24px 60px -15px rgba(2, 40, 54, 0.35) !important;
             }
@@ -287,9 +291,9 @@
             $chatUserAvatarUrl = auth()->check() ? auth()->user()->avatar_url : null;
             $chatUserInitials = auth()->check() ? (auth()->user()->initials ?? strtoupper(substr(auth()->user()->name ?? 'U', 0, 2))) : 'U';
         @endphp
-        <div id="chatbot-messages" class="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-3.5 bg-slate-50 text-xs">
+        <div id="chatbot-messages" class="flex-1 p-3 sm:p-4 overflow-y-auto overflow-x-hidden space-y-3 bg-slate-50 text-xs">
             <template x-for="(msg, index) in messages" :key="index">
-                <div :class="msg.sender === 'user' ? 'flex items-start justify-end gap-2' : 'flex items-start justify-start gap-2'">
+                <div :class="msg.sender === 'user' ? 'flex items-start justify-end gap-2 w-full min-w-0' : 'flex items-start justify-start gap-2 w-full min-w-0'">
                     
                     <!-- Bot Circular Avatar (WhatsApp style) -->
                     <template x-if="msg.sender !== 'user'">
@@ -306,21 +310,22 @@
 
                     <!-- Message Bubble -->
                     <div :class="msg.sender === 'user' 
-                                ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 max-w-[78%] shadow-xs' 
-                                : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 max-w-[82%] shadow-xs'">
-                        <p class="leading-relaxed whitespace-pre-line">
+                                ? 'bg-[#155E63] text-white rounded-2xl rounded-tr-none px-3 sm:px-3.5 py-2.5 max-w-[82%] sm:max-w-[78%] min-w-0 shadow-xs' 
+                                : 'bg-white border border-slate-200/90 text-slate-800 rounded-2xl rounded-tl-none px-3 sm:px-3.5 py-2.5 max-w-[88%] sm:max-w-[84%] min-w-0 shadow-xs'">
+                        <p class="leading-relaxed whitespace-pre-line break-words text-xs sm:text-[13px] text-inherit"
+                           style="word-break: break-word; overflow-wrap: anywhere;">
                             <span x-text="msg.text"></span>
                             <span x-show="msg.isTyping" class="chatbot-typing-cursor"></span>
                         </p>
 
                         <!-- Action Button Menuju Halaman Terkait -->
                         <template x-if="!msg.isTyping && msg.action_url && msg.action_label">
-                            <div class="mt-2 pt-2 border-t border-slate-100 transition-opacity duration-300">
+                            <div class="mt-2.5 pt-2 border-t border-slate-100 transition-opacity duration-300">
                                 <a :href="msg.action_url"
                                    style="background: linear-gradient(135deg, #155E63 0%, #18C4C4 100%) !important;"
-                                   class="inline-flex items-center justify-between w-full px-3 py-2 rounded-xl text-white font-semibold text-[11px] shadow-xs hover:opacity-95 transition-all group">
-                                    <span x-text="msg.action_label"></span>
-                                    <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                   class="inline-flex items-center justify-between w-full px-3 py-2 rounded-xl text-white font-semibold text-[11px] shadow-xs hover:opacity-95 transition-all group active:scale-[0.98]">
+                                    <span class="truncate pr-1.5" x-text="msg.action_label"></span>
+                                    <svg class="w-3.5 h-3.5 shrink-0 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
                                 </a>
@@ -340,7 +345,7 @@
                                     <button type="button"
                                             @click="askPreset(sug)"
                                             class="w-full text-left px-2.5 py-1.5 rounded-xl bg-teal-50/90 hover:bg-teal-100 text-teal-900 border border-teal-200/90 transition-all flex items-center justify-between group cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.98]">
-                                        <span class="text-[11px] font-medium leading-snug truncate pr-1.5 text-teal-900" x-text="sug"></span>
+                                        <span class="text-[11px] font-medium leading-snug line-clamp-2 pr-1.5 text-teal-900" x-text="sug"></span>
                                         <span class="shrink-0 w-4.5 h-4.5 rounded-lg bg-teal-600/10 group-hover:bg-teal-600 group-hover:text-white text-teal-700 flex items-center justify-center transition-colors">
                                             <svg class="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -372,6 +377,9 @@
                     </template>
                 </div>
             </template>
+
+            <!-- Bottom Spacer to ensure last message is fully visible above toolbar -->
+            <div class="h-2 shrink-0"></div>
 
             <!-- Loading Indicator with Bot Avatar -->
             <div x-show="loading" class="flex items-start justify-start gap-2">
@@ -445,7 +453,7 @@
                    x-ref="chatInput"
                    x-model="inputQuery" 
                    :placeholder="isListening ? '🎙️ Mendengarkan suara Anda...' : 'Ketik pertanyaan Anda...'" 
-                   class="flex-1 bg-slate-50 rounded-xl px-3.5 py-2 sm:py-2.5 text-xs text-slate-800 placeholder-slate-400 transition"
+                   class="flex-1 min-w-0 bg-slate-50 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs text-slate-800 placeholder-slate-400 transition"
                    :disabled="loading" />
             <button type="button" 
                     @click="toggleVoiceInput()"
