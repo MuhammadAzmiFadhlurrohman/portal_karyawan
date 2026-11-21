@@ -9,9 +9,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GoMSN">
-    <link rel="icon" type="image/png" href="{{ asset('assets/logo/logo1.png') }}">
-    <link rel="shortcut icon" href="{{ asset('assets/logo/logo1.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('assets/logo/pwa-icon-192.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/logo/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/logo/favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/logo/apple-touch-icon.png') }}">
     <link rel="manifest" href="/manifest.webmanifest">
     <title>{{ $title ?? 'Portal Karyawan Terpadu' }} — PT MSN</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])

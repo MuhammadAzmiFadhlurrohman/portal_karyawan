@@ -21,9 +21,10 @@
             "purpose": "any"
         },
         {
-            "src": "/assets/logo/logo1.png",
-            "sizes": "1433x366",
-            "type": "image/png"
+            "src": "/assets/logo/pwa-icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }
