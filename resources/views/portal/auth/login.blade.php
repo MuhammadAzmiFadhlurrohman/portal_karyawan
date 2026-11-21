@@ -559,12 +559,12 @@
                 </div>
 
                 <!-- Brand Logo GoMSN (Matching Sidebar) -->
-                <div class="mb-1.5 sm:mb-3 lg:mb-4 flex items-center justify-center">
+                <div class="mb-2 sm:mb-3 lg:mb-4 flex items-center justify-center">
                     <h1 class="sr-only">GoMSN - PT Media Solusi Network</h1>
                     <img src="{{ asset('assets/logo/logo1.png') }}"
                          alt="GoMSN"
                          style="filter: brightness(0) invert(1) !important;"
-                         class="h-8 sm:h-11 lg:h-16 w-auto max-w-[180px] sm:max-w-[260px] lg:max-w-[320px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)] transition-transform duration-200 hover:scale-105">
+                         class="h-10 sm:h-13 lg:h-18 w-auto max-w-[220px] sm:max-w-[290px] lg:max-w-[360px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)] transition-transform duration-200 hover:scale-105">
                 </div>
 
                 <!-- Italic Tagline -->
