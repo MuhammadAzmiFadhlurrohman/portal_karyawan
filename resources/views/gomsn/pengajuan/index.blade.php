@@ -230,9 +230,9 @@
 
             <!-- 2. Filter Bar Toolbar & Search Combined (Modern & Terpadu) -->
             @php
-                $hasActiveFilter = (bool) (request('jenis') || request('divisi') || request('status') || (request()->has('bulan') && request('bulan') !== (string)date('n')) || (request()->has('tahun') && request('tahun') !== (string)date('Y')));
+                $hasActiveFilter = (bool) (request('jenis') || request('divisi') || request('status') || (request()->filled('bulan') && request('bulan') !== 'all' && (int)request('bulan') !== (int)date('n')) || (request()->filled('tahun') && request('tahun') !== 'all' && (int)request('tahun') !== (int)date('Y')));
             @endphp
-            <div x-data="{ openFilter: {{ $hasActiveFilter ? 'true' : 'false' }} }" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3.5">
+            <div x-data="{ openFilter: false }" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3.5">
                 <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-3.5">
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
@@ -763,9 +763,9 @@
 
             <!-- Filter Bar Standar (Modern, Rapi & Lengkap) -->
             @php
-                $hasActiveFilterStd = (bool) (request('jenis') || request('divisi') || request('status') || (request()->has('bulan') && request('bulan') !== (string)date('n')) || (request()->has('tahun') && request('tahun') !== (string)date('Y')));
+                $hasActiveFilterStd = (bool) (request('jenis') || request('divisi') || request('status') || (request()->filled('bulan') && request('bulan') !== 'all' && (int)request('bulan') !== (int)date('n')) || (request()->filled('tahun') && request('tahun') !== 'all' && (int)request('tahun') !== (int)date('Y')));
             @endphp
-            <div x-data="{ openFilter: {{ $hasActiveFilterStd ? 'true' : 'false' }} }" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3.5">
+            <div x-data="{ openFilter: false }" class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-xs space-y-3.5">
                 <form method="GET" action="{{ route('gomsn.pengajuan.index') }}" class="space-y-3.5">
                     @if(request('tab'))
                         <input type="hidden" name="tab" value="{{ request('tab') }}">
