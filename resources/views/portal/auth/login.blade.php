@@ -73,11 +73,11 @@
         /* Network Wireframe Globe */
         .gomsn-globe {
             position: absolute;
-            top: -12px;
-            right: -68px;
-            width: 310px;
-            height: 310px;
-            opacity: 0.68;
+            top: -24px;
+            right: -40px;
+            width: 290px;
+            height: 290px;
+            opacity: 0.50;
             pointer-events: none;
         }
 
@@ -109,12 +109,12 @@
         .gomsn-skyline-left,
         .gomsn-skyline-right {
             position: absolute;
-            bottom: 74px;
-            width: 210px;
-            height: 165px;
-            opacity: 0.20;
+            bottom: 0;
+            width: 140px;
+            height: 105px;
+            opacity: 0.12;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
         }
         .gomsn-skyline-left { left: 0; }
         .gomsn-skyline-right { right: 0; transform: scaleX(-1); }
@@ -303,21 +303,23 @@
                 display: block;
             }
             .gomsn-globe {
-                top: 50%;
-                right: 28px;
-                transform: translateY(-54%);
-                width: 470px;
-                height: 470px;
-                opacity: 0.55;
+                top: -24px;
+                right: 32px;
+                transform: none;
+                width: 390px;
+                height: 390px;
+                opacity: 0.38;
             }
             .gomsn-skyline-left {
                 display: none;
             }
             .gomsn-skyline-right {
-                width: 340px;
-                height: 220px;
-                opacity: 0.26;
-                bottom: 42px;
+                width: 170px;
+                height: 120px;
+                opacity: 0.12;
+                bottom: 0;
+                right: 0;
+                transform: scaleX(-1);
             }
             .gomsn-logo-circle {
                 width: 104px;
@@ -485,7 +487,7 @@
         </div>
 
         <!-- Subtle City Skyline Silhouettes on Lower Edges -->
-        <svg class="gomsn-skyline-left" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="gomsn-skyline-left" viewBox="0 0 175 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect x="12" y="90" width="26" height="130" rx="2" fill="#94B8C4" />
             <rect x="44" y="52" width="32" height="168" rx="2" fill="#82ABB8" />
             <rect x="82" y="110" width="24" height="110" rx="2" fill="#A5C4CE" />
@@ -498,7 +500,7 @@
             <rect x="120" y="84" width="6" height="6" fill="#eef7f9" />
             <rect x="130" y="84" width="6" height="6" fill="#eef7f9" />
         </svg>
-        <svg class="gomsn-skyline-right" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="gomsn-skyline-right" viewBox="0 0 175 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect x="12" y="90" width="26" height="130" rx="2" fill="#94B8C4" />
             <rect x="44" y="52" width="32" height="168" rx="2" fill="#82ABB8" />
             <rect x="82" y="110" width="24" height="110" rx="2" fill="#A5C4CE" />
