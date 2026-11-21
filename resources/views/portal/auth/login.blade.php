@@ -109,27 +109,15 @@
         .gomsn-skyline-left,
         .gomsn-skyline-right {
             position: absolute;
-            bottom: 44px;
+            bottom: 74px;
             width: 210px;
             height: 165px;
-            opacity: 0.22;
+            opacity: 0.20;
             pointer-events: none;
             z-index: 1;
         }
         .gomsn-skyline-left { left: 0; }
         .gomsn-skyline-right { right: 0; transform: scaleX(-1); }
-
-        /* Bottom Sweeping Teal Wave & Footer Backdrop */
-        .gomsn-bottom-waves {
-            position: absolute;
-            bottom: 0;
-            left: -2px;
-            right: -2px;
-            width: calc(100% + 4px);
-            height: 98px;
-            pointer-events: none;
-            z-index: 2;
-        }
 
         /* Circular White Logo Badge */
         .gomsn-logo-circle {
@@ -337,9 +325,6 @@
                 padding: 18px;
                 box-shadow: 0 18px 40px rgba(2, 34, 40, 0.38), 0 0 0 7px rgba(255, 255, 255, 0.14);
             }
-            .gomsn-bottom-waves {
-                display: none;
-            }
         }
     </style>
 
@@ -525,25 +510,6 @@
             <rect x="62" y="78" width="6" height="6" fill="#eef7f9" />
             <rect x="120" y="84" width="6" height="6" fill="#eef7f9" />
             <rect x="130" y="84" width="6" height="6" fill="#eef7f9" />
-        </svg>
-
-        <!-- Bottom Multi-Layer Sweeping Teal Wave -->
-        <svg class="gomsn-bottom-waves" viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-                <linearGradient id="bottomDarkWave" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#032b32" />
-                    <stop offset="50%" stop-color="#064e56" />
-                    <stop offset="100%" stop-color="#0b7a78" />
-                </linearGradient>
-                <linearGradient id="bottomMidWave" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.45" />
-                    <stop offset="50%" stop-color="#5eead4" stop-opacity="0.30" />
-                    <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.50" />
-                </linearGradient>
-            </defs>
-            <path d="M0,48 C260,118 540,126 880,76 C1120,40 1310,36 1440,12 L1440,160 L0,160 Z" fill="url(#bottomMidWave)" />
-            <path d="M0,78 C310,128 620,132 960,92 C1190,64 1340,60 1440,44 L1440,160 L0,160 Z" fill="rgba(13, 148, 136, 0.35)" />
-            <path d="M0,104 C360,136 740,126 1080,98 C1260,84 1370,84 1440,78 L1440,160 L0,160 Z" fill="url(#bottomDarkWave)" />
         </svg>
 
         <!-- ============================================================== -->
@@ -815,12 +781,33 @@
         </div>
 
         <!-- ============================================================== -->
-        <!-- LAYER 3: FOOTER COPYRIGHT INSIDE DARK TEAL BOTTOM WAVE         -->
+        <!-- LAYER 3: MOBILE FOOTER WITH INTEGRATED SWEEPING TEAL WAVES     -->
         <!-- ============================================================== -->
-        <footer class="relative z-10 w-full text-center py-3 px-4 select-none lg:hidden">
-            <p class="text-[11px] sm:text-xs text-teal-50/90 font-normal tracking-wide">
-                &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
-            </p>
+        <footer class="relative z-10 w-full select-none lg:hidden mt-auto">
+            <!-- Smooth Wave Transition Header -->
+            <div class="w-full h-12 sm:h-14 overflow-hidden leading-none pointer-events-none -mb-[1px]">
+                <svg class="w-full h-full block" viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="footerDarkWave" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#03262c" />
+                            <stop offset="50%" stop-color="#043239" />
+                            <stop offset="100%" stop-color="#06444a" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Soft Aqua Ribbon -->
+                    <path d="M0,12 C360,65 720,70 1080,24 C1260,8 1370,10 1440,14 L1440,90 L0,90 Z" fill="rgba(94, 234, 212, 0.38)" />
+                    <!-- Vibrant Teal Ribbon -->
+                    <path d="M0,25 C370,75 720,78 1070,35 C1250,18 1365,16 1440,24 L1440,90 L0,90 Z" fill="rgba(20, 184, 166, 0.52)" />
+                    <!-- Solid Dark Teal Base Wave -->
+                    <path d="M0,38 C380,84 720,86 1060,46 C1240,26 1360,24 1440,32 L1440,90 L0,90 Z" fill="url(#footerDarkWave)" />
+                </svg>
+            </div>
+            <!-- Solid Dark Teal Base with Centered Copyright -->
+            <div class="bg-[#043239] pt-1 pb-4 sm:pb-5 px-4 text-center" style="padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));">
+                <p class="text-[11px] sm:text-xs text-teal-100/90 font-normal tracking-wide">
+                    &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
+                </p>
+            </div>
         </footer>
     </div>
 </x-layouts.app>
