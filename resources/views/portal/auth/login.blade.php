@@ -27,16 +27,18 @@
             background: linear-gradient(180deg, #eef7f9 0%, #f7fbfc 60%, #e4f4f5 100%);
         }
 
-        /* Upper Dark Teal Hero Backdrop */
+        /* =========================================================
+           HERO BACKDROP (MOBILE: TOP HALF | DESKTOP: LEFT CURVED HALF)
+           ========================================================= */
         .gomsn-hero-bg {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 54%;
-            min-height: 360px;
+            min-height: 340px;
             background:
-                radial-gradient(circle at 86% 12%, rgba(25, 211, 197, 0.42) 0%, rgba(13, 148, 136, 0.16) 32%, transparent 62%),
+                radial-gradient(circle at 86% 14%, rgba(25, 211, 197, 0.42) 0%, rgba(13, 148, 136, 0.16) 32%, transparent 62%),
                 radial-gradient(circle at 18% 18%, rgba(12, 92, 98, 0.55) 0%, transparent 55%),
                 linear-gradient(145deg, #032c33 0%, #05444c 42%, #08686d 78%, #0a7f82 100%);
             z-index: 0;
@@ -68,7 +70,7 @@
             pointer-events: none;
         }
 
-        /* Network Wireframe Globe (Top-Right) */
+        /* Network Wireframe Globe */
         .gomsn-globe {
             position: absolute;
             top: -12px;
@@ -78,63 +80,44 @@
             opacity: 0.68;
             pointer-events: none;
         }
-        @media (min-width: 640px) {
-            .gomsn-globe {
-                top: -20px;
-                right: -30px;
-                width: 390px;
-                height: 390px;
-                opacity: 0.72;
-            }
-        }
-        @media (min-width: 1024px) {
-            .gomsn-globe {
-                top: -30px;
-                right: 2%;
-                width: 460px;
-                height: 460px;
-                opacity: 0.75;
-            }
-        }
 
-        /* Mid Wave Divider (Dark Teal to Soft White) */
-        .gomsn-mid-wave {
+        /* Mid Wave Divider (Mobile/Tablet Horizontal) */
+        .gomsn-mid-wave-mobile {
+            display: block;
             position: absolute;
             bottom: -2px;
             left: -2px;
             right: -2px;
             width: calc(100% + 4px);
-            height: 120px;
+            height: 115px;
             pointer-events: none;
         }
-        @media (min-width: 768px) {
-            .gomsn-mid-wave {
-                height: 155px;
-            }
+
+        /* Mid Wave Divider (Desktop Vertical Organic Curve) */
+        .gomsn-mid-wave-desktop {
+            display: none;
+            position: absolute;
+            top: -2px;
+            bottom: -2px;
+            right: -2px;
+            width: 150px;
+            height: calc(100% + 4px);
+            pointer-events: none;
         }
 
         /* Faint City Skyline Silhouettes on Lower Edges */
         .gomsn-skyline-left,
         .gomsn-skyline-right {
             position: absolute;
-            bottom: 48px;
-            width: 220px;
-            height: 180px;
+            bottom: 44px;
+            width: 210px;
+            height: 165px;
             opacity: 0.22;
             pointer-events: none;
             z-index: 1;
         }
         .gomsn-skyline-left { left: 0; }
         .gomsn-skyline-right { right: 0; transform: scaleX(-1); }
-
-        @media (min-width: 768px) {
-            .gomsn-skyline-left,
-            .gomsn-skyline-right {
-                width: 340px;
-                height: 230px;
-                opacity: 0.28;
-            }
-        }
 
         /* Bottom Sweeping Teal Wave & Footer Backdrop */
         .gomsn-bottom-waves {
@@ -143,31 +126,24 @@
             left: -2px;
             right: -2px;
             width: calc(100% + 4px);
-            height: 118px;
+            height: 98px;
             pointer-events: none;
             z-index: 2;
         }
 
         /* Circular White Logo Badge */
         .gomsn-logo-circle {
-            width: 76px;
-            height: 76px;
+            width: 72px;
+            height: 72px;
             border-radius: 9999px;
             background: #FFFFFF;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 13px;
-            box-shadow: 0 12px 32px rgba(2, 34, 40, 0.32), 0 0 0 5px rgba(255, 255, 255, 0.12);
+            padding: 12px;
+            box-shadow: 0 12px 32px rgba(2, 34, 40, 0.32), 0 0 0 5px rgba(255, 255, 255, 0.14);
             margin: 0 auto;
             transition: transform 0.25s ease;
-        }
-        @media (min-width: 640px) {
-            .gomsn-logo-circle {
-                width: 86px;
-                height: 86px;
-                padding: 15px;
-            }
         }
         .gomsn-logo-circle:hover {
             transform: scale(1.04);
@@ -177,7 +153,7 @@
         .gomsn-card {
             position: relative;
             width: 100%;
-            max-width: 448px;
+            max-width: 430px;
             background: #FFFFFF;
             border-radius: 26px;
             box-shadow:
@@ -187,31 +163,43 @@
             overflow: hidden;
         }
 
-        /* Input Styling matching reference */
+        /* Input Styling matching reference (clean single focus border + autofill fix) */
         .gomsn-input {
             width: 100%;
-            height: 48px;
-            padding: 0 16px 0 44px;
+            height: 45px;
+            padding: 0 16px 0 42px;
             border-radius: 12px;
             border: 1.5px solid #D9E5EE;
             background-color: #F1F6FA;
             color: #0F2433;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s ease;
-            outline: none;
+            transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            outline: none !important;
+            -webkit-appearance: none;
         }
         .gomsn-input:focus {
             background-color: #FFFFFF;
             border-color: #0F8B8D;
-            box-shadow: 0 0 0 4px rgba(15, 139, 141, 0.13);
+            box-shadow: 0 0 0 3px rgba(15, 139, 141, 0.16);
+            outline: none !important;
+        }
+        .gomsn-input:-webkit-autofill,
+        .gomsn-input:-webkit-autofill:hover,
+        .gomsn-input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #F1F6FA inset !important;
+            -webkit-text-fill-color: #0F2433 !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        .gomsn-input:focus:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset, 0 0 0 3px rgba(15, 139, 141, 0.16) !important;
         }
         .gomsn-input::placeholder {
             color: #8A9BAD;
             font-weight: 400;
         }
 
-        /* Custom Checkbox matching crisp blue check in reference */
+        /* Custom Checkbox */
         .gomsn-checkbox {
             appearance: none;
             -webkit-appearance: none;
@@ -244,16 +232,16 @@
             outline-offset: 2px;
         }
 
-        /* Primary Submit Button matching horizontal dark-to-teal gradient */
+        /* Primary Submit Button */
         .gomsn-btn-submit {
             position: relative;
             flex: 1;
-            height: 52px;
+            height: 49px;
             padding: 0 20px;
-            border-radius: 15px;
+            border-radius: 14px;
             background: linear-gradient(90deg, #043239 0%, #075259 48%, #0b8a87 100%);
             color: #FFFFFF;
-            font-size: 15.5px;
+            font-size: 15px;
             font-weight: 700;
             letter-spacing: 0.01em;
             display: flex;
@@ -279,10 +267,10 @@
         }
 
         .gomsn-btn-biometric {
-            width: 52px;
-            height: 52px;
+            width: 49px;
+            height: 49px;
             flex-shrink: 0;
-            border-radius: 15px;
+            border-radius: 14px;
             background: #F1F8F8;
             border: 1.5px solid rgba(11, 138, 135, 0.3);
             color: #085E63;
@@ -300,6 +288,58 @@
         .gomsn-btn-biometric:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        /* =========================================================
+           TABLET & DESKTOP RESPONSIVE (>= 1024px)
+           Two-column balanced layout fitting 100% in 1 viewport!
+           ========================================================= */
+        @media (min-width: 1024px) {
+            .gomsn-hero-bg {
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: auto;
+                width: 55%;
+                height: 100%;
+                min-height: 100dvh;
+                background:
+                    radial-gradient(circle at 76% 24%, rgba(25, 211, 197, 0.34) 0%, rgba(13, 148, 136, 0.14) 36%, transparent 65%),
+                    radial-gradient(circle at 18% 20%, rgba(12, 92, 98, 0.52) 0%, transparent 55%),
+                    linear-gradient(155deg, #032b32 0%, #05444c 45%, #08686d 82%, #0a7f82 100%);
+            }
+            .gomsn-mid-wave-mobile {
+                display: none;
+            }
+            .gomsn-mid-wave-desktop {
+                display: block;
+            }
+            .gomsn-globe {
+                top: 50%;
+                right: 28px;
+                transform: translateY(-54%);
+                width: 470px;
+                height: 470px;
+                opacity: 0.55;
+            }
+            .gomsn-skyline-left {
+                display: none;
+            }
+            .gomsn-skyline-right {
+                width: 340px;
+                height: 220px;
+                opacity: 0.26;
+                bottom: 42px;
+            }
+            .gomsn-logo-circle {
+                width: 104px;
+                height: 104px;
+                padding: 18px;
+                box-shadow: 0 18px 40px rgba(2, 34, 40, 0.38), 0 0 0 7px rgba(255, 255, 255, 0.14);
+            }
+            .gomsn-bottom-waves {
+                height: 76px;
+            }
         }
     </style>
 
@@ -400,13 +440,13 @@
     }">
 
         <!-- ============================================================== -->
-        <!-- LAYER 1: UPPER DARK TEAL BACKGROUND + NETWORK GLOBE + MID WAVE -->
+        <!-- LAYER 1: DARK TEAL HERO BACKGROUND + GLOBE + ORGANIC WAVES     -->
         <!-- ============================================================== -->
         <div class="gomsn-hero-bg">
             <div class="gomsn-dot-grid"></div>
             <div class="gomsn-hero-beam"></div>
 
-            <!-- Futuristic Glowing Wireframe Network Globe (Top-Right) -->
+            <!-- Futuristic Glowing Wireframe Network Globe -->
             <svg class="gomsn-globe" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                     <radialGradient id="globeGlow" cx="50%" cy="50%" r="50%">
@@ -428,10 +468,8 @@
                 <ellipse cx="210" cy="195" rx="44" ry="142" stroke="url(#meshStroke)" stroke-width="0.85" />
                 <line x1="68" y1="195" x2="352" y2="195" stroke="url(#meshStroke)" stroke-width="0.8" />
                 <line x1="210" y1="53" x2="210" y2="337" stroke="url(#meshStroke)" stroke-width="0.8" />
-                <!-- Constellation Network Mesh Lines -->
                 <path d="M126 112 L192 94 L274 118 L322 178 L286 246 L210 264 L132 232 L98 168 Z" stroke="#5eead4" stroke-opacity="0.45" stroke-width="0.9" />
                 <path d="M126 112 L210 156 L274 118 M210 156 L286 246 M210 156 L132 232 M192 94 L210 156 L322 178" stroke="#99f6e4" stroke-opacity="0.38" stroke-width="0.85" />
-                <!-- Glowing Nodes -->
                 <circle cx="126" cy="112" r="3.2" fill="#ccfbf1" />
                 <circle cx="192" cy="94" r="2.6" fill="#5eead4" />
                 <circle cx="274" cy="118" r="3.5" fill="#ccfbf1" />
@@ -446,15 +484,22 @@
                 <circle cx="268" cy="195" r="2.4" fill="#ccfbf1" />
             </svg>
 
-            <!-- Sweeping Organic Wave Transition (Dark Teal -> Soft White) -->
-            <svg class="gomsn-mid-wave" viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Mobile/Tablet Horizontal Wave Transition -->
+            <svg class="gomsn-mid-wave-mobile" viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M0,128 C280,55 560,15 860,68 C1110,112 1300,96 1440,34 L1440,220 L0,220 Z" fill="rgba(45, 212, 191, 0.24)" />
                 <path d="M0,152 C320,76 620,42 930,92 C1165,130 1330,104 1440,56 L1440,220 L0,220 Z" fill="rgba(204, 251, 241, 0.45)" />
                 <path d="M0,174 C340,94 670,66 980,114 C1200,148 1350,122 1440,82 L1440,220 L0,220 Z" fill="#eef7f9" />
             </svg>
+
+            <!-- Desktop Vertical Curved Wave Transition (Left Teal -> Right Soft Ice-White) -->
+            <svg class="gomsn-mid-wave-desktop" viewBox="0 0 160 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M22,0 C78,180 96,350 62,530 C30,700 84,860 54,1000 L162,1000 L162,0 Z" fill="rgba(45, 212, 191, 0.25)" />
+                <path d="M46,0 C102,180 120,350 86,530 C54,700 108,860 78,1000 L162,1000 L162,0 Z" fill="rgba(204, 251, 241, 0.55)" />
+                <path d="M70,0 C126,180 144,350 110,530 C78,700 132,860 102,1000 L162,1000 L162,0 Z" fill="#f3f9fb" />
+            </svg>
         </div>
 
-        <!-- Subtle City Skyline Silhouettes on Left & Right Background -->
+        <!-- Subtle City Skyline Silhouettes on Lower Edges -->
         <svg class="gomsn-skyline-left" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect x="12" y="90" width="26" height="130" rx="2" fill="#94B8C4" />
             <rect x="44" y="52" width="32" height="168" rx="2" fill="#82ABB8" />
@@ -465,12 +510,8 @@
             <rect x="62" y="64" width="6" height="6" fill="#eef7f9" />
             <rect x="52" y="78" width="6" height="6" fill="#eef7f9" />
             <rect x="62" y="78" width="6" height="6" fill="#eef7f9" />
-            <rect x="52" y="92" width="6" height="6" fill="#eef7f9" />
-            <rect x="62" y="92" width="6" height="6" fill="#eef7f9" />
             <rect x="120" y="84" width="6" height="6" fill="#eef7f9" />
             <rect x="130" y="84" width="6" height="6" fill="#eef7f9" />
-            <rect x="120" y="98" width="6" height="6" fill="#eef7f9" />
-            <rect x="130" y="98" width="6" height="6" fill="#eef7f9" />
         </svg>
         <svg class="gomsn-skyline-right" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect x="12" y="90" width="26" height="130" rx="2" fill="#94B8C4" />
@@ -490,14 +531,14 @@
         <svg class="gomsn-bottom-waves" viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
                 <linearGradient id="bottomDarkWave" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#042f36" />
+                    <stop offset="0%" stop-color="#032b32" />
                     <stop offset="50%" stop-color="#064e56" />
                     <stop offset="100%" stop-color="#0b7a78" />
                 </linearGradient>
                 <linearGradient id="bottomMidWave" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.55" />
-                    <stop offset="50%" stop-color="#5eead4" stop-opacity="0.35" />
-                    <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.55" />
+                    <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.45" />
+                    <stop offset="50%" stop-color="#5eead4" stop-opacity="0.30" />
+                    <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.50" />
                 </linearGradient>
             </defs>
             <path d="M0,48 C260,118 540,126 880,76 C1120,40 1310,36 1440,12 L1440,160 L0,160 Z" fill="url(#bottomMidWave)" />
@@ -506,257 +547,263 @@
         </svg>
 
         <!-- ============================================================== -->
-        <!-- LAYER 2: MAIN CONTENT (TOP BRAND HEADER + FLOATING CARD)       -->
+        <!-- LAYER 2: RESPONSIVE MAIN CONTAINER                             -->
+        <!-- Mobile/Tablet: Vertical Stack | Desktop: Side-by-Side 2-Column -->
         <!-- ============================================================== -->
-        <div class="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-6 sm:pt-8 pb-6">
+        <div class="relative z-10 w-full max-w-[1140px] flex-1 flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-5 lg:gap-12 xl:gap-16 px-4 sm:px-6 lg:px-12 pt-5 sm:pt-7 lg:py-6 pb-5">
 
-            <!-- Brand Header -->
-            <div class="w-full max-w-[448px] text-center mb-5 sm:mb-6 select-none">
+            <!-- Brand Header (Top on Mobile, Centered Left Column on Desktop) -->
+            <div class="w-full max-w-[430px] lg:max-w-none lg:w-[46%] text-center select-none lg:pr-6">
                 <!-- Company Name with flanking thin lines -->
-                <div class="flex items-center justify-center gap-3 mb-3.5 sm:mb-4">
-                    <span class="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent to-white/40"></span>
-                    <span class="text-[11px] sm:text-xs font-bold tracking-[0.15em] text-white/95 uppercase">
+                <div class="flex items-center justify-center gap-3 mb-3 sm:mb-3.5 lg:mb-5">
+                    <span class="h-[1px] w-10 sm:w-14 lg:w-16 bg-gradient-to-r from-transparent to-white/45"></span>
+                    <span class="text-[11px] sm:text-xs lg:text-[13px] font-bold tracking-[0.16em] text-white/95 uppercase">
                         PT. MEDIA SOLUSI NETWORK
                     </span>
-                    <span class="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent to-white/40"></span>
+                    <span class="h-[1px] w-10 sm:w-14 lg:w-16 bg-gradient-to-l from-transparent to-white/45"></span>
                 </div>
 
                 <!-- Circular White Logo Badge -->
-                <div class="gomsn-logo-circle mb-2.5 sm:mb-3">
+                <div class="gomsn-logo-circle mb-2.5 sm:mb-3 lg:mb-4">
                     <img src="{{ asset('assets/logo/logo-msn2.png') }}"
                          alt="Logo GoMSN"
                          class="w-full h-full object-contain">
                 </div>
 
                 <!-- Wordmark GoMSN -->
-                <h1 class="font-heading text-[32px] sm:text-[38px] font-extrabold tracking-tight leading-none">
+                <h1 class="font-heading text-[32px] sm:text-[38px] lg:text-[52px] font-extrabold tracking-tight leading-none">
                     <span class="text-white">Go</span><span class="text-[#2dd4bf]">MSN</span>
                 </h1>
 
                 <!-- Italic Tagline -->
-                <p class="mt-1.5 text-[12px] sm:text-[13.5px] italic text-teal-50/90 font-normal tracking-wide">
+                <p class="mt-1.5 lg:mt-2.5 text-[12px] sm:text-[13.5px] lg:text-[15px] italic text-teal-50/90 font-normal tracking-wide max-w-md mx-auto">
                     Melayani dengan Solusi, Terhubung untuk Masa Depan
                 </p>
+
+                <!-- Desktop-only Subtle System Pill -->
+                <div class="hidden lg:inline-flex items-center gap-2 mt-6 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-xs text-[12px] text-teal-100/90 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Portal Operasional &amp; HRIS Terpadu</span>
+                </div>
             </div>
 
-            <!-- Floating White Login Card -->
-            <div class="gomsn-card">
-                <!-- Signature Top Curved Teal Wave Ribbon inside Card -->
-                <div class="relative w-full h-11 sm:h-12 overflow-hidden pointer-events-none select-none">
-                    <svg class="w-full h-full block" viewBox="0 0 460 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <defs>
-                            <linearGradient id="cardTopWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#0b9b96" />
-                                <stop offset="48%" stop-color="#14b8a6" />
-                                <stop offset="100%" stop-color="#08918c" />
-                            </linearGradient>
-                            <linearGradient id="cardTopWaveSoft" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.55" />
-                                <stop offset="55%" stop-color="#ccfbf1" stop-opacity="0.22" />
-                                <stop offset="100%" stop-color="#5eead4" stop-opacity="0.35" />
-                            </linearGradient>
-                        </defs>
-                        <!-- Soft lower mint ribbon -->
-                        <path d="M0,0 L460,0 L460,20 C385,36 320,26 240,14 C150,0 72,22 0,58 Z" fill="url(#cardTopWaveSoft)" />
-                        <!-- Main vibrant teal top wave -->
-                        <path d="M0,0 L460,0 L460,12 C392,28 334,14 252,4 C168,-6 80,8 0,34 Z" fill="url(#cardTopWaveGrad)" />
-                    </svg>
-                </div>
+            <!-- Floating White Login Card (Bottom on Mobile, Right Column on Desktop) -->
+            <div class="w-full lg:w-[50%] flex justify-center lg:justify-end">
+                <div class="gomsn-card">
+                    <!-- Signature Top Curved Teal Wave Ribbon inside Card -->
+                    <div class="relative w-full h-10 sm:h-11 overflow-hidden pointer-events-none select-none">
+                        <svg class="w-full h-full block" viewBox="0 0 460 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="cardTopWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#0b9b96" />
+                                    <stop offset="48%" stop-color="#14b8a6" />
+                                    <stop offset="100%" stop-color="#08918c" />
+                                </linearGradient>
+                                <linearGradient id="cardTopWaveSoft" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.55" />
+                                    <stop offset="55%" stop-color="#ccfbf1" stop-opacity="0.22" />
+                                    <stop offset="100%" stop-color="#5eead4" stop-opacity="0.35" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,0 L460,0 L460,20 C385,36 320,26 240,14 C150,0 72,22 0,58 Z" fill="url(#cardTopWaveSoft)" />
+                            <path d="M0,0 L460,0 L460,12 C392,28 334,14 252,4 C168,-6 80,8 0,34 Z" fill="url(#cardTopWaveGrad)" />
+                        </svg>
+                    </div>
 
-                <!-- Card Body -->
-                <div class="px-6 sm:px-8 pb-6 sm:pb-7 -mt-3 sm:-mt-3.5 relative z-10">
-                    <!-- Lock Icon Badge with subtle side lines -->
-                    <div class="flex items-center justify-center gap-4 mb-3">
-                        <span class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200"></span>
-                        <div class="w-12 h-12 rounded-full bg-[#e3f7f5] border border-[#cdeee9] flex items-center justify-center shadow-2xs shrink-0">
-                            <svg class="w-5 h-5 text-[#0b5e63]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <rect x="5" y="11" width="14" height="10" rx="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/>
-                            </svg>
+                    <!-- Card Body -->
+                    <div class="px-6 sm:px-8 pb-5 sm:pb-6 -mt-3 relative z-10">
+                        <!-- Lock Icon Badge with subtle side lines -->
+                        <div class="flex items-center justify-center gap-4 mb-2.5">
+                            <span class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200"></span>
+                            <div class="w-11 h-11 rounded-full bg-[#e3f7f5] border border-[#cdeee9] flex items-center justify-center shadow-2xs shrink-0">
+                                <svg class="w-5 h-5 text-[#0b5e63]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="5" y="11" width="14" height="10" rx="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </div>
+                            <span class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200"></span>
                         </div>
-                        <span class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200"></span>
-                    </div>
 
-                    <!-- Card Heading -->
-                    <div class="text-center mb-5">
-                        <h2 class="font-heading text-[24px] sm:text-[27px] font-extrabold text-[#0b2333] tracking-tight leading-tight">
-                            Masuk ke Akun
-                        </h2>
-                        <p class="text-[12.5px] sm:text-[13.5px] text-slate-500 mt-1">
-                            Silakan login untuk mengakses layanan GoMSN
-                        </p>
-                    </div>
+                        <!-- Card Heading -->
+                        <div class="text-center mb-4">
+                            <h2 class="font-heading text-[23px] sm:text-[26px] font-extrabold text-[#0b2333] tracking-tight leading-tight">
+                                Masuk ke Akun
+                            </h2>
+                            <p class="text-[12.5px] sm:text-[13px] text-slate-500 mt-1">
+                                Silakan login untuk mengakses layanan GoMSN
+                            </p>
+                        </div>
 
-                    <!-- Status / Error Alerts -->
-                    @if (session('status'))
-                    <div class="mb-4 p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center gap-2">
-                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>{{ session('status') }}</span>
-                    </div>
-                    @elseif (session('error'))
-                    <div class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
-                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                        <span>{{ session('error') }}</span>
-                    </div>
-                    @elseif ($errors->any())
-                    <div class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
-                        <div class="font-bold flex items-center gap-1.5">
+                        <!-- Status / Error Alerts -->
+                        @if (session('status'))
+                        <div class="mb-3.5 p-2.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center gap-2">
+                            <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ session('status') }}</span>
+                        </div>
+                        @elseif (session('error'))
+                        <div class="mb-3.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
                             <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
-                            <span>Kredensial tidak valid:</span>
+                            <span>{{ session('error') }}</span>
                         </div>
-                        <ul class="list-disc list-inside text-rose-700 pl-1 text-[11px]">
-                            @foreach ($errors->all() as $err)
-                            <li>{{ $err }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
-
-                    <!-- Biometric Error Alert -->
-                    <div x-show="biometricError" x-cloak class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
-                        <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                        <span class="leading-relaxed" x-text="biometricError"></span>
-                    </div>
-
-                    <!-- Login Form -->
-                    <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-4">
-                        @csrf
-                        <input type="hidden" name="platform" value="web">
-
-                        <!-- Field 1: Username -->
-                        <div>
-                            <label for="identifier" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
-                                <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        @elseif ($errors->any())
+                        <div class="mb-3.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
+                            <div class="font-bold flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                 </svg>
-                                <span>Username</span>
-                            </label>
-                            <div class="relative flex items-center group">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0e7478]/85 group-focus-within:text-[#0b5e63] transition-colors">
-                                    <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 20 20">
+                                <span>Kredensial tidak valid:</span>
+                            </div>
+                            <ul class="list-disc list-inside text-rose-700 pl-1 text-[11px]">
+                                @foreach ($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+
+                        <!-- Biometric Error Alert -->
+                        <div x-show="biometricError" x-cloak class="mb-3.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
+                            <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span class="leading-relaxed" x-text="biometricError"></span>
+                        </div>
+
+                        <!-- Login Form -->
+                        <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-3.5">
+                            @csrf
+                            <input type="hidden" name="platform" value="web">
+
+                            <!-- Field 1: Username -->
+                            <div>
+                                <label for="identifier" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
+                                    <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                     </svg>
+                                    <span>Username</span>
+                                </label>
+                                <div class="relative flex items-center group">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0e7478]/85 group-focus-within:text-[#0b5e63] transition-colors">
+                                        <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <input
+                                        id="identifier"
+                                        name="identifier"
+                                        type="text"
+                                        required
+                                        autofocus
+                                        value="{{ old('identifier') }}"
+                                        placeholder="Ketik Username Anda"
+                                        class="gomsn-input"
+                                    >
                                 </div>
-                                <input
-                                    id="identifier"
-                                    name="identifier"
-                                    type="text"
-                                    required
-                                    autofocus
-                                    value="{{ old('identifier') }}"
-                                    placeholder="Ketik Username Anda"
-                                    class="gomsn-input"
-                                >
                             </div>
-                        </div>
 
-                        <!-- Field 2: Kata Sandi (Password) -->
-                        <div>
-                            <label for="password" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
-                                <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                </svg>
-                                <span>Kata Sandi (Password)</span>
-                            </label>
-                            <div class="relative flex items-center group">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0b5e63] transition-colors">
-                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <rect x="5" y="11" width="14" height="10" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Field 2: Kata Sandi (Password) -->
+                            <div>
+                                <label for="password" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
+                                    <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                                     </svg>
+                                    <span>Kata Sandi (Password)</span>
+                                </label>
+                                <div class="relative flex items-center group">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0b5e63] transition-colors">
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <rect x="5" y="11" width="14" height="10" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        :type="showPw ? 'text' : 'password'"
+                                        required
+                                        value=""
+                                        placeholder="Masukkan Kata Sandi Anda"
+                                        class="gomsn-input"
+                                        style="padding-right: 44px;"
+                                    >
+                                    <button
+                                        type="button"
+                                        @click="showPw = !showPw"
+                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-[#0b5e63] cursor-pointer focus:outline-none transition-colors"
+                                        title="Tampilkan / Sembunyikan kata sandi"
+                                        tabindex="-1"
+                                    >
+                                        <svg x-show="!showPw" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                                        </svg>
+                                        <svg x-show="showPw" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                    </button>
                                 </div>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    :type="showPw ? 'text' : 'password'"
-                                    required
-                                    value=""
-                                    placeholder="Masukkan Kata Sandi Anda"
-                                    class="gomsn-input"
-                                    style="padding-right: 44px;"
-                                >
-                                <button
-                                    type="button"
-                                    @click="showPw = !showPw"
-                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-[#0b5e63] cursor-pointer focus:outline-none transition-colors"
-                                    title="Tampilkan / Sembunyikan kata sandi"
-                                    tabindex="-1"
-                                >
-                                    <!-- Eye Slashed when hidden (matches reference) -->
-                                    <svg x-show="!showPw" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                            </div>
+
+                            <!-- Checkbox Ingat Saya -->
+                            <div class="pt-0.5">
+                                <label class="inline-flex items-center gap-2.5 cursor-pointer select-none text-[13px] font-medium text-[#1e293b] hover:text-slate-900">
+                                    <input type="checkbox" name="remember" checked class="gomsn-checkbox">
+                                    <span>Ingat saya di perangkat ini (&plusmn; 30 Hari)</span>
+                                </label>
+                            </div>
+
+                            <!-- Submit Button + Optional Biometric Button -->
+                            <div class="flex items-center gap-2.5 pt-0.5">
+                                <button type="submit" class="gomsn-btn-submit">
+                                    <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l4-4m0 0l-4-4m4 4H3m6-7V5a2 2 0 012-2h7a2 2 0 012 2v14a2 2 0 01-2 2h-7a2 2 0 01-2-2v-2"/>
                                     </svg>
-                                    <svg x-show="showPw" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    <span>Masuk ke Dashboard</span>
+                                    <svg class="w-4.5 h-4.5 text-white/90 absolute right-4.5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+
+                                <button type="button"
+                                        x-show="hasRegisteredBiometric"
+                                        x-cloak
+                                        @click="loginWithBiometric()"
+                                        :disabled="biometricLoading"
+                                        title="Masuk dengan Sidik Jari / Biometrik"
+                                        aria-label="Masuk dengan Sidik Jari / Biometrik"
+                                        class="gomsn-btn-biometric">
+                                    <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                    </svg>
+                                    <svg x-show="biometricLoading" x-cloak class="w-4.5 h-4.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                                     </svg>
                                 </button>
                             </div>
+                        </form>
+
+                        <!-- Divider "atau" -->
+                        <div class="flex items-center justify-center gap-3 my-3.5 select-none">
+                            <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
+                            <span class="text-xs font-medium text-slate-400">atau</span>
+                            <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
                         </div>
 
-                        <!-- Checkbox Ingat Saya -->
-                        <div class="pt-0.5">
-                            <label class="inline-flex items-center gap-2.5 cursor-pointer select-none text-[13px] font-medium text-[#1e293b] hover:text-slate-900">
-                                <input type="checkbox" name="remember" checked class="gomsn-checkbox">
-                                <span>Ingat saya di perangkat ini (&plusmn; 30 Hari)</span>
-                            </label>
+                        <!-- Secure Portal Badge inside Card -->
+                        <div class="text-center select-none">
+                            <p class="inline-flex items-center justify-center gap-1.5 text-[12px] sm:text-[12.5px] font-medium text-[#0e6b70]">
+                                <svg class="w-3.5 h-3.5 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Gunakan Secure Portal - PT Media Solusi Network</span>
+                            </p>
                         </div>
-
-                        <!-- Submit Button + Optional Biometric Button -->
-                        <div class="flex items-center gap-2.5 pt-1">
-                            <button type="submit" class="gomsn-btn-submit">
-                                <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l4-4m0 0l-4-4m4 4H3m6-7V5a2 2 0 012-2h7a2 2 0 012 2v14a2 2 0 01-2 2h-7a2 2 0 01-2-2v-2"/>
-                                </svg>
-                                <span>Masuk ke Dashboard</span>
-                                <svg class="w-4.5 h-4.5 text-white/90 absolute right-4.5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                                </svg>
-                            </button>
-
-                            <button type="button"
-                                    x-show="hasRegisteredBiometric"
-                                    x-cloak
-                                    @click="loginWithBiometric()"
-                                    :disabled="biometricLoading"
-                                    title="Masuk dengan Sidik Jari / Biometrik"
-                                    aria-label="Masuk dengan Sidik Jari / Biometrik"
-                                    class="gomsn-btn-biometric">
-                                <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
-                                </svg>
-                                <svg x-show="biometricLoading" x-cloak class="w-4.5 h-4.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Divider "atau" -->
-                    <div class="flex items-center justify-center gap-3 my-4 select-none">
-                        <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
-                        <span class="text-xs font-medium text-slate-400">atau</span>
-                        <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
-                    </div>
-
-                    <!-- Secure Portal Badge inside Card -->
-                    <div class="text-center select-none">
-                        <p class="inline-flex items-center justify-center gap-1.5 text-[12px] sm:text-[12.5px] font-medium text-[#0e6b70]">
-                            <svg class="w-3.5 h-3.5 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Gunakan Secure Portal - PT Media Solusi Network</span>
-                        </p>
                     </div>
                 </div>
             </div>
@@ -765,7 +812,7 @@
         <!-- ============================================================== -->
         <!-- LAYER 3: FOOTER COPYRIGHT INSIDE DARK TEAL BOTTOM WAVE         -->
         <!-- ============================================================== -->
-        <footer class="relative z-10 w-full text-center py-3.5 px-4 select-none">
+        <footer class="relative z-10 w-full text-center py-3 px-4 select-none">
             <p class="text-[11px] sm:text-xs text-teal-50/90 font-normal tracking-wide">
                 &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
             </p>
