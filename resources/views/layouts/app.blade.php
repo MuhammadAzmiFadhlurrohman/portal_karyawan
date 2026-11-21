@@ -909,6 +909,8 @@
             $navTabActive = 'pengajuan';
         } elseif (request()->routeIs('tickets.*')) {
             $navTabActive = 'tiket';
+        } elseif (request()->routeIs('gomsn.overtime.*')) {
+            $navTabActive = 'lembur';
         } elseif (request()->routeIs('portal.hub') || request()->routeIs('dashboard')) {
             $navTabActive = 'home';
         }
@@ -1010,7 +1012,32 @@
                 </div>
             </a>
 
-            <!-- 4. TIKET GANGGUAN -->
+            <!-- 4. TIKET GANGGUAN / LEMBUR (KHUSUS HRD: LEMBUR KARYAWAN DENGAN LABEL 'Lembur') -->
+            @if ($isHrdRole)
+            <a href="{{ route('gomsn.overtime.index') }}" 
+               @click="currentTab = 'lembur'"
+               class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
+                <div class="relative">
+                    <svg class="w-[22px] h-[22px] transition-colors" 
+                         :class="isActive('lembur') ? 'text-[#0f766e]' : 'text-[#115e59] group-hover:text-[#042f2e]'"
+                         fill="none" stroke="currentColor" :stroke-width="isActive('lembur') ? '2.2' : '1.9'" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    @if (!empty($navPendingLemburCount) && $navPendingLemburCount > 0)
+                        <span class="absolute -top-1 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-slate-900 text-[9px] font-black flex items-center justify-center ring-2 ring-white shadow-xs animate-pulse">
+                            {{ $navPendingLemburCount > 9 ? '9+' : $navPendingLemburCount }}
+                        </span>
+                    @endif
+                </div>
+                <span class="text-[11px] tracking-tight mt-0.5 leading-none transition-colors"
+                      :class="isActive('lembur') ? 'font-black text-[#0f766e]' : 'font-semibold text-slate-700 group-hover:text-slate-900'">
+                    Lembur
+                </span>
+                <div class="h-1 flex items-center justify-center mt-1">
+                    <span x-show="isActive('lembur')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>
+                </div>
+            </a>
+            @else
             <a href="{{ route('tickets.index') }}" 
                @click="currentTab = 'tiket'"
                class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
@@ -1034,6 +1061,7 @@
                     <span x-show="isActive('tiket')" class="w-5 h-[2.5px] bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full" style="display: none;"></span>
                 </div>
             </a>
+            @endif
 
             <!-- 5. MENU (TOGGLE BOTTOM SHEET) -->
             <button @click="bottomSheetOpen = !bottomSheetOpen" 
