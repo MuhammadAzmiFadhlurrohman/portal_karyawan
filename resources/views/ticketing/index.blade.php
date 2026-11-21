@@ -242,10 +242,13 @@
         </div>
     </div>
 
-    <!-- Filter & Search Toolbar (Unified, Compact, Modern) -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 shadow-xs">
+    <!-- Filter & Search Toolbar (Collapsible Accordion / Dropdown) -->
+    @php
+        $hasActiveFilter = request()->hasAny(['kategori', 'status', 'priority', 'assigned']);
+    @endphp
+    <div x-data="{ openFilter: {{ $hasActiveFilter ? 'true' : 'false' }} }" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-4 shadow-xs space-y-3">
+        <!-- Search Input Bar & Filter Toggle Button -->
         <form method="GET" action="{{ route('tickets.index') }}" class="space-y-3">
-            <!-- Row 1: Search Input Bar -->
             <div class="flex items-center gap-2">
                 <div class="relative flex-1">
                     <input type="text" name="q" value="{{ request('q') }}" 
@@ -255,6 +258,18 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
                 </div>
+                
+                <button type="button" @click="openFilter = !openFilter"
+                        class="px-3 py-2 rounded-xl font-bold text-xs border border-slate-200 hover:bg-slate-50 text-slate-700 transition inline-flex items-center gap-1.5 shrink-0 cursor-pointer"
+                        :class="openFilter ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-2xs' : 'bg-white'">
+                    <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                    <span class="hidden xs:inline">Filter</span>
+                    @if($hasActiveFilter)
+                        <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                    @endif
+                    <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="openFilter ? 'rotate-180 text-teal-600' : 'text-slate-400'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+
                 <button type="submit" class="px-4 py-2 rounded-xl font-bold text-xs text-white shadow-xs cursor-pointer transition inline-flex items-center gap-1.5 shrink-0"
                         style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -262,64 +277,70 @@
                 </button>
             </div>
 
-            <!-- Row 2: Filter Selects + Action Buttons -->
-            <div class="flex flex-wrap items-center gap-2 pt-0.5">
-                <!-- Select Kategori -->
-                <div class="min-w-[130px] flex-1 sm:flex-initial">
-                    <select name="kategori" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-1.5 px-2.5 font-medium text-slate-700 transition">
-                        <option value="">Semua Kategori</option>
-                        <option value="BACKBONE" {{ request('kategori') === 'BACKBONE' ? 'selected' : '' }}>Backbone (BDG-)</option>
-                        <option value="BROADBAND" {{ request('kategori') === 'BROADBAND' ? 'selected' : '' }}>Broadband (BRD-)</option>
-                    </select>
+            <!-- Collapsible Dropdown Content: Filter Selects + Full Width Action Buttons -->
+            <div x-show="openFilter" x-collapse x-cloak class="space-y-3 pt-2 border-t border-slate-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+                    <!-- Select Kategori -->
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Kategori</label>
+                        <select name="kategori" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 transition">
+                            <option value="">Semua Kategori</option>
+                            <option value="BACKBONE" {{ request('kategori') === 'BACKBONE' ? 'selected' : '' }}>Backbone (BDG-)</option>
+                            <option value="BROADBAND" {{ request('kategori') === 'BROADBAND' ? 'selected' : '' }}>Broadband (BRD-)</option>
+                        </select>
+                    </div>
+
+                    <!-- Select Status -->
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Status</label>
+                        <select name="status" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 transition">
+                            <option value="">Semua Status</option>
+                            <option value="OPEN" {{ request('status') === 'OPEN' ? 'selected' : '' }}>OPEN</option>
+                            <option value="PROSES" {{ request('status') === 'PROSES' ? 'selected' : '' }}>PROSES</option>
+                            <option value="PENDING_VERIFIKASI" {{ request('status') === 'PENDING_VERIFIKASI' ? 'selected' : '' }}>PENDING VERIFIKASI</option>
+                            <option value="CLOSE" {{ request('status') === 'CLOSE' ? 'selected' : '' }}>CLOSE</option>
+                            <option value="REOPENED" {{ request('status') === 'REOPENED' ? 'selected' : '' }}>REOPENED</option>
+                            <option value="CANCELLED" {{ request('status') === 'CANCELLED' ? 'selected' : '' }}>CANCELLED</option>
+                        </select>
+                    </div>
+
+                    <!-- Select Prioritas -->
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Prioritas</label>
+                        <select name="priority" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 transition">
+                            <option value="">Semua Prioritas</option>
+                            <option value="P1" {{ request('priority') === 'P1' ? 'selected' : '' }}>P1 (Kritis)</option>
+                            <option value="P2" {{ request('priority') === 'P2' ? 'selected' : '' }}>P2 (Mayor)</option>
+                            <option value="P3" {{ request('priority') === 'P3' ? 'selected' : '' }}>P3 (Minor)</option>
+                            <option value="P4" {{ request('priority') === 'P4' ? 'selected' : '' }}>P4 (Terencana)</option>
+                        </select>
+                    </div>
+
+                    <!-- Select Penugasan (Ditugaskan ke Saya) -->
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Penugasan</label>
+                        <select name="assigned" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-2 px-3 font-semibold text-slate-700 transition">
+                            <option value="">Semua Penugasan</option>
+                            <option value="me" {{ request('assigned') === 'me' ? 'selected' : '' }}>Ditugaskan ke Saya</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Select Status -->
-                <div class="min-w-[130px] flex-1 sm:flex-initial">
-                    <select name="status" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-1.5 px-2.5 font-medium text-slate-700 transition">
-                        <option value="">Semua Status</option>
-                        <option value="OPEN" {{ request('status') === 'OPEN' ? 'selected' : '' }}>OPEN</option>
-                        <option value="PROSES" {{ request('status') === 'PROSES' ? 'selected' : '' }}>PROSES</option>
-                        <option value="PENDING_VERIFIKASI" {{ request('status') === 'PENDING_VERIFIKASI' ? 'selected' : '' }}>PENDING VERIFIKASI</option>
-                        <option value="CLOSE" {{ request('status') === 'CLOSE' ? 'selected' : '' }}>CLOSE</option>
-                        <option value="REOPENED" {{ request('status') === 'REOPENED' ? 'selected' : '' }}>REOPENED</option>
-                        <option value="CANCELLED" {{ request('status') === 'CANCELLED' ? 'selected' : '' }}>CANCELLED</option>
-                    </select>
-                </div>
-
-                <!-- Select Prioritas -->
-                <div class="min-w-[120px] flex-1 sm:flex-initial">
-                    <select name="priority" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-1.5 px-2.5 font-medium text-slate-700 transition">
-                        <option value="">Semua Prioritas</option>
-                        <option value="P1" {{ request('priority') === 'P1' ? 'selected' : '' }}>P1 (Kritis)</option>
-                        <option value="P2" {{ request('priority') === 'P2' ? 'selected' : '' }}>P2 (Mayor)</option>
-                        <option value="P3" {{ request('priority') === 'P3' ? 'selected' : '' }}>P3 (Minor)</option>
-                        <option value="P4" {{ request('priority') === 'P4' ? 'selected' : '' }}>P4 (Terencana)</option>
-                    </select>
-                </div>
-
-                <!-- Select Penugasan (Ditugaskan ke Saya) -->
-                <div class="min-w-[130px] flex-1 sm:flex-initial">
-                    <select name="assigned" class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-teal-500 py-1.5 px-2.5 font-medium text-slate-700 transition">
-                        <option value="">Semua Penugasan</option>
-                        <option value="me" {{ request('assigned') === 'me' ? 'selected' : '' }}>Ditugaskan ke Saya</option>
-                    </select>
-                </div>
-
-                <!-- Filter Actions -->
-                <div class="flex items-center gap-1.5 ml-auto shrink-0">
-                    <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                <!-- Filter Actions: Full Width Buttons Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                         <span>Filter</span>
                     </button>
 
                     @if(request()->hasAny(['kategori', 'status', 'priority', 'assigned', 'q']))
-                        <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs rounded-xl transition cursor-pointer" title="Hapus Filter">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                            <span>Reset</span>
+                        <a href="{{ route('tickets.index') }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm rounded-xl transition cursor-pointer" title="Hapus Filter">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span>Reset Filter</span>
                         </a>
                     @else
-                        <a href="{{ route('tickets.index') }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer" title="Refresh">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <a href="{{ route('tickets.index') }}" class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm rounded-xl transition cursor-pointer" title="Refresh">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                             <span>Refresh</span>
                         </a>
                     @endif
