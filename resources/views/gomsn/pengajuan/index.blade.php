@@ -260,7 +260,7 @@
                         </div>
 
                         <!-- Right side: Total counter & Export Excel -->
-                        <div class="flex items-center justify-between md:justify-end gap-2 shrink-0">
+                        <div class="hidden sm:flex items-center justify-between md:justify-end gap-2 shrink-0">
                             <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-600 shadow-2xs">
                                 <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                                 <span>Total <strong class="text-slate-800 font-extrabold">{{ $pengajuanList->total() }}</strong> data</span>
@@ -675,7 +675,7 @@
 
             <!-- Action Toolbar (Tombol Buat Pengajuan & Approval) -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
-                <div class="text-xs text-slate-500 font-medium">
+                <div class="hidden sm:block text-xs text-slate-500 font-medium">
                     @if ($isAtasan)
                         Daftar riwayat permohonan operasional mandiri divisi Anda.
                     @else
@@ -773,7 +773,7 @@
                         </div>
 
                         <!-- Right side: Total counter & Export -->
-                        <div class="flex items-center justify-between md:justify-end gap-2 shrink-0">
+                        <div class="hidden sm:flex items-center justify-between md:justify-end gap-2 shrink-0">
                             <span class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm font-semibold text-slate-600 shadow-2xs">
                                 <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                                 <span>Total <strong class="text-slate-800 font-extrabold">{{ $pengajuanList->total() }}</strong> pengajuan</span>
