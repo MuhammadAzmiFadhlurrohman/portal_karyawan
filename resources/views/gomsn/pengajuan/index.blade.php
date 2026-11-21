@@ -1605,48 +1605,30 @@
                             <template x-if="activeItem?.isOwner || {{ auth()->user()->hasRole(['super_admin', 'admin']) ? 'true' : 'false' }}">
                                 <form :action="activeItem?.realizeUrl" method="POST" enctype="multipart/form-data" class="space-y-4">
                                     @csrf
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                                                Total Pengeluaran Riil (Rp)
-                                            </label>
-                                            <div class="relative">
-                                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-xs font-bold text-slate-400">Rp</span>
-                                                <input type="number" 
-                                                       name="nominal_realisasi" 
-                                                       :value="activeItem?.totalNominal" 
-                                                       min="0" 
-                                                       step="any"
-                                                       placeholder="0"
-                                                       class="w-full text-xs font-bold pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-slate-800 shadow-2xs">
-                                            </div>
-                                            <p class="text-[10px] text-slate-500 mt-1">Estimasi awal diajukan: <strong class="text-slate-700" x-text="activeItem?.totalFormatted"></strong></p>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                                                Foto Bukti Struk / Nota / Kwitansi
-                                            </label>
-                                            <input type="file" 
-                                                   name="bukti_realisasi" 
-                                                   accept="image/*,application/pdf"
-                                                   @change="
-                                                       const file = $event.target.files[0];
-                                                       if (file) {
-                                                           previewRealizationName = file.name;
-                                                           if (file.type.startsWith('image/')) {
-                                                               previewRealizationUrl = URL.createObjectURL(file);
-                                                           } else {
-                                                               previewRealizationUrl = null;
-                                                           }
+                                    <input type="hidden" name="nominal_realisasi" :value="activeItem?.totalNominal">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                                            Foto Bukti Struk / Nota / Kwitansi
+                                        </label>
+                                        <input type="file" 
+                                               name="bukti_realisasi" 
+                                               accept="image/*,application/pdf"
+                                               @change="
+                                                   const file = $event.target.files[0];
+                                                   if (file) {
+                                                       previewRealizationName = file.name;
+                                                       if (file.type.startsWith('image/')) {
+                                                           previewRealizationUrl = URL.createObjectURL(file);
                                                        } else {
-                                                           previewRealizationName = '';
                                                            previewRealizationUrl = null;
                                                        }
-                                                   "
-                                                   class="w-full text-xs file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#155E63] file:text-white hover:file:bg-[#114b4f] border border-slate-300 rounded-xl bg-white p-1 text-slate-600 shadow-2xs cursor-pointer">
-                                            <p class="text-[10px] text-slate-500 mt-1">Format gambar JPG, PNG, atau file PDF (Maksimal 4MB)</p>
-                                        </div>
+                                                   } else {
+                                                       previewRealizationName = '';
+                                                       previewRealizationUrl = null;
+                                                   }
+                                               "
+                                               class="w-full text-xs file:mr-3 file:py-2 file:px-3.5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#155E63] file:text-white hover:file:bg-[#114b4f] border border-slate-300 rounded-xl bg-white p-1 text-slate-600 shadow-2xs cursor-pointer">
+                                        <p class="text-[10px] text-slate-500 mt-1">Format gambar JPG, PNG, atau file PDF (Maksimal 4MB)</p>
                                     </div>
 
                                     <!-- Image Preview Thumbnail (Jika user memilih foto) -->

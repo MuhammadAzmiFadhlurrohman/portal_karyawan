@@ -452,10 +452,7 @@
                         </div>
                         <form method="POST" action="{{ route('gomsn.pengajuan.realize', $pengajuan->id) }}" enctype="multipart/form-data" class="space-y-3">
                             @csrf
-                            <div>
-                                <label class="block text-[11px] font-medium text-slate-600 mb-1">Total Realisasi Pengeluaran (Rp)</label>
-                                <input type="number" name="realization_amount" :value="{{ (float) $pengajuan->nominal_total }}" min="0" placeholder="Contoh: 450000" class="w-full text-xs rounded-lg border-slate-300 py-1.5" />
-                            </div>
+                            <input type="hidden" name="nominal_realisasi" value="{{ (float) $pengajuan->total_nominal }}">
                             <div>
                                 <label class="block text-[11px] font-medium text-slate-600 mb-1">Catatan Realisasi</label>
                                 <textarea name="realization_notes" rows="2" placeholder="Keterangan pengeluaran..." class="w-full text-xs rounded-lg border-slate-300 py-1.5"></textarea>
