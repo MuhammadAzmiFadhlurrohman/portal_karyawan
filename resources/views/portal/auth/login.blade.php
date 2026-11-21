@@ -538,9 +538,9 @@
                          class="w-full h-full object-contain">
                 </div>
 
-                <!-- Wordmark GoMSN -->
+                <!-- Wordmark GOMSN -->
                 <h1 class="font-heading text-[32px] sm:text-[38px] lg:text-[52px] font-extrabold tracking-tight leading-none">
-                    <span class="text-white">Go</span><span class="text-[#2dd4bf]">MSN</span>
+                    <span class="text-white">GO</span><span class="text-[#2dd4bf]">MSN</span>
                 </h1>
 
                 <!-- Italic Tagline -->
@@ -604,7 +604,7 @@
                                 Masuk ke Akun
                             </h2>
                             <p class="text-[12.5px] sm:text-[13px] text-slate-500 mt-1">
-                                Silakan login untuk mengakses layanan GoMSN
+                                Silakan login untuk mengakses layanan GOMSN
                             </p>
                         </div>
 
