@@ -531,17 +531,14 @@
                     <span class="h-[1px] w-10 sm:w-14 lg:w-16 bg-gradient-to-l from-transparent to-white/45"></span>
                 </div>
 
-                <!-- Circular White Logo Badge -->
-                <div class="gomsn-logo-circle mb-2.5 sm:mb-3 lg:mb-4">
-                    <img src="{{ asset('assets/logo/logo-msn2.png') }}"
-                         alt="Logo GoMSN"
-                         class="w-full h-full object-contain">
+                <!-- Brand Logo GoMSN (Matching Sidebar) -->
+                <div class="mb-2.5 sm:mb-3.5 lg:mb-4 flex items-center justify-center">
+                    <h1 class="sr-only">GoMSN - PT Media Solusi Network</h1>
+                    <img src="{{ asset('assets/logo/logo1.png') }}"
+                         alt="GoMSN"
+                         style="filter: brightness(0) invert(1) !important;"
+                         class="h-10 sm:h-12 lg:h-16 w-auto max-w-[220px] sm:max-w-[260px] lg:max-w-[320px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)] transition-transform duration-200 hover:scale-105">
                 </div>
-
-                <!-- Wordmark GOMSN -->
-                <h1 class="font-heading text-[32px] sm:text-[38px] lg:text-[52px] font-extrabold tracking-tight leading-none">
-                    <span class="text-white">GO</span><span class="text-[#2dd4bf]">MSN</span>
-                </h1>
 
                 <!-- Italic Tagline -->
                 <p class="mt-1.5 lg:mt-2.5 text-[12px] sm:text-[13.5px] lg:text-[15px] italic text-teal-50/90 font-normal tracking-wide max-w-md mx-auto">
