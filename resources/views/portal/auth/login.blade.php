@@ -338,7 +338,7 @@
                 box-shadow: 0 18px 40px rgba(2, 34, 40, 0.38), 0 0 0 7px rgba(255, 255, 255, 0.14);
             }
             .gomsn-bottom-waves {
-                height: 76px;
+                display: none;
             }
         }
     </style>
@@ -585,6 +585,11 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span>Portal Operasional &amp; HRIS Terpadu</span>
                 </div>
+
+                <!-- Desktop-only Copyright under Pill Badge -->
+                <p class="hidden lg:block mt-3.5 text-[12px] text-teal-100/80 font-normal tracking-wide">
+                    &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
+                </p>
             </div>
 
             <!-- Floating White Login Card (Bottom on Mobile, Right Column on Desktop) -->
@@ -812,7 +817,7 @@
         <!-- ============================================================== -->
         <!-- LAYER 3: FOOTER COPYRIGHT INSIDE DARK TEAL BOTTOM WAVE         -->
         <!-- ============================================================== -->
-        <footer class="relative z-10 w-full text-center py-3 px-4 select-none">
+        <footer class="relative z-10 w-full text-center py-3 px-4 select-none lg:hidden">
             <p class="text-[11px] sm:text-xs text-teal-50/90 font-normal tracking-wide">
                 &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
             </p>
