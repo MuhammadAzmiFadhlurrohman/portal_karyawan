@@ -760,23 +760,6 @@
                                 </button>
                             </div>
                         </form>
-
-                        <!-- Divider "atau" -->
-                        <div class="flex items-center justify-center gap-3 my-3.5 select-none">
-                            <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
-                            <span class="text-xs font-medium text-slate-400">atau</span>
-                            <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
-                        </div>
-
-                        <!-- Secure Portal Badge inside Card -->
-                        <div class="text-center select-none">
-                            <p class="inline-flex items-center justify-center gap-1.5 text-[12px] sm:text-[12.5px] font-medium text-[#0e6b70]">
-                                <svg class="w-3.5 h-3.5 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                                </svg>
-                                <span>Gunakan Secure Portal - PT Media Solusi Network</span>
-                            </p>
-                        </div>
                     </div>
                 </div>
             </div>
