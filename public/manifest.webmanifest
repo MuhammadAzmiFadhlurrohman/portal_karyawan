@@ -1,6 +1,6 @@
 {
-    "name": "Portal Karyawan Terpadu PT MSN",
-    "short_name": "Portal MSN",
+    "name": "Portal GoMSN PT MSN",
+    "short_name": "GoMSN",
     "description": "Portal Enterprise Terpadu Absensi Biometrik, HRIS, Tiketing Gangguan & Operasional GOMSN PT MSN",
     "start_url": "/",
     "display": "standalone",
@@ -9,18 +9,20 @@
     "orientation": "portrait-primary",
     "icons": [
         {
-            "src": "/assets/logo/icon-192.png",
+            "src": "/assets/logo/pwa-icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
-            "src": "/assets/logo/icon-512.png",
+            "src": "/assets/logo/pwa-icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
-            "src": "/assets/logo/logo-msn2.png",
-            "sizes": "489x399",
+            "src": "/assets/logo/logo1.png",
+            "sizes": "1433x366",
             "type": "image/png"
         }
     ]
