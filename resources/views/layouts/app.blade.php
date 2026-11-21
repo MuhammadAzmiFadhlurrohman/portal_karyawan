@@ -1945,5 +1945,6 @@
     @endauth
 
     @stack('scripts')
+    @include('layouts.partials.pwa-intro')
 </body>
 </html>
