@@ -189,10 +189,12 @@
         .kpi-legend-dot-green{background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.16)}
         .kpi-legend-dot-red{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
         .kpi-legend-dot-amber{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.18)}
+        .kpi-legend-dot-blue{background:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.18)}
         .kpi-legend-val{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:9999px;min-width:24px;text-align:center;flex-shrink:0;margin-left:6px}
         .kpi-legend-val-green{background:#ecfdf5;color:#047857}
         .kpi-legend-val-red{background:#fff1f2;color:#be123c}
         .kpi-legend-val-amber{background:#fffbeb;color:#b45309}
+        .kpi-legend-val-blue{background:#eff6ff;color:#1d4ed8}
 
         .kpi-abs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
         .kpi-abs-box{padding:10px 12px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
@@ -730,9 +732,7 @@
     <!-- Section 1: KPI Summary Cards Matching Reference -->
     <section class="mb-8 hub-anim-section hub-anim-d1" aria-labelledby="heading-stats-kpi">
         <h2 id="heading-stats-kpi" class="sr-only">Ringkasan Statistik Utama</h2>
-        
-        @if ($stats['scope']['type'] === 'personal')
-        {{-- TAMPILAN KHUSUS KARYAWAN: PENGAJUAN, LEMBUR, ABSEN (DONUT CHARTS & STACKED PROGRESS BAR) --}}
+
         @php
             $buildDonutStyle = function ($total, $approved, $rejected, $pending) {
                 $total = (int) $total;
@@ -772,7 +772,51 @@
 
                 return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : '#e2e8f0';
             };
+
+            $buildAttDonutStyle = function ($ontime, $late, $leave, $absent) {
+                $total = (int)$ontime + (int)$late + (int)$leave + (int)$absent;
+                if ($total <= 0) {
+                    return '#e2e8f0';
+                }
+
+                $ontimeDeg = ($ontime / $total) * 360;
+                $lateDeg = ($late / $total) * 360;
+                $leaveDeg = ($leave / $total) * 360;
+                $absentDeg = ($absent / $total) * 360;
+
+                $cur = 0;
+                $parts = [];
+                if ($ontime > 0) {
+                    $next = round($cur + $ontimeDeg, 1);
+                    $parts[] = "#10b981 {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+                if ($late > 0) {
+                    $next = round($cur + $lateDeg, 1);
+                    $parts[] = "#f59e0b {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+                if ($leave > 0) {
+                    $next = round($cur + $leaveDeg, 1);
+                    $parts[] = "#3b82f6 {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+                if ($absent > 0) {
+                    $next = round($cur + $absentDeg, 1);
+                    $parts[] = "#ef4444 {$cur}deg {$next}deg";
+                    $cur = $next;
+                }
+
+                if ($cur < 360) {
+                    $parts[] = "#cbd5e1 {$cur}deg 360deg";
+                }
+
+                return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : '#e2e8f0';
+            };
         @endphp
+        
+        @if ($stats['scope']['type'] === 'personal')
+        {{-- TAMPILAN KHUSUS KARYAWAN: PENGAJUAN, LEMBUR, ABSEN (DONUT CHARTS & STACKED PROGRESS BAR) --}}
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 hub-stagger">
             
@@ -1081,10 +1125,103 @@
 
         </div>
         @else
-        {{-- TAMPILAN MANAJEMEN / SUPERVISOR / COMPANY --}}
+        {{-- TAMPILAN MANAJEMEN / HRD / SUPERVISOR / COMPANY --}}
+        @php
+            $isCompany = ($stats['scope']['type'] === 'company');
+            $scopeLabel = $isCompany ? 'Seluruh Karyawan' : 'Divisi';
+        @endphp
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5 hub-stagger">
             
-            <!-- Card 1: Absensi Hari Ini -->
+            <!-- Card 1: Pengajuan Seluruh Karyawan (Donut Chart + Vertical Legend) -->
+            <div class="kpi-card">
+                <div>
+                    <!-- Header -->
+                    <div class="kpi-hdr">
+                        <div class="kpi-hdr-left">
+                            <div class="kpi-hdr-icon" style="background:#ecfeff; color:#0891b2;">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="kpi-hdr-title">Pengajuan {{ $scopeLabel }}</h3>
+                                <span class="kpi-hdr-sub">Periode {{ now('Asia/Jakarta')->translatedFormat('F Y') }}</span>
+                            </div>
+                        </div>
+                        <span class="kpi-dropdown-btn">
+                            {{ now('Asia/Jakarta')->translatedFormat('M Y') }}
+                        </span>
+                    </div>
+
+                    @php
+                        $pTotal = (int) ($stats['pengajuan']['total'] ?? 0);
+                        $pApproved = (int) ($stats['pengajuan']['approved'] ?? 0);
+                        $pRejected = (int) ($stats['pengajuan']['rejected'] ?? 0);
+                        $pPending = (int) ($stats['pengajuan']['pending'] ?? 0);
+                        $donutPengajuan = $buildDonutStyle($pTotal, $pApproved, $pRejected, $pPending);
+                    @endphp
+
+                    <!-- Donut Chart & Vertical Legend -->
+                    <div class="kpi-donut-wrap">
+                        <!-- Sisi Kiri: Donut Chart -->
+                        <div class="kpi-donut-ring" style="background: {{ $donutPengajuan }};" title="Total Pengajuan: {{ $pTotal }}">
+                            <div class="kpi-donut-center">
+                                <span class="kpi-donut-num">{{ $pTotal }}</span>
+                                <span class="kpi-donut-lbl">Total</span>
+                            </div>
+                        </div>
+
+                        <!-- Sisi Kanan: Vertical Legend -->
+                        <div class="kpi-legend-list">
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-green"></span>
+                                    <span class="truncate">Disetujui</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-green">{{ $pApproved }}</span>
+                            </div>
+
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-red"></span>
+                                    <span class="truncate">Ditolak</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-red">{{ $pRejected }}</span>
+                            </div>
+
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-amber"></span>
+                                    <span class="truncate">Menunggu</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-amber">{{ $pPending }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Row -->
+                    <div class="space-y-1.5 pt-1 mb-3">
+                        <div class="kpi-detail-row">
+                            <span class="inline-flex items-center gap-2">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                Nominal Disetujui
+                            </span>
+                            <strong class="text-emerald-700">Rp {{ number_format($stats['pengajuan']['nominal_disetujui'], 0, ',', '.') }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Link -->
+                <div class="kpi-card-footer">
+                    <span class="text-slate-500 inline-flex items-center gap-1.5">
+                        <svg width="14" height="14" class="text-cyan-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Dana &amp; Pengadaan Barang
+                    </span>
+                    <a href="{{ route('gomsn.pengajuan.index') }}" class="font-bold text-cyan-700 hover:text-cyan-800 inline-flex items-center gap-1">
+                        Kelola Pengajuan &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: Absensi Seluruh Karyawan (Donut Chart + Vertical Legend) -->
             <div class="kpi-card">
                 <div>
                     <!-- Header -->
@@ -1094,8 +1231,8 @@
                                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             </div>
                             <div>
-                                <h3 class="kpi-hdr-title">Absensi Hari Ini</h3>
-                                <span class="kpi-hdr-sub">{{ now('Asia/Jakarta')->translatedFormat('l, d F Y') }}</span>
+                                <h3 class="kpi-hdr-title">Absensi {{ $scopeLabel }}</h3>
+                                <span class="kpi-hdr-sub">Periode {{ now('Asia/Jakarta')->translatedFormat('F Y') }}</span>
                             </div>
                         </div>
                         <span class="kpi-badge-aktif">
@@ -1104,41 +1241,57 @@
                         </span>
                     </div>
 
-                    <!-- 4 Status Blocks -->
-                    <div class="grid grid-cols-4 gap-2 mb-4">
-                        <!-- Hadir -->
-                        <div class="kpi-box kpi-box-mint">
-                            <span class="kpi-box-num">{{ $stats['absensi']['today_present'] }}</span>
-                            <span class="kpi-box-label">Hadir</span>
-                            <div class="kpi-box-icon">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    @php
+                        $attOntime = (int) ($stats['absensi']['month_ontime_days'] ?? 0);
+                        $attLate = (int) ($stats['absensi']['month_late_days'] ?? 0);
+                        $attLeave = (int) ($stats['absensi']['month_leave_days'] ?? 0);
+                        $attAbsent = (int) ($stats['absensi']['month_absent_days'] ?? 0);
+                        $attTotalCount = $attOntime + $attLate + $attLeave + $attAbsent;
+                        $donutAbsensi = $buildAttDonutStyle($attOntime, $attLate, $attLeave, $attAbsent);
+                    @endphp
+
+                    <!-- Donut Chart & Vertical Legend -->
+                    <div class="kpi-donut-wrap">
+                        <!-- Sisi Kiri: Donut Chart -->
+                        <div class="kpi-donut-ring" style="background: {{ $donutAbsensi }};" title="Tingkat Kehadiran: {{ $stats['absensi']['month_rate'] }}%">
+                            <div class="kpi-donut-center">
+                                <span class="kpi-donut-num text-lg font-black text-teal-700">{{ $stats['absensi']['month_rate'] }}%</span>
+                                <span class="kpi-donut-lbl">Rate</span>
                             </div>
                         </div>
 
-                        <!-- Terlambat -->
-                        <div class="kpi-box kpi-box-amber">
-                            <span class="kpi-box-num">{{ $stats['absensi']['today_late'] }}</span>
-                            <span class="kpi-box-label">Terlambat</span>
-                            <div class="kpi-box-icon">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <!-- Sisi Kanan: Vertical Legend -->
+                        <div class="kpi-legend-list">
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-green"></span>
+                                    <span class="truncate">Tepat</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-green">{{ $attOntime }}</span>
                             </div>
-                        </div>
 
-                        <!-- Izin -->
-                        <div class="kpi-box kpi-box-blue">
-                            <span class="kpi-box-num">{{ $stats['absensi']['today_leave'] }}</span>
-                            <span class="kpi-box-label">Izin</span>
-                            <div class="kpi-box-icon">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-amber"></span>
+                                    <span class="truncate">Telat</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-amber">{{ $attLate }}</span>
                             </div>
-                        </div>
 
-                        <!-- Sakit -->
-                        <div class="kpi-box kpi-box-rose">
-                            <span class="kpi-box-num">{{ $stats['absensi']['today_absent'] }}</span>
-                            <span class="kpi-box-label">Sakit</span>
-                            <div class="kpi-box-icon">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-blue"></span>
+                                    <span class="truncate">Izin</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-blue">{{ $attLeave }}</span>
+                            </div>
+
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-red"></span>
+                                    <span class="truncate">Alpa</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-red">{{ $attAbsent }}</span>
                             </div>
                         </div>
                     </div>
@@ -1148,16 +1301,9 @@
                         <div class="kpi-detail-row">
                             <span class="inline-flex items-center gap-2">
                                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Total Hari Kerja
+                                Total Kehadiran
                             </span>
-                            <strong>{{ $metrics['monthly_attendance']['present_days'] ?? $stats['absensi']['month_present_days'] }} Hari</strong>
-                        </div>
-                        <div class="kpi-detail-row">
-                            <span class="inline-flex items-center gap-2">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                Total Jam Kerja
-                            </span>
-                            <strong>{{ $metrics['monthly_attendance']['total_working_hours'] ?? ($stats['absensi']['month_present_days'] * 8) }} Jam</strong>
+                            <strong class="text-teal-800">{{ $stats['absensi']['month_present_days'] }} Hari Kerja</strong>
                         </div>
                     </div>
                 </div>
@@ -1166,164 +1312,99 @@
                 <div class="kpi-card-footer">
                     <span class="text-slate-500 inline-flex items-center gap-1.5">
                         <svg width="14" height="14" class="text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Data absensi diperbarui real-time
+                        Rekapitulasi Presensi
                     </span>
                     <a href="{{ route('attendance.index') }}" class="font-bold text-teal-700 hover:text-teal-800 inline-flex items-center gap-1">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        Refresh
+                        Rekap Absen &rarr;
                     </a>
                 </div>
             </div>
 
-            <!-- Card 2: Ringkasan Gaji & Tunjangan -->
+            <!-- Card 3: Lembur Seluruh Karyawan (Donut Chart + Vertical Legend) -->
             <div class="kpi-card">
                 <div>
                     <!-- Header -->
                     <div class="kpi-hdr">
                         <div class="kpi-hdr-left">
-                            <div class="kpi-hdr-icon">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            <div class="kpi-hdr-icon" style="background:#eef2ff; color:#4f46e5;">
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div>
-                                <h3 class="kpi-hdr-title">Ringkasan Gaji &amp; Tunjangan</h3>
+                                <h3 class="kpi-hdr-title">Lembur {{ $scopeLabel }}</h3>
                                 <span class="kpi-hdr-sub">Periode {{ now('Asia/Jakarta')->translatedFormat('F Y') }}</span>
                             </div>
                         </div>
                         <span class="kpi-dropdown-btn">
-                            {{ now('Asia/Jakarta')->translatedFormat('M Y') }}
-                            <svg width="12" height="12" class="text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                            {{ $stats['lembur']['total_hours'] }} Jam
                         </span>
                     </div>
 
-                    <!-- Gaji Pokok Headline -->
-                    <div class="mb-4">
-                        <span class="text-xs text-slate-500 font-semibold block">Gaji Pokok</span>
-                        <div class="text-2xl font-black text-slate-900 tracking-tight mt-0.5">
-                            Rp 7.500.000
+                    @php
+                        $lTotal = (int) ($stats['lembur']['total'] ?? 0);
+                        $lApproved = (int) ($stats['lembur']['approved'] ?? 0);
+                        $lRejected = (int) ($stats['lembur']['rejected'] ?? 0);
+                        $lPending = (int) ($stats['lembur']['pending'] ?? 0);
+                        $donutLembur = $buildDonutStyle($lTotal, $lApproved, $lRejected, $lPending);
+                    @endphp
+
+                    <!-- Donut Chart & Vertical Legend -->
+                    <div class="kpi-donut-wrap">
+                        <!-- Sisi Kiri: Donut Chart -->
+                        <div class="kpi-donut-ring" style="background: {{ $donutLembur }};" title="Total Lembur: {{ $lTotal }}">
+                            <div class="kpi-donut-center">
+                                <span class="kpi-donut-num">{{ $lTotal }}</span>
+                                <span class="kpi-donut-lbl">Total</span>
+                            </div>
+                        </div>
+
+                        <!-- Sisi Kanan: Vertical Legend -->
+                        <div class="kpi-legend-list">
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-green"></span>
+                                    <span class="truncate">Disetujui</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-green">{{ $lApproved }}</span>
+                            </div>
+
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-red"></span>
+                                    <span class="truncate">Ditolak</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-red">{{ $lRejected }}</span>
+                            </div>
+
+                            <div class="kpi-legend-item">
+                                <span class="kpi-legend-left">
+                                    <span class="kpi-legend-dot kpi-legend-dot-amber"></span>
+                                    <span class="truncate">Menunggu</span>
+                                </span>
+                                <span class="kpi-legend-val kpi-legend-val-amber">{{ $lPending }}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 3 Pill Blocks: Tunjangan, Insentif, Potongan -->
-                    <div class="grid grid-cols-3 gap-2.5 mb-4">
-                        <!-- Tunjangan -->
-                        <div class="kpi-box kpi-box-slate">
-                            <div class="kpi-box-icon mb-1">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                            </div>
-                            <span class="kpi-box-label">Tunjangan</span>
-                            <span class="text-xs font-bold text-slate-900 leading-tight">Rp 1.500.000</span>
-                        </div>
-
-                        <!-- Insentif -->
-                        <div class="kpi-box kpi-box-mint">
-                            <div class="kpi-box-icon mb-1">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
-                            </div>
-                            <span class="kpi-box-label">Insentif</span>
-                            <span class="text-xs font-bold text-emerald-700 leading-tight">Rp 500.000</span>
-                        </div>
-
-                        <!-- Potongan -->
-                        <div class="kpi-box kpi-box-rose">
-                            <div class="kpi-box-icon mb-1">
-                                <svg width="14" height="14" class="fill-rose-600 text-rose-600" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            </div>
-                            <span class="kpi-box-label">Potongan</span>
-                            <span class="text-xs font-bold text-rose-700 leading-tight">Rp 250.000</span>
-                        </div>
-                    </div>
-
-                    <!-- Total Penghasilan -->
-                    <div class="flex items-center justify-between pt-1 mb-3">
-                        <span class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
-                            <svg width="16" height="16" class="text-teal-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                            Total Penghasilan
-                        </span>
-                        <strong class="text-emerald-700 font-extrabold text-base">Rp 8.750.000</strong>
-                    </div>
-                </div>
-
-                <!-- Footer Button CTA -->
-                <div class="pt-2">
-                    <a href="{{ route('attendance.deductions') }}" class="kpi-btn-cta">
-                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        <span>Lihat Detail Gaji</span>
-                        <svg width="14" height="14" class="ml-auto" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Card 3: Cuti & Perizinan -->
-            <div class="kpi-card">
-                <div>
-                    <!-- Header -->
-                    <div class="kpi-hdr">
-                        <div class="kpi-hdr-left">
-                            <div class="kpi-hdr-icon">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                            </div>
-                            <div>
-                                <h3 class="kpi-hdr-title">Cuti &amp; Perizinan</h3>
-                                <span class="kpi-hdr-sub">Ringkasan Pengajuan Anda</span>
-                            </div>
-                        </div>
-                        <span class="kpi-dropdown-btn">
-                            Bulan Ini
-                            <svg width="12" height="12" class="text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                        </span>
-                    </div>
-
-                    <!-- Total Pengajuan Headline -->
-                    <div class="mb-4">
-                        <span class="text-xs text-slate-500 font-semibold inline-flex items-center gap-1.5">
-                            <svg width="14" height="14" class="text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            Total Pengajuan
-                        </span>
-                        <div class="text-2xl font-black text-slate-900 tracking-tight mt-0.5 flex items-baseline gap-1.5">
-                            <span>{{ $metrics['leave_breakdown']['total'] ?? 0 }}</span>
-                            <span class="text-sm font-semibold text-slate-600">Pengajuan</span>
-                        </div>
-                    </div>
-
-                    <!-- 3 Pill Blocks: Cuti, Izin, Work From Home -->
-                    <div class="grid grid-cols-3 gap-2.5 mb-4">
-                        <!-- Cuti -->
-                        <div class="kpi-box kpi-box-mint">
-                            <div class="kpi-box-icon mb-1">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                            </div>
-                            <span class="kpi-box-label">Cuti</span>
-                            <span class="text-[11px] font-bold text-slate-600 leading-tight">{{ $metrics['leave_breakdown']['cuti'] ?? 0 }} Pengajuan</span>
-                        </div>
-
-                        <!-- Izin -->
-                        <div class="kpi-box kpi-box-blue">
-                            <div class="kpi-box-icon mb-1">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            </div>
-                            <span class="kpi-box-label">Izin</span>
-                            <span class="text-[11px] font-bold text-slate-600 leading-tight">{{ $metrics['leave_breakdown']['izin'] ?? 0 }} Pengajuan</span>
-                        </div>
-
-                        <!-- Work From Home -->
-                        <div class="kpi-box kpi-box-purple">
-                            <div class="kpi-box-icon mb-1">
-                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                            </div>
-                            <span class="kpi-box-label">Work From Home</span>
-                            <span class="text-[11px] font-bold text-slate-600 leading-tight">{{ $metrics['leave_breakdown']['wfh'] ?? 0 }} Pengajuan</span>
+                    <!-- Details Row -->
+                    <div class="space-y-1.5 pt-1 mb-3">
+                        <div class="kpi-detail-row">
+                            <span class="inline-flex items-center gap-2">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Total Jam Terverifikasi
+                            </span>
+                            <strong class="text-indigo-700">{{ $stats['lembur']['total_hours'] }} Jam Kerja</strong>
                         </div>
                     </div>
                 </div>
 
                 <!-- Footer Link -->
                 <div class="kpi-card-footer">
-                    <a href="{{ route('attendance.leaves') }}" class="w-full flex items-center justify-between font-bold text-slate-700 hover:text-teal-700 transition-colors">
-                        <span class="inline-flex items-center gap-2">
-                            <svg width="16" height="16" class="text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                            Lihat Semua Pengajuan
-                        </span>
-                        <svg width="16" height="16" class="text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                    <span class="text-slate-500 inline-flex items-center gap-1.5">
+                        <svg width="14" height="14" class="text-indigo-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Surat Perintah Lembur
+                    </span>
+                    <a href="{{ route('gomsn.overtime.index') }}" class="font-bold text-indigo-700 hover:text-indigo-800 inline-flex items-center gap-1">
+                        Kelola Lembur &rarr;
                     </a>
                 </div>
             </div>

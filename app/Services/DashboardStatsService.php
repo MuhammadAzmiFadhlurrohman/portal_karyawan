@@ -115,6 +115,7 @@ class DashboardStatsService
         $monthOntimeDays = $monthAttendances->where('status', 'present')->where('late_minutes', 0)->count();
         $monthLateDays = $monthAttendances->where('late_minutes', '>', 0)->count();
         $monthAbsentDays = $monthAttendances->where('status', 'alpa')->count();
+        $monthLeaveDays = $monthAttendances->whereIn('status', ['leave', 'sick'])->count();
         $monthLateMinutes = (int) $monthAttendances->sum('late_minutes');
 
         // Total potongan bulan ini (untuk personal karyawan / scope)
@@ -276,6 +277,7 @@ class DashboardStatsService
                 'month_ontime_days' => $monthOntimeDays,
                 'month_late_days' => $monthLateDays,
                 'month_absent_days' => $monthAbsentDays,
+                'month_leave_days' => $monthLeaveDays,
                 'month_late_minutes' => $monthLateMinutes,
                 'month_total_deduction' => $monthTotalDeduction,
             ],
