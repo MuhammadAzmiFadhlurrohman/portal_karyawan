@@ -47,7 +47,7 @@
     @guest
     <!-- Guest Layout (Login, OTP, Password Change) -->
     @if (request()->routeIs('login'))
-        <main id="main-content" class="h-full h-[100dvh] max-h-[100dvh] w-full overflow-hidden">
+        <main id="main-content" class="min-h-[100dvh] w-full overflow-x-hidden">
             @if (isset($slot))
                 {{ $slot }}
             @else

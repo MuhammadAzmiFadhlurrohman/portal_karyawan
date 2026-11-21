@@ -1,322 +1,309 @@
 <x-layouts.app title="Masuk ke Akun — GoMSN">
     <style>
         html, body {
-            height: 100% !important;
-            height: 100dvh !important;
-            max-height: 100dvh !important;
             margin: 0 !important;
             padding: 0 !important;
-            overflow: hidden !important;
-            overscroll-behavior: none !important;
+            min-height: 100dvh !important;
             width: 100% !important;
+            background-color: #042f36;
+            overflow-x: hidden !important;
         }
         #main-content {
-            height: 100% !important;
-            height: 100dvh !important;
-            max-height: 100dvh !important;
-            min-height: unset !important;
-            overflow: hidden !important;
+            min-height: 100dvh !important;
+            width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
-            width: 100% !important;
         }
-        .login-wrap {
-            display: flex;
-            position: fixed !important;
-            inset: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            height: 100dvh !important;
-            max-height: 100dvh !important;
-            overflow: hidden !important;
-            background-color: #FFFFFF;
-            background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1.2px, transparent 1.2px);
-            background-size: 22px 22px;
-            user-select: none;
-        }
-        .login-panel-left {
-            width: 49%;
-            height: 100%;
-            flex-shrink: 0;
+
+        .gomsn-login-page {
             position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 60px 30px 48px;
-            background: radial-gradient(120% 120% at 20% 20%, #072d31 0%, #0c4349 35%, #155E63 70%, #0a353a 100%);
-            color: #FFFFFF;
-            text-align: center;
-            z-index: 20;
-        }
-        .login-panel-right {
-            width: 51%;
-            height: 100%;
-            flex: 1;
-            position: relative;
+            min-height: 100dvh;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 32px 48px 20px 48px;
             overflow: hidden;
-            z-index: 10;
+            background: linear-gradient(180deg, #eef7f9 0%, #f7fbfc 60%, #e4f4f5 100%);
         }
-        .input-stylish {
-            width: 100%;
-            padding: 12px 16px 12px 42px;
-            border-radius: 14px;
-            border: 1.5px solid #E2E8F0;
-            background-color: #F8FAFC;
-            color: #0F172A;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-        .input-stylish:focus {
-            background-color: #FFFFFF;
-            border-color: #155E63;
-            box-shadow: 0 0 0 4px rgba(21, 94, 99, 0.12);
-        }
-        .input-stylish::placeholder {
-            color: #94A3B8;
-            font-weight: 400;
-        }
-        .action-row {
-            display: flex;
-            align-items: stretch;
-            gap: 10px;
-            width: 100%;
-        }
-        .btn-stylish {
-            flex: 1;
-            min-height: 48px;
-            padding: 12px 20px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #072d31 0%, #155E63 50%, #0d9488 100%);
-            color: #FFFFFF;
-            font-size: 15px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 22px -4px rgba(21, 94, 99, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: none;
-        }
-        .btn-stylish:hover {
-            filter: brightness(1.08);
-            transform: translateY(-1px);
-            box-shadow: 0 12px 26px -4px rgba(21, 94, 99, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-        }
-        .btn-stylish:active {
-            transform: translateY(0);
-        }
-        .btn-biometric {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-            padding: 0;
-            border-radius: 14px;
-            background: #FFFFFF;
-            border: 1.5px solid rgba(21, 94, 99, 0.28);
-            color: #155E63;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.08);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .btn-biometric:hover:not(:disabled) {
-            background: #F0FDFA;
-            border-color: #155E63;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px -6px rgba(21, 94, 99, 0.25);
-        }
-        .btn-biometric:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-        .wave-desktop {
-            display: block;
+
+        /* Upper Dark Teal Hero Backdrop */
+        .gomsn-hero-bg {
             position: absolute;
-            right: -1px;
-            top: -1px;
-            bottom: -1px;
-            width: 105px;
-            height: calc(100% + 2px);
-            z-index: 30;
-            pointer-events: none;
-        }
-        .wave-mobile {
-            display: none;
-            position: absolute;
-            bottom: -1px;
-            left: -1px;
-            right: -1px;
-            width: calc(100% + 2px);
-            height: 64px;
-            z-index: 30;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 54%;
+            min-height: 360px;
+            background:
+                radial-gradient(circle at 86% 12%, rgba(25, 211, 197, 0.42) 0%, rgba(13, 148, 136, 0.16) 32%, transparent 62%),
+                radial-gradient(circle at 18% 18%, rgba(12, 92, 98, 0.55) 0%, transparent 55%),
+                linear-gradient(145deg, #032c33 0%, #05444c 42%, #08686d 78%, #0a7f82 100%);
+            z-index: 0;
             pointer-events: none;
         }
 
-        /* Hide all scrollbar chrome */
-        .login-wrap::-webkit-scrollbar,
-        .login-panel-right::-webkit-scrollbar,
-        body::-webkit-scrollbar {
-            display: none !important;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        .login-wrap,
-        .login-panel-right,
-        body {
-            -ms-overflow-style: none !important;
-            scrollbar-width: none !important;
+        /* Subtle Top-Left Dot Matrix */
+        .gomsn-dot-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 220px;
+            background-image: radial-gradient(rgba(153, 246, 228, 0.32) 1.4px, transparent 1.4px);
+            background-size: 16px 16px;
+            mask-image: radial-gradient(ellipse at 10% 10%, black 15%, transparent 72%);
+            -webkit-mask-image: radial-gradient(ellipse at 10% 10%, black 15%, transparent 72%);
+            opacity: 0.7;
+            pointer-events: none;
         }
 
-        /* Brand Circular Logo Badge (Fixed dimensions to prevent any overflow) */
-        .brand-logo-badge {
+        /* Sweeping Diagonal Light Beams in Hero */
+        .gomsn-hero-beam {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(125deg, transparent 22%, rgba(45, 212, 191, 0.08) 38%, rgba(20, 184, 166, 0.14) 50%, transparent 65%),
+                linear-gradient(155deg, transparent 48%, rgba(94, 234, 212, 0.08) 62%, transparent 76%);
+            pointer-events: none;
+        }
+
+        /* Network Wireframe Globe (Top-Right) */
+        .gomsn-globe {
+            position: absolute;
+            top: -12px;
+            right: -68px;
+            width: 310px;
+            height: 310px;
+            opacity: 0.68;
+            pointer-events: none;
+        }
+        @media (min-width: 640px) {
+            .gomsn-globe {
+                top: -20px;
+                right: -30px;
+                width: 390px;
+                height: 390px;
+                opacity: 0.72;
+            }
+        }
+        @media (min-width: 1024px) {
+            .gomsn-globe {
+                top: -30px;
+                right: 2%;
+                width: 460px;
+                height: 460px;
+                opacity: 0.75;
+            }
+        }
+
+        /* Mid Wave Divider (Dark Teal to Soft White) */
+        .gomsn-mid-wave {
+            position: absolute;
+            bottom: -2px;
+            left: -2px;
+            right: -2px;
+            width: calc(100% + 4px);
+            height: 120px;
+            pointer-events: none;
+        }
+        @media (min-width: 768px) {
+            .gomsn-mid-wave {
+                height: 155px;
+            }
+        }
+
+        /* Faint City Skyline Silhouettes on Lower Edges */
+        .gomsn-skyline-left,
+        .gomsn-skyline-right {
+            position: absolute;
+            bottom: 48px;
+            width: 220px;
+            height: 180px;
+            opacity: 0.22;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .gomsn-skyline-left { left: 0; }
+        .gomsn-skyline-right { right: 0; transform: scaleX(-1); }
+
+        @media (min-width: 768px) {
+            .gomsn-skyline-left,
+            .gomsn-skyline-right {
+                width: 340px;
+                height: 230px;
+                opacity: 0.28;
+            }
+        }
+
+        /* Bottom Sweeping Teal Wave & Footer Backdrop */
+        .gomsn-bottom-waves {
+            position: absolute;
+            bottom: 0;
+            left: -2px;
+            right: -2px;
+            width: calc(100% + 4px);
+            height: 118px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Circular White Logo Badge */
+        .gomsn-logo-circle {
             width: 76px;
             height: 76px;
-            min-width: 76px;
-            min-height: 76px;
-            max-width: 76px;
-            max-height: 76px;
             border-radius: 9999px;
             background: #FFFFFF;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
-            box-shadow: 0 8px 24px rgba(2, 40, 46, 0.35);
-            border: 3px solid rgba(255, 255, 255, 0.25);
+            padding: 13px;
+            box-shadow: 0 12px 32px rgba(2, 34, 40, 0.32), 0 0 0 5px rgba(255, 255, 255, 0.12);
             margin: 0 auto;
+            transition: transform 0.25s ease;
+        }
+        @media (min-width: 640px) {
+            .gomsn-logo-circle {
+                width: 86px;
+                height: 86px;
+                padding: 15px;
+            }
+        }
+        .gomsn-logo-circle:hover {
+            transform: scale(1.04);
+        }
+
+        /* Floating Login Card */
+        .gomsn-card {
             position: relative;
-            transition: transform 0.3s ease;
-        }
-        @media (min-width: 1024px) {
-            .brand-logo-badge {
-                width: 96px;
-                height: 96px;
-                min-width: 96px;
-                min-height: 96px;
-                max-width: 96px;
-                max-height: 96px;
-                padding: 12px;
-            }
-        }
-        .brand-logo-badge:hover {
-            transform: scale(1.05);
-        }
-        .brand-logo-img {
             width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: block;
+            max-width: 448px;
+            background: #FFFFFF;
+            border-radius: 26px;
+            box-shadow:
+                0 24px 60px -16px rgba(4, 47, 54, 0.22),
+                0 6px 20px -6px rgba(4, 47, 54, 0.08),
+                0 0 0 1px rgba(15, 118, 110, 0.08);
+            overflow: hidden;
         }
 
-        /* Responsive Mobile / Tablet (< 1024px) */
-        @media (max-width: 1023px) {
-            .wave-desktop {
-                display: none !important;
-            }
-            .wave-mobile {
-                display: block !important;
-                height: 38px !important;
-            }
-            .login-wrap {
-                flex-direction: column !important;
-                height: 100vh !important;
-                height: 100dvh !important;
-                max-height: 100dvh !important;
-                overflow: hidden !important;
-            }
-            .brand-logo-badge {
-                width: 58px !important;
-                height: 58px !important;
-                min-width: 58px !important;
-                min-height: 58px !important;
-                max-width: 58px !important;
-                max-height: 58px !important;
-                padding: 8px !important;
-            }
-            .login-panel-left {
-                width: 100% !important;
-                height: 38% !important;
-                height: 38dvh !important;
-                max-height: 320px !important;
-                min-height: 210px !important;
-                flex: 0 0 auto !important;
-                padding: 16px 20px 44px 20px !important;
-                justify-content: space-around !important;
-            }
-            .login-panel-right {
-                width: 100% !important;
-                height: 62% !important;
-                height: 62dvh !important;
-                flex: 1 1 auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                padding: 16px 24px 16px 24px !important;
-                margin-top: 0 !important;
-                z-index: 25 !important;
-                overflow-y: auto !important;
-            }
-            .input-stylish {
-                padding: 12px 14px 12px 42px !important;
-                border-radius: 12px !important;
-                font-size: 14px !important;
-            }
-            .btn-stylish {
-                min-height: 48px !important;
-                padding: 12px 18px !important;
-                border-radius: 12px !important;
-                font-size: 14.5px !important;
-            }
-            .btn-biometric {
-                width: 48px !important;
-                height: 48px !important;
-                border-radius: 12px !important;
-            }
+        /* Input Styling matching reference */
+        .gomsn-input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px 0 44px;
+            border-radius: 12px;
+            border: 1.5px solid #D9E5EE;
+            background-color: #F1F6FA;
+            color: #0F2433;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .gomsn-input:focus {
+            background-color: #FFFFFF;
+            border-color: #0F8B8D;
+            box-shadow: 0 0 0 4px rgba(15, 139, 141, 0.13);
+        }
+        .gomsn-input::placeholder {
+            color: #8A9BAD;
+            font-weight: 400;
         }
 
-        /* Ultra small mobile screens (height <= 640px) */
-        @media (max-height: 640px) and (max-width: 1023px) {
-            .brand-logo-badge {
-                width: 48px !important;
-                height: 48px !important;
-                min-width: 48px !important;
-                min-height: 48px !important;
-                max-width: 48px !important;
-                max-height: 48px !important;
-                padding: 6px !important;
-            }
-            .login-panel-left {
-                height: 34% !important;
-                height: 34dvh !important;
-                min-height: 170px !important;
-                padding: 10px 14px 34px 14px !important;
-            }
-            .login-panel-right {
-                height: 66% !important;
-                height: 66dvh !important;
-                padding: 10px 18px 8px 18px !important;
-            }
-            .wave-mobile {
-                height: 30px !important;
-            }
+        /* Custom Checkbox matching crisp blue check in reference */
+        .gomsn-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1.5px solid #CBD5E1;
+            background-color: #FFFFFF;
+            display: inline-grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+        .gomsn-checkbox:checked {
+            background-color: #1A73E8;
+            border-color: #1A73E8;
+        }
+        .gomsn-checkbox:checked::before {
+            content: "";
+            width: 10px;
+            height: 10px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 10.5 8 14.5 16 6.5'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .gomsn-checkbox:focus-visible {
+            outline: 2px solid #1A73E8;
+            outline-offset: 2px;
+        }
+
+        /* Primary Submit Button matching horizontal dark-to-teal gradient */
+        .gomsn-btn-submit {
+            position: relative;
+            flex: 1;
+            height: 52px;
+            padding: 0 20px;
+            border-radius: 15px;
+            background: linear-gradient(90deg, #043239 0%, #075259 48%, #0b8a87 100%);
+            color: #FFFFFF;
+            font-size: 15.5px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow:
+                0 12px 26px -6px rgba(6, 82, 89, 0.48),
+                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .gomsn-btn-submit:hover {
+            filter: brightness(1.07);
+            transform: translateY(-1px);
+            box-shadow:
+                0 16px 30px -6px rgba(6, 82, 89, 0.56),
+                inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+        .gomsn-btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .gomsn-btn-biometric {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            border-radius: 15px;
+            background: #F1F8F8;
+            border: 1.5px solid rgba(11, 138, 135, 0.3);
+            color: #085E63;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .gomsn-btn-biometric:hover:not(:disabled) {
+            background: #E2F5F4;
+            border-color: #0B8A87;
+            transform: translateY(-1px);
+        }
+        .gomsn-btn-biometric:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
     </style>
 
-    <div class="login-wrap" x-data="{
+    <div class="gomsn-login-page" x-data="{
         showPw: false,
         biometricLoading: false,
         biometricError: '',
@@ -411,257 +398,377 @@
             }
         }
     }">
-        
-        <!-- ============================================================== -->
-        <!-- LEFT PANEL: HERO BRAND WITH ICONIC ORGANIC WAVE                -->
-        <!-- ============================================================== -->
-        <div class="login-panel-left">
-            
-            <!-- Clipped Background Atmosphere (Glows & Micro-Grid) -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/60 to-transparent"></div>
-                <div class="absolute inset-y-0 left-0 w-[1px] bg-gradient-to-b from-white/10 via-white/5 to-transparent"></div>
-                <div class="absolute inset-0 opacity-[0.2]"
-                     style="background-image: radial-gradient(rgba(94, 234, 212, 0.45) 1px, transparent 1px), linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-                            background-size: 22px 22px, 44px 44px, 44px 44px;"></div>
-                <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-teal-400/20 blur-3xl"></div>
-                <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-emerald-400/15 blur-3xl"></div>
-            </div>
 
-            <!-- DESKTOP MULTI-LAYER ORGANIC CURVED WAVES (RIGHT EDGE) -->
-            <svg class="wave-desktop" viewBox="0 0 120 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Layer 1: Medium Vibrant Teal Ribbon -->
-                <path d="M 14,0 C 50,150 58,310 42,490 C 26,670 58,830 44,1000 L 122,1000 L 122,0 Z" fill="rgba(20, 184, 166, 0.55)" />
-                <!-- Layer 2: Soft Pastel Mint/Cyan Ribbon -->
-                <path d="M 32,0 C 68,150 76,310 60,490 C 44,670 76,830 62,1000 L 122,1000 L 122,0 Z" fill="rgba(153, 246, 228, 0.78)" />
-                <!-- Layer 3: Solid White Foreground -->
-                <path d="M 50,0 C 86,150 94,310 78,490 C 62,670 94,830 80,1000 L 122,1000 L 122,0 Z" fill="#FFFFFF" />
+        <!-- ============================================================== -->
+        <!-- LAYER 1: UPPER DARK TEAL BACKGROUND + NETWORK GLOBE + MID WAVE -->
+        <!-- ============================================================== -->
+        <div class="gomsn-hero-bg">
+            <div class="gomsn-dot-grid"></div>
+            <div class="gomsn-hero-beam"></div>
+
+            <!-- Futuristic Glowing Wireframe Network Globe (Top-Right) -->
+            <svg class="gomsn-globe" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <defs>
+                    <radialGradient id="globeGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.32" />
+                        <stop offset="65%" stop-color="#0d9488" stop-opacity="0.10" />
+                        <stop offset="100%" stop-color="#042f36" stop-opacity="0" />
+                    </radialGradient>
+                    <linearGradient id="meshStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.7" />
+                        <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.38" />
+                        <stop offset="100%" stop-color="#0d9488" stop-opacity="0.12" />
+                    </linearGradient>
+                </defs>
+                <circle cx="210" cy="195" r="165" fill="url(#globeGlow)" />
+                <circle cx="210" cy="195" r="142" stroke="url(#meshStroke)" stroke-width="1.2" />
+                <ellipse cx="210" cy="195" rx="142" ry="52" stroke="url(#meshStroke)" stroke-width="0.9" />
+                <ellipse cx="210" cy="195" rx="142" ry="102" stroke="url(#meshStroke)" stroke-width="0.85" />
+                <ellipse cx="210" cy="195" rx="92" ry="142" stroke="url(#meshStroke)" stroke-width="0.85" />
+                <ellipse cx="210" cy="195" rx="44" ry="142" stroke="url(#meshStroke)" stroke-width="0.85" />
+                <line x1="68" y1="195" x2="352" y2="195" stroke="url(#meshStroke)" stroke-width="0.8" />
+                <line x1="210" y1="53" x2="210" y2="337" stroke="url(#meshStroke)" stroke-width="0.8" />
+                <!-- Constellation Network Mesh Lines -->
+                <path d="M126 112 L192 94 L274 118 L322 178 L286 246 L210 264 L132 232 L98 168 Z" stroke="#5eead4" stroke-opacity="0.45" stroke-width="0.9" />
+                <path d="M126 112 L210 156 L274 118 M210 156 L286 246 M210 156 L132 232 M192 94 L210 156 L322 178" stroke="#99f6e4" stroke-opacity="0.38" stroke-width="0.85" />
+                <!-- Glowing Nodes -->
+                <circle cx="126" cy="112" r="3.2" fill="#ccfbf1" />
+                <circle cx="192" cy="94" r="2.6" fill="#5eead4" />
+                <circle cx="274" cy="118" r="3.5" fill="#ccfbf1" />
+                <circle cx="210" cy="156" r="4.2" fill="#ffffff" />
+                <circle cx="210" cy="156" r="9" fill="#2dd4bf" fill-opacity="0.28" />
+                <circle cx="322" cy="178" r="3" fill="#5eead4" />
+                <circle cx="286" cy="246" r="3.4" fill="#99f6e4" />
+                <circle cx="210" cy="264" r="2.6" fill="#5eead4" />
+                <circle cx="132" cy="232" r="3.2" fill="#99f6e4" />
+                <circle cx="98" cy="168" r="2.8" fill="#ccfbf1" />
+                <circle cx="155" cy="195" r="2.2" fill="#5eead4" />
+                <circle cx="268" cy="195" r="2.4" fill="#ccfbf1" />
             </svg>
 
-            <!-- MOBILE MULTI-LAYER HORIZONTAL WAVES (BOTTOM EDGE) -->
-            <svg class="wave-mobile" viewBox="0 0 1000 106" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Layer 1: Medium Vibrant Teal Ribbon -->
-                <path d="M 0,18 C 160,38 320,34 480,48 C 640,64 780,74 900,56 C 950,48 980,50 1000,56 L 1000,108 L 0,108 Z" fill="rgba(20, 184, 166, 0.55)" />
-                <!-- Layer 2: Soft Pastel Mint/Cyan Ribbon -->
-                <path d="M 0,36 C 160,56 320,52 480,66 C 640,82 780,92 900,74 C 950,66 980,68 1000,74 L 1000,108 L 0,108 Z" fill="rgba(153, 246, 228, 0.78)" />
-                <!-- Layer 3: Solid White Foreground -->
-                <path d="M 0,54 C 160,74 320,70 480,84 C 640,100 780,106 900,92 C 950,84 980,86 1000,92 L 1000,108 L 0,108 Z" fill="#FFFFFF" />
+            <!-- Sweeping Organic Wave Transition (Dark Teal -> Soft White) -->
+            <svg class="gomsn-mid-wave" viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M0,128 C280,55 560,15 860,68 C1110,112 1300,96 1440,34 L1440,220 L0,220 Z" fill="rgba(45, 212, 191, 0.24)" />
+                <path d="M0,152 C320,76 620,42 930,92 C1165,130 1330,104 1440,56 L1440,220 L0,220 Z" fill="rgba(204, 251, 241, 0.45)" />
+                <path d="M0,174 C340,94 670,66 980,114 C1200,148 1350,122 1440,82 L1440,220 L0,220 Z" fill="#eef7f9" />
             </svg>
-
-            <!-- Top Spacer for Vertical Balance -->
-            <div class="hidden lg:block h-4"></div>
-
-            <!-- Center Content: Logo, Title, Description -->
-            <div class="relative z-10 my-auto py-1 sm:py-2">
-                <!-- Text: Selamat Datang di -->
-                <p class="text-teal-200/90 text-xs sm:text-sm font-bold tracking-wider uppercase mb-1.5 sm:mb-2.5">
-                    Selamat Datang di
-                </p>
-
-                <!-- Circular Logo Badge with Ambient Glow -->
-                <div class="relative inline-block mx-auto mb-2 sm:mb-3 group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-teal-400/30 to-emerald-400/30 rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-300"></div>
-                    <div class="brand-logo-badge">
-                        <img src="{{ asset('assets/logo/logo-msn2.png') }}" 
-                             alt="GoMSN" 
-                             class="brand-logo-img">
-                    </div>
-                </div>
-
-                <!-- App Name: GoMSN -->
-                <h1 class="font-heading text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-1 leading-tight">
-                    Go<span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-200 via-teal-300 to-emerald-300">MSN</span>
-                </h1>
-
-                <!-- Subtitle / Deskripsi Sistem -->
-                <p class="text-xs sm:text-sm text-teal-50/85 leading-snug max-w-xs sm:max-w-sm mx-auto font-normal">
-                    Sistem Operasional &amp; Manajemen Jaringan Terpadu
-                </p>
-            </div>
-
-            <!-- Bottom Brand Text -->
-            <div class="relative z-10 pt-1.5 pb-0.5 flex items-center justify-center text-[10px] sm:text-xs font-semibold tracking-wider text-teal-200/50 uppercase border-t border-white/10 lg:mb-0">
-                <span>PT MEDIA SOLUSI NETWORK</span>
-            </div>
         </div>
 
+        <!-- Subtle City Skyline Silhouettes on Left & Right Background -->
+        <svg class="gomsn-skyline-left" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="12" y="90" width="26" height="130" rx="2" fill="#94B8C4" />
+            <rect x="44" y="52" width="32" height="168" rx="2" fill="#82ABB8" />
+            <rect x="82" y="110" width="24" height="110" rx="2" fill="#A5C4CE" />
+            <rect x="112" y="72" width="30" height="148" rx="2" fill="#94B8C4" />
+            <rect x="148" y="128" width="22" height="92" rx="2" fill="#B2CED7" />
+            <rect x="52" y="64" width="6" height="6" fill="#eef7f9" />
+            <rect x="62" y="64" width="6" height="6" fill="#eef7f9" />
+            <rect x="52" y="78" width="6" height="6" fill="#eef7f9" />
+            <rect x="62" y="78" width="6" height="6" fill="#eef7f9" />
+            <rect x="52" y="92" width="6" height="6" fill="#eef7f9" />
+            <rect x="62" y="92" width="6" height="6" fill="#eef7f9" />
+            <rect x="120" y="84" width="6" height="6" fill="#eef7f9" />
+            <rect x="130" y="84" width="6" height="6" fill="#eef7f9" />
+            <rect x="120" y="98" width="6" height="6" fill="#eef7f9" />
+            <rect x="130" y="98" width="6" height="6" fill="#eef7f9" />
+        </svg>
+        <svg class="gomsn-skyline-right" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="12" y="90" width="26" height="130" rx="2" fill="#94B8C4" />
+            <rect x="44" y="52" width="32" height="168" rx="2" fill="#82ABB8" />
+            <rect x="82" y="110" width="24" height="110" rx="2" fill="#A5C4CE" />
+            <rect x="112" y="72" width="30" height="148" rx="2" fill="#94B8C4" />
+            <rect x="148" y="128" width="22" height="92" rx="2" fill="#B2CED7" />
+            <rect x="52" y="64" width="6" height="6" fill="#eef7f9" />
+            <rect x="62" y="64" width="6" height="6" fill="#eef7f9" />
+            <rect x="52" y="78" width="6" height="6" fill="#eef7f9" />
+            <rect x="62" y="78" width="6" height="6" fill="#eef7f9" />
+            <rect x="120" y="84" width="6" height="6" fill="#eef7f9" />
+            <rect x="130" y="84" width="6" height="6" fill="#eef7f9" />
+        </svg>
+
+        <!-- Bottom Multi-Layer Sweeping Teal Wave -->
+        <svg class="gomsn-bottom-waves" viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+                <linearGradient id="bottomDarkWave" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#042f36" />
+                    <stop offset="50%" stop-color="#064e56" />
+                    <stop offset="100%" stop-color="#0b7a78" />
+                </linearGradient>
+                <linearGradient id="bottomMidWave" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.55" />
+                    <stop offset="50%" stop-color="#5eead4" stop-opacity="0.35" />
+                    <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.55" />
+                </linearGradient>
+            </defs>
+            <path d="M0,48 C260,118 540,126 880,76 C1120,40 1310,36 1440,12 L1440,160 L0,160 Z" fill="url(#bottomMidWave)" />
+            <path d="M0,78 C310,128 620,132 960,92 C1190,64 1340,60 1440,44 L1440,160 L0,160 Z" fill="rgba(13, 148, 136, 0.35)" />
+            <path d="M0,104 C360,136 740,126 1080,98 C1260,84 1370,84 1440,78 L1440,160 L0,160 Z" fill="url(#bottomDarkWave)" />
+        </svg>
+
         <!-- ============================================================== -->
-        <!-- RIGHT PANEL: CLEAN, SLEEK & ELEGANT LOGIN FORM                 -->
+        <!-- LAYER 2: MAIN CONTENT (TOP BRAND HEADER + FLOATING CARD)       -->
         <!-- ============================================================== -->
-        <div class="login-panel-right">
-            
-            <div class="w-full max-w-[380px] sm:max-w-[420px] mx-auto my-auto relative z-10">
-                
-                <!-- Heading Masuk ke Akun -->
-                <div class="mb-3 sm:mb-4 text-center">
-                    <h2 class="font-heading text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                        Masuk ke Akun
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                        Silakan masukkan kredensial akun Anda untuk login.
-                    </p>
+        <div class="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 sm:px-6 pt-6 sm:pt-8 pb-6">
+
+            <!-- Brand Header -->
+            <div class="w-full max-w-[448px] text-center mb-5 sm:mb-6 select-none">
+                <!-- Company Name with flanking thin lines -->
+                <div class="flex items-center justify-center gap-3 mb-3.5 sm:mb-4">
+                    <span class="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent to-white/40"></span>
+                    <span class="text-[11px] sm:text-xs font-bold tracking-[0.15em] text-white/95 uppercase">
+                        PT. MEDIA SOLUSI NETWORK
+                    </span>
+                    <span class="h-[1px] w-10 sm:w-16 bg-gradient-to-l from-transparent to-white/40"></span>
                 </div>
 
-                <!-- Info Alert / Status Flash Message -->
-                @if (session('status'))
-                <div class="mb-2.5 p-2.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-[11px] sm:text-xs flex items-center gap-2 shadow-2xs">
-                    <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                <!-- Circular White Logo Badge -->
+                <div class="gomsn-logo-circle mb-2.5 sm:mb-3">
+                    <img src="{{ asset('assets/logo/logo-msn2.png') }}"
+                         alt="Logo GoMSN"
+                         class="w-full h-full object-contain">
+                </div>
+
+                <!-- Wordmark GoMSN -->
+                <h1 class="font-heading text-[32px] sm:text-[38px] font-extrabold tracking-tight leading-none">
+                    <span class="text-white">Go</span><span class="text-[#2dd4bf]">MSN</span>
+                </h1>
+
+                <!-- Italic Tagline -->
+                <p class="mt-1.5 text-[12px] sm:text-[13.5px] italic text-teal-50/90 font-normal tracking-wide">
+                    Melayani dengan Solusi, Terhubung untuk Masa Depan
+                </p>
+            </div>
+
+            <!-- Floating White Login Card -->
+            <div class="gomsn-card">
+                <!-- Signature Top Curved Teal Wave Ribbon inside Card -->
+                <div class="relative w-full h-11 sm:h-12 overflow-hidden pointer-events-none select-none">
+                    <svg class="w-full h-full block" viewBox="0 0 460 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="cardTopWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#0b9b96" />
+                                <stop offset="48%" stop-color="#14b8a6" />
+                                <stop offset="100%" stop-color="#08918c" />
+                            </linearGradient>
+                            <linearGradient id="cardTopWaveSoft" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.55" />
+                                <stop offset="55%" stop-color="#ccfbf1" stop-opacity="0.22" />
+                                <stop offset="100%" stop-color="#5eead4" stop-opacity="0.35" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Soft lower mint ribbon -->
+                        <path d="M0,0 L460,0 L460,20 C385,36 320,26 240,14 C150,0 72,22 0,58 Z" fill="url(#cardTopWaveSoft)" />
+                        <!-- Main vibrant teal top wave -->
+                        <path d="M0,0 L460,0 L460,12 C392,28 334,14 252,4 C168,-6 80,8 0,34 Z" fill="url(#cardTopWaveGrad)" />
                     </svg>
-                    <span class="truncate">{{ session('status') }}</span>
-                </div>
-                @elseif (session('error'))
-                <div class="mb-2.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] sm:text-xs flex items-center gap-2 shadow-2xs">
-                    <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                    <span class="truncate">{{ session('error') }}</span>
-                </div>
-                @elseif ($errors->any())
-                <div class="mb-2.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-0.5 shadow-2xs">
-                    <div class="font-bold flex items-center gap-1.5 text-[11px]">
-                        <svg class="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                        <span>Kredensial tidak valid:</span>
-                    </div>
-                    <ul class="list-disc list-inside text-rose-700 pl-1 text-[10.5px]">
-                        @foreach ($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-
-                <!-- Biometric Inline Error Alert -->
-                <div x-show="biometricError" x-cloak class="mb-2.5 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] flex items-start gap-2 shadow-2xs">
-                    <svg class="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                    <span class="leading-relaxed" x-text="biometricError"></span>
                 </div>
 
-                <!-- Form Login -->
-                <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-3 sm:space-y-3.5">
-                    @csrf
-                    <input type="hidden" name="platform" value="web">
-
-                    <!-- Field 1: Email atau Username -->
-                    <div>
-                        <label for="identifier" class="block text-[10.5px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 text-left">
-                            Username
-                        </label>
-                        <div class="relative flex items-center group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-teal-700 transition-colors">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                            </div>
-                            <input
-                                id="identifier"
-                                name="identifier"
-                                type="text"
-                                required
-                                autofocus
-                                value="{{ old('identifier') }}"
-                                placeholder="Masukkan username"
-                                class="input-stylish"
-                            >
+                <!-- Card Body -->
+                <div class="px-6 sm:px-8 pb-6 sm:pb-7 -mt-3 sm:-mt-3.5 relative z-10">
+                    <!-- Lock Icon Badge with subtle side lines -->
+                    <div class="flex items-center justify-center gap-4 mb-3">
+                        <span class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200"></span>
+                        <div class="w-12 h-12 rounded-full bg-[#e3f7f5] border border-[#cdeee9] flex items-center justify-center shadow-2xs shrink-0">
+                            <svg class="w-5 h-5 text-[#0b5e63]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <rect x="5" y="11" width="14" height="10" rx="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+                            </svg>
                         </div>
+                        <span class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200"></span>
                     </div>
 
-                    <!-- Field 2: Kata Sandi (Password) -->
-                    <div>
-                        <label for="password" class="block text-[10.5px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 text-left">
-                            Kata Sandi (Password)
-                        </label>
-                        <div class="relative flex items-center group">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-teal-700 transition-colors">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    <!-- Card Heading -->
+                    <div class="text-center mb-5">
+                        <h2 class="font-heading text-[24px] sm:text-[27px] font-extrabold text-[#0b2333] tracking-tight leading-tight">
+                            Masuk ke Akun
+                        </h2>
+                        <p class="text-[12.5px] sm:text-[13.5px] text-slate-500 mt-1">
+                            Silakan login untuk mengakses layanan GoMSN
+                        </p>
+                    </div>
+
+                    <!-- Status / Error Alerts -->
+                    @if (session('status'))
+                    <div class="mb-4 p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>{{ session('status') }}</span>
+                    </div>
+                    @elseif (session('error'))
+                    <div class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2">
+                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                    @elseif ($errors->any())
+                    <div class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span>Kredensial tidak valid:</span>
+                        </div>
+                        <ul class="list-disc list-inside text-rose-700 pl-1 text-[11px]">
+                            @foreach ($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    <!-- Biometric Error Alert -->
+                    <div x-show="biometricError" x-cloak class="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2">
+                        <svg class="w-4 h-4 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span class="leading-relaxed" x-text="biometricError"></span>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="login-form" method="POST" action="{{ route('login.submit') }}" class="space-y-4">
+                        @csrf
+                        <input type="hidden" name="platform" value="web">
+
+                        <!-- Field 1: Username -->
+                        <div>
+                            <label for="identifier" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
+                                <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                 </svg>
+                                <span>Username</span>
+                            </label>
+                            <div class="relative flex items-center group">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0e7478]/85 group-focus-within:text-[#0b5e63] transition-colors">
+                                    <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <input
+                                    id="identifier"
+                                    name="identifier"
+                                    type="text"
+                                    required
+                                    autofocus
+                                    value="{{ old('identifier') }}"
+                                    placeholder="Ketik Username Anda"
+                                    class="gomsn-input"
+                                >
                             </div>
-                            <input
-                                id="password"
-                                name="password"
-                                :type="showPw ? 'text' : 'password'"
-                                required
-                                value=""
-                                placeholder="Masukkan kata sandi"
-                                class="input-stylish"
-                                style="padding-right: 40px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;"
-                            >
-                            <!-- Show / Hide Password Eye Toggle -->
-                            <button
-                                type="button"
-                                @click="showPw = !showPw"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-teal-700 cursor-pointer focus:outline-none transition-colors"
-                                title="Lihat kata sandi"
-                                tabindex="-1"
-                            >
-                                <svg x-show="!showPw" class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </div>
+
+                        <!-- Field 2: Kata Sandi (Password) -->
+                        <div>
+                            <label for="password" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
+                                <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                                 </svg>
-                                <svg x-show="showPw" x-cloak class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                                <span>Kata Sandi (Password)</span>
+                            </label>
+                            <div class="relative flex items-center group">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0b5e63] transition-colors">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <rect x="5" y="11" width="14" height="10" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    :type="showPw ? 'text' : 'password'"
+                                    required
+                                    value=""
+                                    placeholder="Masukkan Kata Sandi Anda"
+                                    class="gomsn-input"
+                                    style="padding-right: 44px;"
+                                >
+                                <button
+                                    type="button"
+                                    @click="showPw = !showPw"
+                                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-[#0b5e63] cursor-pointer focus:outline-none transition-colors"
+                                    title="Tampilkan / Sembunyikan kata sandi"
+                                    tabindex="-1"
+                                >
+                                    <!-- Eye Slashed when hidden (matches reference) -->
+                                    <svg x-show="!showPw" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/>
+                                    </svg>
+                                    <svg x-show="showPw" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox Ingat Saya -->
+                        <div class="pt-0.5">
+                            <label class="inline-flex items-center gap-2.5 cursor-pointer select-none text-[13px] font-medium text-[#1e293b] hover:text-slate-900">
+                                <input type="checkbox" name="remember" checked class="gomsn-checkbox">
+                                <span>Ingat saya di perangkat ini (&plusmn; 30 Hari)</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button + Optional Biometric Button -->
+                        <div class="flex items-center gap-2.5 pt-1">
+                            <button type="submit" class="gomsn-btn-submit">
+                                <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l4-4m0 0l-4-4m4 4H3m6-7V5a2 2 0 012-2h7a2 2 0 012 2v14a2 2 0 01-2 2h-7a2 2 0 01-2-2v-2"/>
+                                </svg>
+                                <span>Masuk ke Dashboard</span>
+                                <svg class="w-4.5 h-4.5 text-white/90 absolute right-4.5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+
+                            <button type="button"
+                                    x-show="hasRegisteredBiometric"
+                                    x-cloak
+                                    @click="loginWithBiometric()"
+                                    :disabled="biometricLoading"
+                                    title="Masuk dengan Sidik Jari / Biometrik"
+                                    aria-label="Masuk dengan Sidik Jari / Biometrik"
+                                    class="gomsn-btn-biometric">
+                                <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                </svg>
+                                <svg x-show="biometricLoading" x-cloak class="w-4.5 h-4.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                                 </svg>
                             </button>
                         </div>
+                    </form>
+
+                    <!-- Divider "atau" -->
+                    <div class="flex items-center justify-center gap-3 my-4 select-none">
+                        <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
+                        <span class="text-xs font-medium text-slate-400">atau</span>
+                        <span class="h-[1px] flex-1 max-w-[110px] bg-slate-200"></span>
                     </div>
 
-                    <!-- Checkbox Ingat Saya -->
-                    <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-600 select-none pt-0.5">
-                        <label class="inline-flex items-center gap-1.5 sm:gap-2 cursor-pointer font-medium hover:text-slate-800 transition-colors">
-                            <input type="checkbox" name="remember" checked class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border-slate-300 text-teal-700 focus:ring-teal-600 focus:ring-offset-0">
-                            <span>Ingat saya di perangkat ini (30 Hari)</span>
-                        </label>
-                    </div>
-
-                    <!-- Tombol Masuk ke Dashboard + Ikon Biometrik di Samping -->
-                    <div class="action-row pt-0.5">
-                        <button type="submit" class="btn-stylish">
-                            <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    <!-- Secure Portal Badge inside Card -->
+                    <div class="text-center select-none">
+                        <p class="inline-flex items-center justify-center gap-1.5 text-[12px] sm:text-[12.5px] font-medium text-[#0e6b70]">
+                            <svg class="w-3.5 h-3.5 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Masuk ke Dashboard</span>
-                        </button>
-
-                        <button type="button"
-                                x-show="hasRegisteredBiometric"
-                                x-cloak
-                                @click="loginWithBiometric()"
-                                :disabled="biometricLoading"
-                                title="Masuk dengan Sidik Jari / Biometrik"
-                                aria-label="Masuk dengan Sidik Jari / Biometrik"
-                                class="btn-biometric">
-                            <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
-                            </svg>
-                            <svg x-show="biometricLoading" x-cloak class="w-4.5 h-4.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                            </svg>
-                        </button>
+                            <span>Gunakan Secure Portal - PT Media Solusi Network</span>
+                        </p>
                     </div>
-
-                    <!-- Helpdesk Support Link -->
-                    <div class="pt-2 text-center select-none">
-                        <span class="text-[11px] text-slate-400">
-                            Kendala masuk akun? <a href="mailto:noc@ptmsn.co.id" class="text-teal-700 hover:text-teal-800 font-semibold hover:underline">Hubungi Tim IT / NOC</a>
-                        </span>
-                    </div>
-                </form>
-
-            </div>
-
-            <!-- Footer Hak Cipta & Keamanan Portal -->
-            <div class="w-full text-center py-2.5 sm:py-3 relative z-10 select-none shrink-0">
-                <p class="text-[10.5px] sm:text-[11px] text-slate-400 font-medium inline-flex items-center gap-1.5 justify-center">
-                    <svg class="w-3.5 h-3.5 text-teal-600/70 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                    </svg>
-                    <span>GoMSN Secure Portal &bull; PT Media Solusi Network</span>
-                </p>
+                </div>
             </div>
         </div>
+
+        <!-- ============================================================== -->
+        <!-- LAYER 3: FOOTER COPYRIGHT INSIDE DARK TEAL BOTTOM WAVE         -->
+        <!-- ============================================================== -->
+        <footer class="relative z-10 w-full text-center py-3.5 px-4 select-none">
+            <p class="text-[11px] sm:text-xs text-teal-50/90 font-normal tracking-wide">
+                &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
+            </p>
+        </footer>
     </div>
 </x-layouts.app>
