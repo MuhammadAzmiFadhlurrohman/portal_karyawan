@@ -133,13 +133,24 @@ class EmployeeController extends Controller
                 ELSE 6
             END)");
 
-        $employees = $query
+        $employees = (clone $query)
             ->select('users.*')
             ->selectSub($roleRankSub, 'role_rank')
             ->orderByRaw('COALESCE(role_rank, 6) ASC')
             ->orderBy('users.name', 'ASC')
             ->paginate(12)
             ->withQueryString();
+
+        // If current pagination page becomes empty after an action (e.g. deleting/filtering the last item on page N), fall back to the last valid page without losing filters
+        if ($employees->isEmpty() && $employees->currentPage() > 1 && $employees->lastPage() >= 1) {
+            $employees = $query
+                ->select('users.*')
+                ->selectSub($roleRankSub, 'role_rank')
+                ->orderByRaw('COALESCE(role_rank, 6) ASC')
+                ->orderBy('users.name', 'ASC')
+                ->paginate(12, ['*'], 'page', $employees->lastPage())
+                ->withQueryString();
+        }
 
         // Monthly attendance statistics per employee for HRD & Admin overview
         $employeeIds = $employees->pluck('id')->all();
@@ -320,7 +331,7 @@ class EmployeeController extends Controller
             actorId: $request->user()->id
         );
 
-        return redirect()->route('portal.employees.index')
+        return $this->redirectWithPreservedFilters($request)
             ->with('status', "Karyawan '{$user->name}' ({$user->employee_code}) berhasil ditambahkan ke sistem.");
     }
 
@@ -408,7 +419,7 @@ class EmployeeController extends Controller
             actorId: $request->user()->id
         );
 
-        return redirect()->route('portal.employees.index')
+        return $this->redirectWithPreservedFilters($request)
             ->with('status', "Data karyawan '{$user->name}' berhasil diperbarui.");
     }
 
@@ -421,7 +432,8 @@ class EmployeeController extends Controller
 
         // Prevent self-deletion
         if ($user->id === $request->user()->id) {
-            return back()->with('error', 'Anda tidak dapat menghapus atau menonaktifkan akun Anda sendiri!');
+            return $this->redirectWithPreservedFilters($request)
+                ->with('error', 'Anda tidak dapat menghapus atau menonaktifkan akun Anda sendiri!');
         }
 
         $name = $user->name;
@@ -440,7 +452,7 @@ class EmployeeController extends Controller
             actorId: $request->user()->id
         );
 
-        return redirect()->route('portal.employees.index')
+        return $this->redirectWithPreservedFilters($request)
             ->with('status', "Karyawan '{$name}' ({$code}) berhasil dihapus / dinonaktifkan.");
     }
 
@@ -464,7 +476,8 @@ class EmployeeController extends Controller
             actorId: $request->user()->id
         );
 
-        return back()->with('status', "Password untuk '{$user->name}' berhasil direset menjadi: {$defaultPassword} (Pengguna wajib mengganti password saat login).");
+        return $this->redirectWithPreservedFilters($request)
+            ->with('status', "Password untuk '{$user->name}' berhasil direset menjadi: {$defaultPassword} (Pengguna wajib mengganti password saat login).");
     }
 
     /**
@@ -481,7 +494,46 @@ class EmployeeController extends Controller
 
         $attendanceService->resetUserFace($user, $reason, $request->user()->id);
 
-        return back()->with('status', "Pendaftaran wajah absen untuk '{$user->name}' ({$user->employee_code}) berhasil direset. Karyawan dapat melakukan registrasi wajah ulang di halaman Absen.");
+        return $this->redirectWithPreservedFilters($request)
+            ->with('status', "Pendaftaran wajah absen untuk '{$user->name}' ({$user->employee_code}) berhasil direset. Karyawan dapat melakukan registrasi wajah ulang di halaman Absen.");
+    }
+
+    /**
+     * Redirect back to Data Karyawan index while preserving active search, filters, and pagination page.
+     */
+    protected function redirectWithPreservedFilters(Request $request): RedirectResponse
+    {
+        $returnUrl = trim($request->string('_return_url')->toString());
+        if ($returnUrl !== '') {
+            $parsed = parse_url($returnUrl);
+            $path = $parsed['path'] ?? '';
+            if ($path !== '' && str_ends_with($path, '/portal/employees')) {
+                $query = isset($parsed['query']) && $parsed['query'] !== '' ? ('?' . $parsed['query']) : '';
+
+                return redirect()->to($path . $query);
+            }
+        }
+
+        $filterParams = array_filter([
+            'search' => $request->input('_f_search', $request->query('search')),
+            'division' => $request->input('_f_division', $request->query('division')),
+            'role' => $request->input('_f_role', $request->query('role')),
+            'status' => $request->input('_f_status', $request->query('status')),
+            'month' => $request->input('_f_month', $request->query('month')),
+            'year' => $request->input('_f_year', $request->query('year')),
+            'page' => $request->input('_f_page', $request->query('page')),
+        ], static fn ($v) => $v !== null && $v !== '');
+
+        if (! empty($filterParams)) {
+            return redirect()->route('portal.employees.index', $filterParams);
+        }
+
+        $referer = (string) $request->headers->get('referer', '');
+        if ($referer !== '' && str_contains($referer, '/portal/employees')) {
+            return back();
+        }
+
+        return redirect()->route('portal.employees.index');
     }
 
     /**

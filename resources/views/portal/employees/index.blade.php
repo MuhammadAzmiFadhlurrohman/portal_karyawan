@@ -445,6 +445,12 @@
                     <p class="font-bold text-slate-700 text-sm">Tidak ada karyawan yang sesuai filter</p>
                 </div>
             @endforelse
+
+            @if ($employees->hasPages())
+                <div class="bg-white rounded-2xl border border-slate-200/80 px-4 py-3 shadow-xs">
+                    {{ $employees->links() }}
+                </div>
+            @endif
         </div>
 
         <!-- Employee Table Card (Desktop View) -->
@@ -685,6 +691,7 @@
                 <!-- Modal Body (Form) -->
                 <form method="POST" action="{{ route('portal.employees.store') }}" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0">
                     @csrf
+                    <input type="hidden" name="_return_url" value="{{ request()->fullUrl() }}">
 
                     <div class="overflow-y-auto p-5 sm:p-6 space-y-4 flex-1 text-xs sm:text-[13px]">
                         <!-- Section 1: Profil Utama -->
@@ -874,6 +881,7 @@
                 <form :action="'{{ url('/portal/employees') }}/' + editForm.id" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="_return_url" value="{{ request()->fullUrl() }}">
 
                     <div class="overflow-y-auto p-5 sm:p-6 space-y-4 flex-1 text-xs sm:text-[13px]">
                         <!-- Section 1: Profil Utama -->
@@ -1046,6 +1054,7 @@
 
                 <form :action="'{{ url('/portal/employees') }}/' + resetTarget.id + '/reset-password'" method="POST" class="mt-5 flex items-center justify-center gap-2.5">
                     @csrf
+                    <input type="hidden" name="_return_url" value="{{ request()->fullUrl() }}">
                     <button @click="isResetOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 text-xs transition">
                         Batal
                     </button>
@@ -1075,6 +1084,7 @@
                 <form :action="'{{ url('/portal/employees') }}/' + deleteTarget.id" method="POST" class="mt-5 flex items-center justify-center gap-2.5">
                     @csrf
                     @method('DELETE')
+                    <input type="hidden" name="_return_url" value="{{ request()->fullUrl() }}">
                     <button @click="isDeleteOpen = false" type="button" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 text-xs transition">
                         Batal
                     </button>
@@ -1105,6 +1115,7 @@
 
                 <form :action="'{{ url('/portal/employees') }}/' + resetFaceTarget.id + '/reset-face'" method="POST" class="mt-4 space-y-3 text-left">
                     @csrf
+                    <input type="hidden" name="_return_url" value="{{ request()->fullUrl() }}">
                     <div>
                         <label class="block text-[11px] font-bold text-slate-600 mb-1">Alasan Reset (Opsional)</label>
                         <input type="text" 
