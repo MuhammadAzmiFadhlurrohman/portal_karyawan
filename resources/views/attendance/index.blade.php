@@ -309,7 +309,7 @@
                     <!-- SUDAH DAFTAR WAJAH -> TOMBOL ABSEN MASUK / PULANG -->
                     @if (! $todayAttendance)
                         <button type="button"
-                                @click="openClockInModal()"
+                                @click="openAttendanceTypeModal()"
                                 style="background: linear-gradient(135deg, #065f46 0%, #0D8252 55%, #10b981 100%) !important;"
                                 class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-emerald-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -481,12 +481,154 @@
             </div>
         </div>
 
+        <!-- MODAL PILIH TIPE KEHADIRAN / LOKASI ABSEN (Step 1 Sebelum Kamera Absen) -->
+        <div x-show="showAttendanceTypeModal" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-250"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-[#111c26] rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-[0_24px_60px_rgba(15,23,42,0.3)] max-w-md w-full overflow-hidden my-auto" 
+                 @click.outside="closeAttendanceTypeModal()">
+                
+                <!-- Sleek Header with Location Pin -->
+                <div class="px-6 pt-6 pb-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/60 flex items-center justify-center text-[#155E63] dark:text-teal-400 shadow-xs">
+                            <span class="text-xl leading-none">📍</span>
+                        </div>
+                        <div>
+                            <h3 class="font-heading font-bold text-base sm:text-lg text-slate-800 dark:text-white leading-tight">
+                                Pilih Lokasi Absen
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                                Tentukan lokasi kerja sebelum verifikasi wajah
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            @click="closeAttendanceTypeModal()" 
+                            class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Two Selection Cards -->
+                <div class="p-6 space-y-4">
+                    <div class="grid grid-cols-2 gap-3.5 sm:gap-4">
+                        <!-- Card 1: Kantor -->
+                        <button type="button" 
+                                @click="attendanceType = 'office'"
+                                class="group relative flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer focus:outline-none"
+                                :class="attendanceType === 'office' 
+                                    ? 'border-[#155E63] dark:border-teal-400 bg-gradient-to-b from-teal-50/90 to-emerald-50/40 dark:from-teal-950/50 dark:to-emerald-950/20 shadow-md ring-2 ring-[#155E63]/20 dark:ring-teal-400/30 scale-[1.02]' 
+                                    : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-slate-100/70 dark:hover:bg-slate-900/80 opacity-85 hover:opacity-100'">
+                            
+                            <!-- Office Icon Box -->
+                            <div class="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center mb-3 transition shadow-sm"
+                                 :class="attendanceType === 'office' 
+                                    ? 'bg-gradient-to-tr from-[#093c40] via-[#155E63] to-[#0d9488] text-white shadow-teal-900/25' 
+                                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'">
+                                <svg class="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-sm sm:text-base text-slate-800 dark:text-white mb-1">
+                                Kantor
+                            </h4>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mb-2">
+                                Absen di kantor
+                            </p>
+
+                            <!-- Checkmark / Selection Indicator -->
+                            <div class="mt-auto pt-1">
+                                <span x-show="attendanceType === 'office'" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#155E63] text-white dark:bg-teal-500 dark:text-slate-950 shadow-2xs">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    <span>Dipilih</span>
+                                </span>
+                                <span x-show="attendanceType !== 'office'" 
+                                      class="inline-block w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600"></span>
+                            </div>
+                        </button>
+
+                        <!-- Card 2: Dinas Luar -->
+                        <button type="button" 
+                                @click="attendanceType = 'field'"
+                                class="group relative flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer focus:outline-none"
+                                :class="attendanceType === 'field' 
+                                    ? 'border-amber-500 dark:border-amber-400 bg-gradient-to-b from-amber-50/90 to-orange-50/40 dark:from-amber-950/50 dark:to-orange-950/20 shadow-md ring-2 ring-amber-500/20 dark:ring-amber-400/30 scale-[1.02]' 
+                                    : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-slate-100/70 dark:hover:bg-slate-900/80 opacity-85 hover:opacity-100'">
+                            
+                            <!-- Field Work / Car Icon Box -->
+                            <div class="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center mb-3 transition shadow-sm"
+                                 :class="attendanceType === 'field' 
+                                    ? 'bg-gradient-to-tr from-amber-600 via-amber-500 to-orange-500 text-white shadow-amber-900/25' 
+                                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700'">
+                                <svg class="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1" />
+                                </svg>
+                            </div>
+
+                            <h4 class="font-bold text-sm sm:text-base text-slate-800 dark:text-white mb-1">
+                                Dinas Luar
+                            </h4>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-tight mb-2">
+                                Tugas di luar kantor
+                            </p>
+
+                            <!-- Checkmark / Selection Indicator -->
+                            <div class="mt-auto pt-1">
+                                <span x-show="attendanceType === 'field'" 
+                                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-600 text-white dark:bg-amber-400 dark:text-slate-950 shadow-2xs">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    <span>Dipilih</span>
+                                </span>
+                                <span x-show="attendanceType !== 'field'" 
+                                      class="inline-block w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600"></span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Info Tip -->
+                    <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                        <svg class="w-4 h-4 text-[#155E63] dark:text-teal-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            <span x-show="attendanceType === 'office'">Absen di kantor memvalidasi koordinat GPS dengan radius kantor terdekat.</span>
+                            <span x-show="attendanceType === 'field'">Absen dinas luar memungkinkan presensi di lokasi tugas dengan menyertakan keterangan penugasan.</span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Action Buttons: Lanjutkan & Batal -->
+                    <div class="flex items-center gap-3 pt-2">
+                        <button type="button" 
+                                @click="proceedToClockIn()"
+                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                class="flex-1 py-3 px-5 rounded-2xl text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-900/20 hover:brightness-105 active:scale-[0.99] transition flex items-center justify-center gap-2 cursor-pointer">
+                            <span>Lanjutkan</span>
+                            <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                        <button type="button" 
+                                @click="closeAttendanceTypeModal()"
+                                class="py-3 px-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition cursor-pointer">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- MODAL 2: ABSEN MASUK (Camera Face Verification - Lokasi Otomatis dari Halaman) -->
         <div x-show="showClockInModal" 
              x-cloak 
              x-transition.opacity.duration.200ms
-             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-            <div class="bg-white rounded-3xl border border-slate-200/90 shadow-[0_24px_60px_rgba(15,23,42,0.25)] max-w-md w-full overflow-hidden my-auto" @click.outside="closeClockInModal()">
+             class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/65 dark:bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+            <div class="bg-white dark:bg-[#111c26] rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-[0_24px_60px_rgba(15,23,42,0.25)] max-w-md w-full overflow-hidden my-auto" @click.outside="closeClockInModal()">
                 
                 <!-- Sleek Gradient Header -->
                 <div class="px-5 py-3.5 bg-gradient-to-r from-[#093c40] via-[#155E63] to-[#0d9488] text-white flex items-center justify-between relative overflow-hidden">
@@ -620,34 +762,52 @@
                         <input type="hidden" name="anti_spoof_meta" :value="clockInAntiSpoofMeta">
                     </div>
 
-                    <!-- Attendance Type -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                            Tipe Kehadiran
-                        </label>
-                        <div class="relative">
-                            <select name="attendance_type" x-model="attendanceType" class="w-full text-xs font-medium text-slate-800 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 pl-3 pr-8 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition">
-                                <option value="office">Kantor</option>
-                                <option value="field">Dinas Luar</option>
-                            </select>
+                    <!-- Hidden Attendance Type -->
+                    <input type="hidden" name="attendance_type" :value="attendanceType">
+
+                    <!-- Selected Type Badge (Menggantikan dropdown) -->
+                    <div class="flex items-center justify-between px-3.5 py-2 rounded-xl border transition"
+                         :class="attendanceType === 'field' 
+                            ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200' 
+                            : 'bg-teal-50/80 dark:bg-teal-950/40 border-teal-200 dark:border-teal-800/80 text-teal-900 dark:text-teal-200'">
+                        <div class="flex items-center gap-2 text-xs font-semibold">
+                            <template x-if="attendanceType === 'office'">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#155E63] dark:text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    <span>Lokasi Absen: <strong class="font-bold">Kantor</strong></span>
+                                </span>
+                            </template>
+                            <template x-if="attendanceType === 'field'">
+                                <span class="inline-flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1"/></svg>
+                                    <span>Lokasi Absen: <strong class="font-bold">Dinas Luar</strong></span>
+                                </span>
+                            </template>
                         </div>
+                        <button type="button" 
+                                @click="closeClockInModal(); openAttendanceTypeModal()" 
+                                class="text-[11px] font-bold text-[#155E63] dark:text-teal-300 hover:underline cursor-pointer">
+                            Ganti
+                        </button>
                     </div>
 
                     <!-- Notes (Keterangan Tugas) -->
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center justify-between">
-                            <span>Catatan / Keterangan</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full" :class="attendanceType !== 'office' ? 'bg-rose-50 text-rose-600 font-bold border border-rose-200' : 'bg-slate-100 text-slate-500 font-medium'" x-text="attendanceType !== 'office' ? 'Wajib Diisi' : 'Opsional'"></span>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center justify-between">
+                            <span x-text="attendanceType === 'field' ? 'Keterangan Tugas Dinas Luar' : 'Catatan / Keterangan'"></span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full" 
+                                  :class="attendanceType !== 'office' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-bold border border-rose-200 dark:border-rose-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium'" 
+                                  x-text="attendanceType !== 'office' ? 'Wajib Diisi' : 'Opsional'"></span>
                         </label>
                         <textarea name="notes" rows="2" 
                                   :required="attendanceType !== 'office'"
-                                  placeholder="Contoh: Pekerjaan dinas luar / kunjungan lokasi..."
-                                  class="w-full text-xs text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-white focus:bg-white py-2.5 px-3.5 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition resize-none"></textarea>
+                                  :placeholder="attendanceType === 'field' ? 'Wajib sebutkan tugas/tujuan dinas luar...' : 'Contoh: Pekerjaan di kantor / catatan...'"
+                                  class="w-full text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-900 focus:bg-white dark:focus:bg-slate-900 py-2.5 px-3.5 focus:outline-none focus:border-[#155E63] dark:focus:border-teal-400 focus:ring-2 focus:ring-[#18C4C4]/25 shadow-2xs transition resize-none"></textarea>
                     </div>
 
                     <!-- Footer Actions -->
-                    <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-                        <button type="button" @click="closeClockInModal()" class="px-4 py-2.5 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition cursor-pointer">
+                    <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <button type="button" @click="closeClockInModal()" class="px-4 py-2.5 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition cursor-pointer">
                             Batal
                         </button>
                         <button type="submit" 
@@ -771,6 +931,7 @@
 
             return {
                 showEnrollModal: false,
+                showAttendanceTypeModal: false,
                 showClockInModal: false,
                 showClockOutModal: false,
                 showLocationDetail: false,
@@ -1181,7 +1342,21 @@
                     }
                 },
 
-                // Clock-in Face Verification Modal controls
+                // Attendance Type Selection Modal controls (Step 1)
+                openAttendanceTypeModal() {
+                    this.showAttendanceTypeModal = true;
+                },
+
+                closeAttendanceTypeModal() {
+                    this.showAttendanceTypeModal = false;
+                },
+
+                proceedToClockIn() {
+                    this.showAttendanceTypeModal = false;
+                    this.openClockInModal();
+                },
+
+                // Clock-in Face Verification Modal controls (Step 2)
                 openClockInModal() {
                     this.showClockInModal = true;
                     this.clockInVerified = false;
