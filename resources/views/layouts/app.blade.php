@@ -631,7 +631,7 @@
         <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
             <!-- Mobile Fixed Header (Sculpted Metallic Teal Bar - Always Pinned on Scroll) -->
             <div class="md:hidden fixed top-0 inset-x-0 z-50 pt-2 px-3 pb-1.5 bg-slate-50/95 backdrop-blur-md select-none">
-                <div class="relative h-[48px] w-full rounded-[22px] flex items-center justify-between px-3.5 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
+                <div class="relative h-[48px] w-full rounded-[22px] flex items-center justify-between pl-3.5 pr-0 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
                      style="background: linear-gradient(100deg, #07383c 0%, #0c4d53 28%, #105c64 52%, #0a4449 82%, #063135 100%);">
                     
                     <!-- Decorative Background & Highlights Layer (Clipped to Pill Corners) -->
@@ -640,42 +640,44 @@
                         <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/80 to-transparent"></div>
                         <div class="absolute inset-x-3 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/45 to-transparent"></div>
                         <div class="absolute inset-0 bg-gradient-to-b from-white/[0.10] via-transparent to-black/[0.20]"></div>
-
-                        <!-- Sculpted Aerodynamic Wave SVG on Right Pocket -->
-                        <svg class="absolute right-0 top-0 h-full w-[170px]" viewBox="0 0 170 48" fill="none" preserveAspectRatio="none">
-                            <path d="M 45 0 C 35 14 18 28 0 38 L 0 48 L 170 48 L 170 0 Z" fill="url(#mobilePocketGrad)" opacity="0.88"/>
-                            <path d="M 45 0 C 35 14 18 28 0 38 L 0 48" stroke="url(#mobileHighlightStroke)" stroke-width="2" stroke-linecap="round"/>
-                            <defs>
-                                <linearGradient id="mobilePocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#042023"/>
-                                    <stop offset="50%" stop-color="#072d31"/>
-                                    <stop offset="100%" stop-color="#051f22"/>
-                                </linearGradient>
-                                <linearGradient id="mobileHighlightStroke" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stop-color="#5eead4" stop-opacity="0.9"/>
-                                    <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1"/>
-                                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.4"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
                     </div>
 
                     <!-- Left: White GoMSN Logo -->
-                    <a href="{{ route('portal.hub') }}" class="relative z-10 flex items-center group py-0.5" title="GoMSN Portal">
+                    <a href="{{ route('portal.hub') }}" class="relative z-10 flex items-center group py-0.5 shrink-0" title="GoMSN Portal">
                         <img src="{{ asset('assets/logo/logo1.png') }}" 
                              alt="GoMSN" 
                              style="filter: brightness(0) invert(1) !important;"
-                             class="h-6 sm:h-7 w-auto max-w-[130px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+                             class="h-6 sm:h-7 w-auto max-w-[125px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
                     </a>
 
-                    <!-- Right: Actions inside sculpted bezel (Dark Mode Orb + Solid White Ringed Avatar + Chevron) -->
-                    <div class="relative z-10 flex items-center gap-2">
+                    <!-- Right: Actions inside sculpted bezel (Pocket Crease always sits cleanly to the left of Dark Mode Orb) -->
+                    <div class="relative z-10 h-full flex items-center gap-2 pl-11 pr-3.5">
+                        <!-- Sculpted Aerodynamic Wave SVG on Right Pocket (Anchored to left edge of action group) -->
+                        <div class="absolute inset-0 pointer-events-none overflow-hidden rounded-r-[22px] z-0">
+                            <svg class="absolute left-0 top-0 h-full w-[500px] max-w-none" viewBox="0 0 500 48" fill="none" preserveAspectRatio="none">
+                                <path d="M 38 0 C 28 14 14 28 0 38 L 0 48 L 500 48 L 500 0 Z" fill="url(#mobilePocketGrad)" opacity="0.88"/>
+                                <path d="M 38 0 C 28 14 14 28 0 38 L 0 48" stroke="url(#mobileHighlightStroke)" stroke-width="2" stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="mobilePocketGrad" x1="0%" y1="0%" x2="45%" y2="100%">
+                                        <stop offset="0%" stop-color="#042023"/>
+                                        <stop offset="50%" stop-color="#072d31"/>
+                                        <stop offset="100%" stop-color="#051f22"/>
+                                    </linearGradient>
+                                    <linearGradient id="mobileHighlightStroke" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#5eead4" stop-opacity="0.9"/>
+                                        <stop offset="50%" stop-color="#2dd4bf" stop-opacity="1"/>
+                                        <stop offset="100%" stop-color="#0d9488" stop-opacity="0.4"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+
                         <!-- Mobile Dark Mode Toggle Button (Sculpted Glass Orb) -->
                         <button type="button"
                                 @click="window.toggleGomsnTheme($event)"
                                 :title="isDarkMode ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'"
                                 aria-label="Toggle Dark Mode"
-                                class="theme-toggle-mobile relative w-[33px] h-[33px] rounded-full bg-white/12 hover:bg-white/22 active:scale-90 border border-white/25 flex items-center justify-center text-white shadow-sm transition-all duration-300 cursor-pointer overflow-hidden shrink-0">
+                                class="theme-toggle-mobile relative z-10 w-[33px] h-[33px] rounded-full bg-white/12 hover:bg-white/22 active:scale-90 border border-white/25 flex items-center justify-center text-white shadow-sm transition-all duration-300 cursor-pointer overflow-hidden shrink-0">
                             <!-- Sun Icon (Visible in Light Mode) -->
                             <svg class="theme-icon-sun w-4 h-4 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.65)] transition-all duration-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.35"/>
@@ -688,7 +690,7 @@
                         </button>
 
                         <!-- Avatar with Solid White Ring + Name & Division + Chevron Down (Dropdown Menu) -->
-                        <div class="relative" x-data="{ mobileUserMenuOpen: false }" @click.outside="mobileUserMenuOpen = false">
+                        <div class="relative z-10" x-data="{ mobileUserMenuOpen: false }" @click.outside="mobileUserMenuOpen = false">
                             <button @click="mobileUserMenuOpen = !mobileUserMenuOpen"
                                     type="button"
                                     aria-haspopup="true"
