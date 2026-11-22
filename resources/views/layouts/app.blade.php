@@ -866,12 +866,12 @@
                         <span class="text-teal-700 font-mono text-[11px]">WIB</span>
                     </div>
 
-                    <!-- Elegant Interactive Dark / Light Mode Toggle Capsule -->
+                    <!-- Elegant Interactive Dark / Light Mode Toggle Switch -->
                     <button type="button"
                             @click="window.toggleGomsnTheme($event)"
                             :title="isDarkMode ? 'Mode Gelap Aktif — Klik untuk Mode Terang' : 'Mode Terang Aktif — Klik untuk Mode Gelap'"
                             aria-label="Toggle Dark Mode"
-                            class="theme-toggle-desktop group relative inline-flex items-center gap-2 h-9 px-2.5 rounded-xl border border-slate-200/80 bg-slate-50/90 hover:bg-white hover:border-teal-400/80 shadow-2xs hover:shadow-md transition-all duration-300 cursor-pointer select-none overflow-hidden">
+                            class="theme-toggle-desktop group relative inline-flex items-center justify-center h-9 px-2 rounded-xl border border-slate-200/80 bg-slate-50/90 hover:bg-white hover:border-teal-400/80 shadow-2xs hover:shadow-md transition-all duration-300 cursor-pointer select-none overflow-hidden">
                         
                         <!-- Subtle Ambient Hover Halo -->
                         <span class="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-teal-400/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></span>
@@ -898,12 +898,6 @@
                                 </svg>
                             </div>
                         </div>
-
-                        <!-- Mode Text Label -->
-                        <span class="text-[11px] font-bold tracking-tight text-slate-700 group-hover:text-teal-700 transition-colors min-w-[38px] text-left"
-                              x-text="isDarkMode ? 'Gelap' : 'Terang'">
-                            Terang
-                        </span>
                     </button>
 
                     <!-- Divider -->
