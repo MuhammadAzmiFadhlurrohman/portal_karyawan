@@ -311,6 +311,31 @@
             flex-direction: column !important;
             gap: 6px !important;
         }
+        html.dark .chatbot-modal-box {
+            background: #131c2e !important;
+            border-color: rgba(51, 65, 85, 0.9) !important;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.65) !important;
+        }
+        html.dark #chatbot-messages {
+            background: #0f172a !important;
+        }
+        html.dark .chatbot-bubble-bot {
+            background: #162235 !important;
+            color: #e2e8f0 !important;
+            border-color: #334155 !important;
+        }
+        html.dark .chatbot-action-wrap,
+        html.dark .chatbot-suggestions-wrap {
+            border-top-color: #1e293b !important;
+        }
+        html.dark .chatbot-action-btn {
+            background: rgba(20, 184, 166, 0.16) !important;
+            border-color: rgba(45, 212, 191, 0.35) !important;
+            color: #5eead4 !important;
+        }
+        html.dark .chatbot-action-btn:hover {
+            background: rgba(20, 184, 166, 0.26) !important;
+        }
 
         /* Compact Desktop Internal Scale */
         @media (min-width: 640px) {

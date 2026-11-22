@@ -407,15 +407,219 @@ html.dark .md\:hidden.fixed.top-0.bg-slate-50\/95 {
 html.dark .card-enterprise,
 html.dark .card-modern,
 html.dark .folder-tab-card:not(.active-folder),
-html.dark #main-content .bg-white,
-html.dark #main-content .bg-white\/95,
-html.dark #main-content .bg-white\/90,
-html.dark #main-content .bg-white\/80,
-html.dark header .bg-white,
-html.dark .fixed .bg-white {
+html.dark .kpi-card,
+html.dark .emp-attendance-card,
+html.dark .emp-overtime-card,
+html.dark .chatbot-modal-box,
+html.dark .bg-white:not(#desktop-sidebar *):not(.w-2):not(.h-2):not(.w-1\.5):not(.theme-switch-thumb),
+html.dark .bg-white\/95:not(#desktop-sidebar *),
+html.dark .bg-white\/90:not(#desktop-sidebar *),
+html.dark .bg-white\/85:not(#desktop-sidebar *),
+html.dark .bg-white\/80:not(#desktop-sidebar *) {
     background-color: #131c2e !important;
     border-color: rgba(51, 65, 85, 0.85) !important;
     color: #e2e8f0;
+}
+
+/* Override Tailwind Light / White Gradient Stops in Dark Mode */
+html.dark .from-white:not(#desktop-sidebar *):not([class*="to-transparent"]) {
+    --tw-gradient-from: #131c2e !important;
+}
+html.dark .via-white:not(#desktop-sidebar *):not([class*="to-transparent"]) {
+    --tw-gradient-via: #162235 !important;
+}
+html.dark .to-white:not(#desktop-sidebar *) {
+    --tw-gradient-to: #131c2e !important;
+}
+html.dark [class*="from-slate-50"],
+html.dark [class*="from-teal-50"],
+html.dark [class*="from-emerald-50"],
+html.dark [class*="from-cyan-50"],
+html.dark [class*="from-amber-50"],
+html.dark [class*="from-blue-50"],
+html.dark [class*="from-indigo-50"],
+html.dark [class*="from-rose-50"],
+html.dark [class*="from-slate-100"] {
+    --tw-gradient-from: #162235 !important;
+}
+html.dark [class*="via-slate-50"],
+html.dark [class*="via-teal-50"],
+html.dark [class*="via-emerald-50"],
+html.dark [class*="via-orange-50"] {
+    --tw-gradient-via: #131c2e !important;
+}
+html.dark [class*="to-slate-50"],
+html.dark [class*="to-teal-50"],
+html.dark [class*="to-cyan-50"],
+html.dark [class*="to-emerald-50"],
+html.dark [class*="to-amber-50"],
+html.dark [class*="to-indigo-50"],
+html.dark [class*="to-slate-200"] {
+    --tw-gradient-to: #0f172a !important;
+}
+
+/* Dashboard KPI & Custom Card Components Dark Mode */
+html.dark .kpi-donut-center {
+    background: #131c2e !important;
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark .kpi-donut-num,
+html.dark .kpi-hdr-title,
+html.dark .kpi-abs-num,
+html.dark .kpi-box-num {
+    color: #f8fafc !important;
+}
+html.dark .kpi-hdr-sub,
+html.dark .kpi-detail-row,
+html.dark .kpi-pbar-legend {
+    color: #94a3b8 !important;
+}
+html.dark .kpi-detail-row strong {
+    color: #f1f5f9 !important;
+}
+html.dark .kpi-hdr-icon {
+    background: rgba(20, 184, 166, 0.16) !important;
+    color: #2dd4bf !important;
+    border: 1px solid rgba(45, 212, 191, 0.28) !important;
+}
+html.dark .kpi-badge-aktif {
+    background: rgba(16, 185, 129, 0.16) !important;
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+html.dark .kpi-dropdown-btn {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+html.dark .kpi-legend-item {
+    background: #162235 !important;
+    border-color: rgba(51, 65, 85, 0.75) !important;
+}
+html.dark .kpi-legend-item:hover {
+    background: #1e293b !important;
+}
+html.dark .kpi-legend-left {
+    color: #cbd5e1 !important;
+}
+html.dark .kpi-legend-val-green {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+}
+html.dark .kpi-legend-val-red {
+    background: rgba(244, 63, 94, 0.18) !important;
+    color: #fda4af !important;
+}
+html.dark .kpi-legend-val-amber {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fcd34d !important;
+}
+html.dark .kpi-legend-val-blue {
+    background: rgba(59, 130, 246, 0.18) !important;
+    color: #93c5fd !important;
+}
+html.dark .kpi-card-footer {
+    border-top-color: rgba(51, 65, 85, 0.8) !important;
+}
+html.dark .kpi-abs-box-teal {
+    background: rgba(20, 184, 166, 0.14) !important;
+    border-color: rgba(45, 212, 191, 0.3) !important;
+}
+html.dark .kpi-abs-box-amber {
+    background: rgba(245, 158, 11, 0.14) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+}
+html.dark .kpi-abs-unit {
+    color: #5eead4 !important;
+}
+html.dark .kpi-abs-money {
+    color: #fcd34d !important;
+}
+html.dark .kpi-abs-icon-teal {
+    background: rgba(20, 184, 166, 0.22) !important;
+    color: #5eead4 !important;
+}
+html.dark .kpi-abs-icon-amber {
+    background: rgba(245, 158, 11, 0.22) !important;
+    color: #fcd34d !important;
+}
+html.dark .kpi-pbar-track {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+html.dark .cal-tile-present {
+    background-color: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+html.dark .cal-tile-late {
+    background-color: rgba(245, 158, 11, 0.18) !important;
+    color: #fcd34d !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+html.dark .cal-tile-absent {
+    background-color: rgba(244, 63, 94, 0.18) !important;
+    color: #fda4af !important;
+    border-color: rgba(244, 63, 94, 0.4) !important;
+}
+html.dark .cal-tile-off {
+    background-color: #1e293b !important;
+    color: #64748b !important;
+    border-color: #334155 !important;
+}
+html.dark .cal-tile-future {
+    background-color: #0f172a !important;
+    color: #64748b !important;
+    border-color: #334155 !important;
+}
+
+/* Chatbot Widget Dark Mode */
+html.dark #chatbot-messages {
+    background: #0f172a !important;
+}
+html.dark .chatbot-bubble-bot {
+    background: #162235 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+html.dark .chatbot-action-wrap,
+html.dark .chatbot-suggestions-wrap {
+    border-top-color: #1e293b !important;
+}
+html.dark .chatbot-action-btn {
+    background: rgba(20, 184, 166, 0.15) !important;
+    border-color: rgba(45, 212, 191, 0.35) !important;
+    color: #5eead4 !important;
+}
+html.dark .chatbot-action-btn:hover {
+    background: rgba(20, 184, 166, 0.25) !important;
+}
+
+/* Inline Style Light Surface Overrides (Ticketing Chat, Badges, etc.) */
+html.dark [style*="background-color: #FFFFFF"],
+html.dark [style*="background-color: #ffffff"],
+html.dark [style*="background: #FFFFFF"],
+html.dark [style*="background: #ffffff"] {
+    background-color: #162235 !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+html.dark [style*="background-color: #EAF4FE"] {
+    background-color: #132a4a !important;
+    border-color: #1e3a5f !important;
+    color: #e2e8f0 !important;
+}
+html.dark [style*="background-color: #F1F5F9"],
+html.dark [style*="background: #f1f5f9"] {
+    background-color: #1e293b !important;
+    color: #cbd5e1 !important;
+}
+html.dark .ticket-chat-card.is-chat-fullscreen #chat-input-container,
+html.dark .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text,
+html.dark .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar button {
+    background: #131c2e !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
 }
 
 html.dark .card-modern:hover,
@@ -425,23 +629,21 @@ html.dark #main-content .bg-white:hover {
 
 /* Secondary / Muted Backgrounds */
 html.dark .bg-\[\#F8FAFC\],
-html.dark #main-content .bg-slate-50,
-html.dark #main-content .bg-slate-50\/90,
-html.dark #main-content .bg-slate-50\/80,
-html.dark #main-content .bg-slate-50\/70,
-html.dark #main-content .bg-slate-50\/60,
-html.dark #main-content .bg-slate-50\/50,
-html.dark #main-content .bg-gray-50,
-html.dark header .bg-slate-50\/90 {
+html.dark .bg-slate-50:not(#desktop-sidebar *),
+html.dark .bg-slate-50\/90:not(#desktop-sidebar *),
+html.dark .bg-slate-50\/80:not(#desktop-sidebar *),
+html.dark .bg-slate-50\/70:not(#desktop-sidebar *),
+html.dark .bg-slate-50\/60:not(#desktop-sidebar *),
+html.dark .bg-slate-50\/50:not(#desktop-sidebar *),
+html.dark .bg-gray-50:not(#desktop-sidebar *) {
     background-color: #162235 !important;
 }
 
-html.dark #main-content .bg-slate-100,
-html.dark #main-content .bg-slate-100\/80,
-html.dark #main-content .bg-slate-200\/70,
-html.dark #main-content .bg-slate-200,
-html.dark #main-content .bg-gray-100,
-html.dark .fixed .bg-slate-100 {
+html.dark .bg-slate-100:not(#desktop-sidebar *),
+html.dark .bg-slate-100\/80:not(#desktop-sidebar *),
+html.dark .bg-slate-200\/70:not(#desktop-sidebar *),
+html.dark .bg-slate-200:not(#desktop-sidebar *):not(.theme-switch-track),
+html.dark .bg-gray-100:not(#desktop-sidebar *) {
     background-color: #1e293b !important;
 }
 

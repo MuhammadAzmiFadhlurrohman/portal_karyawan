@@ -361,6 +361,11 @@
                     overflow: hidden !important;
                     gap: 12px !important;
                 }
+                html.dark .emp-overtime-card {
+                    background: #131c2e !important;
+                    border-color: rgba(51, 65, 85, 0.85) !important;
+                    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4) !important;
+                }
                 .emp-overtime-photo-panel {
                     width: 108px !important;
                     min-width: 108px !important;

@@ -181,6 +181,59 @@
         .kpi-donut-num{font-size:22px;font-weight:800;color:#0f172a;line-height:1;letter-spacing:-0.02em}
         .kpi-donut-lbl{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-top:3px}
 
+        :root{--donut-empty:#cbd5e1;--donut-zero:#e2e8f0}
+        html.dark{--donut-empty:#334155;--donut-zero:#1e293b}
+        /* Dark Mode Support for Dashboard KPI Cards, Donut Charts & Calendar */
+        html.dark .kpi-card{background:#131c2e!important;border-color:rgba(51,65,85,.85)!important;box-shadow:0 12px 28px -6px rgba(0,0,0,.45),0 2px 6px -1px rgba(0,0,0,.3)!important}
+        html.dark .kpi-hdr-title{color:#f8fafc!important}
+        html.dark .kpi-hdr-sub{color:#94a3b8!important}
+        html.dark .kpi-hdr-icon{background:rgba(20,184,166,.16)!important;color:#2dd4bf!important;border:1px solid rgba(45,212,191,.28)!important}
+        html.dark .kpi-badge-aktif{background:rgba(16,185,129,.16)!important;color:#34d399!important;border-color:rgba(16,185,129,.35)!important}
+        html.dark .kpi-dropdown-btn{background:#1e293b!important;color:#e2e8f0!important;border-color:#334155!important}
+        html.dark .kpi-donut-ring{box-shadow:0 4px 16px -2px rgba(0,0,0,.5)!important}
+        html.dark .kpi-donut-center{background:#131c2e!important;box-shadow:inset 0 1px 5px rgba(0,0,0,.45)!important}
+        html.dark .kpi-donut-num{color:#f8fafc!important}
+        html.dark .kpi-donut-lbl{color:#94a3b8!important}
+        html.dark .kpi-legend-item{background:#162235!important;border-color:rgba(51,65,85,.75)!important}
+        html.dark .kpi-legend-item:hover{background:#1e293b!important}
+        html.dark .kpi-legend-left{color:#cbd5e1!important}
+        html.dark .kpi-legend-val-green{background:rgba(16,185,129,.18)!important;color:#6ee7b7!important}
+        html.dark .kpi-legend-val-red{background:rgba(244,63,94,.18)!important;color:#fda4af!important}
+        html.dark .kpi-legend-val-amber{background:rgba(245,158,11,.18)!important;color:#fcd34d!important}
+        html.dark .kpi-legend-val-blue{background:rgba(59,130,246,.18)!important;color:#93c5fd!important}
+        html.dark .kpi-detail-row{color:#94a3b8!important}
+        html.dark .kpi-detail-row strong{color:#f1f5f9!important}
+        html.dark .kpi-card-footer{border-top-color:rgba(51,65,85,.8)!important}
+        html.dark .kpi-btn-cta{background:rgba(20,184,166,.16)!important;color:#5eead4!important;border-color:rgba(45,212,191,.32)!important}
+        html.dark .kpi-btn-cta:hover{background:rgba(20,184,166,.26)!important}
+        html.dark .kpi-abs-box-teal{background:rgba(20,184,166,.14)!important;border-color:rgba(45,212,191,.3)!important}
+        html.dark .kpi-abs-box-amber{background:rgba(245,158,11,.14)!important;border-color:rgba(245,158,11,.3)!important}
+        html.dark .kpi-abs-num{color:#f8fafc!important}
+        html.dark .kpi-abs-unit{color:#5eead4!important}
+        html.dark .kpi-abs-money{color:#fcd34d!important}
+        html.dark .kpi-abs-icon-teal{background:rgba(20,184,166,.22)!important;color:#5eead4!important}
+        html.dark .kpi-abs-icon-amber{background:rgba(245,158,11,.22)!important;color:#fcd34d!important}
+        html.dark .kpi-pbar-track{background:#1e293b!important;border-color:#334155!important}
+        html.dark .kpi-pbar-legend{color:#94a3b8!important}
+        html.dark .kpi-box-num{color:#f8fafc!important}
+        html.dark .kpi-box-mint{background:rgba(16,185,129,.14)!important;border-color:rgba(16,185,129,.35)!important}
+        html.dark .kpi-box-mint .kpi-box-label{color:#6ee7b7!important}
+        html.dark .kpi-box-amber{background:rgba(245,158,11,.14)!important;border-color:rgba(245,158,11,.35)!important}
+        html.dark .kpi-box-amber .kpi-box-label{color:#fcd34d!important}
+        html.dark .kpi-box-blue{background:rgba(59,130,246,.14)!important;border-color:rgba(59,130,246,.35)!important}
+        html.dark .kpi-box-blue .kpi-box-label{color:#93c5fd!important}
+        html.dark .kpi-box-rose{background:rgba(244,63,94,.14)!important;border-color:rgba(244,63,94,.35)!important}
+        html.dark .kpi-box-rose .kpi-box-label{color:#fda4af!important}
+        html.dark .kpi-box-slate{background:#162235!important;border-color:#334155!important}
+        html.dark .kpi-box-slate .kpi-box-label{color:#cbd5e1!important}
+        html.dark .kpi-box-purple{background:rgba(168,85,247,.14)!important;border-color:rgba(168,85,247,.35)!important}
+        html.dark .kpi-box-purple .kpi-box-label{color:#d8b4fe!important}
+        html.dark .cal-tile-present{background-color:rgba(16,185,129,.18)!important;color:#6ee7b7!important;border-color:rgba(16,185,129,.4)!important}
+        html.dark .cal-tile-late{background-color:rgba(245,158,11,.18)!important;color:#fcd34d!important;border-color:rgba(245,158,11,.4)!important}
+        html.dark .cal-tile-absent{background-color:rgba(244,63,94,.18)!important;color:#fda4af!important;border-color:rgba(244,63,94,.4)!important}
+        html.dark .cal-tile-off{background-color:#1e293b!important;color:#64748b!important;border-color:#334155!important}
+        html.dark .cal-tile-future{background-color:#0f172a!important;color:#64748b!important;border-color:#334155!important}
+
         .kpi-legend-list{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
         .kpi-legend-item{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:10px;background:#f8fafc;border:1px solid #f1f5f9;font-size:11.5px;transition:background .15s ease}
         .kpi-legend-item:hover{background:#f1f5f9}
@@ -741,7 +794,7 @@
                 $pending = (int) $pending;
 
                 if ($total <= 0) {
-                    return '#e2e8f0';
+                    return 'var(--donut-zero, #e2e8f0)';
                 }
 
                 $appDeg = ($approved / $total) * 360;
@@ -767,16 +820,16 @@
                 }
 
                 if ($cur < 360) {
-                    $parts[] = "#cbd5e1 {$cur}deg 360deg";
+                    $parts[] = "var(--donut-empty, #cbd5e1) {$cur}deg 360deg";
                 }
 
-                return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : '#e2e8f0';
+                return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : 'var(--donut-zero, #e2e8f0)';
             };
 
             $buildAttDonutStyle = function ($ontime, $late, $leave, $absent) {
                 $total = (int)$ontime + (int)$late + (int)$leave + (int)$absent;
                 if ($total <= 0) {
-                    return '#e2e8f0';
+                    return 'var(--donut-zero, #e2e8f0)';
                 }
 
                 $ontimeDeg = ($ontime / $total) * 360;
@@ -808,10 +861,10 @@
                 }
 
                 if ($cur < 360) {
-                    $parts[] = "#cbd5e1 {$cur}deg 360deg";
+                    $parts[] = "var(--donut-empty, #cbd5e1) {$cur}deg 360deg";
                 }
 
-                return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : '#e2e8f0';
+                return count($parts) > 0 ? 'conic-gradient(' . implode(', ', $parts) . ')' : 'var(--donut-zero, #e2e8f0)';
             };
         @endphp
         
@@ -1752,7 +1805,8 @@
             const attCanvas = document.getElementById('attendanceTrendChart');
             if (attCanvas) {
                 const attData = @json($stats['charts']['attendance']);
-                new Chart(attCanvas.getContext('2d'), {
+                const isDarkNow = document.documentElement.classList.contains('dark');
+                const attChart = new Chart(attCanvas.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: attData.labels,
@@ -1809,20 +1863,28 @@
                             x: {
                                 stacked: true,
                                 grid: { display: false },
-                                ticks: { font: { family: chartFontFamily, size: 11 }, color: '#64748B' }
+                                ticks: { font: { family: chartFontFamily, size: 11 }, color: isDarkNow ? '#94A3B8' : '#64748B' }
                             },
                             y: {
                                 stacked: true,
                                 beginAtZero: true,
-                                grid: { color: '#F1F5F9' },
+                                grid: { color: isDarkNow ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9' },
                                 ticks: {
                                     stepSize: 1,
                                     font: { family: chartFontFamily, size: 11 },
-                                    color: '#64748B'
+                                    color: isDarkNow ? '#94A3B8' : '#64748B'
                                 }
                             }
                         }
                     }
+                });
+
+                window.addEventListener('gomsn-theme-changed', function (e) {
+                    const dark = e.detail && e.detail.dark;
+                    attChart.options.scales.x.ticks.color = dark ? '#94A3B8' : '#64748B';
+                    attChart.options.scales.y.ticks.color = dark ? '#94A3B8' : '#64748B';
+                    attChart.options.scales.y.grid.color = dark ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9';
+                    attChart.update('none');
                 });
             }
         });
