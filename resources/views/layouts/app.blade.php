@@ -1851,6 +1851,9 @@
     @unless(request()->routeIs('tickets.show') || !empty($hideChatbot))
         <x-chatbot-widget />
     @endunless
+
+    <!-- Onboarding Modal Izin Perangkat (Kamera, Lokasi, Notifikasi, Voice) -->
+    <x-permission-prompt-modal />
     @endauth
 
     <!-- SweetAlert2 Toast Global Notifier (Ujung Kanan Atas) -->
