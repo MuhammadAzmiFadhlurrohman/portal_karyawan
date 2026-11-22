@@ -155,7 +155,7 @@
 
         <!-- Main Form Container -->
         <div x-data="pengajuanAppForm()" x-cloak class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <form method="POST" action="{{ route('gomsn.pengajuan.store') }}" class="p-4 sm:p-7 space-y-6">
+            <form method="POST" action="{{ route('gomsn.pengajuan.store') }}" class="p-3.5 sm:p-7 space-y-6">
                 @csrf
 
                 <!-- ========================================== -->
@@ -163,13 +163,13 @@
                 <!-- ========================================== -->
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-teal-50 border border-teal-100 text-[#0D9488] flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                        <label class="text-[13px] sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-100 text-[#0D9488] flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                             </span>
                             <span>1. Pilih Jenis Pengajuan <span class="text-rose-500">*</span></span>
                         </label>
-                        <span class="text-[11px] font-semibold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200/60" x-text="jenis"></span>
+                        <span class="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200/60" x-text="jenis"></span>
                     </div>
 
                     <input type="hidden" name="jenis" :value="jenis">
@@ -259,74 +259,74 @@
                 <!-- ========================================== -->
                 <!-- SECTION 2: DAFTAR ITEM PENGAJUAN           -->
                 <!-- ========================================== -->
-                <div class="space-y-3.5 pt-2 border-t border-slate-100">
-                    <div class="flex items-center justify-between">
-                        <label class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-teal-50 border border-teal-100 text-[#0D9488] flex items-center justify-center">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <div class="space-y-4 pt-3 border-t border-slate-100">
+                    <div class="flex items-center justify-between gap-2">
+                        <label class="text-[13px] sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-100 text-[#0D9488] flex items-center justify-center shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             </span>
                             <span>2. Rincian Item Pengajuan</span>
                         </label>
-                        <span class="text-[11px] font-semibold text-slate-500" x-text="`${items.length} Item`"></span>
+                        <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full shrink-0" x-text="`${items.length} Item`"></span>
                     </div>
 
-                    <div class="space-y-3.5">
+                    <div class="space-y-4">
                         <template x-for="(item, idx) in items" :key="idx">
-                            <div class="rounded-2xl border border-slate-200/90 bg-slate-50/40 overflow-hidden shadow-2xs transition hover:border-teal-300/80">
+                            <div class="rounded-2xl border border-slate-200/90 bg-slate-50/40 overflow-hidden shadow-xs transition hover:border-teal-300/80">
                                 <!-- Item Card Header -->
-                                <div class="px-4 py-2.5 bg-white border-b border-slate-200/70 flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-lg bg-teal-600 text-white font-bold text-[11px] flex items-center justify-center shadow-2xs"
+                                <div class="px-4 py-3 bg-white border-b border-slate-200/70 flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="w-7 h-7 rounded-lg bg-teal-600 text-white font-bold text-xs flex items-center justify-center shadow-2xs shrink-0"
                                               x-text="idx + 1"></span>
-                                        <span class="font-bold text-slate-800 text-xs sm:text-sm" x-text="`Item Pengajuan #${idx + 1}`"></span>
+                                        <span class="font-bold text-slate-800 text-sm sm:text-base" x-text="`Item Pengajuan #${idx + 1}`"></span>
                                     </div>
 
                                     <div class="flex items-center gap-2">
                                         <!-- Live Subtotal Badge for BELI -->
                                         <template x-if="jenis === 'BELI'">
-                                            <span class="text-[11px] font-bold text-teal-800 bg-teal-50 border border-teal-200/70 px-2.5 py-0.5 rounded-full font-mono"
+                                            <span class="text-xs sm:text-sm font-bold text-teal-800 bg-teal-50 border border-teal-200/70 px-3 py-1 rounded-full font-mono"
                                                   x-text="formatRupiah((Number(item.jumlah) || 0) * (Number(item.harga_satuan) || 0))"></span>
                                         </template>
 
                                         <button type="button" @click="removeItem(idx)" x-show="items.length > 1"
-                                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/70 transition cursor-pointer text-[11px] font-bold"
+                                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/70 transition cursor-pointer text-xs font-bold"
                                                 title="Hapus item ini">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             <span class="hidden sm:inline">Hapus</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 <!-- Item Card Body -->
-                                <div class="p-4 sm:p-5 bg-white/80">
+                                <div class="p-4 sm:p-5 bg-white/90">
                                     <!-- VARIANT 1: BELI -->
                                     <template x-if="jenis === 'BELI'">
-                                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-start">
+                                        <div class="grid grid-cols-12 gap-3.5 items-start">
                                             <!-- Nama Barang -->
-                                            <div class="sm:col-span-6 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                            <div class="col-span-12 sm:col-span-6 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                     Nama Barang / Material <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input type="text" :name="`items[${idx}][nama_barang]`" x-model="item.nama_barang" required placeholder="Contoh: Router Mikrotik / Kabel Patchcord"
-                                                       class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 placeholder-slate-400 transition" />
+                                                       class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 placeholder-slate-400 transition" />
                                             </div>
                                             <!-- Qty -->
-                                            <div class="sm:col-span-2 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                                                    Jumlah (Qty) <span class="text-rose-500">*</span>
+                                            <div class="col-span-4 sm:col-span-2 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                                    Qty <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input type="number" :name="`items[${idx}][jumlah]`" x-model.number="item.jumlah" min="1" required placeholder="1"
-                                                       class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-center text-slate-800 transition" />
+                                                       class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-center text-slate-800 transition" />
                                             </div>
                                             <!-- Harga Satuan -->
-                                            <div class="sm:col-span-4 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                            <div class="col-span-8 sm:col-span-4 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                     Harga Satuan <span class="text-rose-500">*</span>
                                                 </label>
                                                 <div class="relative flex items-center">
-                                                    <span class="absolute left-3.5 text-xs font-bold text-slate-400 select-none pointer-events-none">Rp</span>
+                                                    <span class="absolute left-3.5 text-sm font-bold text-slate-400 select-none pointer-events-none">Rp</span>
                                                     <input type="number" :name="`items[${idx}][harga_satuan]`" x-model.number="item.harga_satuan" min="0" required placeholder="0"
-                                                           class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 pl-9 pr-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-right text-slate-800 font-mono transition" />
+                                                           class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 pl-10 pr-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-right text-slate-800 font-mono transition" />
                                                 </div>
                                             </div>
                                         </div>
@@ -334,14 +334,14 @@
 
                                     <!-- VARIANT 2: STOK -->
                                     <template x-if="jenis === 'STOK'">
-                                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-start">
+                                        <div class="grid grid-cols-12 gap-3.5 items-start">
                                             <!-- Pilih Barang dari Stok -->
-                                            <div class="sm:col-span-8 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                            <div class="col-span-12 sm:col-span-8 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                     Pilih Barang dari Stok Gudang <span class="text-rose-500">*</span>
                                                 </label>
                                                 <select :name="`items[${idx}][master_material_id]`" x-model="item.master_material_id" @change="onMaterialChange(item, $event)" required
-                                                        class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 transition">
+                                                        class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 transition">
                                                     <option value="">-- Pilih Barang Gudang --</option>
                                                     @foreach ($materials as $mat)
                                                     <option value="{{ $mat->id }}" data-satuan="{{ $mat->satuan }}" data-stok="{{ $mat->stok_tersedia }}">
@@ -351,14 +351,14 @@
                                                 </select>
                                             </div>
                                             <!-- Jumlah -->
-                                            <div class="sm:col-span-4 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                            <div class="col-span-12 sm:col-span-4 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                     Jumlah Ambil <span class="text-rose-500">*</span>
                                                 </label>
                                                 <div class="flex items-center gap-2">
                                                     <input type="number" :name="`items[${idx}][jumlah]`" x-model.number="item.jumlah" min="1" required placeholder="1"
-                                                           class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-center text-slate-800 transition" />
-                                                    <span x-show="item.satuan" class="px-2.5 py-2 rounded-xl bg-slate-100 text-xs text-slate-600 font-semibold whitespace-nowrap" x-text="item.satuan"></span>
+                                                           class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-center text-slate-800 transition" />
+                                                    <span x-show="item.satuan" class="px-3 py-3 rounded-xl bg-slate-100 text-xs sm:text-sm text-slate-700 font-semibold whitespace-nowrap" x-text="item.satuan"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -366,26 +366,26 @@
 
                                     <!-- VARIANT 3: PERMINTAAN -->
                                     <template x-if="jenis === 'PERMINTAAN'">
-                                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-start">
+                                        <div class="grid grid-cols-12 gap-3.5 items-start">
                                             <!-- Nama Barang -->
-                                            <div class="sm:col-span-8 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                            <div class="col-span-12 sm:col-span-8 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                     Nama Barang yang Diminta <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input type="text" :name="`items[${idx}][nama_barang]`" x-model="item.nama_barang" required placeholder="Ketik nama alat / barang yang dibutuhkan..."
-                                                       class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 placeholder-slate-400 transition" />
-                                                <p class="text-[11px] text-slate-400 flex items-center gap-1.5 pt-0.5">
-                                                    <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                       class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 placeholder-slate-400 transition" />
+                                                <p class="text-xs text-slate-500 flex items-start gap-1.5 pt-1 leading-relaxed">
+                                                    <svg class="w-4 h-4 text-teal-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                                     <span>Pastikan barang belum tersedia di daftar Stok Gudang sebelum mengajukan permintaan.</span>
                                                 </p>
                                             </div>
                                             <!-- Jumlah -->
-                                            <div class="sm:col-span-4 space-y-1.5">
-                                                <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                            <div class="col-span-12 sm:col-span-4 space-y-1.5">
+                                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                     Jumlah (Qty) <span class="text-rose-500">*</span>
                                                 </label>
                                                 <input type="number" :name="`items[${idx}][jumlah]`" x-model.number="item.jumlah" min="1" required placeholder="1"
-                                                       class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-center text-slate-800 transition" />
+                                                       class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-center text-slate-800 transition" />
                                             </div>
                                         </div>
                                     </template>
@@ -393,14 +393,14 @@
                                     <!-- VARIANT 4: DANA -->
                                     <template x-if="jenis === 'DANA'">
                                         <div class="space-y-4">
-                                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-start">
+                                            <div class="grid grid-cols-12 gap-3.5 items-start">
                                                 <!-- Keperluan Dana -->
-                                                <div class="sm:col-span-7 space-y-1.5">
-                                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                                <div class="col-span-12 sm:col-span-7 space-y-1.5">
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                         Kategori Keperluan Dana <span class="text-rose-500">*</span>
                                                     </label>
                                                     <select :name="`items[${idx}][keperluan_dana]`" x-model="item.keperluan_dana" required
-                                                            class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 transition">
+                                                            class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 transition">
                                                         <option value="Bensin Motor">Bensin Motor</option>
                                                         <option value="Bensin Mobil">Bensin Mobil</option>
                                                         <option value="Tol &amp; Parkir">Tol &amp; Parkir</option>
@@ -412,18 +412,18 @@
                                                     </select>
                                                     <div x-show="item.keperluan_dana === 'Lainnya'" class="pt-1.5">
                                                         <input type="text" :name="`items[${idx}][keperluan_lainnya]`" x-model="item.keperluan_lainnya" placeholder="Tuliskan detail keperluan dana lainnya..."
-                                                               class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488]" />
+                                                               class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488]" />
                                                     </div>
                                                 </div>
                                                 <!-- Jumlah Dana (Rp) -->
-                                                <div class="sm:col-span-5 space-y-1.5">
-                                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                                <div class="col-span-12 sm:col-span-5 space-y-1.5">
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                         Nominal Dana <span class="text-rose-500">*</span>
                                                     </label>
                                                     <div class="relative flex items-center">
-                                                        <span class="absolute left-3.5 text-xs font-bold text-slate-400 select-none pointer-events-none">Rp</span>
+                                                        <span class="absolute left-3.5 text-sm font-bold text-slate-400 select-none pointer-events-none">Rp</span>
                                                         <input type="number" :name="`items[${idx}][jumlah_dana]`" x-model.number="item.jumlah_dana" min="0" required placeholder="0"
-                                                               class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 pl-9 pr-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-right text-slate-800 font-mono transition" />
+                                                               class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 pl-10 pr-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-bold text-right text-slate-800 font-mono transition" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -433,17 +433,17 @@
                                                  x-transition
                                                  class="space-y-2 pt-3 border-t border-slate-100">
                                                 <div class="flex items-center justify-between">
-                                                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                                         Pilih Tim / Personel Lapangan <span class="text-rose-500">*</span>
                                                     </label>
-                                                    <span class="text-[11px] font-semibold text-teal-700" x-text="`${item.personel.length} dipilih`"></span>
+                                                    <span class="text-xs font-bold text-teal-700" x-text="`${item.personel.length} dipilih`"></span>
                                                 </div>
-                                                <div class="border border-slate-200/90 rounded-xl p-3 bg-slate-50/50 max-h-44 overflow-y-auto">
+                                                <div class="border border-slate-200/90 rounded-xl p-3 bg-slate-50/50 max-h-48 overflow-y-auto">
                                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
                                                         @foreach ($employees as $emp)
-                                                        <label class="flex items-center gap-2 text-xs text-slate-700 hover:bg-white p-1.5 rounded-lg border border-transparent hover:border-slate-200/80 cursor-pointer transition">
-                                                            <input type="checkbox" :name="`items[${idx}][personel][]`" value="{{ $emp->name }}" x-model="item.personel" class="rounded text-[#0D9488] focus:ring-[#0D9488] border-slate-300">
-                                                            <span class="truncate font-medium text-[11px] uppercase">{{ $emp->name }}</span>
+                                                        <label class="flex items-center gap-2.5 text-xs text-slate-700 hover:bg-white p-2 rounded-lg border border-transparent hover:border-slate-200/80 cursor-pointer transition">
+                                                            <input type="checkbox" :name="`items[${idx}][personel][]`" value="{{ $emp->name }}" x-model="item.personel" class="w-4 h-4 rounded text-[#0D9488] focus:ring-[#0D9488] border-slate-300">
+                                                            <span class="truncate font-semibold text-xs uppercase">{{ $emp->name }}</span>
                                                         </label>
                                                         @endforeach
                                                     </div>
@@ -459,16 +459,16 @@
                     <!-- Add Item Button & Total Estimasi Bar -->
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                         <button type="button" @click="addItem()"
-                                class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-teal-500/70 bg-teal-50/50 hover:bg-teal-50 text-teal-800 text-xs font-bold transition cursor-pointer">
-                            <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-dashed border-teal-500/70 bg-teal-50/50 hover:bg-teal-50 text-teal-800 text-sm font-bold transition cursor-pointer">
+                            <svg class="w-4.5 h-4.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                             <span>Tambah Baris Item</span>
                         </button>
 
                         <!-- Total Dana Banner (Visible for BELI & DANA) -->
                         <div x-show="jenis === 'BELI' || jenis === 'DANA'"
-                             class="rounded-2xl bg-gradient-to-r from-[#022836] to-[#0e6774] text-white px-4 py-3 flex items-center justify-between sm:justify-end gap-4 shadow-xs">
-                            <span class="text-xs font-medium text-teal-100/90">Total Estimasi Pengajuan:</span>
-                            <span x-text="formatRupiah(calculateTotal())" class="text-sm sm:text-base font-extrabold text-cyan-300 font-mono tracking-tight"></span>
+                             class="rounded-2xl bg-gradient-to-r from-[#022836] to-[#0e6774] text-white px-4 py-3.5 flex items-center justify-between sm:justify-end gap-4 shadow-xs">
+                            <span class="text-xs sm:text-sm font-medium text-teal-100/90">Total Estimasi Pengajuan:</span>
+                            <span x-text="formatRupiah(calculateTotal())" class="text-base sm:text-lg font-extrabold text-cyan-300 font-mono tracking-tight"></span>
                         </div>
                     </div>
                 </div>
@@ -477,9 +477,9 @@
                 <!-- SECTION 3: KETERANGAN & ATASAN PENYETUJU   -->
                 <!-- ========================================== -->
                 <div class="space-y-4 pt-4 border-t border-slate-100">
-                    <label class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-lg bg-teal-50 border border-teal-100 text-[#0D9488] flex items-center justify-center">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <label class="text-[13px] sm:text-sm font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-teal-50 border border-teal-100 text-[#0D9488] flex items-center justify-center shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </span>
                         <span>3. Keterangan &amp; Tujuan Persetujuan</span>
                     </label>
@@ -487,11 +487,11 @@
                     <div class="grid grid-cols-1 gap-4">
                         <!-- Keterangan -->
                         <div class="space-y-1.5">
-                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                 Keterangan / Keperluan Operasional <span class="text-rose-500">*</span>
                             </label>
                             <textarea name="keterangan" rows="3" required placeholder="Jelaskan secara singkat tujuan pengajuan ini (contoh: Kebutuhan instalasi pelanggan baru / Perbaikan jalur FO)..."
-                                      class="w-full text-xs rounded-2xl border border-slate-200 bg-slate-50/60 focus:bg-white py-3 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] text-slate-800 placeholder-slate-400 transition"></textarea>
+                                      class="w-full text-sm rounded-2xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] text-slate-800 placeholder-slate-400 transition"></textarea>
                         </div>
 
                         <!-- Pilih Atasan / Info Pengajuan Mandiri -->
@@ -501,18 +501,18 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <div>
-                                <span class="text-xs font-bold text-teal-950 block">Pengajuan Mandiri Atasan</span>
-                                <p class="text-[11px] text-teal-800 mt-0.5 leading-relaxed">
+                                <span class="text-sm font-bold text-teal-950 block">Pengajuan Mandiri Atasan</span>
+                                <p class="text-xs text-teal-800 mt-0.5 leading-relaxed">
                                     Sebagai Atasan, permohonan ini otomatis langsung diteruskan ke <strong>Bagian Finance</strong> tanpa melalui persetujuan atasan lain.
                                 </p>
                             </div>
                         </div>
                         @else
                         <div class="space-y-1.5">
-                            <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">
                                 Pilih Atasan Penyetuju <span class="text-rose-500">*</span>
                             </label>
-                            <select name="atasan_id" required class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white py-2.5 px-3.5 focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 transition">
+                            <select name="atasan_id" required class="w-full text-sm rounded-xl border border-slate-200 bg-slate-50/70 focus:bg-white py-3 px-3.5 min-h-[46px] focus:ring-2 focus:ring-teal-500/20 focus:border-[#0D9488] font-medium text-slate-800 transition">
                                 <option value="">-- Pilih Atasan Langsung --</option>
                                 @foreach ($atasans as $atasan)
                                 <option value="{{ $atasan->id }}">
@@ -530,13 +530,13 @@
                 <!-- ========================================== -->
                 <div class="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5">
                     <a href="{{ route('gomsn.pengajuan.index') }}"
-                       class="py-3 px-5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-xs font-bold text-center transition">
+                       class="py-3.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-sm font-bold text-center transition">
                         Batal
                     </a>
                     <button type="submit" :disabled="hasOverdue"
                             style="background: linear-gradient(135deg, #022836 0%, #0e6774 55%, #0D9488 100%) !important; color: #ffffff !important;"
-                            class="py-3 px-6 rounded-xl hover:opacity-95 active:scale-[0.99] text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                            class="py-3.5 px-6 rounded-xl hover:opacity-95 active:scale-[0.99] text-white font-bold text-sm inline-flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                        <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                         <span>Kirim Pengajuan Sekarang</span>
                     </button>
                 </div>
