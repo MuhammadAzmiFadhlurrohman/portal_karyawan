@@ -1474,6 +1474,24 @@ class ChatbotService
             'avatar' => 'foto profil',
             'katasandi' => 'password',
             'kata sandi' => 'password',
+            // Troubleshooting & typo variants
+            'terdetekso' => 'terdeteksi',
+            'tedeteksi' => 'terdeteksi',
+            'terdetek' => 'terdeteksi',
+            'kedetek' => 'terdeteksi',
+            'kedeteksi' => 'terdeteksi',
+            'detek' => 'deteksi',
+            'sampe' => 'sampai',
+            'nyampe' => 'sampai',
+            'nyangkut' => 'tertahan',
+            'mandek' => 'tertahan',
+            'stuck' => 'tertahan',
+            'kekunci' => 'terkunci',
+            'keblokir' => 'diblokir',
+            'diclose' => 'close',
+            'ditutup' => 'tutup',
+            'diedit' => 'edit',
+            'direvisi' => 'revisi',
         ];
 
         foreach ($synonyms as $from => $to) {
@@ -1761,9 +1779,10 @@ class ChatbotService
             $userTokens = $this->extractTokens($normMessage);
         }
 
-        // Extract canonical semantic concepts & resolve semantic intent / bilingual policy for varied phrasings
+        // Extract canonical semantic concepts & resolve semantic intent / bilingual policy / live troubleshooting diagnostic
         $semanticConcepts = $this->smartResolver->extractSemanticConcepts($rawClean, $normMessage);
-        $semanticIntentKey = $this->smartResolver->resolveSemanticIntentKey(
+        $troubleshootingDiag = $this->smartResolver->resolveTroubleshootingDiagnosticQuery(
+            $user,
             $rawClean,
             $normMessage,
             $semanticConcepts,
@@ -1772,10 +1791,21 @@ class ChatbotService
             $isSunda,
             $contextDomain
         );
-        $semanticBilingualPolicy = $semanticIntentKey === null
+        $semanticIntentKey = $troubleshootingDiag === null
+            ? $this->smartResolver->resolveSemanticIntentKey(
+                $rawClean,
+                $normMessage,
+                $semanticConcepts,
+                $detectedDomains,
+                $queryStyle,
+                $isSunda,
+                $contextDomain
+            )
+            : null;
+        $semanticBilingualPolicy = ($troubleshootingDiag === null && $semanticIntentKey === null)
             ? $this->smartResolver->resolveSemanticBilingualPolicy($rawClean, $normMessage, $semanticConcepts, $isSunda, $contextDomain)
             : null;
-        $hasSemanticMatch = ($semanticIntentKey !== null || $semanticBilingualPolicy !== null);
+        $hasSemanticMatch = ($troubleshootingDiag !== null || $semanticIntentKey !== null || $semanticBilingualPolicy !== null);
 
         // Step A: Direct live entity lookups (Pengajuan code PND/PBL/PST/PRM, Tiket code BDG/BRD/TKT, Stok Gudang)
         $directEntityResult = $this->smartResolver->resolveDirectEntityQuery($user, $rawClean, $normMessage, $isSunda);
@@ -1993,6 +2023,11 @@ class ChatbotService
                 return $this->finalizeSmartResponse($user, $message, array_merge($networkResult, ['domain' => 'jaringan']));
             }
 
+            // Live Troubleshooting & Workflow Bottleneck Diagnostic ("kenapa tidak bisa absen", "kenapa pengajuan tidak sampai ke finance", etc.)
+            if ($troubleshootingDiag !== null && $bestScore < 80.0) {
+                return $this->finalizeSmartResponse($user, $message, $troubleshootingDiag);
+            }
+
             // Bilingual semantic policy match for scenarios whose DB seed only has Sundanese text
             if ($semanticBilingualPolicy !== null && $bestScore < 80.0) {
                 return $this->finalizeSmartResponse($user, $message, $semanticBilingualPolicy);
@@ -2073,6 +2108,23 @@ class ChatbotService
                 $reply = $isSunda
                     ? "Halo {$user->name}! 👋 Abdi Asisten Virtual GOMSN. Mangga taroskeun langsung perkawis absensi, jadwal shift, cuti, kasbon, lembur, atawa tiket gangguan."
                     : "Halo {$user->name}! 👋 Saya Asisten Virtual GOMSN. Silakan tanyakan langsung seputar absensi, jadwal shift, cuti, kasbon, lembur, atau tiket gangguan.";
+            } elseif ($key === 'q5_troubleshooting_biometrik') {
+                $hasFace = \App\Models\FaceTemplate::query()->where('user_id', $user->id)->exists();
+                $failures = (int) Cache::get("attendance:face_failures:{$user->id}", 0);
+                $faceDiag = $hasFace
+                    ? "Sudah Terdaftar (Aktif)"
+                    : "⚠️ BELUM TERDAFTAR (Anda wajib melakukan Pendaftaran Wajah 3 Pose: Depan, Kiri, Kanan terlebih dahulu di halaman Absen)";
+                $failDiag = $failures > 0 ? " | Percobaan Gagal Saat Ini: {$failures}x (Jalur Manual terbuka otomatis setelah 3x gagal)" : '';
+
+                if (! $isSunda) {
+                    $reply = "Penyebab wajah tidak terdeteksi / gagal verifikasi biometrik saat absen beserta solusinya:\n"
+                        . "1. Belum Daftar Wajah 3 Pose: Jika akun baru atau habis di-reset, lakukan Pendaftaran Wajah 3 Pose (Depan, Kiri, Kanan) terlebih dahulu.\n"
+                        . "2. Pencahayaan & Aksesoris: Pastikan wajah mendapat cahaya cukup (tidak membelakangi lampu/matahari) serta lepas masker, kacamata hitam, atau topi.\n"
+                        . "3. Tantangan Liveness (< 2 Menit): Posisikan wajah tepat di tengah bingkai kamera dan ikuti instruksi liveness (senyum/kedip/menoleh) sebelum batas 2 menit habis.\n"
+                        . "4. Izin Kamera Browser: Pastikan permission Camera di browser berstatus Allow (Izinkan) dan kamera tidak sedang dipakai aplikasi lain.\n"
+                        . "5. Jalur Manual (3x Gagal) & Reset HRD: Jika gagal verifikasi wajah 3x berturut-turut, tombol Jalur Manual (Pending Review HRD) otomatis terbuka. Jika tetap gagal atau baru ganti HP, hubungi HRD untuk Reset Biometrik Wajah.\n\n"
+                        . "🔍 Status Biometrik Akun Anda: {$faceDiag}{$failDiag}";
+                }
             } elseif ($key === 'q1_status_checkin_hari_ini') {
                 $att = Attendance::query()
                     ->where('user_id', $user->id)

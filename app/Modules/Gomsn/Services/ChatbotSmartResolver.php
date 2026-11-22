@@ -3,6 +3,7 @@
 namespace App\Modules\Gomsn\Services;
 
 use App\Models\Attendance;
+use App\Models\FaceTemplate;
 use App\Models\Leave;
 use App\Models\LeaveBalance;
 use App\Models\Lembur;
@@ -468,7 +469,7 @@ class ChatbotSmartResolver
             'leaderboard' => '/\b(leaderboard|peringkat|ranking|juara|paling disiplin|paling rajin|top 5|lima besar|5 besar|skor disiplin)\b/iu',
             'bug_support' => '/\b(it support|helpdesk|kontak it|tim it|admin it|lapor bug|lapor error|aplikasi error|aplikasi crash|force close|nge bug|aplikasi bermasalah|web error|aplikasi lemot|aplikasi hang)\b/iu',
             'tiket_gangguan' => '/\b(tiket|ticket|gangguan|trouble|los|lampu merah|internet mati|inet mati|putus koneksi|backbone|broadband|noc|mttr|dispatch|eskalasi|reopen|closing|tutup tiket)\b/iu',
-            'closing_tiket' => '/\b(closing|tutup tiket|close tiket|menutup tiket|menyelesaikan tiket|syarat tutup|bukti closing|bukti selesai tiket|redaman sebelum)\b/iu',
+            'closing_tiket' => '/\b(closing|(?:di)?close tiket|(?:di)?tutup tiket|menutup tiket|menyelesaikan tiket|syarat tutup|bukti closing|bukti selesai tiket|redaman sebelum|tiket(?:\s+\w+){0,3}\s+(?:tidak bisa|gak bisa|ga bisa|gagal)\s+(?:di)?(?:close|closing|tutup))\b/iu',
             'eskalasi_sla' => '/\b(eskalasi|lewat sla|melewati sla|breach|breached|sla lewat|telat sla|stop clock)\b/iu',
             'indikator_port' => '/\b(indikator|warna port|lampu port|hijau kuning merah|hejo koneng beureum|arti status port|status port pon|status port olt|indikator warna)\b/iu',
             'jaringan_ftth' => '/\b(olt|pon|odp|ftth|topologi|port odp|kapasitas port|slot port|koordinat odp|ekspansi odp|sn ont|serial number ont|redaman opm|otdr)\b/iu',
@@ -920,6 +921,345 @@ class ChatbotSmartResolver
                 'action_label' => '⏰ Ajukan Lembur',
                 'suggestions' => null,
                 'domain' => 'lembur',
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Live Diagnostic & Troubleshooting Resolver for "Kenapa tidak bisa...", "Kenapa belum sampai ke Finance...",
+     * "Kenapa gagal...", "Kenapa tertahan..." across Absensi, Biometrik, Pengajuan, Lembur, Cuti, Shift, and Tiket.
+     *
+     * @param array<string, bool> $c
+     * @param array<string, float> $domains
+     * @param array<string, bool> $style
+     * @return ?array{response: string, confidence: float, matched_intent: string, action_url: ?string, action_label: ?string, suggestions: ?list<string>, domain: string}
+     */
+    public function resolveTroubleshootingDiagnosticQuery(
+        ?User $user,
+        string $rawClean,
+        string $normMessage,
+        array $c,
+        array $domains,
+        array $style,
+        bool $isSunda,
+        ?string $contextDomain = null
+    ): ?array {
+        $text = ' ' . trim($normMessage . ' ' . $rawClean) . ' ';
+        $has = fn (string $k): bool => ! empty($c[$k]);
+        $effDomain = $contextDomain ?? (! empty($domains) ? (string) array_key_first($domains) : null);
+
+        $isCannotOrBlocked = (bool) preg_match('/\b(tidak bisa|gak bisa|ga bisa|teu bisa|gagal|error|diblokir|terkunci|ditolak sistem|tidak muncul|belum muncul|tidak ada tombol)\b/iu', $text);
+        $isNotReachingOrStuck = (bool) preg_match('/\b(tidak sampai|belum sampai|gak sampai|ga sampai|belum masuk|tidak masuk|tidak muncul|belum muncul|tertahan|nyangkut|mandek|stuck|lama banget|belum di acc|belum disetujui|masih pending|belum cair|tidak cair)\b/iu', $text);
+        $isWhyQuestion = (bool) preg_match('/\b(kenapa|mengapa|kunaon|naha|kok|penyebab|solusi|masalah|kendala)\b/iu', $text);
+
+        if (! $isCannotOrBlocked && ! $isNotReachingOrStuck && ! $isWhyQuestion && ! $has('troubleshoot')) {
+            return null;
+        }
+
+        // =====================================================================
+        // 1. KENAPA PENGAJUAN TIDAK SAMPAI KE FINANCE / TERTAHAN / BELUM MASUK FINANCE
+        // =====================================================================
+        $mentionsPengajuan = ($has('kasbon_dana') || $has('beli_barang') || $has('ambil_stok') || isset($domains['pengajuan']) || $effDomain === 'pengajuan')
+            && ! $has('cuti') && ! $has('izin') && ! $has('sakit') && ! $has('lembur') && ! $has('absensi');
+        $mentionsFinanceOrFlow = (bool) preg_match('/\b(finance|keuangan|pencairan|cair|atasan|direksi|executive|approval|acc|tahap)\b/iu', $text);
+
+        if ($mentionsPengajuan && ! $has('koreksi_revisi') && ($isNotReachingOrStuck || ($isWhyQuestion && $mentionsFinanceOrFlow))) {
+            $liveStatus = '';
+            if ($user) {
+                $latest = Pengajuan::with('atasan')->where('user_id', $user->id)->latest()->first();
+                if ($latest) {
+                    $st = strtolower((string) $latest->status);
+                    $nom = 'Rp ' . number_format((float) $latest->nominal_total, 0, ',', '.');
+                    $atasanName = $latest->atasan?->name ?? ($user->resolveEffectiveApprover('attendance')?->name ?? 'Atasan Divisi');
+                    $diagReason = match ($st) {
+                        'draft' => "Masih berstatus DRAFT (belum Anda klik tombol Submit/Ajukan, sehingga belum terkirim ke Atasan maupun Finance).",
+                        'menunggu_atasan' => "Masih berstatus MENUNGGU ATASAN ({$atasanName}). Di sistem GOMSN, pengajuan baru masuk ke antrean Finance SETELAH disetujui oleh Atasan.",
+                        'menunggu_executive' => "Masih berstatus MENUNGGU EXECUTIVE / DIREKSI karena nominalnya ({$nom}) di atas plafon Rp 5.000.000. Setelah Direksi menyetujui, pengajuan otomatis masuk ke Finance.",
+                        'menunggu_finance' => "SUDAH masuk di antrean Finance (status: MENUNGGU FINANCE) dan sedang menunggu proses verifikasi/pencairan oleh tim Finance.",
+                        'ditolak' => "Berstatus DITOLAK. Pengajuan yang ditolak oleh Atasan otomatis dihentikan dan tidak diteruskan ke daftar Finance.",
+                        'dicairkan', 'menunggu_bukti' => "Sudah DICAIRKAN oleh Finance (status: " . strtoupper($st) . "). Jangan lupa unggah bukti nota realisasi (LPJ) maksimal 7 hari.",
+                        'selesai' => "Sudah SELESAI (dana telah dicairkan dan LPJ sudah terverifikasi).",
+                        default => "Saat ini berstatus: " . strtoupper($st) . ".",
+                    };
+                    $liveStatus = "\n\n🔍 Cek Live Pengajuan Terakhir Anda ({$latest->nomor_pengajuan} — {$nom}):\n• {$diagReason}";
+                } else {
+                    $liveStatus = "\n\n🔍 Cek Live Akun Anda: Saat ini Anda belum memiliki riwayat pengajuan di database.";
+                }
+            }
+
+            $resp = ($isSunda
+                ? "Penyebab pengajuan (Kasbon/Beli/Stok) teu acan nepi atawa teu muncul di halaman Finance dina sistem GOMSN:\n"
+                    . "1. Masih Berstatus DRAFT: Pengajuan nembe disimpen tapi acan diklik tombol Submit / Ajukan.\n"
+                    . "2. Masih Menunggu ACC Atasan (MENUNGGU_ATASAN): Halaman Finance ngan nampilkeun pengajuan nu GEUS di-ACC ku Atasan Langsung/Supervisor divisi.\n"
+                    . "3. Menunggu Approval Executive/Direksi (MENUNGGU_EXECUTIVE): Kanggo pengajuan Dana/Beli di luhur Rp 5.000.000, saatos ACC Atasan wajib di-ACC Direksi heula sateuacan asup ka Finance.\n"
+                    . "4. Ditolak ku Atasan (DITOLAK): Pengajuan nu ditolak di tahap Atasan otomatis eureun jeung moal muncul di Finance."
+                : "Penyebab pengajuan (Kasbon/Beli/Stok) tidak sampai atau belum muncul di daftar Finance pada sistem GOMSN:\n"
+                    . "1. Masih Berstatus DRAFT: Pengajuan baru disimpan sebagai draft dan belum ditekan tombol Submit / Ajukan.\n"
+                    . "2. Belum Di-ACC Atasan (MENUNGGU_ATASAN): Di GOMSN, halaman Finance hanya menampilkan pengajuan yang SUDAH disetujui Atasan Divisi. Hubungi Atasan Langsung Anda untuk melakukan approval terlebih dahulu.\n"
+                    . "3. Tertahan di Approval Executive / Direksi (MENUNGGU_EXECUTIVE): Jika nominal pengajuan Dana/Beli di atas Rp 5.000.000, setelah di-ACC Atasan pengajuan wajib disetujui Direksi/CEO terlebih dahulu sebelum masuk ke Finance.\n"
+                    . "4. Ditolak oleh Atasan (DITOLAK): Pengajuan yang ditolak pada tahap Atasan otomatis dihentikan dan tidak akan muncul di halaman Finance.")
+                . $liveStatus;
+
+            return [
+                'response' => $resp,
+                'confidence' => 96.0,
+                'matched_intent' => 'smart_diag_pengajuan_tidak_sampai_finance',
+                'action_url' => $this->safeRoute('gomsn.pengajuan.index'),
+                'action_label' => '📋 Cek Status Pengajuan Saya',
+                'suggestions' => null,
+                'domain' => 'pengajuan',
+            ];
+        }
+
+        // =====================================================================
+        // 2. KENAPA PENGAJUAN TIDAK BISA DIEDIT / DIREVISI
+        // =====================================================================
+        if ($mentionsPengajuan && $has('koreksi_revisi') && ($isCannotOrBlocked || $isWhyQuestion) && preg_match('/\b(tidak bisa|gak bisa|ga bisa|teu bisa|gagal|terkunci|hilang|tidak ada)\b/iu', $text)) {
+            return [
+                'response' => $isSunda
+                    ? "Pengajuan di GOMSN ngan tiasa diedit/direvisi ku pemohon salami statusna masih DRAFT atawa MENUNGGU_ATASAN (teu acan aya tindakan Approved ti Atasan). Upami statusna tos disatujuan Atasan (Menunggu Executive / Menunggu Finance), tos dicairkeun, rengse, atawa ditolak, tombol Edit otomatis dikonci demi kaamanan audit."
+                    : "Di sistem GOMSN, pengajuan hanya dapat diedit atau direvisi oleh pemohon selama statusnya masih DRAFT atau MENUNGGU_ATASAN (belum disetujui Atasan). Apabila pengajuan sudah di-ACC Atasan (Menunggu Executive / Menunggu Finance), sudah dicairkan, selesai, atau ditolak, fitur Edit otomatis dikunci demi integritas audit.",
+                'confidence' => 95.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_edit_pengajuan',
+                'action_url' => $this->safeRoute('gomsn.pengajuan.index'),
+                'action_label' => '📋 Buka Pengajuan Saya',
+                'suggestions' => null,
+                'domain' => 'pengajuan',
+            ];
+        }
+
+        // =====================================================================
+        // 3. KENAPA TIDAK BISA BUAT PENGAJUAN BARU / PENGAJUAN DIBLOKIR
+        // =====================================================================
+        if ($mentionsPengajuan && $isCannotOrBlocked && ! $has('koreksi_revisi') && ! $has('lpj_nota') && ! $has('lembur')) {
+            $overdueInfo = '';
+            if ($user) {
+                $overdueItems = Pengajuan::query()
+                    ->where('user_id', $user->id)
+                    ->whereIn('status', ['dicairkan', 'menunggu_bukti'])
+                    ->get();
+                if ($overdueItems->isNotEmpty()) {
+                    $codes = $overdueItems->pluck('nomor_pengajuan')->implode(', ');
+                    $overdueInfo = "\n\n🔍 Cek Live Akun Anda: Anda memiliki {$overdueItems->count()} pengajuan berstatus DICAIRKAN/MENUNGGU BUKTI ({$codes}) yang belum selesai LPJ/realisasi. Segera unggah bukti nota realisasinya agar blokir terbuka.";
+                } else {
+                    $overdueInfo = "\n\n🔍 Cek Live Akun Anda: Akun Anda bersih dari tunggakan LPJ (>7 hari), sehingga Anda dapat membuat pengajuan baru.";
+                }
+            }
+
+            $resp = "Penyebab Anda tidak bisa membuat atau mengirim pengajuan baru di GOMSN:\n"
+                . "1. Diblokir Otomatis karena Tunggakan Nota Realisasi (LPJ > 7 Hari): Jika ada pengajuan sebelumnya yang sudah cair (status DICAIRKAN / MENUNGGU BUKTI) namun belum diunggah bukti nota realisasinya melewati batas 7 hari, sistem otomatis memblokir pembuatan pengajuan baru.\n"
+                . "2. Kasbon Sebelumnya Belum Lunas (Settled): Selesaikan dulu laporan nota pengeluaran pengajuan sebelumnya.\n"
+                . "3. Rincian Item Belum Lengkap: Pastikan Keperluan, Nama Barang/Deskripsi, Jumlah (Qty minimal 1), dan Harga Satuan sudah terisi tanpa kolom wajib yang kosong."
+                . $overdueInfo;
+
+            return [
+                'response' => $resp,
+                'confidence' => 95.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_buat_pengajuan',
+                'action_url' => $this->safeRoute('gomsn.pengajuan.index'),
+                'action_label' => '📋 Buka Pengajuan Saya',
+                'suggestions' => null,
+                'domain' => 'pengajuan',
+            ];
+        }
+
+        // =====================================================================
+        // 4. KENAPA TIDAK BISA ABSEN (DIAGNOSTIK LIVE + 5 PENYEBAB UTAMA)
+        // =====================================================================
+        $mentionsAbsen = $has('absensi') || $has('check_in') || $has('check_out') || isset($domains['absensi']) || $effDomain === 'absensi';
+        $isSpecificOtherAbsenIntent = $has('biometrik_wajah')
+            || $has('lokasi_gps')
+            || $has('tanpa_internet')
+            || $has('lupa')
+            || $has('ganti_perangkat')
+            || $has('hp_lowbat')
+            || $has('status_belum_checkin')
+            || $has('terlambat')
+            || $has('potongan_denda')
+            || $has('hari_libur');
+
+        if ($mentionsAbsen && ($isCannotOrBlocked || ($isWhyQuestion && $has('troubleshoot'))) && ! $isSpecificOtherAbsenIntent) {
+            $liveDiag = '';
+            if ($user) {
+                $hasFace = FaceTemplate::query()->where('user_id', $user->id)->exists();
+                $todayStr = Carbon::now('Asia/Jakarta')->toDateString();
+                $attToday = Attendance::query()->where('user_id', $user->id)->whereDate('date', $todayStr)->first();
+                $failures = (int) Cache::get("attendance:face_failures:{$user->id}", 0);
+
+                $faceStatus = $hasFace
+                    ? 'Sudah Terdaftar (Aktif)'
+                    : '⚠️ BELUM TERDAFTAR (Anda wajib melakukan Pendaftaran Wajah 3 Pose terlebih dahulu di halaman Absen)';
+                $attStatus = 'Belum Check-In hari ini';
+                if ($attToday && ($attToday->clock_in_at || $attToday->clock_in)) {
+                    $inTime = Carbon::parse($attToday->clock_in_at ?? $attToday->clock_in)->timezone('Asia/Jakarta')->format('H:i');
+                    $outTime = ($attToday->clock_out_at || $attToday->clock_out)
+                        ? Carbon::parse($attToday->clock_out_at ?? $attToday->clock_out)->timezone('Asia/Jakarta')->format('H:i')
+                        : null;
+                    $attStatus = $outTime
+                        ? "⚠️ Sudah Check-In ({$inTime} WIB) & Sudah Check-Out ({$outTime} WIB) — presensi hari ini sudah selesai"
+                        : "Sudah Check-In pukul {$inTime} WIB (silakan gunakan tombol Check-Out saat jam pulang)";
+                }
+
+                $liveDiag = "\n\n🔍 Diagnostik Live Akun Anda Saat Ini:\n"
+                    . "• Status Biometrik Wajah: {$faceStatus}\n"
+                    . "• Status Presensi Hari Ini: {$attStatus}"
+                    . ($failures > 0 ? "\n• Gagal Verifikasi Wajah Berturut-turut: {$failures}x (Jalur Manual terbuka setelah 3x gagal)" : '');
+            }
+
+            $resp = ($isSunda
+                ? "Penyebab utama teu tiasa absen (Check-In / Check-Out) di sistem GOMSN katut solusina:\n"
+                    . "1. Acan Daftar Biometrik Wajah (3 Pose): Karyawan wajib ngadaftarkeun pameunteu 3 pose (Hareup, Kenca, Katuhu) jeung nyentang persetujuan UU PDP.\n"
+                    . "2. Di Luar Radius GPS Kantor (Geofence): Kanggo tipe Kantor, posisi GPS kedah di jero radius kantor & teu meunang nganggo Fake GPS. Upami nuju tugas di lapangan, pilih tipe Dinas Luar / Remote sarta WAJIB ngeusian Catatan Keterangan.\n"
+                    . "3. Idin Kamera & Lokasi Browser Diblokir: Pastikeun idin Camera & Location dina browser HP/Laptop disetel ka Allow (Izinkan).\n"
+                    . "4. Geus Check-In / Token Liveness Kadaluwarsa (>2 Menit): Check-In ngan tiasa 1x sapoe, sarta tantangan liveness (seuri/kedip/nengok) kedah rengse dina 2 menit.\n"
+                    . "5. Jalur Manual / Reset Wajah: Upami gagal verifikasi wajah 3x berturut-turut, sistem otomatis muka Jalur Manual (Pending Review HRD), atawa hubungi HRD kanggo Reset Wajah."
+                : "Berikut 5 penyebab utama tidak bisa absen (Check-In / Check-Out) di aplikasi GOMSN beserta solusinya:\n"
+                    . "1. Belum Daftar Biometrik Wajah (3 Pose): Sebelum absen pertama kali, Anda wajib melakukan Pendaftaran Wajah 3 Pose (Depan, Kiri, Kanan) dan mencentang persetujuan UU PDP.\n"
+                    . "2. Lokasi di Luar Radius GPS Kantor (Geofence): Untuk tipe kehadiran Kantor (Office), GPS harus berada di dalam radius kantor dan tidak boleh menggunakan Fake GPS / Mock Location. Jika sedang bertugas di luar, ubah tipe kehadiran ke Dinas Luar (Field) / Remote dan WAJIB mengisi kolom Catatan Keterangan.\n"
+                    . "3. Izin Kamera & Lokasi Browser Diblokir: Klik ikon gembok di address bar browser (Chrome/Safari), pastikan izin Camera & Location berstatus Allow (Izinkan), lalu refresh halaman.\n"
+                    . "4. Sudah Check-In Hari Ini / Token Kedaluwarsa (>2 Menit): Check-In hanya bisa dilakukan 1x sehari, dan tantangan liveness (senyum/kedip/menoleh) harus diselesaikan dalam waktu maksimal 2 menit.\n"
+                    . "5. Gagal Wajah 3x (Jalur Manual) / Ganti HP: Jika gagal verifikasi wajah 3x berturut-turut, tombol Jalur Manual (Pending Review HRD) otomatis terbuka. Jika ganti perangkat baru, minta HRD melakukan Reset Biometrik Wajah.")
+                . $liveDiag;
+
+            return [
+                'response' => $resp,
+                'confidence' => 96.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_absen',
+                'action_url' => $this->safeRoute('attendance.index'),
+                'action_label' => '📍 Buka Halaman Absen',
+                'suggestions' => null,
+                'domain' => 'absensi',
+            ];
+        }
+
+        // =====================================================================
+        // 5. KENAPA LEMBUR TIDAK SAMPAI KE FINANCE / HRD / BELUM DIBAYAR
+        // =====================================================================
+        $mentionsLembur = $has('lembur') || isset($domains['lembur']) || $effDomain === 'lembur';
+        if ($mentionsLembur && ($isNotReachingOrStuck || ($isWhyQuestion && preg_match('/\b(finance|hrd|keuangan|dibayar|cair|masuk|muncul|sampai)\b/iu', $text)))) {
+            $liveLembur = '';
+            if ($user) {
+                $latestLbr = Lembur::with('atasan')->where('user_id', $user->id)->latest('tanggal')->first();
+                if ($latestLbr) {
+                    $st = strtolower((string) $latestLbr->status);
+                    $tgl = $latestLbr->tanggal ? Carbon::parse($latestLbr->tanggal)->translatedFormat('d M Y') : '-';
+                    $atasanName = $latestLbr->atasan?->name ?? 'Atasan Divisi';
+                    $lbrReason = match ($st) {
+                        'pending' => "Masih berstatus PENDING (Menunggu ACC Atasan: {$atasanName}). Di sistem GOMSN, halaman Lembur Finance & HRD hanya menampilkan lembur yang SUDAH berstatus APPROVED_ATASAN.",
+                        'approved_atasan', 'approved' => "Sudah Disetujui Atasan (APPROVED_ATASAN) dan SUDAH masuk di daftar monitoring HRD serta antrean pembayaran Finance.",
+                        'paid' => "Sudah DIBAYAR / LUNAS (PAID) oleh Finance.",
+                        'rejected' => "Berstatus DITOLAK (REJECTED) oleh Atasan, sehingga tidak diteruskan ke Finance.",
+                        default => "Berstatus: " . strtoupper($st),
+                    };
+                    $liveLembur = "\n\n🔍 Cek Live Lembur Terakhir Anda ({$latestLbr->nomor_lembur} — {$tgl}):\n• {$lbrReason}";
+                }
+            }
+
+            $resp = "Penyebab pengajuan lembur tidak sampai atau belum muncul di Finance / HRD pada sistem GOMSN:\n"
+                . "1. Belum Di-ACC Atasan Divisi (Masih PENDING): Sesuai alur sistem GOMSN, halaman Lembur Finance dan HRD hanya menampilkan pengajuan lembur yang sudah berstatus APPROVED_ATASAN (Disetujui Atasan) atau PAID.\n"
+                . "2. Ditolak oleh Atasan (REJECTED): Lembur yang ditolak Atasan otomatis berhenti dan tidak diteruskan ke Finance.\n"
+                . "3. Filter Periode Bulan/Tahun: Jika lembur berada di bulan sebelumnya dan belum diproses, ubah filter bulan di halaman Lembur ke periode tersebut atau pilih filter 'Belum Diproses'."
+                . $liveLembur;
+
+            return [
+                'response' => $resp,
+                'confidence' => 95.0,
+                'matched_intent' => 'smart_diag_lembur_tidak_sampai_finance',
+                'action_url' => $this->safeRoute('gomsn.overtime.index'),
+                'action_label' => '💼 Buka Halaman Lembur',
+                'suggestions' => null,
+                'domain' => 'lembur',
+            ];
+        }
+
+        // =====================================================================
+        // 6. KENAPA TIDAK BISA AJUKAN / INPUT LEMBUR
+        // =====================================================================
+        if ($mentionsLembur && $isCannotOrBlocked && ! preg_match('/\b(ditolak atasan|alasan penolakan|kenapa pengajuan lembur saya ditolak)\b/iu', $text)) {
+            $resp = "Penyebab Anda tidak bisa mengajukan atau menyimpan data lembur di GOMSN:\n"
+                . "1. Belum Ada Data Absensi pada Tanggal Lembur: Sistem mewajibkan Anda sudah tercatat Check-In (Hadir/Terlambat) pada tanggal lembur tersebut.\n"
+                . "2. Durasi Melebihi 4 Jam (240 Menit) atau Kurang dari 1 Jam: Batas klaim lembur di sistem adalah minimal 60 menit dan maksimal 4 jam (240 menit) per hari.\n"
+                . "3. Melewati Batas Retroaktif 3 Hari (H-3): Tanggal lembur yang sudah lewat lebih dari 3 hari ke belakang otomatis dikunci oleh sistem.\n"
+                . "4. Jam Lembur Bertabrakan (Overlap): Rentang jam mulai & selesai tidak boleh bentrok dengan pengajuan lembur Anda yang lain di tanggal yang sama.\n"
+                . "5. Kolom Alasan Kosong: Rincian/alasan pekerjaan lembur wajib diisi.";
+
+            return [
+                'response' => $resp,
+                'confidence' => 95.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_ajukan_lembur',
+                'action_url' => $this->safeRoute('gomsn.overtime.create'),
+                'action_label' => '⏰ Ajukan Lembur',
+                'suggestions' => null,
+                'domain' => 'lembur',
+            ];
+        }
+
+        // =====================================================================
+        // 7. KENAPA TIDAK BISA AJUKAN CUTI / IZIN ATAU BELUM SAMPAI HRD
+        // =====================================================================
+        $mentionsCuti = $has('cuti') || $has('izin') || ($has('sakit') && $isCannotOrBlocked) || isset($domains['cuti']) || $effDomain === 'cuti';
+        if ($mentionsCuti && ($isCannotOrBlocked || $isNotReachingOrStuck) && ! $has('tukar_shift') && ! $has('batal')) {
+            $liveCuti = '';
+            if ($user) {
+                $bal = LeaveBalance::query()->where('user_id', $user->id)->where('year', (int) date('Y'))->first();
+                $sisa = $bal ? ($bal->remaining_days ?? 12) : 12;
+                $liveCuti = "\n\n🔍 Cek Live Saldo Cuti Tahunan Anda (" . date('Y') . "): Tersisa {$sisa} hari kerja.";
+            }
+
+            $resp = "Penyebab tidak bisa mengajukan Cuti/Izin atau pengajuan belum sampai ke HRD di GOMSN:\n"
+                . "1. Sisa Saldo Cuti Tahunan Habis (0 Hari): Jika kuota cuti tahunan (12 hari/tahun) sudah habis, pengajuan cuti tahunan baru akan ditolak sistem.\n"
+                . "2. Kurang dari Batas Minimal H-3: Cuti tahunan reguler wajib diajukan minimal 3 hari sebelum tanggal mulai cuti.\n"
+                . "3. Belum Upload Surat Keterangan Dokter (SKD): Untuk kategori Izin Sakit, sistem mewajibkan lampiran foto/PDF Surat Dokter.\n"
+                . "4. Tanggal Bertabrakan / Masih Menunggu ACC Atasan: Pengajuan cuti/izin harus disetujui Atasan Langsung terlebih dahulu (status PENDING_SUPERVISOR) sebelum diteruskan ke antrean verifikasi HRD (PENDING_HRD)."
+                . $liveCuti;
+
+            return [
+                'response' => $resp,
+                'confidence' => 94.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_cuti',
+                'action_url' => $this->safeRoute('attendance.leaves'),
+                'action_label' => '🌴 Buka Cuti & Izin Saya',
+                'suggestions' => null,
+                'domain' => 'cuti',
+            ];
+        }
+
+        // =====================================================================
+        // 8. KENAPA TIDAK BISA TUKAR SHIFT
+        // =====================================================================
+        if ($has('tukar_shift') && ($isCannotOrBlocked || $isNotReachingOrStuck)) {
+            return [
+                'response' => "Penyebab pengajuan Tukar Shift gagal atau tidak bisa diproses di GOMSN:\n"
+                    . "1. Beda Divisi: Tukar shift hanya diperbolehkan dengan rekan kerja dalam satu divisi yang sama.\n"
+                    . "2. Jeda Istirahat Kurang dari 11 Jam: Sistem menolak pertukaran shift yang mengakibatkan waktu istirahat antar shift kurang dari 11 jam (aturan K3).\n"
+                    . "3. Belum Disetujui Rekan Pengganti / Atasan: Rekan yang diajak bertukar harus menyetujui permintaan tersebut terlebih dahulu, kemudian wajib di-ACC oleh Atasan/Supervisor.",
+                'confidence' => 94.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_tukar_shift',
+                'action_url' => $this->safeRoute('attendance.schedules'),
+                'action_label' => '📅 Buka Jadwal Kerja Saya',
+                'suggestions' => null,
+                'domain' => 'jadwal',
+            ];
+        }
+
+        // =====================================================================
+        // 9. KENAPA TIDAK BISA CLOSE / TUTUP TIKET GANGGUAN
+        // =====================================================================
+        if (($has('closing_tiket') || ($has('tiket_gangguan') && preg_match('/\b((?:di)?close|closing|(?:di)?tutup|selesai)\b/iu', $text))) && ($isCannotOrBlocked || $isNotReachingOrStuck)) {
+            return [
+                'response' => "Penyebab Tiket Gangguan tidak bisa di-Close (ditutup) di GOMSN:\n"
+                    . "1. Data Redaman Optik Belum Diisi: Teknisi wajib menginput nilai redaman optik (dBm) sebelum dan sesudah perbaikan.\n"
+                    . "2. Kronologi & Resume Pekerjaan Belum Lengkap: Bagian temuan masalah (Problem) dan tindakan perbaikan (Action Taken) wajib diisi.\n"
+                    . "3. Foto Bukti Lapangan Belum Diunggah: Wajib melampirkan foto hasil ukur OPM/OTDR dan foto titik perbaikan.\n"
+                    . "4. Menunggu Verifikasi NOC (PENDING_VERIFIKASI): Setelah teknisi mengirim laporan selesai, penutupan akhir (status CLOSE) diverifikasi oleh tim NOC.",
+                'confidence' => 94.0,
+                'matched_intent' => 'smart_diag_tidak_bisa_close_tiket',
+                'action_url' => $this->safeRoute('tickets.index'),
+                'action_label' => '🎫 Buka Tiket Gangguan',
+                'suggestions' => null,
+                'domain' => 'tiket',
             ];
         }
 
