@@ -676,11 +676,12 @@ html.dark .hover\:bg-purple-50\/30:hover {
     background-color: rgba(56, 189, 248, 0.22) !important;
 }
 
-/* Inline Style Light Surface Overrides (Ticketing Chat, Badges, etc.) */
+/* Inline Style Light Surface Overrides (Ticketing Chat, Division Badges, Overtime Box, etc.) */
 html.dark [style*="background-color: #FFFFFF"],
 html.dark [style*="background-color: #ffffff"],
 html.dark [style*="background: #FFFFFF"],
-html.dark [style*="background: #ffffff"] {
+html.dark [style*="background: #ffffff"],
+html.dark [style*="background: rgba(255, 255, 255, 0.96)"] {
     background-color: #162235 !important;
     border-color: #334155 !important;
     color: #e2e8f0 !important;
@@ -693,7 +694,48 @@ html.dark [style*="background-color: #EAF4FE"] {
 html.dark [style*="background-color: #F1F5F9"],
 html.dark [style*="background: #f1f5f9"] {
     background-color: #1e293b !important;
+    border-color: #334155 !important;
     color: #cbd5e1 !important;
+}
+html.dark [style*="background-color: #eaf6f4"],
+html.dark [style*="background-color: #CCFBF1"],
+html.dark [style*="background-color: #ecfeff"] {
+    background-color: rgba(20, 184, 166, 0.16) !important;
+    border-color: rgba(45, 212, 191, 0.34) !important;
+    color: #5eead4 !important;
+}
+html.dark [style*="background-color: #FFEDD5"],
+html.dark [style*="background-color: #FEF3C7"] {
+    background-color: rgba(245, 158, 11, 0.16) !important;
+    border-color: rgba(245, 158, 11, 0.34) !important;
+    color: #fcd34d !important;
+}
+html.dark [style*="background-color: #EEF2FF"] {
+    background-color: rgba(99, 102, 241, 0.18) !important;
+    border-color: rgba(129, 140, 248, 0.35) !important;
+    color: #a5b4fc !important;
+}
+html.dark [style*="background-color: #E0F2FE"],
+html.dark [style*="background-color: #D6E8FF"] {
+    background-color: rgba(14, 165, 233, 0.18) !important;
+    border-color: rgba(56, 189, 248, 0.35) !important;
+    color: #7dd3fc !important;
+}
+html.dark [style*="background-color: #ECFDF5"] {
+    background-color: rgba(16, 185, 129, 0.16) !important;
+    border-color: rgba(52, 211, 153, 0.34) !important;
+    color: #6ee7b7 !important;
+}
+html.dark [style*="background-color: #FFE4E6"],
+html.dark [style*="background-color: #FEE2E2"] {
+    background-color: rgba(244, 63, 94, 0.16) !important;
+    border-color: rgba(251, 113, 133, 0.34) !important;
+    color: #fda4af !important;
+}
+html.dark [style*="background-color: #F3E8FF"] {
+    background-color: rgba(168, 85, 247, 0.18) !important;
+    border-color: rgba(192, 132, 252, 0.35) !important;
+    color: #d8b4fe !important;
 }
 html.dark .ticket-chat-card.is-chat-fullscreen #chat-input-container,
 html.dark .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text,

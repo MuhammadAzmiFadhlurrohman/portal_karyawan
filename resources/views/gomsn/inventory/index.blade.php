@@ -145,8 +145,7 @@
                         <input type="text" name="nama" required 
                                placeholder="Contoh: Router, Kabel UTP, Switch" 
                                value="{{ old('nama') }}"
-                               style="border: 1px solid #cbd5e1 !important;"
-                               class="w-full text-xs rounded-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 placeholder-slate-400 bg-white">
+                               class="w-full text-xs rounded-xl py-2.5 px-3.5 border border-slate-300 focus:ring-teal-700 focus:border-teal-700 placeholder-slate-400 bg-white">
                     </div>
 
                     <!-- Input Jumlah Stok -->
@@ -156,8 +155,7 @@
                         </label>
                         <input type="number" name="stok_tersedia" min="0" required 
                                value="{{ old('stok_tersedia', 0) }}" 
-                               style="border: 1px solid #cbd5e1 !important;"
-                               class="w-full text-xs rounded-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 font-bold text-slate-800 bg-white">
+                               class="w-full text-xs rounded-xl py-2.5 px-3.5 border border-slate-300 focus:ring-teal-700 focus:border-teal-700 font-bold text-slate-800 bg-white">
                     </div>
 
                     <!-- Select Satuan -->
@@ -166,8 +164,7 @@
                             Satuan <span class="text-rose-500">*</span>
                         </label>
                         <select name="satuan" required 
-                                style="border: 1px solid #cbd5e1 !important;"
-                                class="w-full text-xs rounded-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 bg-white text-slate-700 font-medium">
+                                class="w-full text-xs rounded-xl py-2.5 px-3.5 border border-slate-300 focus:ring-teal-700 focus:border-teal-700 bg-white text-slate-700 font-medium">
                             <option value="">-- Pilih Satuan --</option>
                             <option value="pcs" {{ old('satuan') === 'pcs' ? 'selected' : '' }}>Pcs (Piece)</option>
                             <option value="meter" {{ old('satuan') === 'meter' ? 'selected' : '' }}>Meter (m)</option>
@@ -215,8 +212,7 @@
                     <div class="relative flex-1">
                         <input type="text" name="search" value="{{ request('search') }}" 
                                placeholder="Cari nama barang..."
-                               style="border: 1px solid #cbd5e1 !important; border-right: none !important;"
-                               class="w-full text-xs rounded-l-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 placeholder-slate-400 bg-white">
+                               class="w-full text-xs rounded-l-xl py-2.5 px-3.5 border border-slate-300 border-r-0 focus:ring-teal-700 focus:border-teal-700 placeholder-slate-400 bg-white">
                     </div>
                     <button type="submit" 
                             style="background: linear-gradient(135deg, #18C4C4 0%, #155E63 100%) !important; color: #ffffff !important;"
@@ -327,9 +323,8 @@
                                 @endif
                             </td>
                             <td class="py-3.5 px-4 text-center">
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold"
-                                      style="background-color: #ecfeff !important; border: 1px solid #a5f3fc !important; color: #0e7490 !important;">
-                                    <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20" style="color: #0891b2 !important;">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-cyan-50 text-cyan-700 border border-cyan-200">
+                                    <svg class="w-3 h-3 shrink-0 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
                                     </svg>
                                     <span>{{ $material->satuan }}</span>
@@ -419,8 +414,7 @@
                                 Nama Barang <span class="text-rose-500">*</span>
                             </label>
                             <input type="text" name="nama" x-model="editItem.nama" required 
-                                   style="border: 1px solid #cbd5e1 !important;"
-                                   class="w-full text-xs rounded-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 bg-white">
+                                   class="w-full text-xs rounded-xl py-2.5 px-3.5 border border-slate-300 focus:ring-teal-700 focus:border-teal-700 bg-white">
                         </div>
 
                         <!-- Jumlah Stok -->
@@ -429,8 +423,7 @@
                                 Jumlah Stok <span class="text-rose-500">*</span>
                             </label>
                             <input type="number" name="stok_tersedia" x-model="editItem.stok_tersedia" min="0" required 
-                                   style="border: 1px solid #cbd5e1 !important;"
-                                   class="w-full text-xs rounded-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 font-bold text-slate-800 bg-white">
+                                   class="w-full text-xs rounded-xl py-2.5 px-3.5 border border-slate-300 focus:ring-teal-700 focus:border-teal-700 font-bold text-slate-800 bg-white">
                         </div>
 
                         <!-- Satuan -->
@@ -439,8 +432,7 @@
                                 Satuan <span class="text-rose-500">*</span>
                             </label>
                             <select name="satuan" x-model="editItem.satuan" required 
-                                    style="border: 1px solid #cbd5e1 !important;"
-                                    class="w-full text-xs rounded-xl py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 bg-white text-slate-700 font-medium">
+                                    class="w-full text-xs rounded-xl py-2.5 px-3.5 border border-slate-300 focus:ring-teal-700 focus:border-teal-700 bg-white text-slate-700 font-medium">
                                 <option value="pcs">Pcs (Piece)</option>
                                 <option value="meter">Meter (m)</option>
                                 <option value="box">Box</option>
