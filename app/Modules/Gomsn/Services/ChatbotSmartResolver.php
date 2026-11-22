@@ -53,21 +53,21 @@ class ChatbotSmartResolver
     protected array $domainKeywords = [
         'aplikasi' => ['gomsn', 'aplikasi', 'portal', 'sistem', 'fitur', 'modul', 'panduan', 'bantuan', 'help', 'fungsi', 'kegunaan', 'menu', 'layanan', 'semua fitur', 'cara kerja'],
         'dashboard' => ['dashboard', 'beranda', 'home', 'ringkasan', 'statistik', 'summary', 'keseluruhan', 'operasional'],
-        'absensi' => ['absen', 'absensi', 'presensi', 'kehadiran', 'checkin', 'checkout', 'clock', 'biometrik', 'wajah', 'beungeut', 'gps', 'radius', 'geofence', 'koreksi', 'terlambat', 'telat', 'alpa', 'dinas', 'hadir', 'kamera', 'selfie'],
-        'jadwal' => ['jadwal', 'shift', 'piket', 'kalender', 'tukar', 'schedule', 'jam kerja', 'jam masuk', 'jam pulang', 'libur nasional', 'tanggal merah'],
-        'cuti' => ['cuti', 'izin', 'sakit', 'gering', 'saldo', 'jatah', 'kuota', 'dokter', 'skd', 'melahirkan', 'leave'],
-        'potongan' => ['potongan', 'denda', 'sanggahan', 'payroll', 'deduction', 'waiver'],
-        'pengajuan' => ['pengajuan', 'kasbon', 'dana', 'beli', 'pembelian', 'pengadaan', 'permintaan', 'reimburse', 'reimbursement', 'nota', 'lpj', 'settlement', 'cair', 'pencairan', 'nominal', 'anggaran', 'plafon'],
-        'stok' => ['stok', 'stock', 'gudang', 'material', 'inventaris', 'inventory', 'barang', 'dropcore', 'kabel', 'closure', 'patch', 'utp', 'ont', 'restock'],
-        'lembur' => ['lembur', 'lemburan', 'overtime', 'spk'],
-        'tiket' => ['tiket', 'ticket', 'gangguan', 'trouble', 'noc', 'backbone', 'broadband', 'sla', 'mttr', 'eskalasi', 'closing', 'reopen', 'redaman', 'opm', 'otdr', 'splicing', 'jc', 'core', 'manuver', 'dispatch', 'resume', 'bast', 'berita acara'],
+        'absensi' => ['absen', 'absensi', 'presensi', 'kehadiran', 'checkin', 'checkout', 'clock', 'biometrik', 'wajah', 'muka', 'beungeut', 'gps', 'radius', 'geofence', 'peta', 'map', 'koreksi', 'terlambat', 'telat', 'kesiangan', 'alpa', 'bolos', 'mangkir', 'dinas', 'hadir', 'kamera', 'selfie', 'tap', 'finger', 'site', 'visit', 'lowbat', 'nitip'],
+        'jadwal' => ['jadwal', 'shift', 'piket', 'kalender', 'tukar', 'barter', 'swap', 'schedule', 'jam kerja', 'jam masuk', 'jam pulang', 'libur nasional', 'tanggal merah', 'cuti bersama'],
+        'cuti' => ['cuti', 'izin', 'sakit', 'gering', 'meriang', 'demam', 'flu', 'opname', 'saldo', 'jatah', 'kuota', 'dokter', 'skd', 'melahirkan', 'lahiran', 'nikah', 'menikah', 'kawin', 'duka', 'meninggal', 'wafat', 'leave', 'hangus'],
+        'potongan' => ['potongan', 'denda', 'sanggahan', 'komplain', 'protes', 'payroll', 'deduction', 'waiver', 'penalti'],
+        'pengajuan' => ['pengajuan', 'kasbon', 'dana', 'duit', 'uang', 'talangan', 'pinjam', 'beli', 'pembelian', 'pengadaan', 'permintaan', 'reimburse', 'reimbursement', 'nota', 'struk', 'bon', 'kwitansi', 'kuitansi', 'lpj', 'settlement', 'cair', 'pencairan', 'nominal', 'anggaran', 'plafon', 'limit', 'bensin', 'tol'],
+        'stok' => ['stok', 'stock', 'gudang', 'material', 'inventaris', 'inventory', 'barang', 'dropcore', 'kabel', 'closure', 'patch', 'utp', 'ont', 'restock', 'pigtail', 'konektor'],
+        'lembur' => ['lembur', 'lemburan', 'overtime', 'spk', 'ekstra', 'tambahan jam', 'kerja tambahan', 'jam tambahan'],
+        'tiket' => ['tiket', 'ticket', 'gangguan', 'trouble', 'los', 'lampu merah', 'noc', 'backbone', 'broadband', 'sla', 'mttr', 'eskalasi', 'closing', 'reopen', 'redaman', 'opm', 'otdr', 'splicing', 'jc', 'core', 'manuver', 'dispatch', 'resume', 'bast', 'berita acara'],
         'jaringan' => ['olt', 'pon', 'odp', 'ftth', 'jaringan', 'network', 'port', 'koordinat', 'pelanggan', 'customer', 'topologi', 'internet'],
         'tugas' => ['tugas', 'task', 'tasks', 'kerjaan', 'subtask'],
         'kpi' => ['kpi', 'performa', 'kinerja', 'nilai teknisi', 'skor teknisi', 'analytics', 'analitik'],
-        'leaderboard' => ['leaderboard', 'peringkat', 'ranking', 'juara', 'disiplin', 'terbaik', 'top'],
+        'leaderboard' => ['leaderboard', 'peringkat', 'ranking', 'juara', 'disiplin', 'rajin', 'terbaik', 'top'],
         'karyawan' => ['karyawan', 'pegawai', 'staf', 'staff', 'headcount', 'onboarding', 'resign', 'nonaktif', 'mutasi', 'divisi', 'kontak', 'nik', 'kode karyawan'],
-        'profil' => ['profil', 'profile', 'akun', 'password', 'sandi', 'foto', 'passkey', 'atasan', 'jabatan', 'role', 'hak akses', 'wewenang'],
-        'sesi' => ['sesi', 'session', 'perangkat', 'device', 'otp', 'login', 'logout', 'hp', 'blokir'],
+        'profil' => ['profil', 'profile', 'biodata', 'akun', 'password', 'sandi', 'foto', 'avatar', 'pp', 'passkey', 'atasan', 'bos', 'supervisor', 'manager', 'jabatan', 'role', 'hak akses', 'wewenang'],
+        'sesi' => ['sesi', 'session', 'perangkat', 'device', 'otp', 'login', 'logout', 'hp', 'blokir', 'hilang', 'crash', 'bug', 'helpdesk'],
     ];
 
     /**
@@ -348,13 +348,14 @@ class ChatbotSmartResolver
      */
     public function detectQueryStyle(string $normMessage, string $rawClean): array
     {
-        $isHowTo = (bool) preg_match('/\b(bagaimana|gimana|kumaha|cara|carana|langkah|tutorial|tutor|panduan|alur|proses|mekanisme|step|tahapan|cara kerja|cara pakai|cara menggunakan)\b/iu', $normMessage);
-        $isData = (bool) preg_match('/\b(berapa|sabaraha|total|jumlah|rekap|ringkasan|summary|statistik|stat|laporan|data|daftar|list|cek|lihat|tampilkan|tampilin|sebutkan|sebutin|status|siapa|saha|sudah|geus|belum|acan|hari ini|poe ieu|kemarin|kamari|besok|isukan|bulan ini|bulan ieu|minggu ini|minggu ieu|tahun ini|terakhir|terbaru|aktif|pending|menunggu|disetujui|ditolak|sisa|saldo|ada berapa|kapan|iraha)\b/iu', $normMessage);
-        $isTroubleshoot = (bool) preg_match('/\b(kenapa|mengapa|kunaon|naha|error|gagal|tidak bisa|teu bisa|kendala|masalah|trouble|bug|lupa|poho|kelupaan|hilang|leungit|mati|pareum|kosong|macet|blank|hideung|belum masuk|tidak terdeteksi)\b/iu', $normMessage);
-        $isPolicy = (bool) preg_match('/\b(syarat|aturan|kebijakan|ketentuan|batas|maksimal|minimal|deadline|sla|boleh|wajib|toleransi|tarif|rate|formula|rumus|hitung|beda|perbedaan|bedana|hangus|plafon|berapa lama|berapa menit toleransi)\b/iu', $normMessage);
-        $isConcept = (bool) preg_match('/\b(apa itu|naon eta|apa sih|fungsi|kegunaan|manfaat|arti|hartina|maksud|kepanjangan|singkatan|fitur|modul|menu apa saja|layanan apa saja|tentang aplikasi|tentang gomsn|bisa bantu apa|kamu bisa apa|bisa apa aja|bantuan|help)\b/iu', $normMessage . ' ' . $rawClean);
-        $isCompanyScope = (bool) preg_match('/\b(seluruh karyawan|semua karyawan|sakabeh karyawan|semua pegawai|seluruh pegawai|perusahaan|company|company wide|semua divisi|sa perusahaan|seluruh divisi|per divisi|antar divisi|karyawan hari ini|karyawan bulan ini|semua staf|tim saya|bawahan|divisi saya)\b/iu', $normMessage);
-        $isPersonalScope = (bool) preg_match('/\b(saya|aku|urang|abdi|pribadi|milik saya|punya saya|akun saya)\b/iu', $normMessage);
+        $combined = $normMessage . ' ' . $rawClean;
+        $isHowTo = (bool) preg_match('/\b(bagaimana|gimana|kumaha|cara(?:nya|na)?|langkah|tutorial|tutor|panduan|alur(?:nya|na)?|proses(?:nya|na)?|mekanisme|step|tahapan|cara kerja|cara pakai|cara menggunakan|lewat mana|di mana|dimana|menu mana|ngurus(?:nya)?|lapor(?:nya)?)\b/iu', $combined);
+        $isData = (bool) preg_match('/\b(berapa|sabaraha|total|jumlah|rekap|ringkasan|summary|statistik|stat|laporan|data|daftar|list|cek|lihat|tampilkan|tampilin|sebutkan|sebutin|status(?:nya|na)?|siapa|saha|sudah|udah|geus|belum|belom|acan|hari ini|poe ieu|kemarin|kamari|besok|isukan|bulan ini|bulan ieu|minggu ini|minggu ieu|tahun ini|terakhir|terbaru|aktif|pending|menunggu|disetujui|ditolak|sisa|saldo|tinggal berapa|ada berapa|kapan|iraha)\b/iu', $combined);
+        $isTroubleshoot = (bool) preg_match('/\b(kenapa|mengapa|kunaon|naha|kok|error|gagal|tidak bisa|gak bisa|teu bisa|kendala|masalah|trouble|bug|crash|hang|lemot|force close|lupa|poho|kelupaan|kelewatan|hilang|leungit|mati|pareum|kosong|macet|muter|loading|blank|hitam|hideung|belum masuk|tidak terdeteksi|tidak kebaca|tidak dikenal|ditolak|ketolak|nyangkut|mentok)\b/iu', $combined);
+        $isPolicy = (bool) preg_match('/\b(syarat(?:nya|na)?|aturan(?:nya|na)?|kebijakan(?:nya)?|ketentuan(?:nya)?|batas(?:nya|na)?|limit(?:nya)?|plafon(?:nya)?|maksimal(?:nya|na)?|minimal(?:nya|na)?|deadline|tenggat|sla|boleh|wajib|harus|perlu|toleransi(?:nya)?|tarif(?:nya)?|rate|formula|rumus(?:nya)?|hitung|beda(?:nya|na)?|perbedaan|hangus|efek(?:nya)?|dampak(?:nya)?|ngaruh|berapa lama|berapa menit|berapa hari sebelum|motong|dipotong)\b/iu', $combined);
+        $isConcept = (bool) preg_match('/\b(apa itu|naon eta|apa sih|fungsi(?:nya)?|kegunaan|manfaat|arti(?:nya)?|hartina|maksud(?:nya)?|kepanjangan|singkatan|fitur|modul|menu apa saja|layanan apa saja|tentang aplikasi|tentang gomsn|bisa bantu apa|kamu bisa apa|bisa apa aja|bantuan|help)\b/iu', $combined);
+        $isCompanyScope = (bool) preg_match('/\b(seluruh karyawan|semua karyawan|sakabeh karyawan|semua pegawai|seluruh pegawai|perusahaan|company|company wide|semua divisi|sa perusahaan|seluruh divisi|per divisi|antar divisi|karyawan hari ini|karyawan bulan ini|semua staf|tim saya|bawahan|divisi saya)\b/iu', $combined);
+        $isPersonalScope = (bool) preg_match('/\b(saya|aku|urang|abdi|pribadi|milik saya|punya saya|akun saya)\b/iu', $combined);
 
         return [
             'is_howto' => $isHowTo,
@@ -383,9 +384,546 @@ class ChatbotSmartResolver
             return null;
         }
 
-        $isFollowUp = (bool) preg_match('/\b(caranya|cara|carana|syaratnya|syarat|aturannya|aturan|batasnya|batas|maksimalnya|minimalnya|berapa lama|terus|lalu|kalau ditolak|mun ditolak|kalau lupa|mun poho|dimana menunya|menu mana|dimana|punya saya|milik saya|datanya|statusnya|bulan ini|hari ini|detailnya|selengkapnya|jelaskan|maksudnya|contohnya|siapa yang approve|siapa yang acc|kapan cair|gimana|bagaimana|kumaha)\b/iu', $normMessage);
+        $isFollowUp = (bool) preg_match('/\b(caranya|cara|carana|syaratnya|syarat|aturannya|aturan|batasnya|batas|limitnya|limit|plafonnya|maksimalnya|maksimal|minimalnya|minimal|berapa lama|berapa hari|terus|lalu|kalau ditolak|mun ditolak|kalau lupa|mun poho|kalau batal|kalau hilang|dimana menunya|menu mana|dimana|punya saya|milik saya|datanya|statusnya|bulan ini|hari ini|detailnya|selengkapnya|jelaskan|maksudnya|contohnya|siapa yang approve|siapa yang acc|kapan cair|kapan dibayar|efeknya|dampaknya|gimana|bagaimana|kumaha)\b/iu', $normMessage);
 
         return $isFollowUp ? $ctx['domain'] : null;
+    }
+
+    /**
+     * Extract canonical semantic concepts from any phrasing (formal, casual slang, idioms, English mix, Basa Sunda).
+     *
+     * @return array<string, bool>
+     */
+    public function extractSemanticConcepts(string $rawClean, string $normMessage): array
+    {
+        $text = ' ' . trim($normMessage . ' ' . $rawClean) . ' ';
+
+        $patterns = [
+            // Actions & Modifiers
+            'howto' => '/\b(bagaimana|gimana|kumaha|cara(?:nya|na)?|langkah|prosedur|tutorial|tutor|panduan|alur(?:nya|na)?|tahapan|lewat mana|menu mana|di mana|dimana|ngajuin|mengajukan|ajukan|bikin|buat|daftar|ngurus(?:nya)?|mengurus)\b/iu',
+            'troubleshoot' => '/\b(kenapa|mengapa|kunaon|naha|kok|gagal|error|ditolak|ketolak|tidak bisa|gak bisa|ga bisa|teu bisa|macet|muter|loading|blank|hitam|hideung|tidak terdeteksi|tidak muncul|tidak kebaca|gak kebaca|tidak dikenal|bug|crash|force close|hang|lemot|bermasalah|kendala|masalah|mentok|nyangkut|belum berubah|masih tertulis)\b/iu',
+            'status_cek' => '/\b(sudah|udah|geus|belum|belom|acan|cek|lihat|tampilkan|berapa|sabaraha|total|jumlah|siapa|saha|rekap|daftar|list|sampai mana|sampe mana|tahap mana|tinggal berapa|sisa|saldo|status(?:nya|na)?)\b/iu',
+            'syarat_aturan' => '/\b(syarat(?:nya|na)?|aturan(?:nya|na)?|ketentuan(?:nya)?|kebijakan(?:nya)?|wajib|harus|perlu|dokumen|lampiran|lampirkan|upload|unggah|bukti|boleh|diperbolehkan|emang harus|apakah harus)\b/iu',
+            'batas_maksimal' => '/\b(maksimal(?:nya|na)?|max|paling besar|paling banyak|paling lama|paling lambat|paling telat|mentok|limit(?:nya)?|plafon(?:nya)?|tenggat|deadline|batas waktu|batas akhir|toleransi(?:nya)?|berapa menit|berapa lama|sampai jam berapa|batas(?:nya|na)?)\b/iu',
+            'batas_minimal' => '/\b(minimal(?:nya|na)?|min|paling cepat|paling singkat|paling sedikit|berapa hari sebelum|h minus|h 3|h berapa|sebelum tanggal|masa kerja|30 menit|45 menit|kurang dari sejam|kurang dari 1 jam|minimal 1 jam)\b/iu',
+            'lupa' => '/\b(lupa|poho|kelupaan|kelewatan|ketinggalan|tidak sempat|gak sempat|ga sempat|kelewatan|terlewat|kelewat)\b/iu',
+            'koreksi_revisi' => '/\b(koreksi|revisi|edit|ubah|perbaiki|benerin|betulin|ganti nominal|salah input|salah ketik|salah nominal|salah pencet|salah klik|ubah keterangan|mengedit|merevisi|diedit)\b/iu',
+            'batal' => '/\b(batal|batalkan|dibatalkan|membatalkan|pembatalan|cancel|gajadi|ga jadi|gak jadi|tidak jadi|urung|tarik kembali)\b/iu',
+            'perbedaan' => '/\b(beda(?:nya|na)?|perbedaan|dibanding|dibandingkan|dipisah|terpisah|sama atau beda|sama nggak|sama tidak)\b/iu',
+            'efek_dampak' => '/\b(efek(?:nya)?|dampak(?:nya)?|pengaruh(?:nya)?|ngaruh|akibat(?:nya)?|konsekuensi|risiko|resiko|kena apa)\b/iu',
+            'ekspor_unduh' => '/\b(unduh|download|export|ekspor|cetak|print|excel|tarik data|tarik laporan)\b/iu',
+
+            // Time
+            'hari_ini' => '/\b(hari ini|sekarang|tadi|pagi ini|siang ini|sore ini|poe ieu|ayeuna)\b/iu',
+            'kemarin' => '/\b(kemarin|kemaren|kmrn|kamari|semalam|tadi malam)\b/iu',
+            'besok' => '/\b(besok|esok|bsk|isukan)\b/iu',
+            'tujuh_hari' => '/\b(7 hari|tujuh hari|seminggu|sepekan|minggu terakhir|7 poe)\b/iu',
+            'bulan_lalu' => '/\b(bulan lalu|bulan kemarin|bulan kamari|bulan sebelumnya)\b/iu',
+            'bulan_ini' => '/\b(bulan ini|bulan ieu|periode ini|periode berjalan|sebulan ini)\b/iu',
+            'hari_libur' => '/\b(hari libur|tanggal merah|libur nasional|cuti bersama|minggu|sabtu|weekend|akhir pekan)\b/iu',
+
+            // Domain Concepts (rich everyday paraphrases!)
+            'check_in' => '/\b(check in|checkin|cekin|clock in|tap masuk|tap pagi|absen masuk|absen datang|absen pagi|presensi masuk|masuk kerja|asup gawe)\b/iu',
+            'check_out' => '/\b(check out|checkout|cekout|clock out|tap pulang|tap sore|absen pulang|absen balik|absen sore|presensi pulang|pulang kerja|balik gawe)\b/iu',
+            'absensi' => '/\b(absen|absensi|presensi|kehadiran|hadir|tap|finger|masuk kerja|pulang kerja)\b/iu',
+            'biometrik_wajah' => '/\b(biometrik|wajah|muka|beungeut|pameunteu|selfie|foto wajah|scan wajah|pindai wajah|kamera|face|layar hitam|layar hideung)\b/iu',
+            'status_belum_checkin' => '/\b(masih belum check in|masih tertulis belum|padahal sudah foto|padahal udah absen|udah foto wajah tapi|sudah selfie tapi)\b/iu',
+            'lokasi_gps' => '/\b(gps|lokasi|radius|geofence|koordinat|peta|map|maps|jarak kantor|luar jangkauan|out of range|titik lokasi)\b/iu',
+            'terlambat' => '/\b(terlambat|telat|kesiangan|datang telat|masuk telat|lewat jam masuk|keterlambatan)\b/iu',
+            'alpa' => '/\b(alpa|alpha|mangkir|bolos|tanpa keterangan|tanpa kabar|tidak masuk tanpa izin)\b/iu',
+            'dinas_luar' => '/\b(dinas luar|luar kantor|di lapangan|tugas lapangan|di site|visit|kunjungan klien|kunjungan pelanggan|tugas luar|di jalan|kerja lapangan|lokasi pelanggan)\b/iu',
+            'tanpa_internet' => '/\b(offline|tanpa internet|tidak ada sinyal|gak ada sinyal|ga ada sinyal|tidak ada jaringan|gak ada jaringan|ga ada jaringan|no signal|sinyal mati|jaringan mati|blank spot|blankspot|kuota habis|susah sinyal|koneksi putus|euweuh sinyal)\b|(?:sinyal|jaringan|internet|koneksi)(?:\w*)?(?:\s+\w+){0,3}\s+(?:mati|putus|hilang|pareum)/iu',
+            'ganti_perangkat' => '/\b(ganti hp|hp baru|ponsel baru|ganti device|ganti perangkat|perangkat baru|reset device|reset perangkat|perangkat terkunci|biometrik terkunci|pindah hp|daftar ulang biometrik)\b/iu',
+            'hp_hilang' => '/\b(hp hilang|ponsel hilang|hp leungit|hp kecurian|kehilangan hp|blokir sesi|force logout|keluarkan sesi)\b/iu',
+            'hp_lowbat' => '/\b(lowbat|low batt|baterai habis|batre habis|hp mati|nitip absen|titip absen)\b/iu',
+            'jadwal_shift' => '/\b(jadwal|shift|piket|jam kerja|jam masuk|jam pulang|kalender shift|kalender kerja)\b/iu',
+            'tukar_shift' => '/\b(tukar shift|tuker shift|tukar jadwal|tuker jadwal|barter shift|barter jadwal|gantiin shift|gantian shift|tukeran shift|swap shift)\b/iu',
+            'cuti' => '/\b(cuti|jatah libur|kuota libur|libur tahunan|ambil libur|leave)\b/iu',
+            'izin' => '/\b(izin|ijin|perizinan)\b/iu',
+            'sisa_saldo' => '/\b(sisa|saldo|jatah|kuota|tinggal berapa|masih ada berapa|kari sabaraha|tersisa)\b/iu',
+            'sakit' => '/\b(sakit|gering|meriang|demam|flu|batuk|panas|pusing|opname|rawat inap|rumah sakit|tidak enak badan|gak enak badan|ga enak badan|kurang sehat|badan drop|lagi drop|izin sakit)\b/iu',
+            'surat_dokter' => '/\b(surat dokter|skd|surat keterangan dokter|surat sakit|surat klinik|surat puskesmas|surat rs)\b/iu',
+            'cuti_khusus' => '/\b(cuti khusus|nikah|menikah|kawin|istri melahirkan|istri lahiran|khitanan|sunatan|duka|meninggal|wafat|maot|kemalangan|keluarga meninggal|berduka)\b/iu',
+            'cuti_melahirkan' => '/\b(cuti melahirkan|karyawati melahirkan|cuti hamil|cuti bersalin|jatah melahirkan)\b/iu',
+            'izin_setengah_hari' => '/\b(setengah hari|setengah poe|half day|halfday)\b/iu',
+            'hangus_carryover' => '/\b(hangus|kadaluarsa|expired|diakumulasi|akumulasi|carry over|dibawa tahun depan|tahun depan|diuangkan)\b/iu',
+            'potongan_denda' => '/\b(potongan|denda|dipotong|potong gaji|potongan gaji|penalti|penalty|kena potong|pemotongan|deduction)\b/iu',
+            'sanggahan' => '/\b(sanggahan|sanggah|komplain|protes|salah hitung|tidak sesuai|keliru|banding|keberatan)\b/iu',
+            'formula_hitung' => '/\b(rumus|formula|cara hitung|ngitung|menghitung|perhitungan|hitungan|tarif denda|berapa rupiah|kalkulasi|simulasi)\b/iu',
+            'payroll' => '/\b(payroll|penggajian|slip gaji|gajian)\b/iu',
+            'kasbon_dana' => '/\b(kasbon|dana operasional|duit jalan|uang jalan|uang bensin|duit bensin|biaya tol|uang tol|pinjam dana|talangan|reimburse|reimbursement|pengajuan dana|uang operasional|duit operasional|duit kasbon|uang kasbon)\b/iu',
+            'kasbon_bertumpuk' => '/\b(kasbon bertumpuk|kasbon double|kasbon dobel|dua kasbon|2 kasbon|kasbon baru padahal|belum lunas kasbon|belum dilunasi|belum lpj)\b/iu',
+            'lpj_nota' => '/\b(lpj|settlement|pelunasan|pertanggungjawaban|nota(?:nya|na)?|struk(?:nya|na)?|bon(?:nya|na)?|kwitansi(?:nya|na)?|kuitansi(?:nya|na)?|bukti belanja|bukti pengeluaran|laporan nota|laporan bon|laporan struk|upload nota|upload struk)\b/iu',
+            'nota_hilang' => '/\b(?:nota|struk|bon|kwitansi|kuitansi)(?:nya|na)?(?:\s+\w+){0,3}\s+(?:hilang|ilang|leungit)\b/iu',
+            'sisa_kembalian' => '/\b(sisa kasbon|sisa duit kasbon|sisa uang kasbon|kembalian kasbon|balikin sisa|kembalikan sisa|lebih sedikit dari)\b/iu',
+            'beli_barang' => '/\b(beli barang|pembelian|pengadaan|belanja barang|belanja alat|belanja perangkat|belanja kebutuhan|beli alat|beli perangkat|pengajuan beli|order barang|beli material|meuli barang|estimasi harga)\b/iu',
+            'ambil_stok' => '/\b(stok|material|gudang|inventaris|dropcore|kabel|closure|patchcord|konektor|pigtail|ont|router|mikrotik|alat kerja|ambil barang gudang|minta stok|permintaan stok)\b/iu',
+            'pencairan' => '/\b(cair|pencairan|transfer|ditransfer|masuk rekening|turun dana|dibayar|dibayarkan|pembayaran|bayar lembur|jadwal bayar)\b/iu',
+            'lembur' => '/\b(lembur|lemburan|overtime|kerja tambahan|jam tambahan|jam ekstra|ekstra jam|nambah jam|kerja lembur)\b/iu',
+            'lembur_remote' => '/\b(lembur remote|lembur wfh|lembur dari rumah|lembur ti imah|jarak jauh)\b/iu',
+            'spk' => '/\b(spk|surat perintah kerja|perintah kerja|surat tugas)\b/iu',
+            'alur_approval' => '/\b(approval|approve|acc|persetujuan|disetujui|siapa yang acc|siapa yang approve|siapa yang menyetujui|hierarki|alur persetujuan|tahap persetujuan|sampai tahap mana|pejabat berwenang)\b/iu',
+            'password_akun' => '/\b(password|kata sandi|sandi|pass login|lupa login|gagal login|tidak bisa login|gak bisa login|reset password)\b/iu',
+            'foto_profil' => '/\b(foto profil|poto profil|avatar|pp|gambar profil|ganti foto|ubah foto|ganti profil)\b/iu',
+            'leaderboard' => '/\b(leaderboard|peringkat|ranking|juara|paling disiplin|paling rajin|top 5|lima besar|5 besar|skor disiplin)\b/iu',
+            'bug_support' => '/\b(it support|helpdesk|kontak it|tim it|admin it|lapor bug|lapor error|aplikasi error|aplikasi crash|force close|nge bug|aplikasi bermasalah|web error|aplikasi lemot|aplikasi hang)\b/iu',
+            'tiket_gangguan' => '/\b(tiket|ticket|gangguan|trouble|los|lampu merah|internet mati|inet mati|putus koneksi|backbone|broadband|noc|mttr|dispatch|eskalasi|reopen|closing|tutup tiket)\b/iu',
+            'closing_tiket' => '/\b(closing|tutup tiket|close tiket|menutup tiket|menyelesaikan tiket|syarat tutup|bukti closing|bukti selesai tiket|redaman sebelum)\b/iu',
+            'eskalasi_sla' => '/\b(eskalasi|lewat sla|melewati sla|breach|breached|sla lewat|telat sla|stop clock)\b/iu',
+            'indikator_port' => '/\b(indikator|warna port|lampu port|hijau kuning merah|hejo koneng beureum|arti status port|status port pon|status port olt|indikator warna)\b/iu',
+            'jaringan_ftth' => '/\b(olt|pon|odp|ftth|topologi|port odp|kapasitas port|slot port|koordinat odp|ekspansi odp|sn ont|serial number ont|redaman opm|otdr)\b/iu',
+            'karyawan_hrd' => '/\b(karyawan baru|pegawai baru|tambah karyawan|onboarding|resign|keluar kerja|nonaktif|nonaktifkan|mutasi divisi|pindah divisi|import excel|bulk import|broadcast|pengumuman massal|kontrak kerja|kontak karyawan|nomor hp karyawan|menu khusus hrd|fitur hrd|menu hrd)\b/iu',
+            'perusahaan_scope' => '/\b(semua karyawan|seluruh karyawan|sakabeh karyawan|semua pegawai|seluruh pegawai|company wide|sa perusahaan|se perusahaan|semua divisi|seluruh divisi|antar divisi|per divisi)\b/iu',
+            'akronim' => '/\b(kepanjangan|singkatan|arti spk|arti noc|arti olt|arti pon|arti odp|istilah)\b/iu',
+        ];
+
+        $concepts = [];
+        foreach ($patterns as $name => $regex) {
+            if (preg_match($regex, $text)) {
+                $concepts[$name] = true;
+            }
+        }
+
+        return $concepts;
+    }
+
+    /**
+     * Resolve varied paraphrases (via canonical semantic concepts) to exact active ChatbotIntent intent_key.
+     * Returns only bilingual-ready q* / v* / extra_* intent keys so both Indonesian and Sundanese responses work cleanly.
+     *
+     * @param array<string, bool> $c
+     * @param array<string, float> $domains
+     * @param array<string, bool> $style
+     */
+    public function resolveSemanticIntentKey(
+        string $rawClean,
+        string $normMessage,
+        array $c,
+        array $domains,
+        array $style,
+        bool $isSunda,
+        ?string $contextDomain = null
+    ): ?string {
+        if (empty($c)) {
+            return null;
+        }
+
+        $has = fn (string $k): bool => ! empty($c[$k]);
+        $effDomain = $contextDomain ?? (! empty($domains) ? (string) array_key_first($domains) : null);
+
+        // Skip if query is clearly asking for personal/dashboard/holiday live data handled by resolveSmartDataQuery
+        if (preg_match('/\b(siapa atasan|atasan saya|bos saya|manager saya|supervisor saya|profil saya|biodata saya|data saya|info akun saya|id karyawan saya|kode karyawan saya|ringkasan dashboard|statistik dashboard|ringkasan bulan ini|statistik bulan ini|hari libur nasional|tanggal merah terdekat|kapan tanggal merah|kapan libur)\b/iu', $normMessage . ' ' . $rawClean)) {
+            return null;
+        }
+
+        // 1. Akun, Profil, Keamanan, IT Support & Akronim
+        if ($has('password_akun') && ($has('lupa') || $has('troubleshoot') || $has('howto') || str_contains($normMessage, 'reset') || str_contains($normMessage, 'pulih'))) {
+            return 'q81_prosedur_reset_password_lupa';
+        }
+        if ($has('foto_profil') && ! $has('biometrik_wajah')) {
+            return 'q80_cara_ganti_foto_profil';
+        }
+        if ($has('bug_support')) {
+            return 'q85_kontak_it_support_error';
+        }
+        if ($has('ganti_perangkat')) {
+            return 'v25_reset_device_biometrik';
+        }
+        if ($has('akronim') && ($has('jaringan_ftth') || $has('spk') || $has('tiket_gangguan'))) {
+            return 'q88_kepanjangan_akronim_sistem';
+        }
+
+        // 2. Absensi & Presensi
+        if ($has('status_belum_checkin')) {
+            return 'v21_troubleshooting_status_belum_checkin';
+        }
+        if ($has('biometrik_wajah') && $has('troubleshoot') && ! $has('ganti_perangkat')) {
+            return 'q5_troubleshooting_biometrik';
+        }
+        if ($has('lokasi_gps') && $has('troubleshoot')) {
+            return 'q4_troubleshooting_gps';
+        }
+        if ($has('lokasi_gps') && ($has('kemarin') || str_contains($normMessage, 'riwayat') || str_contains($normMessage, 'tercatat')) && ! $has('troubleshoot') && ! $has('jaringan_ftth')) {
+            return 'v24_cek_lokasi_gps_riwayat_absen';
+        }
+        if ($has('tanpa_internet') && ($has('absensi') || $has('check_in') || $has('check_out') || $has('dinas_luar') || $effDomain === 'absensi')) {
+            return 'q13_absen_offline_kendala_jaringan';
+        }
+        if ($has('dinas_luar') && ($has('absensi') || $has('check_in') || $has('check_out')) && ! $has('kasbon_dana') && ! $has('troubleshoot') && ! $has('lembur') && ! $has('tanpa_internet')) {
+            return 'q9_aturan_absen_luar_kantor';
+        }
+        if ($has('lupa') && ($has('check_out') || $has('check_in') || $has('absensi') || $effDomain === 'absensi') && ! $has('password_akun')) {
+            return 'q8_prosedur_koreksi_absen';
+        }
+        if ($has('koreksi_revisi') && ($has('absensi') || $has('check_in') || $has('check_out') || $effDomain === 'absensi') && ! $has('potongan_denda')) {
+            return 'q8_prosedur_koreksi_absen';
+        }
+        if ($has('check_out') && $has('batas_maksimal') && ! $has('lupa')) {
+            return 'v22_batas_jam_checkout_harian';
+        }
+        if ($has('terlambat') && ($has('efek_dampak') || ($has('potongan_denda') && $has('leaderboard')))) {
+            return 'q90_efek_terlambat_gaji_leaderboard';
+        }
+        if ($has('terlambat') && ($has('batas_maksimal') || $has('syarat_aturan')) && ! $has('status_cek') && ! $has('potongan_denda') && ! $has('formula_hitung')) {
+            return 'q6_batas_toleransi_terlambat';
+        }
+        if ($has('terlambat') && $has('perusahaan_scope') && $has('status_cek')) {
+            return 'q48_daftar_karyawan_terlambat_hari_ini';
+        }
+        if ($has('terlambat') && ($has('status_cek') || $has('bulan_ini')) && ! $has('batas_maksimal') && ! $has('potongan_denda') && ! $has('formula_hitung') && ! $has('efek_dampak')) {
+            return 'q7_rekap_terlambat_bulan_ini';
+        }
+        if ($has('absensi') && $has('perusahaan_scope') && $has('status_cek') && $has('hari_ini')) {
+            return 'q46_company_ringkasan_absensi_hari_ini';
+        }
+        if ($has('sakit') && $has('perusahaan_scope') && $has('status_cek')) {
+            return 'q47_daftar_karyawan_sakit_hari_ini';
+        }
+        if ($has('absensi') && $has('hari_libur') && ! $has('lembur') && ! $has('jadwal_shift')) {
+            return 'q15_aturan_absensi_hari_libur';
+        }
+        if (($has('absensi') || $has('check_in') || $has('check_out')) && $has('tujuh_hari')) {
+            return 'q10_rekap_kehadiran_7_hari';
+        }
+        if (($has('absensi') || $has('check_in') || $has('check_out')) && $has('bulan_lalu')) {
+            return 'q11_cara_lihat_log_bulan_lalu';
+        }
+        if (($has('absensi') || $has('check_in') || $has('check_out')) && $has('kemarin') && ! $has('lupa') && ! $has('lokasi_gps')) {
+            return 'q2_riwayat_checkin_kemarin';
+        }
+        if (
+            ($has('check_in') || ($has('absensi') && ! $has('check_out')))
+            && ($has('hari_ini') || preg_match('/\b(sudah|udah|geus|belum|belom|acan)\b/iu', $normMessage . ' ' . $rawClean))
+            && $has('status_cek')
+            && ! $has('howto') && ! $has('troubleshoot') && ! $has('terlambat') && ! $has('dinas_luar') && ! $has('potongan_denda') && ! $has('perusahaan_scope') && ! $has('kemarin') && ! $has('tujuh_hari') && ! $has('bulan_lalu')
+        ) {
+            return 'q1_status_checkin_hari_ini';
+        }
+        if (($has('absensi') || $has('check_in') || $has('check_out')) && $has('howto') && ! $has('lupa') && ! $has('dinas_luar') && ! $has('tanpa_internet') && ! $has('terlambat') && ! $has('koreksi_revisi') && ! $has('potongan_denda') && ! $has('bulan_lalu') && ! $has('hp_lowbat')) {
+            return 'q3_cara_absen_biometrik_gps';
+        }
+
+        // 3. Jadwal & Shift
+        if ($has('tukar_shift')) {
+            return 'q18_kebijakan_tukar_shift';
+        }
+        if ($has('jadwal_shift') && ($has('hari_ini') || $has('besok')) && ! $has('hari_libur') && ! $has('troubleshoot')) {
+            return 'q16_jadwal_shift_hari_ini_besok';
+        }
+        if ($has('jadwal_shift') && ($has('howto') || str_contains($normMessage, 'kalender') || str_contains($normMessage, 'sebulan') || str_contains($normMessage, 'satu bulan')) && ! $has('hari_libur')) {
+            return 'q17_cara_cek_kalender_shift';
+        }
+
+        // 4. Cuti, Izin & Sakit
+        if ($has('sakit') && $has('perbedaan')) {
+            return 'v20_perbedaan_status_izin_sakit';
+        }
+        if ($has('cuti') && $has('perbedaan')) {
+            return 'q29_perbedaan_jenis_cuti_izin';
+        }
+        if ($has('sakit') && ($has('surat_dokter') || $has('syarat_aturan') || $has('howto') || count(explode(' ', $normMessage)) <= 5) && ! $has('perusahaan_scope') && ! $has('potongan_denda') && ! $has('status_cek')) {
+            return 'q22_syarat_dokumen_izin_sakit';
+        }
+        if ($has('cuti_khusus') && ! $has('cuti_melahirkan')) {
+            return 'v33_jenis_cuti_khusus';
+        }
+        if (($has('cuti') || $effDomain === 'cuti') && $has('batal')) {
+            return 'q24_pembatalan_cuti_disetujui';
+        }
+        if (($has('cuti') || $effDomain === 'cuti') && $has('hangus_carryover')) {
+            return 'q30_aturan_hangus_sisa_cuti';
+        }
+        if (($has('cuti') || $effDomain === 'cuti') && ($has('batas_minimal') || ($has('batas_maksimal') && ! $has('cuti_melahirkan'))) && ! $has('sisa_saldo') && ! $has('hangus_carryover') && ! $has('cuti_melahirkan')) {
+            return 'q21_sla_batas_pengajuan_cuti';
+        }
+        if (($has('cuti') || $effDomain === 'cuti') && $has('sisa_saldo') && ! $has('hangus_carryover') && ! $has('perusahaan_scope') && ! $has('cuti_melahirkan')) {
+            return 'q19_sisa_saldo_cuti';
+        }
+        if (($has('cuti') || $has('izin') || $effDomain === 'cuti') && $has('alur_approval') && ($has('status_cek') || $has('howto')) && ! $has('kasbon_dana') && ! $has('beli_barang') && ! $has('lembur')) {
+            return 'q23_cara_cek_approval_izin';
+        }
+        if (($has('cuti') || $effDomain === 'cuti') && $has('howto') && ! $has('batal') && ! $has('sakit') && ! $has('sisa_saldo') && ! $has('cuti_melahirkan') && ! $has('izin_setengah_hari')) {
+            return 'q20_langkah_ajukan_cuti';
+        }
+
+        // 5. Potongan & Denda
+        if ($has('potongan_denda') && $has('sanggahan')) {
+            return 'q28_alur_sanggahan_potongan';
+        }
+        if ($has('potongan_denda') && $has('formula_hitung')) {
+            return 'q26_formula_hitung_potongan';
+        }
+        if ($has('potongan_denda') && $has('payroll')) {
+            return 'q59_integrasi_potongan_ke_payroll';
+        }
+        if ($has('potongan_denda') && $has('ekspor_unduh')) {
+            return 'q51_unduh_rekap_absensi_potongan';
+        }
+        if ($has('potongan_denda') && $has('troubleshoot') && ! $has('sanggahan')) {
+            return 'q25_penjelasan_nominal_potongan';
+        }
+        if ($has('potongan_denda') && $has('status_cek') && ! $has('perusahaan_scope') && ! $has('formula_hitung') && ! $has('sanggahan') && ! $has('howto')) {
+            return 'q27_total_potongan_denda_saya';
+        }
+
+        // 6. Pengajuan (Kasbon, Beli Barang, Permintaan Stok)
+        if ($has('lpj_nota') && ! $has('nota_hilang') && ! $has('sisa_kembalian') && ! $has('kasbon_bertumpuk')) {
+            return 'q33_prosedur_settlement_kasbon';
+        }
+        if (($has('kasbon_dana') || $effDomain === 'pengajuan') && $has('batas_maksimal') && ! $has('lpj_nota') && ! $has('pencairan') && ! $has('kasbon_bertumpuk') && ! $has('lembur')) {
+            return 'q32_batas_maksimal_kasbon';
+        }
+        if (($has('kasbon_dana') || $effDomain === 'pengajuan') && $has('pencairan') && ($has('batas_maksimal') || preg_match('/\b(berapa lama|kapan|iraha|cepat|hari)\b/iu', $normMessage)) && ! $has('lembur')) {
+            return 'v55_sla_pencairan_dana_lembur';
+        }
+        if (($has('kasbon_dana') || $has('beli_barang') || $effDomain === 'pengajuan') && $has('koreksi_revisi') && ! $has('absensi')) {
+            return 'q45_revisi_pengajuan_pending';
+        }
+        if ($has('beli_barang') && $has('alur_approval')) {
+            return 'q37_hierarki_approval_pembelian';
+        }
+        if ($has('beli_barang') && ($has('howto') || $has('syarat_aturan')) && ! $has('alur_approval') && ! $has('koreksi_revisi')) {
+            return 'q34_langkah_pengajuan_beli_barang';
+        }
+        if ($has('ambil_stok') && $has('tiket_gangguan')) {
+            return 'q71_permintaan_stok_dari_tiket';
+        }
+        if ($has('ambil_stok') && ! $has('beli_barang') && ($has('howto') || preg_match('/\b(permintaan stok|minta stok|ajukan stok|ambil barang gudang)\b/iu', $normMessage)) && ! $has('status_cek')) {
+            return 'q35_cara_permintaan_stok_material';
+        }
+        if ($has('kasbon_dana') && $has('howto') && ! $has('lpj_nota') && ! $has('batas_maksimal') && ! $has('koreksi_revisi') && ! $has('pencairan') && ! $has('kasbon_bertumpuk') && ! $has('nota_hilang') && ! $has('sisa_kembalian')) {
+            return 'q31_cara_ajukan_kasbon';
+        }
+        if (($has('kasbon_dana') || $has('beli_barang')) && $has('status_cek') && preg_match('/\b(terakhir|tahap mana|sampai mana|sampe mana|sudah di acc|udah di acc)\b/iu', $normMessage . ' ' . $rawClean)) {
+            return 'q36_cek_status_pengajuan_terakhir';
+        }
+
+        // 7. Lembur & SPK
+        if (($has('lembur') || $effDomain === 'lembur') && $has('spk') && ($has('ekspor_unduh') || preg_match('/\b(lihat|akses|cari|dimana|di mana)\b/iu', $normMessage)) && ! $has('syarat_aturan')) {
+            return 'q40_cara_akses_dokumen_spk';
+        }
+        if (($has('lembur') || $effDomain === 'lembur') && $has('batas_minimal') && ! $has('lembur_remote')) {
+            return 'v53_durasi_minimal_lembur';
+        }
+        if (($has('lembur') || $effDomain === 'lembur') && $has('hari_libur') && ! $has('absensi')) {
+            return 'q44_aturan_lembur_hari_libur';
+        }
+        if (($has('lembur') || $effDomain === 'lembur') && $has('batas_maksimal') && preg_match('/\b(klaim|setelah|selesai|deadline|tenggat|batas waktu|paling lambat|paling telat|maksimal pengajuan|batas pengajuan)\b/iu', $normMessage . ' ' . $rawClean)) {
+            return 'q41_batas_waktu_klaim_lembur';
+        }
+        if (($has('lembur') || $effDomain === 'lembur') && ($has('spk') || $has('syarat_aturan')) && ! $has('batas_minimal') && ! $has('hari_libur') && ! $has('lembur_remote') && ! $has('pencairan')) {
+            return 'q39_syarat_spk_lembur';
+        }
+        if (($has('lembur') || $effDomain === 'lembur') && $has('troubleshoot') && preg_match('/\b(ditolak|ketolak|reject|alasan)\b/iu', $normMessage . ' ' . $rawClean)) {
+            return 'q43_alasan_lembur_ditolak';
+        }
+        if (($has('lembur') || $effDomain === 'lembur') && $has('howto') && ! $has('spk') && ! $has('batas_minimal') && ! $has('hari_libur') && ! $has('lembur_remote') && ! $has('pencairan')) {
+            return 'q38_cara_ajukan_lembur';
+        }
+        if ($has('lembur') && $has('status_cek') && $has('bulan_ini') && ! $has('perusahaan_scope') && ! $has('batas_minimal') && ! $has('batas_maksimal') && ! $has('syarat_aturan')) {
+            return 'q42_total_jam_lembur_bulan_ini';
+        }
+
+        // 8. Leaderboard
+        if ($has('leaderboard') && ($has('syarat_aturan') || $has('formula_hitung') || preg_match('/\b(kriteria|indikator|penilaian|nilai|cara masuk)\b/iu', $normMessage))) {
+            return 'q55_kriteria_penilaian_leaderboard';
+        }
+        if ($has('leaderboard') && ($has('status_cek') || preg_match('/\b(siapa|juara|top|terbaik|rajin|5 besar|lima besar)\b/iu', $normMessage))) {
+            return 'q56_top_5_leaderboard_disiplin';
+        }
+
+        // 9. Tiket Gangguan & Jaringan FTTH
+        if ($has('closing_tiket')) {
+            return 'q68_syarat_bukti_closing_tiket';
+        }
+        if ($has('eskalasi_sla')) {
+            return 'q69_alur_eskalasi_sla_tiket';
+        }
+        if ($has('indikator_port')) {
+            return 'q66_arti_status_port_pon_olt';
+        }
+        if ($has('tiket_gangguan') && $has('perbedaan')) {
+            return 'q74_perbedaan_tiket_noc_vs_pasang_baru';
+        }
+        if ($has('tiket_gangguan') && $has('howto') && preg_match('/\b(buat|bikin|lapor|open|baru)\b/iu', $normMessage) && ! $has('closing_tiket')) {
+            return 'q61_cara_buat_tiket_gangguan';
+        }
+        if ($has('tiket_gangguan') && $has('howto') && preg_match('/\b(update|progres|kronologi|perbarui)\b/iu', $normMessage)) {
+            return 'q63_update_progres_tiket';
+        }
+        if ($has('jaringan_ftth') && $has('howto') && str_contains($normMessage, 'koordinat')) {
+            return 'q75_cara_input_koordinat_odp';
+        }
+        if ($has('jaringan_ftth') && $has('howto') && preg_match('/\b(kapasitas|slot|sisa port)\b/iu', $normMessage)) {
+            return 'q72_cek_kapasitas_port_odp';
+        }
+
+        // 10. HRD & Karyawan
+        if ($has('karyawan_hrd')) {
+            if (preg_match('/\b(baru|tambah|onboarding|daftarkan)\b/iu', $normMessage)) {
+                return 'q58_onboarding_karyawan_baru';
+            }
+            if (preg_match('/\b(resign|nonaktif|nonaktifkan|keluar kerja)\b/iu', $normMessage)) {
+                return 'q57_cara_ubah_status_aktif_karyawan';
+            }
+            if (preg_match('/\b(kontak|nomor hp|telepon|whatsapp|wa)\b/iu', $normMessage)) {
+                return 'q49_cara_cari_kontak_karyawan';
+            }
+            if (preg_match('/\b(menu khusus hrd|fitur hrd|menu hrd)\b/iu', $normMessage)) {
+                return 'q84_menu_khusus_divisi_hrd';
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Bilingual semantic answers for common everyday operational questions whose seeded intents
+     * were originally only written in Basa Sunda (so Indonesian users get crisp Indonesian answers too!).
+     *
+     * @param array<string, bool> $c
+     * @return ?array{response: string, confidence: float, matched_intent: string, action_url: ?string, action_label: ?string, suggestions: ?list<string>, domain: string}
+     */
+    public function resolveSemanticBilingualPolicy(string $rawClean, string $normMessage, array $c, bool $isSunda, ?string $contextDomain = null): ?array
+    {
+        $has = fn (string $k): bool => ! empty($c[$k]);
+
+        // 1. HP Hilang / Blokir Sesi / Force Logout
+        if ($has('hp_hilang')) {
+            return [
+                'response' => $isSunda
+                    ? "Upami HP karyawan leungit, segera hubungi Admin IT atawa HRD kanggo mencabut sesi login aktif (Force Logout) dina menu Sesi & Perangkat sarta Reset Password di menu Data Karyawan supados akun aman."
+                    : "Jika HP hilang atau dicuri, segera hubungi Admin IT atau HRD untuk mencabut sesi login aktif (Force Logout) melalui menu Sesi & Perangkat serta melakukan Reset Password di menu Data Karyawan agar akun Anda tetap aman.",
+                'confidence' => 92.0,
+                'matched_intent' => 'smart_policy_hp_hilang',
+                'action_url' => $this->safeRoute('portal.sessions') ?? $this->safeRoute('portal.profile'),
+                'action_label' => '🔒 Buka Sesi & Perangkat',
+                'suggestions' => null,
+                'domain' => 'sesi',
+            ];
+        }
+
+        // 2. HP Lowbat / Nitip Absen
+        if ($has('hp_lowbat')) {
+            return [
+                'response' => $isSunda
+                    ? "Teu kenging nitip absen ka rencangan kusabab sistem wajib verifikasi biometrik pameunteu (wajah) masing-masing. Upami HP pareum/lowbat pas rek pulang, pas HP hurung deui mangga ajukeun Koreksi Absen di menu Riwayat Absen Saya katut bukti pendukungna."
+                    : "Tidak diperbolehkan menitip absen ke rekan kerja karena sistem mewajibkan verifikasi biometrik wajah masing-masing karyawan. Jika HP mati/lowbat saat jam pulang, silakan ajukan Koreksi Absen melalui menu Riwayat Absen Saya begitu HP menyala disertai bukti pendukung.",
+                'confidence' => 92.0,
+                'matched_intent' => 'smart_policy_nitip_absen',
+                'action_url' => $this->safeRoute('attendance.history'),
+                'action_label' => '📝 Buka Riwayat Absen Saya',
+                'suggestions' => null,
+                'domain' => 'absensi',
+            ];
+        }
+
+        // 3. Nota / Struk Kasbon Hilang
+        if ($has('nota_hilang')) {
+            return [
+                'response' => $isSunda
+                    ? "Upami nota/struk belanja kasbon leungit, anjeun kedah nyuhunkeun salinan nota/invoice ti toko, atawa ngadamel Kwitansi Pengganti / Berita Acara Pengeluaran anu ditandatanganan ku Atasan Langsung kanggo dilampirkeun dina LPJ ka Finance."
+                    : "Jika nota/struk belanja kasbon hilang, mintalah salinan nota/invoice dari toko tempat pembelian. Jika tidak memungkinkan, buat Kwitansi Pengganti atau Berita Acara Pengeluaran yang disetujui/ditandatangani Atasan Langsung untuk dilampirkan pada LPJ ke Finance.",
+                'confidence' => 92.0,
+                'matched_intent' => 'smart_policy_nota_hilang',
+                'action_url' => $this->safeRoute('gomsn.pengajuan.index'),
+                'action_label' => '📋 Buka Pengajuan Saya',
+                'suggestions' => null,
+                'domain' => 'pengajuan',
+            ];
+        }
+
+        // 4. Kasbon Bertumpuk / Belum Lunas LPJ
+        if ($has('kasbon_bertumpuk')) {
+            return [
+                'response' => $isSunda
+                    ? "Teu tiasa. Karyawan wajib ngarengsekeun laporan pertanggungjawaban (LPJ nota/struk) sareng pelunasan kasbon samemehna heula sateuacan ngajukeun kasbon operasional anyar."
+                    : "Tidak bisa. Karyawan wajib menyelesaikan laporan pertanggungjawaban (LPJ nota/struk) dan pelunasan kasbon sebelumnya terlebih dahulu sebelum mengajukan kasbon operasional baru.",
+                'confidence' => 92.0,
+                'matched_intent' => 'smart_policy_kasbon_bertumpuk',
+                'action_url' => $this->safeRoute('gomsn.pengajuan.index'),
+                'action_label' => '📋 Buka Pengajuan Saya',
+                'suggestions' => null,
+                'domain' => 'pengajuan',
+            ];
+        }
+
+        // 5. Pengembalian Sisa Uang Kasbon
+        if ($has('sisa_kembalian')) {
+            return [
+                'response' => $isSunda
+                    ? "Upami pengeluaran langkung saeutik ti dana kasbon nu cair, lampirkeun nota pengeluaran aslina dina LPJ di menu Pengajuan Saya, teras transfer atawa setor sisa danana ka rekening Finance katut upload bukti transfer pengembalianana supados status kasbon Lunas (Settled)."
+                    : "Jika total pengeluaran lebih kecil dari kasbon yang dicairkan, unggah nota pengeluaran asli pada menu Pengajuan Saya (LPJ), lalu kembalikan/transfer selisih sisa dananya ke bagian Finance beserta bukti transfer pengembalian agar status kasbon berubah menjadi Lunas (Settled).",
+                'confidence' => 92.0,
+                'matched_intent' => 'smart_policy_sisa_kasbon',
+                'action_url' => $this->safeRoute('gomsn.pengajuan.index'),
+                'action_label' => '📋 Buka Pengajuan Saya',
+                'suggestions' => null,
+                'domain' => 'pengajuan',
+            ];
+        }
+
+        // 6. Cuti Melahirkan (Karyawati)
+        if ($has('cuti_melahirkan')) {
+            return [
+                'response' => $isSunda
+                    ? "Hak cuti melahirkan kanggo karyawati nyaeta salila 3 bulan (umumna 1,5 bulan sateuacan perkiraan lahir sareng 1,5 bulan saatos ngalahirkeun) sarta henteu motong jatah cuti taunan."
+                    : "Hak cuti melahirkan untuk karyawati adalah selama 3 bulan (umumnya 1,5 bulan sebelum Hari Perkiraan Lahir dan 1,5 bulan setelah melahirkan), berbayar penuh, dan tidak memotong kuota cuti tahunan. Ajukan melalui menu Cuti & Izin Saya dengan melampirkan surat keterangan dokter/bidan.",
+                'confidence' => 92.0,
+                'matched_intent' => 'smart_policy_cuti_melahirkan',
+                'action_url' => $this->safeRoute('attendance.leaves'),
+                'action_label' => '🌴 Buka Cuti & Izin Saya',
+                'suggestions' => null,
+                'domain' => 'cuti',
+            ];
+        }
+
+        // 7. Izin Setengah Hari
+        if ($has('izin_setengah_hari') && ($has('izin') || $has('cuti') || $contextDomain === 'cuti')) {
+            return [
+                'response' => $isSunda
+                    ? "Bisa. Kanggo kaperluan mendesak setengah poe, anjeun tiasa ngajukeun Izin dina menu Cuti & Izin Saya kalayan nyantumkeun katerangan jam izinna sarta konfirmasi ka Atasan Langsung."
+                    : "Bisa. Untuk keperluan mendesak setengah hari, ajukan permohonan melalui menu Cuti & Izin Saya dengan mencantumkan keterangan rentang jam izin secara jelas serta berkoordinasi dengan Atasan Langsung untuk persetujuan.",
+                'confidence' => 91.0,
+                'matched_intent' => 'smart_policy_izin_setengah_hari',
+                'action_url' => $this->safeRoute('attendance.leaves'),
+                'action_label' => '🌴 Buka Cuti & Izin Saya',
+                'suggestions' => null,
+                'domain' => 'cuti',
+            ];
+        }
+
+        // 8. Jadwal Pembayaran Uang Lembur
+        if (($has('lembur') || $contextDomain === 'lembur') && $has('pencairan')) {
+            return [
+                'response' => $isSunda
+                    ? "Uang kompensasi lembur nu parantos disatujuan (Approved) ku Atasan jeung HRD bakal diakumulasikeun sareng dibayarkeun bareng jeung jadwal penggajian bulanan (payroll) atawa pencairan Finance sesuai periode cut-off."
+                    : "Uang kompensasi lembur yang telah disetujui (Approved) oleh Atasan & HRD akan diakumulasikan dan dibayarkan oleh Finance bersamaan dengan periode penggajian bulanan (payroll) atau sesuai jadwal cut-off pencairan lembur.",
+                'confidence' => 91.0,
+                'matched_intent' => 'smart_policy_jadwal_bayar_lembur',
+                'action_url' => $this->safeRoute('gomsn.overtime.index'),
+                'action_label' => '💼 Buka Halaman Lembur',
+                'suggestions' => null,
+                'domain' => 'lembur',
+            ];
+        }
+
+        // 9. Lembur Remote / WFH
+        if ($has('lembur_remote')) {
+            return [
+                'response' => $isSunda
+                    ? "Lembur jarak jauh (remote/WFH) kanggo nanganan gangguan darurat tiasa diklaim di menu Lembur Saya salami aya penugasan resmi/SPK ti Atasan sarta dilampirkeun bukti log aktivitas atawa nomor tiket penangananna."
+                    : "Lembur jarak jauh (remote/WFH) untuk penanganan gangguan darurat dapat diklaim melalui menu Lembur Saya selama ada penugasan resmi/SPK dari Atasan serta melampirkan bukti log pekerjaan atau nomor tiket yang ditangani.",
+                'confidence' => 91.0,
+                'matched_intent' => 'smart_policy_lembur_remote',
+                'action_url' => $this->safeRoute('gomsn.overtime.create'),
+                'action_label' => '⏰ Ajukan Lembur',
+                'suggestions' => null,
+                'domain' => 'lembur',
+            ];
+        }
+
+        return null;
     }
 
     /**
@@ -556,7 +1094,7 @@ class ChatbotSmartResolver
 
         // 1. Profil Saya / Siapa Atasan Saya / Kode Karyawan / Divisi / Jabatan Saya
         if (
-            preg_match('/\b(siapa atasan saya|atasan saya siapa|atasan langsung saya|supervisor saya|saha atasan urang)\b/iu', $normMessage)
+            preg_match('/\b(siapa atasan saya|atasan saya siapa|atasan langsung saya|supervisor saya|bos saya siapa|siapa bos saya|manager saya siapa|siapa manager saya|saha atasan urang)\b/iu', $normMessage . ' ' . $rawClean)
         ) {
             $approver = $user->resolveEffectiveApprover('attendance');
             $approverName = $approver?->name ?? 'Belum ditetapkan (hubungi HRD)';
@@ -576,7 +1114,7 @@ class ChatbotSmartResolver
         }
 
         if (
-            preg_match('/\b(profil saya|data saya|info akun saya|id karyawan saya|kode karyawan saya|jabatan saya|divisi saya|role saya|siapa saya|akun saya)\b/iu', $normMessage)
+            preg_match('/\b(profil saya|biodata saya|data diri saya|data saya|info akun saya|id karyawan saya|kode karyawan saya|jabatan saya|divisi saya|role saya|siapa saya|akun saya)\b/iu', $normMessage . ' ' . $rawClean)
             && ! preg_match('/\b(ganti|ubah|edit|reset|foto|password|sandi)\b/iu', $normMessage)
         ) {
             $roles = $user->getRoleNames()->implode(', ') ?: 'karyawan';
@@ -783,7 +1321,7 @@ class ChatbotSmartResolver
      * @param array<string, bool> $style
      * @return ?array{response: string, confidence: float, matched_intent: string, action_url: ?string, action_label: ?string, suggestions: ?list<string>, domain: string}
      */
-    public function resolveAppGuideOrBroadTopic(?User $user, string $normMessage, array $userTokens, array $domains, array $style, bool $isSunda, bool $forceFallback = false): ?array
+    public function resolveAppGuideOrBroadTopic(?User $user, string $normMessage, array $userTokens, array $domains, array $style, bool $isSunda, bool $forceFallback = false, bool $hasSemanticIntent = false): ?array
     {
         // A. Full App Overview / "Cara kerja aplikasi ini" / "Fitur apa saja" / "Kamu bisa apa"
         $isAppOverview = (bool) preg_match(
@@ -795,8 +1333,13 @@ class ChatbotSmartResolver
             return $this->buildAppOverviewResponse($user, $isSunda);
         }
 
+        // If a specific semantic intent or bilingual policy already matched, never hijack it with a broad hub!
+        if (! $forceFallback && $hasSemanticIntent) {
+            return null;
+        }
+
         // Do not intercept explicit personal/dashboard live-data queries in broad hub (unless forced fallback)
-        if (! $forceFallback && preg_match('/\b(siapa atasan|atasan saya|supervisor saya|profil saya|data saya|info akun saya|id karyawan saya|kode karyawan saya|ringkasan dashboard|statistik dashboard|ringkasan bulan ini|statistik bulan ini|statistik perusahaan|statistik divisi|hari libur|libur nasional|tanggal merah)\b/iu', $normMessage)) {
+        if (! $forceFallback && preg_match('/\b(siapa atasan|atasan saya|bos saya|manager saya|supervisor saya|profil saya|biodata saya|data diri saya|data saya|info akun saya|id karyawan saya|kode karyawan saya|ringkasan dashboard|statistik dashboard|ringkasan bulan ini|statistik bulan ini|statistik perusahaan|statistik divisi|hari libur|libur nasional|tanggal merah)\b/iu', $normMessage)) {
             return null;
         }
 

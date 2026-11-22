@@ -1449,6 +1449,31 @@ class ChatbotService
             'liat' => 'lihat',
             'tampilin' => 'tampilkan',
             'sebutin' => 'sebutkan',
+            // Paraphrase & everyday colloquialisms
+            'gajadi' => 'batal',
+            'ga jadi' => 'batal',
+            'gak jadi' => 'batal',
+            'cancel' => 'batal',
+            'kuitansi' => 'kwitansi',
+            'ketolak' => 'ditolak',
+            'benerin' => 'perbaiki',
+            'betulin' => 'perbaiki',
+            'ngajukan' => 'mengajukan',
+            'ngurus' => 'mengurus',
+            'ngitung' => 'menghitung',
+            'ngebug' => 'bug',
+            'ngehang' => 'error',
+            'tukeran' => 'tukar',
+            'barter' => 'tukar',
+            'komplain' => 'sanggahan',
+            'protes' => 'sanggahan',
+            'bolos' => 'alpa',
+            'mangkir' => 'alpa',
+            'kesiangan' => 'terlambat',
+            'pp' => 'foto profil',
+            'avatar' => 'foto profil',
+            'katasandi' => 'password',
+            'kata sandi' => 'password',
         ];
 
         foreach ($synonyms as $from => $to) {
@@ -1717,17 +1742,17 @@ class ChatbotService
         }
 
         // ==========================================
-        // SMART CONTEXT, DIRECT ENTITY & APP OVERVIEW PIPELINE
+        // SMART CONTEXT, SEMANTIC CONCEPTS, DIRECT ENTITY & APP OVERVIEW PIPELINE
         // ==========================================
         $detectedDomains = $this->smartResolver->detectDomains($normMessage, $userTokens);
         $queryStyle = $this->smartResolver->detectQueryStyle($normMessage, $rawClean);
 
-        // Multi-turn follow-up context augmentation (e.g. "caranya gimana?", "syaratnya apa?", "punya saya?")
+        // Multi-turn follow-up context augmentation (e.g. "caranya gimana?", "syaratnya apa?", "limitnya berapa?")
         $contextDomain = $this->smartResolver->augmentWithConversationContext($user, $normMessage, $userTokens, $detectedDomains);
         if ($contextDomain !== null) {
             $detectedDomains[$contextDomain] = 2.0;
             $hintWords = [$contextDomain];
-            if ($queryStyle['is_howto']) {
+            if ($queryStyle['is_howto'] && ! $queryStyle['is_policy']) {
                 $hintWords[] = 'cara ajukan';
             } elseif ($queryStyle['is_policy']) {
                 $hintWords[] = 'syarat aturan';
@@ -1735,6 +1760,22 @@ class ChatbotService
             $normMessage = trim($normMessage . ' ' . implode(' ', $hintWords));
             $userTokens = $this->extractTokens($normMessage);
         }
+
+        // Extract canonical semantic concepts & resolve semantic intent / bilingual policy for varied phrasings
+        $semanticConcepts = $this->smartResolver->extractSemanticConcepts($rawClean, $normMessage);
+        $semanticIntentKey = $this->smartResolver->resolveSemanticIntentKey(
+            $rawClean,
+            $normMessage,
+            $semanticConcepts,
+            $detectedDomains,
+            $queryStyle,
+            $isSunda,
+            $contextDomain
+        );
+        $semanticBilingualPolicy = $semanticIntentKey === null
+            ? $this->smartResolver->resolveSemanticBilingualPolicy($rawClean, $normMessage, $semanticConcepts, $isSunda, $contextDomain)
+            : null;
+        $hasSemanticMatch = ($semanticIntentKey !== null || $semanticBilingualPolicy !== null);
 
         // Step A: Direct live entity lookups (Pengajuan code PND/PBL/PST/PRM, Tiket code BDG/BRD/TKT, Stok Gudang)
         $directEntityResult = $this->smartResolver->resolveDirectEntityQuery($user, $rawClean, $normMessage, $isSunda);
@@ -1745,7 +1786,7 @@ class ChatbotService
         // Step B: App Overview ("apa itu gomsn / cara kerja / fitur") & Broad 1-3 word topics ("jadwal kerja", "soal cuti", "soal tiket")
         $isSimpleGreetingOrThanks = (bool) preg_match('/^(halo|hai|hi|hello|ping|selamat pagi|selamat siang|selamat sore|selamat malam|assalamualaikum|permisi|sampurasun|terima kasih|makasih|thanks|thank you|hatur nuhun)(\s+\w+)?$/iu', $normMessage);
         if (! $isSimpleGreetingOrThanks) {
-            $broadResult = $this->smartResolver->resolveAppGuideOrBroadTopic($user, $normMessage, $userTokens, $detectedDomains, $queryStyle, $isSunda, false);
+            $broadResult = $this->smartResolver->resolveAppGuideOrBroadTopic($user, $normMessage, $userTokens, $detectedDomains, $queryStyle, $isSunda, false, $hasSemanticMatch);
             if ($broadResult !== null) {
                 return $this->finalizeSmartResponse($user, $message, $broadResult);
             }
@@ -1923,6 +1964,10 @@ class ChatbotService
                 }
             }
 
+            if ($semanticIntentKey !== null && $intentKey === $semanticIntentKey) {
+                $intentScore = max($intentScore, 85.0);
+            }
+
             if ($intentScore > $bestScore) {
                 $bestScore = $intentScore;
                 $bestIntent = $intent;
@@ -1948,6 +1993,11 @@ class ChatbotService
                 return $this->finalizeSmartResponse($user, $message, array_merge($networkResult, ['domain' => 'jaringan']));
             }
 
+            // Bilingual semantic policy match for scenarios whose DB seed only has Sundanese text
+            if ($semanticBilingualPolicy !== null && $bestScore < 80.0) {
+                return $this->finalizeSmartResponse($user, $message, $semanticBilingualPolicy);
+            }
+
             // Check live Smart Data Analytics Resolver (Pengajuan live stats, Lembur live stats, Dashboard, Profil/Atasan, Libur Nasional, Tiket, Tasks, Karyawan per Divisi)
             $dynamicQaKeys = [
                 'q1_status_checkin_hari_ini', 'q2_riwayat_checkin_kemarin', 'q7_rekap_terlambat_bulan_ini',
@@ -1963,7 +2013,7 @@ class ChatbotService
                 'sunda_166_total_aset_odp_aktif', 'extra_tiket_aktif_saya',
             ];
             $matchedIsAlreadyDynamic = $bestIntent && in_array($bestIntent->intent_key, $dynamicQaKeys, true);
-            $preferSmartData = $bestScore < 12.0 || ($queryStyle['is_data'] && ! $queryStyle['is_howto'] && ! $matchedIsAlreadyDynamic);
+            $preferSmartData = $bestScore < 12.0 || ($bestScore < 80.0 && $queryStyle['is_data'] && ! $queryStyle['is_howto'] && ! $queryStyle['is_policy'] && ! $matchedIsAlreadyDynamic);
 
             if ($preferSmartData) {
                 $smartDataResult = $this->smartResolver->resolveSmartDataQuery($user, $rawClean, $normMessage, $userTokens, $detectedDomains, $queryStyle, $isSunda);
