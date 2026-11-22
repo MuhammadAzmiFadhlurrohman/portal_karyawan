@@ -1030,9 +1030,9 @@
             <!-- Flash Toast / Status Banner -->
             @if (session('status'))
             <div class="px-4 sm:px-6 lg:px-8 pt-4">
-                <div role="alert" class="rounded-xl bg-emerald-50 border border-emerald-300 px-4 py-3 flex items-center justify-between gap-3 text-emerald-900 shadow-xs">
+                <div role="alert" class="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 px-4 py-3 flex items-center justify-between gap-3 text-emerald-900 dark:text-emerald-200 shadow-xs">
                     <div class="flex items-center gap-2.5 text-sm font-medium">
-                        <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <span>{{ session('status') }}</span>
@@ -1044,14 +1044,14 @@
 
             @if (isset($errors) && $errors->any())
             <div class="px-4 sm:px-6 lg:px-8 pt-4">
-                <div role="alert" class="rounded-xl bg-red-50 border border-red-300 px-4 py-3 text-red-900 shadow-xs">
+                <div role="alert" class="rounded-xl bg-red-50 dark:bg-rose-950/40 border border-red-300 dark:border-rose-800/80 px-4 py-3 text-red-900 dark:text-rose-200 shadow-xs">
                     <div class="flex items-center gap-2 font-semibold text-sm mb-1">
-                        <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg class="w-5 h-5 text-red-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span>Periksa kembali input Anda:</span>
                     </div>
-                    <ul class="list-disc list-inside text-xs space-y-0.5 text-red-800">
+                    <ul class="list-disc list-inside text-xs space-y-0.5 text-red-800 dark:text-rose-300">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach

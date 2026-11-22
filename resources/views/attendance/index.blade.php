@@ -6,35 +6,6 @@
          x-data="attendancePage()"
          x-init="init()">
 
-        <!-- Status Alerts / Notifications -->
-        @if (session('status'))
-        <div class="p-4 bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl flex items-start gap-3 shadow-xs">
-            <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
-                ✓
-            </div>
-            <div>
-                <div class="text-xs font-bold text-emerald-800">Berhasil</div>
-                <div class="text-xs text-emerald-700 mt-0.5">{{ session('status') }}</div>
-            </div>
-        </div>
-        @endif
-
-        @if ($errors->any())
-        <div class="p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-xl flex items-start gap-3 shadow-xs">
-            <div class="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shrink-0 text-xs font-bold mt-0.5">
-                ✕
-            </div>
-            <div>
-                <div class="text-xs font-bold text-rose-800">Gagal Memproses Absensi</div>
-                <ul class="text-xs text-rose-700 mt-0.5 list-disc list-inside space-y-0.5">
-                    @foreach ($errors->all() as $err)
-                    <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-        @endif
-
         @php
             $shift = $todaySchedule?->shift ?? \App\Models\Shift::where('code', 'P')->first() ?? \App\Models\Shift::first();
             $hasCustomHours = $todaySchedule && $todaySchedule->isCustomHours();
@@ -518,11 +489,25 @@
 
                 <!-- Two Selection Cards -->
                 <div class="p-6 space-y-4">
-                    <div class="grid grid-cols-2 gap-3.5 sm:gap-4">
-                        <!-- Card 1: Kantor -->
+                    <!-- Notice jika di luar radius kantor -->
+                    <div x-show="!gpsLoading && !isWithinOfficeRadius" 
+                         class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/70 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5">
+                        <span class="text-lg leading-none shrink-0 mt-0.5">⚠️</span>
+                        <div>
+                            <p class="font-bold text-xs sm:text-sm">Lokasi Di Luar Radius Kantor</p>
+                            <p class="text-[11px] text-amber-800 dark:text-amber-300/90 mt-0.5 leading-relaxed">
+                                Jarak Anda saat ini <strong class="font-bold" x-text="(detectedDistanceM !== null ? detectedDistanceM : 0) + ' meter'"></strong> dari kantor terdekat. Karena berada di luar batas geofence kantor (<span x-text="(officesMap[selectedOffice]?.radius_m || 50) + 'm'"></span>), presensi hanya dapat diajukan sebagai <strong>Dinas Luar</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pilihan Tombol (Hanya Dinas Luar jika jauh dari kantor) -->
+                    <div :class="isWithinOfficeRadius ? 'grid grid-cols-2 gap-3.5 sm:gap-4' : 'flex flex-col items-center justify-center'">
+                        <!-- Card 1: Kantor (HANYA MUNCUL JIKA DALAM RADIUS KANTOR) -->
                         <button type="button" 
+                                x-show="isWithinOfficeRadius"
                                 @click="attendanceType = 'office'"
-                                class="group relative flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer focus:outline-none"
+                                class="group relative flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer focus:outline-none w-full"
                                 :class="attendanceType === 'office' 
                                     ? 'border-[#155E63] dark:border-teal-400 bg-gradient-to-b from-teal-50/90 to-emerald-50/40 dark:from-teal-950/50 dark:to-emerald-950/20 shadow-md ring-2 ring-[#155E63]/20 dark:ring-teal-400/30 scale-[1.02]' 
                                     : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-slate-100/70 dark:hover:bg-slate-900/80 opacity-85 hover:opacity-100'">
@@ -556,13 +541,16 @@
                             </div>
                         </button>
 
-                        <!-- Card 2: Dinas Luar -->
+                        <!-- Card 2: Dinas Luar (SELALU MUNCUL, JIKA DILUAR RADIUS JADI SATU-SATUNYA TOMBOL) -->
                         <button type="button" 
                                 @click="attendanceType = 'field'"
                                 class="group relative flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer focus:outline-none"
-                                :class="attendanceType === 'field' 
-                                    ? 'border-amber-500 dark:border-amber-400 bg-gradient-to-b from-amber-50/90 to-orange-50/40 dark:from-amber-950/50 dark:to-orange-950/20 shadow-md ring-2 ring-amber-500/20 dark:ring-amber-400/30 scale-[1.02]' 
-                                    : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-slate-100/70 dark:hover:bg-slate-900/80 opacity-85 hover:opacity-100'">
+                                :class="[
+                                    isWithinOfficeRadius ? 'w-full' : 'w-full max-w-sm',
+                                    attendanceType === 'field' 
+                                        ? 'border-amber-500 dark:border-amber-400 bg-gradient-to-b from-amber-50/90 to-orange-50/40 dark:from-amber-950/50 dark:to-orange-950/20 shadow-md ring-2 ring-amber-500/20 dark:ring-amber-400/30 scale-[1.02]' 
+                                        : 'border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-slate-100/70 dark:hover:bg-slate-900/80 opacity-85 hover:opacity-100'
+                                ]">
                             
                             <!-- Field Work / Car Icon Box -->
                             <div class="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl flex items-center justify-center mb-3 transition shadow-sm"
@@ -599,8 +587,8 @@
                     <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400 flex items-start gap-2">
                         <svg class="w-4 h-4 text-[#155E63] dark:text-teal-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <div>
-                            <span x-show="attendanceType === 'office'">Absen di kantor memvalidasi koordinat GPS dengan radius kantor terdekat.</span>
-                            <span x-show="attendanceType === 'field'">Absen dinas luar memungkinkan presensi di lokasi tugas dengan menyertakan keterangan penugasan.</span>
+                            <span x-show="isWithinOfficeRadius && attendanceType === 'office'">Absen di kantor memvalidasi koordinat GPS dengan radius kantor terdekat.</span>
+                            <span x-show="!isWithinOfficeRadius || attendanceType === 'field'">Absen dinas luar memungkinkan presensi di lokasi tugas dengan menyertakan keterangan penugasan.</span>
                         </div>
                     </div>
 
@@ -785,6 +773,7 @@
                             </template>
                         </div>
                         <button type="button" 
+                                x-show="isWithinOfficeRadius"
                                 @click="closeClockInModal(); openAttendanceTypeModal()" 
                                 class="text-[11px] font-bold text-[#155E63] dark:text-teal-300 hover:underline cursor-pointer">
                             Ganti
@@ -1067,6 +1056,9 @@
                         this.detectedDistanceM = Math.round(minDist);
                         this.isWithinOfficeRadius = minDist <= parseFloat(nearest.radius_m || 50);
                         this.gpsStatus = nearest.name + ' (Radius ' + nearest.radius_m + 'm)';
+                        if (!this.isWithinOfficeRadius) {
+                            this.attendanceType = 'field';
+                        }
                     }
                 },
 
@@ -1344,6 +1336,9 @@
 
                 // Attendance Type Selection Modal controls (Step 1)
                 openAttendanceTypeModal() {
+                    if (!this.isWithinOfficeRadius) {
+                        this.attendanceType = 'field';
+                    }
                     this.showAttendanceTypeModal = true;
                 },
 
@@ -1352,6 +1347,9 @@
                 },
 
                 proceedToClockIn() {
+                    if (!this.isWithinOfficeRadius) {
+                        this.attendanceType = 'field';
+                    }
                     this.showAttendanceTypeModal = false;
                     this.openClockInModal();
                 },
@@ -1682,6 +1680,16 @@
                 },
 
                 handleClockInSubmit(e) {
+                    if (this.attendanceType === 'office' && !this.isWithinOfficeRadius) {
+                        e.preventDefault();
+                        this.showAlert({
+                            icon: 'warning',
+                            title: 'Di Luar Radius Kantor',
+                            text: `Jarak Anda (${this.detectedDistanceM} meter) berada di luar batas geofence kantor. Silakan pilih tipe kehadiran Dinas Luar untuk melanjutkan.`
+                        });
+                        return false;
+                    }
+
                     if (!this.clockInPrimaryImage || !this.clockInVerified) {
                         e.preventDefault();
                         const msg = !this.clockInPrimaryImage
