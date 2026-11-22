@@ -19,7 +19,7 @@ class ChatbotController extends Controller
     public function ask(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'message' => ['required', 'string', 'max:500'],
+            'message' => ['required', 'string', 'max:2000'],
         ]);
 
         $result = $this->chatbotService->ask(

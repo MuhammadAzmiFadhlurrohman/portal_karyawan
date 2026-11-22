@@ -23,6 +23,43 @@ use Illuminate\Support\Facades\Cache;
 
 class ChatbotService
 {
+    protected ChatbotSmartResolver $smartResolver;
+
+    public function __construct(?ChatbotSmartResolver $smartResolver = null)
+    {
+        $this->smartResolver = $smartResolver ?? app(ChatbotSmartResolver::class);
+    }
+
+    /**
+     * Log & return a standardized answered chatbot response while saving multi-turn context.
+     *
+     * @param array{response: string, confidence: float, matched_intent: string, action_url: ?string, action_label: ?string, suggestions?: ?list<string>, domain?: ?string} $result
+     * @return array{response: string, confidence: float, matched_intent: ?string, action_url: ?string, action_label: ?string, suggestions: ?list<string>}
+     */
+    protected function finalizeSmartResponse(?User $user, string $message, array $result): array
+    {
+        $domain = $result['domain'] ?? $this->smartResolver->inferDomainFromIntentKey($result['matched_intent'] ?? null);
+        $this->smartResolver->saveContext($user, $domain, $result['matched_intent'] ?? null);
+
+        ChatbotLog::query()->create([
+            'user_id' => $user?->id,
+            'user_message' => $message,
+            'matched_intent_key' => $result['matched_intent'] ?? null,
+            'confidence_score' => round((float) ($result['confidence'] ?? 90.0), 2),
+            'bot_response' => $result['response'],
+            'is_answered' => true,
+        ]);
+
+        return [
+            'response' => $result['response'],
+            'confidence' => round((float) ($result['confidence'] ?? 90.0), 2),
+            'matched_intent' => $result['matched_intent'] ?? null,
+            'action_url' => $result['action_url'] ?? null,
+            'action_label' => $result['action_label'] ?? null,
+            'suggestions' => $result['suggestions'] ?? null,
+        ];
+    }
+
     /**
      * Ensure knowledge base intents are always up-to-date in database
      * when KNOWLEDGE_VERSION changes, and remove stale legacy intents.
@@ -1360,6 +1397,58 @@ class ChatbotService
             'nyien' => 'nyieun',
             'skabeh' => 'sakabeh',
             'pting' => 'peuting',
+            // Tambahan singkatan & variasi sehari-hari (panjang/pendek)
+            'gmna' => 'bagaimana',
+            'knpa' => 'kenapa',
+            'napa' => 'kenapa',
+            'ngapa' => 'kenapa',
+            'gk' => 'tidak',
+            'belom' => 'belum',
+            'skrg' => 'sekarang',
+            'skg' => 'sekarang',
+            'org' => 'orang',
+            'krywn' => 'karyawan',
+            'karywan' => 'karyawan',
+            'pegawai' => 'karyawan',
+            'spv' => 'supervisor',
+            'mgr' => 'manager',
+            'fin' => 'finance',
+            'keuangan' => 'finance',
+            'jml' => 'jumlah',
+            'jmlh' => 'jumlah',
+            'tot' => 'total',
+            'ttl' => 'total',
+            'reimburse' => 'kasbon',
+            'reimbursement' => 'kasbon',
+            'stock' => 'stok',
+            'dl' => 'dinas luar',
+            'ot' => 'lembur',
+            'ticket' => 'tiket',
+            'schedule' => 'jadwal',
+            'holiday' => 'libur',
+            'calendar' => 'kalender',
+            'ranking' => 'peringkat',
+            'account' => 'akun',
+            'session' => 'sesi',
+            'device' => 'perangkat',
+            'biometric' => 'biometrik',
+            'perkawis' => 'tentang',
+            'gaji' => 'gaji',
+            'clockin' => 'check in',
+            'clock in' => 'check in',
+            'clockout' => 'check out',
+            'clock out' => 'check out',
+            'diacc' => 'disetujui',
+            'di acc' => 'disetujui',
+            'gabisa' => 'tidak bisa',
+            'ga bisa' => 'tidak bisa',
+            'gak bisa' => 'tidak bisa',
+            'nggak bisa' => 'tidak bisa',
+            'teu tiasa' => 'tidak bisa',
+            'teu bisa' => 'tidak bisa',
+            'liat' => 'lihat',
+            'tampilin' => 'tampilkan',
+            'sebutin' => 'sebutkan',
         ];
 
         foreach ($synonyms as $from => $to) {
@@ -1379,16 +1468,22 @@ class ChatbotService
         $stopwords = [
             'yang', 'di', 'ke', 'dari', 'untuk', 'pada', 'dengan', 'dan', 'atau',
             'ini', 'itu', 'sih', 'dong', 'deh', 'ya', 'yah', 'kak', 'min',
-            'pak', 'bu', 'bos', 'apakah', 'kalau', 'kalo', 'bila', 'jika', 'mau',
+            'pak', 'bu', 'bos', 'mas', 'mbak', 'bro', 'gan', 'admin',
+            'apakah', 'kalau', 'kalo', 'bila', 'jika', 'mau',
             'ingin', 'pengen', 'tanya', 'nanya', 'tolong', 'mohon', 'bantu',
-            'bagaimana', 'cara', 'bisa', 'ada', 'masih', 'saya', 'apa', 'saja',
+            'bagaimana', 'cara', 'bisa', 'ada', 'masih', 'saya', 'aku', 'apa', 'saja',
             'aplikasi', 'gomsn', 'sistem', 'menu', 'dalam', 'saat', 'oleh', 'nya',
-            'nih', 'pas', 'buat', 'sama', 'aja', 'kok', 'itu', 'biar', 'harus',
+            'nih', 'pas', 'buat', 'sama', 'aja', 'kok', 'biar', 'harus',
+            'soal', 'tentang', 'mengenai', 'seputar', 'terkait', 'banget', 'bgt',
+            'kan', 'tuh', 'gitu', 'kayak', 'seperti', 'misalnya', 'misal', 'coba',
+            'sedang', 'lagi', 'akan', 'dapat', 'mungkin', 'padahal', 'karena',
+            'soalnya', 'jadi', 'terus', 'lalu', 'kemudian', 'nah', 'eh', 'oh', 'btw',
+            'halo', 'hai', 'permisi', 'maaf', 'jelaskan', 'kasih', 'tahu', 'tau',
             // Sundanese filler words
-            'urang', 'abdi', 'anjeun', 'teh', 'mah', 'wae', 'nya', 'yeuh', 'atuh',
+            'urang', 'abdi', 'anjeun', 'teh', 'mah', 'wae', 'yeuh', 'atuh',
             'keur', 'mun', 'lamun', 'upami', 'jeung', 'atawa', 'nu', 'anu', 'ka',
             'ti', 'dina', 'tina', 'kana', 'kudu', 'rek', 'bade', 'ari', 'cik',
-            'na', 'oge', 'deui', 'heula', 'pisan', 'hungkul', 'wungkul', 'keneh',
+            'na', 'oge', 'deui', 'heula', 'pisan', 'hungkul', 'wungkul', 'keneh', 'punten',
         ];
 
         $words = explode(' ', $normalizedText);
@@ -1622,13 +1717,56 @@ class ChatbotService
         }
 
         // ==========================================
-        // HIGH-PRECISION INTENT MATCHING ENGINE
+        // SMART CONTEXT, DIRECT ENTITY & APP OVERVIEW PIPELINE
+        // ==========================================
+        $detectedDomains = $this->smartResolver->detectDomains($normMessage, $userTokens);
+        $queryStyle = $this->smartResolver->detectQueryStyle($normMessage, $rawClean);
+
+        // Multi-turn follow-up context augmentation (e.g. "caranya gimana?", "syaratnya apa?", "punya saya?")
+        $contextDomain = $this->smartResolver->augmentWithConversationContext($user, $normMessage, $userTokens, $detectedDomains);
+        if ($contextDomain !== null) {
+            $detectedDomains[$contextDomain] = 2.0;
+            $hintWords = [$contextDomain];
+            if ($queryStyle['is_howto']) {
+                $hintWords[] = 'cara ajukan';
+            } elseif ($queryStyle['is_policy']) {
+                $hintWords[] = 'syarat aturan';
+            }
+            $normMessage = trim($normMessage . ' ' . implode(' ', $hintWords));
+            $userTokens = $this->extractTokens($normMessage);
+        }
+
+        // Step A: Direct live entity lookups (Pengajuan code PND/PBL/PST/PRM, Tiket code BDG/BRD/TKT, Stok Gudang)
+        $directEntityResult = $this->smartResolver->resolveDirectEntityQuery($user, $rawClean, $normMessage, $isSunda);
+        if ($directEntityResult !== null) {
+            return $this->finalizeSmartResponse($user, $message, $directEntityResult);
+        }
+
+        // Step B: App Overview ("apa itu gomsn / cara kerja / fitur") & Broad 1-3 word topics ("jadwal kerja", "soal cuti", "soal tiket")
+        $isSimpleGreetingOrThanks = (bool) preg_match('/^(halo|hai|hi|hello|ping|selamat pagi|selamat siang|selamat sore|selamat malam|assalamualaikum|permisi|sampurasun|terima kasih|makasih|thanks|thank you|hatur nuhun)(\s+\w+)?$/iu', $normMessage);
+        if (! $isSimpleGreetingOrThanks) {
+            $broadResult = $this->smartResolver->resolveAppGuideOrBroadTopic($user, $normMessage, $userTokens, $detectedDomains, $queryStyle, $isSunda, false);
+            if ($broadResult !== null) {
+                return $this->finalizeSmartResponse($user, $message, $broadResult);
+            }
+        }
+
+        // ==========================================
+        // LENGTH-INVARIANT SEMANTIC INTENT MATCHING ENGINE
+        // Works accurately for BOTH short (1-3 words) AND long (multi-sentence/paragraph) queries
         // ==========================================
         $intents = ChatbotIntent::query()->where('is_active', true)->get();
 
         $bestIntent = null;
         $bestScore = 0.0;
         $userTokenCount = max(1, count($userTokens));
+        $userStemmedTokens = array_map(fn ($t) => $this->smartResolver->stemToken($t), $userTokens);
+        $userSubjectCount = 0;
+        foreach ($userTokens as $idx => $ut) {
+            if ($this->isSubjectKeyword($ut) || $this->isSubjectKeyword($userStemmedTokens[$idx])) {
+                $userSubjectCount++;
+            }
+        }
 
         foreach ($intents as $intent) {
             $keywords = $intent->keywords ?? [];
@@ -1637,6 +1775,8 @@ class ChatbotService
             }
 
             $intentScore = 0.0;
+            $intentKey = (string) $intent->intent_key;
+            $isSundaIntent = str_starts_with($intentKey, 'sunda_');
 
             foreach ($keywords as $kw) {
                 $kwRaw = mb_strtolower(trim($kw));
@@ -1652,7 +1792,7 @@ class ChatbotService
                 }
 
                 // Short greetings (<= 6 chars) require short user query
-                if ($intent->intent_key === 'sapaan_halo' && mb_strlen($kwNorm) <= 6) {
+                if ($intentKey === 'sapaan_halo' && mb_strlen($kwNorm) <= 6) {
                     if (
                         preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
                         || preg_match('/\b' . preg_quote($kwNorm, '/') . '\b/u', $normMessage)
@@ -1664,8 +1804,8 @@ class ChatbotService
                     continue;
                 }
 
-                // Single-keyword intent sunda_192 ("absen", "kasbon", "cuti") should only match when query is 1 token or exact phrase
-                if ($intent->intent_key === 'sunda_192_input_satu_kata_kunci' && in_array($kwNorm, ['absen', 'kasbon', 'cuti'], true)) {
+                // Single-keyword intent sunda_192 ("absen", "kasbon", "cuti") should only match exact phrase
+                if ($intentKey === 'sunda_192_input_satu_kata_kunci' && in_array($kwNorm, ['absen', 'kasbon', 'cuti'], true)) {
                     if ($normMessage === $kwNorm) {
                         $intentScore = max($intentScore, 100.0);
                     }
@@ -1675,7 +1815,7 @@ class ChatbotService
                 $kwTokens = $this->extractTokens($kwNorm);
                 $kwTokenCount = max(1, count($kwTokens));
 
-                // 1. Whole-phrase match inside message, scaled by query coverage
+                // 1. Whole-phrase match inside message (length-invariant for long sentences too!)
                 if (
                     preg_match('/\b' . preg_quote($kwRaw, '/') . '\b/u', $rawClean)
                     || preg_match('/\b' . preg_quote($kwNorm, '/') . '\b/u', $normMessage)
@@ -1683,20 +1823,23 @@ class ChatbotService
                     $queryCoverage = min(1.0, $kwTokenCount / $userTokenCount);
                     $subjectBonus = 0.0;
                     foreach ($kwTokens as $kt) {
-                        $subjectBonus += $this->isSubjectKeyword($kt) ? 1.2 : 0.4;
+                        $subjectBonus += $this->isSubjectKeyword($kt) ? 1.4 : 0.45;
                     }
 
-                    if ($kwTokenCount <= 2 && $userTokenCount >= 4) {
-                        $phraseScore = (1.5 + $subjectBonus) * ($queryCoverage * 0.6);
+                    if ($kwTokenCount <= 2 && $userTokenCount >= 6) {
+                        // In a long paragraph, a 2-word key phrase is still meaningful if subject-rich
+                        $phraseScore = (2.8 + $subjectBonus) * (0.45 + (0.55 * $queryCoverage));
+                    } elseif ($kwTokenCount <= 2 && $userTokenCount >= 4) {
+                        $phraseScore = (2.2 + $subjectBonus) * (0.40 + (0.60 * $queryCoverage));
                     } else {
-                        $phraseScore = (4.0 + $subjectBonus + ($kwTokenCount * 0.5)) * (0.4 + (0.6 * $queryCoverage));
+                        $phraseScore = (4.5 + $subjectBonus + ($kwTokenCount * 0.55)) * (0.50 + (0.50 * $queryCoverage));
                     }
 
                     $intentScore = max($intentScore, $phraseScore);
                     continue;
                 }
 
-                // 2. Bidirectional Token & Subject Overlap
+                // 2. Bidirectional Stemmed Token & Subject Overlap (Length-Invariant!)
                 if (! empty($kwTokens) && ! empty($userTokens)) {
                     $matchedWeight = 0.0;
                     $totalKwWeight = 0.0;
@@ -1704,20 +1847,23 @@ class ChatbotService
                     $matchedTokenCount = 0;
 
                     foreach ($kwTokens as $kt) {
-                        $weight = $this->isSubjectKeyword($kt) ? 2.5 : 1.0;
+                        $ktStem = $this->smartResolver->stemToken($kt);
+                        $isSubj = $this->isSubjectKeyword($kt) || $this->isSubjectKeyword($ktStem);
+                        $weight = $isSubj ? 2.5 : 1.0;
                         $totalKwWeight += $weight;
 
                         $found = false;
-                        foreach ($userTokens as $ut) {
-                            if ($kt === $ut) {
+                        foreach ($userTokens as $uIdx => $ut) {
+                            $utStem = $userStemmedTokens[$uIdx];
+                            if ($kt === $ut || $ktStem === $utStem) {
                                 $found = true;
                                 break;
                             }
-                            if (mb_strlen($kt) >= 4 && mb_strlen($ut) >= 4 && (str_starts_with($ut, $kt) || str_starts_with($kt, $ut))) {
+                            if (mb_strlen($ktStem) >= 4 && mb_strlen($utStem) >= 4 && (str_starts_with($utStem, $ktStem) || str_starts_with($ktStem, $utStem))) {
                                 $found = true;
                                 break;
                             }
-                            if ($this->isTypoMatch($kt, $ut)) {
+                            if ($this->isTypoMatch($kt, $ut) || $this->isTypoMatch($ktStem, $utStem)) {
                                 $found = true;
                                 $weight *= 0.9;
                                 break;
@@ -1727,7 +1873,7 @@ class ChatbotService
                         if ($found) {
                             $matchedWeight += $weight;
                             $matchedTokenCount++;
-                            if ($this->isSubjectKeyword($kt)) {
+                            if ($isSubj) {
                                 $matchedSubjectCount++;
                             }
                         }
@@ -1736,15 +1882,44 @@ class ChatbotService
                     if ($matchedWeight > 0 && $totalKwWeight > 0) {
                         $kwCoverage = $matchedWeight / $totalKwWeight;
                         $userCoverage = $matchedTokenCount / $userTokenCount;
+                        $subjectRecall = $userSubjectCount > 0 ? min(1.0, $matchedSubjectCount / $userSubjectCount) : 0.0;
 
-                        if ($kwCoverage >= 0.85 && $userCoverage >= 0.60) {
-                            $tokenScore = 6.0 + ($kwCoverage * 3.0) + ($userCoverage * 4.0) + ($matchedSubjectCount * 1.2);
+                        if ($kwCoverage >= 0.80 && $userCoverage >= 0.55) {
+                            // High precision & recall (short/medium direct match)
+                            $tokenScore = 6.5 + ($kwCoverage * 3.0) + ($userCoverage * 4.0) + ($matchedSubjectCount * 1.3);
                             $intentScore = max($intentScore, $tokenScore);
-                        } elseif ($matchedSubjectCount >= 1 && $kwCoverage >= 0.55 && $userCoverage >= 0.40) {
-                            $tokenScore = ($kwCoverage * 2.5) + ($userCoverage * 2.5) + ($matchedSubjectCount * 0.9);
+                        } elseif ($userTokenCount >= 6 && $matchedSubjectCount >= 1 && $kwCoverage >= 0.45) {
+                            // LONG conversational query / paragraph: score by keyword recall & subject alignment without penalizing narrative length!
+                            $tokenScore = 2.5 + ($kwCoverage * 5.0) + ($subjectRecall * 2.5) + ($matchedSubjectCount * 1.25);
+                            $intentScore = max($intentScore, $tokenScore);
+                        } elseif ($matchedSubjectCount >= 1 && $kwCoverage >= 0.45 && $userCoverage >= 0.35) {
+                            // Medium/short paraphrased query
+                            $tokenScore = 1.5 + ($kwCoverage * 3.0) + ($userCoverage * 2.5) + ($matchedSubjectCount * 1.0);
                             $intentScore = max($intentScore, $tokenScore);
                         }
                     }
+                }
+            }
+
+            // Apply Query-Style & Language Alignment bonuses (without distorting exact 100.0 matches)
+            if ($intentScore > 0.0 && $intentScore < 99.0) {
+                if ($queryStyle['is_howto'] && preg_match('/(cara|langkah|prosedur|alur|tutor|buat|ajukan|input|ganti|ubah|isi|catat|onboarding)/i', $intentKey)) {
+                    $intentScore += 1.4;
+                }
+                if ($queryStyle['is_data'] && preg_match('/(status|rekap|total|sisa|daftar|jumlah|cek|riwayat|top_5|ringkasan|antrean|headcount|tertinggi|aktif)/i', $intentKey)) {
+                    $intentScore += 1.4;
+                }
+                if ($queryStyle['is_troubleshoot'] && preg_match('/(troubleshooting|lupa|gagal|kendala|error|ditolak|koreksi|offline|lowbat|hideung|reset)/i', $intentKey)) {
+                    $intentScore += 1.5;
+                }
+                if ($queryStyle['is_policy'] && preg_match('/(aturan|batas|syarat|kebijakan|formula|sla|perbedaan|hangus|minimal|maksimal|toleransi|tarif|kriteria|hierarki|jenis)/i', $intentKey)) {
+                    $intentScore += 1.4;
+                }
+
+                if ($isSunda && $isSundaIntent) {
+                    $intentScore *= 1.18;
+                } elseif (! $isSunda && $isSundaIntent) {
+                    $intentScore *= 0.55;
                 }
             }
 
@@ -1770,32 +1945,46 @@ class ChatbotService
         if ($bestScore < 99.0) {
             $networkResult = $this->resolveNetworkEntityQuery($rawClean, $normMessage, $isSunda);
             if ($networkResult !== null) {
-                ChatbotLog::query()->create([
-                    'user_id' => $user?->id,
-                    'user_message' => $message,
-                    'matched_intent_key' => $networkResult['matched_intent'],
-                    'confidence_score' => $networkResult['confidence'],
-                    'bot_response' => $networkResult['response'],
-                    'is_answered' => true,
-                ]);
+                return $this->finalizeSmartResponse($user, $message, array_merge($networkResult, ['domain' => 'jaringan']));
+            }
 
-                return [
-                    'response' => $networkResult['response'],
-                    'confidence' => $networkResult['confidence'],
-                    'matched_intent' => $networkResult['matched_intent'],
-                    'action_url' => $networkResult['action_url'],
-                    'action_label' => $networkResult['action_label'],
-                    'suggestions' => null,
-                ];
+            // Check live Smart Data Analytics Resolver (Pengajuan live stats, Lembur live stats, Dashboard, Profil/Atasan, Libur Nasional, Tiket, Tasks, Karyawan per Divisi)
+            $dynamicQaKeys = [
+                'q1_status_checkin_hari_ini', 'q2_riwayat_checkin_kemarin', 'q7_rekap_terlambat_bulan_ini',
+                'q10_rekap_kehadiran_7_hari', 'q14_total_hari_kerja_efektif', 'q16_jadwal_shift_hari_ini_besok',
+                'q19_sisa_saldo_cuti', 'q27_total_potongan_denda_saya', 'q36_cek_status_pengajuan_terakhir',
+                'q42_total_jam_lembur_bulan_ini', 'q46_company_ringkasan_absensi_hari_ini', 'q47_daftar_karyawan_sakit_hari_ini',
+                'q48_daftar_karyawan_terlambat_hari_ini', 'q50_cari_karyawan_berdasarkan_nik', 'q52_divisi_kehadiran_tertinggi',
+                'q54_antrean_approval_lembur_hari_ini', 'q56_top_5_leaderboard_disiplin', 'q60_total_karyawan_aktif_headcount',
+                'q62_jumlah_tiket_open_hari_ini', 'q73_teknisi_tugas_prioritas_tinggi', 'q91_ringkasan_operasional_3_poin',
+                'sunda_114_monitoring_belum_checkin', 'sunda_117_daftar_karyawan_cuti_poe_ieu', 'sunda_119_agregasi_lembur_company_wide',
+                'sunda_123_audit_saldo_cuti_beak', 'sunda_125_statistik_lembur_per_divisi', 'sunda_128_persentase_kahadiran_minggu_ieu',
+                'sunda_129_deteksi_karyawan_alpa_poe_ieu', 'sunda_152_cek_gangguan_los_massal', 'sunda_159_laporan_tiket_closed_kamari',
+                'sunda_166_total_aset_odp_aktif', 'extra_tiket_aktif_saya',
+            ];
+            $matchedIsAlreadyDynamic = $bestIntent && in_array($bestIntent->intent_key, $dynamicQaKeys, true);
+            $preferSmartData = $bestScore < 12.0 || ($queryStyle['is_data'] && ! $queryStyle['is_howto'] && ! $matchedIsAlreadyDynamic);
+
+            if ($preferSmartData) {
+                $smartDataResult = $this->smartResolver->resolveSmartDataQuery($user, $rawClean, $normMessage, $userTokens, $detectedDomains, $queryStyle, $isSunda);
+                if ($smartDataResult !== null) {
+                    return $this->finalizeSmartResponse($user, $message, $smartDataResult);
+                }
             }
         }
 
         if ($bestScore < 1.50 || ! $bestIntent) {
+            // Smart Domain Fallback: if any GOMSN app domain was recognized, answer helpfully instead of dead-ending!
+            $domainFallback = $this->smartResolver->resolveAppGuideOrBroadTopic($user, $normMessage, $userTokens, $detectedDomains, $queryStyle, $isSunda, true);
+            if ($domainFallback !== null) {
+                return $this->finalizeSmartResponse($user, $message, $domainFallback);
+            }
+
             $recommendations = $this->getTopTwoRecommendations($rawClean, $normMessage, $userTokens, $isSunda);
 
             $fallback = $isSunda
-                ? "Punten, abdi teu acan ngartos maksad patarosan eta sacara spesifik. Mangga pilih salah sahiji rekomendasi patarosan di handap ieu anu saluyu sareng kabutuhan anjeun:"
-                : "Maaf, saya belum memahami maksud pertanyaan tersebut secara spesifik. Silakan pilih salah satu rekomendasi pertanyaan di bawah ini yang paling mendekati:";
+                ? "Punten, abdi teu acan ngartos maksad patarosan eta sacara spesifik. Mangga pilih rekomendasi patarosan di handap ieu atawa hubungi Helpdesk NOC / HRD:"
+                : "Maaf, saya belum memahami maksud pertanyaan tersebut secara spesifik. Silakan pilih salah satu rekomendasi pertanyaan di bawah ini atau hubungi Helpdesk NOC / HRD jika perlu bantuan lebih lanjut:";
 
             ChatbotLog::query()->create([
                 'user_id' => $user?->id,
@@ -1879,7 +2068,7 @@ class ChatbotService
                     ->whereMonth('date', $cMonth)
                     ->whereYear('date', $cYear)
                     ->where(function ($q) {
-                        $q->where('status', 'TERLAMBAT')->orWhere('late_minutes', '>', 0);
+                        $q->whereIn('status', ChatbotSmartResolver::ATTENDANCE_LATE_STATUSES)->orWhere('late_minutes', '>', 0);
                     })
                     ->count();
                 $totalLateMin = (int) Attendance::query()
@@ -1921,7 +2110,7 @@ class ChatbotService
                     ->where('user_id', $user->id)
                     ->whereMonth('date', $cMonth)
                     ->whereYear('date', $cYear)
-                    ->whereIn('status', ['HADIR', 'TERLAMBAT'])
+                    ->whereIn('status', ChatbotSmartResolver::ATTENDANCE_PRESENT_STATUSES)
                     ->count();
                 $scheduledCount = MonthlySchedule::query()
                     ->where('user_id', $user->id)
@@ -2011,7 +2200,7 @@ class ChatbotService
                 $cYear = Carbon::now('Asia/Jakarta')->year;
                 $approvedLembur = Lembur::query()
                     ->where('user_id', $user->id)
-                    ->whereIn('status', ['approved', 'paid'])
+                    ->whereIn('status', ChatbotSmartResolver::LEMBUR_APPROVED_STATUSES)
                     ->whereMonth('tanggal', $cMonth)
                     ->whereYear('tanggal', $cYear)
                     ->get();
@@ -2030,9 +2219,9 @@ class ChatbotService
                 } else {
                     $today = Carbon::now('Asia/Jakarta')->toDateString();
                     $totalActive = User::query()->where('is_active', true)->count();
-                    $hadir = Attendance::query()->whereDate('date', $today)->where('status', 'HADIR')->count();
+                    $hadir = Attendance::query()->whereDate('date', $today)->whereIn('status', ChatbotSmartResolver::ATTENDANCE_ONTIME_STATUSES)->count();
                     $terlambat = Attendance::query()->whereDate('date', $today)->where(function ($q) {
-                        $q->where('status', 'TERLAMBAT')->orWhere('late_minutes', '>', 0);
+                        $q->whereIn('status', ChatbotSmartResolver::ATTENDANCE_LATE_STATUSES)->orWhere('late_minutes', '>', 0);
                     })->count();
                     $sakit = Leave::query()->where('status', 'approved')->whereIn('leave_type', ['sakit', 'sick'])->whereDate('start_date', '<=', $today)->whereDate('end_date', '>=', $today)->count();
                     $izin = Leave::query()->where('status', 'approved')->whereNotIn('leave_type', ['sakit', 'sick'])->whereDate('start_date', '<=', $today)->whereDate('end_date', '>=', $today)->count();
@@ -2120,7 +2309,7 @@ class ChatbotService
                         ->join('users', 'users.id', '=', 'attendances.user_id')
                         ->whereMonth('attendances.date', $cMonth)
                         ->whereYear('attendances.date', $cYear)
-                        ->whereIn('attendances.status', ['HADIR', 'TERLAMBAT'])
+                        ->whereIn('attendances.status', ChatbotSmartResolver::ATTENDANCE_PRESENT_STATUSES)
                         ->selectRaw('users.division, count(*) as total_hadir')
                         ->whereNotNull('users.division')
                         ->groupBy('users.division')
@@ -2146,7 +2335,7 @@ class ChatbotService
                     ->join('users', 'users.id', '=', 'attendances.user_id')
                     ->whereMonth('attendances.date', $cMonth)
                     ->whereYear('attendances.date', $cYear)
-                    ->where('attendances.status', 'HADIR')
+                    ->whereIn('attendances.status', ChatbotSmartResolver::ATTENDANCE_ONTIME_STATUSES)
                     ->where('attendances.late_minutes', '<=', 0)
                     ->selectRaw('users.name, users.division, count(*) as tepat_waktu')
                     ->groupBy('users.id', 'users.name', 'users.division')
@@ -2206,10 +2395,10 @@ class ChatbotService
             } elseif ($key === 'q91_ringkasan_operasional_3_poin') {
                 $today = Carbon::now('Asia/Jakarta')->toDateString();
                 $totalActive = User::query()->where('is_active', true)->count();
-                $attended = Attendance::query()->whereDate('date', $today)->whereIn('status', ['HADIR', 'TERLAMBAT'])->count();
+                $attended = Attendance::query()->whereDate('date', $today)->whereIn('status', ChatbotSmartResolver::ATTENDANCE_PRESENT_STATUSES)->count();
                 $openTickets = Tiket::query()->whereIn('status', ['OPEN', 'PROSES'])->count();
-                $pendingLembur = Lembur::query()->whereIn('status', ['submitted', 'pending'])->count();
-                $pendingPengajuan = Pengajuan::query()->whereIn('status', ['pending', 'menunggu_approval'])->count();
+                $pendingLembur = Lembur::query()->whereIn('status', ['submitted', 'pending', 'menunggu_approval'])->count();
+                $pendingPengajuan = Pengajuan::query()->whereIn('status', ChatbotSmartResolver::PENGAJUAN_PENDING_STATUSES)->count();
                 $reply = $isSunda
                     ? "Ringkesan 3 poin kondisi operasional & absensi poe ieu:\n1. Absensi: {$attended} tina {$totalActive} karyawan aktif parantos kacatet hadir.\n2. Tiket Gangguan: Aya {$openTickets} tiket gangguan aktif (Open/Proses) nu keur ditangani.\n3. Antrean Approval: Aya {$pendingLembur} pengajuan lembur jeung {$pendingPengajuan} pengajuan operasional nu nungguan di-ACC."
                     : "Ringkasan 3 poin kondisi operasional & absensi hari ini:\n1. Absensi: {$attended} dari {$totalActive} karyawan aktif tercatat sudah hadir.\n2. Tiket Gangguan: Terdapat {$openTickets} tiket gangguan aktif (Open/Proses) yang sedang ditangani.\n3. Antrean Approval: Terdapat {$pendingLembur} pengajuan lembur dan {$pendingPengajuan} pengajuan operasional menunggu persetujuan.";
@@ -2237,7 +2426,7 @@ class ChatbotService
             } elseif ($key === 'sunda_119_agregasi_lembur_company_wide') {
                 $cMonth = Carbon::now('Asia/Jakarta')->month;
                 $cYear = Carbon::now('Asia/Jakarta')->year;
-                $totalMenit = (int) Lembur::query()->whereIn('status', ['approved', 'paid'])->whereMonth('tanggal', $cMonth)->whereYear('tanggal', $cYear)->sum('durasi_menit');
+                $totalMenit = (int) Lembur::query()->whereIn('status', ChatbotSmartResolver::LEMBUR_APPROVED_STATUSES)->whereMonth('tanggal', $cMonth)->whereYear('tanggal', $cYear)->sum('durasi_menit');
                 $jam = round($totalMenit / 60, 1);
                 $reply = "Total jam lembur sakabeh divisi nu geus di-ACC bulan ieu nyaeta {$jam} jam ({$totalMenit} menit).";
             } elseif ($key === 'sunda_123_audit_saldo_cuti_beak') {
@@ -2267,12 +2456,12 @@ class ChatbotService
                 $totalActive = max(1, User::query()->where('is_active', true)->count());
                 $start7 = Carbon::now('Asia/Jakarta')->subDays(6)->toDateString();
                 $today = Carbon::now('Asia/Jakarta')->toDateString();
-                $hadirWeek = Attendance::query()->whereBetween('date', [$start7, $today])->whereIn('status', ['HADIR', 'TERLAMBAT'])->count();
+                $hadirWeek = Attendance::query()->whereBetween('date', [$start7, $today])->whereIn('status', ChatbotSmartResolver::ATTENDANCE_PRESENT_STATUSES)->count();
                 $pct = min(100, round(($hadirWeek / ($totalActive * 5)) * 100, 1));
                 $reply = "Persentase tingkat kahadiran rata-rata karyawan minggu ieu nyaeta sekitar {$pct}% (kalayan {$hadirWeek} log kahadiran kacatet). Menu Rekap Absen Karyawan menyediakan detail per divisina.";
             } elseif ($key === 'sunda_129_deteksi_karyawan_alpa_poe_ieu') {
                 $today = Carbon::now('Asia/Jakarta')->toDateString();
-                $alpaList = Attendance::query()->with('user')->whereDate('date', $today)->where('status', 'ALPA')->get();
+                $alpaList = Attendance::query()->with('user')->whereDate('date', $today)->whereIn('status', ChatbotSmartResolver::ATTENDANCE_ALPA_STATUSES)->get();
                 if ($alpaList->isEmpty()) {
                     $reply = "Poe ieu teu aya karyawan nu kacatet berstatus Alpa dina log absensi harian.";
                 } else {
@@ -2312,6 +2501,11 @@ class ChatbotService
         }
 
         $actionLink = $this->resolveActionLink($bestIntent->intent_key, $user);
+
+        // Save multi-turn conversation context for seamless follow-up questions
+        $resolvedDomain = $this->smartResolver->inferDomainFromIntentKey($bestIntent->intent_key)
+            ?? (! empty($detectedDomains) ? array_key_first($detectedDomains) : null);
+        $this->smartResolver->saveContext($user, $resolvedDomain, $bestIntent->intent_key);
 
         ChatbotLog::query()->create([
             'user_id' => $user?->id,
