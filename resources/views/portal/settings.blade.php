@@ -14,15 +14,8 @@
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
             <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
 
-            <!-- Left: Back Button + Glowing Gear Icon + Title -->
+            <!-- Left: Glowing Gear Icon + Title -->
             <div class="relative z-10 flex items-center gap-3.5 min-w-0">
-                <a href="{{ route('portal.hub') }}" 
-                   class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center shrink-0 shadow-xs transition"
-                   title="Kembali ke Portal Hub">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                </a>
                 <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-teal-300 shrink-0 shadow-inner">
                     <svg class="w-6 h-6 text-teal-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -177,8 +170,8 @@
             </div>
         </div>
 
-        <!-- 4. Settings List / Cards Grid -->
-        <div class="space-y-4">
+        <!-- 4. Settings Grid (Card Kotak Modern) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             @forelse ($currentSettings as $setting)
                 @php
                     $meta = $groupMetadata[$setting->group] ?? [
@@ -191,155 +184,161 @@
                     $isBooleanType = $setting->type === 'boolean' || in_array($normalizedVal, ['true', 'false', '1', '0']);
                 @endphp
 
-                <div class="rounded-2xl bg-white border border-slate-200/90 hover:border-teal-400/80 p-5 shadow-xs hover:shadow-md transition-all duration-200"
+                <div class="flex flex-col justify-between rounded-2xl bg-white border border-slate-200/90 hover:border-teal-400/80 p-5 shadow-xs hover:shadow-md transition-all duration-200"
                      x-data="{ showRevisions: false }"
                      x-show="(activeGroup === 'all' || activeGroup === '{{ $setting->group }}') && ('{{ strtolower($setting->label . ' ' . $setting->key . ' ' . $setting->group . ' ' . $setting->description) }}'.includes(search.toLowerCase().trim()))"
                      x-transition>
                     
-                    <form method="POST" action="{{ route('portal.settings.update') }}" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-                        @csrf
-                        <input type="hidden" name="key" value="{{ $setting->key }}">
+                    <!-- Card Top: Group, Key, Label & Description -->
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold border {{ $meta['color'] }}">
+                                {{ $meta['label'] }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase bg-slate-100 text-slate-600 border border-slate-200/80">
+                                {{ $setting->type }}
+                            </span>
+                        </div>
 
-                        <!-- Left Info (Col 5) -->
-                        <div class="lg:col-span-5 space-y-1.5">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border {{ $meta['color'] }}">
-                                    {{ $meta['label'] }}
-                                </span>
-                                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                                    {{ $setting->key }}
-                                </span>
-                                <span class="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase bg-slate-50 text-slate-400 border border-slate-200">
-                                    {{ $setting->type }}
-                                </span>
-                            </div>
+                        <div>
+                            <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-mono font-medium bg-slate-50 text-slate-500 border border-slate-200/70 truncate max-w-full" title="{{ $setting->key }}">
+                                {{ $setting->key }}
+                            </span>
+                        </div>
 
-                            <label class="block font-heading text-sm font-bold text-slate-800 leading-snug">
+                        <div>
+                            <h3 class="font-heading text-sm font-bold text-slate-800 leading-snug">
                                 {{ $setting->label }}
-                            </label>
-                            
-                            <p class="text-xs text-slate-500 leading-relaxed">
+                            </h3>
+                            <p class="text-xs text-slate-500 leading-relaxed mt-1 line-clamp-2" title="{{ $setting->description }}">
                                 {{ $setting->description ?: 'Parameter konfigurasi operasional sistem.' }}
                             </p>
                         </div>
+                    </div>
 
-                        <!-- Value Input (Col 2) -->
-                        <div class="lg:col-span-2">
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">
-                                Nilai Parameter
-                            </label>
+                    <!-- Card Bottom: Form Update -->
+                    <div class="mt-auto pt-3 border-t border-slate-100">
+                        <form method="POST" action="{{ route('portal.settings.update') }}" class="space-y-3">
+                            @csrf
+                            <input type="hidden" name="key" value="{{ $setting->key }}">
 
-                            @if ($setting->type === 'boolean')
-                                <select name="value" required class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none">
-                                    <option value="true" {{ in_array($normalizedVal, ['true', '1', 'yes', 'on'], true) ? 'selected' : '' }}>Aktif (True)</option>
-                                    <option value="false" {{ in_array($normalizedVal, ['false', '0', 'no', 'off'], true) ? 'selected' : '' }}>Nonaktif (False)</option>
-                                </select>
-                            @elseif ($setting->type === 'integer' || $setting->type === 'decimal' || $setting->type === 'float')
-                                <div class="relative">
-                                    @if (str_contains($setting->key, 'fee') || (str_contains($setting->key, 'threshold') && str_contains($setting->key, 'gomsn')))
-                                        <span class="absolute left-3 top-2 text-xs font-bold text-slate-400 select-none">Rp</span>
-                                        <input type="number" 
-                                               step="{{ $setting->type === 'integer' ? '1' : 'any' }}" 
-                                               name="value" 
-                                               required 
-                                               value="{{ $setting->value }}" 
-                                               class="w-full rounded-xl border border-slate-200 bg-white pl-8 pr-3 py-2 text-xs font-mono font-bold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none">
-                                    @else
-                                        <input type="number" 
-                                               step="{{ $setting->type === 'integer' ? '1' : 'any' }}" 
-                                               name="value" 
-                                               required 
-                                               value="{{ $setting->value }}" 
-                                               class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none">
-                                    @endif
+                            <!-- Nilai Parameter -->
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">
+                                    Nilai Parameter
+                                </label>
+
+                                @if ($setting->type === 'boolean')
+                                    <select name="value" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
+                                        <option value="true" {{ in_array($normalizedVal, ['true', '1', 'yes', 'on'], true) ? 'selected' : '' }}>Aktif (True)</option>
+                                        <option value="false" {{ in_array($normalizedVal, ['false', '0', 'no', 'off'], true) ? 'selected' : '' }}>Nonaktif (False)</option>
+                                    </select>
+                                @elseif ($setting->type === 'integer' || $setting->type === 'decimal' || $setting->type === 'float')
+                                    <div class="relative">
+                                        @if (str_contains($setting->key, 'fee') || (str_contains($setting->key, 'threshold') && str_contains($setting->key, 'gomsn')))
+                                            <span class="absolute left-3 top-2 text-xs font-bold text-slate-400 select-none">Rp</span>
+                                            <input type="number" 
+                                                   step="{{ $setting->type === 'integer' ? '1' : 'any' }}" 
+                                                   name="value" 
+                                                   required 
+                                                   value="{{ $setting->value }}" 
+                                                   class="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white pl-8 pr-3 py-2 text-xs font-mono font-bold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
+                                        @else
+                                            <input type="number" 
+                                                   step="{{ $setting->type === 'integer' ? '1' : 'any' }}" 
+                                                   name="value" 
+                                                   required 
+                                                   value="{{ $setting->value }}" 
+                                                   class="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
+                                        @endif
+                                    </div>
+                                @else
+                                    <input type="text" 
+                                           name="value" 
+                                           required 
+                                           value="{{ $setting->value }}" 
+                                           class="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
+                                @endif
+                            </div>
+
+                            <!-- Berlaku Mulai & Alasan Perubahan -->
+                            <div class="space-y-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-600 mb-1">
+                                        Berlaku Mulai
+                                    </label>
+                                    <input type="datetime-local" 
+                                           name="effective_from" 
+                                           required 
+                                           value="{{ now()->format('Y-m-d\TH:i') }}" 
+                                           class="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white px-2.5 py-1.5 text-[11px] font-mono text-slate-700 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
                                 </div>
-                            @else
-                                <input type="text" 
-                                       name="value" 
-                                       required 
-                                       value="{{ $setting->value }}" 
-                                       class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-mono font-bold text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none">
-                            @endif
-                        </div>
 
-                        <!-- Effective Date (Col 2) -->
-                        <div class="lg:col-span-2">
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">
-                                Berlaku Mulai
-                            </label>
-                            <input type="datetime-local" 
-                                   name="effective_from" 
-                                   required 
-                                   value="{{ now()->format('Y-m-d\TH:i') }}" 
-                                   class="w-full rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-xs font-mono text-slate-700 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none">
-                        </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-600 mb-1">
+                                        Alasan Perubahan <span class="text-rose-500">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           name="change_reason" 
+                                           required 
+                                           placeholder="Mis: Penyesuaian aturan Q4" 
+                                           class="w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white px-3 py-1.5 text-xs text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none placeholder:text-slate-400 transition">
+                                </div>
+                            </div>
 
-                        <!-- Change Reason (Col 2) -->
-                        <div class="lg:col-span-2">
-                            <label class="block text-[11px] font-bold text-slate-700 mb-1">
-                                Alasan Perubahan <span class="text-rose-500">*</span>
-                            </label>
-                            <input type="text" 
-                                   name="change_reason" 
-                                   required 
-                                   placeholder="Mis: Penyesuaian aturan Q4" 
-                                   class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none placeholder:text-slate-400">
-                        </div>
-
-                        <!-- Submit Button (Col 1) -->
-                        <div class="lg:col-span-1">
+                            <!-- Submit Button -->
                             <button type="submit" 
-                                    class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white font-bold text-xs shadow-xs hover:shadow-md transition">
-                                Simpan
+                                    class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 active:scale-[0.99] text-white font-bold text-xs shadow-xs hover:shadow-md transition flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-teal-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Simpan Perubahan</span>
                             </button>
-                        </div>
-                    </form>
+                        </form>
 
-                    <!-- Audit Trail / Revision History Accordion -->
-                    @if ($revisions->count() > 1)
-                        <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-col gap-2">
-                            <div class="flex items-center justify-between">
-                                <button type="button" 
-                                        @click="showRevisions = !showRevisions"
-                                        class="inline-flex items-center gap-1.5 text-[11px] font-bold text-teal-700 hover:text-teal-900 transition">
-                                    <svg class="w-3.5 h-3.5 transition-transform" :class="showRevisions ? 'rotate-90' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                                    </svg>
-                                    <span>Riwayat Revisi ({{ $revisions->count() }} versi terdahulu)</span>
-                                </button>
-                                <span class="text-[10px] text-slate-400 font-mono">
-                                    Update terakhir: {{ $setting->effective_from?->format('d M Y H:i') ?? '-' }}
-                                </span>
-                            </div>
+                        <!-- Audit Trail / Revision History Accordion -->
+                        @if ($revisions->count() > 1)
+                            <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-col gap-1.5">
+                                <div class="flex items-center justify-between">
+                                    <button type="button" 
+                                            @click="showRevisions = !showRevisions"
+                                            class="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700 hover:text-teal-900 transition">
+                                        <svg class="w-3 h-3 transition-transform" :class="showRevisions ? 'rotate-90' : ''" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                        <span>Riwayat Revisi ({{ $revisions->count() }})</span>
+                                    </button>
+                                    <span class="text-[9px] text-slate-400 font-mono">
+                                        {{ $setting->effective_from?->format('d/m/y H:i') ?? '-' }}
+                                    </span>
+                                </div>
 
-                            <div x-show="showRevisions" x-collapse class="mt-2 space-y-1.5">
-                                <div class="bg-slate-50/80 rounded-xl p-3 border border-slate-200/70 space-y-2">
-                                    @foreach ($revisions as $rev)
-                                        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] border-b border-slate-200/60 pb-1.5 last:border-b-0 last:pb-0">
-                                            <div class="flex items-center gap-2">
-                                                <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-mono font-bold text-slate-800">
-                                                    {{ $rev->value }}
-                                                </span>
-                                                <span class="text-slate-500">
-                                                    Alasan: <strong class="text-slate-700 font-normal">"{{ $rev->change_reason }}"</strong>
-                                                </span>
+                                <div x-show="showRevisions" x-collapse class="mt-1 space-y-1">
+                                    <div class="bg-slate-50/80 rounded-xl p-2.5 border border-slate-200/70 space-y-1.5 max-h-36 overflow-y-auto">
+                                        @foreach ($revisions as $rev)
+                                            <div class="text-[10px] border-b border-slate-200/60 pb-1.5 last:border-b-0 last:pb-0">
+                                                <div class="flex items-center justify-between gap-1">
+                                                    <span class="px-1.5 py-0.2 rounded bg-white border border-slate-200 font-mono font-bold text-slate-800">
+                                                        {{ $rev->value }}
+                                                    </span>
+                                                    <span class="text-[9px] text-slate-400 font-mono">
+                                                        {{ $rev->effective_from?->format('d M Y H:i') }}
+                                                    </span>
+                                                </div>
+                                                <div class="text-slate-500 mt-0.5 truncate">
+                                                    "{{ $rev->change_reason }}"
+                                                </div>
                                             </div>
-                                            <div class="text-[10px] text-slate-400 font-mono">
-                                                Berlaku {{ $rev->effective_from?->format('d M Y H:i') }}
-                                                @if($rev->updater)
-                                                    · oleh {{ $rev->updater->name }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
                 </div>
             @empty
                 <!-- Empty State -->
-                <div class="rounded-2xl bg-white border border-slate-200 p-12 text-center shadow-xs">
+                <div class="col-span-full rounded-2xl bg-white border border-slate-200 p-12 text-center shadow-xs">
                     <div class="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 mx-auto mb-4">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
