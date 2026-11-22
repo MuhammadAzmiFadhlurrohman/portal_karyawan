@@ -146,12 +146,6 @@
                     </div>
                 </form>
             </div>
-        @else
-            <!-- Notice Read-Only Mode -->
-            <div class="bg-sky-50/70 border border-sky-200/80 rounded-2xl p-3 flex items-center gap-2.5 text-sky-800 text-xs">
-                <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>Anda masuk dalam <strong>Mode Monitoring</strong>. Hak akses menambah, mengedit, dan menghapus PON/ODP dikhususkan untuk <strong>Atasan Teknisi</strong> dan <strong>Admin</strong>.</span>
-            </div>
         @endif
 
         <!-- Tabel Daftar PON (Ringkas & Pas di Mobile, Lengkap di Desktop) -->
