@@ -15,6 +15,94 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/logo/apple-touch-icon.png') }}?v=3">
     <link rel="manifest" href="/manifest.webmanifest">
     <title>{{ $title ?? 'Portal Karyawan Terpadu' }} — PT MSN</title>
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('gomsn_theme');
+                var isDark = savedTheme === 'dark';
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.style.colorScheme = 'dark';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
+                }
+            } catch (e) {}
+        })();
+
+        window.toggleGomsnTheme = function(event) {
+            var html = document.documentElement;
+            var willBeDark = !html.classList.contains('dark');
+
+            var applySwitch = function() {
+                if (willBeDark) {
+                    html.classList.add('dark');
+                    html.style.colorScheme = 'dark';
+                } else {
+                    html.classList.remove('dark');
+                    html.style.colorScheme = 'light';
+                }
+                try {
+                    localStorage.setItem('gomsn_theme', willBeDark ? 'dark' : 'light');
+                } catch (e) {}
+                window.dispatchEvent(new CustomEvent('gomsn-theme-changed', { detail: { dark: willBeDark } }));
+            };
+
+            var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (document.startViewTransition && !prefersReduced) {
+                var x = window.innerWidth - 120;
+                var y = 32;
+                if (event && typeof event.clientX === 'number' && (event.clientX > 0 || event.clientY > 0)) {
+                    x = event.clientX;
+                    y = event.clientY;
+                } else if (event && event.currentTarget && event.currentTarget.getBoundingClientRect) {
+                    var rect = event.currentTarget.getBoundingClientRect();
+                    x = rect.left + rect.width / 2;
+                    y = rect.top + rect.height / 2;
+                }
+                var endRadius = Math.hypot(
+                    Math.max(x, window.innerWidth - x),
+                    Math.max(y, window.innerHeight - y)
+                );
+
+                html.classList.add('theme-vt-active');
+                try {
+                    var transition = document.startViewTransition(function() {
+                        applySwitch();
+                    });
+
+                    transition.ready.then(function() {
+                        document.documentElement.animate(
+                            {
+                                clipPath: [
+                                    'circle(0px at ' + x + 'px ' + y + 'px)',
+                                    'circle(' + endRadius + 'px at ' + x + 'px ' + y + 'px)'
+                                ]
+                            },
+                            {
+                                duration: 540,
+                                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                                pseudoElement: '::view-transition-new(root)'
+                            }
+                        );
+                    }).catch(function() {});
+
+                    transition.finished.finally(function() {
+                        html.classList.remove('theme-vt-active');
+                    });
+                    return;
+                } catch (err) {
+                    html.classList.remove('theme-vt-active');
+                }
+            }
+
+            html.classList.add('theme-smooth-transition');
+            applySwitch();
+            setTimeout(function() {
+                html.classList.remove('theme-smooth-transition');
+            }, 520);
+        };
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @view-transition {
@@ -28,6 +116,20 @@
             animation: none;
             mix-blend-mode: normal;
         }
+        html.theme-vt-active #desktop-sidebar {
+            view-transition-name: none !important;
+        }
+        html.theme-vt-active::view-transition-old(root),
+        html.theme-vt-active::view-transition-new(root) {
+            animation: none !important;
+            mix-blend-mode: normal !important;
+        }
+        html.theme-vt-active::view-transition-old(root) {
+            z-index: 1;
+        }
+        html.theme-vt-active::view-transition-new(root) {
+            z-index: 9999;
+        }
         img.object-cover[src*="/avatar"] {
             object-position: center top !important;
         }
@@ -40,7 +142,9 @@
         }
     </style>
 </head>
-<body class="min-h-full bg-[#F8FAFC] text-slate-900 font-sans antialiased" x-data="{ bottomSheetOpen: false }">
+<body class="min-h-full bg-[#F8FAFC] text-slate-900 font-sans antialiased"
+      x-data="{ bottomSheetOpen: false, isDarkMode: document.documentElement.classList.contains('dark') }"
+      @gomsn-theme-changed.window="isDarkMode = $event.detail.dark">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-[#155E63] focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white">
         Langsung ke konten utama
     </a>
@@ -72,9 +176,25 @@
                         </span>
                     </div>
                 </a>
-                <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
-                    <span class="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                    <span>Server Prod Normal</span>
+                <div class="flex items-center gap-2.5">
+                    <button type="button"
+                            @click="window.toggleGomsnTheme($event)"
+                            :title="isDarkMode ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'"
+                            class="theme-toggle-pill group relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200/80 bg-slate-50/90 hover:bg-white hover:border-teal-400 transition-all duration-300 cursor-pointer shadow-2xs">
+                        <!-- Sun Icon -->
+                        <svg class="theme-icon-sun w-4.5 h-4.5 text-amber-500 transition-all duration-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.2"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                        </svg>
+                        <!-- Moon Icon -->
+                        <svg class="theme-icon-moon w-4.5 h-4.5 text-cyan-300 transition-all duration-500 absolute" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" fill="currentColor" fill-opacity="0.22" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                        </svg>
+                    </button>
+                    <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 border border-emerald-200">
+                        <span class="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                        <span>Server Prod Normal</span>
+                    </div>
                 </div>
             </div>
 
@@ -548,8 +668,25 @@
                              class="h-6 sm:h-7 w-auto max-w-[130px] object-contain drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
                     </a>
 
-                    <!-- Right: Actions inside sculpted bezel (Solid White Ringed Avatar + Chevron) -->
+                    <!-- Right: Actions inside sculpted bezel (Dark Mode Orb + Solid White Ringed Avatar + Chevron) -->
                     <div class="relative z-10 flex items-center gap-2">
+                        <!-- Mobile Dark Mode Toggle Button (Sculpted Glass Orb) -->
+                        <button type="button"
+                                @click="window.toggleGomsnTheme($event)"
+                                :title="isDarkMode ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'"
+                                aria-label="Toggle Dark Mode"
+                                class="theme-toggle-mobile relative w-[33px] h-[33px] rounded-full bg-white/12 hover:bg-white/22 active:scale-90 border border-white/25 flex items-center justify-center text-white shadow-sm transition-all duration-300 cursor-pointer overflow-hidden shrink-0">
+                            <!-- Sun Icon (Visible in Light Mode) -->
+                            <svg class="theme-icon-sun w-4 h-4 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.65)] transition-all duration-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.35"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                            </svg>
+                            <!-- Moon Icon (Visible in Dark Mode) -->
+                            <svg class="theme-icon-moon w-4 h-4 text-cyan-200 drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] transition-all duration-500 absolute" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" fill="currentColor" fill-opacity="0.3" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                            </svg>
+                        </button>
+
                         <!-- Avatar with Solid White Ring + Name & Division + Chevron Down (Dropdown Menu) -->
                         <div class="relative" x-data="{ mobileUserMenuOpen: false }" @click.outside="mobileUserMenuOpen = false">
                             <button @click="mobileUserMenuOpen = !mobileUserMenuOpen"
@@ -728,6 +865,46 @@
                         <span class="text-slate-400 font-normal">·</span>
                         <span class="text-teal-700 font-mono text-[11px]">WIB</span>
                     </div>
+
+                    <!-- Elegant Interactive Dark / Light Mode Toggle Capsule -->
+                    <button type="button"
+                            @click="window.toggleGomsnTheme($event)"
+                            :title="isDarkMode ? 'Mode Gelap Aktif — Klik untuk Mode Terang' : 'Mode Terang Aktif — Klik untuk Mode Gelap'"
+                            aria-label="Toggle Dark Mode"
+                            class="theme-toggle-desktop group relative inline-flex items-center gap-2 h-9 px-2.5 rounded-xl border border-slate-200/80 bg-slate-50/90 hover:bg-white hover:border-teal-400/80 shadow-2xs hover:shadow-md transition-all duration-300 cursor-pointer select-none overflow-hidden">
+                        
+                        <!-- Subtle Ambient Hover Halo -->
+                        <span class="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-teal-400/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></span>
+
+                        <!-- Sliding Track with Sun & Moon Morph -->
+                        <div class="theme-switch-track relative w-11 h-5.5 rounded-full p-0.5 flex items-center justify-between transition-colors duration-500 bg-slate-200/90 border border-slate-300/60">
+                            <!-- Track Background Stars (Visible in Dark Mode) -->
+                            <span class="theme-track-stars absolute left-1.5 top-1 text-[7px] text-cyan-200 opacity-0 transition-opacity duration-500 select-none pointer-events-none">✦</span>
+                            <span class="theme-track-stars absolute left-3.5 bottom-1 text-[5px] text-teal-300 opacity-0 transition-opacity duration-500 select-none pointer-events-none">★</span>
+
+                            <!-- Track Background Clouds/Ray Dot (Visible in Light Mode) -->
+                            <span class="theme-track-sunray absolute right-2 top-1.5 w-1.5 h-1.5 rounded-full bg-amber-400/60 transition-opacity duration-500 pointer-events-none"></span>
+
+                            <!-- Gliding Thumb Orb -->
+                            <div class="theme-switch-thumb relative z-10 w-4.5 h-4.5 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform duration-500">
+                                <!-- Sun Icon -->
+                                <svg class="theme-icon-sun w-3 h-3 text-amber-500 transition-all duration-500" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.35"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                                </svg>
+                                <!-- Moon Icon -->
+                                <svg class="theme-icon-moon w-3 h-3 text-cyan-300 transition-all duration-500 absolute" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" fill="currentColor" fill-opacity="0.35" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Mode Text Label -->
+                        <span class="text-[11px] font-bold tracking-tight text-slate-700 group-hover:text-teal-700 transition-colors min-w-[38px] text-left"
+                              x-text="isDarkMode ? 'Gelap' : 'Terang'">
+                            Terang
+                        </span>
+                    </button>
 
                     <!-- Divider -->
                     <div class="h-6 w-px bg-slate-200"></div>
@@ -985,7 +1162,7 @@
                 <!-- Seamless Arch Mound Pedestal (Curves smoothly out of the navbar) -->
                 <svg class="absolute -top-[19px] left-1/2 -translate-x-1/2 w-[82px] h-[21px] pointer-events-none drop-shadow-[0_-3px_3px_rgba(13,148,136,0.12)]" viewBox="0 0 82 21">
                     <!-- Mound Fill connecting to navbar body -->
-                    <path d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21 L 82,25 L 0,25 Z" fill="#ffffff"/>
+                    <path class="mobile-nav-mound-fill" d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21 L 82,25 L 0,25 Z" fill="#ffffff"/>
                     <!-- Crisp Top Stroke connecting with navbar border -->
                     <path d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21" fill="none" stroke="rgba(45, 212, 191, 0.9)" stroke-width="1.6"/>
                 </svg>
@@ -1154,7 +1331,7 @@
              class="relative w-full max-w-xl mx-auto max-h-[88vh] bg-white rounded-t-[30px] shadow-[0_-16px_50px_rgba(0,0,0,0.35)] flex flex-col z-20 overflow-hidden">
             
             <!-- Crisp Solid White Background with Ultra-Soft Micro-Dot Texture (Body Area) -->
-            <div class="absolute inset-0 pointer-events-none z-0" 
+            <div class="bottom-sheet-bg-pattern absolute inset-0 pointer-events-none z-0" 
                  style="background-color: #FFFFFF; background-image: radial-gradient(rgba(148, 163, 184, 0.14) 0.75px, transparent 0.75px); background-size: 20px 20px;"></div>
 
             <!-- Unified Theme-Green Top Header (Pull Handle + User Identity + Search Bar) -->

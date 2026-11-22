@@ -291,6 +291,377 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
+/* ==========================================================================
+   ELEGANT DARK MODE SYSTEM & SILKY THEME TRANSITION ENGINE
+   ========================================================================== */
+
+/* 1. Smooth Cubic-Bezier Fallback Transition when Switching Themes */
+html.theme-smooth-transition,
+html.theme-smooth-transition *,
+html.theme-smooth-transition *::before,
+html.theme-smooth-transition *::after {
+    transition:
+        background-color 450ms cubic-bezier(0.22, 1, 0.36, 1),
+        background 450ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 450ms cubic-bezier(0.22, 1, 0.36, 1),
+        color 350ms cubic-bezier(0.22, 1, 0.36, 1),
+        fill 350ms cubic-bezier(0.22, 1, 0.36, 1),
+        stroke 350ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* 2. Animated Sun & Moon Toggle Mechanics (Spring Physics Morph) */
+.theme-icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    transition: transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 320ms ease;
+}
+.theme-icon-moon {
+    opacity: 0;
+    transform: rotate(-110deg) scale(0.35);
+    transition: transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 320ms ease;
+}
+
+html.dark .theme-icon-sun {
+    opacity: 0;
+    transform: rotate(110deg) scale(0.35);
+}
+html.dark .theme-icon-moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* Desktop Toggle Capsule Track & Gliding Thumb */
+.theme-switch-thumb {
+    transform: translateX(0);
+    transition: transform 480ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 350ms ease, box-shadow 350ms ease;
+}
+html.dark .theme-switch-track {
+    background: linear-gradient(135deg, #07383c 0%, #0f172a 100%) !important;
+    border-color: rgba(45, 212, 191, 0.45) !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+html.dark .theme-switch-thumb {
+    transform: translateX(20px);
+    background-color: #131c2e !important;
+    box-shadow: 0 0 10px rgba(45, 212, 191, 0.45), inset 0 0 0 1px rgba(94, 234, 212, 0.4);
+}
+html.dark .theme-track-stars {
+    opacity: 1 !important;
+}
+html.dark .theme-track-sunray {
+    opacity: 0 !important;
+}
+html.dark .theme-toggle-desktop {
+    background-color: #162235 !important;
+    border-color: rgba(45, 212, 191, 0.35) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+html.dark .theme-toggle-desktop:hover {
+    border-color: rgba(94, 234, 212, 0.65) !important;
+    box-shadow: 0 4px 16px rgba(20, 184, 166, 0.22);
+}
+html.dark .theme-toggle-mobile {
+    background-color: rgba(15, 23, 42, 0.55) !important;
+    border-color: rgba(94, 234, 212, 0.45) !important;
+    box-shadow: 0 0 12px rgba(45, 212, 191, 0.28);
+}
+
+/* 3. Core Root & Canvas Dark Palette */
+html.dark {
+    color-scheme: dark;
+    --color-background: #0b1120;
+    --color-card: #131c2e;
+    --color-foreground: #f1f5f9;
+    --color-muted: #94a3b8;
+    --color-border: #1e293b;
+}
+
+html.dark,
+html.dark body {
+    background-color: #0b1120 !important;
+    color: #e2e8f0 !important;
+}
+
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark .font-heading {
+    color: #f8fafc;
+}
+
+/* 4. Header & Navigation Surfaces */
+html.dark header {
+    background-color: rgba(15, 23, 42, 0.88) !important;
+    border-color: rgba(51, 65, 85, 0.85) !important;
+    color: #f1f5f9 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .md\:hidden.fixed.top-0.bg-slate-50\/95 {
+    background-color: rgba(11, 17, 32, 0.90) !important;
+}
+
+/* 5. Cards, Modals, Dropdowns & White Containers */
+html.dark .card-enterprise,
+html.dark .card-modern,
+html.dark .folder-tab-card:not(.active-folder),
+html.dark #main-content .bg-white,
+html.dark #main-content .bg-white\/95,
+html.dark #main-content .bg-white\/90,
+html.dark #main-content .bg-white\/80,
+html.dark header .bg-white,
+html.dark .fixed .bg-white {
+    background-color: #131c2e !important;
+    border-color: rgba(51, 65, 85, 0.85) !important;
+    color: #e2e8f0;
+}
+
+html.dark .card-modern:hover,
+html.dark #main-content .bg-white:hover {
+    border-color: rgba(45, 212, 191, 0.45);
+}
+
+/* Secondary / Muted Backgrounds */
+html.dark .bg-\[\#F8FAFC\],
+html.dark #main-content .bg-slate-50,
+html.dark #main-content .bg-slate-50\/90,
+html.dark #main-content .bg-slate-50\/80,
+html.dark #main-content .bg-slate-50\/70,
+html.dark #main-content .bg-slate-50\/60,
+html.dark #main-content .bg-slate-50\/50,
+html.dark #main-content .bg-gray-50,
+html.dark header .bg-slate-50\/90 {
+    background-color: #162235 !important;
+}
+
+html.dark #main-content .bg-slate-100,
+html.dark #main-content .bg-slate-100\/80,
+html.dark #main-content .bg-slate-200\/70,
+html.dark #main-content .bg-slate-200,
+html.dark #main-content .bg-gray-100,
+html.dark .fixed .bg-slate-100 {
+    background-color: #1e293b !important;
+}
+
+html.dark header .bg-slate-200 {
+    background-color: #334155 !important;
+}
+
+/* 6. Borders & Dividers */
+html.dark .border-slate-50,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-200\/50,
+html.dark .border-slate-200\/60,
+html.dark .border-slate-200\/70,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/90,
+html.dark .border-slate-300,
+html.dark .border-gray-100,
+html.dark .border-gray-200,
+html.dark .border-gray-300 {
+    border-color: rgba(51, 65, 85, 0.85) !important;
+}
+
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(51, 65, 85, 0.7) !important;
+}
+
+/* 7. Typography Hierarchy in Dark Mode */
+html.dark .text-slate-900:not([class*="bg-amber-"]):not([class*="bg-yellow-"]):not([class*="from-teal-500"]),
+html.dark .text-slate-800:not([class*="bg-amber-"]),
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-\[\#1F2937\] {
+    color: #f1f5f9 !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-gray-700 {
+    color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-gray-600,
+html.dark .text-slate-500,
+html.dark .text-gray-500 {
+    color: #94a3b8 !important;
+}
+
+/* 8. Form Inputs, Selects & Textareas */
+html.dark #main-content input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]),
+html.dark #main-content select,
+html.dark #main-content textarea,
+html.dark .fixed input:not([type="checkbox"]):not([type="radio"]):not([class*="bg-white/12"]),
+html.dark .fixed select,
+html.dark .fixed textarea {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark #main-content input::placeholder,
+html.dark #main-content textarea::placeholder,
+html.dark .fixed input:not([class*="bg-white/12"])::placeholder,
+html.dark .fixed textarea::placeholder {
+    color: #64748b !important;
+}
+
+html.dark #main-content input:focus,
+html.dark #main-content select:focus,
+html.dark #main-content textarea:focus {
+    background-color: #131c2e !important;
+    border-color: #14b8a6 !important;
+}
+
+/* Secondary Buttons & Table Rows */
+html.dark .btn-secondary {
+    background-color: #162235 !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+    box-shadow: inset 0 -2px 0 #0f172a, 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+html.dark .btn-secondary:hover {
+    background-color: #1e293b !important;
+    border-color: #18C4C4 !important;
+    color: #5eead4 !important;
+}
+
+html.dark table thead,
+html.dark table thead tr {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+}
+html.dark table tbody tr:hover {
+    background-color: rgba(30, 41, 59, 0.55) !important;
+}
+
+/* 9. Semantic Soft Badges & Alert Surfaces */
+html.dark .bg-teal-50,
+html.dark .bg-teal-50\/90,
+html.dark .bg-teal-50\/50 {
+    background-color: rgba(20, 184, 166, 0.15) !important;
+    border-color: rgba(20, 184, 166, 0.32) !important;
+}
+html.dark .text-teal-900,
+html.dark .text-teal-800,
+html.dark .text-teal-700 {
+    color: #5eead4 !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-50\/90 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    border-color: rgba(16, 185, 129, 0.32) !important;
+}
+html.dark .text-emerald-900,
+html.dark .text-emerald-800,
+html.dark .text-emerald-700 {
+    color: #6ee7b7 !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/90 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(245, 158, 11, 0.32) !important;
+}
+html.dark .text-amber-900,
+html.dark .text-amber-800,
+html.dark .text-amber-700 {
+    color: #fcd34d !important;
+}
+
+html.dark .bg-rose-50,
+html.dark .bg-red-50 {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    border-color: rgba(244, 63, 94, 0.32) !important;
+}
+html.dark .text-rose-900,
+html.dark .text-rose-800,
+html.dark .text-rose-700,
+html.dark .text-red-900,
+html.dark .text-red-800 {
+    color: #fda4af !important;
+}
+
+html.dark .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.32) !important;
+}
+html.dark .text-blue-900,
+html.dark .text-blue-800,
+html.dark .text-blue-700 {
+    color: #93c5fd !important;
+}
+
+html.dark .bg-indigo-50 {
+    background-color: rgba(99, 102, 241, 0.15) !important;
+    border-color: rgba(99, 102, 241, 0.32) !important;
+}
+html.dark .text-indigo-900,
+html.dark .text-indigo-800,
+html.dark .text-indigo-700 {
+    color: #a5b4fc !important;
+}
+
+html.dark .bg-purple-50 {
+    background-color: rgba(168, 85, 247, 0.15) !important;
+    border-color: rgba(168, 85, 247, 0.32) !important;
+}
+html.dark .text-purple-900,
+html.dark .text-purple-800,
+html.dark .text-purple-700 {
+    color: #d8b4fe !important;
+}
+
+html.dark .bg-cyan-50 {
+    background-color: rgba(6, 182, 212, 0.15) !important;
+    border-color: rgba(6, 182, 212, 0.32) !important;
+}
+html.dark .text-cyan-900,
+html.dark .text-cyan-800,
+html.dark .text-cyan-700 {
+    color: #67e8f9 !important;
+}
+
+/* 10. Mobile Bottom Navbar, Mound & Bottom Sheet Drawer */
+html.dark nav[aria-label="Navigasi Cepat Mobile"] {
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.96) 0%, rgba(19, 28, 46, 0.98) 50%, rgba(11, 38, 45, 0.96) 100%) !important;
+    border-color: rgba(45, 212, 191, 0.35) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55) !important;
+}
+html.dark .mobile-nav-mound-fill {
+    fill: #131c2e !important;
+}
+html.dark nav[aria-label="Navigasi Cepat Mobile"] svg.w-\[22px\] {
+    color: #5eead4 !important;
+}
+html.dark nav[aria-label="Navigasi Cepat Mobile"] span.text-\[11px\] {
+    color: #e2e8f0 !important;
+}
+html.dark .bottom-sheet-bg-pattern {
+    background-color: #0f172a !important;
+    background-image: radial-gradient(rgba(148, 163, 184, 0.1) 0.75px, transparent 0.75px) !important;
+}
+
+/* 11. SweetAlert2 Modal & Toast Dark Adaptation */
+html.dark .swal2-popup {
+    background-color: #131c2e !important;
+    border-color: rgba(51, 65, 85, 0.9) !important;
+    color: #f1f5f9 !important;
+}
+html.dark .swal2-title {
+    color: #f8fafc !important;
+}
+html.dark .swal2-html-container {
+    color: #cbd5e1 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     *, ::before, ::after {
         animation-duration: 0.01ms !important;
