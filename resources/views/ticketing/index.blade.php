@@ -249,32 +249,50 @@
     <div x-data="{ openFilter: {{ $hasActiveFilter ? 'true' : 'false' }} }" class="bg-white rounded-2xl border border-slate-200/90 p-3.5 sm:p-4 shadow-xs space-y-3">
         <!-- Search Input Bar & Filter Toggle Button -->
         <form method="GET" action="{{ route('tickets.index') }}" class="space-y-3">
-            <div class="flex items-center gap-2">
-                <div class="relative flex-1">
-                    <input type="text" name="q" value="{{ request('q') }}" 
-                           placeholder="Cari No Tiket / Pelanggan / CID / Segmen Backbone..."
-                           class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 pl-9 pr-4 py-2 text-slate-700 transition">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-initial">
+                    <div class="relative w-full sm:w-72 md:w-80 lg:w-96">
+                        <input type="text" name="q" value="{{ request('q') }}" 
+                               placeholder="Cari No Tiket / Pelanggan / CID / Segmen..."
+                               class="w-full text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 pl-9 pr-4 py-2 text-slate-700 transition">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                    </div>
+                    
+                    <button type="button" @click="openFilter = !openFilter"
+                            class="px-3 py-2 rounded-xl font-bold text-xs border border-slate-200 hover:bg-slate-50 text-slate-700 transition inline-flex items-center gap-1.5 shrink-0 cursor-pointer"
+                            :class="openFilter ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-2xs' : 'bg-white'">
+                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        <span class="hidden xs:inline">Filter</span>
+                        @if($hasActiveFilter)
+                            <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                        @endif
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="openFilter ? 'rotate-180 text-teal-600' : 'text-slate-400'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    <button type="submit" class="px-4 py-2 rounded-xl font-bold text-xs text-white shadow-xs cursor-pointer transition inline-flex items-center gap-1.5 shrink-0"
+                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        <span>Cari</span>
+                    </button>
+                </div>
+
+                <!-- Right Info & Reset on Desktop -->
+                <div class="hidden sm:flex items-center gap-2.5 shrink-0">
+                    @if(request()->hasAny(['kategori', 'status', 'priority', 'assigned', 'q']))
+                        <a href="{{ route('tickets.index') }}" 
+                           class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition"
+                           title="Hapus pencarian & filter">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span>Reset Filter</span>
+                        </a>
+                    @endif
+                    <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/60">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                        <span>Total <b>{{ number_format($tickets->total()) }}</b> tiket</span>
                     </div>
                 </div>
-                
-                <button type="button" @click="openFilter = !openFilter"
-                        class="px-3 py-2 rounded-xl font-bold text-xs border border-slate-200 hover:bg-slate-50 text-slate-700 transition inline-flex items-center gap-1.5 shrink-0 cursor-pointer"
-                        :class="openFilter ? 'bg-teal-50 text-teal-700 border-teal-200 shadow-2xs' : 'bg-white'">
-                    <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                    <span class="hidden xs:inline">Filter</span>
-                    @if($hasActiveFilter)
-                        <span class="w-2 h-2 rounded-full bg-teal-500"></span>
-                    @endif
-                    <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="openFilter ? 'rotate-180 text-teal-600' : 'text-slate-400'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-
-                <button type="submit" class="px-4 py-2 rounded-xl font-bold text-xs text-white shadow-xs cursor-pointer transition inline-flex items-center gap-1.5 shrink-0"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <span>Cari</span>
-                </button>
             </div>
 
             <!-- Collapsible Dropdown Content: Filter Selects + Full Width Action Buttons -->
