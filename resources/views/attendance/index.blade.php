@@ -489,18 +489,6 @@
 
                 <!-- Two Selection Cards -->
                 <div class="p-6 space-y-4">
-                    <!-- Notice jika di luar radius kantor -->
-                    <div x-show="!gpsLoading && !isWithinOfficeRadius" 
-                         class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/70 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5">
-                        <span class="text-lg leading-none shrink-0 mt-0.5">⚠️</span>
-                        <div>
-                            <p class="font-bold text-xs sm:text-sm">Lokasi Di Luar Radius Kantor</p>
-                            <p class="text-[11px] text-amber-800 dark:text-amber-300/90 mt-0.5 leading-relaxed">
-                                Jarak Anda saat ini <strong class="font-bold" x-text="(detectedDistanceM !== null ? detectedDistanceM : 0) + ' meter'"></strong> dari kantor terdekat. Karena berada di luar batas geofence kantor (<span x-text="(officesMap[selectedOffice]?.radius_m || 50) + 'm'"></span>), presensi hanya dapat diajukan sebagai <strong>Dinas Luar</strong>.
-                            </p>
-                        </div>
-                    </div>
-
                     <!-- Pilihan Tombol (Hanya Dinas Luar jika jauh dari kantor) -->
                     <div :class="isWithinOfficeRadius ? 'grid grid-cols-2 gap-3.5 sm:gap-4' : 'flex flex-col items-center justify-center'">
                         <!-- Card 1: Kantor (HANYA MUNCUL JIKA DALAM RADIUS KANTOR) -->
