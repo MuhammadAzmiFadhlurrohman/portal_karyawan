@@ -154,16 +154,15 @@ class DashboardStatsService
         $totalPengajuan = $pengajuans->count();
         $nominalTotalPengajuan = (float) $pengajuans->sum('nominal_total');
 
-        $pengajuanPending = $pengajuans->whereIn('status', [
-            'menunggu_atasan', 'menunggu_finance', 'menunggu_direksi'
-        ])->count();
-        $pengajuanApproved = $pengajuans->whereIn('status', [
-            'disetujui', 'ditransfer', 'terealisasi'
-        ])->count();
+        $approvedStatuses = ['disetujui', 'ditransfer', 'terealisasi', 'dicairkan', 'menunggu_bukti', 'selesai'];
+        $pendingStatuses = ['draft', 'menunggu_atasan', 'menunggu_finance', 'menunggu_executive', 'menunggu_direksi'];
+
+        $pengajuanPending = $pengajuans->whereIn('status', $pendingStatuses)->count();
+        $pengajuanApproved = $pengajuans->whereIn('status', $approvedStatuses)->count();
         $pengajuanRejected = $pengajuans->where('status', 'ditolak')->count();
 
-        $nominalDisetujui = (float) $pengajuans->whereIn('status', ['disetujui', 'ditransfer', 'terealisasi'])->sum('nominal_total');
-        $nominalTerealisasi = (float) $pengajuans->where('status', 'terealisasi')->sum('nominal_realisasi');
+        $nominalDisetujui = (float) $pengajuans->whereIn('status', $approvedStatuses)->sum('nominal_total');
+        $nominalTerealisasi = (float) $pengajuans->whereIn('status', ['terealisasi', 'selesai'])->sum('nominal_realisasi');
 
         // ----------------------------------------------------
         // 3. STATISTIK LEMBUR
@@ -244,7 +243,7 @@ class DashboardStatsService
 
         foreach ($trendDates as $dtStr) {
             $lRecords = $trendLemburRecords->get($dtStr, collect());
-            $mins = (int) $lRecords->whereIn('status', ['approved', 'paid'])->sum('durasi_menit');
+            $mins = (int) $lRecords->whereIn('status', ['approved_atasan', 'approved', 'paid'])->sum('durasi_menit');
             $chartLembur['hours'][] = round($mins / 60, 1);
             $chartLembur['count'][] = $lRecords->count();
         }

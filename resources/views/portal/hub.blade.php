@@ -1612,7 +1612,7 @@
                                             Rp {{ number_format($p->nominal_total, 0, ',', '.') }}
                                         </td>
                                         <td class="py-2.5 px-2">
-                                            @if (in_array($p->status, ['disetujui', 'ditransfer', 'terealisasi']))
+                                            @if (in_array($p->status, ['disetujui', 'ditransfer', 'terealisasi', 'dicairkan', 'menunggu_bukti', 'selesai']))
                                                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                     {{ strtoupper(str_replace('_', ' ', $p->status)) }}
                                                 </span>
