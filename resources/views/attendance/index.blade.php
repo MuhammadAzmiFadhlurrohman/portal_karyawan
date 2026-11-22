@@ -280,23 +280,83 @@
                     <!-- SUDAH DAFTAR WAJAH -> TOMBOL ABSEN MASUK / PULANG -->
                     @if (! $todayAttendance)
                         <button type="button"
-                                @click="openAttendanceTypeModal()"
-                                style="background: linear-gradient(135deg, #065f46 0%, #0D8252 55%, #10b981 100%) !important;"
-                                class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-emerald-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                            </svg>
-                            <span>Absen Masuk Sekarang</span>
+                                :disabled="gpsLoading"
+                                @click="gpsError ? detectGPS() : openAttendanceTypeModal()"
+                                :style="gpsLoading 
+                                    ? 'background: linear-gradient(135deg, #475569 0%, #64748b 100%) !important;' 
+                                    : 'background: linear-gradient(135deg, #065f46 0%, #0D8252 55%, #10b981 100%) !important;'"
+                                class="w-full py-3.5 px-6 rounded-2xl text-white font-bold text-sm shadow-lg transition flex items-center justify-center gap-2.5"
+                                :class="gpsLoading ? 'opacity-65 cursor-not-allowed shadow-none' : 'hover:opacity-95 shadow-emerald-900/20 cursor-pointer active:scale-[0.99]'">
+                            
+                            <!-- Loading State (Menutup tombol saat mendeteksi lokasi) -->
+                            <template x-if="gpsLoading">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-5 h-5 animate-spin text-teal-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span>Mendeteksi Lokasi GPS...</span>
+                                </span>
+                            </template>
+
+                            <!-- GPS Error State -->
+                            <template x-if="!gpsLoading && gpsError">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-amber-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <span>GPS Belum Aktif — Klik untuk Muat Ulang</span>
+                                </span>
+                            </template>
+
+                            <!-- Ready State -->
+                            <template x-if="!gpsLoading && !gpsError">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                    </svg>
+                                    <span>Absen Masuk Sekarang</span>
+                                </span>
+                            </template>
                         </button>
                     @elseif (! $todayAttendance->clock_out_at)
                         <button type="button"
-                                @click="openClockOutModal()"
-                                style="background: linear-gradient(135deg, #b45309 0%, #D97706 60%, #f59e0b 100%) !important;"
-                                class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-amber-900/20 active:scale-[0.99] transition flex items-center justify-center gap-2.5 cursor-pointer">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                            </svg>
-                            <span>Absen Pulang Sekarang</span>
+                                :disabled="gpsLoading"
+                                @click="gpsError ? detectGPS() : openClockOutModal()"
+                                :style="gpsLoading 
+                                    ? 'background: linear-gradient(135deg, #475569 0%, #64748b 100%) !important;' 
+                                    : 'background: linear-gradient(135deg, #b45309 0%, #D97706 60%, #f59e0b 100%) !important;'"
+                                class="w-full py-3.5 px-6 rounded-2xl text-white font-bold text-sm shadow-lg transition flex items-center justify-center gap-2.5"
+                                :class="gpsLoading ? 'opacity-65 cursor-not-allowed shadow-none' : 'hover:opacity-95 shadow-amber-900/20 active:scale-[0.99] cursor-pointer'">
+                            
+                            <!-- Loading State -->
+                            <template x-if="gpsLoading">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-5 h-5 animate-spin text-amber-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span>Mendeteksi Lokasi GPS...</span>
+                                </span>
+                            </template>
+
+                            <!-- GPS Error State -->
+                            <template x-if="!gpsLoading && gpsError">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-amber-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <span>GPS Belum Aktif — Klik untuk Muat Ulang</span>
+                                </span>
+                            </template>
+
+                            <!-- Ready State -->
+                            <template x-if="!gpsLoading && !gpsError">
+                                <span class="flex items-center gap-2.5">
+                                    <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                    </svg>
+                                    <span>Absen Pulang Sekarang</span>
+                                </span>
+                            </template>
                         </button>
                     @endif
                 @endif
@@ -954,9 +1014,10 @@
                 gpsAccuracy: 10,
                 gpsLoading: true,
                 gpsError: false,
-                isWithinOfficeRadius: true,
-                detectedDistanceM: 0,
+                isWithinOfficeRadius: false,
+                detectedDistanceM: null,
                 gpsStatus: 'Mendeteksi titik koordinat GPS perangkat...',
+                gpsWatchId: null,
 
                 // Face poses (Captured from real camera)
                 poseFront: '',
@@ -1042,40 +1103,98 @@
                 },
 
                 detectGPS() {
+                    if (this.gpsWatchId !== null) {
+                        navigator.geolocation.clearWatch(this.gpsWatchId);
+                        this.gpsWatchId = null;
+                    }
+
                     this.gpsLoading = true;
                     this.gpsError = false;
-                    this.gpsStatus = 'Mendeteksi koordinat GPS perangkat...';
+                    this.gpsStatus = 'Mendeteksi titik koordinat GPS akurat...';
 
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(
-                            (pos) => {
-                                this.gpsLat = pos.coords.latitude;
-                                this.gpsLng = pos.coords.longitude;
-                                this.gpsAccuracy = Math.round(pos.coords.accuracy || 10);
-                                this.gpsLoading = false;
-                                this.gpsError = false;
-                                this.resolveNearestOffice(this.gpsLat, this.gpsLng);
-                            },
-                            (err) => {
-                                this.gpsLoading = false;
-                                this.gpsError = true;
-                                const ofc = officesMap[this.selectedOffice] || Object.values(officesMap)[0];
-                                if (ofc) {
-                                    this.selectedOffice = String(ofc.id);
-                                    this.gpsLat = parseFloat(ofc.lat);
-                                    this.gpsLng = parseFloat(ofc.lng);
-                                    this.gpsAccuracy = 10;
-                                    this.gpsStatus = ofc.name + ' (Izin GPS belum aktif)';
-                                } else {
-                                    this.gpsStatus = 'Izin GPS perangkat belum diaktifkan';
-                                }
-                            },
-                            { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-                        );
-                    } else {
+                    if (!navigator.geolocation) {
                         this.gpsLoading = false;
                         this.gpsError = true;
                         this.gpsStatus = 'Browser tidak mendukung Geolocation GPS';
+                        return;
+                    }
+
+                    let bestFix = null;
+                    let watchCompleted = false;
+
+                    const finalizeFix = (fix) => {
+                        if (watchCompleted) return;
+                        watchCompleted = true;
+                        if (this.gpsWatchId !== null) {
+                            navigator.geolocation.clearWatch(this.gpsWatchId);
+                            this.gpsWatchId = null;
+                        }
+
+                        if (fix) {
+                            this.gpsLat = fix.latitude;
+                            this.gpsLng = fix.longitude;
+                            this.gpsAccuracy = Math.round(fix.accuracy || 10);
+                            this.gpsLoading = false;
+                            this.gpsError = false;
+                            this.resolveNearestOffice(this.gpsLat, this.gpsLng);
+                            const officeName = officesMap[this.selectedOffice]?.name || 'Kantor';
+                            this.gpsStatus = `${officeName} (Akurasi: ±${this.gpsAccuracy}m)`;
+                        } else {
+                            this.gpsLoading = false;
+                            this.gpsError = true;
+                            const ofc = officesMap[this.selectedOffice] || Object.values(officesMap)[0];
+                            if (ofc) {
+                                this.selectedOffice = String(ofc.id);
+                                this.gpsLat = parseFloat(ofc.lat);
+                                this.gpsLng = parseFloat(ofc.lng);
+                                this.gpsAccuracy = 15;
+                                this.gpsStatus = ofc.name + ' (Izin GPS belum aktif)';
+                            } else {
+                                this.gpsStatus = 'Izin GPS perangkat belum diaktifkan';
+                            }
+                        }
+                    };
+
+                    // Batas waktu pengumpulan sinyal satelit GPS terbaik (maksimal 3.5 detik)
+                    const timeoutId = setTimeout(() => {
+                        if (!watchCompleted) {
+                            finalizeFix(bestFix);
+                        }
+                    }, 3500);
+
+                    try {
+                        this.gpsWatchId = navigator.geolocation.watchPosition(
+                            (pos) => {
+                                const acc = pos.coords.accuracy || 999;
+                                if (!bestFix || acc < bestFix.accuracy) {
+                                    bestFix = {
+                                        latitude: pos.coords.latitude,
+                                        longitude: pos.coords.longitude,
+                                        accuracy: acc,
+                                    };
+                                }
+
+                                // Jika akurasi sudah sangat presisi (<= 25 meter), kunci langsung
+                                if (acc <= 25) {
+                                    clearTimeout(timeoutId);
+                                    finalizeFix(bestFix);
+                                }
+                            },
+                            (err) => {
+                                if (!bestFix) {
+                                    clearTimeout(timeoutId);
+                                    finalizeFix(null);
+                                }
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 6000,
+                                maximumAge: 0
+                            }
+                        );
+                    } catch (e) {
+                        clearTimeout(timeoutId);
+                        finalizeFix(null);
                     }
                 },
 
