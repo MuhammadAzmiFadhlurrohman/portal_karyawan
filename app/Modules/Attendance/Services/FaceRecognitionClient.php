@@ -274,22 +274,18 @@ class FaceRecognitionClient
             $meta = json_decode($antiSpoofMetaJson, true);
             if (is_array($meta)) {
                 $clientScore = (int) ($meta['screen_score'] ?? 0);
-                if (! empty($meta['screen_detected']) || $clientScore >= 52) {
+                if (! empty($meta['screen_detected']) || $clientScore >= 75) {
                     AuditLogger::record(
-                        action: 'attendance.spoof_attempt_blocked',
+                        action: 'attendance.anti_spoof_notice',
                         auditable: $actor,
                         newValues: [
-                            'reason' => 'CLIENT_SCREEN_SPOOF_DETECTED',
+                            'reason' => 'CLIENT_SCREEN_NOTICE',
                             'client_screen_score' => $clientScore,
                             'metrics' => $meta['metrics'] ?? null,
                         ],
-                        reason: 'Percobaan absensi dengan layar HP kedua / foto digital terdeteksi oleh sensor kamera (AC-02).',
+                        reason: 'Sinyal layar terdeteksi pada sensor kamera klien (AC-02).',
                         actorId: $actor?->id
                     );
-
-                    throw ValidationException::withMessages([
-                        'image' => 'Ditolak oleh Deteksi Layar Anti-Spoofing: Terdeteksi penggunaan layar HP kedua atau foto digital. Silakan absen dengan wajah asli Anda secara langsung (AC-02).',
-                    ]);
                 }
             }
         }
@@ -312,23 +308,19 @@ class FaceRecognitionClient
                 ];
                 $triggeredCount = count(array_filter($signals, static fn (int $v): bool => $v >= 12));
 
-                if ($serverScore >= 65 && $triggeredCount >= 2) {
+                if ($serverScore >= 75 && $triggeredCount >= 2) {
                     AuditLogger::record(
-                        action: 'attendance.spoof_attempt_blocked',
+                        action: 'attendance.anti_spoof_notice',
                         auditable: $actor,
                         newValues: [
-                            'reason' => 'SERVER_SCREEN_SPOOF_DETECTED',
+                            'reason' => 'SERVER_SCREEN_NOTICE',
                             'server_screen_score' => $serverScore,
                             'triggered_signals' => $triggeredCount,
                             'metrics' => $analysis,
                         ],
-                        reason: "Percobaan absensi ditolak oleh analisis piksel server (skor {$serverScore}/100, {$triggeredCount} sinyal layar terdeteksi — AC-02).",
+                        reason: "Analisis piksel server mendeteksi pantulan cahaya/layar (skor {$serverScore}/100, {$triggeredCount} sinyal — AC-02).",
                         actorId: $actor?->id
                     );
-
-                    throw ValidationException::withMessages([
-                        'image' => 'Ditolak oleh Deteksi Layar Anti-Spoofing Server: Terdeteksi penggunaan layar HP kedua atau foto digital. Silakan absen dengan wajah asli Anda secara langsung (AC-02).',
-                    ]);
                 }
             } else {
                 imagedestroy($im);
