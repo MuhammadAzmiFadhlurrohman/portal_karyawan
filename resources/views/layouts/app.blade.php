@@ -1118,7 +1118,9 @@
     <!-- ============================================================== -->
     @php
         $navTabActive = 'home';
-        if (request()->routeIs('attendance.*')) {
+        if (request()->routeIs('attendance.leaves.approvals*')) {
+            $navTabActive = 'pengajuan';
+        } elseif (request()->routeIs('attendance.*')) {
             $navTabActive = 'presensi';
         } elseif (request()->routeIs('gomsn.pengajuan.*')) {
             $navTabActive = 'pengajuan';
@@ -1129,6 +1131,13 @@
         } elseif (request()->routeIs('portal.hub') || request()->routeIs('dashboard')) {
             $navTabActive = 'home';
         }
+
+        $mobilePengajuanUrl = $isHrdRole 
+            ? route('attendance.leaves.approvals') 
+            : ($navCanApprovePengajuan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index'));
+        $mobilePengajuanBadge = $isHrdRole 
+            ? ($navPendingLeaveHrdCount ?? 0) 
+            : ($navPendingAtasanCount ?? 0);
     @endphp
 
     <div class="md:hidden fixed bottom-3 inset-x-3 sm:inset-x-6 max-w-md mx-auto z-40 pointer-events-none pt-4"
@@ -1169,7 +1178,7 @@
             </a>
 
             <!-- 2. PENGAJUAN -->
-            <a href="{{ $navCanApprovePengajuan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index') }}" 
+            <a href="{{ $mobilePengajuanUrl }}" 
                @click="currentTab = 'pengajuan'"
                class="flex-1 h-full flex flex-col items-center justify-center relative group select-none cursor-pointer z-10 pt-1">
                 <div class="relative">
@@ -1178,7 +1187,7 @@
                          fill="none" stroke="currentColor" :stroke-width="isActive('pengajuan') ? '2.2' : '1.9'" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
-                    @if (!empty($navPendingAtasanCount) && $navPendingAtasanCount > 0)
+                    @if (!empty($mobilePengajuanBadge) && $mobilePengajuanBadge > 0)
                         <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white"></span>
                     @endif
                 </div>
@@ -1688,7 +1697,7 @@
 
                 @if ($navIsHrd)
                 <!-- KATEGORI KHUSUS HRD: KELOLA KARYAWAN -->
-                <div x-show="!sheetSearch || 'karyawan absen karyawan data staff tim rekap potongan lembur spk leaderboard peringkat disiplin'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
+                <div x-show="!sheetSearch || 'karyawan absen karyawan data staff tim rekap potongan pengajuan cuti izin persetujuan lembur spk laporan leaderboard peringkat disiplin'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-teal-500 to-emerald-500"></span>
@@ -1720,6 +1729,24 @@
                             </div>
                         </a>
 
+                        <!-- Pengajuan Absen (Cuti & Izin Karyawan) -->
+                        <a href="{{ route('attendance.leaves.approvals') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Pengajuan Absen</span>
+                                    <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Persetujuan Cuti &amp; Izin</span>
+                                </div>
+                            </div>
+                            @if (($navPendingLeaveHrdCount ?? 0) > 0)
+                            <span class="w-5 h-5 rounded-full text-[10px] font-bold bg-amber-500 text-white flex items-center justify-center shrink-0">
+                                {{ $navPendingLeaveHrdCount }}
+                            </span>
+                            @endif
+                        </a>
+
                         <!-- Lembur Karyawan -->
                         <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'karyawan']) }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center justify-between gap-2 group shadow-2xs">
                             <div class="flex items-center gap-2.5 min-w-0">
@@ -1736,6 +1763,17 @@
                                 {{ $navPendingLemburCount }}
                             </span>
                             @endif
+                        </a>
+
+                        <!-- Laporan Absensi -->
+                        <a href="{{ route('attendance.reports') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Laporan Absensi</span>
+                                <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Rekap Harian &amp; Admin</span>
+                            </div>
                         </a>
 
                         <!-- Leaderboard Disiplin Karyawan -->
