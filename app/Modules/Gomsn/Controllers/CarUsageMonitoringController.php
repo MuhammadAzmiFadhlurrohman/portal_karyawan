@@ -29,29 +29,38 @@ class CarUsageMonitoringController extends Controller
         $searchTerm = trim($request->input('q', ''));
         $periodMode = $request->input('period_mode', 'month');
 
+        $carKeywords = [
+            'mobil', 'sigra', 'luxio', 'avanza', 'xenia', 'ertiga', 'innova',
+            'calya', 'gran max', 'granmax', 'apv', 'blind van', 'blindvan', 'roda 4', 'roda empat',
+        ];
+
         $baseQuery = Pengajuan::query()
             ->with(['user', 'atasan', 'transferUser', 'details.material', 'approvals.approver'])
-            // Filter keywords bensin / BBM / mobil operasional
-            ->where(function ($q): void {
-                $q->where(function ($sub): void {
-                    $sub->where('judul', 'like', '%mobil%')
-                        ->orWhere('judul', 'like', '%bensin%')
-                        ->orWhere('judul', 'like', '%bbm%')
-                        ->orWhere('judul', 'like', '%pertalite%')
-                        ->orWhere('judul', 'like', '%pertamax%')
-                        ->orWhere('judul', 'like', '%solar%')
-                        ->orWhere('keperluan', 'like', '%mobil%')
-                        ->orWhere('keperluan', 'like', '%bensin%')
-                        ->orWhere('keperluan', 'like', '%bbm%')
-                        ->orWhereHas('details', function ($qd): void {
-                            $qd->where('deskripsi', 'like', '%mobil%')
-                                ->orWhere('deskripsi', 'like', '%bensin%')
-                                ->orWhere('deskripsi', 'like', '%bbm%')
-                                ->orWhere('deskripsi', 'like', '%pertalite%')
-                                ->orWhere('deskripsi', 'like', '%pertamax%')
-                                ->orWhere('deskripsi', 'like', '%solar%');
-                        });
+            // WAJIB mengandung kata kunci mobil / armada mobil operasional (BUKAN motor)
+            ->where(function ($q) use ($carKeywords): void {
+                $q->where(function ($sub) use ($carKeywords): void {
+                    foreach ($carKeywords as $kw) {
+                        $sub->orWhere('judul', 'like', "%{$kw}%")
+                            ->orWhere('keperluan', 'like', "%{$kw}%")
+                            ->orWhereHas('details', function ($qd) use ($kw): void {
+                                $qd->where('deskripsi', 'like', "%{$kw}%");
+                            });
+                    }
                 });
+            })
+            // TEGAS mengecualikan pengajuan motor / sepeda motor / bensin motor
+            ->where(function ($q): void {
+                $q->where('judul', 'not like', '%bensin motor%')
+                    ->where('judul', 'not like', '%bbm motor%')
+                    ->where('judul', 'not like', '%sepeda motor%')
+                    ->where('judul', 'not like', '%roda 2%')
+                    ->where('judul', 'not like', '%roda dua%')
+                    ->where('keperluan', 'not like', '%bensin motor%')
+                    ->where('keperluan', 'not like', '%bbm motor%')
+                    ->where(function ($sub): void {
+                        $sub->where('judul', 'not like', '%motor%')
+                            ->orWhere('judul', 'like', '%mobil%');
+                    });
             })
             // Status sudah disetujui atasan dan finance
             ->where('status', '!=', 'ditolak')

@@ -69,10 +69,25 @@ class CarUsageMonitoringTest extends TestCase
             'created_at' => Carbon::now('Asia/Jakarta'),
         ]);
 
-        // 3. Approved request but NOT related to car/fuel (should NOT appear)
-        $otherApproved = Pengajuan::create([
+        // 3. Approved motorcycle fuel request (should NOT appear - strictly CAR / MOBIL only)
+        $motorcycleApproved = Pengajuan::create([
             'user_id' => $driver->id,
             'nomor_pengajuan' => 'PJ-202611-0003',
+            'jenis' => 'DANA',
+            'tipe_pengajuan' => 'dana',
+            'kategori' => 'operasional',
+            'judul' => 'Bensin Motor - Rp15.000',
+            'keperluan' => 'Kunjungan pop kopo',
+            'nominal_total' => 15000,
+            'status' => 'ditransfer',
+            'transfer_at' => Carbon::now('Asia/Jakarta'),
+            'created_at' => Carbon::now('Asia/Jakarta'),
+        ]);
+
+        // 4. Approved request but NOT related to car/fuel (should NOT appear)
+        $otherApproved = Pengajuan::create([
+            'user_id' => $driver->id,
+            'nomor_pengajuan' => 'PJ-202611-0004',
             'jenis' => 'DANA',
             'tipe_pengajuan' => 'dana',
             'kategori' => 'operasional',
@@ -89,7 +104,9 @@ class CarUsageMonitoringTest extends TestCase
         $response->assertSee('BBM Mobil Operasional Sigra Cilegon');
         $response->assertSee('PJ-202611-0001');
         $response->assertDontSee('PJ-202611-0002');
+        $response->assertDontSee('Bensin Motor - Rp15.000');
         $response->assertDontSee('PJ-202611-0003');
+        $response->assertDontSee('PJ-202611-0004');
     }
 
     public function test_admin_can_export_car_usage_to_csv(): void
