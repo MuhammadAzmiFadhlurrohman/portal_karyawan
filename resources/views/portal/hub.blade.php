@@ -892,6 +892,26 @@
         })();
     </script>
 
+    <!-- Dedicated Notification Connect Card (Mobile & Desktop) -->
+    <div id="hub-notif-connect-card" class="mb-4">
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#093c40] via-[#155E63] to-[#0d9488] text-white shadow-xl border border-teal-500/30 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-teal-200 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-xs sm:text-sm text-white leading-tight">Push Notifikasi HP</h3>
+                    <p class="text-[11px] text-teal-100/90 leading-tight mt-0.5 truncate">Sambungkan perangkat ke database notifikasi.</p>
+                </div>
+            </div>
+            <button type="button" onclick="window.initGomsnFcmToken(true)" class="px-3.5 py-2 rounded-xl bg-white text-[#155E63] hover:bg-teal-50 font-bold text-xs shadow-md transition shrink-0 active:scale-95 cursor-pointer">
+                Aktifkan Sekarang
+            </button>
+        </div>
+    </div>
+
     <!-- PWA App Install Banner (GoMSN Ocean Teal Theme - Mobile Only) -->
     <section id="pwa-install-banner" class="pwa-banner md:hidden hub-anim-d2" aria-label="Pasang Aplikasi Mobile PT MSN">
         <div class="pwa-rim" aria-hidden="true"></div>
