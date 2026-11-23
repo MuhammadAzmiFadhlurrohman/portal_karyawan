@@ -200,43 +200,45 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(ellipse 420px 80px at 12% 50%, rgba(20, 184, 166, 0.09) 0%, transparent 75%),
-                radial-gradient(ellipse 460px 80px at 88% 50%, rgba(13, 148, 136, 0.08) 0%, transparent 75%);
+                radial-gradient(ellipse 450px 75px at 8% 50%, rgba(20, 184, 166, 0.04) 0%, transparent 75%),
+                radial-gradient(ellipse 480px 75px at 92% 50%, rgba(13, 148, 136, 0.035) 0%, transparent 75%);
         }
         .gomsn-desktop-header-grid {
             position: absolute;
             inset: 0;
             background-image:
-                linear-gradient(to right, rgba(148, 163, 184, 0.13) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(148, 163, 184, 0.13) 1px, transparent 1px);
-            background-size: 28px 28px;
-            opacity: 0.9;
+                linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.45;
         }
         .gomsn-desktop-header-dots {
             position: absolute;
             inset: 0;
-            background-image: radial-gradient(rgba(13, 148, 136, 0.22) 1.25px, transparent 1.25px);
-            background-size: 14px 14px;
-            opacity: 0.95;
+            background-image: radial-gradient(rgba(13, 148, 136, 0.08) 0.85px, transparent 0.85px);
+            background-size: 16px 16px;
+            opacity: 0.50;
         }
         .gomsn-desktop-header-grain {
             position: absolute;
             inset: 0;
-            opacity: 0.04;
+            opacity: 0.02;
             mix-blend-mode: multiply;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
         html.dark .gomsn-desktop-header-grid {
             background-image:
-                linear-gradient(to right, rgba(94, 234, 212, 0.08) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(94, 234, 212, 0.08) 1px, transparent 1px);
+                linear-gradient(to right, rgba(94, 234, 212, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(94, 234, 212, 0.04) 1px, transparent 1px);
+            opacity: 0.35;
         }
         html.dark .gomsn-desktop-header-dots {
-            background-image: radial-gradient(rgba(45, 212, 191, 0.25) 1.25px, transparent 1.25px);
+            background-image: radial-gradient(rgba(45, 212, 191, 0.10) 0.85px, transparent 0.85px);
+            opacity: 0.40;
         }
         html.dark .gomsn-desktop-header-grain {
             mix-blend-mode: screen;
-            opacity: 0.05;
+            opacity: 0.02;
         }
     </style>
 </head>
@@ -937,7 +939,7 @@
                     <div class="gomsn-desktop-header-grain"></div>
 
                     <!-- 5. Network Constellation & Fiber Optic Flow Vectors -->
-                    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-25" preserveAspectRatio="none" viewBox="0 0 1200 64" fill="none">
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-[0.09]" preserveAspectRatio="none" viewBox="0 0 1200 64" fill="none">
                         <!-- Fiber network paths -->
                         <path d="M 0 32 Q 240 8 480 36 T 920 22 T 1200 32" stroke="url(#gomsnNetGrad1)" stroke-width="1.2" stroke-dasharray="3 5"/>
                         <path d="M 0 46 C 300 20 620 50 1200 22" stroke="url(#gomsnNetGrad2)" stroke-width="1" opacity="0.6"/>
