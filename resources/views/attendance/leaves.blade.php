@@ -302,84 +302,135 @@
                 </div>
             @else
                 <!-- Mobile Card View (sm:hidden) -->
-                <div class="sm:hidden space-y-2.5">
+                <div class="sm:hidden space-y-3">
                     @foreach ($myLeaves as $lv)
-                        <div class="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-2xs space-y-2">
+                        @php
+                            $cardBorderColor = $lv->is_alpa_conversion 
+                                ? 'border-l-purple-500' 
+                                : ($lv->leave_type === 'annual' 
+                                    ? 'border-l-teal-500' 
+                                    : ($lv->leave_type === 'sick' ? 'border-l-amber-500' : 'border-l-blue-500'));
+                        @endphp
+                        <div class="rounded-2xl border border-slate-200/90 border-l-4 {{ $cardBorderColor }} bg-white p-4 shadow-xs space-y-3 transition hover:shadow-sm">
+                            <!-- Baris 1: Kategori & Status -->
                             <div class="flex items-center justify-between gap-2">
                                 @if ($lv->is_alpa_conversion)
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-purple-50 text-purple-700 border border-purple-200/80">
                                         <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                         <span>Alpa Memotong Cuti</span>
                                     </span>
                                 @elseif ($lv->leave_type === 'annual')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-teal-50 text-teal-700 border border-teal-200/80">
                                         <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
                                         <span>Cuti Tahunan</span>
                                     </span>
                                 @elseif ($lv->leave_type === 'sick')
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                         <span>Cuti Sakit</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80">
                                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                                         <span>Izin / Cuti Khusus</span>
                                     </span>
                                 @endif
 
                                 @if ($lv->status === 'approved')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Disetujui</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                                        <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Disetujui</span>
+                                    </span>
                                 @elseif ($lv->status === 'cancelled')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">Dibatalkan</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-slate-100 text-slate-500 border border-slate-200/70">
+                                        <span>Dibatalkan</span>
+                                    </span>
                                 @elseif ($lv->status === 'pending_supervisor')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Menunggu Atasan</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        <span>Menunggu Atasan</span>
+                                    </span>
                                 @elseif ($lv->status === 'pending_hrd')
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">Menunggu HRD</span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-teal-50 text-teal-700 border border-teal-200/80">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                                        <span>Menunggu HRD</span>
+                                    </span>
                                 @else
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">{{ strtoupper($lv->status) }}</span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-slate-100 text-slate-600 border border-slate-200/70">{{ strtoupper($lv->status) }}</span>
                                 @endif
                             </div>
 
-                            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
-                                <div class="font-mono text-slate-800 font-semibold flex items-center gap-1.5">
-                                    <span>{{ $lv->start_date->format('d/m/Y') }}</span>
-                                    @if ($lv->start_date->ne($lv->end_date))
-                                        <span class="text-slate-400">&rarr;</span>
-                                        <span>{{ $lv->end_date->format('d/m/Y') }}</span>
-                                    @endif
+                            <!-- Baris 2: Tanggal & Durasi -->
+                            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="text-xs font-bold text-slate-800 tracking-tight">
+                                        <span>{{ $lv->start_date->format('d/m/Y') }}</span>
+                                        @if ($lv->start_date->ne($lv->end_date))
+                                            <span class="text-slate-400 font-normal mx-0.5">&rarr;</span>
+                                            <span>{{ $lv->end_date->format('d/m/Y') }}</span>
+                                        @endif
+                                    </div>
                                 </div>
-                                <span class="font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px]">
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-mono font-bold text-xs shrink-0 border border-slate-200/60">
                                     {{ $lv->working_days }} hari
                                 </span>
                             </div>
 
-                            @if ($lv->reason)
-                                <p class="text-[11px] text-slate-600 bg-slate-50/80 p-2 rounded-lg leading-relaxed">
-                                    {{ $lv->reason }}
-                                </p>
-                            @endif
-
-                            <div class="flex items-center justify-between gap-2 pt-0.5">
-                                <div>
-                                    @if ($lv->attachment_path)
-                                        <span class="inline-block text-[10px] text-teal-700 font-semibold">📎 Ada Bukti</span>
-                                    @endif
-                                    @if ($lv->is_alpa_conversion && $lv->dispute_deadline_at)
-                                        <span class="block text-[9px] text-rose-500 font-mono">Sanggah s.d. {{ $lv->dispute_deadline_at->format('d/m H:i') }}</span>
+                            <!-- Baris 3: Keterangan / Informasi Sistem -->
+                            @if ($lv->is_alpa_conversion)
+                                <div class="rounded-xl bg-purple-50/60 border border-purple-100/90 p-3 text-[11px] text-purple-950 leading-relaxed space-y-2">
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-5 h-5 rounded-md bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 mt-0.5">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        </div>
+                                        <p class="font-normal text-slate-700 leading-snug">
+                                            {{ $lv->reason }}
+                                        </p>
+                                    </div>
+                                    @if ($lv->dispute_deadline_at)
+                                        <div class="flex items-center gap-1.5 pt-1.5 border-t border-purple-100/80 text-[10.5px] font-semibold text-rose-600">
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span>Masa sanggah s.d. <strong class="font-bold">{{ $lv->dispute_deadline_at->format('d/m H:i') }} WIB</strong></span>
+                                        </div>
                                     @endif
                                 </div>
+                            @elseif ($lv->reason && trim($lv->reason) !== '-' && trim($lv->reason) !== '')
+                                <div class="rounded-xl bg-slate-50/80 border border-slate-100 p-2.5 text-[11px] text-slate-600 leading-relaxed">
+                                    <span class="font-semibold text-slate-700">Keperluan:</span> {{ $lv->reason }}
+                                </div>
+                            @endif
 
-                                @if (in_array($lv->status, ['pending_supervisor', 'pending_hrd', 'approved'], true) && ! $lv->is_alpa_conversion && now('Asia/Jakarta')->startOfDay()->lt($lv->start_date))
-                                    <form method="POST" action="{{ route('attendance.leaves.cancel', $lv) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan cuti ini dan mengembalikan kuota?');">
-                                        @csrf
-                                        <input type="hidden" name="reason" value="Dibatalkan oleh karyawan sebelum tanggal mulai">
-                                        <button type="submit" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold border border-rose-200 transition cursor-pointer">
-                                            Batalkan Cuti
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
+                            <!-- Baris 4: Footer Aksi / Lampiran -->
+                            @if ($lv->attachment_path || (in_array($lv->status, ['pending_supervisor', 'pending_hrd', 'approved'], true) && ! $lv->is_alpa_conversion && now('Asia/Jakarta')->startOfDay()->lt($lv->start_date)))
+                                <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                                    <div>
+                                        @if ($lv->attachment_path)
+                                            <a href="{{ Storage::url($lv->attachment_path) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-teal-600 hover:text-teal-700 transition">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                                <span>Lampiran Bukti</span>
+                                            </a>
+                                        @endif
+                                    </div>
+
+                                    @if (in_array($lv->status, ['pending_supervisor', 'pending_hrd', 'approved'], true) && ! $lv->is_alpa_conversion && now('Asia/Jakarta')->startOfDay()->lt($lv->start_date))
+                                        <form method="POST" action="{{ route('attendance.leaves.cancel', $lv) }}" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan cuti ini dan mengembalikan kuota?');" class="ml-auto">
+                                            @csrf
+                                            <input type="hidden" name="reason" value="Dibatalkan oleh karyawan sebelum tanggal mulai">
+                                            <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-bold border border-rose-200/80 transition cursor-pointer">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                <span>Batalkan Cuti</span>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -436,7 +487,11 @@
                                         {{ $lv->working_days }} hari
                                     </td>
                                     <td class="py-3 px-3.5 text-slate-600 max-w-xs truncate">
-                                        {{ $lv->reason }}
+                                        @if ($lv->reason && trim($lv->reason) !== '-')
+                                            {{ $lv->reason }}
+                                        @else
+                                            <span class="text-slate-300">-</span>
+                                        @endif
                                         @if ($lv->attachment_path)
                                             <span class="block text-[10px] text-teal-600 font-semibold mt-0.5">Ada Lampiran Bukti</span>
                                         @endif
