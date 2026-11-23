@@ -74,7 +74,7 @@ class AuthController extends Controller
 
         RateLimiter::clear($throttleKey);
 
-        Auth::login($user, $request->boolean('remember', true));
+        Auth::login($user, true);
         $request->session()->regenerate();
         $request->session()->put('auth_login_at', now()->timestamp);
 

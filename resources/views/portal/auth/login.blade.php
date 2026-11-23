@@ -742,13 +742,6 @@
                                 </div>
                             </div>
 
-                            <!-- Checkbox Ingat Saya -->
-                            <div class="pt-0.5">
-                                <label class="inline-flex items-center gap-2.5 cursor-pointer select-none text-[13px] font-medium text-[#1e293b] hover:text-slate-900">
-                                    <input type="checkbox" name="remember" checked class="gomsn-checkbox">
-                                    <span>Ingat saya di perangkat ini (3 Bulan)</span>
-                                </label>
-                            </div>
 
                             <!-- Submit Button + Optional Biometric Button -->
                             <div class="flex items-center gap-2.5 pt-0.5">
