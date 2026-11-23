@@ -3,12 +3,15 @@
 namespace App\Modules\Attendance\Services;
 
 use App\Models\MonthlySchedule;
+use App\Models\NotificationLog;
 use App\Models\Shift;
 use App\Models\ShiftSwap;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\FcmService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class ShiftSwapService
@@ -169,6 +172,19 @@ class ShiftSwapService
             actorId: $requester->id
         );
 
+        // Notifikasi ke rekan yang diajukan (Target User)
+        $modeName = $isBackup ? 'backup shift' : 'tukar shift';
+        $title = $isBackup ? "🤝 Permintaan Backup Shift dari {$requester->name}" : "🔄 Permintaan Tukar Shift dari {$requester->name}";
+        $body = "Halo {$targetUser->name}, {$requester->name} mengajukan {$modeName} untuk tanggal {$d1Str}. Alasan: {$payload['reason']}. Silakan tinjau dan tanggapi permintaan ini.";
+
+        $this->notifyUser($targetUser, 'shift_swap_requested', $title, $body, [
+            'swap_id' => (string) $swap->id,
+            'tag' => "shift-swap-req-{$swap->id}",
+            'requester_name' => $requester->name,
+            'is_backup' => $isBackup ? '1' : '0',
+            'date' => $d1Str,
+        ]);
+
         return $swap;
     }
 
@@ -200,6 +216,21 @@ class ShiftSwapService
             reason: 'Disetujui oleh rekan target tukar shift',
             actorId: $actor->id
         );
+
+        // Notifikasi ke yang mengajukan bahwa rekan telah menerima/menyetujui
+        $requester = $swap->requester ?? User::find($swap->requester_id);
+        if ($requester) {
+            $isBackup = (bool) $swap->is_backup;
+            $modeName = $isBackup ? 'backup shift' : 'tukar shift';
+            $title = "✅ Rekan Menyetujui " . ucfirst($modeName) . " ({$actor->name})";
+            $body = "Halo {$requester->name}, {$actor->name} telah menyetujui permintaan {$modeName} Anda. Menunggu persetujuan akhir Atasan/Admin.";
+
+            $this->notifyUser($requester, 'shift_swap_target_approved', $title, $body, [
+                'swap_id' => (string) $swap->id,
+                'tag' => "shift-swap-target-approved-{$swap->id}",
+                'actor_name' => $actor->name,
+            ]);
+        }
 
         return $swap;
     }
@@ -283,6 +314,22 @@ class ShiftSwapService
                     actorId: $actor->id
                 );
 
+                $requester = User::find($lockedSwap->requester_id);
+                $targetUser = User::find($lockedSwap->target_user_id);
+                $modeName = $lockedSwap->is_backup ? 'backup shift' : 'tukar shift';
+                if ($requester) {
+                    $this->notifyUser($requester, 'shift_swap_rejected', '❌ Permintaan ' . ucfirst($modeName) . ' Ditolak Sistem', "Halo {$requester->name}, permintaan {$modeName} Anda ditolak otomatis karena jadwal telah berubah sejak pengajuan dibuat.", [
+                        'swap_id' => (string) $lockedSwap->id,
+                        'tag' => "shift-swap-rejected-{$lockedSwap->id}",
+                    ]);
+                }
+                if ($targetUser) {
+                    $this->notifyUser($targetUser, 'shift_swap_rejected', '❌ Permintaan ' . ucfirst($modeName) . ' Ditolak Sistem', "Halo {$targetUser->name}, permintaan {$modeName} bersama {$requester?->name} ditolak otomatis karena jadwal telah berubah sejak pengajuan dibuat.", [
+                        'swap_id' => (string) $lockedSwap->id,
+                        'tag' => "shift-swap-rejected-{$lockedSwap->id}",
+                    ]);
+                }
+
                 return $lockedSwap;
             }
 
@@ -334,6 +381,39 @@ class ShiftSwapService
                 actorId: $actor->id
             );
 
+            // Notifikasi ke yang mengajukan dan yang diajukan bahwa permohonan disetujui Atasan
+            $requester = User::find($lockedSwap->requester_id);
+            $targetUser = User::find($lockedSwap->target_user_id);
+            $modeName = $lockedSwap->is_backup ? 'backup shift' : 'tukar shift';
+
+            if ($requester) {
+                $this->notifyUser(
+                    $requester,
+                    'shift_swap_approved',
+                    '🎉 ' . ucfirst($modeName) . ' Disetujui Atasan',
+                    "Selamat {$requester->name}! Permintaan {$modeName} Anda bersama {$targetUser?->name} telah disetujui oleh {$actor->name}. Jadwal kerja Anda telah diperbarui.",
+                    [
+                        'swap_id' => (string) $lockedSwap->id,
+                        'tag' => "shift-swap-approved-{$lockedSwap->id}",
+                        'approved_by' => $actor->name,
+                    ]
+                );
+            }
+
+            if ($targetUser) {
+                $this->notifyUser(
+                    $targetUser,
+                    'shift_swap_approved',
+                    '🎉 ' . ucfirst($modeName) . ' Disetujui Atasan',
+                    "Halo {$targetUser->name}, permintaan {$modeName} bersama {$requester?->name} telah disetujui oleh {$actor->name}. Jadwal kerja Anda telah diperbarui.",
+                    [
+                        'swap_id' => (string) $lockedSwap->id,
+                        'tag' => "shift-swap-approved-{$lockedSwap->id}",
+                        'approved_by' => $actor->name,
+                    ]
+                );
+            }
+
             return $lockedSwap;
         });
     }
@@ -361,7 +441,86 @@ class ShiftSwapService
             actorId: $actor->id
         );
 
+        $requester = $swap->requester ?? User::find($swap->requester_id);
+        $targetUser = $swap->targetUser ?? User::find($swap->target_user_id);
+        $modeName = $swap->is_backup ? 'backup shift' : 'tukar shift';
+
+        // Notif ke yang mengajukan bahwa permohonan ditolak
+        if ($requester) {
+            $actorRoleText = ($actor->id === $swap->target_user_id) ? "rekan ({$actor->name})" : "Atasan/Admin ({$actor->name})";
+            $this->notifyUser(
+                $requester,
+                'shift_swap_rejected',
+                '❌ ' . ucfirst($modeName) . ' Ditolak',
+                "Halo {$requester->name}, permintaan {$modeName} Anda ditolak oleh {$actorRoleText}. Alasan: {$reason}",
+                [
+                    'swap_id' => (string) $swap->id,
+                    'tag' => "shift-swap-rejected-{$swap->id}",
+                    'rejected_by' => $actor->name,
+                    'reason' => $reason,
+                ]
+            );
+        }
+
+        // Jika ditolak oleh atasan saat status pending_supervisor, beri notif juga ke rekan (target)
+        if ($actor->id !== $swap->target_user_id && $targetUser) {
+            $this->notifyUser(
+                $targetUser,
+                'shift_swap_rejected',
+                '❌ ' . ucfirst($modeName) . ' Ditolak Atasan',
+                "Halo {$targetUser->name}, permintaan {$modeName} bersama {$requester?->name} ditolak oleh Atasan/Admin ({$actor->name}). Alasan: {$reason}",
+                [
+                    'swap_id' => (string) $swap->id,
+                    'tag' => "shift-swap-rejected-{$swap->id}",
+                    'rejected_by' => $actor->name,
+                    'reason' => $reason,
+                ]
+            );
+        }
+
         return $swap;
+    }
+
+    /**
+     * Send push notification & log to recipient.
+     *
+     * @param  array<string, mixed>  $extraData
+     */
+    private function notifyUser(User $recipient, string $eventType, string $title, string $body, array $extraData = []): void
+    {
+        try {
+            NotificationLog::create([
+                'user_id' => $recipient->id,
+                'channel' => 'fcm',
+                'event_type' => $eventType,
+                'recipient' => (string) ($recipient->email ?? $recipient->name ?? $recipient->id),
+                'payload' => [
+                    'title' => $title,
+                    'body' => $body,
+                    'data' => array_merge([
+                        'click_action' => url('/attendance/swaps'),
+                        'url' => url('/attendance/swaps'),
+                    ], $extraData),
+                ],
+                'status' => 'sent',
+                'attempts' => 1,
+                'sent_at' => now(),
+            ]);
+
+            FcmService::sendToUsers(
+                users: collect([$recipient]),
+                title: $title,
+                body: $body,
+                data: array_merge([
+                    'click_action' => url('/attendance/swaps'),
+                    'url' => url('/attendance/swaps'),
+                    'event_type' => $eventType,
+                ], $extraData),
+                eventType: 'absen'
+            );
+        } catch (\Throwable $e) {
+            Log::error("Failed to send shift swap notification ({$eventType}) to user {$recipient->id}: {$e->getMessage()}");
+        }
     }
 
     /**
