@@ -257,7 +257,7 @@ class PengajuanService
                     title: 'Pengajuan Baru Siap Dicairkan',
                     body: "Pengajuan {$pengajuan->nomor_pengajuan} ({$pengajuan->keperluan}) dari {$user->name} siap diproses Finance.",
                     deepLink: route('gomsn.pengajuan.index'),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
             } catch (\Throwable) {}
 
@@ -284,7 +284,7 @@ class PengajuanService
                     title: 'Pengajuan Baru Menunggu Persetujuan',
                     body: "{$user->name} mengajukan {$pengajuan->jenis}: {$pengajuan->keperluan}",
                     deepLink: route('gomsn.pengajuan.approvals'),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
             }
         } catch (\Throwable) {}
@@ -341,7 +341,7 @@ class PengajuanService
                     title: 'Pengajuan Anda Disetujui Atasan',
                     body: "Pengajuan {$pengajuan->nomor_pengajuan} disetujui oleh {$approver->name}.",
                     deepLink: route('gomsn.pengajuan.show', $pengajuan->id),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
 
                 // Notif ke tahapan berikutnya (Executive atau Finance)
@@ -353,7 +353,7 @@ class PengajuanService
                         title: 'Persetujuan Direksi Diperlukan',
                         body: "Pengajuan {$pengajuan->nomor_pengajuan} membutuhkan persetujuan Direksi (> 1 Juta).",
                         deepLink: route('gomsn.pengajuan.approvals'),
-                        extraData: ['reference_id' => $pengajuan->id]
+                        extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                     );
                 } else {
                     $financeIds = User::role('finance')->pluck('id')->toArray();
@@ -363,7 +363,7 @@ class PengajuanService
                         title: 'Pengajuan Siap Dicairkan',
                         body: "Pengajuan {$pengajuan->nomor_pengajuan} telah disetujui Atasan dan siap dicairkan.",
                         deepLink: route('gomsn.pengajuan.index'),
-                        extraData: ['reference_id' => $pengajuan->id]
+                        extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                     );
                 }
             } catch (\Throwable) {}
@@ -414,7 +414,7 @@ class PengajuanService
                     title: 'Pengajuan Disetujui Direksi',
                     body: "Pengajuan {$pengajuan->nomor_pengajuan} telah disetujui Direksi ({$approver->name}) dan siap dicairkan.",
                     deepLink: route('gomsn.pengajuan.show', $pengajuan->id),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
 
                 // Notif ke Finance
@@ -425,7 +425,7 @@ class PengajuanService
                     title: 'Pengajuan Disetujui Direksi',
                     body: "Pengajuan {$pengajuan->nomor_pengajuan} telah disetujui Direksi dan siap dicairkan.",
                     deepLink: route('gomsn.pengajuan.index'),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
             } catch (\Throwable) {}
 
@@ -504,7 +504,7 @@ class PengajuanService
                     title: 'Barang Telah Diserahkan oleh Finance',
                     body: "Pengajuan barang {$pengajuan->nomor_pengajuan} telah disetujui & dikeluarkan dari gudang.",
                     deepLink: route('gomsn.pengajuan.show', $pengajuan->id),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
             } catch (\Throwable) {}
 
@@ -562,7 +562,7 @@ class PengajuanService
                     title: 'Dana Pengajuan Telah Dicairkan',
                     body: "Pengajuan {$pengajuan->nomor_pengajuan} senilai Rp " . number_format($pengajuan->nominal_total, 0, ',', '.') . " telah dicairkan oleh Finance.",
                     deepLink: route('gomsn.pengajuan.show', $pengajuan->id),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
             } catch (\Throwable) {}
 
@@ -653,7 +653,7 @@ class PengajuanService
                     title: 'Pengajuan Ditolak',
                     body: "Pengajuan {$pengajuan->nomor_pengajuan} ditolak pada tahap {$stage}: {$reason}",
                     deepLink: route('gomsn.pengajuan.show', $pengajuan->id),
-                    extraData: ['reference_id' => $pengajuan->id]
+                    extraData: ['reference_id' => $pengajuan->id, 'tag' => 'pengajuan-' . $pengajuan->id]
                 );
             } catch (\Throwable) {}
 

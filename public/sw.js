@@ -55,14 +55,21 @@ try {
 
     messaging.onBackgroundMessage((payload) => {
         console.log('[sw.js] Firebase background message:', payload);
-        const title = payload.notification?.title || payload.data?.title || 'Portal MSN';
-        const body = payload.notification?.body || payload.data?.body || 'Anda menerima notifikasi baru.';
+
+        // If payload already has notification block, browser displays it natively via webpush! Do NOT double-show!
+        if (payload.notification && payload.notification.title) {
+            console.log('[sw.js] Native browser handles display for notification:', payload.notification.title);
+            return Promise.resolve();
+        }
+
+        const title = payload.data?.title || 'Portal MSN';
+        const body = payload.data?.body || 'Anda menerima notifikasi baru.';
         const deepLink = payload.data?.deep_link || payload.data?.click_action || '/';
         const tag = (payload.data?.type || 'notif') + '-' + (payload.data?.reference_id || 'general');
 
-        // Prevent duplicate popup if triggered within 3 seconds for same tag
+        // Prevent duplicate popup if triggered within 5 seconds for same tag
         const now = Date.now();
-        if (lastNotificationTag === tag && (now - lastNotificationTime) < 3000) {
+        if (lastNotificationTag === tag && (now - lastNotificationTime) < 5000) {
             console.log('[sw.js] Duplicate notification suppressed for tag:', tag);
             return Promise.resolve();
         }

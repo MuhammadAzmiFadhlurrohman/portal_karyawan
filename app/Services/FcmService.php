@@ -93,6 +93,12 @@ class FcmService
     {
         $tokenHash = hash('sha256', $token);
 
+        // Prune older tokens for this user on the same platform to avoid duplicate pushes
+        UserFcmToken::where('user_id', $user->id)
+            ->where('platform', $platform)
+            ->where('token_hash', '!=', $tokenHash)
+            ->delete();
+
         return UserFcmToken::updateOrCreate(
             [
                 'user_id' => $user->id,
@@ -188,8 +194,12 @@ class FcmService
             return 0;
         }
 
-        // 2. Fetch all registered device tokens
-        $tokens = UserFcmToken::whereIn('user_id', $allowedUserIds)->get();
+        // 2. Fetch latest active device token per user and platform to eliminate duplicates
+        $tokens = UserFcmToken::whereIn('user_id', $allowedUserIds)
+            ->orderByDesc('last_used_at')
+            ->get()
+            ->unique(fn ($t) => $t->user_id . '-' . $t->platform);
+
         if ($tokens->isEmpty()) {
             return 0;
         }
