@@ -29,6 +29,9 @@ class EnforceActiveUserSession
             ]);
         }
 
+        // Masa aktif login: 3 Bulan (90 Hari = 129.600 menit) kecuali logout manual
+        $maxSessionMinutes = max(129600, (int) SystemSettingService::get('security.session_idle_timeout_minutes', 129600));
+
         $sessionId = $request->session()->getId();
         $userSession = UserSession::query()
             ->where('session_id', $sessionId)
@@ -42,26 +45,47 @@ class EnforceActiveUserSession
                 $request->session()->regenerateToken();
 
                 return redirect()->route('login')->withErrors([
-                    'identifier' => 'Sesi Anda telah dihentikan oleh Administrator: '.($userSession->revoke_reason ?: 'Keamanan Sesi'),
+                    'identifier' => 'Sesi Anda telah dihentikan: '.($userSession->revoke_reason ?: 'Keamanan Sesi'),
                 ]);
             }
 
-            $idleTimeoutMinutes = (int) SystemSettingService::get('security.session_idle_timeout_minutes', 120);
-            if ($userSession->last_activity_at && $userSession->last_activity_at->diffInMinutes(now()) > $idleTimeoutMinutes) {
+            $loginStart = $userSession->created_at ?? $userSession->last_activity_at;
+            if ($loginStart && $loginStart->diffInMinutes(now()) > $maxSessionMinutes) {
                 $userSession->update([
                     'revoked_at' => now(),
-                    'revoke_reason' => 'Sesi berakhir otomatis karena melewati batas idle ('.$idleTimeoutMinutes.' menit).',
+                    'revoke_reason' => 'Masa aktif login 3 bulan telah berakhir.',
                 ]);
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return redirect()->route('login')->withErrors([
-                    'identifier' => 'Sesi Anda telah berakhir karena tidak ada aktivitas.',
+                    'identifier' => 'Masa aktif login 3 bulan Anda telah berakhir. Silakan login kembali.',
                 ]);
             }
 
             $userSession->update(['last_activity_at' => now()]);
+        } else {
+            // If authenticated via Remember Me cookie, check if there is an active session within 3 months
+            $latestSession = UserSession::query()
+                ->where('user_id', $user->id)
+                ->whereNull('revoked_at')
+                ->orderByDesc('created_at')
+                ->first();
+
+            if ($latestSession && $latestSession->created_at && $latestSession->created_at->diffInMinutes(now()) > $maxSessionMinutes) {
+                $latestSession->update([
+                    'revoked_at' => now(),
+                    'revoke_reason' => 'Masa aktif login 3 bulan telah berakhir.',
+                ]);
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login')->withErrors([
+                    'identifier' => 'Masa aktif login 3 bulan Anda telah berakhir. Silakan login kembali.',
+                ]);
+            }
         }
 
         if (

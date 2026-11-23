@@ -238,10 +238,10 @@ class SystemSettingService
             [
                 'key' => 'security.session_idle_timeout_minutes',
                 'group' => 'security',
-                'label' => 'Batas Waktu Idle Sesi Login (Menit)',
-                'value' => '120',
+                'label' => 'Batas Waktu Aktif Sesi Login (Menit)',
+                'value' => '129600',
                 'type' => 'integer',
-                'description' => 'Sesi login akan otomatis berakhir bila pengguna tidak aktif melebihi batas waktu ini.',
+                'description' => 'Masa aktif sesi login (129.600 menit = 90 hari / 3 bulan) kecuali logout manual.',
             ],
         ];
     }

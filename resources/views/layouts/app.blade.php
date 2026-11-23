@@ -2085,7 +2085,7 @@
 
     @auth
     @php
-        $sessionTimeoutMinutes = (int) (\App\Services\SystemSettingService::get('security.session_idle_timeout_minutes', config('session.lifetime', 120)));
+        $sessionTimeoutMinutes = max(129600, (int) (\App\Services\SystemSettingService::get('security.session_idle_timeout_minutes', config('session.lifetime', 129600))));
         $sessionTimeoutSeconds = max(60, $sessionTimeoutMinutes * 60);
     @endphp
     <script>

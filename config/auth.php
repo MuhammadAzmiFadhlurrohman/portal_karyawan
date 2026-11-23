@@ -41,6 +41,7 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'remember' => 129600, // 3 Bulan (90 Hari = 129.600 Menit)
         ],
     ],
 

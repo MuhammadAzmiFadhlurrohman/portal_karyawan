@@ -74,8 +74,9 @@ class AuthController extends Controller
 
         RateLimiter::clear($throttleKey);
 
-        Auth::login($user, $request->boolean('remember'));
+        Auth::login($user, $request->boolean('remember', true));
         $request->session()->regenerate();
+        $request->session()->put('auth_login_at', now()->timestamp);
 
         $device = $deviceSessionService->resolveAndValidateDevice($user, $request);
         $deviceSessionService->recordSession($user, $request, $device);
@@ -153,6 +154,7 @@ class AuthController extends Controller
 
         Auth::login($user, true);
         $request->session()->regenerate();
+        $request->session()->put('auth_login_at', now()->timestamp);
 
         $device = $deviceSessionService->resolveAndValidateDevice($user, $request);
         if ($device->status === 'pending') {

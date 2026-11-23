@@ -620,10 +620,10 @@
 
                         <!-- Card Heading -->
                         <div class="text-center mb-4">
-                            <h2 class="font-heading text-[23px] sm:text-[26px] font-extrabold text-[#0b2333] tracking-tight leading-tight">
+                            <h2 style="color: #0b2333 !important;" class="font-heading text-[23px] sm:text-[26px] font-extrabold text-[#0b2333] tracking-tight leading-tight">
                                 Masuk ke Akun
                             </h2>
-                            <p class="text-[12.5px] sm:text-[13px] text-slate-500 mt-1">
+                            <p style="color: #64748b !important;" class="text-[12.5px] sm:text-[13px] text-slate-500 mt-1">
                                 Silakan login untuk mengakses layanan GOMSN
                             </p>
                         </div>
@@ -746,7 +746,7 @@
                             <div class="pt-0.5">
                                 <label class="inline-flex items-center gap-2.5 cursor-pointer select-none text-[13px] font-medium text-[#1e293b] hover:text-slate-900">
                                     <input type="checkbox" name="remember" checked class="gomsn-checkbox">
-                                    <span>Ingat saya di perangkat ini (&plusmn; 30 Hari)</span>
+                                    <span>Ingat saya di perangkat ini (3 Bulan)</span>
                                 </label>
                             </div>
 

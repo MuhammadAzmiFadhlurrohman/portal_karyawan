@@ -71,8 +71,9 @@ class DeviceSessionService
     public function recordSession(User $user, Request $request, ?UserDevice $device = null): UserSession
     {
         $sessionId = $request->session()->getId();
+        $now = now();
 
-        return UserSession::query()->updateOrCreate(
+        $session = UserSession::query()->updateOrCreate(
             ['session_id' => $sessionId],
             [
                 'user_id' => $user->id,
@@ -80,12 +81,17 @@ class DeviceSessionService
                 'device_name' => $device ? $device->device_name : $this->parseDeviceName((string) $request->userAgent()),
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-                'last_activity_at' => now(),
+                'last_activity_at' => $now,
                 'revoked_at' => null,
                 'revoked_by' => null,
                 'revoke_reason' => null,
             ]
         );
+
+        // Reset created_at on fresh login so the 3-month active period resets from this login
+        $session->forceFill(['created_at' => $now])->save();
+
+        return $session;
     }
 
     /**
