@@ -1,22 +1,26 @@
 <!-- Firebase Cloud Messaging Client Integration -->
-<div id="gomsn-notif-prompt-banner" style="display: none;" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99998] w-[92%] max-w-lg bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-teal-500/40 rounded-2xl shadow-2xl p-4 transition-all duration-300">
-    <div class="flex items-center gap-3.5">
-        <div class="w-10 h-10 rounded-xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
-            <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<!-- Floating Connect Notification Card (Shown when not yet registered in database) -->
+<div id="gomsn-notif-prompt-banner" style="display: none;" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99998] w-[94%] max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-2 border-teal-500/50 rounded-2xl shadow-2xl p-4 transition-all duration-300">
+    <div class="flex items-start gap-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-500/30">
+            <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
         </div>
         <div class="flex-1 min-w-0">
-            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Aktifkan Notifikasi Portal</h4>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-snug">Izinkan notifikasi agar langsung menerima pembaruan tiket, lembur, &amp; persetujuan pengajuan.</p>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-            <button type="button" onclick="window.requestNotificationPermission()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#155E63] to-[#0d9488] hover:from-[#114b4f] hover:to-[#0f766e] text-white text-xs font-bold shadow-md hover:shadow transition cursor-pointer">
-                Izinkan
-            </button>
-            <button type="button" onclick="window.dismissNotificationPrompt()" class="w-7 h-7 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 flex items-center justify-center transition cursor-pointer" title="Nanti">
-                ✕
-            </button>
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">Sambungkan Notifikasi HP</h4>
+            <p id="gomsn-notif-subtext" class="text-xs text-slate-600 dark:text-slate-300 leading-snug mt-1">
+                Ketuk tombol untuk menyambungkan perangkat ini ke server agar menerima pembaruan tiket, lembur, &amp; persetujuan.
+            </p>
+            <div class="mt-3 flex items-center gap-2">
+                <button type="button" id="gomsn-btn-connect-fcm" onclick="window.initGomsnFcmToken(true)" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#155E63] to-[#0d9488] hover:from-[#114b4f] hover:to-[#0f766e] text-white text-xs font-bold shadow-md hover:shadow-lg transition cursor-pointer flex items-center gap-1.5 active:scale-95">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span>Sambungkan Sekarang</span>
+                </button>
+                <button type="button" onclick="window.dismissNotificationPrompt()" class="px-3 py-2 rounded-xl text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 text-xs font-medium transition cursor-pointer">
+                    Nanti
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -39,6 +43,13 @@
     };
 
     const vapidKey = "{{ config('services.fcm.vapid_key') }}";
+
+    // Auto-update service worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(function(reg) {
+            if (reg) reg.update().catch(function() {});
+        }).catch(function() {});
+    }
 
     if (!('Notification' in window) || !('serviceWorker' in navigator)) {
         return;
@@ -96,7 +107,7 @@
     });
 
     // Helper to register token to backend
-    async function sendTokenToBackend(token, showToast = false) {
+    async function sendTokenToBackend(token, interactive = false) {
         try {
             const response = await fetch('{{ route("api.fcm.token.register") }}', {
                 method: 'POST',
@@ -111,28 +122,47 @@
                 })
             });
 
-            if (response.ok) {
+            const data = await response.json().catch(function() { return {}; });
+
+            if (response.ok && data.success) {
                 localStorage.setItem('gomsn_fcm_token_registered', '1');
                 console.log('[FCM] Device token successfully registered to backend!');
-                if (showToast && window.Swal) {
+                
+                const banner = document.getElementById('gomsn-notif-prompt-banner');
+                if (banner) banner.remove();
+
+                if (interactive && window.Swal) {
                     Swal.fire({
-                        toast: true,
-                        position: 'top-end',
                         icon: 'success',
-                        title: 'Notifikasi Siap!',
-                        text: 'Perangkat berhasil terhubung ke server notifikasi.',
-                        showConfirmButton: false,
-                        timer: 3500,
-                        timerProgressBar: true
+                        title: 'Perangkat Terhubung!',
+                        text: 'Notifikasi berhasil diaktifkan dan terdaftar di server database.',
+                        confirmButtonColor: '#155E63',
+                        timer: 3500
                     });
                 }
                 return true;
             } else {
-                console.warn('[FCM] Backend rejected token registration:', response.status);
+                console.warn('[FCM] Backend rejected token registration:', response.status, data);
+                if (interactive && window.Swal) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Menyimpan ke Database',
+                        text: data.message || ('Error HTTP ' + response.status),
+                        confirmButtonColor: '#155E63'
+                    });
+                }
                 return false;
             }
         } catch (netErr) {
             console.error('[FCM] Failed to send token to backend:', netErr);
+            if (interactive && window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Gagal',
+                    text: netErr.message || 'Gagal mengirim token ke server.',
+                    confirmButtonColor: '#155E63'
+                });
+            }
             return false;
         }
     }
@@ -144,18 +174,25 @@
             return;
         }
 
+        if (interactive && window.Swal) {
+            Swal.fire({
+                title: 'Menghubungkan Notifikasi...',
+                text: 'Sedang mendaftarkan perangkat ke Google FCM & server...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+
         let permission = Notification.permission;
         if (permission !== 'granted') {
-            if (interactive) {
-                permission = await Notification.requestPermission();
-            } else {
-                return;
-            }
+            permission = await Notification.requestPermission();
         }
 
         if (permission !== 'granted') {
             if (interactive && window.Swal) {
-                Swal.fire('Izin Ditolak', 'Izin notifikasi belum diaktifkan di browser. Silakan izinkan di pengaturan situs browser Anda.', 'warning');
+                Swal.fire('Izin Ditolak', 'Izin notifikasi belum diaktifkan di browser. Silakan izinkan di pengaturan browser Anda.', 'warning');
             }
             return;
         }
@@ -173,36 +210,27 @@
             const token = await messaging.getToken(tokenOptions);
             if (token) {
                 console.log('[FCM] FCM Token obtained:', token.substring(0, 16) + '...');
-                const banner = document.getElementById('gomsn-notif-prompt-banner');
-                if (banner) banner.remove();
-
-                // Always send to backend to guarantee registration
                 await sendTokenToBackend(token, interactive);
+            } else {
+                if (interactive && window.Swal) {
+                    Swal.fire('Perhatian', 'Tidak berhasil mendapatkan token dari Firebase.', 'warning');
+                }
             }
         } catch (err) {
             console.error('[FCM] Error generating FCM token:', err);
             if (interactive && window.Swal) {
-                Swal.fire('Error FCM', err.message || 'Gagal membuat token notifikasi.', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Firebase',
+                    text: err.message || 'Gagal membuat token notifikasi.',
+                    confirmButtonColor: '#155E63'
+                });
             }
         }
     };
 
-    // User-triggered permission request
-    window.requestNotificationPermission = async function() {
-        if (!('Notification' in window)) return;
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                const banner = document.getElementById('gomsn-notif-prompt-banner');
-                if (banner) banner.remove();
-                await window.initGomsnFcmToken(true);
-            } else if (permission === 'denied') {
-                const banner = document.getElementById('gomsn-notif-prompt-banner');
-                if (banner) banner.remove();
-            }
-        } catch (e) {
-            console.warn('[FCM] requestPermission error:', e);
-        }
+    window.requestNotificationPermission = function() {
+        window.initGomsnFcmToken(true);
     };
 
     window.dismissNotificationPrompt = function() {
@@ -211,39 +239,25 @@
         sessionStorage.setItem('gomsn_notif_prompt_dismissed', '1');
     };
 
-    // Auto-prompt & auto-register logic
+    // Auto-check on load
     function checkAndPromptPermission() {
         if (!('Notification' in window)) return;
 
-        // If permission is already granted, automatically register token to backend
+        const isRegistered = localStorage.getItem('gomsn_fcm_token_registered') === '1';
+
+        // If not yet confirmed registered in backend, show the connect prompt card on screen
+        if (!isRegistered && !sessionStorage.getItem('gomsn_notif_prompt_dismissed')) {
+            const banner = document.getElementById('gomsn-notif-prompt-banner');
+            if (banner) {
+                setTimeout(() => {
+                    banner.style.display = 'block';
+                }, 800);
+            }
+        }
+
+        // Also attempt automatic silent background registration if permission already granted
         if (Notification.permission === 'granted') {
             window.initGomsnFcmToken(false);
-        } else if (Notification.permission === 'default') {
-            // Not yet decided: show prompt banner
-            if (!sessionStorage.getItem('gomsn_notif_prompt_dismissed')) {
-                const banner = document.getElementById('gomsn-notif-prompt-banner');
-                if (banner) {
-                    setTimeout(() => {
-                        banner.style.display = 'block';
-                    }, 1200);
-                }
-            }
-
-            // Auto-trigger native browser prompt on first user click
-            const autoPromptOnce = async function() {
-                document.removeEventListener('click', autoPromptOnce);
-                if (Notification.permission === 'default') {
-                    try {
-                        const perm = await Notification.requestPermission();
-                        if (perm === 'granted') {
-                            const banner = document.getElementById('gomsn-notif-prompt-banner');
-                            if (banner) banner.remove();
-                            window.initGomsnFcmToken(true);
-                        }
-                    } catch (err) {}
-                }
-            };
-            document.addEventListener('click', autoPromptOnce, { once: true });
         }
     }
 
