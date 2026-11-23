@@ -95,9 +95,10 @@ class ChronologyController extends Controller
         }
 
         try {
+            $user = $request->user();
             $entry = $this->chronologyService->addChronology(
                 tiket: $tiket,
-                user: $request->user(),
+                user: $user,
                 category: $category,
                 message: $message,
                 photoPath: $photoPath,
@@ -109,19 +110,27 @@ class ChronologyController extends Controller
             );
 
             try {
-                $recipientIds = $tiket->assignees->pluck('user_id')->toArray();
-                if ($tiket->created_by) $recipientIds[] = $tiket->created_by;
-                $recipientIds = array_diff(array_unique($recipientIds), [$user->id]);
+                $assigneeIds = $tiket->assignees()->pluck('user_id')->toArray();
+                $chronologyUserIds = $tiket->chronologies()->pluck('user_id')->toArray();
+                $recipientIds = array_merge($assigneeIds, $chronologyUserIds);
+                if ($tiket->created_by) {
+                    $recipientIds[] = $tiket->created_by;
+                }
+                $recipientIds = array_values(array_diff(array_unique(array_filter($recipientIds)), [$user->id]));
 
                 if (! empty($recipientIds)) {
-                    $snippet = $validated['message'] ?? ($photoPath ? '📷 Lampiran Foto' : ($videoPath ? '🎥 Lampiran Video' : 'Update Lapangan'));
+                    $noTiket = $tiket->no_tiket ?: $tiket->nomor_tiket;
+                    $snippet = $message ?: ($photoPath ? '📷 Lampiran Foto' : ($videoPath ? '🎥 Lampiran Video' : 'Update Lapangan'));
                     app(\App\Services\FcmService::class)->sendToUsers(
                         userIds: $recipientIds,
                         eventType: 'tiket',
-                        title: "Pesan Tiket [{$tiket->nomor_tiket}]",
+                        title: "Update Kronologis [{$noTiket}]",
                         body: "{$user->name}: " . \Illuminate\Support\Str::limit($snippet, 80),
                         deepLink: route('tickets.show', $tiket->id),
-                        extraData: ['reference_id' => $tiket->id]
+                        extraData: [
+                            'reference_id' => $tiket->id,
+                            'tag' => 'tiket-chron-' . $tiket->id . '-' . $entry->id,
+                        ]
                     );
                 }
             } catch (\Throwable) {}

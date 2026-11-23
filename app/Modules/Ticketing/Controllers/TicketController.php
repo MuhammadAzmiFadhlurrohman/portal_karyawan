@@ -323,6 +323,21 @@ class TicketController extends Controller
             $msg .= " (Peringatan: Terdapat tiket aktif {$existingActive->no_tiket} pada segmen yang sama)";
         }
 
+        try {
+            $dispatcherIds = User::role(['atasan_teknik', 'atasan_umum', 'manager_teknisi', 'admin', 'super_admin'])->pluck('id')->toArray();
+            $dispatcherIds = array_values(array_diff(array_unique($dispatcherIds), [$user->id]));
+            if (! empty($dispatcherIds)) {
+                app(FcmService::class)->sendToUsers(
+                    userIds: $dispatcherIds,
+                    eventType: 'tiket',
+                    title: "Tiket Backbone Baru [{$noTiket}]",
+                    body: "{$user->name} membuka tiket Backbone ({$priority}): {$validated['backbone_segment']}",
+                    deepLink: route('tickets.show', $tiket->id),
+                    extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-new-' . $tiket->id]
+                );
+            }
+        } catch (\Throwable) {}
+
         return redirect()->route('tickets.show', $tiket)->with('success', $msg);
     }
 
@@ -446,6 +461,21 @@ class TicketController extends Controller
             $msg .= " (Peringatan: Terdapat tiket aktif {$existingActive->no_tiket} untuk pelanggan ini)";
         }
 
+        try {
+            $dispatcherIds = User::role(['atasan_teknik', 'atasan_umum', 'manager_teknisi', 'admin', 'super_admin'])->pluck('id')->toArray();
+            $dispatcherIds = array_values(array_diff(array_unique($dispatcherIds), [$user->id]));
+            if (! empty($dispatcherIds)) {
+                app(FcmService::class)->sendToUsers(
+                    userIds: $dispatcherIds,
+                    eventType: 'tiket',
+                    title: "Tiket Broadband Baru [{$noTiket}]",
+                    body: "{$user->name} membuka tiket Broadband ({$priority}): {$validated['customer_name']}",
+                    deepLink: route('tickets.show', $tiket->id),
+                    extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-new-' . $tiket->id]
+                );
+            }
+        } catch (\Throwable) {}
+
         return redirect()->route('tickets.show', $tiket)->with('success', $msg);
     }
 
@@ -488,13 +518,15 @@ class TicketController extends Controller
 
         try {
             $assignedUserIds = array_filter(array_unique(array_merge([$leadId], (array) $memberIds)));
+            $noTiket = $tiket->no_tiket ?: $tiket->nomor_tiket;
+            $label = $tiket->customer_name ?: ($tiket->backbone_segment ?: $tiket->kategori_tiket);
             app(FcmService::class)->sendToUsers(
                 userIds: $assignedUserIds,
                 eventType: 'tiket',
                 title: 'Penugasan Tiket Baru',
-                body: "Tiket [{$tiket->nomor_tiket}] {$tiket->judul} telah ditugaskan kepada Anda oleh {$user->name}.",
+                body: "Tiket [{$noTiket}] {$label} telah ditugaskan kepada Anda oleh {$user->name}.",
                 deepLink: route('tickets.show', $tiket->id),
-                extraData: ['reference_id' => $tiket->id]
+                extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-dispatch-' . $tiket->id]
             );
         } catch (\Throwable) {}
 
@@ -540,6 +572,25 @@ class TicketController extends Controller
                 return redirect()->route('tickets.show', $tiket)->withErrors(['closing' => $errMessage]);
             }
 
+            try {
+                $verifierIds = User::role(['noc', 'atasan_noc', 'helpdesk', 'atasan_teknik', 'manager_teknisi'])->pluck('id')->toArray();
+                if ($tiket->created_by) {
+                    $verifierIds[] = $tiket->created_by;
+                }
+                $verifierIds = array_values(array_diff(array_unique($verifierIds), [$request->user()->id]));
+                if (! empty($verifierIds)) {
+                    $noTiket = $tiket->no_tiket ?: $tiket->nomor_tiket;
+                    app(FcmService::class)->sendToUsers(
+                        userIds: $verifierIds,
+                        eventType: 'tiket',
+                        title: "Closing Awal Tiket [{$noTiket}]",
+                        body: "{$request->user()->name} mengajukan Closing Awal untuk tiket {$noTiket} (menunggu verifikasi).",
+                        deepLink: route('tickets.show', $tiket->id),
+                        extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-closing-' . $tiket->id]
+                    );
+                }
+            } catch (\Throwable) {}
+
             if ($request->wantsJson()) {
                 return response()->json([
                     'success' => true,
@@ -571,13 +622,14 @@ class TicketController extends Controller
             try {
                 $assigneeIds = $tiket->assignees->pluck('user_id')->toArray();
                 if ($tiket->created_by) $assigneeIds[] = $tiket->created_by;
+                $noTiket = $tiket->no_tiket ?: $tiket->nomor_tiket;
                 app(FcmService::class)->sendToUsers(
                     userIds: array_unique($assigneeIds),
                     eventType: 'tiket',
                     title: 'Tiket Selesai Diverifikasi',
-                    body: "Tiket [{$tiket->nomor_tiket}] telah diverifikasi & DITUTUP oleh {$request->user()->name}.",
+                    body: "Tiket [{$noTiket}] telah diverifikasi & DITUTUP oleh {$request->user()->name}.",
                     deepLink: route('tickets.show', $tiket->id),
-                    extraData: ['reference_id' => $tiket->id]
+                    extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-verify-' . $tiket->id]
                 );
             } catch (\Throwable) {}
 
@@ -614,13 +666,14 @@ class TicketController extends Controller
 
             try {
                 $assigneeIds = $tiket->assignees->pluck('user_id')->toArray();
+                $noTiket = $tiket->no_tiket ?: $tiket->nomor_tiket;
                 app(FcmService::class)->sendToUsers(
                     userIds: $assigneeIds,
                     eventType: 'tiket',
                     title: 'Closing Tiket Ditolak',
-                    body: "Closing tiket [{$tiket->nomor_tiket}] ditolak: {$validated['reason']}",
+                    body: "Closing tiket [{$noTiket}] ditolak: {$validated['reason']}",
                     deepLink: route('tickets.show', $tiket->id),
-                    extraData: ['reference_id' => $tiket->id]
+                    extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-reject-' . $tiket->id]
                 );
             } catch (\Throwable) {}
 
@@ -657,13 +710,14 @@ class TicketController extends Controller
 
             try {
                 $assigneeIds = $tiket->assignees->pluck('user_id')->toArray();
+                $noTiket = $tiket->no_tiket ?: $tiket->nomor_tiket;
                 app(FcmService::class)->sendToUsers(
                     userIds: $assigneeIds,
                     eventType: 'tiket',
                     title: 'Tiket Dibuka Kembali (Reopened)',
-                    body: "Tiket [{$tiket->nomor_tiket}] dibuka kembali oleh {$request->user()->name}: {$validated['reason']}",
+                    body: "Tiket [{$noTiket}] dibuka kembali oleh {$request->user()->name}: {$validated['reason']}",
                     deepLink: route('tickets.show', $tiket->id),
-                    extraData: ['reference_id' => $tiket->id]
+                    extraData: ['reference_id' => $tiket->id, 'tag' => 'tiket-reopen-' . $tiket->id]
                 );
             } catch (\Throwable) {}
 

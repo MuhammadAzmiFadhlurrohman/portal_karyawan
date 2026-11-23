@@ -1,9 +1,12 @@
-<!-- Firebase Cloud Messaging Client Integration -->
+<!-- Firebase Cloud Messaging Client Integration (v5) -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 <script>
 (function() {
     'use strict';
+
+    const SW_VERSION = '2026112305';
+    const SW_URL = '/sw.js?v=' + SW_VERSION;
 
     // Firebase Web App Configuration
     const firebaseConfig = {
@@ -19,11 +22,32 @@
     const vapidKey = "{{ config('services.fcm.vapid_key') }}";
     const isSecureOrigin = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-    // Auto-update service worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistration().then(function(reg) {
-            if (reg) reg.update().catch(function() {});
-        }).catch(function() {});
+    // Ensure clean Service Worker registration (unregister duplicate firebase-messaging-sw.js & upgrade sw.js)
+    async function getCleanServiceWorkerRegistration() {
+        if (!('serviceWorker' in navigator)) return null;
+
+        try {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (const r of regs) {
+                const scriptUrl = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+                if (scriptUrl.includes('firebase-messaging-sw.js')) {
+                    await r.unregister().catch(function() {});
+                }
+            }
+        } catch (e) {}
+
+        try {
+            const reg = await navigator.serviceWorker.register(SW_URL, {
+                scope: '/',
+                updateViaCache: 'none'
+            });
+            await reg.update().catch(function() {});
+            window.msnServiceWorkerReg = reg;
+            await navigator.serviceWorker.ready;
+            return reg;
+        } catch (e) {
+            return await navigator.serviceWorker.ready.catch(function() { return null; });
+        }
     }
 
     // Wait until Firebase SDK script from Google CDN is fully loaded
@@ -51,53 +75,6 @@
         }
     }
 
-    // Foreground message listener
-    async function setupForegroundListener() {
-        await ensureFirebaseLoaded();
-        initFirebaseApp();
-
-        try {
-            if (typeof firebase !== 'undefined' && firebase.messaging) {
-                const messaging = firebase.messaging();
-                messaging.onMessage(function(payload) {
-                    console.log('[FCM] Foreground notification received:', payload);
-                    const title = payload.notification?.title || payload.data?.title || 'Notifikasi Baru';
-                    const body = payload.notification?.body || payload.data?.body || '';
-                    const deepLink = payload.data?.deep_link || payload.data?.click_action || '';
-
-                    if (window.Swal) {
-                        window.Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'info',
-                            title: title,
-                            text: body,
-                            showConfirmButton: !!deepLink,
-                            confirmButtonText: 'Buka',
-                            confirmButtonColor: '#155E63',
-                            showCancelButton: !!deepLink,
-                            cancelButtonText: 'Tutup',
-                            timer: deepLink ? 8000 : 5000,
-                            timerProgressBar: true,
-                            customClass: {
-                                popup: 'cursor-pointer'
-                            }
-                        }).then(function(result) {
-                            if (result.isConfirmed && deepLink) {
-                                window.location.href = deepLink;
-                            }
-                        });
-                    } else if (window.triggerToast) {
-                        window.triggerToast('info', title + (body ? ': ' + body : ''));
-                    }
-                });
-            }
-        } catch (e) {
-            console.warn('[FCM] onMessage setup error:', e);
-        }
-    }
-    setupForegroundListener();
-
     // Helper to register token to backend
     async function sendTokenToBackend(token, interactive = false) {
         try {
@@ -118,6 +95,7 @@
 
             if (response.ok && data.success) {
                 localStorage.setItem('gomsn_fcm_token_registered', '1');
+                localStorage.setItem('gomsn_sw_version', SW_VERSION);
                 console.log('[FCM] Device token successfully registered to backend!');
                 
                 const connectCard = document.getElementById('hub-notif-connect-card');
@@ -190,7 +168,6 @@
             });
         }
 
-        // Wait for Firebase SDK to load
         const loaded = await ensureFirebaseLoaded();
         if (!loaded) {
             if (interactive && window.Swal) {
@@ -219,10 +196,11 @@
         }
 
         try {
-            const swReg = await navigator.serviceWorker.ready;
-            const tokenOptions = {
-                serviceWorkerRegistration: swReg
-            };
+            const swReg = await getCleanServiceWorkerRegistration();
+            const tokenOptions = {};
+            if (swReg) {
+                tokenOptions.serviceWorkerRegistration = swReg;
+            }
 
             if (vapidKey && vapidKey.trim() !== '') {
                 tokenOptions.vapidKey = vapidKey.trim();
@@ -262,10 +240,21 @@
         }
     };
 
-    // Trigger Dashboard popup dialog
-    window.promptDashboardDialog = function() {
-        if (!isSecureOrigin) return;
-        if (!('Notification' in window)) return;
+    // Hide connect card automatically if already registered with latest SW version
+    function checkInitialState() {
+        if (!isSecureOrigin || !('Notification' in window)) return;
+
+        // Always upgrade Service Worker & re-sync token silently if permission is already granted
+        if (Notification.permission === 'granted') {
+            const connectCard = document.getElementById('hub-notif-connect-card');
+            if (connectCard && localStorage.getItem('gomsn_fcm_token_registered') === '1') {
+                connectCard.remove();
+            }
+            window.initGomsnFcmToken(false);
+            return;
+        }
+
+        // If permission not yet granted, prompt dialog
         if (localStorage.getItem('gomsn_fcm_token_registered') === '1') return;
 
         function doPrompt() {
@@ -291,13 +280,12 @@
         }
 
         setTimeout(doPrompt, 600);
-    };
+    }
 
-    // Auto-prompt upon loading
     if (document.readyState === 'complete') {
-        window.promptDashboardDialog();
+        checkInitialState();
     } else {
-        window.addEventListener('load', window.promptDashboardDialog);
+        window.addEventListener('load', checkInitialState);
     }
 })();
 </script>

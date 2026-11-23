@@ -93,7 +93,13 @@ class FcmService
     {
         $tokenHash = hash('sha256', $token);
 
-        // Prune older tokens for this user on the same platform to avoid duplicate pushes
+        // 1. A specific token_hash belongs to one physical browser/device instance.
+        // Remove it from any other user_id who previously logged in on this same browser/device.
+        UserFcmToken::where('token_hash', $tokenHash)
+            ->where('user_id', '!=', $user->id)
+            ->delete();
+
+        // 2. Prune older tokens for this user on the same platform so a user never accumulates duplicate tokens.
         UserFcmToken::where('user_id', $user->id)
             ->where('platform', $platform)
             ->where('token_hash', '!=', $tokenHash)
@@ -173,7 +179,6 @@ class FcmService
 
         $accessToken = $this->getAccessToken();
         if (! $accessToken || empty($this->projectId)) {
-            // Still log audit of the intent so systems can track
             Log::info("FCM Notification Skipped (FCM not configured) for event [{$eventType}]: '{$title}' to users: " . implode(',', $ids));
             return 0;
         }
@@ -194,11 +199,27 @@ class FcmService
             return 0;
         }
 
-        // 2. Fetch latest active device token per user and platform to eliminate duplicates
+        // 2. Permanently prune any older duplicate tokens per user in the DB table
+        foreach ($allowedUserIds as $uid) {
+            $latestTokenId = UserFcmToken::where('user_id', $uid)
+                ->orderByDesc('last_used_at')
+                ->orderByDesc('id')
+                ->value('id');
+
+            if ($latestTokenId) {
+                UserFcmToken::where('user_id', $uid)
+                    ->where('id', '!=', $latestTokenId)
+                    ->delete();
+            }
+        }
+
+        // 3. Fetch strictly 1 active device token per user, and deduplicate by physical token_hash
         $tokens = UserFcmToken::whereIn('user_id', $allowedUserIds)
             ->orderByDesc('last_used_at')
+            ->orderByDesc('id')
             ->get()
-            ->unique(fn ($t) => $t->user_id . '-' . $t->platform);
+            ->unique('user_id')
+            ->unique('token_hash');
 
         if ($tokens->isEmpty()) {
             return 0;
@@ -206,46 +227,57 @@ class FcmService
 
         $endpoint = "https://fcm.googleapis.com/v1/projects/{$this->projectId}/messages:send";
         $sentCount = 0;
+        $tag = (string) ($extraData['tag'] ?? ($eventType . '-' . ($extraData['reference_id'] ?? 'notif')));
+
+        $dataPayload = array_merge([
+            'title' => (string) $title,
+            'body' => (string) $body,
+            'type' => (string) $eventType,
+            'deep_link' => (string) $deepLink,
+            'click_action' => (string) $deepLink,
+            'tag' => $tag,
+            'icon' => url('/assets/logo/icon-192.png'),
+            'badge' => url('/assets/logo/favicon-32x32.png'),
+        ], array_map('strval', $extraData));
 
         foreach ($tokens as $tokenRecord) {
             $fcmToken = $tokenRecord->fcm_token;
-            $payload = [
-                'message' => [
-                    'token' => $fcmToken,
-                    'notification' => [
-                        'title' => $title,
-                        'body' => $body,
+
+            if ($tokenRecord->platform === 'web') {
+                // Send DATA-ONLY payload for Web Push so Service Worker displays it ONCE.
+                // Sending top-level 'notification' causes Firebase SDK + Service Worker to double/triple display.
+                $payload = [
+                    'message' => [
+                        'token' => $fcmToken,
+                        'data' => $dataPayload,
+                        'webpush' => [
+                            'headers' => [
+                                'Urgency' => 'high',
+                            ],
+                        ],
                     ],
-                    'data' => array_merge([
-                        'title' => (string) $title,
-                        'body' => (string) $body,
-                        'type' => (string) $eventType,
-                        'deep_link' => (string) $deepLink,
-                        'click_action' => (string) $deepLink,
-                    ], array_map('strval', $extraData)),
-                    'webpush' => [
+                ];
+            } else {
+                $payload = [
+                    'message' => [
+                        'token' => $fcmToken,
                         'notification' => [
-                            'tag' => (string) ($extraData['tag'] ?? ($eventType . '-' . ($extraData['reference_id'] ?? time()))),
-                            'icon' => url('/assets/logo/icon-192.png'),
-                            'badge' => url('/assets/logo/favicon-32x32.png'),
+                            'title' => $title,
+                            'body' => $body,
                         ],
-                        'fcm_options' => [
-                            'link' => (string) $deepLink,
-                        ],
-                        'headers' => [
-                            'Urgency' => 'high',
-                        ],
-                    ],
-                    'android' => [
-                        'priority' => 'HIGH',
-                        'notification' => [
-                            'click_action' => (string) $deepLink,
-                            'sound' => 'default',
-                            'channel_id' => 'msn_urgent_channel',
+                        'data' => $dataPayload,
+                        'android' => [
+                            'priority' => 'HIGH',
+                            'notification' => [
+                                'click_action' => (string) $deepLink,
+                                'sound' => 'default',
+                                'channel_id' => 'msn_urgent_channel',
+                                'tag' => $tag,
+                            ],
                         ],
                     ],
-                ],
-            ];
+                ];
+            }
 
             try {
                 $response = Http::withToken($accessToken)

@@ -1,8 +1,5 @@
-// PT MSN Portal - Unified PWA & Firebase Cloud Messaging Service Worker
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
-
-const CACHE_NAME = 'msn-portal-v2-shell';
+// PT MSN Portal - Unified PWA & Web Push Service Worker (v5 - Single Notification Guard)
+const CACHE_NAME = 'msn-portal-v5-shell';
 const OFFLINE_ASSETS = [
     '/',
     '/login',
@@ -27,110 +24,64 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
+    // Never cache sw.js or firebase-messaging-sw.js
+    if (event.request.url.includes('sw.js')) return;
     event.respondWith(
         fetch(event.request).catch(() => caches.match(event.request))
     );
 });
 
 // ==========================================
-// Firebase Cloud Messaging (FCM) Setup
+// Single Web Push Notification Handler
 // ==========================================
-const firebaseConfig = {
-    apiKey: "AIzaSyA668mrHa1p0uumFLmK-b5Hmjw9AC2zHzk",
-    authDomain: "portal-gomsn.firebaseapp.com",
-    projectId: "portal-gomsn",
-    storageBucket: "portal-gomsn.firebasestorage.app",
-    messagingSenderId: "504216298607",
-    appId: "1:504216298607:web:33f6314ca55837fae5999a",
-    measurementId: "G-2FS9BQQ087"
-};
+let lastNotifSignature = '';
+let lastNotifTimestamp = 0;
 
-let fcmInitialized = false;
-let lastNotificationTag = null;
-let lastNotificationTime = 0;
-
-try {
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-
-    messaging.onBackgroundMessage((payload) => {
-        console.log('[sw.js] Firebase background message:', payload);
-
-        // If payload already has notification block, browser displays it natively via webpush! Do NOT double-show!
-        if (payload.notification && payload.notification.title) {
-            console.log('[sw.js] Native browser handles display for notification:', payload.notification.title);
-            return Promise.resolve();
-        }
-
-        const title = payload.data?.title || 'Portal MSN';
-        const body = payload.data?.body || 'Anda menerima notifikasi baru.';
-        const deepLink = payload.data?.deep_link || payload.data?.click_action || '/';
-        const tag = (payload.data?.type || 'notif') + '-' + (payload.data?.reference_id || 'general');
-
-        // Prevent duplicate popup if triggered within 5 seconds for same tag
-        const now = Date.now();
-        if (lastNotificationTag === tag && (now - lastNotificationTime) < 5000) {
-            console.log('[sw.js] Duplicate notification suppressed for tag:', tag);
-            return Promise.resolve();
-        }
-        lastNotificationTag = tag;
-        lastNotificationTime = now;
-
-        const options = {
-            body: body,
-            icon: '/assets/logo/icon-192.png',
-            badge: '/assets/logo/favicon-32x32.png',
-            vibrate: [100, 50, 100],
-            tag: tag,
-            renotify: false,
-            data: {
-                deep_link: deepLink,
-                ...(payload.data || {})
-            }
-        };
-
-        return self.registration.showNotification(title, options);
-    });
-    fcmInitialized = true;
-} catch (e) {
-    console.warn('[sw.js] Firebase background initialization error:', e);
-}
-
-// Fallback native push event listener (only runs if Firebase background handler was not initialized)
 self.addEventListener('push', (event) => {
-    if (fcmInitialized) {
-        return; // Prevent duplicate display because Firebase onBackgroundMessage already handles it
-    }
-
-    let data = {};
+    let raw = {};
     if (event.data) {
         try {
-            data = event.data.json();
+            raw = event.data.json();
         } catch (e) {
-            data = { notification: { title: 'Portal MSN', body: event.data.text() } };
+            raw = { data: { title: 'Portal MSN', body: event.data.text() } };
         }
     }
 
-    const title = data.notification?.title || data.data?.title || 'Portal MSN';
-    const body = data.notification?.body || data.data?.body || 'Anda menerima notifikasi baru.';
-    const deepLink = data.data?.deep_link || data.data?.click_action || '/';
-    const tag = (data.data?.type || 'notif') + '-' + (data.data?.reference_id || 'general');
+    const d = raw.data || {};
+    const n = raw.notification || {};
+
+    const title = d.title || n.title || 'Portal MSN';
+    const body = d.body || n.body || 'Anda menerima pembaruan baru.';
+    const deepLink = d.deep_link || d.click_action || n.click_action || '/';
+    const tag = d.tag || n.tag || ((d.type || 'gomsn') + '-' + (d.reference_id || 'notif'));
+
+    // Deduplicate identical messages arriving within 8 seconds
+    const now = Date.now();
+    const signature = `${tag}|${title}|${body}`;
+    if (lastNotifSignature === signature && (now - lastNotifTimestamp) < 8000) {
+        return;
+    }
+    lastNotifSignature = signature;
+    lastNotifTimestamp = now;
 
     const options = {
         body: body,
-        icon: '/assets/logo/icon-192.png',
-        badge: '/assets/logo/favicon-32x32.png',
+        icon: d.icon || n.icon || '/assets/logo/icon-192.png',
+        badge: d.badge || n.badge || '/assets/logo/favicon-32x32.png',
         vibrate: [100, 50, 100],
         tag: tag,
         renotify: false,
         data: {
             deep_link: deepLink,
-            ...(data.data || {})
+            ...d
         }
     };
 
     event.waitUntil(
-        self.registration.showNotification(title, options)
+        self.registration.getNotifications({ tag: tag }).then((existing) => {
+            existing.forEach((notification) => notification.close());
+            return self.registration.showNotification(title, options);
+        })
     );
 });
 

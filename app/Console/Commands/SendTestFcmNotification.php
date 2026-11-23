@@ -21,18 +21,34 @@ class SendTestFcmNotification extends Command
      *
      * @var string
      */
-    protected $description = 'Send a test push notification via FCM HTTP v1 to registered user devices';
+    protected $description = 'Clean up duplicate FCM tokens and send a test push notification via FCM HTTP v1';
 
     /**
      * Execute the console command.
      */
     public function handle(FcmService $fcmService): int
     {
-        $this->info('== Test FCM HTTP v1 Push Notification ==');
+        $this->info('== Test & Cleanup FCM HTTP v1 Push Notification ==');
 
         if (! $fcmService->isConfigured()) {
             $this->error('FCM is not configured properly. Check FCM_PROJECT_ID and credentials file.');
             return Command::FAILURE;
+        }
+
+        // Automatically prune duplicate tokens per user in database
+        $allUserIds = UserFcmToken::distinct()->pluck('user_id');
+        $prunedCount = 0;
+        foreach ($allUserIds as $uid) {
+            $latestId = UserFcmToken::where('user_id', $uid)
+                ->orderByDesc('last_used_at')
+                ->orderByDesc('id')
+                ->value('id');
+            if ($latestId) {
+                $prunedCount += UserFcmToken::where('user_id', $uid)->where('id', '!=', $latestId)->delete();
+            }
+        }
+        if ($prunedCount > 0) {
+            $this->info("Cleaned up {$prunedCount} duplicate/old FCM token(s) from database.");
         }
 
         $userInput = $this->argument('user');
@@ -48,7 +64,6 @@ class SendTestFcmNotification extends Command
             }
             $users = collect([$user]);
         } else {
-            // Find all users who have at least one registered device token
             $userIdsWithTokens = UserFcmToken::distinct()->pluck('user_id');
             if ($userIdsWithTokens->isEmpty()) {
                 $this->warn('No active device tokens found in the user_fcm_tokens table.');
@@ -62,18 +77,18 @@ class SendTestFcmNotification extends Command
 
         foreach ($users as $user) {
             $tokenCount = $user->fcmTokens()->count();
-            $this->line("- User: {$user->name} ({$user->email}) [{$tokenCount} device token(s)]");
+            $this->line("- User: {$user->name} ({$user->email}) [{$tokenCount} active device token]");
 
-            $result = $fcmService->sendToUsers(
+            $sentCount = $fcmService->sendToUsers(
                 $user->id,
                 'pengajuan',
                 '🔔 Tes Push Notification GoMSN',
-                'Notifikasi FCM berhasil terhubung ke perangkat Anda!',
-                url('/portal/dashboard'),
-                ['test' => true, 'timestamp' => now()->toIso8601String()]
+                'Notifikasi FCM berhasil terhubung (1 notifikasi bersih)!',
+                url('/'),
+                ['test' => '1', 'tag' => 'fcm-test-' . $user->id]
             );
 
-            $this->info("  Result: Sent: {$result['sent']}, Failed: {$result['failed']}");
+            $this->info("  Result: Sent to {$sentCount} device(s).");
         }
 
         $this->info('Test completed successfully.');

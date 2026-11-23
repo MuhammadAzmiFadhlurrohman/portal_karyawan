@@ -2163,14 +2163,11 @@
             }
         })();
 
-        // PWA Service Worker Registration
+        // PWA Service Worker Registration (v5 cache-busted)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                navigator.serviceWorker.register('/sw.js?v=2026112305', { scope: '/', updateViaCache: 'none' }).then(function(reg) {
                     window.msnServiceWorkerReg = reg;
-                    if (window.initGomsnFcmToken) {
-                        window.initGomsnFcmToken();
-                    }
                 }).catch(function(){});
             });
         }
