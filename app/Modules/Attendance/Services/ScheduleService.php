@@ -2,14 +2,20 @@
 
 namespace App\Modules\Attendance\Services;
 
+use App\Models\Attendance;
+use App\Models\Leave;
 use App\Models\MonthlySchedule;
 use App\Models\NationalHoliday;
+use App\Models\NotificationLog;
 use App\Models\OfficeLocation;
 use App\Models\Shift;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\FcmService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ScheduleService
 {
@@ -504,5 +510,246 @@ class ScheduleService
         }
 
         return $conflicts;
+    }
+
+    /**
+     * Send shift reminders (§5.9):
+     * 1) 1 hour before shift start (50 - 65 minutes before) to prompt attendance clock-in.
+     * 2) 20 minutes before shift end (15 - 25 minutes before) to prompt attendance clock-out.
+     *
+     * @return array{
+     *   clock_in_reminders: int,
+     *   clock_out_reminders: int,
+     *   total_notified: int,
+     *   details: array<int, array<string, mixed>>
+     * }
+     */
+    public function sendShiftReminders(?Carbon $officeNow = null, bool $force = false, ?int $userId = null): array
+    {
+        $now = $officeNow ? $officeNow->copy()->setTimezone('Asia/Jakarta') : Carbon::now('Asia/Jakarta');
+        $todayStr = $now->toDateString();
+
+        $query = MonthlySchedule::query()
+            ->with(['user', 'shift'])
+            ->whereDate('date', $todayStr);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        $schedules = $query->get();
+
+        $fcmService = app(FcmService::class);
+        $clockInCount = 0;
+        $clockOutCount = 0;
+        $details = [];
+
+        foreach ($schedules as $schedule) {
+            $shift = $schedule->shift;
+            $user = $schedule->user;
+
+            // Skip invalid, inactive users or day off (§5.9)
+            if (! $shift || ! $user || $shift->is_day_off || ! $user->is_active) {
+                continue;
+            }
+
+            $effectiveStartTime = $schedule->effective_start_time ?? ($shift->start_time ? substr((string) $shift->start_time, 0, 5) : null);
+            $effectiveEndTime = $schedule->effective_end_time ?? ($shift->end_time ? substr((string) $shift->end_time, 0, 5) : null);
+
+            if (empty($effectiveStartTime) || empty($effectiveEndTime)) {
+                continue;
+            }
+
+            // Skip employees on approved leave (§5.9)
+            $onApprovedLeave = Leave::query()
+                ->where('user_id', $user->id)
+                ->where('status', 'approved')
+                ->where('is_alpa_conversion', false)
+                ->whereDate('start_date', '<=', $todayStr)
+                ->whereDate('end_date', '>=', $todayStr)
+                ->exists();
+
+            if ($onApprovedLeave) {
+                continue;
+            }
+
+            $shiftStart = Carbon::parse($todayStr . ' ' . $effectiveStartTime, 'Asia/Jakarta');
+            $shiftEnd = Carbon::parse($todayStr . ' ' . $effectiveEndTime, 'Asia/Jakarta');
+
+            $minsToStart = $now->diffInMinutes($shiftStart, false);
+            $minsToEnd = $now->diffInMinutes($shiftEnd, false);
+            $shiftName = $schedule->isCustomHours() ? 'Custom Jam Kerja' : $shift->name;
+
+            // 1. CLOCK-IN REMINDER: 1 jam sebelum masuk shift (window 50 - 65 menit, atau jika force <= 75 & >= 0)
+            $isClockInWindow = $force ? ($minsToStart >= 0 && $minsToStart <= 75) : ($minsToStart >= 50 && $minsToStart <= 65);
+            if ($isClockInWindow) {
+                // Skip if employee already clocked in today
+                $alreadyClockedIn = Attendance::query()
+                    ->where('user_id', $user->id)
+                    ->whereDate('date', $todayStr)
+                    ->whereNotNull('clock_in_at')
+                    ->exists();
+
+                if (! $alreadyClockedIn) {
+                    $dedupKey = "shift_reminder_in_{$user->id}_{$todayStr}_{$schedule->id}";
+                    $alreadyNotified = ! $force && (
+                        Cache::has($dedupKey) ||
+                        NotificationLog::query()
+                            ->where('user_id', $user->id)
+                            ->where('event_type', 'shift_reminder_clock_in')
+                            ->whereDate('created_at', $todayStr)
+                            ->exists()
+                    );
+
+                    if (! $alreadyNotified) {
+                        AuditLogger::record(
+                            action: 'notification.shift_reminder.clock_in',
+                            auditable: $schedule,
+                            newValues: ['shift' => $shift->code, 'mins_before_start' => $minsToStart],
+                            reason: 'Pengingat otomatis 1 jam sebelum masuk shift (§5.9)',
+                            actorId: $user->id
+                        );
+
+                        $title = "⏰ Pengingat Absen Masuk ({$shiftName})";
+                        $body = "Halo {$user->name}, 1 jam lagi jadwal kerja Anda ({$shiftName}) dimulai pukul {$effectiveStartTime} WIB. Jangan lupa lakukan presensi masuk!";
+                        $deepLink = url('/attendance');
+
+                        $fcmService->sendToUsers(
+                            $user->id,
+                            'absen',
+                            $title,
+                            $body,
+                            $deepLink,
+                            [
+                                'tag' => "shift-reminder-in-{$user->id}-{$todayStr}",
+                                'type' => 'absen',
+                                'shift_code' => (string) $shift->code,
+                                'start_time' => (string) $effectiveStartTime,
+                                'schedule_id' => (string) $schedule->id,
+                            ]
+                        );
+
+                        NotificationLog::query()->create([
+                            'user_id' => $user->id,
+                            'channel' => 'fcm',
+                            'event_type' => 'shift_reminder_clock_in',
+                            'recipient' => $user->name . ' (' . ($user->email ?? $user->username) . ')',
+                            'payload' => [
+                                'title' => $title,
+                                'body' => $body,
+                                'shift_code' => $shift->code,
+                                'shift_name' => $shiftName,
+                                'start_time' => $effectiveStartTime,
+                                'mins_before_start' => $minsToStart,
+                                'deep_link' => $deepLink,
+                            ],
+                            'status' => 'sent',
+                            'attempts' => 1,
+                            'sent_at' => Carbon::now('Asia/Jakarta'),
+                        ]);
+
+                        Cache::put($dedupKey, true, now()->addHours(12));
+                        $clockInCount++;
+                        $details[] = [
+                            'user_id' => $user->id,
+                            'user_name' => $user->name,
+                            'type' => 'clock_in',
+                            'shift' => $shiftName,
+                            'time' => $effectiveStartTime,
+                            'mins_diff' => $minsToStart,
+                        ];
+                    }
+                }
+            }
+
+            // 2. CLOCK-OUT REMINDER: 20 menit sebelum pulang shift (window 15 - 25 menit)
+            $isClockOutWindow = $force ? ($minsToEnd >= 0 && $minsToEnd <= 35) : ($minsToEnd >= 15 && $minsToEnd <= 25);
+            if ($isClockOutWindow) {
+                // Skip if employee already clocked out today
+                $alreadyClockedOut = Attendance::query()
+                    ->where('user_id', $user->id)
+                    ->whereDate('date', $todayStr)
+                    ->whereNotNull('clock_out_at')
+                    ->exists();
+
+                if (! $alreadyClockedOut) {
+                    $dedupKeyOut = "shift_reminder_out_{$user->id}_{$todayStr}_{$schedule->id}";
+                    $alreadyNotifiedOut = ! $force && (
+                        Cache::has($dedupKeyOut) ||
+                        NotificationLog::query()
+                            ->where('user_id', $user->id)
+                            ->where('event_type', 'shift_reminder_clock_out')
+                            ->whereDate('created_at', $todayStr)
+                            ->exists()
+                    );
+
+                    if (! $alreadyNotifiedOut) {
+                        AuditLogger::record(
+                            action: 'notification.shift_reminder.clock_out',
+                            auditable: $schedule,
+                            newValues: ['shift' => $shift->code, 'mins_before_end' => $minsToEnd],
+                            reason: 'Pengingat otomatis 20 menit sebelum pulang shift (§5.9)',
+                            actorId: $user->id
+                        );
+
+                        $title = "⏰ Pengingat Absen Pulang ({$shiftName})";
+                        $body = "Halo {$user->name}, jam kerja Anda ({$shiftName}) berakhir pukul {$effectiveEndTime} WIB. Jangan lupa lakukan presensi pulang!";
+                        $deepLink = url('/attendance');
+
+                        $fcmService->sendToUsers(
+                            $user->id,
+                            'absen',
+                            $title,
+                            $body,
+                            $deepLink,
+                            [
+                                'tag' => "shift-reminder-out-{$user->id}-{$todayStr}",
+                                'type' => 'absen',
+                                'shift_code' => (string) $shift->code,
+                                'end_time' => (string) $effectiveEndTime,
+                                'schedule_id' => (string) $schedule->id,
+                            ]
+                        );
+
+                        NotificationLog::query()->create([
+                            'user_id' => $user->id,
+                            'channel' => 'fcm',
+                            'event_type' => 'shift_reminder_clock_out',
+                            'recipient' => $user->name . ' (' . ($user->email ?? $user->username) . ')',
+                            'payload' => [
+                                'title' => $title,
+                                'body' => $body,
+                                'shift_code' => $shift->code,
+                                'shift_name' => $shiftName,
+                                'end_time' => $effectiveEndTime,
+                                'mins_before_end' => $minsToEnd,
+                                'deep_link' => $deepLink,
+                            ],
+                            'status' => 'sent',
+                            'attempts' => 1,
+                            'sent_at' => Carbon::now('Asia/Jakarta'),
+                        ]);
+
+                        Cache::put($dedupKeyOut, true, now()->addHours(12));
+                        $clockOutCount++;
+                        $details[] = [
+                            'user_id' => $user->id,
+                            'user_name' => $user->name,
+                            'type' => 'clock_out',
+                            'shift' => $shiftName,
+                            'time' => $effectiveEndTime,
+                            'mins_diff' => $minsToEnd,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return [
+            'clock_in_reminders' => $clockInCount,
+            'clock_out_reminders' => $clockOutCount,
+            'total_notified' => $clockInCount + $clockOutCount,
+            'details' => $details,
+        ];
     }
 }

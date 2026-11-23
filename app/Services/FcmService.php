@@ -139,6 +139,7 @@ class FcmService
                 'notify_pengajuan' => true,
                 'notify_lembur' => true,
                 'notify_tiket' => true,
+                'notify_absen' => true,
             ]
         );
     }
@@ -153,6 +154,7 @@ class FcmService
             'notify_pengajuan' => (bool) ($attributes['notify_pengajuan'] ?? $pref->notify_pengajuan),
             'notify_lembur' => (bool) ($attributes['notify_lembur'] ?? $pref->notify_lembur),
             'notify_tiket' => (bool) ($attributes['notify_tiket'] ?? $pref->notify_tiket),
+            'notify_absen' => (bool) ($attributes['notify_absen'] ?? $pref->notify_absen),
         ]);
 
         return $pref;
@@ -162,7 +164,7 @@ class FcmService
      * Send push notification to target users (with preference filtering and dead token removal).
      *
      * @param array<int>|int $userIds
-     * @param string $eventType 'pengajuan'|'lembur'|'tiket'
+     * @param string $eventType 'pengajuan'|'lembur'|'tiket'|'absen'
      */
     public function sendToUsers(
         array|int $userIds,
@@ -183,17 +185,20 @@ class FcmService
             return 0;
         }
 
-        // 1. Filter out users who turned off this event preference
+        // 1. Filter out users who turned off this event preference (if preference column exists)
         $prefColumn = "notify_{$eventType}";
-        $allowedUserIds = DB::table('users')
-            ->leftJoin('user_notification_preferences', 'users.id', '=', 'user_notification_preferences.user_id')
-            ->whereIn('users.id', $ids)
-            ->where(function ($q) use ($prefColumn) {
-                $q->whereNull("user_notification_preferences.{$prefColumn}")
-                  ->orWhere("user_notification_preferences.{$prefColumn}", true);
-            })
-            ->pluck('users.id')
-            ->toArray();
+        $allowedUserIds = $ids;
+        if (\Illuminate\Support\Facades\Schema::hasColumn('user_notification_preferences', $prefColumn)) {
+            $allowedUserIds = DB::table('users')
+                ->leftJoin('user_notification_preferences', 'users.id', '=', 'user_notification_preferences.user_id')
+                ->whereIn('users.id', $ids)
+                ->where(function ($q) use ($prefColumn) {
+                    $q->whereNull("user_notification_preferences.{$prefColumn}")
+                      ->orWhere("user_notification_preferences.{$prefColumn}", true);
+                })
+                ->pluck('users.id')
+                ->toArray();
+        }
 
         if (empty($allowedUserIds)) {
             return 0;

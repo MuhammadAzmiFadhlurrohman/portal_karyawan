@@ -95,6 +95,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/attendance/schedules/upload-piket', [ScheduleController::class, 'uploadPiket'])->name('attendance.schedules.upload-piket');
     Route::post('/attendance/schedules/preview', [ScheduleController::class, 'previewGenerate'])->name('attendance.schedules.preview');
     Route::post('/attendance/schedules/commit', [ScheduleController::class, 'commitGenerate'])->name('attendance.schedules.commit');
+    Route::post('/attendance/schedules/sync-reminders', [ScheduleController::class, 'syncReminders'])->name('attendance.schedules.sync-reminders');
     Route::post('/attendance/schedules/cell', [ScheduleController::class, 'updateCell'])->name('attendance.schedules.cell');
     Route::post('/attendance/offices', [ScheduleController::class, 'storeOffice'])->name('attendance.offices.store');
     Route::get('/attendance/schedules/export-csv', [ScheduleController::class, 'exportCsv'])->name('attendance.schedules.export');

@@ -334,6 +334,26 @@ class ScheduleController extends Controller
     }
 
     /**
+     * Trigger manual sync for shift reminders (1 hour before clock-in & 20m before clock-out).
+     */
+    public function syncReminders(Request $request, ScheduleService $scheduleService): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($this->canManageSchedule($actor) || ($actor && $actor->hasRole('hrd')), 403);
+
+        $result = $scheduleService->sendShiftReminders(
+            officeNow: Carbon::now('Asia/Jakarta'),
+            force: (bool) $request->boolean('force', false)
+        );
+
+        return back()->with(
+            'status',
+            "Sinkronisasi notifikasi berhasil: {$result['total_notified']} notifikasi pengingat shift diproses ({$result['clock_in_reminders']} masuk, {$result['clock_out_reminders']} pulang)."
+        );
+    }
+
+    /**
      * Delete entire monthly schedule.
      */
     public function deleteMonth(Request $request, ScheduleService $scheduleService): RedirectResponse

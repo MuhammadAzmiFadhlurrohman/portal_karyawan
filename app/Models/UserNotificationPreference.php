@@ -14,12 +14,14 @@ class UserNotificationPreference extends Model
         'notify_pengajuan',
         'notify_lembur',
         'notify_tiket',
+        'notify_absen',
     ];
 
     protected $casts = [
         'notify_pengajuan' => 'boolean',
         'notify_lembur' => 'boolean',
         'notify_tiket' => 'boolean',
+        'notify_absen' => 'boolean',
     ];
 
     public function user(): BelongsTo

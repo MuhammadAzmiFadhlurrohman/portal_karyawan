@@ -67,6 +67,7 @@ class FcmController extends Controller
                 'notify_pengajuan' => (bool) $pref->notify_pengajuan,
                 'notify_lembur' => (bool) $pref->notify_lembur,
                 'notify_tiket' => (bool) $pref->notify_tiket,
+                'notify_absen' => (bool) ($pref->notify_absen ?? true),
             ],
         ]);
     }
@@ -80,6 +81,7 @@ class FcmController extends Controller
             'notify_pengajuan' => ['nullable', 'boolean'],
             'notify_lembur' => ['nullable', 'boolean'],
             'notify_tiket' => ['nullable', 'boolean'],
+            'notify_absen' => ['nullable', 'boolean'],
         ]);
 
         $pref = $this->fcmService->updatePreferences($request->user(), $validated);
@@ -91,6 +93,7 @@ class FcmController extends Controller
                 'notify_pengajuan' => (bool) $pref->notify_pengajuan,
                 'notify_lembur' => (bool) $pref->notify_lembur,
                 'notify_tiket' => (bool) $pref->notify_tiket,
+                'notify_absen' => (bool) ($pref->notify_absen ?? true),
             ],
         ]);
     }

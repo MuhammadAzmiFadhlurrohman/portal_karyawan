@@ -5,6 +5,7 @@ use App\Models\MonthlySchedule;
 use App\Models\Tiket;
 use App\Modules\Attendance\Services\AttendanceService;
 use App\Modules\Attendance\Services\LeaveService;
+use App\Modules\Attendance\Services\ScheduleService;
 use App\Modules\Ticketing\Services\HandoverService;
 use App\Services\AuditLogger;
 use Carbon\Carbon;
@@ -30,70 +31,17 @@ Artisan::command('leave:sync {--date=}', function (LeaveService $leaveService): 
     );
 })->purpose('Daily idempotent Alpa detection and optional conversion to annual leave with 3-workday dispute window (§5.4)');
 
-Artisan::command('attendance:shift-reminders {--now=}', function (): void {
+Artisan::command('attendance:shift-reminders {--now=} {--user=} {--force}', function (ScheduleService $scheduleService): void {
     $officeNow = $this->option('now')
         ? Carbon::parse((string) $this->option('now'), 'Asia/Jakarta')
         : now('Asia/Jakarta');
 
-    $todayStr = $officeNow->toDateString();
+    $force = (bool) $this->option('force');
+    $userId = $this->option('user') ? (int) $this->option('user') : null;
 
-    $schedules = MonthlySchedule::query()
-        ->with(['user', 'shift'])
-        ->whereDate('date', $todayStr)
-        ->get();
+    $result = $scheduleService->sendShiftReminders($officeNow, $force, $userId);
 
-    $sentCount = 0;
-
-    foreach ($schedules as $schedule) {
-        $shift = $schedule->shift;
-        $user = $schedule->user;
-
-        // Skip employees on day-off ('L') or inactive (§5.9)
-        if (! $shift || ! $user || $shift->is_day_off || ! $user->is_active || ! $shift->start_time || ! $shift->end_time) {
-            continue;
-        }
-
-        // Skip employees on approved leave (§5.9)
-        $onApprovedLeave = Leave::query()
-            ->where('user_id', $user->id)
-            ->where('status', 'approved')
-            ->where('is_alpa_conversion', false)
-            ->whereDate('start_date', '<=', $todayStr)
-            ->whereDate('end_date', '>=', $todayStr)
-            ->exists();
-
-        if ($onApprovedLeave) {
-            continue;
-        }
-
-        $shiftStart = Carbon::parse($todayStr.' '.$shift->start_time, 'Asia/Jakarta');
-        $shiftEnd = Carbon::parse($todayStr.' '.$shift->end_time, 'Asia/Jakarta');
-
-        $minsToStart = $officeNow->diffInMinutes($shiftStart, false);
-        $minsToEnd = $officeNow->diffInMinutes($shiftEnd, false);
-
-        if ($minsToStart >= 55 && $minsToStart <= 65) {
-            AuditLogger::record(
-                action: 'notification.shift_reminder.clock_in',
-                auditable: $schedule,
-                newValues: ['shift' => $shift->code, 'mins_before_start' => $minsToStart],
-                reason: 'Pengingat otomatis 1 jam sebelum masuk shift (§5.9)',
-                actorId: $user->id
-            );
-            $sentCount++;
-        } elseif ($minsToEnd >= 15 && $minsToEnd <= 25) {
-            AuditLogger::record(
-                action: 'notification.shift_reminder.clock_out',
-                auditable: $schedule,
-                newValues: ['shift' => $shift->code, 'mins_before_end' => $minsToEnd],
-                reason: 'Pengingat otomatis 20 menit sebelum pulang shift (§5.9)',
-                actorId: $user->id
-            );
-            $sentCount++;
-        }
-    }
-
-    $this->info("Sent {$sentCount} shift reminder notification(s).");
+    $this->info("Shift reminder sync completed: {$result['total_notified']} notification(s) ({$result['clock_in_reminders']} masuk, {$result['clock_out_reminders']} pulang).");
 })->purpose('Send shift reminders 1h before clock-in and 20m before clock-out (§5.9)');
 
 Artisan::command('ticket:escalate-unassigned', function (): void {
