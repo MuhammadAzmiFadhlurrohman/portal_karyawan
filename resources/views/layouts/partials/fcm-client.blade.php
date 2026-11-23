@@ -26,55 +26,77 @@
         }).catch(function() {});
     }
 
+    // Wait until Firebase SDK script from Google CDN is fully loaded
+    async function ensureFirebaseLoaded() {
+        if (typeof firebase !== 'undefined' && typeof firebase.messaging === 'function') {
+            return true;
+        }
+        for (let i = 0; i < 30; i++) {
+            await new Promise(resolve => setTimeout(resolve, 150));
+            if (typeof firebase !== 'undefined' && typeof firebase.messaging === 'function') {
+                return true;
+            }
+        }
+        return typeof firebase !== 'undefined';
+    }
+
     // Initialize Firebase
-    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (e) {
-            console.error('[FCM] Initialization error:', e);
+    function initFirebaseApp() {
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+            } catch (e) {
+                console.error('[FCM] Initialization error:', e);
+            }
         }
     }
 
     // Foreground message listener
-    try {
-        if (typeof firebase !== 'undefined' && firebase.messaging) {
-            const messaging = firebase.messaging();
-            messaging.onMessage(function(payload) {
-                console.log('[FCM] Foreground notification received:', payload);
-                const title = payload.notification?.title || payload.data?.title || 'Notifikasi Baru';
-                const body = payload.notification?.body || payload.data?.body || '';
-                const deepLink = payload.data?.deep_link || payload.data?.click_action || '';
+    async function setupForegroundListener() {
+        await ensureFirebaseLoaded();
+        initFirebaseApp();
 
-                if (window.Swal) {
-                    window.Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'info',
-                        title: title,
-                        text: body,
-                        showConfirmButton: !!deepLink,
-                        confirmButtonText: 'Buka',
-                        confirmButtonColor: '#155E63',
-                        showCancelButton: !!deepLink,
-                        cancelButtonText: 'Tutup',
-                        timer: deepLink ? 8000 : 5000,
-                        timerProgressBar: true,
-                        customClass: {
-                            popup: 'cursor-pointer'
-                        }
-                    }).then(function(result) {
-                        if (result.isConfirmed && deepLink) {
-                            window.location.href = deepLink;
-                        }
-                    });
-                } else if (window.triggerToast) {
-                    window.triggerToast('info', title + (body ? ': ' + body : ''));
-                }
-            });
+        try {
+            if (typeof firebase !== 'undefined' && firebase.messaging) {
+                const messaging = firebase.messaging();
+                messaging.onMessage(function(payload) {
+                    console.log('[FCM] Foreground notification received:', payload);
+                    const title = payload.notification?.title || payload.data?.title || 'Notifikasi Baru';
+                    const body = payload.notification?.body || payload.data?.body || '';
+                    const deepLink = payload.data?.deep_link || payload.data?.click_action || '';
+
+                    if (window.Swal) {
+                        window.Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'info',
+                            title: title,
+                            text: body,
+                            showConfirmButton: !!deepLink,
+                            confirmButtonText: 'Buka',
+                            confirmButtonColor: '#155E63',
+                            showCancelButton: !!deepLink,
+                            cancelButtonText: 'Tutup',
+                            timer: deepLink ? 8000 : 5000,
+                            timerProgressBar: true,
+                            customClass: {
+                                popup: 'cursor-pointer'
+                            }
+                        }).then(function(result) {
+                            if (result.isConfirmed && deepLink) {
+                                window.location.href = deepLink;
+                            }
+                        });
+                    } else if (window.triggerToast) {
+                        window.triggerToast('info', title + (body ? ': ' + body : ''));
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('[FCM] onMessage setup error:', e);
         }
-    } catch (e) {
-        console.warn('[FCM] onMessage setup error:', e);
     }
+    setupForegroundListener();
 
     // Helper to register token to backend
     async function sendTokenToBackend(token, interactive = false) {
@@ -167,6 +189,22 @@
                 }
             });
         }
+
+        // Wait for Firebase SDK to load
+        const loaded = await ensureFirebaseLoaded();
+        if (!loaded) {
+            if (interactive && window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'SDK Google Belum Siap',
+                    text: 'Gagal memuat pustaka Firebase dari Google CDN. Periksa koneksi internet Anda.',
+                    confirmButtonColor: '#155E63'
+                });
+            }
+            return;
+        }
+
+        initFirebaseApp();
 
         let permission = Notification.permission;
         if (permission !== 'granted') {
