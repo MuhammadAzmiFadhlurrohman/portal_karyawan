@@ -5189,6 +5189,7 @@ async function handleChatFormSubmit(e) {
     const stream = document.getElementById('chat-stream-container') || document.getElementById('chat-stream-box');
     const scrollBox = document.getElementById('chat-stream-box');
     const tempRowId = 'temp-row-' + Date.now();
+    let localMediaPreviewUrl = null;
 
     if (stream) {
         const now = new Date();
@@ -5201,7 +5202,6 @@ async function handleChatFormSubmit(e) {
         bubble.id = tempRowId;
         
         let mediaNotice = '';
-        let localMediaPreviewUrl = null;
         const attachedPhotoFile = (mediaInput && mediaInput.files && mediaInput.files[0]) || null;
         const attachedVideoFile = (videoInput && videoInput.files && videoInput.files[0]) || null;
 
