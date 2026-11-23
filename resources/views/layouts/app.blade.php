@@ -575,7 +575,7 @@
                 <!-- Bagian 2 & 3: Absensi & Cuti / Pekerjaan & Tiketing (Urutan disesuaikan role NOC) -->
                 @php
                     $sidebarUser = auth()->user();
-                    $canViewReports = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin']);
+                    $canViewReports = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin']) && ! $sidebarUser->hasRole('finance') && strtolower($sidebarUser->division ?? '') !== 'finance';
                     $isHrdRole = $sidebarUser && $sidebarUser->hasRole('hrd') && ! $sidebarUser->hasRole(['super_admin', 'admin']);
                     $canViewEmployeeRecap = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin', 'hrd']);
                     $isAbsensiActive = request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals');
@@ -1681,7 +1681,10 @@
                         </a>
                         @endif
 
-                        @if (! $navIsHrd && $canViewReports)
+                        @php
+                            $isFinanceUser = $navUser && ($navUser->hasRole('finance') || strtolower($navUser->division ?? '') === 'finance');
+                        @endphp
+                        @if (! $navIsHrd && ! $isFinanceUser && $canViewReports)
                         <a href="{{ route('attendance.reports') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -1765,6 +1768,7 @@
                             @endif
                         </a>
 
+                        @if ($canViewReports)
                         <!-- Laporan Absensi -->
                         <a href="{{ route('attendance.reports') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
                             <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
@@ -1775,6 +1779,7 @@
                                 <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Rekap Harian &amp; Admin</span>
                             </div>
                         </a>
+                        @endif
 
                         <!-- Leaderboard Disiplin Karyawan -->
                         <a href="{{ route('attendance.leaderboard') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">

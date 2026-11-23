@@ -31,6 +31,16 @@ class AttendanceReportTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_finance_role_cannot_access_attendance_report(): void
+    {
+        Role::firstOrCreate(['name' => 'finance']);
+        $finance = User::factory()->create(['division' => 'Finance']);
+        $finance->assignRole('finance');
+
+        $response = $this->actingAs($finance)->get(route('attendance.reports'));
+        $response->assertStatus(403);
+    }
+
     public function test_admin_can_access_attendance_report(): void
     {
         $admin = User::factory()->create();

@@ -54,16 +54,6 @@
                     <span class="truncate">Riwayat Absen</span>
                 </a>
 
-                @if (auth()->user()->hasRole(['super_admin', 'admin', 'hrd']) || auth()->user()->can('attendance.employee.manage'))
-                <a href="{{ route('attendance.reports') }}" 
-                   class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-cyan-300 bg-cyan-50/70 hover:bg-cyan-100/70 text-cyan-900 text-xs font-semibold transition cursor-pointer w-full sm:w-auto">
-                    <svg class="w-4 h-4 text-cyan-700 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span>Laporan Absensi</span>
-                </a>
-                @endif
-
                 <div class="inline-flex items-center justify-between sm:justify-start gap-2 px-3 py-1.5 rounded-xl bg-teal-50/80 border border-teal-200/70 text-xs w-full sm:w-auto">
                     <div class="flex items-center gap-1.5">
                         <span class="text-teal-700 font-medium">Periode:</span>
