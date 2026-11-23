@@ -181,7 +181,8 @@
     </div>
 
     <!-- Daily Breakdown Table (Rekapitulasi Harian) -->
-    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden" x-data="{ photoModalUrl: null, photoModalName: '' }">
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden" 
+         x-data="{ photoModalUrl: null, photoModalName: '', onlyPotongan: false }">
         <!-- Card Header with Filters / Meta Info -->
         <div class="px-5 py-4 border-b border-slate-100 bg-linear-to-r from-slate-50/70 via-white to-slate-50/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -201,8 +202,15 @@
                 </div>
             </div>
 
-            <!-- Status Legend Badges -->
+            <!-- Status Legend Badges & Filter Toggle -->
             <div class="flex items-center flex-wrap gap-2 text-[10.5px]">
+                <button type="button"
+                        @click="onlyPotongan = !onlyPotongan"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold border transition cursor-pointer select-none"
+                        :class="onlyPotongan ? 'bg-rose-500 text-white border-rose-600 shadow-xs' : 'bg-rose-50 text-rose-700 border-rose-200/80 hover:bg-rose-100'">
+                    <span class="w-1.5 h-1.5 rounded-full" :class="onlyPotongan ? 'bg-white' : 'bg-rose-500'"></span>
+                    <span x-text="onlyPotongan ? 'Tampilkan Semua Hari' : 'Hanya Hari Ada Potongan'"></span>
+                </button>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/50">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Hadir
                 </span>
@@ -254,8 +262,9 @@
                             $isRowIzin = in_array($statusLower, ['izin', 'special']) || str_contains($statusLower, 'izin');
                             $isWeekend = in_array(strtolower($row['day_name']), ['minggu', 'sabtu', 'sunday', 'saturday']);
                             $isSunday = in_array(strtolower($row['day_name']), ['minggu', 'sunday']);
+                            $hasPotongan = !empty($row['potongan_badge']) && !empty($row['potongan_badge']['amount']) && $row['potongan_badge']['amount'] !== 'Rp 0' && $row['potongan_badge']['amount'] !== '0';
                         @endphp
-                        <tr class="transition-colors hover:bg-slate-50/80 {{ $isRowLibur ? 'bg-slate-50/30' : ($isRowAlpa ? 'bg-rose-50/20' : ($isRowSakit ? 'bg-amber-50/20' : '')) }}">
+                        <tr x-show="!onlyPotongan || {{ $hasPotongan ? 'true' : 'false' }}" class="transition-colors hover:bg-slate-50/80 {{ $isRowLibur ? 'bg-slate-50/30' : ($isRowAlpa ? 'bg-rose-50/20' : ($isRowSakit ? 'bg-amber-50/20' : '')) }}">
                             <!-- Tanggal & Hari -->
                             <td class="py-3 px-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2.5">

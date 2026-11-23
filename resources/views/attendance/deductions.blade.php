@@ -231,7 +231,13 @@
 
         <!-- Daily Breakdown Table (Full Width) -->
         <div class="w-full rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs">
-            <div class="flex items-center justify-between gap-3 mb-4">
+            @php
+                $deductionItems = collect($monthlyReport['daily_items'] ?? [])->filter(function ($item) {
+                    return ((float) ($item['total_deduction'] ?? 0)) > 0;
+                })->values();
+            @endphp
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 text-[#155E63] flex items-center justify-center shrink-0">
                         <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -239,32 +245,39 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="font-heading text-sm sm:text-base font-bold text-slate-800 leading-tight">
-                            Rincian Harian &amp; Tautan Absensi
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">Catatan presensi, keterlambatan &amp; potongan per hari</p>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 class="font-heading text-sm sm:text-base font-bold text-slate-800 leading-tight">
+                                Rincian Harian &amp; Tautan Absensi
+                            </h2>
+                            @if ($deductionItems->isNotEmpty())
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    {{ $deductionItems->count() }} Hari Berpotongan
+                                </span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Hanya menampilkan hari yang memiliki potongan keterlambatan atau alpa</p>
                     </div>
                 </div>
 
                 <a href="{{ route('attendance.history', ['month' => $month, 'year' => $year]) }}" 
                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#155E63] hover:text-[#0f4448] transition cursor-pointer shrink-0">
-                    <span>Riwayat Lengkap</span>
+                    <span>Lihat Semua di Riwayat</span>
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </a>
             </div>
 
-            @if (empty($monthlyReport['daily_items']))
-                <div class="rounded-xl border border-dashed border-slate-200 p-8 text-center bg-slate-50/50">
-                    <div class="w-10 h-10 rounded-2xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center mx-auto mb-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            @if ($deductionItems->isEmpty())
+                <div class="rounded-xl border border-dashed border-emerald-200 p-8 text-center bg-emerald-50/40">
+                    <div class="w-10 h-10 rounded-2xl bg-white border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto mb-2 shadow-2xs">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <h3 class="font-bold text-xs sm:text-sm text-slate-700">Tidak Ada Catatan Potongan / Jadwal</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Belum ada jadwal kerja atau catatan absensi pada periode bulan ini.</p>
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-800">Tidak Ada Hari Berpotongan</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Luar biasa! Tidak ada potongan keterlambatan maupun alpa pada periode bulan ini.</p>
                 </div>
             @else
                 <!-- Mobile Card List View (sm:hidden) -->
                 <div class="sm:hidden space-y-2.5">
-                    @foreach ($monthlyReport['daily_items'] as $item)
+                    @foreach ($deductionItems as $item)
                         <div class="rounded-xl border border-slate-200/80 bg-white p-3 shadow-2xs space-y-2">
                             <div class="flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-1.5">
@@ -333,7 +346,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
-                            @foreach ($monthlyReport['daily_items'] as $item)
+                            @foreach ($deductionItems as $item)
                                 <tr class="hover:bg-slate-50/60 transition">
                                     <td class="py-3 px-3 font-mono font-semibold text-slate-800">
                                         {{ $item['date'] }}
