@@ -1601,15 +1601,11 @@
                                     </div>
                                 </template>
 
-                                <div>
-                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Pencairan (Opsional):</label>
-                                    <input type="text" name="notes" placeholder="No. referensi transaksi / kas kecil / catatan..." class="w-full text-xs rounded-xl border-slate-300 py-2.5 px-3 bg-white">
-                                </div>
                                 <button type="submit" 
                                         style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
                                         class="w-full hover:opacity-90 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                    <span x-text="disburseMethod === 'Cash' ? '✓ Terima &amp; Cairkan Cash (Tunai)' : '✓ Terima &amp; Cairkan Dana Transfer'"></span>
+                                    <span x-text="disburseMethod === 'Cash' ? 'Terima &amp; Cairkan Cash (Tunai)' : 'Terima &amp; Cairkan Dana Transfer'"></span>
                                 </button>
                             </form>
 

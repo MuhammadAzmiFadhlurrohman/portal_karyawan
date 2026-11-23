@@ -768,15 +768,11 @@
                                             <input type="file" name="bukti_transfer" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 border border-slate-300 rounded-xl bg-white p-1" />
                                         </div>
                                     </template>
-                                    <div>
-                                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Catatan Pencairan (Opsional):</label>
-                                        <input type="text" name="notes" placeholder="No. referensi transfer / catatan kas..." class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3 bg-white" />
-                                    </div>
                                     <button type="submit" 
                                             style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
                                             class="w-full hover:opacity-90 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                        <span x-text="method === 'Cash' ? '✓ Konfirmasi Pencairan Cash' : '✓ Konfirmasi Pencairan Transfer'"></span>
+                                        <span x-text="method === 'Cash' ? 'Konfirmasi Pencairan Cash' : 'Konfirmasi Pencairan Transfer'"></span>
                                     </button>
                                 </form>
                             @endif
