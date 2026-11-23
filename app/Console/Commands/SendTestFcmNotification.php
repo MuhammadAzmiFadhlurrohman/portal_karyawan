@@ -14,7 +14,7 @@ class SendTestFcmNotification extends Command
      *
      * @var string
      */
-    protected $signature = 'fcm:test {user? : User ID or email to send the test notification to}';
+    protected $signature = 'fcm:test {user? : User ID or email to send the test notification to} {--title= : Custom notification title} {--body= : Custom notification body}';
 
     /**
      * The console command description.
@@ -79,11 +79,14 @@ class SendTestFcmNotification extends Command
             $tokenCount = $user->fcmTokens()->count();
             $this->line("- User: {$user->name} ({$user->email}) [{$tokenCount} active device token]");
 
+            $title = $this->option('title') ?: '🔔 Tes Push Notification GoMSN';
+            $body = $this->option('body') ?: 'Notifikasi FCM berhasil terhubung (1 notifikasi bersih)!';
+
             $sentCount = $fcmService->sendToUsers(
                 $user->id,
-                'pengajuan',
-                '🔔 Tes Push Notification GoMSN',
-                'Notifikasi FCM berhasil terhubung (1 notifikasi bersih)!',
+                'absen',
+                $title,
+                $body,
                 url('/'),
                 ['test' => '1', 'tag' => 'fcm-test-' . $user->id]
             );
