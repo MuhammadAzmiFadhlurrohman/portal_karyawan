@@ -182,6 +182,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/gomsn/pengajuan/create', [PengajuanController::class, 'create'])->name('gomsn.pengajuan.create');
     Route::post('/gomsn/pengajuan', [PengajuanController::class, 'store'])->name('gomsn.pengajuan.store');
     Route::get('/gomsn/pengajuan/{pengajuan}', [PengajuanController::class, 'show'])->name('gomsn.pengajuan.show');
+    Route::get('/gomsn/pengajuan/{pengajuan}/file/{type}', [PengajuanController::class, 'viewFile'])->name('gomsn.pengajuan.file');
     Route::get('/gomsn/pengajuan/{pengajuan}/edit', [PengajuanController::class, 'edit'])->name('gomsn.pengajuan.edit');
     Route::put('/gomsn/pengajuan/{pengajuan}', [PengajuanController::class, 'update'])->name('gomsn.pengajuan.update');
     Route::post('/gomsn/pengajuan/{pengajuan}/submit', [PengajuanController::class, 'submit'])->name('gomsn.pengajuan.submit');

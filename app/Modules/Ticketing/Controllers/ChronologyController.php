@@ -74,12 +74,12 @@ class ChronologyController extends Controller
 
         $photoPath = null;
         if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('tickets/chronologies/photos', 'public');
+            $photoPath = $request->file('photo')->store('tickets/chronologies/photos', 'private');
         }
 
         $videoPath = null;
         if ($request->hasFile('video')) {
-            $videoPath = $request->file('video')->store('tickets/chronologies/videos', 'public');
+            $videoPath = $request->file('video')->store('tickets/chronologies/videos', 'private');
         }
 
         $replyToId = $request->filled('reply_to_id') ? (int) $request->input('reply_to_id') : null;
@@ -385,9 +385,15 @@ class ChronologyController extends Controller
             $cleanPath = substr($cleanPath, 8);
         }
 
+        if (Storage::disk('private')->exists($cleanPath)) {
+            return response()->file(Storage::disk('private')->path($cleanPath), [
+                'Cache-Control' => 'private, max-age=86400',
+            ]);
+        }
+
         if (Storage::disk('public')->exists($cleanPath)) {
             return response()->file(Storage::disk('public')->path($cleanPath), [
-                'Cache-Control' => 'public, max-age=86400',
+                'Cache-Control' => 'private, max-age=86400',
             ]);
         }
 
@@ -420,9 +426,15 @@ class ChronologyController extends Controller
             $cleanPath = substr($cleanPath, 8);
         }
 
+        if (Storage::disk('private')->exists($cleanPath)) {
+            return response()->file(Storage::disk('private')->path($cleanPath), [
+                'Cache-Control' => 'private, max-age=86400',
+            ]);
+        }
+
         if (Storage::disk('public')->exists($cleanPath)) {
             return response()->file(Storage::disk('public')->path($cleanPath), [
-                'Cache-Control' => 'public, max-age=86400',
+                'Cache-Control' => 'private, max-age=86400',
             ]);
         }
 

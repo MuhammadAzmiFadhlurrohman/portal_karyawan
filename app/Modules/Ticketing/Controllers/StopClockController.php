@@ -34,7 +34,7 @@ class StopClockController extends Controller
 
         $evidencePath = null;
         if ($request->hasFile('evidence')) {
-            $evidencePath = $request->file('evidence')->store('tickets/stopclock/evidence', 'public');
+            $evidencePath = $request->file('evidence')->store('tickets/stopclock/evidence', 'private');
         }
 
         try {

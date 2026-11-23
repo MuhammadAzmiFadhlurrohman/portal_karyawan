@@ -432,6 +432,7 @@
                                             'totalNominal' => (float) $item->total_nominal,
                                             'status' => $item->status,
                                             'buktiTransferPath' => $item->bukti_transfer_path,
+                                            'buktiTransferUrl' => $item->bukti_transfer_url,
                                             'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
                                             'disburseUrl' => route('gomsn.pengajuan.disburse', $item->id),
                                             'realizeUrl' => route('gomsn.pengajuan.realize', $item->id),
@@ -442,6 +443,7 @@
                                             'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
                                             'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
                                             'buktiRealisasiPath' => $item->bukti_realisasi_path,
+                                            'buktiRealisasiUrl' => $item->bukti_realisasi_url,
                                             'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                             'realisasiNotes' => $item->realisasi_notes,
                                             'details' => $item->getModalDetails(),
@@ -562,6 +564,7 @@
                                         'totalNominal' => (float) $item->total_nominal,
                                         'status' => $item->status,
                                         'buktiTransferPath' => $item->bukti_transfer_path,
+                                        'buktiTransferUrl' => $item->bukti_transfer_url,
                                         'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
                                         'disburseUrl' => route('gomsn.pengajuan.disburse', $item->id),
                                         'realizeUrl' => route('gomsn.pengajuan.realize', $item->id),
@@ -572,6 +575,7 @@
                                         'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
                                         'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
                                         'buktiRealisasiPath' => $item->bukti_realisasi_path,
+                                        'buktiRealisasiUrl' => $item->bukti_realisasi_url,
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
                                         'details' => $item->getModalDetails(),
@@ -971,6 +975,7 @@
                                             'totalNominal' => (float) $item->total_nominal,
                                             'status' => $item->status,
                                             'buktiTransferPath' => $item->bukti_transfer_path,
+                                            'buktiTransferUrl' => $item->bukti_transfer_url,
                                             'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
                                             'disburseUrl' => route('gomsn.pengajuan.disburse', $item->id),
                                             'realizeUrl' => route('gomsn.pengajuan.realize', $item->id),
@@ -981,6 +986,7 @@
                                             'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
                                             'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
                                             'buktiRealisasiPath' => $item->bukti_realisasi_path,
+                                            'buktiRealisasiUrl' => $item->bukti_realisasi_url,
                                             'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                             'realisasiNotes' => $item->realisasi_notes,
                                             'details' => $item->getModalDetails(),
@@ -1109,6 +1115,7 @@
                                         'totalNominal' => (float) $item->total_nominal,
                                         'status' => $item->status,
                                         'buktiTransferPath' => $item->bukti_transfer_path,
+                                        'buktiTransferUrl' => $item->bukti_transfer_url,
                                         'rejectUrl' => route('gomsn.pengajuan.reject', $item->id),
                                         'disburseUrl' => route('gomsn.pengajuan.disburse', $item->id),
                                         'realizeUrl' => route('gomsn.pengajuan.realize', $item->id),
@@ -1119,6 +1126,7 @@
                                         'selisihRealisasi' => $item->selisih_realisasi !== null ? (float) $item->selisih_realisasi : null,
                                         'selisihRealisasiFormatted' => $item->selisih_realisasi !== null ? ('Rp' . number_format((float) abs($item->selisih_realisasi), 0, ',', '.')) : null,
                                         'buktiRealisasiPath' => $item->bukti_realisasi_path,
+                                        'buktiRealisasiUrl' => $item->bukti_realisasi_url,
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
                                         'details' => $item->getModalDetails(),
@@ -1611,9 +1619,9 @@
                                 </div>
                                 <span class="text-sm">Pengajuan ini telah Disetujui &amp; Diproses oleh Finance</span>
                             </div>
-                            <template x-if="activeItem?.buktiTransferPath">
+                            <template x-if="activeItem?.buktiTransferUrl">
                                 <div class="pt-1 pl-9">
-                                    <a :href="'/storage/' + activeItem?.buktiTransferPath" target="_blank" class="inline-flex items-center gap-1.5 text-teal-700 hover:text-teal-900 hover:underline font-semibold bg-white border border-emerald-200 px-3 py-1.5 rounded-lg shadow-2xs">
+                                    <a :href="activeItem?.buktiTransferUrl" target="_blank" class="inline-flex items-center gap-1.5 text-teal-700 hover:text-teal-900 hover:underline font-semibold bg-white border border-emerald-200 px-3 py-1.5 rounded-lg shadow-2xs">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         <span>Lihat Bukti Transfer / Penyerahan</span>
                                     </a>
@@ -1761,7 +1769,7 @@
                                             <span>Foto Bukti Realisasi / Kwitansi Pembelian</span>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <a :href="'/storage/' + activeItem?.buktiRealisasiPath" target="_blank" class="text-xs text-teal-700 hover:text-teal-900 hover:underline font-bold inline-flex items-center gap-1">
+                                            <a :href="activeItem?.buktiRealisasiUrl" target="_blank" class="text-xs text-teal-700 hover:text-teal-900 hover:underline font-bold inline-flex items-center gap-1">
                                                 <span>Buka Ukuran Penuh</span>
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                             </a>
@@ -1771,10 +1779,10 @@
                                     <!-- Foto Visual Inline (Jika Gambar) -->
                                     <template x-if="!activeItem?.buktiRealisasiPath.toLowerCase().endsWith('.pdf')">
                                         <div class="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center max-h-80">
-                                            <img :src="'/storage/' + activeItem?.buktiRealisasiPath" 
+                                            <img :src="activeItem?.buktiRealisasiUrl" 
                                                  alt="Bukti Foto Realisasi Pembelian" 
                                                  class="max-h-80 w-auto object-contain rounded-lg shadow-inner group-hover:scale-[1.02] transition duration-200">
-                                            <a :href="'/storage/' + activeItem?.buktiRealisasiPath" target="_blank" class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-xs font-bold gap-1.5 backdrop-blur-2xs">
+                                            <a :href="activeItem?.buktiRealisasiUrl" target="_blank" class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-xs font-bold gap-1.5 backdrop-blur-2xs">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                                 <span>Klik untuk Memperbesar Gambar</span>
                                             </a>
@@ -1791,7 +1799,7 @@
                                                     <span class="text-[11px] text-slate-500 font-mono" x-text="activeItem?.buktiRealisasiPath.split('/').pop()"></span>
                                                 </div>
                                             </div>
-                                            <a :href="'/storage/' + activeItem?.buktiRealisasiPath" target="_blank" class="px-3.5 py-1.5 bg-[#155E63] text-white rounded-lg text-xs font-bold hover:bg-[#114b4f] transition shadow-2xs">
+                                            <a :href="activeItem?.buktiRealisasiUrl" target="_blank" class="px-3.5 py-1.5 bg-[#155E63] text-white rounded-lg text-xs font-bold hover:bg-[#114b4f] transition shadow-2xs">
                                                 Buka Dokumen PDF
                                             </a>
                                         </div>

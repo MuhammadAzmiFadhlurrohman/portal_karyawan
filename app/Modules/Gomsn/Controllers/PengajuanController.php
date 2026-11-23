@@ -11,7 +11,9 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PengajuanController extends Controller
@@ -850,7 +852,7 @@ class PengajuanController extends Controller
         ]);
 
         $path = $request->hasFile('bukti_transfer')
-            ? $request->file('bukti_transfer')->store('gomsn/transfer_proofs', 'public')
+            ? $request->file('bukti_transfer')->store('gomsn/transfer_proofs', 'private')
             : null;
 
         $metode = $request->input('metode_pencairan');
@@ -903,7 +905,7 @@ class PengajuanController extends Controller
         ]);
 
         $path = $request->hasFile('bukti_realisasi')
-            ? $request->file('bukti_realisasi')->store('gomsn/realizations', 'public')
+            ? $request->file('bukti_realisasi')->store('gomsn/realizations', 'private')
             : null;
 
         $nominalVal = $request->filled('nominal_realisasi')
@@ -960,5 +962,42 @@ class PengajuanController extends Controller
         } catch (Exception $e) {
             return back()->withErrors(['reject' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Securely serve financial proof files (transfer proof or realization receipt).
+     */
+    public function viewFile(Request $request, Pengajuan $pengajuan, string $type): Response
+    {
+        $user = $request->user();
+
+        // Access control: only owner, approver, or finance/admin roles
+        $isAuthorized = $user->id === $pengajuan->user_id
+            || $user->id === $pengajuan->atasan_id
+            || $user->id === $pengajuan->transfer_by
+            || $user->hasRole(['super_admin', 'admin', 'finance', 'executive', 'manager_teknisi', 'hrd']);
+
+        abort_unless($isAuthorized, 403, 'Anda tidak memiliki hak akses untuk melihat bukti keuangan ini.');
+
+        $path = match ($type) {
+            'transfer' => $pengajuan->bukti_transfer_path,
+            'realization' => $pengajuan->bukti_realisasi_path,
+            default => null,
+        };
+
+        if (! $path) {
+            abort(404, 'Bukti file tidak ditemukan.');
+        }
+
+        // Check private disk first, then public disk for legacy files
+        if (Storage::disk('private')->exists($path)) {
+            return Storage::disk('private')->response($path);
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return Storage::disk('public')->response($path);
+        }
+
+        abort(404, 'File lampiran tidak tersedia di server storage.');
     }
 }

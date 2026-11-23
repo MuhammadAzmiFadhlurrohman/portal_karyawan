@@ -98,6 +98,32 @@ class Pengajuan extends Model
         return $this->bukti_realisasi_path;
     }
 
+    public function getBuktiTransferUrlAttribute(): ?string
+    {
+        if (empty($this->bukti_transfer_path)) {
+            return null;
+        }
+
+        try {
+            return route('gomsn.pengajuan.file', ['pengajuan' => $this->id, 'type' => 'transfer']);
+        } catch (\Throwable $e) {
+            return asset('storage/' . $this->bukti_transfer_path);
+        }
+    }
+
+    public function getBuktiRealisasiUrlAttribute(): ?string
+    {
+        if (empty($this->bukti_realisasi_path)) {
+            return null;
+        }
+
+        try {
+            return route('gomsn.pengajuan.file', ['pengajuan' => $this->id, 'type' => 'realization']);
+        } catch (\Throwable $e) {
+            return asset('storage/' . $this->bukti_realisasi_path);
+        }
+    }
+
     public function getRealizedAtAttribute(): ?\Carbon\Carbon
     {
         return $this->realisasi_at;

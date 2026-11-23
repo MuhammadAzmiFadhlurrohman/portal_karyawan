@@ -305,7 +305,7 @@ class TicketController extends Controller
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 if ($photo && $photo->isValid()) {
-                    $path = $photo->store('tickets/evidence', 'public');
+                    $path = $photo->store('tickets/evidence', 'private');
                     $tiket->chronologies()->create([
                         'user_id' => $user->id,
                         'category' => 'INVESTIGASI',
@@ -425,7 +425,7 @@ class TicketController extends Controller
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 if ($photo && $photo->isValid()) {
-                    $path = $photo->store('tickets/evidence', 'public');
+                    $path = $photo->store('tickets/evidence', 'private');
                     $tiket->chronologies()->create([
                         'user_id' => $user->id,
                         'category' => 'INVESTIGASI',

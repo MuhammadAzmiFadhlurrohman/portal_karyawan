@@ -258,15 +258,15 @@
                             <span class="text-slate-500 block text-xs font-semibold mb-2">Lampiran Bukti Nota / Foto Kwitansi:</span>
                             @if (!str_ends_with(strtolower($pengajuan->realization_proof_path), '.pdf'))
                             <div class="rounded-xl overflow-hidden border border-slate-200 bg-slate-50 p-2 max-w-md">
-                                <a href="/storage/{{ $pengajuan->realization_proof_path }}" target="_blank" class="block group relative overflow-hidden rounded-lg">
-                                    <img src="/storage/{{ $pengajuan->realization_proof_path }}" alt="Bukti Nota" class="max-h-72 w-auto object-contain mx-auto group-hover:scale-105 transition duration-200">
+                                <a href="{{ $pengajuan->bukti_realisasi_url }}" target="_blank" class="block group relative overflow-hidden rounded-lg">
+                                    <img src="{{ $pengajuan->bukti_realisasi_url }}" alt="Bukti Nota" class="max-h-72 w-auto object-contain mx-auto group-hover:scale-105 transition duration-200">
                                     <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-xs font-bold gap-1">
                                         <span>Buka Ukuran Penuh ↗</span>
                                     </div>
                                 </a>
                             </div>
                             @else
-                            <a href="/storage/{{ $pengajuan->realization_proof_path }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold">
+                            <a href="{{ $pengajuan->bukti_realisasi_url }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold">
                                 <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                                 <span>Buka Lampiran Dokumen Bukti (PDF)</span>
                             </a>
