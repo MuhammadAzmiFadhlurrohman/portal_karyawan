@@ -1286,7 +1286,7 @@
         <!-- ============================================== -->
         <div x-show="showModal" 
              x-cloak 
-             class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+             class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -1294,37 +1294,37 @@
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0">
 
-            <div class="relative bg-white rounded-2xl max-w-4xl lg:max-w-5xl w-full shadow-2xl overflow-hidden border border-slate-200 transform transition-all my-8"
+            <div class="relative bg-white rounded-2xl max-w-4xl lg:max-w-5xl w-full shadow-2xl overflow-hidden border border-slate-200 transform transition-all my-auto sm:my-8 max-h-[94vh] sm:max-h-[90vh] flex flex-col"
                  @click.away="showModal = false">
 
                 <!-- Header Modal Sesuai Tema (#155E63 -> #1F2937) -->
-                <div class="px-6 py-4 text-white flex items-center justify-between" style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0 shadow-inner">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <div class="px-4 py-3 sm:px-6 sm:py-4 text-white flex items-center justify-between shrink-0" style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0 shadow-inner">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                         </div>
-                        <div>
-                            <h3 class="font-bold text-base tracking-wide text-white leading-tight">Detail Pengajuan</h3>
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <span class="text-xs text-white/80 font-mono" x-text="activeItem?.nomor"></span>
-                                <span class="text-white/40 text-xs">•</span>
-                                <span class="text-xs text-white/80" x-text="activeItem?.created_at"></span>
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-sm sm:text-base tracking-wide text-white leading-tight truncate">Detail Pengajuan</h3>
+                            <div class="flex items-center gap-1.5 sm:gap-2 mt-0.5 flex-wrap">
+                                <span class="text-[11px] sm:text-xs text-white/80 font-mono" x-text="activeItem?.nomor"></span>
+                                <span class="text-white/40 text-[10px] sm:text-xs">•</span>
+                                <span class="text-[11px] sm:text-xs text-white/80" x-text="activeItem?.created_at"></span>
                             </div>
                         </div>
                     </div>
-                    <button type="button" @click="showModal = false" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-bold text-lg leading-none transition cursor-pointer">
+                    <button type="button" @click="showModal = false" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center font-bold text-lg leading-none transition cursor-pointer shrink-0 ml-2">
                         &times;
                     </button>
                 </div>
 
                 <!-- Body Modal -->
-                <div class="p-6 sm:p-7 space-y-6 max-h-[82vh] overflow-y-auto" x-show="activeItem">
+                <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-5 flex-1 overflow-y-auto" x-show="activeItem">
                     <!-- Top Two Cards: Informasi Pengaju & Informasi Keuangan -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-5">
                         <!-- Card 1: Informasi Pengaju -->
-                        <div class="border border-slate-200/90 rounded-2xl p-5 bg-slate-50/70 space-y-3.5 shadow-xs">
+                        <div class="border border-slate-200/90 rounded-2xl p-3.5 sm:p-5 bg-slate-50/70 space-y-3 sm:space-y-3.5 shadow-xs">
                             <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Informasi Pengaju</span>
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide"
@@ -1409,15 +1409,22 @@
                         </div>
                     </div>
 
-                    <!-- Detail Barang Table Sesuai Mockup -->
+                    <!-- Detail Barang Table Sesuai Mockup (Responsive Table & Mobile Cards) -->
                     <div class="border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs">
-                        <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2 font-bold text-xs text-slate-700">
-                            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                            </svg>
-                            <span>Rincian Item Pengajuan</span>
+                        <div class="px-4 py-2.5 sm:px-5 sm:py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 font-bold text-xs text-slate-700">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                                <span>Rincian Item Pengajuan</span>
+                            </div>
+                            <span class="text-[11px] font-normal text-slate-400 font-mono" x-show="activeItem?.details?.length">
+                                (<span x-text="activeItem.details.length"></span> item)
+                            </span>
                         </div>
-                        <div class="overflow-x-auto">
+
+                        <!-- 1. Tampilan Desktop Table (hidden on mobile) -->
+                        <div class="hidden sm:block overflow-x-auto">
                             <table class="w-full text-left border-collapse text-xs">
                                 <thead>
                                     <tr class="border-b border-slate-200 bg-white font-bold text-slate-700">
@@ -1458,6 +1465,44 @@
                                     </tr>
                                 </tfoot>
                             </table>
+                        </div>
+
+                        <!-- 2. Tampilan Mobile Cards (visible on mobile only, rapi & leluasa) -->
+                        <div class="block sm:hidden divide-y divide-slate-100 bg-white">
+                            <template x-for="(detail, idx) in (activeItem?.details || [])" :key="idx">
+                                <div class="p-3.5 space-y-2">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="flex items-start gap-2 min-w-0">
+                                            <span class="text-[11px] font-bold font-mono text-slate-400 bg-slate-100 rounded-md w-5 h-5 flex items-center justify-center shrink-0 mt-0.5" x-text="idx + 1"></span>
+                                            <span class="font-bold text-slate-800 text-xs leading-snug break-words" x-text="detail.name"></span>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 border border-teal-200 font-mono text-xs font-bold shrink-0">
+                                            <span x-text="detail.qty"></span>
+                                            <span class="text-teal-600 font-normal ml-1" x-text="detail.satuan"></span>
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-xs pt-1.5 border-t border-slate-50 pl-7">
+                                        <div class="text-[11px] text-slate-500">
+                                            <span>Harga: </span>
+                                            <span class="font-mono text-slate-700 font-semibold" x-text="detail.unitPrice"></span>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="text-[10px] text-slate-400 mr-1">Subtotal:</span>
+                                            <span class="font-bold text-slate-900 font-mono text-xs" x-text="detail.subtotal"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template x-if="!activeItem?.details || activeItem.details.length === 0">
+                                <div class="py-6 text-center text-slate-400 text-xs">
+                                    Tidak ada rincian item barang/dana.
+                                </div>
+                            </template>
+                            <!-- Mobile Total Footer -->
+                            <div class="p-3.5 bg-emerald-50/80 border-t-2 border-emerald-300 flex items-center justify-between">
+                                <span class="text-xs uppercase tracking-wider font-extrabold text-slate-800">TOTAL ESTIMASI</span>
+                                <span class="font-extrabold text-slate-900 text-sm font-mono" x-text="activeItem?.totalFormatted"></span>
+                            </div>
                         </div>
                     </div>
 
@@ -1849,10 +1894,10 @@
                 </div>
 
                 <!-- Modal Footer: Tombol Tutup Sebelah Kanan Bawah -->
-                <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end">
+                <div class="px-4 py-3 sm:px-6 sm:py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-end shrink-0">
                     <button type="button" 
                             @click="showModal = false" 
-                            class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-xs transition cursor-pointer flex items-center gap-1.5">
+                            class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
