@@ -1110,7 +1110,7 @@
 
                     this.gpsLoading = true;
                     this.gpsError = false;
-                    this.gpsStatus = 'Mendeteksi titik koordinat GPS akurat...';
+                    this.gpsStatus = 'Mendeteksi titik koordinat GPS...';
 
                     if (!navigator.geolocation) {
                         this.gpsLoading = false;
@@ -1120,81 +1120,162 @@
                     }
 
                     let bestFix = null;
-                    let watchCompleted = false;
+                    let hasAppliedFix = false;
 
-                    const finalizeFix = (fix) => {
-                        if (watchCompleted) return;
-                        watchCompleted = true;
-                        if (this.gpsWatchId !== null) {
-                            navigator.geolocation.clearWatch(this.gpsWatchId);
-                            this.gpsWatchId = null;
-                        }
-
-                        if (fix) {
-                            this.gpsLat = fix.latitude;
-                            this.gpsLng = fix.longitude;
-                            this.gpsAccuracy = Math.round(fix.accuracy || 10);
+                    const applyLocationFix = (fix, isFinal = false) => {
+                        if (!fix) return;
+                        
+                        // Perbarui jika fix baru memiliki akurasi lebih baik atau belum pernah diterapkan
+                        if (!bestFix || fix.accuracy <= bestFix.accuracy || !hasAppliedFix) {
+                            bestFix = {
+                                latitude: fix.latitude,
+                                longitude: fix.longitude,
+                                accuracy: Math.round(fix.accuracy || 10),
+                            };
+                            this.gpsLat = bestFix.latitude;
+                            this.gpsLng = bestFix.longitude;
+                            this.gpsAccuracy = bestFix.accuracy;
                             this.gpsLoading = false;
                             this.gpsError = false;
                             this.resolveNearestOffice(this.gpsLat, this.gpsLng);
                             const officeName = officesMap[this.selectedOffice]?.name || 'Kantor';
                             this.gpsStatus = `${officeName} (Akurasi: ±${this.gpsAccuracy}m)`;
-                        } else {
-                            this.gpsLoading = false;
-                            this.gpsError = true;
-                            const ofc = officesMap[this.selectedOffice] || Object.values(officesMap)[0];
-                            if (ofc) {
-                                this.selectedOffice = String(ofc.id);
-                                this.gpsLat = parseFloat(ofc.lat);
-                                this.gpsLng = parseFloat(ofc.lng);
-                                this.gpsAccuracy = 15;
-                                this.gpsStatus = ofc.name + ' (Izin GPS belum aktif)';
-                            } else {
-                                this.gpsStatus = 'Izin GPS perangkat belum diaktifkan';
-                            }
+                            hasAppliedFix = true;
+                        }
+
+                        if (isFinal && this.gpsWatchId !== null) {
+                            navigator.geolocation.clearWatch(this.gpsWatchId);
+                            this.gpsWatchId = null;
                         }
                     };
 
-                    // Batas waktu pengumpulan sinyal satelit GPS terbaik (maksimal 3.5 detik)
-                    const timeoutId = setTimeout(() => {
-                        if (!watchCompleted) {
-                            finalizeFix(bestFix);
+                    const handleFinalFailure = (err) => {
+                        if (this.gpsWatchId !== null) {
+                            navigator.geolocation.clearWatch(this.gpsWatchId);
+                            this.gpsWatchId = null;
                         }
-                    }, 3500);
+
+                        // Jika sudah ada koordinat yang pernah diterapkan, pertahankan dan jangan error
+                        if (hasAppliedFix && bestFix) {
+                            this.gpsLoading = false;
+                            this.gpsError = false;
+                            return;
+                        }
+
+                        this.gpsLoading = false;
+                        this.gpsError = true;
+
+                        const ofc = officesMap[this.selectedOffice] || Object.values(officesMap)[0];
+                        if (ofc) {
+                            this.selectedOffice = String(ofc.id);
+                            this.gpsLat = parseFloat(ofc.lat);
+                            this.gpsLng = parseFloat(ofc.lng);
+                            this.gpsAccuracy = 20;
+                        }
+
+                        if (err && err.code === 1) { // PERMISSION_DENIED
+                            this.gpsStatus = 'Izin lokasi/GPS ditolak di browser. Aktifkan izin lokasi.';
+                        } else if (err && err.code === 2) { // POSITION_UNAVAILABLE
+                            this.gpsStatus = 'Sinyal GPS tidak tersedia. Pastikan GPS HP aktif.';
+                        } else if (err && err.code === 3) { // TIMEOUT
+                            this.gpsStatus = 'Waktu deteksi GPS habis. Klik untuk muat ulang.';
+                        } else {
+                            this.gpsStatus = 'GPS belum aktif. Pastikan GPS HP menyala.';
+                        }
+                    };
+
+                    // =========================================================================
+                    // TAHAP 1: Fast Immediate Fix (< 500ms dari Cache Seluler/Wi-Fi/GPS)
+                    // Mengambil posisi terakhir perangkat yang valid agar tombol langsung aktif
+                    // =========================================================================
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            if (pos && pos.coords) {
+                                applyLocationFix({
+                                    latitude: pos.coords.latitude,
+                                    longitude: pos.coords.longitude,
+                                    accuracy: pos.coords.accuracy || 30,
+                                }, false);
+                            }
+                        },
+                        (errFast) => {
+                            // Abaikan error tahap 1, biarkan Tahap 2 satelit presisi yang mencari
+                        },
+                        {
+                            enableHighAccuracy: false,
+                            timeout: 3000,
+                            maximumAge: 60000 // Izinkan cache hingga 1 menit agar instan
+                        }
+                    );
+
+                    // =========================================================================
+                    // TAHAP 2: Precision High-Accuracy Satellite Lock (Jendela 10 Detik)
+                    // Memantau sinyal GPS akurasi tinggi dan memperhalus koordinat secara dinamis
+                    // =========================================================================
+                    const timeoutId = setTimeout(() => {
+                        if (!hasAppliedFix) {
+                            // Coba fallback terakhir dengan akurasi standar jika high accuracy belum dapat
+                            navigator.geolocation.getCurrentPosition(
+                                (pos) => {
+                                    if (pos && pos.coords) {
+                                        applyLocationFix({
+                                            latitude: pos.coords.latitude,
+                                            longitude: pos.coords.longitude,
+                                            accuracy: pos.coords.accuracy || 40,
+                                        }, true);
+                                    } else {
+                                        handleFinalFailure({ code: 3 });
+                                    }
+                                },
+                                (errFallback) => {
+                                    handleFinalFailure(errFallback);
+                                },
+                                { enableHighAccuracy: false, timeout: 4000, maximumAge: 120000 }
+                            );
+                        } else {
+                            // Sudah ada fix cepat, tutup pemantauan satelit secara tenang
+                            if (this.gpsWatchId !== null) {
+                                navigator.geolocation.clearWatch(this.gpsWatchId);
+                                this.gpsWatchId = null;
+                            }
+                        }
+                    }, 10000);
 
                     try {
                         this.gpsWatchId = navigator.geolocation.watchPosition(
                             (pos) => {
+                                if (!pos || !pos.coords) return;
                                 const acc = pos.coords.accuracy || 999;
-                                if (!bestFix || acc < bestFix.accuracy) {
-                                    bestFix = {
-                                        latitude: pos.coords.latitude,
-                                        longitude: pos.coords.longitude,
-                                        accuracy: acc,
-                                    };
-                                }
+                                applyLocationFix({
+                                    latitude: pos.coords.latitude,
+                                    longitude: pos.coords.longitude,
+                                    accuracy: acc,
+                                }, false);
 
-                                // Jika akurasi sudah sangat presisi (<= 25 meter), kunci langsung
-                                if (acc <= 25) {
+                                // Jika akurasi satelit sudah sangat tinggi (<= 20 meter), kunci posisi
+                                if (acc <= 20) {
                                     clearTimeout(timeoutId);
-                                    finalizeFix(bestFix);
+                                    applyLocationFix(bestFix, true);
                                 }
                             },
                             (err) => {
-                                if (!bestFix) {
+                                // Jika izin ditolak, langsung hentikan
+                                if (err && err.code === 1) {
                                     clearTimeout(timeoutId);
-                                    finalizeFix(null);
+                                    handleFinalFailure(err);
                                 }
                             },
                             {
                                 enableHighAccuracy: true,
-                                timeout: 6000,
-                                maximumAge: 0
+                                timeout: 12000,
+                                maximumAge: 10000
                             }
                         );
                     } catch (e) {
-                        clearTimeout(timeoutId);
-                        finalizeFix(null);
+                        if (!hasAppliedFix) {
+                            clearTimeout(timeoutId);
+                            handleFinalFailure(e);
+                        }
                     }
                 },
 
