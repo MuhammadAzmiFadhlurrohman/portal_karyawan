@@ -96,7 +96,7 @@
     });
 
     // Helper to register token to backend
-    async function sendTokenToBackend(token) {
+    async function sendTokenToBackend(token, showToast = false) {
         try {
             const response = await fetch('{{ route("api.fcm.token.register") }}', {
                 method: 'POST',
@@ -112,8 +112,20 @@
             });
 
             if (response.ok) {
-                localStorage.setItem('gomsn_fcm_token', token);
+                localStorage.setItem('gomsn_fcm_token_registered', '1');
                 console.log('[FCM] Device token successfully registered to backend!');
+                if (showToast && window.Swal) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Notifikasi Siap!',
+                        text: 'Perangkat berhasil terhubung ke server notifikasi.',
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true
+                    });
+                }
                 return true;
             } else {
                 console.warn('[FCM] Backend rejected token registration:', response.status);
@@ -161,22 +173,11 @@
             const token = await messaging.getToken(tokenOptions);
             if (token) {
                 console.log('[FCM] FCM Token obtained:', token.substring(0, 16) + '...');
-                await sendTokenToBackend(token);
                 const banner = document.getElementById('gomsn-notif-prompt-banner');
                 if (banner) banner.remove();
 
-                if (interactive && window.Swal) {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Notifikasi Aktif',
-                        text: 'Perangkat Anda siap menerima notifikasi portal.',
-                        showConfirmButton: false,
-                        timer: 3500,
-                        timerProgressBar: true
-                    });
-                }
+                // Always send to backend to guarantee registration
+                await sendTokenToBackend(token, interactive);
             }
         } catch (err) {
             console.error('[FCM] Error generating FCM token:', err);
@@ -210,14 +211,15 @@
         sessionStorage.setItem('gomsn_notif_prompt_dismissed', '1');
     };
 
-    // Auto-prompt logic if permission is not yet granted
+    // Auto-prompt & auto-register logic
     function checkAndPromptPermission() {
         if (!('Notification' in window)) return;
 
+        // If permission is already granted, automatically register token to backend
         if (Notification.permission === 'granted') {
-            window.initGomsnFcmToken();
+            window.initGomsnFcmToken(false);
         } else if (Notification.permission === 'default') {
-            // Not yet decided: automatically prompt browser if supported, and show prompt banner
+            // Not yet decided: show prompt banner
             if (!sessionStorage.getItem('gomsn_notif_prompt_dismissed')) {
                 const banner = document.getElementById('gomsn-notif-prompt-banner');
                 if (banner) {
@@ -227,7 +229,7 @@
                 }
             }
 
-            // Also auto-trigger native browser prompt on first click anywhere on the page
+            // Auto-trigger native browser prompt on first user click
             const autoPromptOnce = async function() {
                 document.removeEventListener('click', autoPromptOnce);
                 if (Notification.permission === 'default') {
