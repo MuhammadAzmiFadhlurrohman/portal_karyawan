@@ -212,12 +212,18 @@
             background:rgba(3,20,24,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
             border:1px solid rgba(94,234,212,.32);
             box-shadow:0 16px 34px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.14);
-            transition:border-color .25s ease,background-color .25s ease,box-shadow .25s ease;
+            transition:border-color .25s ease,background-color .25s ease,box-shadow .25s ease,transform .2s ease;
+            text-decoration:none;
+            cursor:pointer;
         }
         .hh-check:hover{
             border-color:rgba(94,234,212,.55);
             background:rgba(4,26,31,.88);
             box-shadow:0 18px 38px rgba(0,0,0,.55),0 0 22px -6px rgba(45,212,191,.32),inset 0 1px 0 rgba(255,255,255,.2);
+            transform:translateY(-2px);
+        }
+        .hh-check:active{
+            transform:scale(0.98);
         }
         .hh-check .ic{position:relative;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.16);flex-shrink:0}
         .hh-check .ic::before{content:"";position:absolute;inset:2px;border-radius:50%;border:1px solid rgba(52,211,153,.45);animation:hhPulseRing 2.6s cubic-bezier(.16,1,.3,1) infinite}
@@ -834,15 +840,15 @@
                 </div>
             </div>
 
-            <!-- Check-in Floating Card (Rendered inside inner container so it flows cleanly on mobile & desktop) -->
-            <div class="hh-check {{ $clockInTime ? '' : 'no' }}">
+            <!-- Check-in / Absen Floating Card (Rendered inside inner container so it flows cleanly on mobile & desktop) -->
+            <a href="{{ route('attendance.index') }}" class="hh-check {{ $clockInTime ? '' : 'no' }}" title="Buka Halaman Absensi">
                 <span class="ic"><i></i></span>
                 <div class="chk-info">
-                    <b>{{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Check-in' }}</b>
-                    <small>{{ $clockInTime ? 'Check-in hari ini' : 'Belum ada rekam hari ini' }}</small>
+                    <b>{{ $clockInTime ? 'Hadir · ' . $clockInTime : 'Belum Absen' }}</b>
+                    <small>{{ $clockInTime ? 'Sudah absen hari ini' : 'Belum ada rekam hari ini' }}</small>
                 </div>
                 <svg class="hh-check-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            </div>
+            </a>
         </div>
     </div>
     <script>
