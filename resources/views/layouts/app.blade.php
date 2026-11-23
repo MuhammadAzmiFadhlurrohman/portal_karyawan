@@ -1700,7 +1700,7 @@
 
                 @if ($navIsHrd)
                 <!-- KATEGORI KHUSUS HRD: KELOLA KARYAWAN -->
-                <div x-show="!sheetSearch || 'karyawan absen karyawan data staff tim rekap potongan pengajuan cuti izin persetujuan lembur spk laporan leaderboard peringkat disiplin'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
+                <div x-show="!sheetSearch || 'karyawan absen karyawan data staff tim rekap potongan pengajuan cuti izin persetujuan lembur spk laporan leaderboard peringkat disiplin mobil bensin kendaraan'.includes(sheetSearch.toLowerCase())" class="space-y-2.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-teal-500 to-emerald-500"></span>
@@ -1748,6 +1748,17 @@
                                 {{ $navPendingLeaveHrdCount }}
                             </span>
                             @endif
+                        </a>
+
+                        <!-- Pengajuan Mobil (Pemantauan Mobil HRD) -->
+                        <a href="{{ route('gomsn.car-usage.index') }}" class="p-3 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-white via-teal-50/20 to-teal-50/40 hover:border-teal-400 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zM3 13h1m16 0h1M5 13l1.5-5A2 2 0 018.4 6.5h7.2a2 2 0 011.9 1.5L19 13m-16 0a2 2 0 00-2 2v2a2 2 0 002 2h1.1a3 3 0 015.8 0h4.2a3 3 0 015.8 0H21a2 2 0 002-2v-2a2 2 0 00-2-2m-18 0h18"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Pengajuan Mobil</span>
+                                <span class="text-[10px] text-teal-700/80 block truncate mt-0.5 leading-tight">Pemantauan Kendaraan</span>
+                            </div>
                         </a>
 
                         <!-- Lembur Karyawan -->

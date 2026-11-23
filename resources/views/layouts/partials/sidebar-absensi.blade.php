@@ -180,6 +180,17 @@
                 @endif
             </a>
 
+            <!-- Pengajuan Mobil (Pemantauan Penggunaan Mobil HRD) -->
+            <a href="{{ route('gomsn.car-usage.index') }}"
+               @if (request()->routeIs('gomsn.car-usage.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.car-usage.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zM3 13h1m16 0h1M5 13l1.5-5A2 2 0 018.4 6.5h7.2a2 2 0 011.9 1.5L19 13m-16 0a2 2 0 00-2 2v2a2 2 0 002 2h1.1a3 3 0 015.8 0h4.2a3 3 0 015.8 0H21a2 2 0 002-2v-2a2 2 0 00-2-2m-18 0h18"/></svg>
+                <span>Pengajuan Mobil</span>
+                @if (request()->routeIs('gomsn.car-usage.*'))
+                <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                @endif
+            </a>
+
             <!-- Lembur Karyawan -->
             <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'karyawan']) }}"
                @if ($isOvertimeKaryawan) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
@@ -215,6 +226,17 @@
                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 <span>Absen Karyawan</span>
                 @if (request()->routeIs('attendance.employee-recap*'))
+                <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                @endif
+            </a>
+
+            <!-- Pengajuan Mobil (Pemantauan Mobil Admin) -->
+            <a href="{{ route('gomsn.car-usage.index') }}"
+               @if (request()->routeIs('gomsn.car-usage.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.car-usage.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zM3 13h1m16 0h1M5 13l1.5-5A2 2 0 018.4 6.5h7.2a2 2 0 011.9 1.5L19 13m-16 0a2 2 0 00-2 2v2a2 2 0 002 2h1.1a3 3 0 015.8 0h4.2a3 3 0 015.8 0H21a2 2 0 002-2v-2a2 2 0 00-2-2m-18 0h18"/></svg>
+                <span>Pengajuan Mobil</span>
+                @if (request()->routeIs('gomsn.car-usage.*'))
                 <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                 @endif
             </a>

@@ -7,6 +7,7 @@ use App\Modules\Attendance\Controllers\LeaderboardController;
 use App\Modules\Attendance\Controllers\LeaveController;
 use App\Modules\Attendance\Controllers\ScheduleController;
 use App\Modules\Attendance\Controllers\ShiftSwapController;
+use App\Modules\Gomsn\Controllers\CarUsageMonitoringController;
 use App\Modules\Gomsn\Controllers\ChatbotController;
 use App\Modules\Gomsn\Controllers\InventoryController;
 use App\Modules\Gomsn\Controllers\KpiReportController;
@@ -179,6 +180,7 @@ Route::middleware('auth')->group(function (): void {
 
     // Pengajuan Dana & Barang (§8.1)
     Route::get('/gomsn/pengajuan', [PengajuanController::class, 'index'])->name('gomsn.pengajuan.index');
+    Route::get('/gomsn/pengajuan-mobil', [CarUsageMonitoringController::class, 'index'])->name('gomsn.car-usage.index');
     Route::get('/gomsn/pengajuan/approvals', [PengajuanController::class, 'approvals'])->name('gomsn.pengajuan.approvals');
     Route::get('/gomsn/pengajuan/create', [PengajuanController::class, 'create'])->name('gomsn.pengajuan.create');
     Route::post('/gomsn/pengajuan', [PengajuanController::class, 'store'])->name('gomsn.pengajuan.store');
