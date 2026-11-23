@@ -753,7 +753,7 @@ class PengajuanController extends Controller
      */
     public function show(Request $request, Pengajuan $pengajuan): View
     {
-        $pengajuan->load(['user', 'atasan', 'details', 'approvals.approver', 'transferUser']);
+        $pengajuan->load(['user', 'atasan', 'details.material', 'approvals.approver', 'transferUser']);
 
         return view('gomsn.pengajuan.show', compact('pengajuan'));
     }
