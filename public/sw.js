@@ -1,9 +1,9 @@
-// PT MSN Portal - Unified PWA & Web Push Service Worker (v6 - Clean White Splash & No Extra Intro)
-const CACHE_NAME = 'msn-portal-v6-shell';
+// PT MSN Portal - Unified PWA & Web Push Service Worker (v8 - White Splash & Updated Maskable Icons)
+const CACHE_NAME = 'msn-portal-v8-shell';
 const OFFLINE_ASSETS = [
     '/',
     '/login',
-    '/manifest.webmanifest'
+    '/manifest.webmanifest?v=2026112308'
 ];
 
 self.addEventListener('install', (event) => {

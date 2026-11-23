@@ -1,28 +1,36 @@
 {
+    "id": "/?source=pwa",
     "name": "Portal GoMSN PT MSN",
     "short_name": "GoMSN",
     "description": "Portal Enterprise Terpadu Absensi Biometrik, HRIS, Tiketing Gangguan & Operasional GOMSN PT MSN",
-    "start_url": "/",
+    "start_url": "/?source=pwa",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#ffffff",
     "orientation": "portrait-primary",
     "icons": [
         {
-            "src": "/assets/logo/pwa-icon-192.png",
+            "src": "/assets/logo/pwa-icon-192.png?v=2026112308",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/assets/logo/pwa-icon-512.png",
+            "src": "/assets/logo/pwa-icon-512.png?v=2026112308",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any"
         },
         {
-            "src": "/assets/logo/pwa-icon-192.png",
+            "src": "/assets/logo/pwa-icon-maskable-192.png?v=2026112308",
             "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/assets/logo/pwa-icon-maskable-512.png?v=2026112308",
+            "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
         }

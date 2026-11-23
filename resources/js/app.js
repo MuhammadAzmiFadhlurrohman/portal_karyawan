@@ -44,7 +44,7 @@ Alpine.start();
 // Register Service Worker for PWA & Offline Queue Readiness (§6.4, §10.3)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=2026112305', { scope: '/', updateViaCache: 'none' }).catch(() => {
+        navigator.serviceWorker.register('/sw.js?v=2026112308', { scope: '/', updateViaCache: 'none' }).catch(() => {
             // Silent fallback in non-HTTPS local dev
         });
     });

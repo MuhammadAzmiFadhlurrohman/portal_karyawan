@@ -7,7 +7,7 @@
             height: 100dvh !important;
             max-height: 100dvh !important;
             width: 100% !important;
-            background-color: #042f36;
+            background-color: #ffffff !important;
             overflow: hidden !important;
         }
         #main-content {
