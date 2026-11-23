@@ -140,6 +140,50 @@
             overflow-x: clip !important;
             overflow-y: visible !important;
         }
+
+        /* Modern Elegant Universal Scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+        }
+        html.dark * {
+            scrollbar-color: rgba(148, 163, 184, 0.28) transparent;
+        }
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.45);
+            border-radius: 9999px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            transition: background-color 0.2s ease;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d9488;
+            background-clip: padding-box;
+        }
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-button {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        html.dark ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.28);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        html.dark ::-webkit-scrollbar-thumb:hover {
+            background: #14b8a6;
+            background-clip: padding-box;
+        }
     </style>
 </head>
 <body class="min-h-full bg-[#F8FAFC] text-slate-900 font-sans antialiased"
