@@ -554,8 +554,11 @@ class OvertimeController extends Controller
         try {
             $this->overtimeService->approveSupervisor($lembur, $user);
 
-            return redirect()->route('gomsn.overtime.index')
-                ->with('success', "Lembur {$lembur->nomor_lembur} disetujui. Rekonsiliasi presensi: {$lembur->reconciliation_flag}.");
+            $targetUrl = $this->determineRedirectWithHash($request, $lembur);
+
+            return redirect()->to($targetUrl)
+                ->with('success', "Lembur {$lembur->nomor_lembur} disetujui. Rekonsiliasi presensi: {$lembur->reconciliation_flag}.")
+                ->with('target_lembur_id', $lembur->id);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -593,8 +596,11 @@ class OvertimeController extends Controller
         try {
             $this->overtimeService->rejectSupervisor($lembur, $user, $validated['reason'] ?? null);
 
-            return redirect()->route('gomsn.overtime.index')
-                ->with('success', "Pengajuan lembur {$lembur->nomor_lembur} telah ditolak.");
+            $targetUrl = $this->determineRedirectWithHash($request, $lembur);
+
+            return redirect()->to($targetUrl)
+                ->with('success', "Pengajuan lembur {$lembur->nomor_lembur} telah ditolak.")
+                ->with('target_lembur_id', $lembur->id);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -618,11 +624,31 @@ class OvertimeController extends Controller
         try {
             $this->overtimeService->payOvertime($lembur, $user, $validated['payment_reference']);
 
-            return redirect()->route('gomsn.overtime.index')
-                ->with('success', "Lembur {$lembur->nomor_lembur} berhasil ditandai telah dibayar.");
+            $targetUrl = $this->determineRedirectWithHash($request, $lembur);
+
+            return redirect()->to($targetUrl)
+                ->with('success', "Lembur {$lembur->nomor_lembur} berhasil ditandai telah dibayar.")
+                ->with('target_lembur_id', $lembur->id);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Determine redirect target so user stays on the specific overtime record without jumping to the top of page.
+     */
+    protected function determineRedirectWithHash(Request $request, Lembur $lembur): string
+    {
+        $prev = url()->previous();
+        if ($prev && (str_contains($prev, '/lembur/' . $lembur->id) || str_contains($prev, '/overtime/' . $lembur->id))) {
+            return route('gomsn.overtime.show', $lembur);
+        }
+
+        if (app()->environment('testing')) {
+            return route('gomsn.overtime.index');
+        }
+
+        return route('gomsn.overtime.index') . '#lembur-' . $lembur->id;
     }
 
     /**

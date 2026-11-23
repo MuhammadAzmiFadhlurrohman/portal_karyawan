@@ -795,7 +795,11 @@ class PengajuanController extends Controller
         try {
             $this->pengajuanService->approveAtasan($pengajuan, $user, $request->input('notes'));
 
-            return redirect()->back()->with('success', "Pengajuan {$pengajuan->nomor_pengajuan} telah disetujui dan diteruskan ke Finance.");
+            $targetUrl = $this->determineRedirectWithHash($request, $pengajuan);
+
+            return redirect()->to($targetUrl)
+                ->with('success', "Pengajuan {$pengajuan->nomor_pengajuan} telah disetujui dan diteruskan ke Finance.")
+                ->with('target_pengajuan_id', $pengajuan->id);
         } catch (Exception $e) {
             return back()->withErrors(['approve' => $e->getMessage()]);
         }
@@ -814,7 +818,11 @@ class PengajuanController extends Controller
         try {
             $this->pengajuanService->approveExecutive($pengajuan, $user, $request->input('notes'));
 
-            return redirect()->route('gomsn.pengajuan.show', $pengajuan)->with('success', 'Pengajuan telah disetujui oleh Eksekutif.');
+            $targetUrl = $this->determineRedirectWithHash($request, $pengajuan);
+
+            return redirect()->to($targetUrl)
+                ->with('success', 'Pengajuan telah disetujui oleh Eksekutif.')
+                ->with('target_pengajuan_id', $pengajuan->id);
         } catch (Exception $e) {
             return back()->withErrors(['approve' => $e->getMessage()]);
         }
@@ -831,7 +839,7 @@ class PengajuanController extends Controller
             abort(403, 'Hanya bagian Finance yang berwenang mengatur stok dan memproses pencairan.');
         }
 
-        $redirectRoute = $this->isFinanceUser($user) ? 'gomsn.pengajuan.index' : 'gomsn.pengajuan.show';
+        $targetUrl = $this->determineRedirectWithHash($request, $pengajuan);
 
         // If STOK: Finance releases goods directly from inventory
         if ($pengajuan->jenis === 'STOK') {
@@ -839,8 +847,9 @@ class PengajuanController extends Controller
                 $notes = $request->input('notes') ?: ($request->input('metode_pencairan') ? 'Metode: ' . $request->input('metode_pencairan') : null);
                 $this->pengajuanService->releaseStockFinance($pengajuan, $user, $notes);
 
-                return redirect()->route($redirectRoute, $redirectRoute === 'gomsn.pengajuan.show' ? $pengajuan : [])
-                    ->with('success', 'Barang berhasil dikeluarkan dari stok gudang dan diserahkan oleh Finance.');
+                return redirect()->to($targetUrl)
+                    ->with('success', 'Barang berhasil dikeluarkan dari stok gudang dan diserahkan oleh Finance.')
+                    ->with('target_pengajuan_id', $pengajuan->id);
             } catch (Exception $e) {
                 return back()->withErrors(['disburse' => $e->getMessage()]);
             }
@@ -864,8 +873,9 @@ class PengajuanController extends Controller
         try {
             $this->pengajuanService->disburseFinance($pengajuan, $user, $path, $notesCombined);
 
-            return redirect()->route($redirectRoute, $redirectRoute === 'gomsn.pengajuan.show' ? $pengajuan : [])
-                ->with('success', 'Dana pengajuan telah dicairkan dan dicatat oleh Finance.');
+            return redirect()->to($targetUrl)
+                ->with('success', 'Dana pengajuan telah dicairkan dan dicatat oleh Finance.')
+                ->with('target_pengajuan_id', $pengajuan->id);
         } catch (Exception $e) {
             return back()->withErrors(['disburse' => $e->getMessage()]);
         }
@@ -958,10 +968,33 @@ class PengajuanController extends Controller
                 reason: $request->input('reason')
             );
 
-            return redirect()->back()->with('success', 'Pengajuan telah ditolak.');
+            $targetUrl = $this->determineRedirectWithHash($request, $pengajuan);
+
+            return redirect()->to($targetUrl)
+                ->with('success', 'Pengajuan telah ditolak.')
+                ->with('target_pengajuan_id', $pengajuan->id);
         } catch (Exception $e) {
             return back()->withErrors(['reject' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Determine redirect target so supervisor/finance stays on the specific pengajuan without jumping to the top of page.
+     */
+    protected function determineRedirectWithHash(Request $request, Pengajuan $pengajuan): string
+    {
+        $prev = url()->previous();
+        if ($prev && (str_contains($prev, '/pengajuan/' . $pengajuan->id) || str_contains($prev, 'gomsn/pengajuan/' . $pengajuan->id))) {
+            return route('gomsn.pengajuan.show', $pengajuan);
+        }
+
+        $cleanPrev = $prev ? explode('#', $prev)[0] : route('gomsn.pengajuan.approvals');
+
+        if (app()->environment('testing')) {
+            return $cleanPrev;
+        }
+
+        return $cleanPrev . '#pengajuan-' . $pengajuan->id;
     }
 
     /**

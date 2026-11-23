@@ -785,7 +785,7 @@
                         $durasiStr = "{$hours} jam " . sprintf('%02d mnt', $mins);
                         $uangLembur = (int) $item->nominal;
                     @endphp
-                    <div class="bg-white rounded-2xl border border-slate-200 border-l-[6px]! border-l-[#0f766e]! shadow-xs hover:shadow-md p-4 sm:p-5 space-y-3.5 transition-all overflow-hidden" style="border-left: 6px solid #0f766e !important;">
+                    <div id="lembur-card-{{ $item->id }}" data-lembur-row="{{ $item->id }}" class="bg-white rounded-2xl border border-slate-200 border-l-[6px]! border-l-[#0f766e]! shadow-xs hover:shadow-md p-4 sm:p-5 space-y-3.5 transition-all overflow-hidden scroll-mt-28" style="border-left: 6px solid #0f766e !important;">
                         <!-- Top Header: Tanggal Lembur -->
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-200 text-[#0f766e] flex flex-col items-center justify-center font-bold shrink-0 shadow-2xs">
@@ -933,7 +933,7 @@
                                 $durasiStr = "{$hours} jam " . sprintf('%02d menit', $mins);
                                 $uangLembur = (int) $item->nominal;
                             @endphp
-                            <tr class="hover:bg-slate-50/70 transition-colors">
+                            <tr id="lembur-{{ $item->id }}" data-lembur-row="{{ $item->id }}" class="hover:bg-slate-50/70 transition-colors scroll-mt-28">
                                 <!-- NO -->
                                 <td class="py-3.5 px-4 text-center font-bold text-slate-800">
                                     {{ $idx + 1 }}
@@ -1093,4 +1093,60 @@
         </div>
 
     </div>
+
+    @push('styles')
+    <style>
+        @keyframes approvedRowGlow {
+            0% {
+                background-color: rgba(16, 185, 129, 0.28) !important;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.55), 0 8px 24px rgba(16, 185, 129, 0.2) !important;
+            }
+            50% {
+                background-color: rgba(16, 185, 129, 0.15) !important;
+                box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.35) !important;
+            }
+            100% {
+                background-color: transparent !important;
+                box-shadow: none !important;
+            }
+        }
+        .highlight-approved-row {
+            animation: approvedRowGlow 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            position: relative;
+            z-index: 20;
+        }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const targetId = '{{ session('target_lembur_id') }}' || (window.location.hash ? window.location.hash.replace('#', '') : null);
+            if (targetId) {
+                const cleanNum = targetId.toString().replace(/^(lembur-card-|lembur-)/, '');
+                const el = document.getElementById('lembur-' + cleanNum) 
+                        || document.getElementById('lembur-card-' + cleanNum)
+                        || document.getElementById(targetId);
+                if (el) {
+                    setTimeout(function () {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('highlight-approved-row');
+                        setTimeout(function () {
+                            el.classList.remove('highlight-approved-row');
+                        }, 4000);
+                    }, 150);
+                }
+            }
+
+            // Simpan scroll saat submit aksi approval atau pay
+            document.querySelectorAll('form').forEach(function (form) {
+                if (form.action && (form.action.includes('approve') || form.action.includes('pay') || form.action.includes('reject'))) {
+                    form.addEventListener('submit', function () {
+                        sessionStorage.setItem('last_approval_scroll_y', window.scrollY);
+                    });
+                }
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>

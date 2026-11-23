@@ -342,7 +342,7 @@
                                     ];
                                     $isApprovedStatus = in_array($item->status, ['menunggu_finance', 'menunggu_executive', 'dicairkan', 'menunggu_bukti', 'selesai']);
                                 @endphp
-                                <tr class="hover:bg-teal-50/30 transition-colors">
+                                <tr id="pengajuan-{{ $item->id }}" data-pengajuan-row="{{ $item->id }}" class="hover:bg-teal-50/30 transition-colors scroll-mt-28">
                                     <!-- No. Pengajuan -->
                                     <td class="py-3.5 px-4 whitespace-nowrap">
                                         <button type="button" @click="openDetail({{ json_encode($modalData) }})" class="inline-flex items-center text-xs font-extrabold text-[#155E63] hover:text-white bg-teal-50 hover:bg-[#155E63] border border-teal-200/70 px-2.5 py-1 rounded-lg transition cursor-pointer shadow-2xs">
@@ -507,7 +507,7 @@
                             @endphp
 
                             <!-- Single Pengajuan Card -->
-                            <div class="bg-white rounded-2xl border border-slate-200/90 hover:border-teal-400/80 shadow-2xs hover:shadow-md transition-all duration-200 p-4 flex flex-col justify-between gap-3.5">
+                            <div id="pengajuan-card-{{ $item->id }}" data-pengajuan-row="{{ $item->id }}" class="bg-white rounded-2xl border border-slate-200/90 hover:border-teal-400/80 shadow-2xs hover:shadow-md transition-all duration-200 p-4 flex flex-col justify-between gap-3.5 scroll-mt-28">
                                 <div class="space-y-3">
                                     <!-- Top Row: ID + Date & Badges -->
                                     <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-slate-100">
@@ -1189,5 +1189,61 @@
             </div>
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        @keyframes approvedRowGlow {
+            0% {
+                background-color: rgba(16, 185, 129, 0.28) !important;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.55), 0 8px 24px rgba(16, 185, 129, 0.2) !important;
+            }
+            50% {
+                background-color: rgba(16, 185, 129, 0.15) !important;
+                box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.35) !important;
+            }
+            100% {
+                background-color: transparent !important;
+                box-shadow: none !important;
+            }
+        }
+        .highlight-approved-row {
+            animation: approvedRowGlow 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            position: relative;
+            z-index: 20;
+        }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const targetId = '{{ session('target_pengajuan_id') }}' || (window.location.hash ? window.location.hash.replace('#', '') : null);
+            if (targetId) {
+                const cleanNum = targetId.toString().replace(/^(pengajuan-card-|pengajuan-)/, '');
+                const el = document.getElementById('pengajuan-' + cleanNum) 
+                        || document.getElementById('pengajuan-card-' + cleanNum)
+                        || document.getElementById(targetId);
+                if (el) {
+                    setTimeout(function () {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('highlight-approved-row');
+                        setTimeout(function () {
+                            el.classList.remove('highlight-approved-row');
+                        }, 4000);
+                    }, 150);
+                }
+            }
+
+            // Simpan scroll saat submit aksi approval
+            document.querySelectorAll('form').forEach(function (form) {
+                if (form.action && (form.action.includes('approve') || form.action.includes('disburse') || form.action.includes('reject'))) {
+                    form.addEventListener('submit', function () {
+                        sessionStorage.setItem('last_approval_scroll_y', window.scrollY);
+                    });
+                }
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>
 
