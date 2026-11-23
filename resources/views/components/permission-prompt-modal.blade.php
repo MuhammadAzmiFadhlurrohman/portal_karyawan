@@ -236,8 +236,8 @@
                     return; // DO NOT show modal
                 }
 
-                // If camera and location (essential for attendance) are already granted:
-                if (this.permissions.camera === 'granted' && this.permissions.location === 'granted') {
+                // If camera, location, and notification are already resolved:
+                if (this.permissions.camera === 'granted' && this.permissions.location === 'granted' && (this.permissions.notification === 'granted' || this.permissions.notification === 'denied')) {
                     localStorage.setItem(storageKey, 'done');
                     return; // DO NOT show modal
                 }

@@ -43,7 +43,7 @@ return [
     'fcm' => [
         'project_id' => env('FCM_PROJECT_ID', ''),
         'credentials_path' => env('FCM_CREDENTIALS_PATH', storage_path('app/fcm-service-account.json')),
-        'vapid_key' => env('FCM_VAPID_KEY', ''),
+        'vapid_key' => env('FCM_VAPID_KEY', env('VAPID_PUBLIC_KEY', '')),
     ],
 
 ];
