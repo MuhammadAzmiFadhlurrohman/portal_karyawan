@@ -185,23 +185,24 @@ class DashboardStatsService
         $lemburRejected = $lemburs->where('status', 'rejected')->count();
 
         // ----------------------------------------------------
-        // 4. DATA GRAFIK 1: TREN KEHADIRAN 7 HARI TERAKHIR
+        // 4. DATA GRAFIK 1: TREN KEHADIRAN & JAM KERJA 1 BULAN (30 HARI TERAKHIR)
         // ----------------------------------------------------
+        $isHrdOrAdmin = $user->hasRole(['super_admin', 'admin', 'hrd', 'ceo']);
+
+        $trendDays = 30; // 1 Bulan (30 Hari Terakhir)
         $trendDates = [];
         $trendLabels = [];
-        for ($i = 6; $i >= 0; $i--) {
+        for ($i = $trendDays - 1; $i >= 0; $i--) {
             $dt = $now->copy()->subDays($i);
             $trendDates[] = $dt->toDateString();
             $trendLabels[] = $dt->locale('id')->isoFormat('D MMM');
         }
 
-        $trendAttQuery = Attendance::query()->whereIn('date', $trendDates);
-        if ($userIds !== null) {
-            $trendAttQuery->whereIn('user_id', $userIds);
-        }
-        $trendAttRecords = $trendAttQuery->get()->groupBy(fn ($a) => Carbon::parse($a->date)->toDateString());
+        // A. DATA UNTUK HRD & ADMIN: TREN KEHADIRAN SELURUH KARYAWAN (1 BULAN)
+        $companyAttQuery = Attendance::query()->whereIn('date', $trendDates);
+        $companyAttRecords = $companyAttQuery->get()->groupBy(fn ($a) => Carbon::parse($a->date)->toDateString());
 
-        $chartAttendance = [
+        $chartAttendanceCompany = [
             'labels' => $trendLabels,
             'present' => [],
             'late' => [],
@@ -210,12 +211,82 @@ class DashboardStatsService
         ];
 
         foreach ($trendDates as $dtStr) {
-            $records = $trendAttRecords->get($dtStr, collect());
-            $chartAttendance['present'][] = $records->where('status', 'present')->where('late_minutes', 0)->count();
-            $chartAttendance['late'][] = $records->where('late_minutes', '>', 0)->count();
-            $chartAttendance['leave'][] = $records->whereIn('status', ['leave', 'sick'])->count();
-            $chartAttendance['absent'][] = $records->where('status', 'alpa')->count();
+            $records = $companyAttRecords->get($dtStr, collect());
+            $chartAttendanceCompany['present'][] = $records->where('status', 'present')->where('late_minutes', 0)->count();
+            $chartAttendanceCompany['late'][] = $records->where('late_minutes', '>', 0)->count();
+            $chartAttendanceCompany['leave'][] = $records->whereIn('status', ['leave', 'sick'])->count();
+            $chartAttendanceCompany['absent'][] = $records->where('status', 'alpa')->count();
         }
+
+        // B. DATA UNTUK KARYAWAN: JAM KERJA, LEMBUR & KETERLAMBATAN PRIBADI (1 BULAN)
+        $personalAttQuery = Attendance::query()
+            ->where('user_id', $user->id)
+            ->whereIn('date', $trendDates);
+        $personalAttRecords = $personalAttQuery->get()->keyBy(fn ($a) => Carbon::parse($a->date)->toDateString());
+
+        $personalLemburQuery = Lembur::query()
+            ->where('user_id', $user->id)
+            ->whereIn('tanggal', $trendDates)
+            ->whereIn('status', ['approved_atasan', 'approved', 'paid']);
+        $personalLemburs = $personalLemburQuery->get()->groupBy(fn ($l) => Carbon::parse($l->tanggal)->toDateString());
+
+        $chartPersonal = [
+            'labels' => $trendLabels,
+            'work_hours' => [],
+            'overtime_hours' => [],
+            'late_minutes' => [],
+            'clock_in_times' => [],
+            'statuses' => [],
+        ];
+
+        $totalPersonalWorkHours = 0.0;
+        $totalPersonalOvertimeHours = 0.0;
+        $totalPersonalLateMinutes = 0;
+
+        foreach ($trendDates as $dtStr) {
+            $att = $personalAttRecords->get($dtStr);
+            $lemburGroup = $personalLemburs->get($dtStr, collect());
+            $otHours = round($lemburGroup->sum('durasi_menit') / 60, 1);
+
+            $workHours = 0.0;
+            $lateMins = 0;
+            $clockInTime = '-';
+            $statusStr = 'Libur / Tidak Hadir';
+
+            if ($att) {
+                if (in_array($att->status, ['present', 'late'])) {
+                    if ($att->work_duration_minutes > 0) {
+                        $workHours = round($att->work_duration_minutes / 60, 1);
+                    } else {
+                        $workHours = 8.0;
+                    }
+                    $statusStr = $att->late_minutes > 0 ? "Terlambat ({$att->late_minutes} mnt)" : 'Tepat Waktu';
+                } elseif (in_array($att->status, ['leave', 'sick'])) {
+                    $statusStr = 'Izin / Cuti';
+                } elseif ($att->status === 'alpa') {
+                    $statusStr = 'Alpa';
+                }
+
+                $lateMins = (int) $att->late_minutes;
+                $clockInTime = $att->clock_in_at ? Carbon::parse($att->clock_in_at)->timezone('Asia/Jakarta')->format('H:i') . ' WIB' : '-';
+            }
+
+            $chartPersonal['work_hours'][] = $workHours;
+            $chartPersonal['overtime_hours'][] = $otHours;
+            $chartPersonal['late_minutes'][] = $lateMins;
+            $chartPersonal['clock_in_times'][] = $clockInTime;
+            $chartPersonal['statuses'][] = $statusStr;
+
+            $totalPersonalWorkHours += $workHours;
+            $totalPersonalOvertimeHours += $otHours;
+            $totalPersonalLateMinutes += $lateMins;
+        }
+
+        $chartPersonal['summary'] = [
+            'total_work_hours' => round($totalPersonalWorkHours, 1),
+            'total_overtime_hours' => round($totalPersonalOvertimeHours, 1),
+            'total_late_minutes' => $totalPersonalLateMinutes,
+        ];
 
         // ----------------------------------------------------
         // 5. DATA GRAFIK 2: KOMPOSISI PENGAJUAN & LEMBUR
@@ -298,7 +369,10 @@ class DashboardStatsService
                 'rejected' => $lemburRejected,
             ],
             'charts' => [
-                'attendance' => $chartAttendance,
+                'is_admin_or_hrd' => $isHrdOrAdmin,
+                'attendance' => $isHrdOrAdmin ? $chartAttendanceCompany : $chartAttendanceCompany,
+                'company_attendance' => $chartAttendanceCompany,
+                'personal_attendance' => $chartPersonal,
                 'pengajuan' => $chartPengajuan,
                 'lembur' => $chartLembur,
             ],

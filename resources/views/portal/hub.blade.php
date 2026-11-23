@@ -1733,35 +1733,87 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <!-- Chart 1: Tren Kehadiran 7 Hari Terakhir (Col 7) -->
+            <!-- Chart 1: Tren Kehadiran / Jam Kerja (Col 7) -->
+            @php
+                $isHrdOrAdmin = $stats['charts']['is_admin_or_hrd'] ?? auth()->user()->hasRole(['super_admin', 'admin', 'hrd', 'ceo']);
+            @endphp
             <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
                 <div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
-                        <div>
-                            <h3 class="font-heading font-bold text-sm text-slate-800">
-                                Tren Kehadiran Harian (7 Hari Terakhir)
-                            </h3>
-                            <p class="text-xs text-slate-400 mt-0.5">
-                                Distribusi status tepat waktu, keterlambatan, izin, dan alpa
-                            </p>
+                    @if ($isHrdOrAdmin)
+                        <!-- Tampilan untuk HRD & Admin: Tren Kehadiran Seluruh Karyawan (1 Bulan) -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-heading font-bold text-sm text-slate-800">
+                                        Tren Kehadiran Harian Seluruh Karyawan
+                                    </h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                        1 Bulan (30 Hari)
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Distribusi status tepat waktu, keterlambatan, izin, dan alpa seluruh tim
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3 text-[11px] font-medium text-slate-600 flex-wrap">
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-teal-600 inline-block"></span> Tepat</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Telat</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-indigo-500 inline-block"></span> Izin</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block"></span> Alpa</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-3 text-[11px] font-medium text-slate-600 flex-wrap">
-                            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-teal-600 inline-block"></span> Tepat</span>
-                            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500 inline-block"></span> Telat</span>
-                            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-indigo-500 inline-block"></span> Izin</span>
-                            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block"></span> Alpa</span>
-                        </div>
-                    </div>
 
-                    <div class="relative w-full h-[250px] sm:h-[280px]">
-                        <canvas id="attendanceTrendChart"></canvas>
-                    </div>
+                        <div class="relative w-full h-[250px] sm:h-[280px]">
+                            <canvas id="attendanceTrendChart"></canvas>
+                        </div>
+                    @else
+                        <!-- Tampilan untuk Role Karyawan: Jam Kerja, Lembur & Keterlambatan Pribadi (1 Bulan) -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 mb-3 border-b border-slate-100 gap-2">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-heading font-bold text-sm text-slate-800">
+                                        Statistik Jam Kerja &amp; Presensi Saya
+                                    </h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                        1 Bulan Terakhir
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Monitoring durasi kerja harian, akumulasi jam lembur, dan riwayat keterlambatan
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3 text-[11px] font-medium text-slate-600 flex-wrap">
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-teal-600 inline-block"></span> Jam Kerja</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span> Lembur</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Telat (Mnt)</span>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full h-[250px] sm:h-[280px]">
+                            <canvas id="attendanceTrendChart"></canvas>
+                        </div>
+                    @endif
                 </div>
-                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                    <span>*Data dihitung berdasarkan jadwal kerja harian (Shift &amp; Presensi)</span>
-                    <a href="{{ route('attendance.leaderboard') }}" class="font-semibold text-teal-700 hover:underline">
-                        Lihat Leaderboard &rarr;
-                    </a>
+
+                <!-- Footer Informasi di Bawah Chart -->
+                <div class="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 flex-wrap gap-2">
+                    @if ($isHrdOrAdmin)
+                        <span>*Data dihitung harian dari seluruh jadwal kerja &amp; absensi karyawan</span>
+                        <a href="{{ route('attendance.reports') }}" class="font-semibold text-teal-700 hover:underline">
+                            Rekap Laporan Absensi &rarr;
+                        </a>
+                    @else
+                        <div class="flex items-center gap-3 text-[11px] flex-wrap">
+                            <span class="text-slate-600">Total Kerja: <strong class="text-teal-700 font-mono">{{ $stats['charts']['personal_attendance']['summary']['total_work_hours'] ?? 0 }} Jam</strong></span>
+                            <span class="text-slate-300">·</span>
+                            <span class="text-slate-600">Total Lembur: <strong class="text-emerald-700 font-mono">{{ $stats['charts']['personal_attendance']['summary']['total_overtime_hours'] ?? 0 }} Jam</strong></span>
+                            <span class="text-slate-300">·</span>
+                            <span class="text-slate-600">Keterlambatan: <strong class="{{ ($stats['charts']['personal_attendance']['summary']['total_late_minutes'] ?? 0) > 0 ? 'text-amber-600' : 'text-emerald-600' }} font-mono">{{ $stats['charts']['personal_attendance']['summary']['total_late_minutes'] ?? 0 }} Mnt</strong></span>
+                        </div>
+                        <a href="{{ route('attendance.history') }}" class="font-semibold text-teal-700 hover:underline shrink-0">
+                            Riwayat Absensi Saya &rarr;
+                        </a>
+                    @endif
                 </div>
             </div>
 
@@ -2047,89 +2099,228 @@
 
             const chartFontFamily = 'Plus Jakarta Sans, Inter, sans-serif';
 
-            // 1. Attendance Trend Chart (Stacked / Grouped Bar)
+            // 1. Attendance & Work Hours Trend Chart
             const attCanvas = document.getElementById('attendanceTrendChart');
             if (attCanvas) {
-                const attData = @json($stats['charts']['attendance']);
+                const isHrdOrAdmin = @json($isHrdOrAdmin);
                 const isDarkNow = document.documentElement.classList.contains('dark');
-                const attChart = new Chart(attCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: attData.labels,
-                        datasets: [
-                            {
-                                label: 'Tepat Waktu',
-                                data: attData.present,
-                                backgroundColor: '#0D9488',
-                                borderRadius: 6,
-                                maxBarThickness: 28,
-                            },
-                            {
-                                label: 'Terlambat',
-                                data: attData.late,
-                                backgroundColor: '#F59E0B',
-                                borderRadius: 6,
-                                maxBarThickness: 28,
-                            },
-                            {
-                                label: 'Izin / Cuti',
-                                data: attData.leave,
-                                backgroundColor: '#6366F1',
-                                borderRadius: 6,
-                                maxBarThickness: 28,
-                            },
-                            {
-                                label: 'Alpa / Belum',
-                                data: attData.absent,
-                                backgroundColor: '#EF4444',
-                                borderRadius: 6,
-                                maxBarThickness: 28,
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
+                let attChart = null;
+
+                if (isHrdOrAdmin) {
+                    // HRD & Admin: Stacked Bar Chart Seluruh Karyawan (1 Bulan / 30 Hari)
+                    const attData = @json($stats['charts']['company_attendance'] ?? $stats['charts']['attendance']);
+                    attChart = new Chart(attCanvas.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: attData.labels,
+                            datasets: [
+                                {
+                                    label: 'Tepat Waktu',
+                                    data: attData.present,
+                                    backgroundColor: '#0D9488',
+                                    borderRadius: 4,
+                                    maxBarThickness: 16,
+                                },
+                                {
+                                    label: 'Terlambat',
+                                    data: attData.late,
+                                    backgroundColor: '#F59E0B',
+                                    borderRadius: 4,
+                                    maxBarThickness: 16,
+                                },
+                                {
+                                    label: 'Izin / Cuti',
+                                    data: attData.leave,
+                                    backgroundColor: '#6366F1',
+                                    borderRadius: 4,
+                                    maxBarThickness: 16,
+                                },
+                                {
+                                    label: 'Alpa / Belum',
+                                    data: attData.absent,
+                                    backgroundColor: '#EF4444',
+                                    borderRadius: 4,
+                                    maxBarThickness: 16,
+                                }
+                            ]
                         },
-                        plugins: {
-                            legend: {
-                                display: false,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
                             },
-                            tooltip: {
-                                padding: 10,
-                                cornerRadius: 8,
-                                bodyFont: { family: chartFontFamily, size: 12 },
-                                titleFont: { family: chartFontFamily, size: 12, weight: 'bold' },
-                            }
-                        },
-                        scales: {
-                            x: {
-                                stacked: true,
-                                grid: { display: false },
-                                ticks: { font: { family: chartFontFamily, size: 11 }, color: isDarkNow ? '#94A3B8' : '#64748B' }
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    padding: 10,
+                                    cornerRadius: 8,
+                                    bodyFont: { family: chartFontFamily, size: 12 },
+                                    titleFont: { family: chartFontFamily, size: 12, weight: 'bold' },
+                                }
                             },
-                            y: {
-                                stacked: true,
-                                beginAtZero: true,
-                                grid: { color: isDarkNow ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9' },
-                                ticks: {
-                                    stepSize: 1,
-                                    font: { family: chartFontFamily, size: 11 },
-                                    color: isDarkNow ? '#94A3B8' : '#64748B'
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    grid: { display: false },
+                                    ticks: {
+                                        font: { family: chartFontFamily, size: 10 },
+                                        color: isDarkNow ? '#94A3B8' : '#64748B',
+                                        maxRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 15
+                                    }
+                                },
+                                y: {
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    grid: { color: isDarkNow ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9' },
+                                    ticks: {
+                                        stepSize: 1,
+                                        font: { family: chartFontFamily, size: 11 },
+                                        color: isDarkNow ? '#94A3B8' : '#64748B'
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                } else {
+                    // Role Karyawan: Mixed Combo Chart Jam Kerja, Lembur & Keterlambatan Pribadi (1 Bulan)
+                    const personalData = @json($stats['charts']['personal_attendance'] ?? []);
+                    attChart = new Chart(attCanvas.getContext('2d'), {
+                        data: {
+                            labels: personalData.labels || [],
+                            datasets: [
+                                {
+                                    type: 'bar',
+                                    label: 'Jam Kerja Reguler',
+                                    data: personalData.work_hours || [],
+                                    backgroundColor: '#0D9488',
+                                    borderRadius: 4,
+                                    maxBarThickness: 16,
+                                    stack: 'hours',
+                                    yAxisID: 'y',
+                                },
+                                {
+                                    type: 'bar',
+                                    label: 'Jam Lembur',
+                                    data: personalData.overtime_hours || [],
+                                    backgroundColor: '#34D399',
+                                    borderRadius: 4,
+                                    maxBarThickness: 16,
+                                    stack: 'hours',
+                                    yAxisID: 'y',
+                                },
+                                {
+                                    type: 'line',
+                                    label: 'Keterlambatan (Menit)',
+                                    data: personalData.late_minutes || [],
+                                    borderColor: '#F59E0B',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                                    pointBackgroundColor: '#F59E0B',
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 1.5,
+                                    pointRadius: 2.5,
+                                    pointHoverRadius: 5,
+                                    tension: 0.25,
+                                    borderWidth: 2,
+                                    yAxisID: 'yLate',
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: {
+                                mode: 'index',
+                                intersect: false,
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    padding: 10,
+                                    cornerRadius: 8,
+                                    bodyFont: { family: chartFontFamily, size: 12 },
+                                    titleFont: { family: chartFontFamily, size: 12, weight: 'bold' },
+                                    callbacks: {
+                                        afterTitle: function(context) {
+                                            const idx = context[0].dataIndex;
+                                            const clockIn = (personalData.clock_in_times && personalData.clock_in_times[idx]) || '-';
+                                            const status = (personalData.statuses && personalData.statuses[idx]) || '-';
+                                            return `Jam Masuk: ${clockIn} · Status: ${status}`;
+                                        },
+                                        label: function(context) {
+                                            const val = context.parsed.y;
+                                            if (context.dataset.yAxisID === 'yLate') {
+                                                return `Keterlambatan: ${val} Menit`;
+                                            }
+                                            return `${context.dataset.label}: ${val} Jam`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { display: false },
+                                    ticks: {
+                                        font: { family: chartFontFamily, size: 10 },
+                                        color: isDarkNow ? '#94A3B8' : '#64748B',
+                                        maxRotation: 45,
+                                        autoSkip: true,
+                                        maxTicksLimit: 15
+                                    }
+                                },
+                                y: {
+                                    type: 'linear',
+                                    position: 'left',
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    grid: { color: isDarkNow ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9' },
+                                    title: {
+                                        display: true,
+                                        text: 'Jam Kerja',
+                                        font: { family: chartFontFamily, size: 10, weight: 'bold' },
+                                        color: isDarkNow ? '#94A3B8' : '#64748B'
+                                    },
+                                    ticks: {
+                                        stepSize: 2,
+                                        font: { family: chartFontFamily, size: 11 },
+                                        color: isDarkNow ? '#94A3B8' : '#64748B'
+                                    }
+                                },
+                                yLate: {
+                                    type: 'linear',
+                                    position: 'right',
+                                    beginAtZero: true,
+                                    grid: { display: false },
+                                    title: {
+                                        display: true,
+                                        text: 'Telat (Mnt)',
+                                        font: { family: chartFontFamily, size: 10, weight: 'bold' },
+                                        color: '#F59E0B'
+                                    },
+                                    ticks: {
+                                        font: { family: chartFontFamily, size: 10 },
+                                        color: '#F59E0B',
+                                        callback: function(value) { return value + 'm'; }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
 
                 window.addEventListener('gomsn-theme-changed', function (e) {
+                    if (!attChart) return;
                     const dark = e.detail && e.detail.dark;
-                    attChart.options.scales.x.ticks.color = dark ? '#94A3B8' : '#64748B';
-                    attChart.options.scales.y.ticks.color = dark ? '#94A3B8' : '#64748B';
-                    attChart.options.scales.y.grid.color = dark ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9';
+                    if (attChart.options.scales.x) {
+                        attChart.options.scales.x.ticks.color = dark ? '#94A3B8' : '#64748B';
+                    }
+                    if (attChart.options.scales.y) {
+                        attChart.options.scales.y.ticks.color = dark ? '#94A3B8' : '#64748B';
+                        attChart.options.scales.y.grid.color = dark ? 'rgba(51, 65, 85, 0.5)' : '#F1F5F9';
+                    }
                     attChart.update('none');
                 });
             }
