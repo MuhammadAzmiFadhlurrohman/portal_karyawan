@@ -447,6 +447,8 @@
                                             'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                             'realisasiNotes' => $item->realisasi_notes,
                                             'details' => $item->getModalDetails(),
+                                        'personelList' => $item->getPersonelList(),
+                                        'personelList' => $item->getPersonelList(),
                                         ];
                                     @endphp
                                     <tr id="pengajuan-{{ $item->id }}" data-pengajuan-row="{{ $item->id }}" class="hover:bg-teal-50/30 transition-colors scroll-mt-28">
@@ -579,6 +581,8 @@
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
                                         'details' => $item->getModalDetails(),
+                                        'personelList' => $item->getPersonelList(),
+                                        'personelList' => $item->getPersonelList(),
                                     ];
                                 @endphp
 
@@ -990,6 +994,8 @@
                                             'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                             'realisasiNotes' => $item->realisasi_notes,
                                             'details' => $item->getModalDetails(),
+                                        'personelList' => $item->getPersonelList(),
+                                        'personelList' => $item->getPersonelList(),
                                         ];
 
                                         $badge = match($item->status) {
@@ -1130,6 +1136,8 @@
                                         'realisasiAt' => $item->realisasi_at?->format('d M Y - H:i') . ' WIB',
                                         'realisasiNotes' => $item->realisasi_notes,
                                         'details' => $item->getModalDetails(),
+                                        'personelList' => $item->getPersonelList(),
+                                        'personelList' => $item->getPersonelList(),
                                     ];
 
                                     $badge = match($item->status) {
@@ -1375,9 +1383,26 @@
                                     <div class="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center shrink-0 mt-0.5">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-4 0H9v2h2V9z" clip-rule="evenodd"/></svg>
                                     </div>
-                                    <div class="min-w-0">
+                                    <div class="min-w-0 flex-1">
                                         <span class="text-slate-500 text-[11px] block leading-none">Keterangan / Keperluan</span>
                                         <p class="text-slate-800 font-medium text-xs mt-0.5 leading-relaxed" x-text="activeItem?.keperluan || '-'"></p>
+
+                                        <!-- Personel di bawah Keterangan / Keperluan -->
+                                        <template x-if="activeItem?.personelList && activeItem.personelList.length">
+                                            <div class="mt-2.5 pt-2 border-t border-slate-200/80">
+                                                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 block mb-1">
+                                                    Personel:
+                                                </span>
+                                                <div class="flex flex-wrap items-center gap-1.5">
+                                                    <template x-for="person in activeItem.personelList" :key="person">
+                                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200">
+                                                            <span>👤</span>
+                                                            <span x-text="person"></span>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>

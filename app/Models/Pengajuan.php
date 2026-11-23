@@ -142,15 +142,56 @@ class Pengajuan extends Model
     /**
      * Return structured items array for detail modal with auto-fallback for legacy unpopulated rows.
      */
+    public function getPersonelList(): array
+    {
+        $personel = [];
+        if ($this->relationLoaded('details') && $this->details->isNotEmpty()) {
+            foreach ($this->details as $d) {
+                $raw = $d->deskripsi ?: $d->item_name ?: '';
+                if (preg_match('/\[Personel:\s*(.*?)\]/i', $raw, $m)) {
+                    $parts = array_map('trim', explode(',', $m[1]));
+                    foreach ($parts as $p) {
+                        if ($p !== '' && ! in_array($p, $personel, true)) {
+                            $personel[] = $p;
+                        }
+                    }
+                }
+            }
+        }
+        $allText = ($this->judul ?? '') . ' ' . ($this->keperluan ?? '');
+        if (preg_match_all('/\[Personel:\s*(.*?)\]/i', $allText, $allMatches)) {
+            foreach ($allMatches[1] as $matchStr) {
+                $parts = array_map('trim', explode(',', $matchStr));
+                foreach ($parts as $p) {
+                    if ($p !== '' && ! in_array($p, $personel, true)) {
+                        $personel[] = $p;
+                    }
+                }
+            }
+        }
+        return $personel;
+    }
+
     public function getModalDetails(): array
     {
         if ($this->relationLoaded('details') && $this->details->isNotEmpty()) {
             return $this->details->map(function ($d) {
                 $isStok = in_array(strtoupper($this->jenis), ['STOK', 'PERMINTAAN'], true);
+                $rawName = $d->item_name ?: ($d->material?->nama ?? '-');
+                $personel = [];
+                if (preg_match('/\[Personel:\s*(.*?)\]/i', $rawName, $m)) {
+                    $personel = array_map('trim', explode(',', $m[1]));
+                    $cleanName = trim(preg_replace('/\[Personel:\s*.*?\]/i', '', $rawName));
+                } else {
+                    $cleanName = $rawName;
+                }
+
                 return [
-                    'name' => $d->item_name ?: ($d->material?->nama ?? '-'),
+                    'name' => $cleanName,
+                    'rawName' => $rawName,
+                    'personel' => $personel,
                     'qty' => (int) ($d->qty ?: 1),
-                    'satuan' => $d->satuan ?: ($d->material?->satuan ?? self::guessSatuan($d->item_name)),
+                    'satuan' => $d->satuan ?: ($d->material?->satuan ?? self::guessSatuan($cleanName)),
                     'unitPrice' => $isStok ? 'Rp 0' : 'Rp ' . number_format((float) $d->estimated_unit_price, 0, ',', '.'),
                     'subtotal' => $isStok ? 'Rp 0' : 'Rp ' . number_format((float) $d->subtotal, 0, ',', '.'),
                 ];
@@ -158,12 +199,19 @@ class Pengajuan extends Model
         }
 
         // Fallback: parse from judul if details relationship is empty
-        return self::parseLegacyItems(
+        $legacy = self::parseLegacyItems(
             $this->judul ?? '',
             $this->keperluan ?? '',
             $this->jenis ?? 'STOK',
             (float) ($this->nominal_total ?? 0.0)
         );
+
+        return array_map(function ($item) {
+            $raw = $item['name'] ?? '';
+            $item['rawName'] = $raw;
+            $item['name'] = trim(preg_replace('/\[Personel:\s*.*?\]/i', '', $raw));
+            return $item;
+        }, $legacy);
     }
 
     public static function guessSatuan(?string $name): string

@@ -351,7 +351,26 @@
                             Keperluan / Keterangan Permohonan:
                         </span>
                         <div class="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/70 text-slate-800 text-xs sm:text-[13px] leading-relaxed whitespace-pre-line font-medium shadow-2xs">
-                            {{ $pengajuan->keperluan ?: '-' }}
+                            <div>{{ $pengajuan->keperluan ?: '-' }}</div>
+
+                            @php
+                                $personelList = $pengajuan->getPersonelList();
+                            @endphp
+                            @if (! empty($personelList))
+                                <div class="mt-3 pt-3 border-t border-slate-200/80">
+                                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800 block mb-1.5">
+                                        Personel yang Terlibat:
+                                    </span>
+                                    <div class="flex flex-wrap items-center gap-1.5">
+                                        @foreach ($personelList as $p)
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200 shadow-2xs">
+                                                <span>👤</span>
+                                                <span>{{ $p }}</span>
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -410,7 +429,7 @@
                                 @forelse ($displayItems as $item)
                                 <tr class="hover:bg-teal-50/20 transition-colors">
                                     <td class="py-3.5 px-4 font-semibold text-slate-800">
-                                        <span>{{ $item->item_name }}</span>
+                                        <span>{{ trim(preg_replace('/\[Personel:\s*.*?\]/i', '', $item->item_name)) }}</span>
                                         @if ($item->material)
                                             <span class="text-[10px] text-slate-400 block font-mono mt-0.5">Kode: {{ $item->material->kode }}</span>
                                         @endif
@@ -470,7 +489,7 @@
                         <div class="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="min-w-0">
-                                    <span class="font-bold text-slate-900 block text-xs leading-tight">{{ $item->item_name }}</span>
+                                    <span class="font-bold text-slate-900 block text-xs leading-tight">{{ trim(preg_replace('/\[Personel:\s*.*?\]/i', '', $item->item_name)) }}</span>
                                     @if ($item->material)
                                         <span class="text-[10px] text-slate-400 font-mono block mt-0.5">Kode: {{ $item->material->kode }}</span>
                                     @endif
