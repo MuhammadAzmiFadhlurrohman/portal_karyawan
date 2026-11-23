@@ -47,8 +47,8 @@ self.addEventListener('push', (event) => {
 
     const options = {
         body: body,
-        icon: '/images/icons/icon-192x192.png',
-        badge: '/images/icons/badge-72x72.png',
+        icon: '/assets/logo/icon-192.png',
+        badge: '/assets/logo/favicon-32x32.png',
         vibrate: [100, 50, 100],
         data: {
             deep_link: deepLink,

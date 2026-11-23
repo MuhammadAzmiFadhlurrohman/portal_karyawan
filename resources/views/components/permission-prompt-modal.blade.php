@@ -320,6 +320,9 @@
                     try {
                         const notifResult = await Notification.requestPermission();
                         this.permissions.notification = (notifResult === 'granted') ? 'granted' : 'denied';
+                        if (notifResult === 'granted' && typeof window.initGomsnFcmToken === 'function') {
+                            window.initGomsnFcmToken();
+                        }
                     } catch (e) {
                         this.permissions.notification = 'denied';
                     }

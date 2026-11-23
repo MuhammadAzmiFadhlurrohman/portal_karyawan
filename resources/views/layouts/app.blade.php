@@ -2163,33 +2163,19 @@
             }
         })();
 
-        // PWA Service Worker & Push Notification Registration
+        // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw.js').then(function(reg) {
                     window.msnServiceWorkerReg = reg;
-                    if (window.Notification && Notification.permission === 'granted') {
-                        reg.pushManager.getSubscription().then(function(sub) {
-                            if (sub && sub.endpoint) {
-                                fetch('{{ route("api.fcm.token.register") }}', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                    },
-                                    body: JSON.stringify({
-                                        token: sub.endpoint,
-                                        platform: 'web',
-                                        device_name: navigator.userAgent.slice(0, 100)
-                                    })
-                                }).catch(function(){});
-                            }
-                        });
+                    if (window.initGomsnFcmToken) {
+                        window.initGomsnFcmToken();
                     }
                 }).catch(function(){});
             });
         }
     </script>
+    @include('layouts.partials.fcm-client')
     @endauth
 
     @stack('scripts')
