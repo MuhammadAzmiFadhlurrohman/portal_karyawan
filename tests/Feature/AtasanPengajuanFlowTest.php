@@ -666,7 +666,7 @@ class AtasanPengajuanFlowTest extends TestCase
         $this->assertEquals(5000, (float) $completedPengajuan->selisih_realisasi);
         $this->assertNotNull($completedPengajuan->bukti_realisasi_path);
         $this->assertEquals('Sisa uang kasbon Rp 5.000 telah dikembalikan', $completedPengajuan->realisasi_notes);
-        Storage::disk('public')->assertExists($completedPengajuan->bukti_realisasi_path);
+        Storage::disk('private')->assertExists($completedPengajuan->bukti_realisasi_path);
 
         // Karyawan opens index again, now it displays completed realization
         $resAfter = $this->actingAs($karyawan)->get(route('gomsn.pengajuan.index'));

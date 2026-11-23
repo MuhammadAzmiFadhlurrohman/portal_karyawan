@@ -136,7 +136,7 @@
                 </div>
             </div>
 
-            <!-- Right: Action Button Ajukan Lembur (Hanya ada di Lembur Saya atau Karyawan Mandiri) -->
+            {{-- Right: Action Button (Hanya ada di Lembur Saya atau Karyawan Mandiri) --}}
             @if ((! $isAtasan && ! $isFinance && ! $isSuperAdmin && ! $isHrd) || ($viewMode === 'saya'))
             <div class="relative z-10 flex items-center gap-2 shrink-0">
                 <a href="{{ route('gomsn.overtime.create') }}" 
