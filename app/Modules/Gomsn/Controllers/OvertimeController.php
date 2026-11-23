@@ -505,6 +505,19 @@ class OvertimeController extends Controller
                 requireAttendance: true
             );
 
+            try {
+                if ($lembur->atasan_id) {
+                    app(\App\Services\FcmService::class)->sendToUsers(
+                        userIds: $lembur->atasan_id,
+                        eventType: 'lembur',
+                        title: 'Pengajuan Lembur Baru',
+                        body: "{$user->name} mengajukan lembur ({$lembur->nomor_lembur}) untuk tanggal {$lembur->tanggal_lembur}.",
+                        deepLink: route('gomsn.overtime.index', ['user_id' => $user->id]),
+                        extraData: ['reference_id' => $lembur->id]
+                    );
+                }
+            } catch (\Throwable) {}
+
             return redirect()->route('gomsn.overtime.index')
                 ->with('success', "Pengajuan lembur {$lembur->nomor_lembur} berhasil diajukan.");
         } catch (Exception $e) {

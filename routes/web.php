@@ -240,6 +240,12 @@ Route::middleware('auth')->group(function (): void {
     // Chatbot Asisten API (§5.8)
     Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('api.chatbot.ask');
 
+    // Firebase Cloud Messaging (FCM) Push Notifications
+    Route::post('/api/fcm/token', [\App\Http\Controllers\FcmController::class, 'registerToken'])->name('api.fcm.token.register');
+    Route::delete('/api/fcm/token', [\App\Http\Controllers\FcmController::class, 'deleteToken'])->name('api.fcm.token.delete');
+    Route::get('/api/fcm/preferences', [\App\Http\Controllers\FcmController::class, 'getPreferences'])->name('api.fcm.preferences.get');
+    Route::post('/api/fcm/preferences', [\App\Http\Controllers\FcmController::class, 'updatePreferences'])->name('api.fcm.preferences.update');
+
     // System Utilities / Migrations Runner
     Route::post('/portal/system/migrate', function () {
         if (! auth()->user()->hasRole(['super_admin', 'admin'])) {

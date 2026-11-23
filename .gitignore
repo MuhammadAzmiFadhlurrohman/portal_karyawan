@@ -30,3 +30,7 @@ __pycache__/
 *.sql.gz
 attendance_db.sql
 gomsn.sql
+
+# Google Firebase Service Account Credentials
+*fcm*.json
+storage/app/*service-account*.json

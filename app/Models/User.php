@@ -386,4 +386,14 @@ class User extends Authenticatable
 
         return $this->supervisor;
     }
+
+    public function fcmTokens(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserFcmToken::class);
+    }
+
+    public function notificationPreference(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserNotificationPreference::class);
+    }
 }

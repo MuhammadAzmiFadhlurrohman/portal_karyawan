@@ -108,6 +108,24 @@ class ChronologyController extends Controller
                 replyToId: $replyToId,
             );
 
+            try {
+                $recipientIds = $tiket->assignees->pluck('user_id')->toArray();
+                if ($tiket->created_by) $recipientIds[] = $tiket->created_by;
+                $recipientIds = array_diff(array_unique($recipientIds), [$user->id]);
+
+                if (! empty($recipientIds)) {
+                    $snippet = $validated['message'] ?? ($photoPath ? '📷 Lampiran Foto' : ($videoPath ? '🎥 Lampiran Video' : 'Update Lapangan'));
+                    app(\App\Services\FcmService::class)->sendToUsers(
+                        userIds: $recipientIds,
+                        eventType: 'tiket',
+                        title: "Pesan Tiket [{$tiket->nomor_tiket}]",
+                        body: "{$user->name}: " . \Illuminate\Support\Str::limit($snippet, 80),
+                        deepLink: route('tickets.show', $tiket->id),
+                        extraData: ['reference_id' => $tiket->id]
+                    );
+                }
+            } catch (\Throwable) {}
+
             if ($request->wantsJson()) {
                 $entry->load(['user', 'replyTo.user']);
                 return response()->json([

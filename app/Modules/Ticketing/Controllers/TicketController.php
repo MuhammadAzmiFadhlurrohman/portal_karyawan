@@ -8,6 +8,7 @@ use App\Models\MasterSla;
 use App\Models\TicketChronology;
 use App\Models\Tiket;
 use App\Models\User;
+use App\Services\FcmService;
 use App\Modules\Ticketing\Services\ChronologyService;
 use App\Modules\Ticketing\Services\ImsIntegrationService;
 use App\Modules\Ticketing\Services\TicketDispatchService;
@@ -485,6 +486,18 @@ class TicketController extends Controller
             $user
         );
 
+        try {
+            $assignedUserIds = array_filter(array_unique(array_merge([$leadId], (array) $memberIds)));
+            app(FcmService::class)->sendToUsers(
+                userIds: $assignedUserIds,
+                eventType: 'tiket',
+                title: 'Penugasan Tiket Baru',
+                body: "Tiket [{$tiket->nomor_tiket}] {$tiket->judul} telah ditugaskan kepada Anda oleh {$user->name}.",
+                deepLink: route('tickets.show', $tiket->id),
+                extraData: ['reference_id' => $tiket->id]
+            );
+        } catch (\Throwable) {}
+
         $msg = "Tiket {$tiket->no_tiket} berhasil di-dispatch.";
         if (! empty($result['overload_warnings'])) {
             $msg .= ' Catatan beban: '.implode(' | ', $result['overload_warnings']);
@@ -555,6 +568,19 @@ class TicketController extends Controller
         try {
             $closedTiket = $this->stateMachine->verifyAndClose($tiket, $request->user());
 
+            try {
+                $assigneeIds = $tiket->assignees->pluck('user_id')->toArray();
+                if ($tiket->created_by) $assigneeIds[] = $tiket->created_by;
+                app(FcmService::class)->sendToUsers(
+                    userIds: array_unique($assigneeIds),
+                    eventType: 'tiket',
+                    title: 'Tiket Selesai Diverifikasi',
+                    body: "Tiket [{$tiket->nomor_tiket}] telah diverifikasi & DITUTUP oleh {$request->user()->name}.",
+                    deepLink: route('tickets.show', $tiket->id),
+                    extraData: ['reference_id' => $tiket->id]
+                );
+            } catch (\Throwable) {}
+
             $msg = "Tiket {$tiket->no_tiket} berhasil diverifikasi & DITUTUP. MTTR Bersih: {$closedTiket->net_mttr_minutes}m, Status SLA: {$closedTiket->sla_status}.";
             if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => $msg, 'tiket' => $closedTiket]);
@@ -586,6 +612,18 @@ class TicketController extends Controller
         try {
             $this->stateMachine->rejectClosing($tiket, $request->user(), $validated['reason']);
 
+            try {
+                $assigneeIds = $tiket->assignees->pluck('user_id')->toArray();
+                app(FcmService::class)->sendToUsers(
+                    userIds: $assigneeIds,
+                    eventType: 'tiket',
+                    title: 'Closing Tiket Ditolak',
+                    body: "Closing tiket [{$tiket->nomor_tiket}] ditolak: {$validated['reason']}",
+                    deepLink: route('tickets.show', $tiket->id),
+                    extraData: ['reference_id' => $tiket->id]
+                );
+            } catch (\Throwable) {}
+
             $msg = "Closing tiket {$tiket->no_tiket} telah ditolak dan dikembalikan ke teknisi.";
             if ($request->wantsJson()) {
                 return response()->json(['success' => true, 'message' => $msg]);
@@ -616,6 +654,18 @@ class TicketController extends Controller
 
         try {
             $this->stateMachine->reopen($tiket, $request->user(), $validated['reason']);
+
+            try {
+                $assigneeIds = $tiket->assignees->pluck('user_id')->toArray();
+                app(FcmService::class)->sendToUsers(
+                    userIds: $assigneeIds,
+                    eventType: 'tiket',
+                    title: 'Tiket Dibuka Kembali (Reopened)',
+                    body: "Tiket [{$tiket->nomor_tiket}] dibuka kembali oleh {$request->user()->name}: {$validated['reason']}",
+                    deepLink: route('tickets.show', $tiket->id),
+                    extraData: ['reference_id' => $tiket->id]
+                );
+            } catch (\Throwable) {}
 
             return redirect()->route('tickets.show', $tiket)->with('success', "Tiket {$tiket->no_tiket} berhasil di-reopen.");
         } catch (\Throwable $e) {

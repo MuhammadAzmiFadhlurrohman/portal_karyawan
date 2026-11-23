@@ -281,6 +281,17 @@ class OvertimeService
             actorId: $supervisor->id
         );
 
+        try {
+            app(\App\Services\FcmService::class)->sendToUsers(
+                userIds: $lembur->user_id,
+                eventType: 'lembur',
+                title: 'Pengajuan Lembur Disetujui',
+                body: "Pengajuan lembur {$lembur->nomor_lembur} tanggal {$lembur->tanggal_lembur} telah disetujui Atasan ({$supervisor->name}).",
+                deepLink: route('gomsn.overtime.index', ['view_mode' => 'saya']),
+                extraData: ['reference_id' => $lembur->id]
+            );
+        } catch (\Throwable) {}
+
         return $lembur;
     }
 
@@ -309,6 +320,17 @@ class OvertimeService
             reason: 'Lembur ditolak Atasan',
             actorId: $supervisor->id
         );
+
+        try {
+            app(\App\Services\FcmService::class)->sendToUsers(
+                userIds: $lembur->user_id,
+                eventType: 'lembur',
+                title: 'Pengajuan Lembur Ditolak',
+                body: "Lembur {$lembur->nomor_lembur} ditolak Atasan ({$supervisor->name}): " . ($reason ?? 'Tidak memenuhi kriteria.'),
+                deepLink: route('gomsn.overtime.index', ['view_mode' => 'saya']),
+                extraData: ['reference_id' => $lembur->id]
+            );
+        } catch (\Throwable) {}
 
         return $lembur;
     }
