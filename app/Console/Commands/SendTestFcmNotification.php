@@ -88,7 +88,7 @@ class SendTestFcmNotification extends Command
                 $title,
                 $body,
                 url('/'),
-                ['test' => '1', 'tag' => 'fcm-test-' . $user->id]
+                ['test' => '1', 'tag' => 'fcm-test-' . $user->id . '-' . time()]
             );
 
             $this->info("  Result: Sent to {$sentCount} device(s).");

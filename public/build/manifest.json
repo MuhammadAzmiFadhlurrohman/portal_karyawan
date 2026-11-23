@@ -120,7 +120,7 @@
     "src": "node_modules/@fontsource/work-sans/files/work-sans-vietnamese-600-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BPbTQovg.css",
+    "file": "assets/app-iKzhsjZ0.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -129,7 +129,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DA2831d4.js",
+    "file": "assets/app-CYEdejoh.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

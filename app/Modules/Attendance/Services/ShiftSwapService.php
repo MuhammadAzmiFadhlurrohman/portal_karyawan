@@ -507,16 +507,15 @@ class ShiftSwapService
                 'sent_at' => now(),
             ]);
 
-            FcmService::sendToUsers(
-                users: collect([$recipient]),
+            app(FcmService::class)->sendToUsers(
+                userIds: $recipient->id,
+                eventType: 'absen',
                 title: $title,
                 body: $body,
-                data: array_merge([
-                    'click_action' => url('/attendance/swaps'),
-                    'url' => url('/attendance/swaps'),
+                deepLink: url('/attendance/swaps'),
+                extraData: array_merge([
                     'event_type' => $eventType,
-                ], $extraData),
-                eventType: 'absen'
+                ], $extraData)
             );
         } catch (\Throwable $e) {
             Log::error("Failed to send shift swap notification ({$eventType}) to user {$recipient->id}: {$e->getMessage()}");

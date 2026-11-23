@@ -241,6 +241,7 @@ class FcmService
             'deep_link' => (string) $deepLink,
             'click_action' => (string) $deepLink,
             'tag' => $tag,
+            'timestamp' => (string) (now()->timestamp * 1000),
             'icon' => url('/assets/logo/icon-192.png'),
             'badge' => url('/assets/logo/favicon-32x32.png'),
         ], array_map('strval', $extraData));
@@ -249,8 +250,9 @@ class FcmService
             $fcmToken = $tokenRecord->fcm_token;
 
             if ($tokenRecord->platform === 'web') {
-                // Send DATA-ONLY payload for Web Push so Service Worker displays it ONCE.
-                // Sending top-level 'notification' causes Firebase SDK + Service Worker to double/triple display.
+                // Send DATA-ONLY payload with high-priority WebPush headers (Urgency + TTL)
+                // so Android Doze Mode & iOS APNs wake the Service Worker immediately when
+                // the app is closed or screen is off, while sw.js displays it cleanly once.
                 $payload = [
                     'message' => [
                         'token' => $fcmToken,
@@ -258,6 +260,10 @@ class FcmService
                         'webpush' => [
                             'headers' => [
                                 'Urgency' => 'high',
+                                'TTL' => '86400',
+                            ],
+                            'fcm_options' => [
+                                'link' => (string) $deepLink,
                             ],
                         ],
                     ],

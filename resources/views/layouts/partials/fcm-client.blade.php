@@ -5,8 +5,8 @@
 (function() {
     'use strict';
 
-    const SW_VERSION = '2026112305';
-    const SW_URL = '/sw.js?v=' + SW_VERSION;
+    const SW_VERSION = '2026112409';
+    const SW_URL = '/sw.js';
 
     // Firebase Web App Configuration
     const firebaseConfig = {
@@ -42,9 +42,9 @@
                 updateViaCache: 'none'
             });
             await reg.update().catch(function() {});
-            window.msnServiceWorkerReg = reg;
-            await navigator.serviceWorker.ready;
-            return reg;
+            const readyReg = await navigator.serviceWorker.ready;
+            window.msnServiceWorkerReg = readyReg || reg;
+            return readyReg || reg;
         } catch (e) {
             return await navigator.serviceWorker.ready.catch(function() { return null; });
         }

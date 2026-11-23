@@ -1,25 +1,28 @@
-// PT MSN Portal - Unified PWA & Web Push Service Worker (v8 - White Splash & Updated Maskable Icons)
-const CACHE_NAME = 'msn-portal-v8-shell';
+// PT MSN Portal - Unified PWA & Background Web Push Service Worker (v9)
+const CACHE_NAME = 'msn-portal-v9-shell';
 const OFFLINE_ASSETS = [
     '/',
     '/login',
-    '/manifest.webmanifest?v=2026112308'
+    '/manifest.webmanifest?v=2026112308',
+    '/assets/logo/icon-192.png',
+    '/assets/logo/favicon-32x32.png'
 ];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_ASSETS)).catch(() => {})
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(OFFLINE_ASSETS))
+            .catch(() => {})
+            .then(() => self.skipWaiting())
     );
-    self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-        )
+        caches.keys()
+            .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+            .then(() => self.clients.claim())
     );
-    self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
@@ -32,11 +35,8 @@ self.addEventListener('fetch', (event) => {
 });
 
 // ==========================================
-// Single Web Push Notification Handler
+// Background & Lock-Screen Web Push Handler
 // ==========================================
-let lastNotifSignature = '';
-let lastNotifTimestamp = 0;
-
 self.addEventListener('push', (event) => {
     let raw = {};
     if (event.data) {
@@ -53,53 +53,50 @@ self.addEventListener('push', (event) => {
     const title = d.title || n.title || 'Portal MSN';
     const body = d.body || n.body || 'Anda menerima pembaruan baru.';
     const deepLink = d.deep_link || d.click_action || n.click_action || '/';
-    const tag = d.tag || n.tag || ((d.type || 'gomsn') + '-' + (d.reference_id || 'notif'));
-
-    // Deduplicate identical messages arriving within 8 seconds
-    const now = Date.now();
-    const signature = `${tag}|${title}|${body}`;
-    if (lastNotifSignature === signature && (now - lastNotifTimestamp) < 8000) {
-        return;
-    }
-    lastNotifSignature = signature;
-    lastNotifTimestamp = now;
+    const tag = d.tag || n.tag || ((d.type || 'gomsn') + '-' + (d.reference_id || Date.now()));
+    const timestamp = d.timestamp ? Number(d.timestamp) : Date.now();
 
     const options = {
         body: body,
         icon: d.icon || n.icon || '/assets/logo/icon-192.png',
         badge: d.badge || n.badge || '/assets/logo/favicon-32x32.png',
-        vibrate: [100, 50, 100],
+        vibrate: [200, 100, 200],
         tag: tag,
-        renotify: false,
+        renotify: true,
+        silent: false,
+        timestamp: Number.isFinite(timestamp) ? timestamp : Date.now(),
         data: {
             deep_link: deepLink,
             ...d
         }
     };
 
+    // Always fulfill userVisibleOnly: true contract so Chrome/Android/iOS never throttle background pushes
     event.waitUntil(
-        self.registration.getNotifications({ tag: tag }).then((existing) => {
-            existing.forEach((notification) => notification.close());
-            return self.registration.showNotification(title, options);
-        })
+        self.registration.showNotification(title, options)
     );
 });
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    const deepLink = event.notification.data?.deep_link || '/';
+    const rawDeepLink = event.notification.data?.deep_link || '/';
+    const targetUrl = new URL(rawDeepLink, self.location.origin).href;
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
             for (let i = 0; i < clientList.length; i++) {
                 const client = clientList[i];
-                if ('focus' in client) {
-                    client.focus();
-                    return client.navigate(deepLink);
+                if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+                    return client.focus().then((focused) => {
+                        if (focused && 'navigate' in focused) {
+                            return focused.navigate(targetUrl).catch(() => focused);
+                        }
+                        return focused;
+                    });
                 }
             }
             if (clients.openWindow) {
-                return clients.openWindow(deepLink);
+                return clients.openWindow(targetUrl);
             }
         })
     );
