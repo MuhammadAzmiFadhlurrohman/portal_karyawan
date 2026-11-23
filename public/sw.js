@@ -45,6 +45,10 @@ const firebaseConfig = {
     measurementId: "G-2FS9BQQ087"
 };
 
+let fcmInitialized = false;
+let lastNotificationTag = null;
+let lastNotificationTime = 0;
+
 try {
     firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
@@ -54,27 +58,43 @@ try {
         const title = payload.notification?.title || payload.data?.title || 'Portal MSN';
         const body = payload.notification?.body || payload.data?.body || 'Anda menerima notifikasi baru.';
         const deepLink = payload.data?.deep_link || payload.data?.click_action || '/';
+        const tag = (payload.data?.type || 'notif') + '-' + (payload.data?.reference_id || 'general');
+
+        // Prevent duplicate popup if triggered within 3 seconds for same tag
+        const now = Date.now();
+        if (lastNotificationTag === tag && (now - lastNotificationTime) < 3000) {
+            console.log('[sw.js] Duplicate notification suppressed for tag:', tag);
+            return Promise.resolve();
+        }
+        lastNotificationTag = tag;
+        lastNotificationTime = now;
 
         const options = {
             body: body,
             icon: '/assets/logo/icon-192.png',
             badge: '/assets/logo/favicon-32x32.png',
             vibrate: [100, 50, 100],
+            tag: tag,
+            renotify: false,
             data: {
                 deep_link: deepLink,
                 ...(payload.data || {})
-            },
-            requireInteraction: true
+            }
         };
 
         return self.registration.showNotification(title, options);
     });
+    fcmInitialized = true;
 } catch (e) {
     console.warn('[sw.js] Firebase background initialization error:', e);
 }
 
-// Fallback native push event listener
+// Fallback native push event listener (only runs if Firebase background handler was not initialized)
 self.addEventListener('push', (event) => {
+    if (fcmInitialized) {
+        return; // Prevent duplicate display because Firebase onBackgroundMessage already handles it
+    }
+
     let data = {};
     if (event.data) {
         try {
@@ -87,17 +107,19 @@ self.addEventListener('push', (event) => {
     const title = data.notification?.title || data.data?.title || 'Portal MSN';
     const body = data.notification?.body || data.data?.body || 'Anda menerima notifikasi baru.';
     const deepLink = data.data?.deep_link || data.data?.click_action || '/';
+    const tag = (data.data?.type || 'notif') + '-' + (data.data?.reference_id || 'general');
 
     const options = {
         body: body,
         icon: '/assets/logo/icon-192.png',
         badge: '/assets/logo/favicon-32x32.png',
         vibrate: [100, 50, 100],
+        tag: tag,
+        renotify: false,
         data: {
             deep_link: deepLink,
             ...(data.data || {})
-        },
-        requireInteraction: true
+        }
     };
 
     event.waitUntil(

@@ -507,13 +507,14 @@ class OvertimeController extends Controller
 
             try {
                 if ($lembur->atasan_id) {
+                    $tanggalFmt = $lembur->tanggal ? \Carbon\Carbon::parse($lembur->tanggal)->translatedFormat('d F Y') : date('d/m/Y');
                     app(\App\Services\FcmService::class)->sendToUsers(
                         userIds: $lembur->atasan_id,
                         eventType: 'lembur',
                         title: 'Pengajuan Lembur Baru',
-                        body: "{$user->name} mengajukan lembur ({$lembur->nomor_lembur}) untuk tanggal {$lembur->tanggal_lembur}.",
+                        body: "{$user->name} mengajukan lembur ({$lembur->nomor_lembur}) untuk tanggal {$tanggalFmt}.",
                         deepLink: route('gomsn.overtime.index', ['user_id' => $user->id]),
-                        extraData: ['reference_id' => $lembur->id]
+                        extraData: ['reference_id' => $lembur->id, 'tag' => 'lembur-' . $lembur->id]
                     );
                 }
             } catch (\Throwable) {}

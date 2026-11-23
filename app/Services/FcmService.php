@@ -214,6 +214,11 @@ class FcmService
                         'click_action' => (string) $deepLink,
                     ], array_map('strval', $extraData)),
                     'webpush' => [
+                        'notification' => [
+                            'tag' => (string) ($extraData['tag'] ?? ($eventType . '-' . ($extraData['reference_id'] ?? time()))),
+                            'icon' => url('/assets/logo/icon-192.png'),
+                            'badge' => url('/assets/logo/favicon-32x32.png'),
+                        ],
                         'fcm_options' => [
                             'link' => (string) $deepLink,
                         ],
