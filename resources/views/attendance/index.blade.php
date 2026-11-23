@@ -1480,11 +1480,23 @@
                 },
 
                 // Clock-out Modal controls
+                updateClockOutLiveTime() {
+                    try {
+                        const timeStr = new Intl.DateTimeFormat('id-ID', {
+                            timeZone: 'Asia/Jakarta',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        }).format(new Date());
+                        this.clockOutLiveTime = timeStr.replace('.', ':');
+                    } catch (e) {
+                        const now = new Date();
+                        this.clockOutLiveTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                    }
+                },
+
                 openClockOutModal() {
-                    const now = new Date();
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const mins = String(now.getMinutes()).padStart(2, '0');
-                    this.clockOutLiveTime = `${hours}:${mins}`;
+                    this.updateClockOutLiveTime();
                     this.showClockOutModal = true;
                 },
 

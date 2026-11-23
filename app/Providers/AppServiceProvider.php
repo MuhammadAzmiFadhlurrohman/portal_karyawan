@@ -22,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        date_default_timezone_set(config('app.timezone', 'Asia/Jakarta'));
+
         Gate::policy(Tiket::class, TicketPolicy::class);
 
         // Implicitly grant 'super_admin' and 'admin' roles all permissions

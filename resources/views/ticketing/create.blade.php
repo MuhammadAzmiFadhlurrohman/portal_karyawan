@@ -637,9 +637,27 @@
 <script>
 function openTicketForm(config) {
     // Current WIB datetime helper in YYYY-MM-DDTHH:mm format
-    const now = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const localWibStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const getWibLocalStr = () => {
+        try {
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Jakarta',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).formatToParts(new Date());
+            const m = {};
+            parts.forEach(p => m[p.type] = p.value);
+            return `${m.year}-${m.month}-${m.day}T${m.hour}:${m.minute}`;
+        } catch (e) {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        }
+    };
+    const localWibStr = getWibLocalStr();
 
     return {
         category: config.initialCategory || 'backbone',
