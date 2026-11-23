@@ -1,5 +1,5 @@
-// PT MSN Portal - Unified PWA & Web Push Service Worker (v5 - Single Notification Guard)
-const CACHE_NAME = 'msn-portal-v5-shell';
+// PT MSN Portal - Unified PWA & Web Push Service Worker (v6 - Clean White Splash & No Extra Intro)
+const CACHE_NAME = 'msn-portal-v6-shell';
 const OFFLINE_ASSETS = [
     '/',
     '/login',

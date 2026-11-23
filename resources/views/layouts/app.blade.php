@@ -2268,7 +2268,7 @@
         // PWA Service Worker Registration (v5 cache-busted)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js?v=2026112305', { scope: '/', updateViaCache: 'none' }).then(function(reg) {
+                navigator.serviceWorker.register('/sw.js?v=2026112306', { scope: '/', updateViaCache: 'none' }).then(function(reg) {
                     window.msnServiceWorkerReg = reg;
                 }).catch(function(){});
             });
@@ -2278,6 +2278,5 @@
     @endauth
 
     @stack('scripts')
-    @include('layouts.partials.pwa-intro')
 </body>
 </html>

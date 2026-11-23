@@ -4,8 +4,8 @@
     "description": "Portal Enterprise Terpadu Absensi Biometrik, HRIS, Tiketing Gangguan & Operasional GOMSN PT MSN",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#06111b",
-    "theme_color": "#06111b",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
     "orientation": "portrait-primary",
     "icons": [
         {
