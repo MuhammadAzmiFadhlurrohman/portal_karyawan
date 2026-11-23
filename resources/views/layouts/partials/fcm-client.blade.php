@@ -1,6 +1,6 @@
 <!-- Firebase Cloud Messaging Client Integration -->
-<!-- Floating Connect Notification Card (Shown when not yet registered in database) -->
-<div id="gomsn-notif-prompt-banner" style="display: none;" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99998] w-[94%] max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-2 border-teal-500/50 rounded-2xl shadow-2xl p-4 transition-all duration-300">
+<!-- Floating Connect Notification Card -->
+<div id="gomsn-notif-prompt-banner" style="display: none;" class="fixed top-4 left-1/2 -translate-x-1/2 z-[99998] w-[94%] max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-2 border-teal-500/60 rounded-2xl shadow-2xl p-4 transition-all duration-300">
     <div class="flex items-start gap-3.5">
         <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-500/20 to-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-500/30">
             <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -9,11 +9,11 @@
         </div>
         <div class="flex-1 min-w-0">
             <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-tight">Sambungkan Notifikasi HP</h4>
-            <p id="gomsn-notif-subtext" class="text-xs text-slate-600 dark:text-slate-300 leading-snug mt-1">
-                Ketuk tombol untuk menyambungkan perangkat ini ke server agar menerima pembaruan tiket, lembur, &amp; persetujuan.
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-snug mt-1">
+                Daftarkan HP ini ke database server agar menerima notifikasi tiket, lembur, &amp; persetujuan.
             </p>
             <div class="mt-3 flex items-center gap-2">
-                <button type="button" id="gomsn-btn-connect-fcm" onclick="window.initGomsnFcmToken(true)" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#155E63] to-[#0d9488] hover:from-[#114b4f] hover:to-[#0f766e] text-white text-xs font-bold shadow-md hover:shadow-lg transition cursor-pointer flex items-center gap-1.5 active:scale-95">
+                <button type="button" onclick="window.initGomsnFcmToken(true)" class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#155E63] to-[#0d9488] hover:from-[#114b4f] hover:to-[#0f766e] text-white text-xs font-bold shadow-md hover:shadow-lg transition cursor-pointer flex items-center gap-1.5 active:scale-95">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     <span>Sambungkan Sekarang</span>
                 </button>
@@ -192,7 +192,7 @@
 
         if (permission !== 'granted') {
             if (interactive && window.Swal) {
-                Swal.fire('Izin Ditolak', 'Izin notifikasi belum diaktifkan di browser. Silakan izinkan di pengaturan browser Anda.', 'warning');
+                Swal.fire('Izin Belum Aktif', 'Izin notifikasi belum diaktifkan di browser. Silakan aktifkan di info situs browser Anda.', 'warning');
             }
             return;
         }
@@ -205,6 +205,17 @@
 
             if (vapidKey && vapidKey.trim() !== '') {
                 tokenOptions.vapidKey = vapidKey.trim();
+            } else {
+                console.warn('[FCM] vapidKey is empty!');
+                if (interactive && window.Swal) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'VAPID Key Belum Terbaca',
+                        text: 'FCM_VAPID_KEY belum terbaca di server. Pastikan sudah ada di .env server lalu jalankan: php artisan config:clear',
+                        confirmButtonColor: '#155E63'
+                    });
+                    return;
+                }
             }
 
             const token = await messaging.getToken(tokenOptions);
@@ -239,25 +250,55 @@
         sessionStorage.setItem('gomsn_notif_prompt_dismissed', '1');
     };
 
-    // Auto-check on load
+    // Auto-prompt modal upon entering Dashboard / Portal
     function checkAndPromptPermission() {
         if (!('Notification' in window)) return;
 
         const isRegistered = localStorage.getItem('gomsn_fcm_token_registered') === '1';
 
-        // If not yet confirmed registered in backend, show the connect prompt card on screen
-        if (!isRegistered && !sessionStorage.getItem('gomsn_notif_prompt_dismissed')) {
-            const banner = document.getElementById('gomsn-notif-prompt-banner');
-            if (banner) {
-                setTimeout(() => {
-                    banner.style.display = 'block';
-                }, 800);
+        // If not registered in database yet:
+        if (!isRegistered) {
+            // If user already granted permission in phone, try silent register immediately
+            if (Notification.permission === 'granted') {
+                window.initGomsnFcmToken(false).then(() => {
+                    // If still not registered after silent attempt, pop up the prominent connect dialog
+                    if (localStorage.getItem('gomsn_fcm_token_registered') !== '1') {
+                        promptDashboardDialog();
+                    }
+                });
+            } else {
+                // Not yet granted: pop up dashboard dialog immediately
+                setTimeout(promptDashboardDialog, 1000);
             }
         }
+    }
 
-        // Also attempt automatic silent background registration if permission already granted
-        if (Notification.permission === 'granted') {
-            window.initGomsnFcmToken(false);
+    function promptDashboardDialog() {
+        if (sessionStorage.getItem('gomsn_notif_modal_dismissed')) return;
+
+        if (window.Swal) {
+            Swal.fire({
+                title: 'Aktifkan Notifikasi Portal?',
+                text: 'Dapatkan pemberitahuan seketika di HP saat pengajuan kasbon/reimbursement disetujui, lembur dikonfirmasi, & tiket ditugaskan.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#155E63',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: '🔔 Ya, Sambungkan Notifikasi',
+                cancelButtonText: 'Nanti Saja',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.initGomsnFcmToken(true);
+                } else {
+                    sessionStorage.setItem('gomsn_notif_modal_dismissed', '1');
+                    const banner = document.getElementById('gomsn-notif-prompt-banner');
+                    if (banner) banner.style.display = 'block';
+                }
+            });
+        } else {
+            const banner = document.getElementById('gomsn-notif-prompt-banner');
+            if (banner) banner.style.display = 'block';
         }
     }
 
