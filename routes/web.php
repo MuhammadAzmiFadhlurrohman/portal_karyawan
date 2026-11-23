@@ -240,9 +240,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('api.chatbot.ask');
 
     // System Utilities / Migrations Runner
-    Route::match(['get', 'post'], '/portal/system/migrate', function () {
-        if (! auth()->user()->hasRole(['super_admin', 'admin', 'noc', 'manager_teknisi'])) {
-            abort(403, 'Akses terbatas untuk Administrator & NOC.');
+    Route::post('/portal/system/migrate', function () {
+        if (! auth()->user()->hasRole(['super_admin', 'admin'])) {
+            abort(403, 'Akses terbatas untuk Administrator.');
         }
         try {
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);

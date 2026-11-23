@@ -25,6 +25,8 @@ Thumbs.db
 __pycache__/
 *.pyc
 
-# Legacy database dumps
+# Database dumps & SQL files (prevent credential & sensitive data leaks)
+*.sql
+*.sql.gz
 attendance_db.sql
 gomsn.sql
