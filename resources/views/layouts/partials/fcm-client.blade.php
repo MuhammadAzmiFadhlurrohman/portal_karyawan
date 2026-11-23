@@ -18,7 +18,17 @@
 
     const vapidKey = "{{ config('services.fcm.vapid_key') }}";
 
-    // Initialize Firebase if not already initialized
+    if (!('Notification' in window)) {
+        console.warn('[FCM] Browser does not support Notification API.');
+        return;
+    }
+
+    if (!('serviceWorker' in navigator)) {
+        console.warn('[FCM] Browser does not support Service Worker.');
+        return;
+    }
+
+    // Initialize Firebase
     if (!firebase.apps.length) {
         try {
             firebase.initializeApp(firebaseConfig);
@@ -29,7 +39,7 @@
     }
 
     if (!firebase.messaging.isSupported()) {
-        console.warn('[FCM] Firebase messaging is not supported in this browser.');
+        console.warn('[FCM] Firebase messaging is not supported in this environment (requires HTTPS or localhost).');
         return;
     }
 
@@ -69,59 +79,97 @@
         }
     });
 
+    // Helper to register token to backend
+    async function sendTokenToBackend(token) {
+        try {
+            const response = await fetch('{{ route("api.fcm.token.register") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    token: token,
+                    platform: 'web',
+                    device_name: (navigator.userAgentData?.platform || navigator.platform || 'Browser') + ' (' + (navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop') + ')'
+                })
+            });
+
+            if (response.ok) {
+                localStorage.setItem('gomsn_fcm_token', token);
+                console.log('[FCM] Device token successfully registered to backend!');
+                return true;
+            } else {
+                console.warn('[FCM] Backend rejected token registration:', response.status);
+                return false;
+            }
+        } catch (netErr) {
+            console.error('[FCM] Failed to send token to backend:', netErr);
+            return false;
+        }
+    }
+
     // Function to retrieve FCM Token and store to backend
-    window.initGomsnFcmToken = async function() {
-        if (!('Notification' in window)) return;
-        if (Notification.permission !== 'granted') return;
+    window.initGomsnFcmToken = async function(interactive = false) {
+        if (!('Notification' in window)) {
+            if (interactive && window.Swal) Swal.fire('Error', 'Browser Anda tidak mendukung notifikasi.', 'error');
+            return;
+        }
+
+        let permission = Notification.permission;
+        if (permission !== 'granted') {
+            if (interactive) {
+                permission = await Notification.requestPermission();
+            } else {
+                console.log('[FCM] Notification permission is currently:', permission);
+                return;
+            }
+        }
+
+        if (permission !== 'granted') {
+            if (interactive && window.Swal) {
+                Swal.fire('Izin Ditolak', 'Izin notifikasi belum diaktifkan di browser. Silakan izinkan di pengaturan situs.', 'warning');
+            }
+            return;
+        }
 
         try {
-            // Register or wait for service worker
-            let swReg = null;
-            if ('serviceWorker' in navigator) {
-                swReg = await navigator.serviceWorker.ready.catch(function() { return null; });
-            }
+            // Wait for unified service worker ready
+            const swReg = await navigator.serviceWorker.ready;
 
-            const tokenOptions = {};
-            if (swReg) {
-                tokenOptions.serviceWorkerRegistration = swReg;
-            }
+            const tokenOptions = {
+                serviceWorkerRegistration: swReg
+            };
+
             if (vapidKey && vapidKey.trim() !== '') {
                 tokenOptions.vapidKey = vapidKey.trim();
+            } else {
+                console.warn('[FCM] FCM_VAPID_KEY is not defined in .env! Make sure FCM_VAPID_KEY is saved.');
             }
 
             const token = await messaging.getToken(tokenOptions);
             if (token) {
-                console.log('[FCM] Token active:', token.substring(0, 16) + '...');
-                const prevToken = localStorage.getItem('gomsn_fcm_token');
-                
-                // Only post to backend if token changed or not yet stored
-                if (prevToken !== token) {
-                    const response = await fetch('{{ route("api.fcm.token.register") }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            token: token,
-                            platform: 'web',
-                            device_name: (navigator.userAgentData?.platform || navigator.platform || 'Browser') + ' (' + (navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop') + ')'
-                        })
-                    });
-
-                    if (response.ok) {
-                        localStorage.setItem('gomsn_fcm_token', token);
-                        console.log('[FCM] Token successfully registered to backend.');
-                    }
+                console.log('[FCM] FCM Token obtained:', token.substring(0, 16) + '...');
+                const success = await sendTokenToBackend(token);
+                if (interactive && window.Swal) {
+                    Swal.fire('Berhasil', 'Notifikasi berhasil diaktifkan di perangkat ini!', 'success');
+                }
+            } else {
+                console.warn('[FCM] No token returned by Firebase.');
+                if (interactive && window.Swal) {
+                    Swal.fire('Perhatian', 'Tidak berhasil mendapatkan token dari Firebase.', 'warning');
                 }
             }
         } catch (err) {
-            console.warn('[FCM] Failed to obtain token:', err);
+            console.error('[FCM] Error generating FCM token:', err);
+            if (interactive && window.Swal) {
+                Swal.fire('Error FCM', err.message || 'Gagal membuat token notifikasi.', 'error');
+            }
         }
     };
 
-    // Auto-initialize if notification permission is already granted
-    if ('Notification' in window && Notification.permission === 'granted') {
+    // Auto-run if permission is already granted
+    if (Notification.permission === 'granted') {
         if (document.readyState === 'complete') {
             window.initGomsnFcmToken();
         } else {
