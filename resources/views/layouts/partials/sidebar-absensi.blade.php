@@ -184,7 +184,7 @@
             <a href="{{ route('gomsn.car-usage.index') }}"
                @if (request()->routeIs('gomsn.car-usage.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.car-usage.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zM3 13h1m16 0h1M5 13l1.5-5A2 2 0 018.4 6.5h7.2a2 2 0 011.9 1.5L19 13m-16 0a2 2 0 00-2 2v2a2 2 0 002 2h1.1a3 3 0 015.8 0h4.2a3 3 0 015.8 0H21a2 2 0 002-2v-2a2 2 0 00-2-2m-18 0h18"/></svg>
+                <svg class="w-4 h-4 shrink-0 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 3.1C2.1 11.4 2 11.7 2 12.1V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
                 <span>Pengajuan Mobil</span>
                 @if (request()->routeIs('gomsn.car-usage.*'))
                 <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
@@ -234,7 +234,7 @@
             <a href="{{ route('gomsn.car-usage.index') }}"
                @if (request()->routeIs('gomsn.car-usage.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.car-usage.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
-                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4zM3 13h1m16 0h1M5 13l1.5-5A2 2 0 018.4 6.5h7.2a2 2 0 011.9 1.5L19 13m-16 0a2 2 0 00-2 2v2a2 2 0 002 2h1.1a3 3 0 015.8 0h4.2a3 3 0 015.8 0H21a2 2 0 002-2v-2a2 2 0 00-2-2m-18 0h18"/></svg>
+                <svg class="w-4 h-4 shrink-0 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 3.1C2.1 11.4 2 11.7 2 12.1V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
                 <span>Pengajuan Mobil</span>
                 @if (request()->routeIs('gomsn.car-usage.*'))
                 <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
