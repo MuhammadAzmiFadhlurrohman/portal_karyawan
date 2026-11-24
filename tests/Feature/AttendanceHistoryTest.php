@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\SystemSetting;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -90,21 +91,23 @@ class AttendanceHistoryTest extends TestCase
         \Spatie\Permission\Models\Role::findOrCreate('atasan');
         $supervisor->assignRole('atasan');
 
+        $testDate = Carbon::now('Asia/Jakarta')->subDays(2)->toDateString();
+
         // Initial late attendance
         $attendance = \App\Models\Attendance::create([
             'user_id' => $employee->id,
-            'date' => '2026-11-09',
+            'date' => $testDate,
             'status' => 'late',
             'attendance_type' => 'office',
-            'clock_in_at' => '2026-11-09 08:35:00',
-            'clock_out_at' => '2026-11-09 17:00:00',
+            'clock_in_at' => "{$testDate} 08:35:00",
+            'clock_out_at' => "{$testDate} 17:00:00",
             'late_minutes' => 20,
             'work_duration_minutes' => 505,
         ]);
 
         // Employee submits correction
         $response = $this->actingAs($employee)->post(route('attendance.corrections.store'), [
-            'date' => '2026-11-09',
+            'date' => $testDate,
             'requested_status' => 'present',
             'requested_attendance_type' => 'office',
             'requested_clock_in_time' => '08:10',
@@ -130,8 +133,8 @@ class AttendanceHistoryTest extends TestCase
         // Verify Attendance record updated directly!
         $attendance->refresh();
         $this->assertEquals('present', $attendance->status);
-        $this->assertEquals('2026-11-09 08:10:00', $attendance->clock_in_at?->timezone('Asia/Jakarta')->format('Y-m-d H:i:s'));
-        $this->assertEquals('2026-11-09 17:05:00', $attendance->clock_out_at?->timezone('Asia/Jakarta')->format('Y-m-d H:i:s'));
+        $this->assertEquals("{$testDate} 08:10:00", $attendance->clock_in_at?->timezone('Asia/Jakarta')->format('Y-m-d H:i:s'));
+        $this->assertEquals("{$testDate} 17:05:00", $attendance->clock_out_at?->timezone('Asia/Jakarta')->format('Y-m-d H:i:s'));
         $this->assertEquals(0, $attendance->late_minutes);
 
         $correction->refresh();

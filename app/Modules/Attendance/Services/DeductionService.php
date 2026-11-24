@@ -7,13 +7,16 @@ use App\Models\AttendanceCorrection;
 use App\Models\DeductionAdjustment;
 use App\Models\Leave;
 use App\Models\MonthlySchedule;
+use App\Models\NotificationLog;
 use App\Models\PeriodClosing;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\FcmService;
 use App\Services\SystemSettingService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class DeductionService
@@ -368,6 +371,37 @@ class DeductionService
             actorId: $user->id
         );
 
+        // Notifikasi ke Atasan / Supervisor
+        $atasanUsers = User::query()
+            ->where('id', '!=', $user->id)
+            ->where('is_active', true)
+            ->get()
+            ->filter(function ($u) use ($user) {
+                if (! $u->isAtasan()) {
+                    return false;
+                }
+                if ($u->hasRole(['super_admin', 'admin', 'ceo'])) {
+                    return true;
+                }
+                if ($user->division && $u->division) {
+                    return strtolower($user->division) === strtolower($u->division);
+                }
+                return true;
+            });
+
+        $tglStr = $targetDate->format('d/m/Y');
+        $title = "📝 Pengajuan Revisi Absen: {$user->name}";
+        $body = "{$user->name} (" . ($user->division ?: 'Karyawan') . ") mengajukan revisi absen tgl {$tglStr} ({$payload['requested_clock_in_time']} - {$payload['requested_clock_out_time']}). Alasan: {$payload['reason']}";
+
+        foreach ($atasanUsers as $atasan) {
+            $this->notifyUser($atasan, 'correction_requested', $title, $body, [
+                'correction_id' => (string) $correction->id,
+                'tag' => "correction-req-{$correction->id}",
+                'url' => url('/attendance/corrections/approvals'),
+                'click_action' => url('/attendance/corrections/approvals'),
+            ]);
+        }
+
         return $correction;
     }
 
@@ -396,6 +430,20 @@ class DeductionService
             'supervisor_approved_by' => $actor->id,
             'supervisor_approved_at' => now(),
         ]);
+
+        $employee = $correction->user ?? User::find($correction->user_id);
+        if ($employee) {
+            $tglStr = $correction->date ? Carbon::parse($correction->date)->format('d/m/Y') : '';
+            $title = "✅ Revisi Absensi Disetujui Atasan";
+            $body = "Halo {$employee->name}, pengajuan koreksi absen Anda untuk tanggal {$tglStr} telah disetujui oleh {$actor->name}. Data absensi Anda telah diperbarui.";
+
+            $this->notifyUser($employee, 'correction_approved', $title, $body, [
+                'correction_id' => (string) $correction->id,
+                'tag' => "correction-approved-{$correction->id}",
+                'url' => url('/attendance/history'),
+                'click_action' => url('/attendance/history'),
+            ]);
+        }
 
         return $updated;
     }
@@ -427,6 +475,21 @@ class DeductionService
             reason: $reason,
             actorId: $actor->id
         );
+
+        $employee = $correction->user ?? User::find($correction->user_id);
+        if ($employee) {
+            $tglStr = $correction->date ? Carbon::parse($correction->date)->format('d/m/Y') : '';
+            $title = "❌ Revisi Absensi Ditolak Atasan";
+            $body = "Halo {$employee->name}, pengajuan koreksi absen Anda untuk tanggal {$tglStr} ditolak oleh {$actor->name}. Alasan: {$reason}";
+
+            $this->notifyUser($employee, 'correction_rejected', $title, $body, [
+                'correction_id' => (string) $correction->id,
+                'tag' => "correction-rejected-{$correction->id}",
+                'url' => url('/attendance/history'),
+                'click_action' => url('/attendance/history'),
+                'reason' => $reason,
+            ]);
+        }
 
         return $correction;
     }
@@ -534,8 +597,8 @@ class DeductionService
                     'status' => $finalStatus,
                     'attendance_type' => $correction->requested_attendance_type,
                     'source' => 'correction',
-                    'clock_in_at' => $clockInAt->utc(),
-                    'clock_out_at' => $clockOutAt->utc(),
+                    'clock_in_at' => $clockInAt,
+                    'clock_out_at' => $clockOutAt,
                     'late_minutes' => $lateMinutes,
                     'reviewed_by' => $actor->id,
                     'reviewed_at' => now(),
@@ -550,8 +613,8 @@ class DeductionService
                     'attendance_type' => $correction->requested_attendance_type,
                     'status' => $finalStatus,
                     'source' => 'correction',
-                    'clock_in_at' => $clockInAt->utc(),
-                    'clock_out_at' => $clockOutAt->utc(),
+                    'clock_in_at' => $clockInAt,
+                    'clock_out_at' => $clockOutAt,
                     'late_minutes' => $lateMinutes,
                     'reviewed_by' => $actor->id,
                     'reviewed_at' => now(),
@@ -613,5 +676,46 @@ class DeductionService
 
             return $correction;
         });
+    }
+
+    /**
+     * Send push notification & log to recipient.
+     *
+     * @param  array<string, mixed>  $extraData
+     */
+    private function notifyUser(User $recipient, string $eventType, string $title, string $body, array $extraData = []): void
+    {
+        try {
+            NotificationLog::create([
+                'user_id' => $recipient->id,
+                'channel' => 'fcm',
+                'event_type' => $eventType,
+                'recipient' => (string) ($recipient->email ?? $recipient->name ?? $recipient->id),
+                'payload' => [
+                    'title' => $title,
+                    'body' => $body,
+                    'data' => array_merge([
+                        'click_action' => $extraData['click_action'] ?? url('/'),
+                        'url' => $extraData['url'] ?? url('/'),
+                    ], $extraData),
+                ],
+                'status' => 'sent',
+                'attempts' => 1,
+                'sent_at' => now(),
+            ]);
+
+            app(FcmService::class)->sendToUsers(
+                userIds: $recipient->id,
+                eventType: 'absen',
+                title: $title,
+                body: $body,
+                deepLink: (string) ($extraData['url'] ?? url('/')),
+                extraData: array_merge([
+                    'event_type' => $eventType,
+                ], $extraData)
+            );
+        } catch (\Throwable $e) {
+            Log::error("Failed to send correction notification ({$eventType}) to user {$recipient->id}: {$e->getMessage()}");
+        }
     }
 }

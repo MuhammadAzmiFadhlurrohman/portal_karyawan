@@ -7,12 +7,15 @@ use App\Models\Leave;
 use App\Models\LeaveBalance;
 use App\Models\MonthlySchedule;
 use App\Models\NationalHoliday;
+use App\Models\NotificationLog;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\FcmService;
 use App\Services\SystemSettingService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 
 class LeaveService
@@ -226,6 +229,40 @@ class LeaveService
             actorId: $user->id
         );
 
+        // Notifikasi ke HRD
+        $hrdUsers = User::query()
+            ->where('is_active', true)
+            ->where('id', '!=', $user->id)
+            ->get()
+            ->filter(function ($u) {
+                return $u->hasRole('hrd') || $u->can('attendance.employee.manage');
+            });
+
+        if ($hrdUsers->isEmpty()) {
+            $hrdUsers = User::query()->where('is_active', true)->where('id', '!=', $user->id)->role(['super_admin', 'admin'])->get();
+        }
+
+        $leaveTypeName = match ($leaveType) {
+            'sick' => 'Izin Sakit',
+            'annual' => 'Cuti Tahunan',
+            'special' => 'Izin Khusus',
+            default => 'Pengajuan Cuti / Izin',
+        };
+
+        $startStr = $start->format('d/m/Y');
+        $endStr = $end->format('d/m/Y');
+        $title = "📋 Pengajuan {$leaveTypeName}: {$user->name}";
+        $body = "{$user->name} (" . ($user->division ?: 'Karyawan') . ") mengajukan {$leaveTypeName} ({$workingDays} hari, {$startStr} s.d. {$endStr}). Alasan: {$payload['reason']}";
+
+        foreach ($hrdUsers as $hrd) {
+            $this->notifyUser($hrd, 'leave_requested', $title, $body, [
+                'leave_id' => (string) $leave->id,
+                'tag' => "leave-req-{$leave->id}",
+                'url' => url('/attendance/leaves/approvals'),
+                'click_action' => url('/attendance/leaves/approvals'),
+            ]);
+        }
+
         return $leave;
     }
 
@@ -285,6 +322,26 @@ class LeaveService
             reason: $reason,
             actorId: $actor->id
         );
+
+        $employee = $leave->user ?? User::find($leave->user_id);
+        if ($employee) {
+            $leaveTypeName = match ($leave->leave_type) {
+                'sick' => 'Izin Sakit',
+                'annual' => 'Cuti Tahunan',
+                'special' => 'Izin Khusus',
+                default => 'Cuti / Izin',
+            };
+            $title = "❌ Pengajuan {$leaveTypeName} Ditolak HRD";
+            $body = "Halo {$employee->name}, pengajuan {$leaveTypeName} Anda ditolak oleh {$actor->name}. Alasan: {$reason}";
+
+            $this->notifyUser($employee, 'leave_rejected', $title, $body, [
+                'leave_id' => (string) $leave->id,
+                'tag' => "leave-rejected-{$leave->id}",
+                'url' => url('/attendance/leaves'),
+                'click_action' => url('/attendance/leaves'),
+                'reason' => $reason,
+            ]);
+        }
 
         return $leave;
     }
@@ -368,6 +425,26 @@ class LeaveService
                 reason: 'Disetujui final oleh HRD (§5.4)',
                 actorId: $actor->id
             );
+
+            if ($employee) {
+                $leaveTypeName = match ($leave->leave_type) {
+                    'sick' => 'Izin Sakit',
+                    'annual' => 'Cuti Tahunan',
+                    'special' => 'Izin Khusus',
+                    default => 'Cuti / Izin',
+                };
+                $startStr = $leave->start_date ? $leave->start_date->format('d/m/Y') : '';
+                $endStr = $leave->end_date ? $leave->end_date->format('d/m/Y') : '';
+                $title = "✅ Pengajuan {$leaveTypeName} Disetujui HRD";
+                $body = "Halo {$employee->name}, pengajuan {$leaveTypeName} Anda ({$startStr} s.d. {$endStr}) telah disetujui oleh {$actor->name}.";
+
+                $this->notifyUser($employee, 'leave_approved', $title, $body, [
+                    'leave_id' => (string) $leave->id,
+                    'tag' => "leave-approved-{$leave->id}",
+                    'url' => url('/attendance/leaves'),
+                    'click_action' => url('/attendance/leaves'),
+                ]);
+            }
 
             return $leave;
         });
@@ -716,5 +793,46 @@ class LeaveService
         }
 
         return $cursor->endOfDay();
+    }
+
+    /**
+     * Send push notification & log to recipient.
+     *
+     * @param  array<string, mixed>  $extraData
+     */
+    private function notifyUser(User $recipient, string $eventType, string $title, string $body, array $extraData = []): void
+    {
+        try {
+            NotificationLog::create([
+                'user_id' => $recipient->id,
+                'channel' => 'fcm',
+                'event_type' => $eventType,
+                'recipient' => (string) ($recipient->email ?? $recipient->name ?? $recipient->id),
+                'payload' => [
+                    'title' => $title,
+                    'body' => $body,
+                    'data' => array_merge([
+                        'click_action' => $extraData['click_action'] ?? url('/'),
+                        'url' => $extraData['url'] ?? url('/'),
+                    ], $extraData),
+                ],
+                'status' => 'sent',
+                'attempts' => 1,
+                'sent_at' => now(),
+            ]);
+
+            app(FcmService::class)->sendToUsers(
+                userIds: $recipient->id,
+                eventType: 'absen',
+                title: $title,
+                body: $body,
+                deepLink: (string) ($extraData['url'] ?? url('/')),
+                extraData: array_merge([
+                    'event_type' => $eventType,
+                ], $extraData)
+            );
+        } catch (\Throwable $e) {
+            Log::error("Failed to send leave notification ({$eventType}) to user {$recipient->id}: {$e->getMessage()}");
+        }
     }
 }
