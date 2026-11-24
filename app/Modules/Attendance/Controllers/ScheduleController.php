@@ -54,7 +54,7 @@ class ScheduleController extends Controller
 
         $shifts = Shift::query()->orderBy('id')->get();
         $offices = OfficeLocation::query()->where('is_active', true)->orderBy('name')->get();
-        $allDivisions = User::query()->whereNotNull('division')->where('division', '!=', '')->pluck('division')->unique()->values();
+        $allDivisions = User::query()->where('is_active', true)->excludeAtasan()->whereNotNull('division')->where('division', '!=', '')->pluck('division')->unique()->sort()->values();
 
         /** @var User $actor */
         $actor = $request->user();
@@ -143,7 +143,7 @@ class ScheduleController extends Controller
         // Screen 2: Generate Jadwal Bulanan
         // -------------------------------------------------------------------------
         if ($view === 'generate') {
-            $activeUsers = User::query()->where('is_active', true)->orderBy('name')->get();
+            $activeUsers = User::query()->where('is_active', true)->excludeAtasan()->orderBy('name')->get();
 
             return view('attendance.schedules', [
                 'viewMode' => 'generate',
@@ -163,7 +163,7 @@ class ScheduleController extends Controller
         // Screen 5: Kalender Jadwal Detail Karyawan (Custom Jadwal)
         // -------------------------------------------------------------------------
         if ($view === 'user') {
-            $activeUsers = User::query()->where('is_active', true)->orderBy('name')->get();
+            $activeUsers = User::query()->where('is_active', true)->excludeAtasan()->orderBy('name')->get();
             $userId = (int) $request->input('user_id', 0);
             $targetUser = $userId > 0
                 ? (User::query()->find($userId) ?? $actor)
@@ -210,7 +210,7 @@ class ScheduleController extends Controller
         // Screen 3: Detail Bulan / Daftar Karyawan
         // -------------------------------------------------------------------------
         if ($view === 'month' || ($request->has('year') && $request->has('month') && ! $request->has('list'))) {
-            $usersQuery = User::query()->where('is_active', true)->orderBy('name');
+            $usersQuery = User::query()->where('is_active', true)->excludeAtasan()->orderBy('name');
             if ($division) {
                 $usersQuery->where('division', $division);
             }
@@ -256,6 +256,7 @@ class ScheduleController extends Controller
 
             $allActiveUsers = User::query()
                 ->where('is_active', true)
+                ->excludeAtasan()
                 ->orderBy('name')
                 ->get(['id', 'name', 'employee_code', 'nik', 'division', 'foto']);
 
@@ -452,7 +453,7 @@ class ScheduleController extends Controller
         $month = (int) $request->input('month', now('Asia/Jakarta')->month);
         $division = $request->input('division');
 
-        $usersQuery = User::query()->where('is_active', true)->orderBy('name');
+        $usersQuery = User::query()->where('is_active', true)->excludeAtasan()->orderBy('name');
         if ($division && $division !== 'Semua Divisi' && $division !== 'all') {
             $usersQuery->where('division', $division);
         }
@@ -654,6 +655,8 @@ class ScheduleController extends Controller
         ];
 
         $allDivisions = User::query()
+            ->where('is_active', true)
+            ->excludeAtasan()
             ->whereNotNull('division')
             ->where('division', '!=', '')
             ->pluck('division')
@@ -663,6 +666,7 @@ class ScheduleController extends Controller
 
         $usersQuery = User::query()
             ->where('is_active', true)
+            ->excludeAtasan()
             ->orderBy('division')
             ->orderBy('name');
 

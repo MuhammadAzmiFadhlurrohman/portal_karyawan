@@ -108,6 +108,48 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope to exclude supervisors, managers, executives, admins, and system placeholder accounts
+     * from shift and piket roster scheduling.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeExcludeAtasan($query)
+    {
+        $atasanRoles = [
+            'super_admin',
+            'admin',
+            'ceo',
+            'manager_teknisi',
+            'atasan',
+            'atasan_noc',
+            'atasan_teknik',
+            'atasan_umum',
+        ];
+        $excludedDivisions = ['Direksi', 'Executive'];
+
+        return $query->whereNotIn('division', $excludedDivisions)
+            ->whereDoesntHave('roles', fn ($q) => $q->whereIn('name', $atasanRoles))
+            ->where(function ($q) {
+                $q->whereNull('position')
+                    ->orWhere(function ($sq) {
+                        $sq->where('position', 'not like', '%Manager%')
+                            ->where('position', 'not like', '%Supervisor%')
+                            ->where('position', 'not like', '%Head%')
+                            ->where('position', 'not like', '%Direktur%')
+                            ->where('position', 'not like', '%CEO%')
+                            ->where('position', 'not like', '%Administrator%');
+                    });
+            })
+            ->whereNotIn('id', function ($sq) {
+                $sq->select('supervisor_id')
+                    ->from('users')
+                    ->whereNotNull('supervisor_id');
+            })
+            ->whereRaw('LOWER(TRIM(name)) != LOWER(TRIM(division))');
+    }
+
+    /**
      * Get display badge for chat / ticketing: Prioritaskan Divisi/Jabatan sesuai profil header.
      */
     public function getChatBadgeAttribute(): string

@@ -49,7 +49,7 @@ class ScheduleService
         $startDate = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->startOfMonth();
         $daysInMonth = $startDate->daysInMonth;
 
-        $usersQuery = User::query()->where('is_active', true)->orderBy('name');
+        $usersQuery = User::query()->where('is_active', true)->excludeAtasan()->orderBy('name');
         if ($userId) {
             $usersQuery->where('id', $userId);
         } elseif ($division) {
