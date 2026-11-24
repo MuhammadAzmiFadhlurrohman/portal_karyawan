@@ -43,12 +43,6 @@
                         <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
                             Pengajuan &amp; Pemantauan Mobil
                         </h1>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-300 border border-teal-400/30">
-                            Khusus HRD
-                        </span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/10 text-white/90 border border-white/20">
-                            Read-Only Monitoring
-                        </span>
                     </div>
                     <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug">
                         Memantau riwayat karyawan yang menggunakan mobil operasional via pengajuan dana bensin yang telah disetujui Atasan dan dicairkan Finance.
