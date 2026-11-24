@@ -152,6 +152,17 @@
                 @endif
             </a>
 
+            <!-- Kirim Notifikasi -->
+            <a href="{{ route('portal.notifications.index') }}"
+               @if (request()->routeIs('portal.notifications.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('portal.notifications.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span>Kirim Notifikasi</span>
+                @if (request()->routeIs('portal.notifications.*'))
+                <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
+                @endif
+            </a>
+
             <!-- Absen Karyawan -->
             <a href="{{ route('attendance.employee-recap') }}"
                @if (request()->routeIs('attendance.employee-recap*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif

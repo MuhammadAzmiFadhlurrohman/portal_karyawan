@@ -580,10 +580,10 @@
                     $canViewEmployeeRecap = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin', 'hrd']);
                     $isAbsensiActive = request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals');
                     $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
-                    $isKelolaKaryawanActive = request()->routeIs('attendance.employee-recap*', 'portal.employees.*', 'attendance.reports*');
+                    $isKelolaKaryawanActive = request()->routeIs('attendance.employee-recap*', 'portal.employees.*', 'portal.notifications.*', 'attendance.reports*');
 
                     $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.network.*');
-                    $isLainnyaActive = request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
+                    $isLainnyaActive = request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.notifications.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
 
                     $isNocRole = $sidebarUser && ($sidebarUser->hasRole(['noc', 'atasan_noc', 'karyawan_noc']) || str_contains(strtolower($sidebarUser->division ?? ''), 'noc'));
                 @endphp
@@ -843,6 +843,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                                         </svg>
                                         <span>Data Karyawan</span>
+                                    </a>
+
+                                    <a href="{{ route('portal.notifications.index') }}" 
+                                       class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-800 transition-colors">
+                                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                        </svg>
+                                        <span>Kirim Notifikasi</span>
                                     </a>
                                     @endif
                                 </div>
@@ -1913,6 +1921,16 @@
                             <div class="min-w-0">
                                 <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Data Karyawan</span>
                                 <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Kelola SDM &amp; Akun</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('portal.notifications.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-[#155E63] leading-snug">Kirim Notifikasi</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Broadcast Push &amp; Web</span>
                             </div>
                         </a>
                         @endif

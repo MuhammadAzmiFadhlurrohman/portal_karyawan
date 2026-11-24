@@ -16,6 +16,7 @@ use App\Modules\Gomsn\Controllers\OvertimeController;
 use App\Modules\Gomsn\Controllers\PengajuanController;
 use App\Modules\Portal\Controllers\AuthController;
 use App\Modules\Portal\Controllers\EmployeeController;
+use App\Modules\Portal\Controllers\NotificationBroadcastController;
 use App\Modules\Portal\Controllers\PortalHubController;
 use App\Modules\Ticketing\Controllers\ChronologyController;
 use App\Modules\Ticketing\Controllers\HandoverController;
@@ -68,6 +69,11 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/portal/employees/{user}', [EmployeeController::class, 'destroy'])->name('portal.employees.destroy');
     Route::post('/portal/employees/{user}/reset-password', [EmployeeController::class, 'resetPassword'])->name('portal.employees.reset-password');
     Route::post('/portal/employees/{user}/reset-face', [EmployeeController::class, 'resetFace'])->name('portal.employees.reset-face');
+
+    // Pusat Notifikasi & Broadcast Pesan (§4, §6, Admin / HRD)
+    Route::get('/portal/notifications', [NotificationBroadcastController::class, 'index'])->name('portal.notifications.index');
+    Route::post('/portal/notifications/send', [NotificationBroadcastController::class, 'send'])->name('portal.notifications.send');
+    Route::delete('/portal/notifications/{notificationLog}', [NotificationBroadcastController::class, 'destroy'])->name('portal.notifications.destroy');
 
     // Fase 1: Modul Absensi Inti — Biometrik Wajah, Geofencing & Jadwal Shift (§5.1, §5.2, §5.9)
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
