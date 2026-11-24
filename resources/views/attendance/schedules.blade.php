@@ -1499,78 +1499,15 @@
 
             <div x-cloak x-show="showPiketModal || showUploadModal"
                  x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
                  x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
                  class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/60 backdrop-blur-xs">
                 <div @click.away="showPiketModal = false; showUploadModal = false"
-                     x-data="{
-                        piketTab: piketTab || 'form',
-                        allWeekends: {{ json_encode($weekendDays) }},
-                        allSaturdays: {{ json_encode($saturdays) }},
-                        allSundays: {{ json_encode($sundays) }},
-                        allUsers: {{ json_encode($usersJson) }},
-                        divisionFilter: 'all',
-                        userSearch: '',
-                        selectedUserIds: [],
-                        selectedDates: [],
-                        selectedShiftId: {{ $defaultPiketShift?->id ?? 5 }},
-                        selectedOfficeId: {{ $defaultOfficeId }},
-                        notes: '',
-                        manualDate: '',
-                        listSearch: '',
-                        get filteredUsers() {
-                            const q = this.userSearch.trim().toLowerCase();
-                            return this.allUsers.filter(u => {
-                                const matchDiv = (this.divisionFilter === 'all' || u.division === this.divisionFilter);
-                                const matchSearch = !q || u.name.toLowerCase().includes(q) || u.nik.toLowerCase().includes(q);
-                                return matchDiv && matchSearch;
-                            });
-                        },
-                        toggleUser(id) {
-                            if (this.selectedUserIds.includes(id)) {
-                                this.selectedUserIds = this.selectedUserIds.filter(x => x !== id);
-                            } else {
-                                this.selectedUserIds.push(id);
-                            }
-                        },
-                        selectAllVisibleUsers() {
-                            const ids = this.filteredUsers.map(u => u.id);
-                            this.selectedUserIds = Array.from(new Set([...this.selectedUserIds, ...ids]));
-                        },
-                        deselectAllVisibleUsers() {
-                            const ids = new Set(this.filteredUsers.map(u => u.id));
-                            this.selectedUserIds = this.selectedUserIds.filter(x => !ids.has(x));
-                        },
-                        toggleDate(dateStr) {
-                            if (this.selectedDates.includes(dateStr)) {
-                                this.selectedDates = this.selectedDates.filter(d => d !== dateStr);
-                            } else {
-                                this.selectedDates.push(dateStr);
-                            }
-                        },
-                        addManualDate() {
-                            if (this.manualDate && !this.selectedDates.includes(this.manualDate)) {
-                                this.selectedDates.push(this.manualDate);
-                                this.manualDate = '';
-                            }
-                        },
-                        selectWeekends() {
-                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allWeekends]));
-                        },
-                        selectSaturdays() {
-                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allSaturdays]));
-                        },
-                        selectSundays() {
-                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allSundays]));
-                        },
-                        clearDates() {
-                            this.selectedDates = [];
-                        }
-                     }"
-                     class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+                     x-data="piketModalManager()"
+                     class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-5xl w-full max-h-[92vh] flex flex-col overflow-hidden">
                     
                     <!-- Modal Header with Tab Navigation -->
                     <div class="px-5 sm:px-7 pt-5 pb-3 border-b border-slate-100 shrink-0">
@@ -1595,7 +1532,7 @@
                         </div>
 
                         <!-- Pill Tabs -->
-                        <div class="flex items-center gap-2 pt-1 border-t border-slate-100/80">
+                        <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100/80">
                             <button type="button"
                                     @click="piketTab = 'form'"
                                     :class="piketTab === 'form' 
@@ -1637,7 +1574,7 @@
                             </button>
 
                             <a href="{{ route('attendance.schedules.matrix', ['year' => $year, 'month' => $month, 'division' => $division]) }}"
-                               class="ml-auto px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                               class="sm:ml-auto px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
                                 <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
@@ -1646,7 +1583,7 @@
                         </div>
                     </div>
 
-                    <!-- TAB 1: FORM INPUT PIKET LANGSUNG -->
+                    <!-- TAB 1: FORM INPUT PIKET LANGSUNG (Sleek 2-Column Desktop Grid) -->
                     <div x-show="piketTab === 'form'" class="flex flex-col flex-1 overflow-hidden">
                         <form method="POST" action="{{ route('attendance.schedules.piket.store') }}" class="flex flex-col flex-1 overflow-hidden">
                             @csrf
@@ -1663,273 +1600,285 @@
                             <input type="hidden" name="shift_id" :value="selectedShiftId">
                             <input type="hidden" name="office_location_id" :value="selectedOfficeId">
 
-                            <!-- Scrollable Form Body -->
-                            <div class="overflow-y-auto p-5 sm:p-7 space-y-6 flex-1 text-slate-800 text-xs">
-                                
-                                <!-- STEP 1: PILIH KARYAWAN -->
-                                <div class="space-y-2.5">
-                                    <div class="flex flex-wrap items-center justify-between gap-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[11px] font-black">1</span>
-                                            <label class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Karyawan yang Bertugas</label>
-                                            <span class="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-[#155E63] font-bold text-[11px]">
-                                                <span x-text="selectedUserIds.length"></span> dipilih
-                                            </span>
+                            <!-- Scrollable Form Body with 2-Column Split Layout -->
+                            <div class="overflow-y-auto p-5 sm:p-6 flex-1 text-slate-800 text-xs">
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                                    
+                                    <!-- ============================================== -->
+                                    <!-- KOLOM KIRI: PILIH KARYAWAN (5 COLS)            -->
+                                    <!-- ============================================== -->
+                                    <div class="lg:col-span-5 flex flex-col space-y-3">
+                                        <!-- Step 1 Header -->
+                                        <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                                            <div class="flex items-center gap-2">
+                                                <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[10px] font-black">1</span>
+                                                <span class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Karyawan</span>
+                                                <span class="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[#155E63] font-bold text-[10px]">
+                                                    <span x-text="selectedUserIds.length"></span> dipilih
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" @click="selectAllVisibleUsers()"
+                                                        class="text-[11px] font-semibold text-[#155E63] hover:underline cursor-pointer">
+                                                    Semua
+                                                </button>
+                                                <span class="text-slate-300">|</span>
+                                                <button type="button" @click="deselectAllVisibleUsers()"
+                                                        class="text-[11px] font-semibold text-slate-500 hover:text-slate-800 cursor-pointer">
+                                                    Batal
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <button type="button" @click="selectAllVisibleUsers()"
-                                                    class="text-[11px] font-semibold text-[#155E63] hover:underline">
-                                                Pilih Semua Hasil
-                                            </button>
-                                            <span class="text-slate-300">|</span>
-                                            <button type="button" @click="deselectAllVisibleUsers()"
-                                                    class="text-[11px] font-semibold text-slate-500 hover:text-slate-800">
-                                                Batal Pilih
-                                            </button>
-                                        </div>
-                                    </div>
 
-                                    <!-- Filter Divisi & Search Box -->
-                                    <div class="flex flex-col sm:flex-row gap-2">
-                                        <div class="relative flex-1">
+                                        <!-- Search Box -->
+                                        <div class="relative">
                                             <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                             </svg>
-                                            <input type="text" x-model="userSearch" placeholder="Cari nama karyawan atau NIK..."
-                                                   class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                                            <input type="text" x-model="userSearch" placeholder="Cari nama karyawan / NIK..."
+                                                   class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
                                         </div>
-                                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+
+                                        <!-- Filter Divisi Pills -->
+                                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                                             <button type="button" @click="divisionFilter = 'all'"
                                                     :class="divisionFilter === 'all' ? 'bg-[#155E63] text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-                                                    class="px-2.5 py-1.5 rounded-xl text-[11px] whitespace-nowrap transition">
+                                                    class="px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition cursor-pointer">
                                                 Semua
                                             </button>
                                             @foreach ($allDivisions as $divName)
                                                 <button type="button" @click="divisionFilter = '{{ $divName }}'"
                                                         :class="divisionFilter === '{{ $divName }}' ? 'bg-[#155E63] text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-                                                        class="px-2.5 py-1.5 rounded-xl text-[11px] whitespace-nowrap transition">
+                                                        class="px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition cursor-pointer">
                                                     {{ $divName }}
                                                 </button>
                                             @endforeach
                                         </div>
-                                    </div>
 
-                                    <!-- Employee Cards Grid -->
-                                    <div class="max-h-48 overflow-y-auto p-2 bg-slate-50/70 rounded-2xl border border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        <template x-for="user in filteredUsers" :key="user.id">
-                                            <div @click="toggleUser(user.id)"
-                                                 :class="selectedUserIds.includes(user.id) 
-                                                    ? 'bg-teal-50/90 border-[#155E63] ring-1 ring-[#155E63] shadow-xs' 
-                                                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
-                                                 class="flex items-center gap-2.5 p-2 rounded-xl border cursor-pointer transition select-none">
-                                                <input type="checkbox" :checked="selectedUserIds.includes(user.id)"
-                                                       @click.stop="toggleUser(user.id)"
-                                                       class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500 border-slate-300 pointer-events-none">
-                                                
-                                                <template x-if="user.avatar">
-                                                    <img :src="user.avatar" class="w-7 h-7 rounded-full object-cover border border-slate-200">
-                                                </template>
-                                                <template x-if="!user.avatar">
-                                                    <div class="w-7 h-7 rounded-full bg-teal-100 text-[#155E63] font-bold text-[11px] flex items-center justify-center shrink-0">
-                                                        <span x-text="user.name.charAt(0)"></span>
+                                        <!-- Employee Cards Vertical List -->
+                                        <div class="h-[360px] overflow-y-auto p-1.5 bg-slate-50/70 rounded-2xl border border-slate-200/90 space-y-1.5 pr-1.5">
+                                            <template x-for="user in filteredUsers" :key="user.id">
+                                                <div @click="toggleUser(user.id)"
+                                                     :class="selectedUserIds.includes(user.id) 
+                                                        ? 'bg-teal-50/90 border-[#155E63] ring-1 ring-[#155E63] shadow-xs' 
+                                                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
+                                                     class="flex items-center gap-2.5 p-2 rounded-xl border cursor-pointer transition select-none">
+                                                    <input type="checkbox" :checked="selectedUserIds.includes(user.id)"
+                                                           @click.stop="toggleUser(user.id)"
+                                                           class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500 border-slate-300 pointer-events-none">
+                                                    
+                                                    <template x-if="user.avatar">
+                                                        <img :src="user.avatar" class="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0">
+                                                    </template>
+                                                    <template x-if="!user.avatar">
+                                                        <div class="w-7 h-7 rounded-full bg-teal-100 text-[#155E63] font-bold text-[11px] flex items-center justify-center shrink-0">
+                                                            <span x-text="user.name.charAt(0)"></span>
+                                                        </div>
+                                                    </template>
+
+                                                    <div class="min-w-0 flex-1">
+                                                        <p class="font-bold text-slate-900 truncate" x-text="user.name"></p>
+                                                        <p class="text-[10px] text-slate-500 truncate">
+                                                            <span x-text="user.nik" class="font-mono"></span> • <span class="font-medium text-slate-600" x-text="user.division"></span>
+                                                        </p>
                                                     </div>
-                                                </template>
-
-                                                <div class="min-w-0 flex-1">
-                                                    <p class="font-bold text-slate-900 truncate" x-text="user.name"></p>
-                                                    <p class="text-[10px] text-slate-500 truncate">
-                                                        <span x-text="user.nik"></span> • <span class="font-medium text-slate-600" x-text="user.division"></span>
-                                                    </p>
                                                 </div>
-                                            </div>
-                                        </template>
+                                            </template>
 
-                                        <template x-if="filteredUsers.length === 0">
-                                            <div class="col-span-2 py-6 text-center text-slate-400 italic">
-                                                Tidak ada karyawan yang sesuai filter atau pencarian.
-                                            </div>
-                                        </template>
-                                    </div>
-                                </div>
-
-                                <!-- STEP 2: PILIH TANGGAL PIKET -->
-                                <div class="space-y-2.5 pt-2 border-t border-slate-100">
-                                    <div class="flex flex-wrap items-center justify-between gap-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[11px] font-black">2</span>
-                                            <label class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Tanggal Penugasan Piket</label>
-                                            <span class="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200/80 text-[#155E63] font-bold text-[11px]">
-                                                <span x-text="selectedDates.length"></span> tanggal dipilih
-                                            </span>
-                                        </div>
-
-                                        <!-- Quick Weekend Select Buttons -->
-                                        <div class="flex items-center gap-1.5 flex-wrap">
-                                            <button type="button" @click="selectWeekends()"
-                                                    class="px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 text-[11px] font-bold transition">
-                                                + Semua Sabtu &amp; Minggu
-                                            </button>
-                                            <button type="button" @click="selectSaturdays()"
-                                                    class="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium transition">
-                                                + Sabtu
-                                            </button>
-                                            <button type="button" @click="selectSundays()"
-                                                    class="px-2 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[11px] font-medium transition">
-                                                + Minggu
-                                            </button>
-                                            <button type="button" @click="clearDates()"
-                                                    class="px-2 py-1 rounded-lg text-rose-600 hover:bg-rose-50 text-[11px] font-semibold transition">
-                                                Reset
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Interactive Calendar Matrix -->
-                                    <div class="bg-slate-50/70 rounded-2xl border border-slate-200/80 p-3">
-                                        <!-- Calendar Day of Week Header -->
-                                        <div class="grid grid-cols-7 gap-1 text-center font-bold text-[10px] text-slate-400 mb-1.5">
-                                            <span>SEN</span>
-                                            <span>SEL</span>
-                                            <span>RAB</span>
-                                            <span>KAM</span>
-                                            <span>JUM</span>
-                                            <span class="text-amber-600">SAB</span>
-                                            <span class="text-rose-600">MIN</span>
-                                        </div>
-
-                                        <!-- Calendar Day Grid -->
-                                        <div class="grid grid-cols-7 gap-1 sm:gap-1.5">
-                                            <!-- Empty slots before 1st of month -->
-                                            @for ($i = 0; $i < $leadingEmptySlots; $i++)
-                                                <div class="h-8 rounded-lg bg-transparent"></div>
-                                            @endfor
-
-                                            <!-- Days of the month -->
-                                            @foreach ($daysData as $item)
-                                                @php
-                                                    $dStr = $item['date'];
-                                                    $isWk = $item['isWeekend'];
-                                                    $isSat = $item['isSaturday'];
-                                                    $isSun = $item['isSunday'];
-                                                @endphp
-                                                <button type="button"
-                                                        @click="toggleDate('{{ $dStr }}')"
-                                                        :class="selectedDates.includes('{{ $dStr }}') 
-                                                            ? 'bg-[#155E63] text-white font-black shadow-xs ring-2 ring-teal-400 scale-[1.03]' 
-                                                            : '{{ $isSun ? 'bg-rose-50/80 text-rose-700 border-rose-200 hover:bg-rose-100 font-bold' : ($isSat ? 'bg-amber-50/80 text-amber-700 border-amber-200 hover:bg-amber-100 font-bold' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100') }} border'"
-                                                        class="h-8 sm:h-9 rounded-xl text-xs flex flex-col items-center justify-center transition-all cursor-pointer select-none">
-                                                    <span>{{ $item['day'] }}</span>
-                                                </button>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                    <!-- Selected Dates Chips Preview -->
-                                    <template x-if="selectedDates.length > 0">
-                                        <div class="flex flex-wrap items-center gap-1.5 max-h-20 overflow-y-auto pt-1">
-                                            <span class="text-[11px] font-bold text-slate-500 mr-1">Terpilih:</span>
-                                            <template x-for="d in selectedDates.slice().sort()" :key="d">
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-teal-100/80 text-[#155E63] text-[11px] font-bold border border-teal-200">
-                                                    <span x-text="d"></span>
-                                                    <button type="button" @click="toggleDate(d)" class="text-teal-700 hover:text-rose-600 font-bold">×</button>
-                                                </span>
+                                            <template x-if="filteredUsers.length === 0">
+                                                <div class="py-12 text-center text-slate-400 italic text-xs">
+                                                    Tidak ada karyawan yang sesuai filter.
+                                                </div>
                                             </template>
                                         </div>
-                                    </template>
-                                </div>
-
-                                <!-- STEP 3: PILIH SHIFT PIKET -->
-                                <div class="space-y-2.5 pt-2 border-t border-slate-100">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[11px] font-black">3</span>
-                                        <label class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Shift Piket</label>
                                     </div>
 
-                                    <!-- Visual Shift Cards -->
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        @php
-                                            $shiftPK = $shifts->firstWhere('code', 'PK');
-                                            $shiftPA = $shifts->firstWhere('code', 'PA');
-                                        @endphp
+                                    <!-- ============================================== -->
+                                    <!-- KOLOM KANAN: TANGGAL, SHIFT & PENGATURAN (7 COLS)-->
+                                    <!-- ============================================== -->
+                                    <div class="lg:col-span-7 flex flex-col space-y-4">
+                                        
+                                        <!-- STEP 2: PILIH TANGGAL PIKET -->
+                                        <div class="space-y-2">
+                                            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[10px] font-black">2</span>
+                                                    <span class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Tanggal Piket</span>
+                                                    <span class="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[#155E63] font-bold text-[10px]">
+                                                        <span x-text="selectedDates.length"></span> tanggal
+                                                    </span>
+                                                </div>
 
-                                        @if ($shiftPK)
-                                            <div @click="selectedShiftId = {{ $shiftPK->id }}"
-                                                 :class="selectedShiftId == {{ $shiftPK->id }} 
-                                                    ? 'bg-teal-50/90 border-[#155E63] ring-2 ring-[#155E63] shadow-xs' 
-                                                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
-                                                 class="flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition select-none">
-                                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                                                     :class="selectedShiftId == {{ $shiftPK->id }} ? 'border-[#155E63] bg-[#155E63]' : 'border-slate-300'">
-                                                    <div class="w-2 h-2 rounded-full bg-white" x-show="selectedShiftId == {{ $shiftPK->id }}"></div>
-                                                </div>
-                                                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0">
-                                                    ☀️
-                                                </div>
-                                                <div>
-                                                    <p class="font-bold text-slate-900 text-xs sm:text-sm">{{ $shiftPK->name }} ({{ $shiftPK->code }})</p>
-                                                    <p class="text-[11px] text-slate-500 font-mono">08:15 – 17:00 WIB</p>
+                                                <!-- Quick Weekend Buttons -->
+                                                <div class="flex items-center gap-1.5 flex-wrap">
+                                                    <button type="button" @click="selectWeekends()"
+                                                            class="px-2 py-0.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold transition cursor-pointer">
+                                                        + Weekend
+                                                    </button>
+                                                    <button type="button" @click="selectSaturdays()"
+                                                            class="px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-medium transition cursor-pointer">
+                                                        + Sabtu
+                                                    </button>
+                                                    <button type="button" @click="selectSundays()"
+                                                            class="px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-medium transition cursor-pointer">
+                                                        + Minggu
+                                                    </button>
+                                                    <button type="button" @click="clearDates()"
+                                                            class="px-2 py-0.5 rounded-lg text-rose-600 hover:bg-rose-50 text-[10px] font-semibold transition cursor-pointer">
+                                                        Reset
+                                                    </button>
                                                 </div>
                                             </div>
-                                        @endif
 
-                                        @if ($shiftPA)
-                                            <div @click="selectedShiftId = {{ $shiftPA->id }}"
-                                                 :class="selectedShiftId == {{ $shiftPA->id }} 
-                                                    ? 'bg-indigo-50/90 border-indigo-600 ring-2 ring-indigo-600 shadow-xs' 
-                                                    : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
-                                                 class="flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition select-none">
-                                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
-                                                     :class="selectedShiftId == {{ $shiftPA->id }} ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'">
-                                                    <div class="w-2 h-2 rounded-full bg-white" x-show="selectedShiftId == {{ $shiftPA->id }}"></div>
+                                            <!-- Bulletproof 7-Column Calendar Grid -->
+                                            <div class="bg-slate-50/80 rounded-2xl border border-slate-200/90 p-3 space-y-1.5">
+                                                <!-- Day of Week Header with Explicit Grid Style -->
+                                                <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;"
+                                                     class="text-center font-bold text-[10px] text-slate-400 mb-1">
+                                                    <span>SEN</span>
+                                                    <span>SEL</span>
+                                                    <span>RAB</span>
+                                                    <span>KAM</span>
+                                                    <span>JUM</span>
+                                                    <span class="text-amber-600 font-bold">SAB</span>
+                                                    <span class="text-rose-600 font-bold">MIN</span>
                                                 </div>
-                                                <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs shrink-0">
-                                                    🌙
-                                                </div>
-                                                <div>
-                                                    <p class="font-bold text-slate-900 text-xs sm:text-sm">{{ $shiftPA->name }} ({{ $shiftPA->code }})</p>
-                                                    <p class="text-[11px] text-slate-500 font-mono">13:00 – 21:00 WIB</p>
+
+                                                <!-- Day Cells with Explicit Grid Style -->
+                                                <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;">
+                                                    <!-- Leading empty slots before 1st day of month -->
+                                                    @for ($i = 0; $i < $leadingEmptySlots; $i++)
+                                                        <div class="h-8 rounded-lg bg-transparent"></div>
+                                                    @endfor
+
+                                                    <!-- Month Days (1..30/31) -->
+                                                    @foreach ($daysData as $item)
+                                                        @php
+                                                            $dStr = $item['date'];
+                                                            $isWk = $item['isWeekend'];
+                                                            $isSat = $item['isSaturday'];
+                                                            $isSun = $item['isSunday'];
+                                                        @endphp
+                                                        <button type="button"
+                                                                @click="toggleDate('{{ $dStr }}')"
+                                                                :class="selectedDates.includes('{{ $dStr }}') 
+                                                                    ? 'bg-[#155E63] text-white font-black shadow-xs ring-2 ring-teal-400 scale-[1.03]' 
+                                                                    : '{{ $isSun ? 'bg-rose-50/90 text-rose-800 border-rose-200 hover:bg-rose-100 font-bold' : ($isSat ? 'bg-amber-50/90 text-amber-800 border-amber-200 hover:bg-amber-100 font-bold' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100') }} border'"
+                                                                class="h-8 rounded-xl text-xs flex items-center justify-center transition cursor-pointer select-none">
+                                                            <span>{{ $item['day'] }}</span>
+                                                        </button>
+                                                    @endforeach
                                                 </div>
                                             </div>
-                                        @endif
-                                    </div>
 
-                                    <!-- Other Shift Dropdown (Optional) -->
-                                    <div class="pt-1">
-                                        <label class="block text-[11px] text-slate-500 mb-1">Atau pilih shift lainnya:</label>
-                                        <select x-model="selectedShiftId"
-                                                class="w-full sm:w-1/2 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500">
-                                            @foreach ($shifts as $s)
-                                                <option value="{{ $s->id }}">
-                                                    {{ $s->name }} ({{ $s->code }}) - {{ substr((string)$s->start_time, 0, 5) }} s/d {{ substr((string)$s->end_time, 0, 5) }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                            <!-- Selected Dates Chips Preview -->
+                                            <template x-if="selectedDates.length > 0">
+                                                <div class="flex flex-wrap items-center gap-1.5 max-h-16 overflow-y-auto pt-0.5">
+                                                    <span class="text-[10px] font-bold text-slate-500 mr-1">Terpilih:</span>
+                                                    <template x-for="d in selectedDates.slice().sort()" :key="d">
+                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-teal-100 text-[#155E63] text-[10px] font-bold border border-teal-200">
+                                                            <span x-text="d"></span>
+                                                            <button type="button" @click="toggleDate(d)" class="text-teal-700 hover:text-rose-600 font-bold">×</button>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <!-- STEP 3: PILIH SHIFT PIKET -->
+                                        <div class="space-y-2 pt-1">
+                                            <div class="flex items-center gap-2 pb-1 border-b border-slate-100">
+                                                <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[10px] font-black">3</span>
+                                                <span class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Shift Piket</span>
+                                            </div>
+
+                                            <!-- Visual Shift Radio Cards -->
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                                @php
+                                                    $shiftPK = $shifts->firstWhere('code', 'PK');
+                                                    $shiftPA = $shifts->firstWhere('code', 'PA');
+                                                @endphp
+
+                                                @if ($shiftPK)
+                                                    <div @click="selectedShiftId = {{ $shiftPK->id }}"
+                                                         :class="selectedShiftId == {{ $shiftPK->id }} 
+                                                            ? 'bg-teal-50/90 border-[#155E63] ring-1 ring-[#155E63] shadow-xs' 
+                                                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
+                                                         class="flex items-center gap-2.5 p-2.5 rounded-2xl border cursor-pointer transition select-none">
+                                                        <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0"
+                                                             :class="selectedShiftId == {{ $shiftPK->id }} ? 'border-[#155E63] bg-[#155E63]' : 'border-slate-300'">
+                                                            <div class="w-1.5 h-1.5 rounded-full bg-white" x-show="selectedShiftId == {{ $shiftPK->id }}"></div>
+                                                        </div>
+                                                        <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0">
+                                                            ☀️
+                                                        </div>
+                                                        <div class="min-w-0">
+                                                            <p class="font-bold text-slate-900 text-xs truncate">{{ $shiftPK->name }} (PK)</p>
+                                                            <p class="text-[10px] text-slate-500 font-mono">08:15 – 17:00</p>
+                                                        </div>
+                                                    </div>
+                                                @endif
+
+                                                @if ($shiftPA)
+                                                    <div @click="selectedShiftId = {{ $shiftPA->id }}"
+                                                         :class="selectedShiftId == {{ $shiftPA->id }} 
+                                                            ? 'bg-indigo-50/90 border-indigo-600 ring-1 ring-indigo-600 shadow-xs' 
+                                                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
+                                                         class="flex items-center gap-2.5 p-2.5 rounded-2xl border cursor-pointer transition select-none">
+                                                        <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0"
+                                                             :class="selectedShiftId == {{ $shiftPA->id }} ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'">
+                                                            <div class="w-1.5 h-1.5 rounded-full bg-white" x-show="selectedShiftId == {{ $shiftPA->id }}"></div>
+                                                        </div>
+                                                        <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs shrink-0">
+                                                            🌙
+                                                        </div>
+                                                        <div class="min-w-0">
+                                                            <p class="font-bold text-slate-900 text-xs truncate">{{ $shiftPA->name }} (PA)</p>
+                                                            <p class="text-[10px] text-slate-500 font-mono">13:00 – 21:00</p>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Other Shift Option -->
+                                            <div class="flex items-center gap-2 pt-0.5">
+                                                <span class="text-[10px] text-slate-400">Shift Lain:</span>
+                                                <select x-model="selectedShiftId"
+                                                        class="flex-1 px-2.5 py-1 rounded-xl border border-slate-200 text-[11px] focus:ring-1 focus:ring-teal-500 bg-white">
+                                                    @foreach ($shifts as $s)
+                                                        <option value="{{ $s->id }}">
+                                                            {{ $s->name }} ({{ $s->code }}) - {{ substr((string)$s->start_time, 0, 5) }} s/d {{ substr((string)$s->end_time, 0, 5) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- STEP 4: LOKASI & CATATAN -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-100">
+                                            <div class="space-y-1">
+                                                <label class="block font-bold text-slate-800 text-[11px]">Lokasi Kantor</label>
+                                                <select x-model="selectedOfficeId"
+                                                        class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-teal-500 bg-white">
+                                                    @foreach ($offices as $off)
+                                                        <option value="{{ $off->id }}">{{ $off->name }} (Radius {{ $off->radius_m }}m)</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="space-y-1">
+                                                <label class="block font-bold text-slate-800 text-[11px]">Catatan (Opsional)</label>
+                                                <input type="text" name="notes" x-model="notes" placeholder="Contoh: Piket Weekend / Backup NOC"
+                                                       class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-teal-500 bg-white">
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-
-                                <!-- STEP 4: LOKASI KANTOR & CATATAN -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-                                    <div class="space-y-1.5">
-                                        <label class="block font-bold text-slate-900 text-xs">Lokasi Kantor</label>
-                                        <select x-model="selectedOfficeId"
-                                                class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500">
-                                            @foreach ($offices as $off)
-                                                <option value="{{ $off->id }}">{{ $off->name }} (Radius {{ $off->radius_m }}m)</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="space-y-1.5">
-                                        <label class="block font-bold text-slate-900 text-xs">Catatan (Opsional)</label>
-                                        <input type="text" name="notes" x-model="notes" placeholder="Contoh: Piket Weekend / Standby NOC"
-                                               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500">
-                                    </div>
-                                </div>
-
                             </div>
 
                             <!-- Modal Footer Action Bar -->
-                            <div class="px-5 sm:px-7 py-3.5 bg-slate-50/80 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                            <div class="px-5 sm:px-7 py-3 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
                                 <div class="text-xs text-slate-600">
                                     <span class="font-bold text-slate-900" x-text="selectedUserIds.length * selectedDates.length">0</span> total slot piket akan dibuat
                                     (<span x-text="selectedUserIds.length"></span> karyawan × <span x-text="selectedDates.length"></span> tanggal)
@@ -1937,7 +1886,7 @@
 
                                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                                     <button type="button" @click="showPiketModal = false; showUploadModal = false"
-                                            class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition">
+                                            class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition cursor-pointer">
                                         Batal
                                     </button>
                                     <button type="submit"
@@ -1964,7 +1913,7 @@
                                 <p class="text-xs text-slate-500">Total {{ $piketList->count() }} penugasan piket pada periode {{ $monthName }} {{ $year }}</p>
                             </div>
                             <button type="button" @click="piketTab = 'form'"
-                                    class="px-3 py-1.5 rounded-xl bg-[#155E63] hover:bg-[#0c4349] text-white text-xs font-bold transition flex items-center gap-1">
+                                    class="px-3.5 py-1.5 rounded-xl bg-[#155E63] hover:bg-[#0c4349] text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer">
                                 <span>+ Tambah Piket</span>
                             </button>
                         </div>
@@ -2025,7 +1974,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" title="Batalkan Jadwal Piket"
-                                                            class="w-8 h-8 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition border border-transparent hover:border-rose-200">
+                                                            class="w-8 h-8 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition border border-transparent hover:border-rose-200 cursor-pointer">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                         </svg>
@@ -2091,11 +2040,11 @@
                             <!-- Modal Actions -->
                             <div class="flex items-center justify-end gap-3 pt-2">
                                 <button type="button" @click="showUploadModal = false; showPiketModal = false"
-                                        class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50">
+                                        class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 cursor-pointer">
                                     Batal
                                 </button>
                                 <button type="submit"
-                                        class="px-5 py-2.5 rounded-xl bg-[#155E63] hover:bg-[#0c4349] text-white text-xs font-semibold shadow-xs">
+                                        class="px-5 py-2.5 rounded-xl bg-[#155E63] hover:bg-[#0c4349] text-white text-xs font-semibold shadow-xs cursor-pointer">
                                     Upload &amp; Proses
                                 </button>
                             </div>
@@ -2104,6 +2053,77 @@
 
                 </div>
             </div>
+
+            <!-- Modal Piket Alpine Component Script -->
+            <script>
+                function piketModalManager() {
+                    return {
+                        piketTab: 'form',
+                        allWeekends: {!! json_encode($weekendDays) !!},
+                        allSaturdays: {!! json_encode($saturdays) !!},
+                        allSundays: {!! json_encode($sundays) !!},
+                        allUsers: {!! json_encode($usersJson) !!},
+                        divisionFilter: 'all',
+                        userSearch: '',
+                        selectedUserIds: [],
+                        selectedDates: [],
+                        selectedShiftId: {{ $defaultPiketShift?->id ?? 5 }},
+                        selectedOfficeId: {{ $defaultOfficeId }},
+                        notes: '',
+
+                        get filteredUsers() {
+                            const q = this.userSearch.trim().toLowerCase();
+                            return this.allUsers.filter(u => {
+                                const matchDiv = (this.divisionFilter === 'all' || u.division === this.divisionFilter);
+                                const matchSearch = !q || u.name.toLowerCase().includes(q) || u.nik.toLowerCase().includes(q);
+                                return matchDiv && matchSearch;
+                            });
+                        },
+
+                        toggleUser(id) {
+                            if (this.selectedUserIds.includes(id)) {
+                                this.selectedUserIds = this.selectedUserIds.filter(x => x !== id);
+                            } else {
+                                this.selectedUserIds.push(id);
+                            }
+                        },
+
+                        selectAllVisibleUsers() {
+                            const ids = this.filteredUsers.map(u => u.id);
+                            this.selectedUserIds = Array.from(new Set([...this.selectedUserIds, ...ids]));
+                        },
+
+                        deselectAllVisibleUsers() {
+                            const ids = new Set(this.filteredUsers.map(u => u.id));
+                            this.selectedUserIds = this.selectedUserIds.filter(x => !ids.has(x));
+                        },
+
+                        toggleDate(dateStr) {
+                            if (this.selectedDates.includes(dateStr)) {
+                                this.selectedDates = this.selectedDates.filter(d => d !== dateStr);
+                            } else {
+                                this.selectedDates.push(dateStr);
+                            }
+                        },
+
+                        selectWeekends() {
+                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allWeekends]));
+                        },
+
+                        selectSaturdays() {
+                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allSaturdays]));
+                        },
+
+                        selectSundays() {
+                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allSundays]));
+                        },
+
+                        clearDates() {
+                            this.selectedDates = [];
+                        }
+                    };
+                }
+            </script>
         @endif
 
         {{-- ========================================================================= --}}
