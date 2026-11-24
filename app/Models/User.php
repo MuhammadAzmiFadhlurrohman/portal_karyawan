@@ -35,6 +35,8 @@ class User extends Authenticatable
         'phone',
         'nik',
         'division',
+        'office',
+        'office_location_id',
         'position',
         'foto',
         'bank',
@@ -292,6 +294,11 @@ class User extends Authenticatable
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(self::class, 'supervisor_id');
+    }
+
+    public function officeLocation(): BelongsTo
+    {
+        return $this->belongsTo(OfficeLocation::class, 'office_location_id');
     }
 
     /**

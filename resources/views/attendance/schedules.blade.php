@@ -1200,15 +1200,19 @@
                                 </button>
                                 <div x-show="openDivPrint" @click.away="openDivPrint = false" x-cloak
                                      class="absolute right-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 shadow-2xl py-2 z-30 text-xs">
-                                    <div class="px-3 py-1 font-bold text-[10px] uppercase tracking-wider text-slate-400">Pilih Divisi</div>
-                                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month]) }}"
-                                       class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 font-medium">Semua Divisi</a>
-                                    @foreach ($allDivisions as $div)
-                                        <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month, 'division' => $div]) }}"
-                                           class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 {{ $division === $div ? 'font-bold text-[#155E63] bg-teal-50/50' : '' }}">
-                                            {{ $div }}
-                                        </a>
-                                    @endforeach
+                                    <div class="px-3 py-1 font-bold text-[10px] uppercase tracking-wider text-slate-400">Pilih Operasional</div>
+                                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month, 'division' => 'teknik_bandung']) }}"
+                                       class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 {{ in_array($division, ['teknik_bandung', 'bandung', 'Teknik']) ? 'font-bold text-[#155E63] bg-teal-50/50' : '' }}">
+                                        Teknik Bandung
+                                    </a>
+                                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month, 'division' => 'teknik_soreang']) }}"
+                                       class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 {{ in_array($division, ['teknik_soreang', 'soreang']) ? 'font-bold text-[#155E63] bg-teal-50/50' : '' }}">
+                                        Teknik Soreang
+                                    </a>
+                                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month, 'division' => 'noc']) }}"
+                                       class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 {{ in_array($division, ['noc', 'NOC']) ? 'font-bold text-[#155E63] bg-teal-50/50' : '' }}">
+                                        NOC
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -1636,98 +1640,115 @@
                                 </div>
                             </div>
 
-                            <!-- Grid Cards Divisi -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+                            <!-- Grid Cards Operasional (Teknik Bandung, Teknik Soreang, NOC) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
                                 
-                                <!-- Card: SEMUA DIVISI -->
-                                <div @click="selectedDivision = 'all'"
-                                     @dblclick="goToMatrix('all')"
-                                     :class="selectedDivision === 'all' 
+                                <!-- Card 1: TEKNIK BANDUNG -->
+                                <div @click="selectedDivision = 'teknik_bandung'"
+                                     @dblclick="goToMatrix('teknik_bandung')"
+                                     :class="selectedDivision === 'teknik_bandung' 
                                         ? 'border-2 border-[#155E63] bg-teal-50/60 ring-2 ring-teal-500/20 shadow-sm' 
                                         : 'border border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50/60'"
                                      class="p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between group">
                                     <div class="flex items-start justify-between gap-2">
-                                        <div class="w-10 h-10 rounded-xl bg-[#155E63] text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <div class="w-10 h-10 rounded-xl bg-teal-100 text-[#155E63] flex items-center justify-center shrink-0">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             </svg>
                                         </div>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 group-hover:bg-teal-100 group-hover:text-teal-900 transition">
-                                            Semua
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center transition"
+                                              :class="selectedDivision === 'teknik_bandung' ? 'bg-[#155E63] text-white' : 'bg-slate-100 text-slate-300'">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
                                         </span>
                                     </div>
                                     <div class="mt-3">
-                                        <h5 class="font-bold text-slate-900 text-sm">Semua Divisi</h5>
-                                        <p class="text-[11px] text-slate-500 mt-0.5">Kelola seluruh karyawan sekaligus dalam 1 tabel matriks</p>
+                                        <div class="flex items-center gap-1.5">
+                                            <h5 class="font-bold text-slate-900 text-sm">Teknik Bandung</h5>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-teal-100 text-teal-800">Pusat</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-1">Kantor Pusat Bandung &bull; Kelola roster shift & piket teknisi Bandung</p>
                                     </div>
                                     <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                                        <span class="font-bold text-[#155E63]">{{ $allActiveUsers->count() }} Karyawan Aktif</span>
+                                        <span class="font-bold text-slate-700">{{ $operationalCounts['teknik_bandung'] ?? 15 }} Teknisi</span>
                                         <span class="text-xs text-slate-400 group-hover:text-[#155E63] font-bold transition flex items-center gap-0.5">
                                             Pilih <span>&rarr;</span>
                                         </span>
                                     </div>
                                 </div>
 
-                                <!-- Loop per Divisi -->
-                                @foreach ($allDivisions as $dName)
-                                    @php
-                                        $count = $divisionCounts[$dName] ?? 0;
-                                    @endphp
-                                    <div x-show="!divisionSearch || '{{ strtolower($dName) }}'.includes(divisionSearch.toLowerCase())"
-                                         @click="selectedDivision = '{{ $dName }}'"
-                                         @dblclick="goToMatrix('{{ $dName }}')"
-                                         :class="selectedDivision === '{{ $dName }}' 
-                                            ? 'border-2 border-[#155E63] bg-teal-50/60 ring-2 ring-teal-500/20 shadow-sm' 
-                                            : 'border border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50/60'"
-                                         class="p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between group">
-                                        <div class="flex items-start justify-between gap-2">
-                                            <div class="w-10 h-10 rounded-xl bg-teal-100 text-[#155E63] flex items-center justify-center shrink-0">
-                                                @if (str_contains(strtolower($dName), 'teknik'))
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                    </svg>
-                                                @elseif (str_contains(strtolower($dName), 'noc'))
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
-                                                    </svg>
-                                                @elseif (str_contains(strtolower($dName), 'it') || str_contains(strtolower($dName), 'sistem'))
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                                    </svg>
-                                                @elseif (str_contains(strtolower($dName), 'hrd') || str_contains(strtolower($dName), 'human'))
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                                    </svg>
-                                                @elseif (str_contains(strtolower($dName), 'finance') || str_contains(strtolower($dName), 'akuntansi'))
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                @else
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                                    </svg>
-                                                @endif
-                                            </div>
-                                            <span class="w-5 h-5 rounded-full flex items-center justify-center transition"
-                                                  :class="selectedDivision === '{{ $dName }}' ? 'bg-[#155E63] text-white' : 'bg-slate-100 text-slate-300'">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                                </svg>
-                                            </span>
+                                <!-- Card 2: TEKNIK SOREANG -->
+                                <div @click="selectedDivision = 'teknik_soreang'"
+                                     @dblclick="goToMatrix('teknik_soreang')"
+                                     :class="selectedDivision === 'teknik_soreang' 
+                                        ? 'border-2 border-[#155E63] bg-teal-50/60 ring-2 ring-teal-500/20 shadow-sm' 
+                                        : 'border border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50/60'"
+                                     class="p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between group">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
                                         </div>
-                                        <div class="mt-3">
-                                            <h5 class="font-bold text-slate-900 text-sm">{{ $dName }}</h5>
-                                            <p class="text-[11px] text-slate-500 mt-0.5">Kelola shift kerja & jadwal piket divisi {{ $dName }}</p>
-                                        </div>
-                                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                                            <span class="font-bold text-slate-700">{{ $count }} Karyawan</span>
-                                            <span class="text-xs text-slate-400 group-hover:text-[#155E63] font-bold transition flex items-center gap-0.5">
-                                                Pilih <span>&rarr;</span>
-                                            </span>
-                                        </div>
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center transition"
+                                              :class="selectedDivision === 'teknik_soreang' ? 'bg-[#155E63] text-white' : 'bg-slate-100 text-slate-300'">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </span>
                                     </div>
-                                @endforeach
+                                    <div class="mt-3">
+                                        <div class="flex items-center gap-1.5">
+                                            <h5 class="font-bold text-slate-900 text-sm">Teknik Soreang</h5>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800">Soreang</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-1">Kantor Operasional Soreang &bull; Kelola roster shift & piket teknisi Soreang</p>
+                                    </div>
+                                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                                        <span class="font-bold text-slate-700">{{ $operationalCounts['teknik_soreang'] ?? 5 }} Teknisi</span>
+                                        <span class="text-xs text-slate-400 group-hover:text-[#155E63] font-bold transition flex items-center gap-0.5">
+                                            Pilih <span>&rarr;</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Card 3: NOC -->
+                                <div @click="selectedDivision = 'noc'"
+                                     @dblclick="goToMatrix('noc')"
+                                     :class="selectedDivision === 'noc' 
+                                        ? 'border-2 border-[#155E63] bg-teal-50/60 ring-2 ring-teal-500/20 shadow-sm' 
+                                        : 'border border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50/60'"
+                                     class="p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between group">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                            </svg>
+                                        </div>
+                                        <span class="w-5 h-5 rounded-full flex items-center justify-center transition"
+                                              :class="selectedDivision === 'noc' ? 'bg-[#155E63] text-white' : 'bg-slate-100 text-slate-300'">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </span>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="flex items-center gap-1.5">
+                                            <h5 class="font-bold text-slate-900 text-sm">NOC</h5>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-800">24/7 Monitoring</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-1">Network Operation Center &bull; Kelola piket shift subuh, pagi & siang</p>
+                                    </div>
+                                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                                        <span class="font-bold text-slate-700">{{ $operationalCounts['noc'] ?? 7 }} Staff</span>
+                                        <span class="text-xs text-slate-400 group-hover:text-[#155E63] font-bold transition flex items-center gap-0.5">
+                                            Pilih <span>&rarr;</span>
+                                        </span>
+                                    </div>
+                                </div>
+
                             </div>
 
                         </div>
@@ -1735,9 +1756,9 @@
                         <!-- Modal Footer Action Bar -->
                         <div class="px-5 sm:px-7 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
                             <div class="text-xs text-slate-600 flex items-center gap-2">
-                                <span>Divisi Terpilih:</span>
+                                <span>Operasional Terpilih:</span>
                                 <span class="px-2.5 py-0.5 rounded-full bg-[#155E63] text-white font-bold text-xs"
-                                      x-text="selectedDivision === 'all' ? 'Semua Divisi' : selectedDivision">
+                                      x-text="selectedDivision === 'teknik_soreang' ? 'Teknik Soreang' : (selectedDivision === 'noc' ? 'NOC' : 'Teknik Bandung')">
                                 </span>
                             </div>
 
@@ -1911,7 +1932,7 @@
                 function piketModalManager() {
                     return {
                         piketTab: 'form',
-                        selectedDivision: '{{ $division ?? "all" }}',
+                        selectedDivision: '{{ (!empty($division) && in_array($division, ["teknik_bandung", "teknik_soreang", "noc"])) ? $division : "teknik_bandung" }}',
                         selectedMonth: {{ $month }},
                         selectedYear: {{ $year }},
                         divisionSearch: '',

@@ -30,6 +30,9 @@
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-400 text-teal-950 shadow-xs">
                             Spreadsheet Matrix View
                         </span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white border border-white/20">
+                            {{ $divisionTitle ?? 'Teknik Bandung' }} &bull; {{ $officeName ?? 'Kantor Pusat' }} ({{ $users->count() }} Orang)
+                        </span>
                     </div>
                     <h1 class="font-heading font-black text-xl sm:text-2xl tracking-tight text-white flex items-center gap-2">
                         <span>📊 Matriks Jadwal Shift &amp; Piket</span>
@@ -91,10 +94,9 @@
                         </select>
 
                         <select name="division" class="px-3 py-1.5 rounded-xl border-0 text-xs font-bold text-slate-800 bg-white shadow-2xs focus:ring-2 focus:ring-teal-500">
-                            <option value="all">Semua Divisi</option>
-                            @foreach ($allDivisions as $d)
-                                <option value="{{ $d }}" {{ $division === $d ? 'selected' : '' }}>{{ $d }}</option>
-                            @endforeach
+                            <option value="teknik_bandung" {{ ($division ?? 'teknik_bandung') === 'teknik_bandung' ? 'selected' : '' }}>Teknik Bandung</option>
+                            <option value="teknik_soreang" {{ ($division ?? '') === 'teknik_soreang' ? 'selected' : '' }}>Teknik Soreang</option>
+                            <option value="noc" {{ ($division ?? '') === 'noc' ? 'selected' : '' }}>NOC</option>
                         </select>
                     </div>
 
@@ -331,7 +333,13 @@
                                 <td style="position: sticky; left: 304px; z-index: 20; width: 90px; min-width: 90px; background-color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.08);"
                                     class="py-2 px-2 text-center group-hover:bg-teal-50/60 border-r-2 border-slate-300">
                                     <span class="text-[11px] font-medium text-slate-600 truncate block max-w-[85px]">
-                                        {{ $u->division ?: 'Umum' }}
+                                        @if (($division ?? '') === 'teknik_soreang')
+                                            Teknik (Soreang)
+                                        @elseif (($division ?? '') === 'teknik_bandung')
+                                            Teknik (Bandung)
+                                        @else
+                                            {{ $u->division ?: 'NOC' }}
+                                        @endif
                                     </span>
                                 </td>
 

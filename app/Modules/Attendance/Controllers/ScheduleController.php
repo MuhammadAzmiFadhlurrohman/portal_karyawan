@@ -212,7 +212,25 @@ class ScheduleController extends Controller
         if ($view === 'month' || ($request->has('year') && $request->has('month') && ! $request->has('list'))) {
             $usersQuery = User::query()->where('is_active', true)->excludeAtasan()->orderBy('name');
             if ($division) {
-                $usersQuery->where('division', $division);
+                $divKey = strtolower(trim((string) $division));
+                if ($divKey === 'teknik_soreang' || $divKey === 'soreang') {
+                    $usersQuery->where('division', 'Teknik')
+                        ->where(function ($q) {
+                            $q->where('office', 'soreang')
+                              ->orWhere('office_location_id', 2);
+                        });
+                } elseif ($divKey === 'teknik_bandung' || $divKey === 'bandung' || $divKey === 'teknik') {
+                    $usersQuery->where('division', 'Teknik')
+                        ->where(function ($q) {
+                            $q->where('office', 'bandung')
+                              ->orWhere('office_location_id', 1)
+                              ->orWhereNull('office');
+                        });
+                } elseif ($divKey === 'noc') {
+                    $usersQuery->where('division', 'NOC');
+                } else {
+                    $usersQuery->where('division', $division);
+                }
             }
             $users = $usersQuery->get();
 
@@ -258,7 +276,21 @@ class ScheduleController extends Controller
                 ->where('is_active', true)
                 ->excludeAtasan()
                 ->orderBy('name')
-                ->get(['id', 'name', 'employee_code', 'nik', 'division', 'foto']);
+                ->get(['id', 'name', 'employee_code', 'nik', 'division', 'office', 'office_location_id', 'foto']);
+
+            $operationalCounts = [
+                'teknik_bandung' => User::query()->where('is_active', true)->excludeAtasan()
+                    ->where('division', 'Teknik')
+                    ->where(fn ($q) => $q->where('office', 'bandung')->orWhere('office_location_id', 1)->orWhereNull('office'))
+                    ->count(),
+                'teknik_soreang' => User::query()->where('is_active', true)->excludeAtasan()
+                    ->where('division', 'Teknik')
+                    ->where(fn ($q) => $q->where('office', 'soreang')->orWhere('office_location_id', 2))
+                    ->count(),
+                'noc' => User::query()->where('is_active', true)->excludeAtasan()
+                    ->where('division', 'NOC')
+                    ->count(),
+            ];
 
             return view('attendance.schedules', [
                 'viewMode' => 'month',
@@ -269,6 +301,7 @@ class ScheduleController extends Controller
                 'daysInMonth' => $daysInMonth,
                 'users' => $users,
                 'allActiveUsers' => $allActiveUsers,
+                'operationalCounts' => $operationalCounts,
                 'piketSchedules' => $piketSchedules,
                 'totalUsersCount' => $users->count(),
                 'registeredCount' => $registeredCount,
@@ -644,9 +677,6 @@ class ScheduleController extends Controller
         $now = Carbon::now('Asia/Jakarta');
         $year = (int) $request->input('year', $now->year);
         $month = (int) $request->input('month', $now->month);
-        $division = $request->filled('division') && $request->input('division') !== 'all' && $request->input('division') !== 'Semua Divisi'
-            ? (string) $request->input('division')
-            : null;
 
         $monthNames = [
             1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -654,27 +684,49 @@ class ScheduleController extends Controller
             9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
         ];
 
-        $allDivisions = User::query()
-            ->where('is_active', true)
-            ->excludeAtasan()
-            ->whereNotNull('division')
-            ->where('division', '!=', '')
-            ->pluck('division')
-            ->unique()
-            ->sort()
-            ->values();
+        // Filter dibatasi khusus 3 pilihan operasional: Teknik Bandung, Teknik Soreang, dan NOC
+        $rawDivision = strtolower(trim((string) $request->input('division', 'teknik_bandung')));
+        if ($rawDivision === 'teknik_soreang' || $rawDivision === 'soreang') {
+            $division = 'teknik_soreang';
+            $divisionTitle = 'Teknik Soreang';
+            $officeName = 'Kantor Operasional Soreang';
+            $defaultOfficeId = 2;
+        } elseif ($rawDivision === 'noc') {
+            $division = 'noc';
+            $divisionTitle = 'NOC';
+            $officeName = 'Kantor Pusat Bandung';
+            $defaultOfficeId = 1;
+        } else {
+            // Default: Teknik Bandung
+            $division = 'teknik_bandung';
+            $divisionTitle = 'Teknik Bandung';
+            $officeName = 'Kantor Pusat Bandung';
+            $defaultOfficeId = 1;
+        }
 
         $usersQuery = User::query()
             ->where('is_active', true)
             ->excludeAtasan()
-            ->orderBy('division')
             ->orderBy('name');
 
-        if ($division) {
-            $usersQuery->where('division', $division);
+        if ($division === 'teknik_soreang') {
+            $usersQuery->where('division', 'Teknik')
+                ->where(function ($q) {
+                    $q->where('office', 'soreang')
+                      ->orWhere('office_location_id', 2);
+                });
+        } elseif ($division === 'noc') {
+            $usersQuery->where('division', 'NOC');
+        } else {
+            $usersQuery->where('division', 'Teknik')
+                ->where(function ($q) {
+                    $q->where('office', 'bandung')
+                      ->orWhere('office_location_id', 1)
+                      ->orWhereNull('office');
+                });
         }
 
-        $users = $usersQuery->get(['id', 'name', 'employee_code', 'nik', 'division', 'foto']);
+        $users = $usersQuery->get(['id', 'name', 'employee_code', 'nik', 'division', 'office', 'office_location_id', 'foto']);
 
         $shifts = Shift::query()->orderBy('id')->get();
         $offices = OfficeLocation::query()->where('is_active', true)->orderBy('name')->get();
@@ -719,7 +771,9 @@ class ScheduleController extends Controller
             'month' => $month,
             'monthName' => $monthNames[$month] ?? "Bulan {$month}",
             'division' => $division,
-            'allDivisions' => $allDivisions,
+            'divisionTitle' => $divisionTitle,
+            'officeName' => $officeName,
+            'defaultOfficeId' => $defaultOfficeId,
             'users' => $users,
             'daysInMonth' => $daysInMonth,
             'daysData' => $daysData,
@@ -757,6 +811,9 @@ class ScheduleController extends Controller
             return response()->json(['success' => false, 'message' => 'Tidak ada data sel yang dikirim.'], 422);
         }
 
+        $userIds = array_unique(array_filter(array_map(fn ($c) => (int) ($c['user_id'] ?? 0), $cells)));
+        $usersMap = User::whereIn('id', $userIds)->get()->keyBy('id');
+
         $savedCount = 0;
         foreach ($cells as $cell) {
             $userId = (int) ($cell['user_id'] ?? 0);
@@ -788,6 +845,8 @@ class ScheduleController extends Controller
             }
 
             $isPiket = $shift->is_piket || in_array($shift->code, ['PK', 'PA']);
+            $userObj = $usersMap->get($userId);
+            $userOfficeId = $userObj?->office_location_id ?? $defaultOfficeId;
 
             MonthlySchedule::query()->updateOrCreate(
                 [
@@ -796,7 +855,7 @@ class ScheduleController extends Controller
                 ],
                 [
                     'shift_id' => $shift->id,
-                    'office_location_id' => $defaultOfficeId,
+                    'office_location_id' => $userOfficeId,
                     'is_locked' => $isPiket,
                     'notes' => $isPiket ? "Jadwal Piket ({$shift->name})" : $shift->name,
                     'updated_by' => $actor->id,
