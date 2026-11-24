@@ -21,6 +21,67 @@
 
     const vapidKey = "{{ config('services.fcm.vapid_key') }}";
     const isSecureOrigin = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    // Interactive Apple iOS Safari Home Screen installation guide
+    window.showIosPushGuideModal = function() {
+        if (!window.Swal) return;
+        Swal.fire({
+            title: '<div class="flex items-center justify-center gap-2 text-base font-bold text-slate-800"><svg class="w-6 h-6 text-[#155E63]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.77 1.06-1.85.94-2.93-.93.04-2.07.62-2.73 1.39-.58.67-.99 1.77-.85 2.82 1.05.08 2.01-.51 2.64-1.28z"/></svg><span>Panduan Notifikasi di iPhone</span></div>',
+            html: `
+                <div class="text-left text-xs text-slate-700 space-y-3 pt-2">
+                    <div class="p-3 rounded-2xl bg-teal-50 border border-teal-200 text-teal-900 leading-relaxed text-[11px]">
+                        <strong>Aturan Resmi Apple iOS:</strong> Di iPhone Safari, notifikasi Web Push baru aktif jika portal telah ditambahkan ke <strong>Layar Utama (Home Screen)</strong>.
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                            <div>
+                                <p class="font-bold text-slate-800">Ketuk Tombol Bagikan (Share)</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Ketuk ikon kotak dengan panah ke atas (<strong class="text-slate-800">⎋</strong>) di bilah navigasi bawah Safari.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                            <div>
+                                <p class="font-bold text-slate-800">Pilih "Tambahkan ke Layar Utama"</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Gulir ke bawah menu lalu pilih opsi <strong class="text-slate-800">"Add to Home Screen"</strong> (ikon <strong class="text-slate-800">[+]</strong>).</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                            <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
+                            <div>
+                                <p class="font-bold text-slate-800">Buka Aplikasi dari Layar Utama</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Tutup Safari, lalu buka ikon <strong>GoMSN</strong> yang baru muncul di Layar Utama iPhone Anda.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">4</span>
+                            <div>
+                                <p class="font-bold text-emerald-900">Aktifkan Notifikasi</p>
+                                <p class="text-[11px] text-emerald-700 mt-0.5">Ketuk tombol <strong>"Aktifkan Sekarang"</strong> di dalam aplikasi Layar Utama. Izin pop-up notifikasi iPhone akan langsung muncul dan tersambung!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-[10px] text-slate-400 text-center pt-0.5">
+                        * Memerlukan iOS 16.4 atau lebih baru pada iPhone Anda.
+                    </p>
+                </div>
+            `,
+            showCloseButton: true,
+            confirmButtonColor: '#155E63',
+            confirmButtonText: 'Saya Mengerti, Terima Kasih',
+            customClass: {
+                popup: 'rounded-3xl shadow-2xl border border-slate-200'
+            }
+        });
+    };
 
     // Ensure clean Service Worker registration (unregister duplicate firebase-messaging-sw.js & upgrade sw.js)
     async function getCleanServiceWorkerRegistration() {
@@ -86,8 +147,8 @@
                 },
                 body: JSON.stringify({
                     token: token,
-                    platform: 'web',
-                    device_name: (navigator.userAgentData?.platform || navigator.platform || 'Browser') + ' (' + (navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop') + ')'
+                    platform: isIOS ? 'ios' : 'web',
+                    device_name: (isIOS ? 'Apple iPhone' : (navigator.userAgentData?.platform || navigator.platform || 'Browser')) + ' (' + (isStandalone ? 'PWA Home Screen' : (navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop')) + ')'
                 })
             });
 
@@ -153,7 +214,24 @@
         }
 
         if (!('Notification' in window)) {
-            if (interactive && window.Swal) Swal.fire('Error', 'Browser Anda tidak mendukung notifikasi.', 'error');
+            if (interactive && window.Swal) {
+                if (isIOS) {
+                    if (!isStandalone) {
+                        window.showIosPushGuideModal();
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Pembaruan iOS Diperlukan',
+                            html: '<div class="text-left text-xs text-slate-700 space-y-2"><p>Apple mewajibkan minimal <strong>iOS 16.4 atau lebih baru</strong> untuk mendukung Web Push Notification di iPhone.</p><p class="text-slate-500">Silakan periksa dan perbarui iPhone Anda melalui <strong>Pengaturan &gt; Umum &gt; Pembaruan Perangkat Lunak</strong>.</p></div>',
+                            confirmButtonColor: '#155E63',
+                            confirmButtonText: 'Tutup'
+                        });
+                    }
+                } else {
+                    Swal.fire('Error', 'Browser perangkat Anda belum mendukung Web Push Notification. Silakan gunakan Google Chrome.', 'error');
+                }
+            }
+            console.warn('[FCM] Notification API is not available in current window.');
             return;
         }
 

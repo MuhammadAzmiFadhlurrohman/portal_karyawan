@@ -249,10 +249,10 @@ class FcmService
         foreach ($tokens as $tokenRecord) {
             $fcmToken = $tokenRecord->fcm_token;
 
-            if ($tokenRecord->platform === 'web') {
+            if ($tokenRecord->platform === 'web' || $tokenRecord->platform === 'ios') {
                 // Include both top-level notification and webpush.notification with Urgency: high
-                // so Android OS & Google Play Services immediately wake up and display the notification
-                // in the lock-screen & status bar even when the PWA/APK is closed or screen is off.
+                // so Android OS, iOS APNs (PWA Home Screen), and Google Play Services immediately wake up
+                // and display the notification in the lock-screen & status bar even when the app is closed.
                 $payload = [
                     'message' => [
                         'token' => $fcmToken,

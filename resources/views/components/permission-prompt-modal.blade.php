@@ -130,8 +130,9 @@
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                             </div>
                             <span class="text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0"
-                                  :class="permissions.notification === 'granted' ? 'bg-emerald-600 text-white' : (permissions.notification === 'denied' ? 'bg-rose-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300')"
-                                  x-text="permissions.notification === 'granted' ? '✓ Aktif' : (permissions.notification === 'denied' ? '✕ Ditolak' : 'Belum Aktif')">
+                                  :class="permissions.notification === 'granted' ? 'bg-emerald-600 text-white' : (permissions.notification === 'denied' ? 'bg-rose-600 text-white' : (permissions.notification === 'ios_guide' ? 'bg-amber-500 text-white cursor-pointer hover:bg-amber-600' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'))"
+                                  @click="permissions.notification === 'ios_guide' && typeof window.showIosPushGuideModal === 'function' ? window.showIosPushGuideModal() : null"
+                                  x-text="permissions.notification === 'granted' ? '✓ Aktif' : (permissions.notification === 'denied' ? '✕ Ditolak' : (permissions.notification === 'ios_guide' ? 'Panduan iPhone' : (permissions.notification === 'unsupported' ? 'Tidak Didukung' : 'Belum Aktif')))">
                             </span>
                         </div>
                         <h4 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white mt-2.5">Notifikasi</h4>
@@ -327,7 +328,12 @@
                         this.permissions.notification = 'denied';
                     }
                 } else {
-                    this.permissions.notification = 'unsupported';
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                    if (isIOS) {
+                        this.permissions.notification = 'ios_guide';
+                    } else {
+                        this.permissions.notification = 'unsupported';
+                    }
                 }
 
                 // 3. Request Geolocation (GPS / Maps)
