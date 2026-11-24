@@ -1,8 +1,8 @@
-<x-layouts.app title="Pengajuan Absen">
-    <div class="space-y-6 w-full pb-12" x-data="{ rejectModalOpen: false, selectedLeaveId: null, rejectActionUrl: '' }">
+<x-layouts.app title="Persetujuan Cuti &amp; Izin">
+    <div class="space-y-5 w-full pb-14" x-data="{ rejectModalOpen: false, selectedLeaveId: null, rejectActionUrl: '' }">
         
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal) -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-5 sm:px-6 select-none"
              style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
             
             <!-- Gloss Highlights -->
@@ -11,149 +11,166 @@
 
             <!-- Left: Glowing Icon + Page Name -->
             <div class="relative z-10 flex items-center gap-3.5 min-w-0">
-                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                     <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
 
-                <div class="min-w-0">
-                    <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
-                        <span>Pengajuan Absen (Cuti &amp; Izin)</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                            Persetujuan Cuti &amp; Izin
+                        </h1>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
                             Persetujuan HRD
                         </span>
-                    </h1>
-                    <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                        Tinjau dan proses persetujuan pengajuan cuti tahunan, sakit, dan izin khusus karyawan.
+                    </div>
+                    <p class="text-xs sm:text-[13px] text-teal-100/85 mt-0.5 leading-snug">
+                        Tinjau dan verifikasi pengajuan cuti tahunan, sakit, dan izin khusus karyawan
                     </p>
                 </div>
             </div>
-
-
         </div>
 
-        <!-- Filter & Search Toolbar -->
-        <div class="space-y-3">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                <!-- Segmented Tabs Status -->
-                <div class="rounded-2xl border border-slate-200/80 bg-slate-100/60 p-1.5 flex flex-wrap items-center gap-1 shadow-2xs w-full lg:w-auto">
-                    <!-- Menunggu -->
-                    <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
-                       class="flex-1 sm:flex-none flex items-center justify-center gap-2 py-2 px-3.5 rounded-xl transition-all text-xs font-semibold {{ $status === 'pending' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/70 font-bold' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 border border-transparent' }}">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>Menunggu Persetujuan</span>
-                        @if ($pendingCount > 0)
-                            <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900">
-                                {{ $pendingCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <!-- Disetujui -->
-                    <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'approved'])) }}"
-                       class="flex-1 sm:flex-none flex items-center justify-center gap-2 py-2 px-3.5 rounded-xl transition-all text-xs font-semibold {{ $status === 'approved' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/70 font-bold' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 border border-transparent' }}">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>Disetujui</span>
-                        @if ($approvedCount > 0)
-                            <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                {{ $approvedCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <!-- Ditolak -->
-                    <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'rejected'])) }}"
-                       class="flex-1 sm:flex-none flex items-center justify-center gap-2 py-2 px-3.5 rounded-xl transition-all text-xs font-semibold {{ $status === 'rejected' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/70 font-bold' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 border border-transparent' }}">
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>Ditolak</span>
-                        @if ($rejectedCount > 0)
-                            <span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
-                                {{ $rejectedCount }}
-                            </span>
-                        @endif
-                    </a>
-
-                    <!-- Semua -->
-                    <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}"
-                       class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-xl transition-all text-xs font-semibold {{ $status === 'all' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/70 font-bold' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 border border-transparent' }}">
-                        <span>Semua</span>
-                    </a>
-                </div>
-
-                <!-- Form Search & Filter -->
-                <form method="GET" action="{{ route('attendance.leaves.approvals') }}" class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                    <input type="hidden" name="status" value="{{ $status }}">
-                    
-                    <!-- Search Input -->
-                    <div class="relative flex-1 sm:w-56">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <!-- Segmented Status Tabs (Modern Balanced 4-Grid Control) -->
+        <div class="rounded-2xl border border-slate-200/90 bg-slate-100/70 p-1.5 shadow-2xs">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                <!-- Menunggu -->
+                <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'pending'])) }}"
+                   class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition-all text-xs font-bold {{ $status === 'pending' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/80 ring-1 ring-black/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 border border-transparent' }}">
+                    <div class="w-2 h-2 rounded-full {{ $status === 'pending' ? 'bg-amber-500 animate-pulse' : 'bg-slate-300' }}"></div>
+                    <span>Menunggu</span>
+                    @if ($pendingCount > 0)
+                        <span class="ml-0.5 px-2 py-0.5 rounded-full text-[10px] font-black {{ $status === 'pending' ? 'bg-amber-400 text-slate-900' : 'bg-amber-200/80 text-amber-900' }}">
+                            {{ $pendingCount }}
                         </span>
-                        <input type="text" 
-                               name="search" 
-                               value="{{ $search }}" 
-                               placeholder="Cari karyawan / NIK..." 
-                               class="w-full pl-9 pr-3 py-2 bg-white rounded-xl border border-slate-200/90 text-xs font-semibold text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition shadow-2xs">
-                    </div>
-
-                    <!-- Divisi Filter -->
-                    <select name="divisi" onchange="this.form.submit()" 
-                            class="py-2 pl-3 pr-8 bg-white rounded-xl border border-slate-200/90 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition shadow-2xs">
-                        <option value="all">Semua Divisi</option>
-                        @foreach ($divisions as $div)
-                            <option value="{{ $div }}" {{ $divisi === $div ? 'selected' : '' }}>{{ $div }}</option>
-                        @endforeach
-                    </select>
-
-                    <!-- Jenis Pengajuan Filter -->
-                    <select name="type" onchange="this.form.submit()" 
-                            class="py-2 pl-3 pr-8 bg-white rounded-xl border border-slate-200/90 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500 transition shadow-2xs">
-                        <option value="all">Semua Jenis</option>
-                        <option value="annual" {{ $leaveType === 'annual' ? 'selected' : '' }}>Cuti Tahunan</option>
-                        <option value="sick" {{ $leaveType === 'sick' ? 'selected' : '' }}>Cuti Sakit</option>
-                        <option value="special" {{ $leaveType === 'special' ? 'selected' : '' }}>Izin Khusus</option>
-                    </select>
-
-                    <button type="submit" class="px-3.5 py-2 bg-[#155E63] hover:bg-[#114b4f] text-white text-xs font-semibold rounded-xl shadow-2xs transition">
-                        Filter
-                    </button>
-                    @if ($search || $divisi !== 'all' || $leaveType !== 'all')
-                        <a href="{{ route('attendance.leaves.approvals', ['status' => $status]) }}" class="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl transition" title="Reset Filter">
-                            Reset
-                        </a>
                     @endif
-                </form>
+                </a>
+
+                <!-- Disetujui -->
+                <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'approved'])) }}"
+                   class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition-all text-xs font-bold {{ $status === 'approved' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/80 ring-1 ring-black/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 border border-transparent' }}">
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>Disetujui</span>
+                    @if ($approvedCount > 0)
+                        <span class="ml-0.5 px-2 py-0.5 rounded-full text-[10px] font-black {{ $status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200/70 text-slate-700' }}">
+                            {{ $approvedCount }}
+                        </span>
+                    @endif
+                </a>
+
+                <!-- Ditolak -->
+                <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'rejected'])) }}"
+                   class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl transition-all text-xs font-bold {{ $status === 'rejected' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/80 ring-1 ring-black/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 border border-transparent' }}">
+                    <svg class="w-3.5 h-3.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span>Ditolak</span>
+                    @if ($rejectedCount > 0)
+                        <span class="ml-0.5 px-2 py-0.5 rounded-full text-[10px] font-black {{ $status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-slate-200/70 text-slate-700' }}">
+                            {{ $rejectedCount }}
+                        </span>
+                    @endif
+                </a>
+
+                <!-- Semua -->
+                <a href="{{ route('attendance.leaves.approvals', array_merge(request()->except('status', 'page'), ['status' => 'all'])) }}"
+                   class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl transition-all text-xs font-bold {{ $status === 'all' ? 'bg-white text-slate-800 shadow-xs border border-slate-200/80 ring-1 ring-black/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white/50 border border-transparent' }}">
+                    <span>Semua Data</span>
+                </a>
             </div>
         </div>
 
+        <!-- Filter & Search Toolbar (Card Container) -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white p-3.5 sm:p-4 shadow-2xs">
+            <form method="GET" action="{{ route('attendance.leaves.approvals') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <input type="hidden" name="status" value="{{ $status }}">
+                
+                <!-- Search Input -->
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </span>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ $search }}" 
+                           placeholder="Cari nama karyawan, NIK, atau alasan..." 
+                           class="w-full pl-9 pr-3 py-2.5 bg-slate-50/70 hover:bg-slate-50 focus:bg-white rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition shadow-2xs">
+                </div>
+
+                <!-- Dropdown Divisi & Jenis in 2 Columns on Mobile -->
+                <div class="grid grid-cols-2 sm:flex sm:items-center gap-2">
+                    <!-- Divisi Filter -->
+                    <div class="relative">
+                        <select name="divisi" onchange="this.form.submit()" 
+                                class="w-full sm:w-auto py-2.5 pl-3 pr-8 bg-slate-50/70 hover:bg-slate-50 focus:bg-white rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition shadow-2xs appearance-none cursor-pointer">
+                            <option value="all">Semua Divisi</option>
+                            @foreach ($divisions as $div)
+                                <option value="{{ $div }}" {{ $divisi === $div ? 'selected' : '' }}>{{ $div }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Jenis Pengajuan Filter -->
+                    <div class="relative">
+                        <select name="type" onchange="this.form.submit()" 
+                                class="w-full sm:w-auto py-2.5 pl-3 pr-8 bg-slate-50/70 hover:bg-slate-50 focus:bg-white rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 transition shadow-2xs appearance-none cursor-pointer">
+                            <option value="all">Semua Jenis</option>
+                            <option value="annual" {{ $leaveType === 'annual' ? 'selected' : '' }}>Cuti Tahunan</option>
+                            <option value="sick" {{ $leaveType === 'sick' ? 'selected' : '' }}>Cuti Sakit</option>
+                            <option value="special" {{ $leaveType === 'special' ? 'selected' : '' }}>Izin Khusus</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Filter Buttons -->
+                <div class="flex items-center gap-2">
+                    <button type="submit" 
+                            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white text-xs sm:text-sm font-bold shadow-sm shadow-teal-950/10 transition active:scale-95 cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-teal-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                        <span>Filter</span>
+                    </button>
+                    @if ($search || $divisi !== 'all' || $leaveType !== 'all')
+                        <a href="{{ route('attendance.leaves.approvals', ['status' => $status]) }}" 
+                           class="inline-flex items-center justify-center gap-1 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs sm:text-sm font-semibold transition cursor-pointer" 
+                           title="Reset Filter">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span>Reset</span>
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
 
         <!-- List Content Area -->
         @if ($leaves->isEmpty())
-            <div class="rounded-3xl border-2 border-dashed border-slate-200/90 bg-white/40 p-12 sm:p-16 flex flex-col items-center justify-center text-center min-h-[320px]">
-                <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4 shadow-2xs">
-                    <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div class="rounded-3xl border-2 border-dashed border-slate-200/90 bg-white/70 p-12 sm:p-16 flex flex-col items-center justify-center text-center min-h-[300px]">
+                <div class="w-16 h-16 rounded-2xl bg-teal-50 border border-teal-100/80 flex items-center justify-center text-teal-600 mb-4 shadow-2xs">
+                    <svg class="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                 </div>
                 <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1">
                     @if ($status === 'pending')
-                        Tidak ada antrean pengajuan absen
+                        Tidak Ada Antrean Pengajuan Absen
                     @elseif ($status === 'approved')
-                        Belum ada riwayat pengajuan disetujui
+                        Belum Ada Riwayat Pengajuan Disetujui
                     @elseif ($status === 'rejected')
-                        Belum ada riwayat pengajuan ditolak
+                        Belum Ada Riwayat Pengajuan Ditolak
                     @else
-                        Tidak ada data pengajuan yang ditemukan
+                        Tidak Ada Data Pengajuan Ditemukan
                     @endif
                 </h3>
-                <p class="text-xs sm:text-sm text-slate-400 max-w-sm">
+                <p class="text-xs sm:text-sm text-slate-500 max-w-sm leading-relaxed">
                     @if ($status === 'pending')
                         Semua pengajuan cuti, izin, dan sakit dari karyawan telah selesai ditinjau.
                     @else
@@ -163,7 +180,7 @@
             </div>
         @else
             <!-- Desktop Table View (hidden md:block) -->
-            <div class="hidden md:block overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xs">
+            <div class="hidden md:block overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-2xs">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
@@ -173,7 +190,7 @@
                                 <th class="py-3.5 px-3">Periode &amp; Durasi</th>
                                 <th class="py-3.5 px-3">Alasan</th>
                                 <th class="py-3.5 px-3">Lampiran / Bukti</th>
-                                <th class="py-3.5 px-3">Status &amp; Tracking</th>
+                                <th class="py-3.5 px-3">Status</th>
                                 <th class="py-3.5 px-4 text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -230,7 +247,7 @@
 
                                     <!-- Periode & Durasi -->
                                     <td class="py-3.5 px-3 whitespace-nowrap">
-                                        <div class="font-medium text-slate-800 flex items-center gap-1.5 font-mono text-[11px]">
+                                        <div class="font-semibold text-slate-800 flex items-center gap-1.5 font-mono text-[11px]">
                                             <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                             <span>{{ $item->start_date->format('d M Y') }}</span>
                                             @if ($item->start_date->ne($item->end_date))
@@ -245,7 +262,7 @@
 
                                     <!-- Alasan Pengajuan -->
                                     <td class="py-3.5 px-3 max-w-xs">
-                                        <p class="text-slate-700 italic text-xs leading-snug line-clamp-2" title="{{ $item->reason }}">
+                                        <p class="text-slate-700 text-xs leading-snug line-clamp-2" title="{{ $item->reason }}">
                                             "{{ $item->reason }}"
                                         </p>
                                     </td>
@@ -255,21 +272,20 @@
                                         @if ($item->attachment_path)
                                             <a href="{{ route('attendance.leaves.attachment', $item) }}" 
                                                target="_blank" 
-                                               class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 hover:bg-teal-100 text-xs font-semibold transition shadow-2xs hover:shadow-xs">
+                                               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-teal-50 hover:bg-teal-100/80 text-teal-700 font-bold border border-teal-200 text-[11px] transition">
                                                 <svg class="w-3.5 h-3.5 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                                <span>Bukti / Surat</span>
-                                                <svg class="w-3 h-3 text-teal-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                <span>Bukti Surat &rarr;</span>
                                             </a>
                                         @else
-                                            <span class="text-slate-400 text-xs italic">&mdash;</span>
+                                            <span class="text-slate-400 text-[11px] italic">Tidak ada lampiran</span>
                                         @endif
                                     </td>
 
-                                    <!-- Status & Tracking -->
+                                    <!-- Status -->
                                     <td class="py-3.5 px-3 whitespace-nowrap">
                                         @if ($isPending)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs animate-pulse">
-                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                                                 Menunggu HRD
                                             </span>
                                         @elseif ($item->status === 'approved')
@@ -318,7 +334,7 @@
                                                     @csrf
                                                     <button type="submit" 
                                                             onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan cuti/izin ini? Saldo cuti akan disesuaikan otomatis.')"
-                                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer">
+                                                            class="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-teal-900/10 active:scale-[0.98] cursor-pointer">
                                                         <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                                         <span>Setujui</span>
                                                     </button>
@@ -335,18 +351,21 @@
                 </div>
             </div>
 
-            <!-- Mobile Card View (md:hidden) -->
+            <!-- Mobile Card View (md:hidden - Modern Clean Mobile Architecture) -->
             <div class="md:hidden space-y-3.5">
                 @foreach ($leaves as $item)
                     @php
                         $emp = $item->user;
                         $isPending = in_array($item->status, ['pending_hrd', 'pending_supervisor']);
                     @endphp
-                    <div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs space-y-3">
+                    <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-xs space-y-3.5 relative overflow-hidden transition-all duration-200">
                         
-                        <!-- Header: Profile & Badges -->
-                        <div class="flex items-start justify-between gap-2.5 pb-2.5 border-b border-slate-100">
-                            <div class="flex items-center gap-2.5 min-w-0">
+                        <!-- Top Accent Highlight -->
+                        <div class="absolute inset-x-0 top-0 h-[3px] {{ $isPending ? 'bg-amber-400' : ($item->status === 'approved' ? 'bg-emerald-500' : 'bg-rose-400') }}"></div>
+
+                        <!-- 1. Header: Profile & Leave Type -->
+                        <div class="flex items-start justify-between gap-2.5 pt-1">
+                            <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-[#155E63] font-black flex items-center justify-center text-xs shrink-0 overflow-hidden shadow-2xs">
                                     @if ($emp?->avatar_url)
                                         <img src="{{ $emp->avatar_url }}" alt="" class="w-full h-full object-cover">
@@ -355,87 +374,115 @@
                                     @endif
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="font-bold text-xs sm:text-sm text-slate-900 truncate">
-                                        {{ $emp?->name }}
-                                        <span class="text-[10px] font-mono text-slate-400">({{ $emp?->employee_code }})</span>
+                                    <div class="font-bold text-sm text-slate-900 truncate flex items-center gap-1.5">
+                                        <span>{{ $emp?->name }}</span>
+                                        <span class="text-[10px] font-mono font-medium text-slate-400">({{ $emp?->employee_code }})</span>
                                     </div>
-                                    <div class="text-[11px] text-teal-700 font-medium truncate mt-0.5">
-                                        {{ $emp?->division ?? '-' }}
+                                    <div class="flex items-center gap-1 text-[11px] text-teal-700 font-semibold truncate mt-0.5">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                                        <span>{{ $emp?->division ?? '-' }}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Badges -->
+                            <!-- Leave Type Badge -->
                             <div class="shrink-0 text-right">
                                 @if ($item->leave_type === 'annual')
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200 shadow-2xs">
                                         Cuti Tahunan
                                     </span>
                                 @elseif ($item->leave_type === 'sick')
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-2xs">
                                         Cuti Sakit
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-2xs">
                                         Izin Khusus
                                     </span>
                                 @endif
                             </div>
                         </div>
 
-                        <!-- Details -->
-                        <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-200/60 text-xs space-y-2">
-                            <div class="flex items-center justify-between text-slate-700 font-mono text-[11px]">
-                                <span class="text-slate-500 font-sans">Periode:</span>
-                                <span class="font-bold text-slate-800">{{ $item->start_date->format('d M') }} &mdash; {{ $item->end_date->format('d M Y') }} ({{ $item->working_days }} hari)</span>
+                        <!-- 2. Structured Content Block -->
+                        <div class="rounded-xl bg-slate-50/80 border border-slate-200/70 p-3 space-y-2.5 text-xs">
+                            <!-- Periode & Durasi -->
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-1.5 text-slate-700 font-mono text-[11px] font-semibold">
+                                    <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>{{ $item->start_date->format('d M') }} &mdash; {{ $item->end_date->format('d M Y') }}</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-lg bg-teal-100/90 text-teal-900 font-bold text-[10px] font-mono shrink-0">
+                                    {{ $item->working_days }} Hari Kerja
+                                </span>
                             </div>
-                            <div class="text-slate-700 italic text-xs">
-                                <span class="text-slate-500 not-italic font-sans text-[11px] block mb-0.5">Alasan:</span>
-                                "{{ $item->reason }}"
+
+                            <!-- Alasan -->
+                            <div class="pt-2 border-t border-slate-200/60">
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">Alasan Pengajuan:</span>
+                                <p class="text-slate-800 text-xs leading-relaxed italic">
+                                    "{{ $item->reason }}"
+                                </p>
                             </div>
+
+                            <!-- Lampiran Surat / Bukti jika ada -->
                             @if ($item->attachment_path)
-                                <div class="pt-1 border-t border-slate-200/60">
+                                <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+                                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Lampiran Bukti:</span>
                                     <a href="{{ route('attendance.leaves.attachment', $item) }}" 
                                        target="_blank" 
-                                       class="inline-flex items-center gap-1 text-teal-700 font-bold hover:underline text-[11px]">
-                                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                        <span>Buka Surat / Bukti Pendukung &rarr;</span>
+                                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-teal-50 text-teal-700 font-bold border border-teal-200/90 text-[11px] shadow-2xs transition">
+                                        <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                        </svg>
+                                        <span>Buka Surat / Bukti &rarr;</span>
                                     </a>
                                 </div>
                             @endif
+
+                            <!-- Diajukan Pada -->
+                            <div class="pt-1.5 border-t border-slate-200/60 flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Diajukan: {{ $item->created_at?->translatedFormat('d M Y, H:i') ?? '-' }} WIB</span>
+                            </div>
                         </div>
 
-                        <!-- Footer: Status & Actions -->
-                        <div class="flex items-center justify-between gap-2 pt-1">
+                        <!-- 3. Footer: Status & Actions -->
+                        <div class="flex items-center justify-between gap-2 pt-0.5">
                             <div>
                                 @if ($isPending)
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                                        Menunggu HRD
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        <span>Menunggu HRD</span>
                                     </span>
                                 @elseif ($item->status === 'approved')
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                        Disetujui
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                        <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                        <span>Disetujui</span>
                                     </span>
                                 @elseif ($item->status === 'rejected')
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
-                                        Ditolak
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                                        <svg class="w-3 h-3 text-rose-600" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <span>Ditolak</span>
                                     </span>
                                 @endif
                             </div>
 
                             @if ($isPending)
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-2">
                                     <button type="button" 
                                             @click="rejectActionUrl = '{{ route('attendance.leaves.reject', $item) }}'; selectedLeaveId = {{ $item->id }}; rejectModalOpen = true"
-                                            class="px-2.5 py-1.5 rounded-lg border border-rose-200 bg-white text-rose-700 text-xs font-bold">
+                                            class="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-700 text-xs font-bold transition active:scale-95 shadow-2xs cursor-pointer">
                                         Tolak
                                     </button>
                                     <form method="POST" action="{{ route('attendance.leaves.approve-hrd', $item) }}">
                                         @csrf
                                         <button type="submit" 
-                                                onclick="return confirm('Setujui pengajuan cuti/izin ini?')"
-                                                class="px-3 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-bold">
+                                                onclick="return confirm('Apakah Anda yakin ingin menyetujui pengajuan cuti/izin ini? Saldo cuti karyawan akan disesuaikan otomatis.')"
+                                                class="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white text-xs font-bold transition shadow-sm shadow-teal-900/10 active:scale-95 cursor-pointer">
                                             Setujui
                                         </button>
                                     </form>
