@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    const SW_VERSION = '2026112409';
+    const SW_VERSION = '2026112410';
     const SW_URL = '/sw.js';
 
     // Firebase Web App Configuration

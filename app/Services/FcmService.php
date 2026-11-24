@@ -250,17 +250,30 @@ class FcmService
             $fcmToken = $tokenRecord->fcm_token;
 
             if ($tokenRecord->platform === 'web') {
-                // Send DATA-ONLY payload with high-priority WebPush headers (Urgency + TTL)
-                // so Android Doze Mode & iOS APNs wake the Service Worker immediately when
-                // the app is closed or screen is off, while sw.js displays it cleanly once.
+                // Include both top-level notification and webpush.notification with Urgency: high
+                // so Android OS & Google Play Services immediately wake up and display the notification
+                // in the lock-screen & status bar even when the PWA/APK is closed or screen is off.
                 $payload = [
                     'message' => [
                         'token' => $fcmToken,
+                        'notification' => [
+                            'title' => (string) $title,
+                            'body' => (string) $body,
+                        ],
                         'data' => $dataPayload,
                         'webpush' => [
                             'headers' => [
                                 'Urgency' => 'high',
                                 'TTL' => '86400',
+                            ],
+                            'notification' => [
+                                'title' => (string) $title,
+                                'body' => (string) $body,
+                                'icon' => url('/assets/logo/icon-192.png'),
+                                'badge' => url('/assets/logo/favicon-32x32.png'),
+                                'tag' => $tag,
+                                'renotify' => true,
+                                'requireInteraction' => true,
                             ],
                             'fcm_options' => [
                                 'link' => (string) $deepLink,
@@ -273,13 +286,15 @@ class FcmService
                     'message' => [
                         'token' => $fcmToken,
                         'notification' => [
-                            'title' => $title,
-                            'body' => $body,
+                            'title' => (string) $title,
+                            'body' => (string) $body,
                         ],
                         'data' => $dataPayload,
                         'android' => [
                             'priority' => 'HIGH',
                             'notification' => [
+                                'title' => (string) $title,
+                                'body' => (string) $body,
                                 'click_action' => (string) $deepLink,
                                 'sound' => 'default',
                                 'channel_id' => 'msn_urgent_channel',

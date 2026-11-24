@@ -1,5 +1,5 @@
-// PT MSN Portal - Unified PWA & Background Web Push Service Worker (v9)
-const CACHE_NAME = 'msn-portal-v9-shell';
+// PT MSN Portal - Unified PWA & Background Web Push Service Worker (v10)
+const CACHE_NAME = 'msn-portal-v10-shell';
 const OFFLINE_ASSETS = [
     '/',
     '/login',
@@ -58,12 +58,13 @@ self.addEventListener('push', (event) => {
 
     const options = {
         body: body,
-        icon: d.icon || n.icon || '/assets/logo/icon-192.png',
-        badge: d.badge || n.badge || '/assets/logo/favicon-32x32.png',
+        icon: n.icon || d.icon || '/assets/logo/icon-192.png',
+        badge: n.badge || d.badge || '/assets/logo/favicon-32x32.png',
         vibrate: [200, 100, 200],
         tag: tag,
         renotify: true,
         silent: false,
+        requireInteraction: true,
         timestamp: Number.isFinite(timestamp) ? timestamp : Date.now(),
         data: {
             deep_link: deepLink,
@@ -71,9 +72,15 @@ self.addEventListener('push', (event) => {
         }
     };
 
-    // Always fulfill userVisibleOnly: true contract so Chrome/Android/iOS never throttle background pushes
+    // Always fulfill userVisibleOnly: true contract and check for deduplication
     event.waitUntil(
-        self.registration.showNotification(title, options)
+        self.registration.getNotifications({ tag: tag }).then((existingNotifications) => {
+            if (existingNotifications && existingNotifications.length > 0) {
+                // If the OS / browser native push service already displayed this notification tag, do not duplicate
+                return;
+            }
+            return self.registration.showNotification(title, options);
+        })
     );
 });
 
