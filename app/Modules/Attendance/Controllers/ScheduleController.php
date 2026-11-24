@@ -257,7 +257,7 @@ class ScheduleController extends Controller
             $allActiveUsers = User::query()
                 ->where('is_active', true)
                 ->orderBy('name')
-                ->get(['id', 'name', 'employee_code', 'division', 'avatar']);
+                ->get(['id', 'name', 'employee_code', 'nik', 'division', 'foto']);
 
             return view('attendance.schedules', [
                 'viewMode' => 'month',

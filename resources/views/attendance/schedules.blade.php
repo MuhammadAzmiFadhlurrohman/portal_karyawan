@@ -1475,9 +1475,9 @@
                     return [
                         'id' => (int) $u->id,
                         'name' => (string) $u->name,
-                        'nik' => (string) ($u->employee_code ?: ('KR' . str_pad($u->id, 5, '0', STR_PAD_LEFT))),
+                        'nik' => (string) ($u->employee_code ?: ($u->nik ?: ('KR' . str_pad($u->id, 5, '0', STR_PAD_LEFT)))),
                         'division' => (string) ($u->division ?: 'Umum'),
-                        'avatar' => $u->avatar ? asset('storage/' . $u->avatar) : null,
+                        'avatar' => $u->avatar_url,
                     ];
                 })->values();
 
