@@ -1118,9 +1118,7 @@
     <!-- ============================================================== -->
     @php
         $navTabActive = 'home';
-        if (request()->routeIs('attendance.leaves.approvals*')) {
-            $navTabActive = 'pengajuan';
-        } elseif (request()->routeIs('attendance.*')) {
+        if (request()->routeIs('attendance.*')) {
             $navTabActive = 'presensi';
         } elseif (request()->routeIs('gomsn.pengajuan.*')) {
             $navTabActive = 'pengajuan';
@@ -1132,12 +1130,8 @@
             $navTabActive = 'home';
         }
 
-        $mobilePengajuanUrl = $isHrdRole 
-            ? route('attendance.leaves.approvals') 
-            : ($navCanApprovePengajuan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index'));
-        $mobilePengajuanBadge = $isHrdRole 
-            ? ($navPendingLeaveHrdCount ?? 0) 
-            : ($navPendingAtasanCount ?? 0);
+        $mobilePengajuanUrl = $navCanApprovePengajuan ? route('gomsn.pengajuan.approvals') : route('gomsn.pengajuan.index');
+        $mobilePengajuanBadge = $navPendingAtasanCount ?? 0;
     @endphp
 
     <div class="md:hidden fixed bottom-3 inset-x-3 sm:inset-x-6 max-w-md mx-auto z-40 pointer-events-none pt-4"
