@@ -243,6 +243,22 @@ class ScheduleController extends Controller
             $daysInMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->daysInMonth;
             $conflicts = $scheduleService->detectRestConflicts($year, $month);
 
+            $piketSchedules = MonthlySchedule::query()
+                ->with(['user', 'shift', 'officeLocation'])
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->where(function ($q) {
+                    $q->where('is_locked', true)
+                        ->orWhereHas('shift', fn ($sq) => $sq->where('is_piket', true)->orWhereIn('code', ['PK', 'PA']));
+                })
+                ->orderBy('date')
+                ->get();
+
+            $allActiveUsers = User::query()
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'employee_code', 'division', 'avatar']);
+
             return view('attendance.schedules', [
                 'viewMode' => 'month',
                 'year' => $year,
@@ -251,6 +267,8 @@ class ScheduleController extends Controller
                 'division' => $division,
                 'daysInMonth' => $daysInMonth,
                 'users' => $users,
+                'allActiveUsers' => $allActiveUsers,
+                'piketSchedules' => $piketSchedules,
                 'totalUsersCount' => $users->count(),
                 'registeredCount' => $registeredCount,
                 'unregisteredCount' => $unregisteredCount,
@@ -493,6 +511,124 @@ class ScheduleController extends Controller
             'status',
             "Upload piket berhasil: {$result['imported']} dari {$result['total']} jadwal piket berhasil diproses dan dikunci."
         );
+    }
+
+    /**
+     * Store visual manual piket assignments (§5.2).
+     */
+    public function storePiket(Request $request): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($this->canManageSchedule($actor), 403);
+
+        $validated = $request->validate([
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['exists:users,id'],
+            'dates' => ['required', 'array', 'min:1'],
+            'dates.*' => ['date'],
+            'shift_id' => ['required', 'exists:shifts,id'],
+            'office_location_id' => ['nullable', 'exists:office_locations,id'],
+            'notes' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $shift = Shift::findOrFail($validated['shift_id']);
+        $officeId = $validated['office_location_id'] ?? (OfficeLocation::where('is_active', true)->first()?->id);
+        $notes = ! empty($validated['notes']) ? trim($validated['notes']) : "Jadwal Piket ({$shift->name})";
+
+        $count = 0;
+        foreach ($validated['user_ids'] as $userId) {
+            foreach ($validated['dates'] as $dateStr) {
+                try {
+                    $date = Carbon::parse($dateStr)->toDateString();
+                } catch (\Exception $e) {
+                    continue;
+                }
+
+                MonthlySchedule::query()->updateOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'date' => $date,
+                    ],
+                    [
+                        'shift_id' => $shift->id,
+                        'office_location_id' => $officeId,
+                        'is_locked' => true,
+                        'notes' => $notes,
+                        'updated_by' => $actor->id,
+                        'created_by' => $actor->id,
+                    ]
+                );
+                $count++;
+            }
+        }
+
+        AuditLogger::record(
+            action: 'schedule.piket_assigned',
+            newValues: [
+                'users_count' => count($validated['user_ids']),
+                'dates_count' => count($validated['dates']),
+                'total_slots' => $count,
+                'shift_code' => $shift->code,
+                'shift_name' => $shift->name,
+            ],
+            reason: "Penugasan visual {$count} slot jadwal piket shift {$shift->name}",
+            actorId: $actor->id
+        );
+
+        return back()->with('status', "Berhasil menambahkan {$count} penugasan jadwal piket ({$shift->name}) secara langsung.");
+    }
+
+    /**
+     * Delete / Cancel a single piket assignment.
+     */
+    public function destroyPiket(MonthlySchedule $schedule, Request $request): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($this->canManageSchedule($actor), 403);
+
+        $userName = $schedule->user?->name ?? 'Karyawan';
+        $dateStr = $schedule->date->format('d/m/Y');
+
+        $dayOfWeek = $schedule->date->dayOfWeek; // 0 = Sun, 6 = Sat
+        $isWeekend = in_array($dayOfWeek, [0, 6], true);
+        $isHoliday = NationalHoliday::query()->whereDate('date', $schedule->date)->exists();
+
+        if ($isWeekend || $isHoliday) {
+            $offShift = Shift::query()->where('is_day_off', true)->orWhere('code', 'L')->first();
+            if ($offShift) {
+                $schedule->update([
+                    'shift_id' => $offShift->id,
+                    'is_locked' => false,
+                    'notes' => 'Piket dibatalkan',
+                    'updated_by' => $actor->id,
+                ]);
+            } else {
+                $schedule->delete();
+            }
+        } else {
+            $pShift = Shift::query()->where('code', 'P')->first();
+            if ($pShift) {
+                $schedule->update([
+                    'shift_id' => $pShift->id,
+                    'is_locked' => false,
+                    'notes' => 'Piket dibatalkan',
+                    'updated_by' => $actor->id,
+                ]);
+            } else {
+                $schedule->delete();
+            }
+        }
+
+        AuditLogger::record(
+            action: 'schedule.piket_deleted',
+            auditable: $schedule,
+            reason: "Pembatalan jadwal piket {$userName} pada {$dateStr}",
+            actorId: $actor->id
+        );
+
+        return back()->with('status', "Jadwal piket {$userName} tanggal {$dateStr} berhasil dibatalkan.");
     }
 
     /**

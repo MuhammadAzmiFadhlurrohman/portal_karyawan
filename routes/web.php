@@ -94,6 +94,8 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/attendance/schedules/holidays/{holiday}', [ScheduleController::class, 'deleteHoliday'])->name('attendance.schedules.holidays.destroy');
     Route::get('/attendance/schedules/template', [ScheduleController::class, 'downloadTemplate'])->name('attendance.schedules.template');
     Route::post('/attendance/schedules/upload-piket', [ScheduleController::class, 'uploadPiket'])->name('attendance.schedules.upload-piket');
+    Route::post('/attendance/schedules/piket', [ScheduleController::class, 'storePiket'])->name('attendance.schedules.piket.store');
+    Route::delete('/attendance/schedules/piket/{schedule}', [ScheduleController::class, 'destroyPiket'])->name('attendance.schedules.piket.destroy');
     Route::post('/attendance/schedules/preview', [ScheduleController::class, 'previewGenerate'])->name('attendance.schedules.preview');
     Route::post('/attendance/schedules/commit', [ScheduleController::class, 'commitGenerate'])->name('attendance.schedules.commit');
     Route::post('/attendance/schedules/sync-reminders', [ScheduleController::class, 'syncReminders'])->name('attendance.schedules.sync-reminders');
