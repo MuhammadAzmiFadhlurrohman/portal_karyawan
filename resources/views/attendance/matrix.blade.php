@@ -9,130 +9,10 @@
                 $initialCells[$u->id . '_' . $dt] = $s?->shift?->code ?? '';
             }
         }
+        $weekendDates = collect($daysData)->where('isWeekend', true)->pluck('date')->values();
     @endphp
 
-    <div x-data="{
-        cells: {{ json_encode($initialCells) }},
-        dirtyCells: {},
-        activeStamp: null,
-        isSaving: false,
-        saveStatus: '',
-        searchQuery: '',
-        divisionFilter: '{{ $division ?? 'all' }}',
-        popover: { open: false, userId: null, userName: '', date: '', dayName: '', x: 0, y: 0 },
-
-        get dirtyCount() {
-            return Object.keys(this.dirtyCells).length;
-        },
-
-        onCellClick(userId, userName, dateStr, dayName, event) {
-            if (this.activeStamp !== null) {
-                this.updateCell(userId, dateStr, this.activeStamp);
-                return;
-            }
-
-            const rect = event.currentTarget.getBoundingClientRect();
-            this.popover = {
-                open: true,
-                userId: userId,
-                userName: userName,
-                date: dateStr,
-                dayName: dayName,
-                x: Math.min(window.innerWidth - 220, Math.max(10, rect.left - 50)),
-                y: rect.bottom + window.scrollY + 6
-            };
-        },
-
-        selectFromPopover(shiftCode) {
-            if (this.popover.userId && this.popover.date) {
-                this.updateCell(this.popover.userId, this.popover.date, shiftCode);
-            }
-            this.popover.open = false;
-        },
-
-        updateCell(userId, dateStr, shiftCode) {
-            const key = userId + '_' + dateStr;
-            this.cells[key] = shiftCode;
-            this.dirtyCells[key] = { user_id: userId, date: dateStr, shift_code: shiftCode };
-            this.saveSingleCell(userId, dateStr, shiftCode);
-        },
-
-        saveSingleCell(userId, dateStr, shiftCode) {
-            this.isSaving = true;
-            this.saveStatus = 'Menyimpan...';
-            fetch('{{ route('attendance.schedules.matrix.save') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    user_id: userId,
-                    date: dateStr,
-                    shift_code: shiftCode
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.isSaving = false;
-                delete this.dirtyCells[userId + '_' + dateStr];
-                this.saveStatus = 'Tersimpan otomatis ✔';
-                setTimeout(() => { if (this.saveStatus === 'Tersimpan otomatis ✔') this.saveStatus = ''; }, 2500);
-            })
-            .catch(() => {
-                this.isSaving = false;
-                this.saveStatus = 'Gagal menyimpan!';
-            });
-        },
-
-        saveAllDirty() {
-            const payload = Object.values(this.dirtyCells);
-            if (payload.length === 0) return;
-            this.isSaving = true;
-            this.saveStatus = 'Menyimpan semua perubahan...';
-            fetch('{{ route('attendance.schedules.matrix.save') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ cells: payload })
-            })
-            .then(res => res.json())
-            .then(data => {
-                this.isSaving = false;
-                this.dirtyCells = {};
-                this.saveStatus = 'Semua perubahan berhasil disimpan ✔';
-                setTimeout(() => { this.saveStatus = ''; }, 3000);
-            })
-            .catch(() => {
-                this.isSaving = false;
-                this.saveStatus = 'Gagal menyimpan perubahan!';
-            });
-        },
-
-        stampWeekendVisible(shiftCode) {
-            if (!confirm(`Terapkan shift '${shiftCode}' untuk semua hari Sabtu & Minggu karyawan yang tampil?`)) return;
-            @foreach ($daysData as $d)
-                @if ($d['isWeekend'])
-                    document.querySelectorAll('[data-date=\"{{ $d['date'] }}\"]').forEach(el => {
-                        const uid = el.getAttribute('data-user-id');
-                        if (uid && el.closest('tr').style.display !== 'none') {
-                            this.cells[uid + '_{{ $d['date'] }}'] = shiftCode;
-                            this.dirtyCells[uid + '_{{ $d['date'] }}'] = {
-                                user_id: parseInt(uid),
-                                date: '{{ $d['date'] }}',
-                                shift_code: shiftCode
-                            };
-                        }
-                    });
-                @endif
-            @endforeach
-            this.saveAllDirty();
-        }
-    }" class="space-y-4 pb-16">
+    <div x-data="scheduleMatrix()" class="space-y-4 pb-16">
 
         <!-- Top Header & Navigation -->
         <div class="rounded-3xl bg-gradient-to-r from-[#155E63] via-[#0f4d51] to-[#0c3c3f] p-5 sm:p-7 text-white shadow-xl">
@@ -235,7 +115,7 @@
                         <span>🖌️ Kuas Cepat:</span>
                     </span>
 
-                    <button type="button" @click="activeStamp = (activeStamp === null ? null : null)"
+                    <button type="button" @click="activeStamp = null"
                             :class="activeStamp === null ? 'bg-slate-800 text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
                             class="px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer">
                         Mode Normal
@@ -425,7 +305,7 @@
         <!-- Floating Popover Shift Picker (When click cell in normal mode) -->
         <div x-show="popover.open" x-cloak
              @click.away="popover.open = false"
-             :style="`position: absolute; left: ${popover.x}px; top: ${popover.y}px; z-index: 60;`"
+             :style="'position: absolute; left: ' + popover.x + 'px; top: ' + popover.y + 'px; z-index: 60;'"
              class="bg-white rounded-2xl border border-slate-200 shadow-2xl p-3 w-56 space-y-2 text-xs">
             <div class="border-b border-slate-100 pb-1.5 flex items-center justify-between">
                 <div>
@@ -480,4 +360,131 @@
         </div>
 
     </div>
+
+    <!-- Script Component Function -->
+    <script>
+        function scheduleMatrix() {
+            return {
+                cells: {!! json_encode($initialCells) !!},
+                weekendDates: {!! json_encode($weekendDates) !!},
+                dirtyCells: {},
+                activeStamp: null,
+                isSaving: false,
+                saveStatus: '',
+                searchQuery: '',
+                popover: { open: false, userId: null, userName: '', date: '', dayName: '', x: 0, y: 0 },
+
+                get dirtyCount() {
+                    return Object.keys(this.dirtyCells).length;
+                },
+
+                onCellClick(userId, userName, dateStr, dayName, event) {
+                    if (this.activeStamp !== null) {
+                        this.updateCell(userId, dateStr, this.activeStamp);
+                        return;
+                    }
+
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    this.popover = {
+                        open: true,
+                        userId: userId,
+                        userName: userName,
+                        date: dateStr,
+                        dayName: dayName,
+                        x: Math.min(window.innerWidth - 240, Math.max(10, rect.left - 50)),
+                        y: rect.bottom + window.scrollY + 6
+                    };
+                },
+
+                selectFromPopover(shiftCode) {
+                    if (this.popover.userId && this.popover.date) {
+                        this.updateCell(this.popover.userId, this.popover.date, shiftCode);
+                    }
+                    this.popover.open = false;
+                },
+
+                updateCell(userId, dateStr, shiftCode) {
+                    const key = userId + '_' + dateStr;
+                    this.cells[key] = shiftCode;
+                    this.dirtyCells[key] = { user_id: userId, date: dateStr, shift_code: shiftCode };
+                    this.saveSingleCell(userId, dateStr, shiftCode);
+                },
+
+                saveSingleCell(userId, dateStr, shiftCode) {
+                    this.isSaving = true;
+                    this.saveStatus = 'Menyimpan...';
+                    fetch('{{ route('attendance.schedules.matrix.save') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: userId,
+                            date: dateStr,
+                            shift_code: shiftCode
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isSaving = false;
+                        delete this.dirtyCells[userId + '_' + dateStr];
+                        this.saveStatus = 'Tersimpan otomatis ✔';
+                        setTimeout(() => { if (this.saveStatus === 'Tersimpan otomatis ✔') this.saveStatus = ''; }, 2500);
+                    })
+                    .catch(() => {
+                        this.isSaving = false;
+                        this.saveStatus = 'Gagal menyimpan!';
+                    });
+                },
+
+                saveAllDirty() {
+                    const payload = Object.values(this.dirtyCells);
+                    if (payload.length === 0) return;
+                    this.isSaving = true;
+                    this.saveStatus = 'Menyimpan semua perubahan...';
+                    fetch('{{ route('attendance.schedules.matrix.save') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ cells: payload })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isSaving = false;
+                        this.dirtyCells = {};
+                        this.saveStatus = 'Semua perubahan berhasil disimpan ✔';
+                        setTimeout(() => { this.saveStatus = ''; }, 3000);
+                    })
+                    .catch(() => {
+                        this.isSaving = false;
+                        this.saveStatus = 'Gagal menyimpan perubahan!';
+                    });
+                },
+
+                stampWeekendVisible(shiftCode) {
+                    if (!confirm("Terapkan shift '" + shiftCode + "' untuk semua hari Sabtu & Minggu karyawan yang tampil?")) return;
+                    this.weekendDates.forEach(dStr => {
+                        document.querySelectorAll('[data-date="' + dStr + '"]').forEach(el => {
+                            const uid = el.getAttribute('data-user-id');
+                            const row = el.closest('tr');
+                            if (uid && row && row.style.display !== 'none') {
+                                this.cells[uid + '_' + dStr] = shiftCode;
+                                this.dirtyCells[uid + '_' + dStr] = {
+                                    user_id: parseInt(uid),
+                                    date: dStr,
+                                    shift_code: shiftCode
+                                };
+                            }
+                        });
+                    });
+                    this.saveAllDirty();
+                }
+            };
+        }
+    </script>
 </x-layouts.app>
