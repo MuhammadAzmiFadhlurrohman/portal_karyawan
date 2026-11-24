@@ -186,39 +186,6 @@
             </div>
         </div>
 
-        <!-- Feedback Alert Messages -->
-        @if (session('status'))
-            <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                    <span class="font-semibold">{{ session('status') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800 p-1 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-xs">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </div>
-                    <span class="font-semibold">{{ session('error') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" class="text-rose-500 hover:text-rose-800 p-1 cursor-pointer">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-        @endif
-
         <!-- Sleek Compact Metrics Row -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
             <!-- 1. Total Karyawan Aktif -->
@@ -590,99 +557,110 @@
             <!-- RIGHT COLUMN: Authentic High-Fidelity Smartphone Mockup (5 of 12 cols on desktop) -->
             <div :class="mobileTab === 'preview' ? 'block' : 'hidden lg:block'" class="lg:col-span-5 lg:sticky lg:top-6 space-y-3">
                 
-                <!-- Mockup Wrapper Box -->
-                <div class="bg-gradient-to-b from-slate-900 to-slate-950 rounded-3xl p-4 sm:p-5 text-white shadow-xl border border-slate-800">
+                <!-- Mockup Wrapper Box (Explicit High-Contrast Dark Card) -->
+                <div class="rounded-3xl p-4 sm:p-5 shadow-xl border select-none"
+                     style="background: #090f1d; border-color: #1e293b; color: #f8fafc;">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-teal-300 font-mono">Live Push Preview</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50"></span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider font-mono" style="color: #2dd4bf;">Live Push Preview</span>
                         </div>
-                        <span class="text-[10px] text-slate-400">Lock-Screen Simulasi</span>
+                        <span class="text-[11px] font-medium" style="color: #94a3b8;">Lock-Screen Simulasi</span>
                     </div>
 
-                    <!-- REALISTIC SMARTPHONE CHASSIS (Fixed proportion, never stretched) -->
-                    <div class="relative mx-auto w-full max-w-[290px] sm:max-w-[310px] bg-slate-950 rounded-[2.8rem] p-3 border-[5px] border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
+                    <!-- REALISTIC SMARTPHONE CHASSIS (Fixed proportion, deep titanium border) -->
+                    <div class="relative mx-auto w-full max-w-[290px] sm:max-w-[315px] rounded-[2.8rem] p-3 border-[5px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] ring-1"
+                         style="background: #020617; border-color: #334155; ring-color: rgba(255,255,255,0.15);">
                         
-                        <!-- Top Dynamic Island & Speaker -->
-                        <div class="relative z-20 flex items-center justify-between px-4 pt-1 pb-2 text-[10px] text-slate-300">
-                            <span class="font-bold text-white text-[11px] tracking-tight">09:41</span>
+                        <!-- Top Dynamic Island & Status Bar -->
+                        <div class="relative z-20 flex items-center justify-between px-3.5 pt-1.5 pb-2 text-[10px]"
+                             style="color: #cbd5e1;">
+                            <span class="font-bold text-[11px] tracking-tight font-sans" style="color: #ffffff;">09:41</span>
                             
                             <!-- Dynamic Island Pill -->
-                            <div class="w-20 h-4.5 bg-black rounded-full flex items-center justify-end px-2 gap-1.5 shadow-inner">
-                                <span class="w-1.5 h-1.5 rounded-full bg-slate-800 border border-slate-700"></span>
+                            <div class="w-20 h-4.5 rounded-full flex items-center justify-end px-2 gap-1.5 shadow-inner"
+                                 style="background: #000000; border: 1px solid #1e293b;">
+                                <span class="w-1.5 h-1.5 rounded-full" style="background: #1e293b;"></span>
                             </div>
 
-                            <div class="flex items-center gap-1 text-[10px]">
-                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.64 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
-                                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
+                            <div class="flex items-center gap-1.5 text-[10px]" style="color: #ffffff;">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.64 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
                             </div>
                         </div>
 
-                        <!-- Screen Area (Wallpaper Background) -->
-                        <div class="rounded-[2.2rem] bg-gradient-to-br from-[#04282e] via-[#091b24] to-[#020d13] p-3.5 min-h-[440px] flex flex-col justify-between relative overflow-hidden border border-white/5 select-none">
+                        <!-- Screen Area (Vibrant Deep Aurora Teal Lock Screen Wallpaper) -->
+                        <div class="rounded-[2.2rem] p-4 min-h-[440px] flex flex-col justify-between relative overflow-hidden select-none"
+                             style="background: radial-gradient(circle at 50% 12%, #0e3f46 0%, #072229 45%, #02090e 100%) !important; border: 1px solid rgba(255, 255, 255, 0.1);">
                             
-                            <!-- Subtle Aurora Background Lights -->
-                            <div class="absolute -top-12 -right-12 w-40 h-40 bg-teal-500/15 rounded-full blur-2xl pointer-events-none"></div>
-                            <div class="absolute bottom-10 -left-12 w-40 h-40 bg-cyan-500/15 rounded-full blur-2xl pointer-events-none"></div>
+                            <!-- Aurora Lighting Orbs -->
+                            <div class="absolute -top-12 -right-12 w-44 h-44 rounded-full blur-2xl pointer-events-none" style="background: rgba(20, 184, 166, 0.25);"></div>
+                            <div class="absolute bottom-10 -left-12 w-44 h-44 rounded-full blur-2xl pointer-events-none" style="background: rgba(6, 182, 212, 0.25);"></div>
 
-                            <!-- Lock Screen Clock Header -->
+                            <!-- Lock Screen Clock Header (High Contrast & Sharp) -->
                             <div class="relative z-10 text-center pt-2">
-                                <div class="w-3.5 h-3.5 mx-auto mb-1 text-slate-400">
-                                    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                                <div class="w-4 h-4 mx-auto mb-1 flex items-center justify-center" style="color: #94a3b8;">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
                                 </div>
-                                <span class="text-4xl font-extralight text-white tracking-tight">09:41</span>
-                                <p class="text-[10px] text-teal-200/90 font-medium mt-0.5">Selasa, 24 November</p>
+                                <span class="text-4xl font-extralight tracking-tight block font-sans" style="color: #ffffff; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);">09:41</span>
+                                <p class="text-[11px] font-semibold mt-1 tracking-wide" style="color: #5eead4; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);">Selasa, 24 November</p>
                             </div>
 
-                            <!-- Push Notification Glass Banner -->
-                            <div class="relative z-10 my-auto p-3.5 rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl border text-slate-900 transition-all duration-200"
+                            <!-- Push Notification Glass Banner (Super Crisp White Card) -->
+                            <div class="relative z-10 my-auto p-3.5 rounded-2xl transition-all duration-200"
+                                 style="background: #ffffff !important; box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.15); border: 1px solid rgba(226, 232, 240, 0.9);"
                                  :class="bannerBorderColor">
                                 
                                 <!-- App Header in Banner -->
                                 <div class="flex items-center justify-between gap-2 mb-2">
                                     <div class="flex items-center gap-1.5 min-w-0">
                                         <img src="{{ asset('assets/logo/icon-192.png') }}" class="w-4.5 h-4.5 rounded-md shadow-2xs shrink-0" alt="Logo">
-                                        <span class="font-bold text-[10px] text-slate-800 tracking-tight">PORTAL PT MSN</span>
+                                        <span class="font-bold text-[10px] tracking-tight font-sans" style="color: #0f172a;">PORTAL PT MSN</span>
                                     </div>
                                     <div class="flex items-center gap-1 shrink-0">
                                         <span :class="badgeColorClass" class="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow-2xs" x-text="badgeLabel"></span>
-                                        <span class="text-[9px] text-slate-400">baru saja</span>
+                                        <span class="text-[9px]" style="color: #64748b;">baru saja</span>
                                     </div>
                                 </div>
 
                                 <!-- Notification Content -->
                                 <div class="space-y-1">
-                                    <h4 class="font-bold text-xs text-slate-900 leading-snug line-clamp-2"
+                                    <h4 class="font-bold text-xs leading-snug line-clamp-2"
+                                        style="color: #0f172a;"
                                         x-text="form.title ? form.title : 'Judul Notifikasi Akan Muncul Disini'"></h4>
-                                    <p class="text-[11px] text-slate-600 leading-relaxed line-clamp-3"
+                                    <p class="text-[11px] leading-relaxed line-clamp-3"
+                                       style="color: #334155;"
                                        x-text="form.body ? form.body : 'Tuliskan pesan notifikasi pada form di sebelah kiri untuk melihat simulasi tampilan langsung di layar ponsel...'"></p>
                                 </div>
 
                                 <!-- Deep Link Action Chip -->
-                                <div x-show="form.link" class="mt-2 pt-2 border-t border-slate-200/70 flex items-center gap-1 text-[9px] text-teal-700 font-semibold font-mono truncate">
-                                    <svg class="w-3 h-3 text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                <div x-show="form.link" class="mt-2 pt-2 border-t flex items-center gap-1 text-[9px] font-semibold font-mono truncate"
+                                     style="border-color: #f1f5f9; color: #0f766e;">
+                                    <svg class="w-3 h-3 shrink-0" style="color: #0d9488;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     <span class="truncate" x-text="'Buka: ' + form.link"></span>
                                 </div>
                             </div>
 
-                            <!-- Target Summary Chip at Bottom -->
+                            <!-- Target Summary Chip at Bottom (Solid Dark Frosted Capsule) -->
                             <div class="relative z-10 pt-2 text-center">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-[9px] font-medium border border-white/15 backdrop-blur-xs">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0"></span>
-                                    <span class="truncate" x-text="'Target: ' + targetSummaryText"></span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-medium"
+                                      style="background: rgba(15, 23, 42, 0.75); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                                    <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: #2dd4bf;"></span>
+                                    <span class="truncate max-w-[210px]" x-text="'Target: ' + targetSummaryText"></span>
                                 </span>
                             </div>
                         </div>
 
                         <!-- Bottom Home Indicator Bar -->
-                        <div class="w-24 h-1 bg-white/40 rounded-full mx-auto mt-2.5 mb-0.5"></div>
+                        <div class="w-24 h-1 rounded-full mx-auto mt-2.5 mb-0.5" style="background: rgba(255, 255, 255, 0.45);"></div>
                     </div>
                 </div>
 
                 <!-- Info Help Box -->
-                <div class="p-3 rounded-2xl bg-teal-50/80 border border-teal-200/80 text-[11px] text-teal-900 flex items-start gap-2.5">
-                    <svg class="w-4 h-4 text-teal-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <p class="leading-relaxed text-teal-800">
+                <div class="p-3.5 rounded-2xl text-[11px] flex items-start gap-2.5"
+                     style="background: #f0fdfa; border: 1px solid #99f6e4; color: #115e59;">
+                    <svg class="w-4 h-4 shrink-0 mt-0.5" style="color: #0d9488;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="leading-relaxed" style="color: #115e59;">
                         Notifikasi dikirimkan langsung melalui <strong>Google FCM v1</strong> dengan prioritas tinggi. Pesan seketika muncul di lock-screen ponsel karyawan meskipun aplikasi sedang tertutup.
                     </p>
                 </div>

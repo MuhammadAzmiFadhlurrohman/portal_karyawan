@@ -69,14 +69,22 @@
                         </div>
                     </div>
 
+                    <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-[11px] leading-relaxed">
+                        <strong class="text-slate-800">💡 Ingin tetap di Safari tanpa instal?</strong>
+                        <p class="mt-0.5">Anda tetap dapat menggunakan seluruh fitur portal secara normal di Safari. Seluruh pemberitahuan dapat Anda pantau langsung melalui ikon <strong>Lonceng Notifikasi</strong> di bilah atas portal saat website dibuka.</p>
+                    </div>
+
                     <p class="text-[10px] text-slate-400 text-center pt-0.5">
-                        * Memerlukan iOS 16.4 atau lebih baru pada iPhone Anda.
+                        * Fitur Push Layar Kunci iPhone memerlukan iOS 16.4+ dan ditambahkan ke Layar Utama sesuai regulasi Apple.
                     </p>
                 </div>
             `,
             showCloseButton: true,
+            showCancelButton: true,
             confirmButtonColor: '#155E63',
-            confirmButtonText: 'Saya Mengerti, Terima Kasih',
+            confirmButtonText: 'Tambah ke Layar Utama',
+            cancelButtonColor: '#64748b',
+            cancelButtonText: 'Tetap Buka di Safari',
             customClass: {
                 popup: 'rounded-3xl shadow-2xl border border-slate-200'
             }
