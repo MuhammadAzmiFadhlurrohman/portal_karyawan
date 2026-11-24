@@ -31,17 +31,29 @@ Artisan::command('leave:sync {--date=}', function (LeaveService $leaveService): 
     );
 })->purpose('Daily idempotent Alpa detection and optional conversion to annual leave with 3-workday dispute window (§5.4)');
 
-Artisan::command('attendance:shift-reminders {--now=} {--user=} {--force}', function (ScheduleService $scheduleService): void {
+Artisan::command('attendance:shift-reminders {--now=} {--user=} {--force} {--test}', function (ScheduleService $scheduleService): void {
     $officeNow = $this->option('now')
         ? Carbon::parse((string) $this->option('now'), 'Asia/Jakarta')
         : now('Asia/Jakarta');
 
     $force = (bool) $this->option('force');
+    $test = (bool) $this->option('test');
     $userId = $this->option('user') ? (int) $this->option('user') : null;
 
-    $result = $scheduleService->sendShiftReminders($officeNow, $force, $userId);
+    $result = $scheduleService->sendShiftReminders($officeNow, $force, $userId, $test);
 
+    $this->line("Waktu evaluasi: {$officeNow->format('Y-m-d H:i:s')} WIB | Jadwal hari ini ditemukan: {$result['total_schedules']}");
+    if (! empty($result['details'])) {
+        foreach ($result['details'] as $detail) {
+            $this->line("  ✓ [{$detail['type']}] {$detail['user_name']} ({$detail['shift']} jam {$detail['time']})");
+        }
+    }
     $this->info("Shift reminder sync completed: {$result['total_notified']} notification(s) ({$result['clock_in_reminders']} masuk, {$result['clock_out_reminders']} pulang).");
+    if ($result['total_notified'] === 0 && ! $test) {
+        $this->comment("Tips: Notifikasi masuk dikirim 1 jam sebelum shift (misal 07:15 untuk shift 08:15).");
+        $this->comment("Gunakan opsi --test untuk uji coba kirim langsung sekarang ke semua karyawan/user:");
+        $this->comment("  php artisan attendance:shift-reminders --test");
+    }
 })->purpose('Send shift reminders 1h before clock-in and 20m before clock-out (§5.9)');
 
 Artisan::command('ticket:escalate-unassigned', function (): void {

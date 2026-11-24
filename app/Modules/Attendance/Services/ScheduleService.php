@@ -524,7 +524,7 @@ class ScheduleService
      *   details: array<int, array<string, mixed>>
      * }
      */
-    public function sendShiftReminders(?Carbon $officeNow = null, bool $force = false, ?int $userId = null): array
+    public function sendShiftReminders(?Carbon $officeNow = null, bool $force = false, ?int $userId = null, bool $test = false): array
     {
         $now = $officeNow ? $officeNow->copy()->setTimezone('Asia/Jakarta') : Carbon::now('Asia/Jakarta');
         $todayStr = $now->toDateString();
@@ -569,7 +569,7 @@ class ScheduleService
                 ->whereDate('end_date', '>=', $todayStr)
                 ->exists();
 
-            if ($onApprovedLeave) {
+            if ($onApprovedLeave && ! $test) {
                 continue;
             }
 
@@ -580,11 +580,14 @@ class ScheduleService
             $minsToEnd = $now->diffInMinutes($shiftEnd, false);
             $shiftName = $schedule->isCustomHours() ? 'Custom Jam Kerja' : $shift->name;
 
-            // 1. CLOCK-IN REMINDER: 1 jam sebelum masuk shift (window 50 - 65 menit, atau jika force <= 75 & >= 0)
-            $isClockInWindow = $force ? ($minsToStart >= 0 && $minsToStart <= 75) : ($minsToStart >= 50 && $minsToStart <= 65);
+            // 1. CLOCK-IN REMINDER: 1 jam sebelum masuk shift (window 50 - 65 menit, atau jika force <= 75 & >= 0, atau bypass jika test)
+            $isClockInWindow = $test
+                ? true
+                : ($force ? ($minsToStart >= 0 && $minsToStart <= 75) : ($minsToStart >= 50 && $minsToStart <= 65));
+
             if ($isClockInWindow) {
-                // Skip if employee already clocked in today
-                $alreadyClockedIn = Attendance::query()
+                // Skip if employee already clocked in today (kecuali mode test)
+                $alreadyClockedIn = ! $test && Attendance::query()
                     ->where('user_id', $user->id)
                     ->whereDate('date', $todayStr)
                     ->whereNotNull('clock_in_at')
@@ -592,7 +595,7 @@ class ScheduleService
 
                 if (! $alreadyClockedIn) {
                     $dedupKey = "shift_reminder_in_{$user->id}_{$todayStr}_{$schedule->id}";
-                    $alreadyNotified = ! $force && (
+                    $alreadyNotified = ! $force && ! $test && (
                         Cache::has($dedupKey) ||
                         NotificationLog::query()
                             ->where('user_id', $user->id)
@@ -746,6 +749,7 @@ class ScheduleService
         }
 
         return [
+            'total_schedules' => $schedules->count(),
             'clock_in_reminders' => $clockInCount,
             'clock_out_reminders' => $clockOutCount,
             'total_notified' => $clockInCount + $clockOutCount,
