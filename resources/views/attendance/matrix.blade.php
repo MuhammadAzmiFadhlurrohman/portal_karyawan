@@ -239,17 +239,9 @@
                                 class="py-2.5 px-2 text-center border-r border-teal-800">
                                 No
                             </th>
-                            <th style="position: sticky; left: 44px; z-index: 50; width: 180px; min-width: 180px; background-color: #134e4a; color: #ffffff;"
-                                class="py-2.5 px-3 text-left border-r border-teal-800">
+                            <th style="position: sticky; left: 44px; z-index: 50; width: 220px; min-width: 220px; background-color: #134e4a; color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.15);"
+                                class="py-2.5 px-3 text-left border-r-2 border-teal-900">
                                 Nama Karyawan
-                            </th>
-                            <th style="position: sticky; left: 224px; z-index: 50; width: 80px; min-width: 80px; background-color: #134e4a; color: #ffffff;"
-                                class="py-2.5 px-2 text-center border-r border-teal-800">
-                                Kode
-                            </th>
-                            <th style="position: sticky; left: 304px; z-index: 50; width: 90px; min-width: 90px; background-color: #134e4a; color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.15);"
-                                class="py-2.5 px-2 text-center border-r-2 border-teal-900">
-                                Divisi
                             </th>
 
                             <!-- Dates columns (1..30/31) -->
@@ -271,8 +263,8 @@
 
                         <!-- Excel Table Header 2: Nama Hari (Kam, Jum, Sab, Min...) -->
                         <tr style="background-color: #0f3d3a; color: #cbd5e1;" class="text-[11px] font-semibold text-center border-b border-slate-300">
-                            <th colspan="4"
-                                style="position: sticky; left: 0; z-index: 50; background-color: #0f3d3a; color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.15);"
+                            <th colspan="2"
+                                style="position: sticky; left: 0; z-index: 50; width: 264px; min-width: 264px; background-color: #0f3d3a; color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.15);"
                                 class="py-1 px-3 text-left border-r-2 border-teal-900 tracking-wider font-bold text-[10px] uppercase">
                                 Hari
                             </th>
@@ -311,36 +303,17 @@
                                 </td>
 
                                 <!-- Nama Karyawan (Freeze column) -->
-                                <td style="position: sticky; left: 44px; z-index: 20; width: 180px; min-width: 180px; background-color: #ffffff;"
-                                    class="py-2 px-3 group-hover:bg-teal-50/60 border-r border-slate-200 text-xs">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <div class="w-6 h-6 rounded-full bg-teal-50 border border-teal-200 text-[#155E63] font-bold text-[10px] flex items-center justify-center shrink-0">
+                                <td style="position: sticky; left: 44px; z-index: 20; width: 220px; min-width: 220px; background-color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.08);"
+                                    class="py-2 px-3 group-hover:bg-teal-50/60 border-r-2 border-slate-300 text-xs">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-7 h-7 rounded-full bg-teal-50 border border-teal-200 text-[#155E63] font-bold text-[10px] flex items-center justify-center shrink-0">
                                             <span>{{ $initials }}</span>
                                         </div>
-                                        <span class="font-bold text-slate-900 truncate" title="{{ $u->name }}">{{ $u->name }}</span>
+                                        <div class="min-w-0">
+                                            <span class="font-bold text-slate-900 truncate block text-xs" title="{{ $u->name }}">{{ $u->name }}</span>
+                                            <span class="text-[10px] font-mono text-slate-400 block">{{ $uCode }}</span>
+                                        </div>
                                     </div>
-                                </td>
-
-                                <!-- Kode Karyawan (Freeze column) -->
-                                <td style="position: sticky; left: 224px; z-index: 20; width: 80px; min-width: 80px; background-color: #ffffff;"
-                                    class="py-2 px-2 text-center group-hover:bg-teal-50/60 border-r border-slate-200">
-                                    <span class="font-mono text-[11px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/80">
-                                        {{ $uCode }}
-                                    </span>
-                                </td>
-
-                                <!-- Divisi (Freeze column) -->
-                                <td style="position: sticky; left: 304px; z-index: 20; width: 90px; min-width: 90px; background-color: #ffffff; box-shadow: 4px 0 8px -2px rgba(0,0,0,0.08);"
-                                    class="py-2 px-2 text-center group-hover:bg-teal-50/60 border-r-2 border-slate-300">
-                                    <span class="text-[11px] font-medium text-slate-600 truncate block max-w-[85px]">
-                                        @if (($division ?? '') === 'teknik_soreang')
-                                            Teknik (Soreang)
-                                        @elseif (($division ?? '') === 'teknik_bandung')
-                                            Teknik (Bandung)
-                                        @else
-                                            {{ $u->division ?: 'NOC' }}
-                                        @endif
-                                    </span>
                                 </td>
 
                                 <!-- Daily Matrix Cells -->
@@ -376,7 +349,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ count($daysData) + 4 }}" class="py-12 text-center text-slate-400 italic">
+                                <td colspan="{{ count($daysData) + 2 }}" class="py-12 text-center text-slate-400 italic">
                                     Tidak ada data karyawan pada filter ini.
                                 </td>
                             </tr>
