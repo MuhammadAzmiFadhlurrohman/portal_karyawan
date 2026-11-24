@@ -632,6 +632,195 @@ class ScheduleController extends Controller
     }
 
     /**
+     * Dedicated Excel-like Matrix View for bulk schedule / piket management.
+     */
+    public function matrix(Request $request): View
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($this->canManageSchedule($actor), 403);
+
+        $now = Carbon::now('Asia/Jakarta');
+        $year = (int) $request->input('year', $now->year);
+        $month = (int) $request->input('month', $now->month);
+        $division = $request->filled('division') && $request->input('division') !== 'all' && $request->input('division') !== 'Semua Divisi'
+            ? (string) $request->input('division')
+            : null;
+
+        $monthNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $allDivisions = User::query()
+            ->whereNotNull('division')
+            ->where('division', '!=', '')
+            ->pluck('division')
+            ->unique()
+            ->sort()
+            ->values();
+
+        $usersQuery = User::query()
+            ->where('is_active', true)
+            ->orderBy('division')
+            ->orderBy('name');
+
+        if ($division) {
+            $usersQuery->where('division', $division);
+        }
+
+        $users = $usersQuery->get(['id', 'name', 'employee_code', 'nik', 'division', 'foto']);
+
+        $shifts = Shift::query()->orderBy('id')->get();
+        $offices = OfficeLocation::query()->where('is_active', true)->orderBy('name')->get();
+
+        $daysInMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta')->daysInMonth;
+        $indonesianDayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+        $holidays = NationalHoliday::query()
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->get()
+            ->keyBy(fn ($h) => $h->date->format('Y-m-d'));
+
+        $daysData = [];
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $cDate = Carbon::createFromDate($year, $month, $d, 'Asia/Jakarta');
+            $dateStr = $cDate->toDateString();
+            $daysData[] = [
+                'day' => $d,
+                'date' => $dateStr,
+                'dayName' => $indonesianDayNames[$cDate->dayOfWeek],
+                'isWeekend' => $cDate->isSaturday() || $cDate->isSunday(),
+                'isSaturday' => $cDate->isSaturday(),
+                'isSunday' => $cDate->isSunday(),
+                'holiday' => $holidays->get($dateStr)?->name,
+            ];
+        }
+
+        $schedules = MonthlySchedule::query()
+            ->with('shift')
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->whereIn('user_id', $users->pluck('id'))
+            ->get()
+            ->groupBy('user_id')
+            ->map(function ($userScheds) {
+                return $userScheds->keyBy(fn ($s) => $s->date->format('Y-m-d'));
+            });
+
+        return view('attendance.matrix', [
+            'year' => $year,
+            'month' => $month,
+            'monthName' => $monthNames[$month] ?? "Bulan {$month}",
+            'division' => $division,
+            'allDivisions' => $allDivisions,
+            'users' => $users,
+            'daysInMonth' => $daysInMonth,
+            'daysData' => $daysData,
+            'schedules' => $schedules,
+            'shifts' => $shifts,
+            'offices' => $offices,
+            'holidays' => $holidays,
+            'canManageSchedule' => true,
+        ]);
+    }
+
+    /**
+     * Save single or batch matrix cell changes.
+     */
+    public function saveMatrix(Request $request): JsonResponse|RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($this->canManageSchedule($actor), 403);
+
+        $defaultOfficeId = OfficeLocation::where('is_active', true)->first()?->id ?? 1;
+        $shiftsByCode = Shift::all()->keyBy(fn ($s) => strtoupper($s->code));
+        $shiftsById = Shift::all()->keyBy('id');
+
+        $cells = $request->input('cells');
+        if (empty($cells) && $request->filled('user_id') && $request->filled('date')) {
+            $cells = [[
+                'user_id' => $request->input('user_id'),
+                'date' => $request->input('date'),
+                'shift_code' => $request->input('shift_code'),
+            ]];
+        }
+
+        if (empty($cells) || ! is_array($cells)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data sel yang dikirim.'], 422);
+        }
+
+        $savedCount = 0;
+        foreach ($cells as $cell) {
+            $userId = (int) ($cell['user_id'] ?? 0);
+            $dateStr = trim($cell['date'] ?? '');
+            $shiftCode = strtoupper(trim($cell['shift_code'] ?? ''));
+
+            if (! $userId || ! $dateStr) {
+                continue;
+            }
+
+            try {
+                $date = Carbon::parse($dateStr)->toDateString();
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            if ($shiftCode === '' || $shiftCode === '-' || $shiftCode === 'CLEAR') {
+                MonthlySchedule::query()
+                    ->where('user_id', $userId)
+                    ->whereDate('date', $date)
+                    ->delete();
+                $savedCount++;
+                continue;
+            }
+
+            $shift = $shiftsByCode->get($shiftCode) ?? $shiftsById->get($shiftCode);
+            if (! $shift) {
+                continue;
+            }
+
+            $isPiket = $shift->is_piket || in_array($shift->code, ['PK', 'PA']);
+
+            MonthlySchedule::query()->updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'date' => $date,
+                ],
+                [
+                    'shift_id' => $shift->id,
+                    'office_location_id' => $defaultOfficeId,
+                    'is_locked' => $isPiket,
+                    'notes' => $isPiket ? "Jadwal Piket ({$shift->name})" : $shift->name,
+                    'updated_by' => $actor->id,
+                    'created_by' => $actor->id,
+                ]
+            );
+            $savedCount++;
+        }
+
+        AuditLogger::record(
+            action: 'schedule.matrix_saved',
+            newValues: ['saved_count' => $savedCount],
+            reason: "Menyimpan {$savedCount} perubahan pada Matriks Jadwal Excel",
+            actorId: $actor->id
+        );
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'saved_count' => $savedCount,
+                'message' => "Berhasil menyimpan {$savedCount} perubahan jadwal.",
+            ]);
+        }
+
+        return back()->with('status', "Berhasil menyimpan {$savedCount} perubahan jadwal matriks.");
+    }
+
+    /**
      * Backward-compatible Preview Generate
      */
     public function previewGenerate(Request $request, ScheduleService $scheduleService): RedirectResponse

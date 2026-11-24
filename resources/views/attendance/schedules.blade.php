@@ -1117,6 +1117,16 @@
                                     </span>
                                 @endif
                             </button>
+
+                            <!-- Matriks Excel View Button -->
+                            <a href="{{ route('attendance.schedules.matrix', ['year' => $year, 'month' => $month, 'division' => $division]) }}"
+                               title="Buka halaman matriks spreadsheet jadwal kerja & piket ala Excel"
+                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-950/20 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Tampilan Matriks (Excel)</span>
+                            </a>
                         @endif
 
                         <!-- Sync Notif Reminders Button -->
@@ -1625,6 +1635,14 @@
                                 </svg>
                                 <span>Upload Excel / CSV</span>
                             </button>
+
+                            <a href="{{ route('attendance.schedules.matrix', ['year' => $year, 'month' => $month, 'division' => $division]) }}"
+                               class="ml-auto px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Buka Matriks Excel</span>
+                            </a>
                         </div>
                     </div>
 

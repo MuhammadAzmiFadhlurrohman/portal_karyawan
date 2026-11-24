@@ -87,6 +87,8 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/attendance/offline-sync', [AttendanceController::class, 'syncOffline'])->name('attendance.offline-sync');
 
     Route::get('/attendance/schedules', [ScheduleController::class, 'index'])->name('attendance.schedules');
+    Route::get('/attendance/schedules/matrix', [ScheduleController::class, 'matrix'])->name('attendance.schedules.matrix');
+    Route::post('/attendance/schedules/matrix/save', [ScheduleController::class, 'saveMatrix'])->name('attendance.schedules.matrix.save');
     Route::get('/attendance/schedules/peer-shift', [ScheduleController::class, 'getPeerShift'])->name('attendance.schedules.peer-shift');
     Route::post('/attendance/schedules/generate', [ScheduleController::class, 'generate'])->name('attendance.schedules.generate');
     Route::post('/attendance/schedules/delete-month', [ScheduleController::class, 'deleteMonth'])->name('attendance.schedules.delete-month');
