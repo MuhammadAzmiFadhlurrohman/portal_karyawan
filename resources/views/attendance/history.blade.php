@@ -115,33 +115,6 @@
             </form>
         </div>
 
-        <!-- Flash Status Notification -->
-        @if (session('status'))
-            <div class="rounded-2xl bg-teal-50 border border-teal-200/80 text-teal-800 p-4 flex items-center gap-3 text-xs sm:text-sm shadow-2xs">
-                <div class="w-8 h-8 rounded-xl bg-teal-100/80 flex items-center justify-center text-[#155E63] shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </div>
-                <span class="font-medium">{{ session('status') }}</span>
-            </div>
-        @endif
-
-        @if (isset($errors) && $errors->any())
-            <div class="rounded-2xl bg-rose-50 border border-rose-200/80 text-rose-800 p-4 text-xs sm:text-sm space-y-1 shadow-2xs">
-                <div class="font-bold flex items-center gap-2 text-rose-900">
-                    <svg class="w-4.5 h-4.5 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span>Pengajuan Koreksi Tidak Dapat Diproses</span>
-                </div>
-                <ul class="list-disc list-inside space-y-0.5 pl-6 text-xs text-rose-700">
-                    @foreach ($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         @php
             $totalHadir = $stats['total_hadir'] ?? 0;

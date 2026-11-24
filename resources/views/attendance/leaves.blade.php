@@ -89,28 +89,6 @@
             </div>
         </div>
 
-        @if (session('status'))
-            <div class="rounded-2xl p-4 bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
-                <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-700 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <span>{{ session('status') }}</span>
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div role="alert" class="rounded-2xl p-4 bg-rose-50 border border-rose-200/80 text-rose-800 text-xs shadow-2xs">
-                <div class="font-bold flex items-center gap-2 mb-1">
-                    <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    <span>Pengajuan Cuti / Izin Tidak Valid</span>
-                </div>
-                <ul class="list-disc list-inside text-rose-700 space-y-0.5">
-                    @foreach ($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
         <!-- Summary Metric Cards (4 Cards for Leave Balance) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">

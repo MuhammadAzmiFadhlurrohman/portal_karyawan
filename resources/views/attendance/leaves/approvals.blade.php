@@ -168,20 +168,6 @@
             </div>
         </div>
 
-        <!-- Alert Notifikasi Session -->
-        @if (session('status'))
-            <div class="rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center gap-3 shadow-2xs">
-                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                <span>{{ session('status') }}</span>
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="rounded-2xl border border-rose-200 bg-rose-50/90 p-4 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-3 shadow-2xs">
-                <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                <span>{{ $errors->first() }}</span>
-            </div>
-        @endif
 
         <!-- List Content Area -->
         @if ($leaves->isEmpty())
