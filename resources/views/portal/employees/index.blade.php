@@ -1,6 +1,8 @@
 <x-layouts.app title="Data Karyawan — Manajemen SDM">
     <div x-data="{
         isCreateOpen: false,
+        createDivision: '',
+        createOffice: 'bandung',
         isEditOpen: false,
         isDeleteOpen: false,
         isResetOpen: false,
@@ -46,6 +48,7 @@
             phone: '',
             nik: '',
             division: '',
+            office: 'bandung',
             position: '',
             supervisor_id: '',
             role: '',
@@ -61,6 +64,7 @@
         resetFaceTarget: { id: '', name: '', code: '', hasFace: false },
         openEdit(emp) {
             this.selectedEmployee = emp;
+            const officeVal = emp.office || (emp.office_location_id == 2 ? 'soreang' : 'bandung');
             this.editForm = {
                 id: emp.id,
                 name: emp.name || '',
@@ -70,6 +74,7 @@
                 phone: emp.phone || '',
                 nik: emp.nik || '',
                 division: emp.division || '',
+                office: officeVal,
                 position: emp.position || '',
                 supervisor_id: emp.supervisor_id || '',
                 role: (emp.roles && emp.roles.length > 0) ? emp.roles[0].name : 'karyawan',
@@ -395,7 +400,7 @@
                                 <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span>Lokasi</span>
                             </span>
-                            <span class="font-semibold text-slate-800">{{ $emp->branch ?? 'Bandung' }}</span>
+                            <span class="font-semibold text-slate-800">{{ $emp->office ? ($emp->office === 'soreang' || $emp->office_location_id == 2 ? 'Kantor Soreang' : 'Kantor Bandung') : ($emp->branch ?? 'Bandung') }}</span>
                         </div>
                     </div>
 
@@ -513,8 +518,8 @@
                                 <td class="py-2.5 px-2.5">
                                     <div class="space-y-0.5 leading-tight">
                                         <div class="flex items-center gap-1 flex-wrap">
-                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-full">
-                                                {{ $emp->division ?: 'Non-Divisi' }}
+                                            <span class="inline-block px-1.5 py-0.5 rounded text-[9.5px] font-bold {{ ($emp->office === 'soreang' || $emp->office_location_id == 2) ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200' }} border truncate max-w-full">
+                                                {{ $emp->division ?: 'Non-Divisi' }}@if ($emp->division === 'Teknik') ({{ ($emp->office === 'soreang' || $emp->office_location_id == 2) ? 'Soreang' : 'Bandung' }})@endif
                                             </span>
                                             <span class="text-slate-800 font-semibold text-[11px] truncate">{{ $emp->position ?: '-' }}</span>
                                         </div>
@@ -761,13 +766,26 @@
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Divisi</label>
-                                    <select name="division" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                    <select name="division" x-model="createDivision" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
                                         <option value="">Pilih Divisi...</option>
                                         @foreach ($divisions as $div)
                                             <option value="{{ $div }}">{{ $div }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+                                <div x-show="createDivision === 'Teknik'" x-transition class="transition-all">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
+                                        <span>Kantor Penempatan</span>
+                                        <span class="text-[9.5px] font-bold text-teal-800 bg-teal-100/90 px-1.5 py-0.5 rounded">Khusus Teknik</span>
+                                    </label>
+                                    <select name="office" x-model="createOffice" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-teal-400 text-slate-800 font-semibold focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="bandung">Kantor Bandung (Pusat)</option>
+                                        <option value="soreang">Kantor Soreang (Operasional)</option>
+                                    </select>
+                                </div>
+                                <template x-if="createDivision !== 'Teknik'">
+                                    <input type="hidden" name="office" value="bandung">
+                                </template>
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jabatan / Posisi</label>
                                     <input type="text" name="position" placeholder="Teknisi Lapangan, NOC..." class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
@@ -956,6 +974,19 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div x-show="editForm.division === 'Teknik'" x-transition class="transition-all">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
+                                        <span>Kantor Penempatan</span>
+                                        <span class="text-[9.5px] font-bold text-teal-800 bg-teal-100/90 px-1.5 py-0.5 rounded">Khusus Teknik</span>
+                                    </label>
+                                    <select name="office" x-model="editForm.office" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-teal-400 text-slate-800 font-semibold focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="bandung">Kantor Bandung (Pusat)</option>
+                                        <option value="soreang">Kantor Soreang (Operasional)</option>
+                                    </select>
+                                </div>
+                                <template x-if="editForm.division !== 'Teknik'">
+                                    <input type="hidden" name="office" value="bandung">
+                                </template>
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jabatan / Posisi</label>
                                     <input type="text" name="position" x-model="editForm.position" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">

@@ -250,6 +250,7 @@ class EmployeeController extends Controller
             'phone' => ['required', 'string', 'max:32', 'unique:users,phone'],
             'nik' => ['nullable', 'string', 'max:32', 'unique:users,nik'],
             'division' => ['nullable', 'string', 'max:100'],
+            'office' => ['nullable', 'string', 'in:bandung,soreang'],
             'position' => ['nullable', 'string', 'max:100'],
             'supervisor_id' => ['nullable', 'exists:users,id'],
             'role' => ['required', 'string', 'exists:roles,name'],
@@ -294,6 +295,17 @@ class EmployeeController extends Controller
             $fotoPath = $request->file('foto')->store('avatars', 'public');
         }
 
+        $division = $validated['division'] ?? null;
+        $office = strtolower(trim((string) ($request->input('office', 'bandung'))));
+        if ($division === 'Teknik') {
+            if (! in_array($office, ['bandung', 'soreang'], true)) {
+                $office = 'bandung';
+            }
+        } else {
+            $office = 'bandung';
+        }
+        $officeLocationId = ($office === 'soreang') ? 2 : 1;
+
         $user = User::create([
             'name' => $validated['name'],
             'employee_code' => $employeeCode,
@@ -301,7 +313,9 @@ class EmployeeController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'nik' => $validated['nik'] ?? null,
-            'division' => $validated['division'] ?? null,
+            'division' => $division,
+            'office' => $office,
+            'office_location_id' => $officeLocationId,
             'position' => $validated['position'] ?? null,
             'supervisor_id' => $validated['supervisor_id'] ?? null,
             'join_date' => $validated['join_date'] ?? now()->toDateString(),
@@ -350,6 +364,7 @@ class EmployeeController extends Controller
             'phone' => ['required', 'string', 'max:32', Rule::unique('users', 'phone')->ignore($user->id)],
             'nik' => ['nullable', 'string', 'max:32', Rule::unique('users', 'nik')->ignore($user->id)],
             'division' => ['nullable', 'string', 'max:100'],
+            'office' => ['nullable', 'string', 'in:bandung,soreang'],
             'position' => ['nullable', 'string', 'max:100'],
             'supervisor_id' => ['nullable', 'exists:users,id', 'different:id'],
             'role' => ['required', 'string', 'exists:roles,name'],
@@ -363,6 +378,17 @@ class EmployeeController extends Controller
             'foto' => ['nullable', 'image', 'max:5120'],
         ]);
 
+        $division = $validated['division'] ?? null;
+        $office = strtolower(trim((string) ($request->input('office', 'bandung'))));
+        if ($division === 'Teknik') {
+            if (! in_array($office, ['bandung', 'soreang'], true)) {
+                $office = 'bandung';
+            }
+        } else {
+            $office = 'bandung';
+        }
+        $officeLocationId = ($office === 'soreang') ? 2 : 1;
+
         $userData = [
             'name' => $validated['name'],
             'employee_code' => $validated['employee_code'],
@@ -370,7 +396,9 @@ class EmployeeController extends Controller
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'nik' => $validated['nik'] ?? null,
-            'division' => $validated['division'] ?? null,
+            'division' => $division,
+            'office' => $office,
+            'office_location_id' => $officeLocationId,
             'position' => $validated['position'] ?? null,
             'supervisor_id' => $validated['supervisor_id'] ?? null,
             'join_date' => $validated['join_date'] ?? $user->join_date,
@@ -720,7 +748,9 @@ class EmployeeController extends Controller
                 'no_rekening' => $user->no_rekening,
                 'atas_nama' => $user->atas_nama,
                 'supervisor_name' => $user->supervisor?->name,
-                'branch' => $user->branch ?? 'Bandung',
+                'office' => $user->office ?? 'bandung',
+                'office_location_id' => $user->office_location_id ?? 1,
+                'branch' => $user->office ? ($user->office === 'soreang' ? 'Soreang' : 'Bandung') : ($user->branch ?? 'Bandung'),
                 'is_active' => (bool) $user->is_active,
                 'role' => $user->roles->first()?->name ? strtoupper($user->roles->first()->name) : 'KARYAWAN',
             ],
