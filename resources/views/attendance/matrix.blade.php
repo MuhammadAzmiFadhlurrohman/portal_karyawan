@@ -339,10 +339,16 @@
                                                     'bg-emerald-100 text-emerald-900 font-black border border-emerald-300': cells['{{ $cellKey }}'] === 'BJ',
                                                     'bg-slate-100 text-slate-800 font-bold border border-slate-200': cells['{{ $cellKey }}'] === 'P',
                                                     'bg-rose-100 text-rose-800 font-black border border-rose-200': cells['{{ $cellKey }}'] === 'L',
-                                                    'hover:bg-teal-100/70': !cells['{{ $cellKey }}']
+                                                    'hover:bg-teal-50/80': !cells['{{ $cellKey }}'],
+                                                    '!ring-2 !ring-teal-600 !ring-inset z-20 shadow-sm font-black': activeCell === '{{ $cellKey }}',
+                                                    'hover:ring-2 hover:ring-teal-400/90 hover:ring-inset hover:z-10': activeCell !== '{{ $cellKey }}'
                                                 }"
-                                                class="w-full h-full flex items-center justify-center font-mono text-xs cursor-pointer transition select-none">
+                                                class="w-full h-full flex items-center justify-center font-mono text-xs cursor-pointer transition select-none relative group/cell">
                                             <span x-text="cells['{{ $cellKey }}'] || ''"></span>
+
+                                            <!-- Active Cell Corner Accent (Excel Style) -->
+                                            <span x-show="activeCell === '{{ $cellKey }}'"
+                                                  class="absolute bottom-0 right-0 w-1.5 h-1.5 bg-teal-700 rounded-tl-xs pointer-events-none"></span>
                                         </button>
                                     </td>
                                 @endforeach
@@ -492,6 +498,7 @@
                 weekendDates: {!! json_encode($weekendDates) !!},
                 dirtyCells: {},
                 activeStamp: null,
+                activeCell: null,
                 isSaving: false,
                 saveStatus: '',
                 searchQuery: '',
@@ -502,6 +509,7 @@
                 },
 
                 onCellClick(userId, userName, dateStr, dayName, event) {
+                    this.activeCell = userId + '_' + dateStr;
                     if (this.activeStamp !== null) {
                         this.updateCell(userId, dateStr, this.activeStamp);
                         return;
@@ -530,6 +538,7 @@
 
                 updateCell(userId, dateStr, shiftCode) {
                     const key = userId + '_' + dateStr;
+                    this.activeCell = key;
                     this.cells[key] = shiftCode;
                     this.dirtyCells[key] = { user_id: userId, date: dateStr, shift_code: shiftCode };
                     this.saveSingleCell(userId, dateStr, shiftCode);
