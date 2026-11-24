@@ -118,39 +118,47 @@
                 </div>
             </div>
 
-            <!-- ROW 2: Kuas Cepat (Stamp Tool) & Weekend Actions -->
-            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
+            <!-- ROW 2: Kuas Cepat (Stamp Tool) & Weekend Actions Toolbar Ribbon -->
+            <div class="mt-3 pt-3 border-t border-slate-100 flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-2.5 text-xs">
                 
-                <!-- Kuas Cepat Buttons -->
+                <!-- Kuas Cepat Segmented Tools -->
                 <div class="flex items-center gap-1.5 flex-wrap">
-                    <span class="font-bold text-slate-700 mr-1 flex items-center gap-1.5 shrink-0">
+                    <!-- Title Pill -->
+                    <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-teal-50 text-[#0d9488] font-bold text-xs shrink-0 border border-teal-100">
                         <span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                        <span>🖌️ Kuas Cepat:</span>
-                    </span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                        </svg>
+                        <span>Kuas Cepat:</span>
+                    </div>
 
+                    <!-- Normal Pointer Button -->
                     <button type="button" @click="activeStamp = null"
                             :class="activeStamp === null 
                                 ? 'bg-slate-800 text-white font-bold ring-2 ring-slate-800/30 shadow-xs' 
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium'"
-                            class="px-2.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-1">
+                                : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/90 font-semibold shadow-2xs'"
+                            class="px-2.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 shrink-0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/>
                         </svg>
                         <span>Pointer Normal</span>
                     </button>
 
+                    <div class="h-5 w-px bg-slate-200 mx-0.5 hidden sm:block shrink-0"></div>
+
+                    <!-- Shift Stamp Buttons -->
                     @foreach ($shifts as $s)
                         @php
                             $code = strtoupper($s->code);
                             $btnStyle = match($code) {
-                                'PK' => ['bg' => 'background-color: #0d9488; color: #ffffff;', 'badge' => 'Piket Pagi'],
-                                'PA' => ['bg' => 'background-color: #4f46e5; color: #ffffff;', 'badge' => 'Piket Siang'],
-                                'SB' => ['bg' => 'background-color: #0284c7; color: #ffffff;', 'badge' => 'Subuh'],
-                                'S'  => ['bg' => 'background-color: #d97706; color: #ffffff;', 'badge' => 'Siang'],
-                                'BJ' => ['bg' => 'background-color: #059669; color: #ffffff;', 'badge' => 'Visit Soreang'],
-                                'P'  => ['bg' => 'background-color: #475569; color: #ffffff;', 'badge' => 'Pagi Reguler'],
-                                'L'  => ['bg' => 'background-color: #e11d48; color: #ffffff;', 'badge' => 'Libur'],
-                                default => ['bg' => 'background-color: #64748b; color: #ffffff;', 'badge' => $s->name]
+                                'PK' => ['bg' => 'background-color: #0d9488; color: #ffffff;', 'badge' => 'Piket Pagi', 'short' => 'Piket Pagi', 'pill' => 'bg-teal-50 text-teal-800 border-teal-200'],
+                                'PA' => ['bg' => 'background-color: #4f46e5; color: #ffffff;', 'badge' => 'Piket Siang', 'short' => 'Piket Siang', 'pill' => 'bg-indigo-50 text-indigo-800 border-indigo-200'],
+                                'SB' => ['bg' => 'background-color: #0284c7; color: #ffffff;', 'badge' => 'Subuh', 'short' => 'Subuh', 'pill' => 'bg-sky-50 text-sky-800 border-sky-200'],
+                                'S'  => ['bg' => 'background-color: #d97706; color: #ffffff;', 'badge' => 'Siang', 'short' => 'Siang', 'pill' => 'bg-amber-50 text-amber-800 border-amber-200'],
+                                'BJ' => ['bg' => 'background-color: #059669; color: #ffffff;', 'badge' => 'Visit Soreang', 'short' => 'Soreang', 'pill' => 'bg-emerald-50 text-emerald-800 border-emerald-200'],
+                                'P'  => ['bg' => 'background-color: #475569; color: #ffffff;', 'badge' => 'Pagi Reguler', 'short' => 'Pagi', 'pill' => 'bg-slate-100 text-slate-700 border-slate-300'],
+                                'L'  => ['bg' => 'background-color: #e11d48; color: #ffffff;', 'badge' => 'Libur', 'short' => 'Libur', 'pill' => 'bg-rose-50 text-rose-800 border-rose-200'],
+                                default => ['bg' => 'background-color: #7c3aed; color: #ffffff;', 'badge' => $s->name, 'short' => 'Custom', 'pill' => 'bg-purple-50 text-purple-800 border-purple-200']
                             };
                         @endphp
                         <button type="button" @click="activeStamp = (activeStamp === '{{ $code }}' ? null : '{{ $code }}')"
@@ -158,15 +166,22 @@
                                 :class="activeStamp === '{{ $code }}' 
                                     ? 'ring-2 ring-teal-400 font-bold shadow-xs scale-105' 
                                     : 'bg-white text-slate-700 border border-slate-200/90 hover:border-slate-300 hover:bg-slate-50 shadow-2xs font-semibold'"
-                                class="px-2.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5">
-                            <span class="font-mono font-black">{{ $code }}</span>
-                            <span class="text-[10px] opacity-75 hidden sm:inline">({{ $btnStyle['badge'] }})</span>
+                                title="{{ $s->name }} ({{ $code }})"
+                                class="px-2 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-1.5 shrink-0">
+                            <span class="font-mono font-black px-1.5 py-0.5 rounded-md text-[10px] border"
+                                  :class="activeStamp === '{{ $code }}' ? 'bg-white/20 text-white border-white/30' : '{{ $btnStyle['pill'] }}'">
+                                {{ $code }}
+                            </span>
+                            <span class="text-xs font-semibold opacity-90">{{ $btnStyle['short'] }}</span>
                         </button>
                     @endforeach
 
+                    <div class="h-5 w-px bg-slate-200 mx-0.5 hidden sm:block shrink-0"></div>
+
+                    <!-- Clear / Hapus Button -->
                     <button type="button" @click="activeStamp = (activeStamp === 'CLEAR' ? null : 'CLEAR')"
                             :class="activeStamp === 'CLEAR' ? 'bg-rose-600 text-white font-bold ring-2 ring-rose-400 shadow-xs' : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'"
-                            class="px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1">
+                            class="px-2.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 shrink-0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                         </svg>
@@ -174,15 +189,20 @@
                     </button>
                 </div>
 
-                <!-- Fast Weekend Actions -->
-                <div class="flex items-center gap-1.5 self-start xl:self-center shrink-0">
-                    <span class="text-[11px] text-slate-500 font-bold mr-0.5">⚡ Isi Weekend:</span>
+                <!-- Fast Weekend Actions in Distinct Pill -->
+                <div class="flex items-center gap-1.5 bg-slate-50/90 border border-slate-200/80 p-1 rounded-2xl shadow-2xs self-start 2xl:self-center shrink-0">
+                    <span class="text-[11px] text-slate-600 font-bold px-2 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Isi Weekend:</span>
+                    </span>
                     <button type="button" @click="stampWeekendVisible('PK')"
-                            class="px-3 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#155E63] border border-teal-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                            class="px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0d9488] border border-teal-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
                         <span>Semua PK</span>
                     </button>
                     <button type="button" @click="stampWeekendVisible('PA')"
-                            class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                            class="px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
                         <span>Semua PA</span>
                     </button>
                 </div>
