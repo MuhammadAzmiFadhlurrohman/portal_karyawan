@@ -12,22 +12,78 @@
                 'initials' => $emp->initials,
             ];
         })->values();
+
+        $oldUserIds = array_values(array_map('intval', (array) old('user_ids', [])));
     @endphp
 
     <div x-data="{
-        targetType: 'all',
-        selectedDivision: 'Teknik Bandung',
+        targetType: {{ Js::from(old('target_type', 'all')) }},
+        selectedDivision: {{ Js::from(old('division', 'Teknik Bandung')) }},
         searchQuery: '',
-        selectedUserIds: [],
+        selectedUserIds: {{ Js::from($oldUserIds) }},
         mobileTab: 'form', // 'form' or 'preview' on small screens
         isSubmitting: false,
         form: {
-            title: '',
-            body: '',
-            type: 'info',
-            link: ''
+            title: {{ Js::from(old('title', '')) }},
+            body: {{ Js::from(old('body', '')) }},
+            type: {{ Js::from(old('type', 'info')) }},
+            link: {{ Js::from(old('link', '')) }}
         },
         allEmployees: {{ Js::from($employeeJson) }},
+        
+        init() {
+            // Restore from localStorage draft if no flashed old input is present
+            const hasOldInput = {{ Js::from(old('title') !== null || old('body') !== null || old('target_type') !== null) }};
+            if (!hasOldInput) {
+                try {
+                    const saved = localStorage.getItem('gomsn_broadcast_draft');
+                    if (saved) {
+                        const d = JSON.parse(saved);
+                        if (d.targetType) this.targetType = d.targetType;
+                        if (d.selectedDivision) this.selectedDivision = d.selectedDivision;
+                        if (Array.isArray(d.selectedUserIds)) this.selectedUserIds = d.selectedUserIds;
+                        if (d.form) {
+                            if (d.form.title) this.form.title = d.form.title;
+                            if (d.form.body) this.form.body = d.form.body;
+                            if (d.form.type) this.form.type = d.form.type;
+                            if (d.form.link) this.form.link = d.form.link;
+                        }
+                    }
+                } catch (e) {}
+            } else {
+                this.saveDraft();
+            }
+
+            this.$watch('targetType', () => this.saveDraft());
+            this.$watch('selectedDivision', () => this.saveDraft());
+            this.$watch('selectedUserIds', () => this.saveDraft());
+            this.$watch('form', () => this.saveDraft(), { deep: true });
+        },
+
+        saveDraft() {
+            try {
+                localStorage.setItem('gomsn_broadcast_draft', JSON.stringify({
+                    targetType: this.targetType,
+                    selectedDivision: this.selectedDivision,
+                    selectedUserIds: this.selectedUserIds,
+                    form: this.form
+                }));
+            } catch (e) {}
+        },
+
+        resetForm() {
+            this.form.title = '';
+            this.form.body = '';
+            this.form.link = '';
+            this.form.type = 'info';
+            this.targetType = 'all';
+            this.selectedDivision = 'Teknik Bandung';
+            this.selectedUserIds = [];
+            this.searchQuery = '';
+            try {
+                localStorage.removeItem('gomsn_broadcast_draft');
+            } catch (e) {}
+        },
         
         get filteredEmployees() {
             if (!this.searchQuery.trim()) {
@@ -272,9 +328,18 @@
                         </h2>
                         <p class="text-[11px] text-slate-500 mt-0.5">Tentukan penerima, kategori notifikasi, dan tuliskan pesan.</p>
                     </div>
-                    <span class="px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200/80 text-teal-700 text-[10px] font-bold">
-                        Pemberitahuan Instan
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button"
+                                @click="resetForm()"
+                                title="Kosongkan form dan buat pesan baru"
+                                class="px-2.5 py-1 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 text-[10px] font-semibold transition cursor-pointer flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            <span>Kosongkan</span>
+                        </button>
+                        <span class="px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200/80 text-teal-700 text-[10px] font-bold">
+                            Pemberitahuan Instan
+                        </span>
+                    </div>
                 </div>
 
                 <form method="POST" action="{{ route('portal.notifications.send') }}" @submit="submitForm($event)" class="space-y-4">

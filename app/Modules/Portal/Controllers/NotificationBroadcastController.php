@@ -223,6 +223,7 @@ class NotificationBroadcastController extends Controller
         ]);
 
         return redirect()->route('portal.notifications.index')
+            ->withInput()
             ->with('status', "Notifikasi '{$validated['title']}' berhasil dikirimkan ke {$recipients->count()} karyawan!");
     }
 
