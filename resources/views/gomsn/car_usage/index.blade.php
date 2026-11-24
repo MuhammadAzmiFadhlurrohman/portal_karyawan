@@ -62,8 +62,8 @@
             </div>
         </div>
 
-        <!-- 4 KPI Summary Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <!-- 2 KPI Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <!-- Total Penggunaan Mobil -->
             <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-2xs flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-[#155E63] flex items-center justify-center shrink-0">
@@ -81,20 +81,6 @@
                 </div>
             </div>
 
-            <!-- Total Dana Bensin Disetujui -->
-            <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-2xs flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="min-w-0">
-                    <span class="text-[11px] font-medium text-slate-500 block truncate">Dana Bensin Cair</span>
-                    <span class="text-base sm:text-lg font-extrabold text-emerald-700 leading-tight font-mono">Rp {{ number_format($totalNominal, 0, ',', '.') }}</span>
-                    <span class="text-[10px] text-emerald-600 block mt-0.5">Disetujui Finance</span>
-                </div>
-            </div>
-
             <!-- Karyawan / Driver Terlibat -->
             <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-2xs flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
@@ -106,20 +92,6 @@
                     <span class="text-[11px] font-medium text-slate-500 block truncate">Karyawan / Driver</span>
                     <span class="text-base sm:text-lg font-extrabold text-slate-800 leading-tight font-mono">{{ $uniqueDriversCount }}</span>
                     <span class="text-[10px] text-blue-600 block mt-0.5">Pengaju Mobil</span>
-                </div>
-            </div>
-
-            <!-- Status Pemantauan -->
-            <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 sm:p-4 shadow-2xs flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="min-w-0">
-                    <span class="text-[11px] font-medium text-slate-500 block truncate">Status Alur</span>
-                    <span class="text-sm sm:text-base font-extrabold text-slate-800 leading-tight">Approved Full</span>
-                    <span class="text-[10px] text-amber-600 block mt-0.5">Atasan &amp; Finance</span>
                 </div>
             </div>
         </div>
