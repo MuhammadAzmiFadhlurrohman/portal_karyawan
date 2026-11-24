@@ -1481,16 +1481,7 @@
                 }
 
                 $activeUsersList = isset($allActiveUsers) && $allActiveUsers->isNotEmpty() ? $allActiveUsers : $users;
-                $usersJson = $activeUsersList->map(function ($u) {
-                    return [
-                        'id' => (int) $u->id,
-                        'name' => (string) $u->name,
-                        'nik' => (string) ($u->employee_code ?: ($u->nik ?: ('KR' . str_pad($u->id, 5, '0', STR_PAD_LEFT)))),
-                        'division' => (string) ($u->division ?: 'Umum'),
-                        'avatar' => $u->avatar_url,
-                    ];
-                })->values();
-
+                $divisionCounts = $activeUsersList->groupBy('division')->map->count();
                 $piketList = isset($piketSchedules) ? $piketSchedules : collect();
                 $piketShifts = $shifts->filter(fn($s) => $s->is_piket || in_array($s->code, ['PK', 'PA']));
                 $defaultPiketShift = $piketShifts->firstWhere('code', 'PK') ?? ($piketShifts->first() ?? $shifts->first());
@@ -1540,9 +1531,9 @@
                                         : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 font-semibold'"
                                     class="px-3.5 py-1.5 rounded-xl text-xs transition-all flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <span>Input Jadwal Piket</span>
+                                <span>Pilih Divisi (Matriks Excel)</span>
                             </button>
 
                             <button type="button"
@@ -1583,326 +1574,163 @@
                         </div>
                     </div>
 
-                    <!-- TAB 1: FORM INPUT PIKET LANGSUNG (Sleek 2-Column Desktop Grid) -->
+                    <!-- TAB 1: PILIHAN DIVISI UNTUK ATUR JADWAL DI MATRIKS EXCEL -->
                     <div x-show="piketTab === 'form'" class="flex flex-col flex-1 overflow-hidden">
-                        <form method="POST" action="{{ route('attendance.schedules.piket.store') }}" class="flex flex-col flex-1 overflow-hidden">
-                            @csrf
-                            <input type="hidden" name="year" value="{{ $year }}">
-                            <input type="hidden" name="month" value="{{ $month }}">
+                        <div class="overflow-y-auto p-5 sm:p-6 flex-1 text-slate-800 text-xs space-y-5">
+                            
+                            <!-- Info Banner -->
+                            <div class="p-4 rounded-2xl bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-teal-500/5 border border-teal-200/80 flex items-start gap-3.5">
+                                <div class="w-9 h-9 rounded-xl bg-[#155E63] text-white flex items-center justify-center shrink-0 shadow-xs">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <h4 class="font-bold text-slate-900 text-sm">Pilih Divisi untuk Mengatur Jadwal</h4>
+                                    <p class="text-xs text-slate-600 leading-relaxed">
+                                        Pilih divisi karyawan di bawah ini. Pengaturan jadwal kerja, shift harian, dan penugasan piket (<b>PK</b>, <b>PA</b>, dll) diatur langsung pada <b>Matriks Spreadsheet (ala Excel)</b> yang fleksibel, cepat, dan otomatis menyimpan setiap perubahan per sel.
+                                    </p>
+                                </div>
+                            </div>
 
-                            <!-- Hidden inputs for selected users & dates -->
-                            <template x-for="uid in selectedUserIds" :key="'u-' + uid">
-                                <input type="hidden" name="user_ids[]" :value="uid">
-                            </template>
-                            <template x-for="dStr in selectedDates" :key="'d-' + dStr">
-                                <input type="hidden" name="dates[]" :value="dStr">
-                            </template>
-                            <input type="hidden" name="shift_id" :value="selectedShiftId">
-                            <input type="hidden" name="office_location_id" :value="selectedOfficeId">
+                            <!-- Periode Filter & Search Divisi -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-700">Periode Jadwal:</span>
+                                    <span class="px-3 py-1 rounded-xl bg-slate-100 text-slate-800 font-bold text-xs border border-slate-200 font-mono">
+                                        {{ $monthName }} {{ $year }}
+                                    </span>
+                                </div>
 
-                            <!-- Scrollable Form Body with 2-Column Split Layout -->
-                            <div class="overflow-y-auto p-5 sm:p-6 flex-1 text-slate-800 text-xs">
-                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                                    
-                                    <!-- ============================================== -->
-                                    <!-- KOLOM KIRI: PILIH KARYAWAN (5 COLS)            -->
-                                    <!-- ============================================== -->
-                                    <div class="lg:col-span-5 flex flex-col space-y-3">
-                                        <!-- Step 1 Header -->
-                                        <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[10px] font-black">1</span>
-                                                <span class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Karyawan</span>
-                                                <span class="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[#155E63] font-bold text-[10px]">
-                                                    <span x-text="selectedUserIds.length"></span> dipilih
-                                                </span>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <button type="button" @click="selectAllVisibleUsers()"
-                                                        class="text-[11px] font-semibold text-[#155E63] hover:underline cursor-pointer">
-                                                    Semua
-                                                </button>
-                                                <span class="text-slate-300">|</span>
-                                                <button type="button" @click="deselectAllVisibleUsers()"
-                                                        class="text-[11px] font-semibold text-slate-500 hover:text-slate-800 cursor-pointer">
-                                                    Batal
-                                                </button>
-                                            </div>
-                                        </div>
+                                <!-- Quick Search Divisi -->
+                                <div class="relative w-full sm:w-64">
+                                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                    <input type="text" x-model="divisionSearch" placeholder="Cari nama divisi..."
+                                           class="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500 bg-white">
+                                </div>
+                            </div>
 
-                                        <!-- Search Box -->
-                                        <div class="relative">
-                                            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            <!-- Grid Cards Divisi -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+                                
+                                <!-- Card: SEMUA DIVISI -->
+                                <div @click="selectedDivision = 'all'"
+                                     @dblclick="goToMatrix('all')"
+                                     :class="selectedDivision === 'all' 
+                                        ? 'border-2 border-[#155E63] bg-teal-50/60 ring-2 ring-teal-500/20 shadow-sm' 
+                                        : 'border border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50/60'"
+                                     class="p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between group">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="w-10 h-10 rounded-xl bg-[#155E63] text-white flex items-center justify-center shrink-0 shadow-xs">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                             </svg>
-                                            <input type="text" x-model="userSearch" placeholder="Cari nama karyawan / NIK..."
-                                                   class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-white">
                                         </div>
-
-                                        <!-- Filter Divisi Pills -->
-                                        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                                            <button type="button" @click="divisionFilter = 'all'"
-                                                    :class="divisionFilter === 'all' ? 'bg-[#155E63] text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-                                                    class="px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition cursor-pointer">
-                                                Semua
-                                            </button>
-                                            @foreach ($allDivisions as $divName)
-                                                <button type="button" @click="divisionFilter = '{{ $divName }}'"
-                                                        :class="divisionFilter === '{{ $divName }}' ? 'bg-[#155E63] text-white font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-                                                        class="px-2.5 py-1 rounded-lg text-[11px] whitespace-nowrap transition cursor-pointer">
-                                                    {{ $divName }}
-                                                </button>
-                                            @endforeach
-                                        </div>
-
-                                        <!-- Employee Cards Vertical List -->
-                                        <div class="h-[360px] overflow-y-auto p-1.5 bg-slate-50/70 rounded-2xl border border-slate-200/90 space-y-1.5 pr-1.5">
-                                            <template x-for="user in filteredUsers" :key="user.id">
-                                                <div @click="toggleUser(user.id)"
-                                                     :class="selectedUserIds.includes(user.id) 
-                                                        ? 'bg-teal-50/90 border-[#155E63] ring-1 ring-[#155E63] shadow-xs' 
-                                                        : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
-                                                     class="flex items-center gap-2.5 p-2 rounded-xl border cursor-pointer transition select-none">
-                                                    <input type="checkbox" :checked="selectedUserIds.includes(user.id)"
-                                                           @click.stop="toggleUser(user.id)"
-                                                           class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500 border-slate-300 pointer-events-none">
-                                                    
-                                                    <template x-if="user.avatar">
-                                                        <img :src="user.avatar" class="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0">
-                                                    </template>
-                                                    <template x-if="!user.avatar">
-                                                        <div class="w-7 h-7 rounded-full bg-teal-100 text-[#155E63] font-bold text-[11px] flex items-center justify-center shrink-0">
-                                                            <span x-text="user.name.charAt(0)"></span>
-                                                        </div>
-                                                    </template>
-
-                                                    <div class="min-w-0 flex-1">
-                                                        <p class="font-bold text-slate-900 truncate" x-text="user.name"></p>
-                                                        <p class="text-[10px] text-slate-500 truncate">
-                                                            <span x-text="user.nik" class="font-mono"></span> • <span class="font-medium text-slate-600" x-text="user.division"></span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </template>
-
-                                            <template x-if="filteredUsers.length === 0">
-                                                <div class="py-12 text-center text-slate-400 italic text-xs">
-                                                    Tidak ada karyawan yang sesuai filter.
-                                                </div>
-                                            </template>
-                                        </div>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 group-hover:bg-teal-100 group-hover:text-teal-900 transition">
+                                            Semua
+                                        </span>
                                     </div>
-
-                                    <!-- ============================================== -->
-                                    <!-- KOLOM KANAN: TANGGAL, SHIFT & PENGATURAN (7 COLS)-->
-                                    <!-- ============================================== -->
-                                    <div class="lg:col-span-7 flex flex-col space-y-4">
-                                        
-                                        <!-- STEP 2: PILIH TANGGAL PIKET -->
-                                        <div class="space-y-2">
-                                            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[10px] font-black">2</span>
-                                                    <span class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Tanggal Piket</span>
-                                                    <span class="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-[#155E63] font-bold text-[10px]">
-                                                        <span x-text="selectedDates.length"></span> tanggal
-                                                    </span>
-                                                </div>
-
-                                                <!-- Quick Weekend Buttons -->
-                                                <div class="flex items-center gap-1.5 flex-wrap">
-                                                    <button type="button" @click="selectWeekends()"
-                                                            class="px-2 py-0.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-[10px] font-bold transition cursor-pointer">
-                                                        + Weekend
-                                                    </button>
-                                                    <button type="button" @click="selectSaturdays()"
-                                                            class="px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-medium transition cursor-pointer">
-                                                        + Sabtu
-                                                    </button>
-                                                    <button type="button" @click="selectSundays()"
-                                                            class="px-2 py-0.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-[10px] font-medium transition cursor-pointer">
-                                                        + Minggu
-                                                    </button>
-                                                    <button type="button" @click="clearDates()"
-                                                            class="px-2 py-0.5 rounded-lg text-rose-600 hover:bg-rose-50 text-[10px] font-semibold transition cursor-pointer">
-                                                        Reset
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <!-- Bulletproof 7-Column Calendar Grid -->
-                                            <div class="bg-slate-50/80 rounded-2xl border border-slate-200/90 p-3 space-y-1.5">
-                                                <!-- Day of Week Header with Explicit Grid Style -->
-                                                <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;"
-                                                     class="text-center font-bold text-[10px] text-slate-400 mb-1">
-                                                    <span>SEN</span>
-                                                    <span>SEL</span>
-                                                    <span>RAB</span>
-                                                    <span>KAM</span>
-                                                    <span>JUM</span>
-                                                    <span class="text-amber-600 font-bold">SAB</span>
-                                                    <span class="text-rose-600 font-bold">MIN</span>
-                                                </div>
-
-                                                <!-- Day Cells with Explicit Grid Style -->
-                                                <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;">
-                                                    <!-- Leading empty slots before 1st day of month -->
-                                                    @for ($i = 0; $i < $leadingEmptySlots; $i++)
-                                                        <div class="h-8 rounded-lg bg-transparent"></div>
-                                                    @endfor
-
-                                                    <!-- Month Days (1..30/31) -->
-                                                    @foreach ($daysData as $item)
-                                                        @php
-                                                            $dStr = $item['date'];
-                                                            $isWk = $item['isWeekend'];
-                                                            $isSat = $item['isSaturday'];
-                                                            $isSun = $item['isSunday'];
-                                                        @endphp
-                                                        <button type="button"
-                                                                @click="toggleDate('{{ $dStr }}')"
-                                                                :class="selectedDates.includes('{{ $dStr }}') 
-                                                                    ? 'bg-[#155E63] text-white font-black shadow-xs ring-2 ring-teal-400 scale-[1.03]' 
-                                                                    : '{{ $isSun ? 'bg-rose-50/90 text-rose-800 border-rose-200 hover:bg-rose-100 font-bold' : ($isSat ? 'bg-amber-50/90 text-amber-800 border-amber-200 hover:bg-amber-100 font-bold' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100') }} border'"
-                                                                class="h-8 rounded-xl text-xs flex items-center justify-center transition cursor-pointer select-none">
-                                                            <span>{{ $item['day'] }}</span>
-                                                        </button>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-
-                                            <!-- Selected Dates Chips Preview -->
-                                            <template x-if="selectedDates.length > 0">
-                                                <div class="flex flex-wrap items-center gap-1.5 max-h-16 overflow-y-auto pt-0.5">
-                                                    <span class="text-[10px] font-bold text-slate-500 mr-1">Terpilih:</span>
-                                                    <template x-for="d in selectedDates.slice().sort()" :key="d">
-                                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-teal-100 text-[#155E63] text-[10px] font-bold border border-teal-200">
-                                                            <span x-text="d"></span>
-                                                            <button type="button" @click="toggleDate(d)" class="text-teal-700 hover:text-rose-600 font-bold">×</button>
-                                                        </span>
-                                                    </template>
-                                                </div>
-                                            </template>
-                                        </div>
-
-                                        <!-- STEP 3: PILIH SHIFT PIKET -->
-                                        <div class="space-y-2 pt-1">
-                                            <div class="flex items-center gap-2 pb-1 border-b border-slate-100">
-                                                <span class="w-5 h-5 rounded-full bg-[#155E63] text-white flex items-center justify-center text-[10px] font-black">3</span>
-                                                <span class="font-bold text-slate-900 text-xs sm:text-sm">Pilih Shift Piket</span>
-                                            </div>
-
-                                            <!-- Visual Shift Radio Cards -->
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                                @php
-                                                    $shiftPK = $shifts->firstWhere('code', 'PK');
-                                                    $shiftPA = $shifts->firstWhere('code', 'PA');
-                                                @endphp
-
-                                                @if ($shiftPK)
-                                                    <div @click="selectedShiftId = {{ $shiftPK->id }}"
-                                                         :class="selectedShiftId == {{ $shiftPK->id }} 
-                                                            ? 'bg-teal-50/90 border-[#155E63] ring-1 ring-[#155E63] shadow-xs' 
-                                                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
-                                                         class="flex items-center gap-2.5 p-2.5 rounded-2xl border cursor-pointer transition select-none">
-                                                        <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0"
-                                                             :class="selectedShiftId == {{ $shiftPK->id }} ? 'border-[#155E63] bg-[#155E63]' : 'border-slate-300'">
-                                                            <div class="w-1.5 h-1.5 rounded-full bg-white" x-show="selectedShiftId == {{ $shiftPK->id }}"></div>
-                                                        </div>
-                                                        <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0">
-                                                            ☀️
-                                                        </div>
-                                                        <div class="min-w-0">
-                                                            <p class="font-bold text-slate-900 text-xs truncate">{{ $shiftPK->name }} (PK)</p>
-                                                            <p class="text-[10px] text-slate-500 font-mono">08:15 – 17:00</p>
-                                                        </div>
-                                                    </div>
-                                                @endif
-
-                                                @if ($shiftPA)
-                                                    <div @click="selectedShiftId = {{ $shiftPA->id }}"
-                                                         :class="selectedShiftId == {{ $shiftPA->id }} 
-                                                            ? 'bg-indigo-50/90 border-indigo-600 ring-1 ring-indigo-600 shadow-xs' 
-                                                            : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'"
-                                                         class="flex items-center gap-2.5 p-2.5 rounded-2xl border cursor-pointer transition select-none">
-                                                        <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0"
-                                                             :class="selectedShiftId == {{ $shiftPA->id }} ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'">
-                                                            <div class="w-1.5 h-1.5 rounded-full bg-white" x-show="selectedShiftId == {{ $shiftPA->id }}"></div>
-                                                        </div>
-                                                        <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs shrink-0">
-                                                            🌙
-                                                        </div>
-                                                        <div class="min-w-0">
-                                                            <p class="font-bold text-slate-900 text-xs truncate">{{ $shiftPA->name }} (PA)</p>
-                                                            <p class="text-[10px] text-slate-500 font-mono">13:00 – 21:00</p>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            <!-- Other Shift Option -->
-                                            <div class="flex items-center gap-2 pt-0.5">
-                                                <span class="text-[10px] text-slate-400">Shift Lain:</span>
-                                                <select x-model="selectedShiftId"
-                                                        class="flex-1 px-2.5 py-1 rounded-xl border border-slate-200 text-[11px] focus:ring-1 focus:ring-teal-500 bg-white">
-                                                    @foreach ($shifts as $s)
-                                                        <option value="{{ $s->id }}">
-                                                            {{ $s->name }} ({{ $s->code }}) - {{ substr((string)$s->start_time, 0, 5) }} s/d {{ substr((string)$s->end_time, 0, 5) }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- STEP 4: LOKASI & CATATAN -->
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-100">
-                                            <div class="space-y-1">
-                                                <label class="block font-bold text-slate-800 text-[11px]">Lokasi Kantor</label>
-                                                <select x-model="selectedOfficeId"
-                                                        class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-teal-500 bg-white">
-                                                    @foreach ($offices as $off)
-                                                        <option value="{{ $off->id }}">{{ $off->name }} (Radius {{ $off->radius_m }}m)</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div class="space-y-1">
-                                                <label class="block font-bold text-slate-800 text-[11px]">Catatan (Opsional)</label>
-                                                <input type="text" name="notes" x-model="notes" placeholder="Contoh: Piket Weekend / Backup NOC"
-                                                       class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-1 focus:ring-teal-500 bg-white">
-                                            </div>
-                                        </div>
-
+                                    <div class="mt-3">
+                                        <h5 class="font-bold text-slate-900 text-sm">Semua Divisi</h5>
+                                        <p class="text-[11px] text-slate-500 mt-0.5">Kelola seluruh karyawan sekaligus dalam 1 tabel matriks</p>
+                                    </div>
+                                    <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                                        <span class="font-bold text-[#155E63]">{{ $allActiveUsers->count() }} Karyawan Aktif</span>
+                                        <span class="text-xs text-slate-400 group-hover:text-[#155E63] font-bold transition flex items-center gap-0.5">
+                                            Pilih <span>&rarr;</span>
+                                        </span>
                                     </div>
                                 </div>
+
+                                <!-- Loop per Divisi -->
+                                @foreach ($allDivisions as $dName)
+                                    @php
+                                        $count = $divisionCounts[$dName] ?? 0;
+                                    @endphp
+                                    <div x-show="!divisionSearch || '{{ strtolower($dName) }}'.includes(divisionSearch.toLowerCase())"
+                                         @click="selectedDivision = '{{ $dName }}'"
+                                         @dblclick="goToMatrix('{{ $dName }}')"
+                                         :class="selectedDivision === '{{ $dName }}' 
+                                            ? 'border-2 border-[#155E63] bg-teal-50/60 ring-2 ring-teal-500/20 shadow-sm' 
+                                            : 'border border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50/60'"
+                                         class="p-4 rounded-2xl transition-all cursor-pointer relative flex flex-col justify-between group">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="w-10 h-10 rounded-xl bg-teal-100 text-[#155E63] flex items-center justify-center shrink-0">
+                                                @if (str_contains(strtolower($dName), 'teknik'))
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    </svg>
+                                                @elseif (str_contains(strtolower($dName), 'noc'))
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                                                    </svg>
+                                                @elseif (str_contains(strtolower($dName), 'it') || str_contains(strtolower($dName), 'sistem'))
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                                    </svg>
+                                                @elseif (str_contains(strtolower($dName), 'hrd') || str_contains(strtolower($dName), 'human'))
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                                    </svg>
+                                                @elseif (str_contains(strtolower($dName), 'finance') || str_contains(strtolower($dName), 'akuntansi'))
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                @else
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                            <span class="w-5 h-5 rounded-full flex items-center justify-center transition"
+                                                  :class="selectedDivision === '{{ $dName }}' ? 'bg-[#155E63] text-white' : 'bg-slate-100 text-slate-300'">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                        <div class="mt-3">
+                                            <h5 class="font-bold text-slate-900 text-sm">{{ $dName }}</h5>
+                                            <p class="text-[11px] text-slate-500 mt-0.5">Kelola shift kerja & jadwal piket divisi {{ $dName }}</p>
+                                        </div>
+                                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                                            <span class="font-bold text-slate-700">{{ $count }} Karyawan</span>
+                                            <span class="text-xs text-slate-400 group-hover:text-[#155E63] font-bold transition flex items-center gap-0.5">
+                                                Pilih <span>&rarr;</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
 
-                            <!-- Modal Footer Action Bar -->
-                            <div class="px-5 sm:px-7 py-3 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-                                <div class="text-xs text-slate-600">
-                                    <span class="font-bold text-slate-900" x-text="selectedUserIds.length * selectedDates.length">0</span> total slot piket akan dibuat
-                                    (<span x-text="selectedUserIds.length"></span> karyawan × <span x-text="selectedDates.length"></span> tanggal)
-                                </div>
+                        </div>
 
-                                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                    <button type="button" @click="showPiketModal = false; showUploadModal = false"
-                                            class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition cursor-pointer">
-                                        Batal
-                                    </button>
-                                    <button type="submit"
-                                            :disabled="selectedUserIds.length === 0 || selectedDates.length === 0"
-                                            :class="selectedUserIds.length === 0 || selectedDates.length === 0 
-                                                ? 'opacity-50 cursor-not-allowed bg-slate-400' 
-                                                : 'bg-[#155E63] hover:bg-[#0c4349] shadow-md shadow-teal-900/20 cursor-pointer'"
-                                            class="px-5 py-2 rounded-xl text-white text-xs font-bold transition flex items-center gap-1.5">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span>Simpan Jadwal Piket</span>
-                                    </button>
-                                </div>
+                        <!-- Modal Footer Action Bar -->
+                        <div class="px-5 sm:px-7 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+                            <div class="text-xs text-slate-600 flex items-center gap-2">
+                                <span>Divisi Terpilih:</span>
+                                <span class="px-2.5 py-0.5 rounded-full bg-[#155E63] text-white font-bold text-xs"
+                                      x-text="selectedDivision === 'all' ? 'Semua Divisi' : selectedDivision">
+                                </span>
                             </div>
-                        </form>
+
+                            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                <button type="button" @click="showPiketModal = false; showUploadModal = false"
+                                        class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition cursor-pointer">
+                                    Tutup
+                                </button>
+                                <button type="button" @click="goToMatrix()"
+                                        class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-950/20 transition flex items-center gap-2 cursor-pointer">
+                                    <svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>Buka Matriks Jadwal (Excel) &rarr;</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- TAB 2: DAFTAR PIKET BULAN INI -->
@@ -2059,67 +1887,24 @@
                 function piketModalManager() {
                     return {
                         piketTab: 'form',
-                        allWeekends: {!! json_encode($weekendDays) !!},
-                        allSaturdays: {!! json_encode($saturdays) !!},
-                        allSundays: {!! json_encode($sundays) !!},
-                        allUsers: {!! json_encode($usersJson) !!},
-                        divisionFilter: 'all',
-                        userSearch: '',
-                        selectedUserIds: [],
-                        selectedDates: [],
-                        selectedShiftId: {{ $defaultPiketShift?->id ?? 5 }},
-                        selectedOfficeId: {{ $defaultOfficeId }},
-                        notes: '',
+                        selectedDivision: '{{ $division ?? "all" }}',
+                        selectedMonth: {{ $month }},
+                        selectedYear: {{ $year }},
+                        divisionSearch: '',
 
-                        get filteredUsers() {
-                            const q = this.userSearch.trim().toLowerCase();
-                            return this.allUsers.filter(u => {
-                                const matchDiv = (this.divisionFilter === 'all' || u.division === this.divisionFilter);
-                                const matchSearch = !q || u.name.toLowerCase().includes(q) || u.nik.toLowerCase().includes(q);
-                                return matchDiv && matchSearch;
-                            });
-                        },
-
-                        toggleUser(id) {
-                            if (this.selectedUserIds.includes(id)) {
-                                this.selectedUserIds = this.selectedUserIds.filter(x => x !== id);
-                            } else {
-                                this.selectedUserIds.push(id);
+                        get matrixUrl() {
+                            let url = '{{ route("attendance.schedules.matrix") }}' + '?year=' + this.selectedYear + '&month=' + this.selectedMonth;
+                            if (this.selectedDivision && this.selectedDivision !== 'all') {
+                                url += '&division=' + encodeURIComponent(this.selectedDivision);
                             }
+                            return url;
                         },
 
-                        selectAllVisibleUsers() {
-                            const ids = this.filteredUsers.map(u => u.id);
-                            this.selectedUserIds = Array.from(new Set([...this.selectedUserIds, ...ids]));
-                        },
-
-                        deselectAllVisibleUsers() {
-                            const ids = new Set(this.filteredUsers.map(u => u.id));
-                            this.selectedUserIds = this.selectedUserIds.filter(x => !ids.has(x));
-                        },
-
-                        toggleDate(dateStr) {
-                            if (this.selectedDates.includes(dateStr)) {
-                                this.selectedDates = this.selectedDates.filter(d => d !== dateStr);
-                            } else {
-                                this.selectedDates.push(dateStr);
+                        goToMatrix(divName) {
+                            if (divName !== undefined) {
+                                this.selectedDivision = divName;
                             }
-                        },
-
-                        selectWeekends() {
-                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allWeekends]));
-                        },
-
-                        selectSaturdays() {
-                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allSaturdays]));
-                        },
-
-                        selectSundays() {
-                            this.selectedDates = Array.from(new Set([...this.selectedDates, ...this.allSundays]));
-                        },
-
-                        clearDates() {
-                            this.selectedDates = [];
+                            window.location.href = this.matrixUrl;
                         }
                     };
                 }
