@@ -1053,142 +1053,166 @@
         {{-- ========================================================================= --}}
         @if ($viewMode === 'month')
             <div class="space-y-6">
-                <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-                <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 select-none"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+                <!-- Top Page Header Banner (Sleek 2-Tier Executive Layout) -->
+                <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-xl p-5 sm:p-6 select-none space-y-4"
+                     style="background: linear-gradient(135deg, #022836 0%, #06404d 40%, #0c5663 80%, #083c45 100%);">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
                     <div class="absolute inset-x-4 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#2dd4bf]/35 to-transparent pointer-events-none"></div>
 
-                    <!-- Left: Back Button + Glowing Icon + Title -->
-                    <div class="relative z-10 flex items-center gap-3.5 min-w-0">
-                        <a href="{{ route('attendance.schedules', ['view' => 'list']) }}"
-                           class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center shrink-0 shadow-xs transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                            </svg>
-                        </a>
-                        <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
-                            <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
+                    <!-- TIER 1: Title, Month Context, and Live Schedule Statistics -->
+                    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        
+                        <!-- Left: Back Button + Glowing Icon + Title & Subtitle -->
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <a href="{{ route('attendance.schedules', ['view' => 'list']) }}"
+                               title="Kembali ke Daftar Periode"
+                               class="w-10 h-10 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center shrink-0 shadow-xs transition backdrop-blur-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </a>
+                            
+                            <div class="w-11 h-11 rounded-2xl bg-teal-500/20 border border-teal-300/30 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner backdrop-blur-xs">
+                                <svg class="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2.5 flex-wrap">
+                                    <h1 class="font-heading text-lg sm:text-xl font-black text-white tracking-tight leading-snug">
+                                        Roster Shift: {{ $monthName }} {{ $year }}
+                                    </h1>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-400 text-teal-950 shadow-xs">
+                                        Periode Aktif
+                                    </span>
+                                </div>
+                                <p class="text-xs text-teal-100/80 mt-0.5 leading-snug">
+                                    Daftar shift kerja karyawan, status pengisian jadwal, dan cetak roster divisi.
+                                </p>
+                            </div>
                         </div>
-                        <div class="min-w-0">
-                            <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2 leading-snug">
-                                <span>Roster Shift: {{ $monthName }} {{ $year }}</span>
-                            </h1>
-                            <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                                Daftar shift karyawan, status pengisian jadwal, dan cetak roster divisi.
-                            </p>
+
+                        <!-- Right: Stats Badges (Employee Schedule Progress) -->
+                        <div class="flex items-center gap-3 bg-black/30 backdrop-blur-md border border-white/15 px-4 py-2 rounded-2xl text-xs font-semibold text-white shadow-xs self-start lg:self-center shrink-0">
+                            <div title="Total Karyawan Aktif" class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                                <span class="text-slate-300 text-[11px]">Total:</span>
+                                <span class="font-bold font-mono text-white">{{ $totalUsersCount }}</span>
+                            </div>
+                            <span class="text-white/20">|</span>
+                            <div title="Karyawan Sudah Terdaftar Jadwal" class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                <span class="text-slate-300 text-[11px]">Terjadwal:</span>
+                                <span class="font-bold font-mono text-emerald-300">{{ $registeredCount }}</span>
+                            </div>
+                            <span class="text-white/20">|</span>
+                            <div title="Karyawan Belum Ada Jadwal" class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                <span class="text-slate-300 text-[11px]">Belum:</span>
+                                <span class="font-bold font-mono text-amber-300">{{ $unregisteredCount }}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Right Controls: Badges & Action Buttons -->
-                    <div class="relative z-10 flex flex-wrap items-center gap-2.5">
-                        <!-- Stats Badges -->
-                        <div class="flex items-center gap-2 bg-black/25 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-xl text-xs font-semibold text-white">
-                            <span title="Total Karyawan Aktif" class="flex items-center gap-1">
-                                👥 <span>{{ $totalUsersCount }}</span>
-                            </span>
-                            <span class="text-white/30">|</span>
-                            <span title="Karyawan Terdaftar Jadwal" class="flex items-center gap-1 text-emerald-300">
-                                ✔ <span>{{ $registeredCount }}</span>
-                            </span>
-                            <span class="text-white/30">|</span>
-                            <span title="Karyawan Belum Ada Jadwal" class="flex items-center gap-1 text-amber-300">
-                                ⚠️ <span>{{ $unregisteredCount }}</span>
-                            </span>
+                    <!-- TIER 2: Dedicated Action Bar (Management Actions on Left, Export/Print on Right) -->
+                    <div class="relative z-10 pt-3 border-t border-white/10 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        
+                        <!-- Left: Primary Management Actions -->
+                        <div class="flex items-center gap-2 flex-wrap">
+                            @if ($canManageSchedule)
+                                <!-- Atur Jadwal Piket Button -->
+                                <button type="button"
+                                        @click="showPiketModal = true; piketTab = 'form'"
+                                        class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-300 hover:to-emerald-300 text-teal-950 text-xs font-bold shadow-md shadow-teal-950/30 flex items-center gap-2 transition cursor-pointer">
+                                    <svg class="w-4 h-4 text-teal-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>Atur Jadwal Piket</span>
+                                    @if (isset($piketSchedules) && $piketSchedules->count() > 0)
+                                        <span class="px-1.5 py-0.2 rounded-full bg-teal-950 text-teal-300 text-[10px] font-black leading-none">
+                                            {{ $piketSchedules->count() }}
+                                        </span>
+                                    @endif
+                                </button>
+
+                                <!-- Matriks Excel View Button -->
+                                <a href="{{ route('attendance.schedules.matrix', ['year' => $year, 'month' => $month, 'division' => $division]) }}"
+                                   class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-950/25 flex items-center gap-2 transition cursor-pointer border border-emerald-400/30">
+                                    <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>Tampilan Matriks (Excel)</span>
+                                </a>
+                            @endif
+
+                            <!-- Sync Notif Reminders Button -->
+                            @if ($canManageSchedule || auth()->user()?->hasRole('hrd'))
+                                <form method="POST" action="{{ route('attendance.schedules.sync-reminders') }}" class="inline">
+                                    @csrf
+                                    <button type="submit"
+                                            title="Sinkronisasi & kirim notifikasi pengingat absen 1 jam sebelum jam masuk karyawan hari ini"
+                                            class="px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 hover:text-white text-xs font-semibold shadow-xs transition cursor-pointer flex items-center gap-1.5 backdrop-blur-xs">
+                                        <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                        </svg>
+                                        <span>Sync Notif Absen</span>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
 
-                        <!-- Atur Jadwal Piket Button -->
-                        @if ($canManageSchedule)
-                            <button type="button"
-                                    @click="showPiketModal = true; piketTab = 'form'"
-                                    title="Atur penugasan jadwal piket karyawan secara visual atau upload template"
-                                    class="btn-primary !py-2 !px-3.5 text-xs font-bold shadow-md shadow-teal-900/30 flex items-center gap-1.5 cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        <!-- Right: Export & Print Actions (Segmented Group) -->
+                        <div class="flex items-center gap-1.5 self-start md:self-center">
+                            <!-- Export Button -->
+                            <a href="{{ route('attendance.schedules.export', ['year' => $year, 'month' => $month]) }}"
+                               class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition flex items-center gap-1.5 backdrop-blur-xs">
+                                <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                 </svg>
-                                <span>Atur Jadwal Piket</span>
-                                @if (isset($piketSchedules) && $piketSchedules->count() > 0)
-                                    <span class="ml-1 px-1.5 py-0.5 rounded-full bg-teal-400 text-teal-950 text-[10px] font-black leading-none">
-                                        {{ $piketSchedules->count() }}
-                                    </span>
-                                @endif
-                            </button>
-
-                            <!-- Matriks Excel View Button -->
-                            <a href="{{ route('attendance.schedules.matrix', ['year' => $year, 'month' => $month, 'division' => $division]) }}"
-                               title="Buka halaman matriks spreadsheet jadwal kerja & piket ala Excel"
-                               class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-950/20 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-emerald-100" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 4h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span>Tampilan Matriks (Excel)</span>
+                                <span>Export CSV</span>
                             </a>
-                        @endif
 
-                        <!-- Sync Notif Reminders Button -->
-                        @if ($canManageSchedule || auth()->user()?->hasRole('hrd'))
-                            <form method="POST" action="{{ route('attendance.schedules.sync-reminders') }}" class="inline">
-                                @csrf
-                                <button type="submit"
-                                        title="Sinkronisasi & kirim notifikasi pengingat absen 1 jam sebelum jam masuk karyawan hari ini"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 hover:text-white text-xs font-semibold shadow-xs transition cursor-pointer">
-                                    <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                                    </svg>
-                                    <span>Sync Notif Absen</span>
-                                </button>
-                            </form>
-                        @endif
-
-                        <!-- Export Button -->
-                        <a href="{{ route('attendance.schedules.export', ['year' => $year, 'month' => $month]) }}"
-                           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition">
-                            <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                            </svg>
-                            <span>Export</span>
-                        </a>
-
-                        <!-- Print Semua Button -->
-                        <button type="button"
-                                onclick="window.print()"
-                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition cursor-pointer">
-                            <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                            </svg>
-                            <span>Print</span>
-                        </button>
-
-                        <!-- Print Divisi Dropdown -->
-                        <div x-data="{ openDivPrint: false }" class="relative">
+                            <!-- Print Semua Button -->
                             <button type="button"
-                                    @click="openDivPrint = !openDivPrint"
-                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition cursor-pointer">
+                                    onclick="window.print()"
+                                    class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition cursor-pointer flex items-center gap-1.5 backdrop-blur-xs">
                                 <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                                 </svg>
-                                <span>Print Divisi</span>
-                                <svg class="w-3 h-3 text-cyan-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                                </svg>
+                                <span>Print</span>
                             </button>
-                            <div x-show="openDivPrint" @click.away="openDivPrint = false"
-                                 class="absolute right-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-30 text-xs">
-                                <div class="px-3 py-1 font-bold text-[10px] uppercase tracking-wider text-slate-400">Pilih Divisi</div>
-                                <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month]) }}"
-                                   class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 font-medium">Semua Divisi</a>
-                                @foreach ($allDivisions as $div)
-                                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month, 'division' => $div]) }}"
-                                       class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 {{ $division === $div ? 'font-bold text-[#155E63] bg-teal-50/50' : '' }}">
-                                        {{ $div }}
-                                    </a>
-                                @endforeach
+
+                            <!-- Print Divisi Dropdown -->
+                            <div x-data="{ openDivPrint: false }" class="relative">
+                                <button type="button"
+                                        @click="openDivPrint = !openDivPrint"
+                                        class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold shadow-xs transition cursor-pointer flex items-center gap-1.5 backdrop-blur-xs">
+                                    <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                    <span>Print Divisi</span>
+                                    <svg class="w-3 h-3 text-cyan-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                    </svg>
+                                </button>
+                                <div x-show="openDivPrint" @click.away="openDivPrint = false" x-cloak
+                                     class="absolute right-0 mt-2 w-48 rounded-2xl bg-white border border-slate-200 shadow-2xl py-2 z-30 text-xs">
+                                    <div class="px-3 py-1 font-bold text-[10px] uppercase tracking-wider text-slate-400">Pilih Divisi</div>
+                                    <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month]) }}"
+                                       class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 font-medium">Semua Divisi</a>
+                                    @foreach ($allDivisions as $div)
+                                        <a href="{{ route('attendance.schedules', ['view' => 'month', 'year' => $year, 'month' => $month, 'division' => $div]) }}"
+                                           class="block px-3 py-1.5 text-slate-700 hover:bg-slate-50 {{ $division === $div ? 'font-bold text-[#155E63] bg-teal-50/50' : '' }}">
+                                            {{ $div }}
+                                        </a>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
