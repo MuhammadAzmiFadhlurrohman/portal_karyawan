@@ -934,6 +934,53 @@
             transform-origin: center center;
         }
 
+        html.dark .ticket-chat-card.is-chat-fullscreen,
+        .dark .ticket-chat-card.is-chat-fullscreen {
+            background-color: #0b141a !important;
+            background-image: url('{{ asset('assets/images/whatsapp-chat-bg-dark.png') }}?v=2') !important;
+        }
+
+        #chat-stream-box {
+            background-color: #EFEAE2;
+            background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2');
+            background-repeat: repeat;
+            background-size: 420px auto;
+            background-position: top left;
+        }
+
+        html.dark #chat-stream-box,
+        .dark #chat-stream-box {
+            background-color: #0b141a !important;
+            background-image: url('{{ asset('assets/images/whatsapp-chat-bg-dark.png') }}?v=2') !important;
+            background-repeat: repeat !important;
+            background-size: 420px auto !important;
+            background-position: top left !important;
+        }
+
+        html.dark .chat-date-divider span,
+        .dark .chat-date-divider span {
+            background-color: rgba(18, 30, 39, 0.95) !important;
+            color: #cbd5e1 !important;
+            border-color: rgba(51, 65, 85, 0.75) !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+        }
+        html.dark .chat-date-divider span svg,
+        .dark .chat-date-divider span svg {
+            color: #94a3b8 !important;
+        }
+
+        html.dark #btn-scroll-to-bottom,
+        .dark #btn-scroll-to-bottom {
+            background: rgba(17, 27, 33, 0.95) !important;
+            border-color: rgba(45, 212, 191, 0.4) !important;
+            color: #5eead4 !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+        }
+        html.dark #btn-scroll-to-bottom svg,
+        .dark #btn-scroll-to-bottom svg {
+            color: #5eead4 !important;
+        }
+
         .ticket-chat-card.is-chat-fullscreen.chat-fs-entering {
             animation: chatFsEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
             will-change: transform, opacity, filter;
@@ -1184,8 +1231,7 @@
             <div class="flex-1 min-h-0 relative w-full flex flex-col">
                 <div id="chat-stream-box"
                      onscroll="handleChatScrollPosition()"
-                     class="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto relative w-full"
-                     style="background-color: #EFEAE2; background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2'); background-repeat: repeat; background-size: 420px auto; background-position: top left;">
+                     class="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto relative w-full">
                 
                 <!-- Full Width Conversation Stream Container -->
                 <div id="chat-stream-container" class="w-full space-y-1.5 sm:space-y-2">
@@ -1230,16 +1276,16 @@
                             @endif
                         </div>
                         <div style="max-width: min(80%, 420px);"
-                             class="bg-white rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-slate-200/90 text-[11px] space-y-1">
+                             class="bg-white dark:bg-slate-800/95 rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-slate-200/90 dark:border-slate-700/80 text-[11px] space-y-1">
                             <div class="flex items-center justify-between gap-2.5">
-                                <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                                <span class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
                                     <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
                                     <span class="text-[11px]">{{ $tiket->creator->name ?? 'Helpdesk' }}</span>
-                                    <span class="px-1.5 py-0.2 rounded text-[9px] bg-teal-100 text-teal-800 font-bold">NOC</span>
+                                    <span class="px-1.5 py-0.2 rounded text-[9px] bg-teal-100 dark:bg-teal-900/60 text-teal-800 dark:text-teal-200 font-bold">NOC</span>
                                 </span>
-                                <span class="text-[9.5px] text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
+                                <span class="text-[9.5px] text-slate-400 dark:text-slate-400 font-mono">{{ $tiket->tanggal_open ? $tiket->tanggal_open->format('H:i') : '' }} WIB</span>
                             </div>
-                            <p class="text-slate-700 leading-snug font-medium text-[11px]">
+                            <p class="text-slate-700 dark:text-slate-200 leading-snug font-medium text-[11px]">
                                 🎫 <strong>OPEN TIKET BARU</strong>: Tiket dibuat dengan status OPEN. Kendala: {{ $tiket->problem_temuan ?? '-' }}
                             </p>
                         </div>
@@ -1267,16 +1313,16 @@
                                 <span class="text-[10px] sm:text-[11px] font-bold text-white">MT</span>
                             </div>
                             <div style="max-width: min(80%, 420px);"
-                                 class="bg-amber-50/90 rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-amber-200/90 text-[11px] space-y-1">
+                                 class="bg-amber-50/90 dark:bg-amber-950/40 rounded-xl rounded-tl-xs px-3 py-2 shadow-xs border border-amber-200/90 dark:border-amber-700/60 text-[11px] space-y-1">
                                 <div class="flex items-center justify-between gap-2.5">
-                                    <span class="font-bold text-amber-900 flex items-center gap-1.5">
-                                        <span class="w-4 h-4 rounded-full bg-amber-200 text-amber-900 font-bold flex items-center justify-center text-[8px]">MT</span>
+                                    <span class="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                                        <span class="w-4 h-4 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 font-bold flex items-center justify-center text-[8px]">MT</span>
                                         <span class="text-[11px]">Manager Teknis</span>
-                                        <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-200 text-amber-900 font-bold">DISPATCH</span>
+                                        <span class="px-1.5 py-0.2 rounded text-[9px] bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 font-bold">DISPATCH</span>
                                     </span>
-                                    <span class="text-[9.5px] text-amber-700 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
+                                    <span class="text-[9.5px] text-amber-700 dark:text-amber-300 font-mono">{{ $lead->pivot->assigned_at ? \Carbon\Carbon::parse($lead->pivot->assigned_at)->format('H:i') : '' }} WIB</span>
                                 </div>
-                                <p class="text-amber-950 leading-snug text-[11px]">
+                                <p class="text-amber-950 dark:text-amber-100 leading-snug text-[11px]">
                                     👷 <strong>DISPATCH / PENUGASAN TIM</strong>: Ditugaskan <strong>{{ $lead->name }}</strong> (Lead) bersama tim: 
                                     {{ $crew->pluck('name')->join(', ') ?: 'mandiri' }} untuk menangani perbaikan tiket ini.
                                 </p>

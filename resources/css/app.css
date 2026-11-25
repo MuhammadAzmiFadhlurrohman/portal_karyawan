@@ -793,6 +793,58 @@ html.dark .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar button 
     color: #e2e8f0 !important;
 }
 
+#chat-stream-box {
+    background-color: #EFEAE2;
+    background-image: url('/assets/images/whatsapp-chat-bg.jpg?v=2');
+    background-repeat: repeat;
+    background-size: 420px auto;
+    background-position: top left;
+}
+
+html.dark #chat-stream-box,
+.dark #chat-stream-box {
+    background-color: #0b141a !important;
+    background-image: url('/assets/images/whatsapp-chat-bg-dark.png?v=2') !important;
+    background-repeat: repeat !important;
+    background-size: 420px auto !important;
+    background-position: top left !important;
+}
+
+html.dark .ticket-chat-card.is-chat-fullscreen,
+.dark .ticket-chat-card.is-chat-fullscreen {
+    background-color: #0b141a !important;
+    background-image: url('/assets/images/whatsapp-chat-bg-dark.png?v=2') !important;
+    background-repeat: repeat !important;
+    background-size: 420px auto !important;
+    background-position: top left !important;
+}
+
+html.dark .chat-date-divider span,
+.dark .chat-date-divider span {
+    background-color: rgba(18, 30, 39, 0.95) !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(51, 65, 85, 0.75) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .chat-date-divider span svg,
+.dark .chat-date-divider span svg {
+    color: #94a3b8 !important;
+}
+
+html.dark #btn-scroll-to-bottom,
+.dark #btn-scroll-to-bottom {
+    background: rgba(17, 27, 33, 0.95) !important;
+    border-color: rgba(45, 212, 191, 0.4) !important;
+    color: #5eead4 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark #btn-scroll-to-bottom svg,
+.dark #btn-scroll-to-bottom svg {
+    color: #5eead4 !important;
+}
+
 html.dark .card-modern:hover,
 html.dark #main-content .bg-white:hover {
     border-color: rgba(45, 212, 191, 0.45);
