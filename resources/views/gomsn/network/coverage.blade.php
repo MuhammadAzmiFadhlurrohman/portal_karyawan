@@ -482,7 +482,18 @@
                         className: 'ftth-cable-line'
                     }).addTo(this.map);
 
-                    // Render Lingkaran Radius 150m & 300m
+                    this.updateCoverageCircles(oLat, oLng);
+
+                    // Jika user tidak memilih manual ODP tertentu, evaluasi kandidat ODP terdekat
+                    // agar sistem memilih ODP dengan rute jalan raya riil terpendek (bukan sekadar garis lurus)
+                    if (!this.selectedOdp && this.nearbyOdps.length > 1) {
+                        this.fetchBestRoute(tLat, tLng, this.nearbyOdps);
+                    } else {
+                        this.fetchStreetRoute(tLat, tLng, oLat, oLng);
+                    }
+                },
+
+                updateCoverageCircles(oLat, oLng) {
                     if (this.circle150) this.map.removeLayer(this.circle150);
                     if (this.circle300) this.map.removeLayer(this.circle300);
 
@@ -505,9 +516,85 @@
                             dashArray: '6, 6'
                         }).addTo(this.map);
                     }
+                },
 
-                    // Panggil API Route untuk mendapatkan geometri jalan raya sesungguhnya
-                    this.fetchStreetRoute(tLat, tLng, oLat, oLng);
+                async fetchBestRoute(lat1, lng1, candidateList) {
+                    if (!candidateList || candidateList.length === 0) return;
+                    this.isRouting = true;
+                    try {
+                        const candidatesData = candidateList.slice(0, 6).map(c => ({
+                            id: c.id,
+                            lat: c.lat,
+                            lng: c.lng,
+                            has_slot: Boolean(c.has_slot)
+                        }));
+
+                        const res = await fetch(`{{ route('gomsn.network.coverage.best_route') }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            },
+                            body: JSON.stringify({
+                                origin: `${lat1},${lng1}`,
+                                candidates: candidatesData
+                            })
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && data.success) {
+                                // Update jarak jalan sebenarnya untuk seluruh kandidat
+                                if (data.distances && typeof data.distances === 'object') {
+                                    this.nearbyOdps.forEach(odp => {
+                                        if (data.distances[odp.id]) {
+                                            odp.calculatedRouteDist = data.distances[odp.id];
+                                        }
+                                    });
+                                    this.nearbyOdps.sort((a, b) => a.calculatedRouteDist - b.calculatedRouteDist);
+                                }
+
+                                const bestOdp = this.allOdps.find(o => o.id === data.best_odp_id);
+                                if (bestOdp) {
+                                    this.nearestOdp = bestOdp;
+                                }
+
+                                this.roadRouteDistance = Math.round(data.best_distance);
+                                const updatedLineColor = this.getTierColor(this.roadRouteDistance);
+
+                                if (this.cablePolyline) {
+                                    this.map.removeLayer(this.cablePolyline);
+                                }
+
+                                if (Array.isArray(data.best_geometry) && data.best_geometry.length > 0) {
+                                    this.cablePolyline = L.polyline(data.best_geometry, {
+                                        color: updatedLineColor,
+                                        weight: 4.5,
+                                        opacity: 0.95,
+                                        dashArray: '6, 6',
+                                        className: 'ftth-cable-line'
+                                    }).addTo(this.map);
+
+                                    if (this.activeOdp) {
+                                        this.updateCoverageCircles(this.activeOdp.lat, this.activeOdp.lng);
+                                    }
+
+                                    const bounds = this.cablePolyline.getBounds();
+                                    this.map.fitBounds(bounds, { padding: [60, 60], maxZoom: 17 });
+                                }
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Gagal memuat best route multi-kandidat, fallback ke single route:', e);
+                    } finally {
+                        this.isRouting = false;
+                    }
+
+                    if (this.activeOdp) {
+                        this.fetchStreetRoute(lat1, lng1, this.activeOdp.lat, this.activeOdp.lng);
+                    }
                 },
 
                 async fetchStreetRoute(lat1, lng1, lat2, lng2) {

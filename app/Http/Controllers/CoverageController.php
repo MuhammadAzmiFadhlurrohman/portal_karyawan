@@ -266,7 +266,8 @@ class CoverageController extends Controller
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GoMSN-FTTH/1.0');
-            curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $res = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
@@ -296,5 +297,157 @@ class CoverageController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Gagal mengambil rute jalan dari OSRM.'], 500);
+    }
+
+    /**
+     * API Helper untuk mengevaluasi beberapa kandidat ODP terdekat secara presisi.
+     * Menggunakan OSRM Table Service untuk mencari ODP mana yang memiliki jarak
+     * rute jalan sesungguhnya (turn-by-turn) paling pendek, bukan sekadar garis lurus.
+     */
+    public function bestRoute(Request $request): JsonResponse
+    {
+        $origin = $request->input('origin'); // "lat,lng"
+        $rawCandidates = $request->input('candidates');
+
+        if (is_string($rawCandidates)) {
+            $rawCandidates = json_decode($rawCandidates, true);
+        }
+
+        if (! $origin || empty($rawCandidates) || ! is_array($rawCandidates)) {
+            return response()->json(['success' => false, 'message' => 'Origin dan candidates wajib diisi.'], 400);
+        }
+
+        $origCoords = explode(',', $origin);
+        if (count($origCoords) !== 2) {
+            return response()->json(['success' => false, 'message' => 'Format origin tidak valid.'], 400);
+        }
+
+        $origLat = (float) trim($origCoords[0]);
+        $origLng = (float) trim($origCoords[1]);
+
+        // Batasi maksimal 6 kandidat terdekat untuk efisiensi OSRM
+        $candidates = array_slice($rawCandidates, 0, 6);
+
+        // Format koordinat untuk OSRM Table: lng,lat
+        $coordStrings = ["{$origLng},{$origLat}"];
+        foreach ($candidates as $cand) {
+            $cLat = (float) ($cand['lat'] ?? 0);
+            $cLng = (float) ($cand['lng'] ?? 0);
+            $coordStrings[] = "{$cLng},{$cLat}";
+        }
+
+        $tableUrl = 'https://router.project-osrm.org/table/v1/driving/' . implode(';', $coordStrings) . '?sources=0&annotations=distance';
+        $cacheKey = 'ftth_table_' . md5($tableUrl);
+        $tableData = cache()->get($cacheKey);
+
+        if (! $tableData) {
+            try {
+                $ch = curl_init($tableUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GoMSN-FTTH/1.0');
+                curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $res = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($httpCode === 200 && $res) {
+                    $json = json_decode($res, true);
+                    if (($json['code'] ?? '') === 'Ok' && ! empty($json['distances'][0])) {
+                        $tableData = $json;
+                        cache()->put($cacheKey, $tableData, now()->addHours(6));
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        $bestIndex = 0;
+        $minDist = PHP_FLOAT_MAX;
+        $candidateDistances = [];
+
+        if (! empty($tableData['distances'][0])) {
+            $distances = $tableData['distances'][0]; // [0 => 0, 1 => dist1, 2 => dist2, ...]
+            foreach ($candidates as $idx => $cand) {
+                $d = $distances[$idx + 1] ?? null;
+                if ($d !== null && $d > 0) {
+                    $candidateDistances[$cand['id']] = (float) $d;
+                }
+            }
+
+            // Cari kandidat terbaik:
+            // 1. Prioritaskan ODP yang memiliki slot port kosong (has_slot == true)
+            // 2. Pilih yang jarak rute jalannya paling pendek
+            $sortedIndices = array_keys($candidates);
+            usort($sortedIndices, function ($i1, $i2) use ($candidates, $distances) {
+                $c1 = $candidates[$i1];
+                $c2 = $candidates[$i2];
+                $slot1 = ! empty($c1['has_slot']);
+                $slot2 = ! empty($c2['has_slot']);
+                $d1 = (float) ($distances[$i1 + 1] ?? PHP_FLOAT_MAX);
+                $d2 = (float) ($distances[$i2 + 1] ?? PHP_FLOAT_MAX);
+
+                if ($slot1 !== $slot2) {
+                    return $slot2 <=> $slot1; // ODP berslot port didahulukan
+                }
+
+                return $d1 <=> $d2; // Rute jalan paling pendek
+            });
+
+            if (! empty($sortedIndices)) {
+                $bestIndex = $sortedIndices[0];
+                $minDist = (float) ($distances[$bestIndex + 1] ?? PHP_FLOAT_MAX);
+            }
+        }
+
+        $bestCandidate = $candidates[$bestIndex] ?? $candidates[0];
+        $bestLat = (float) $bestCandidate['lat'];
+        $bestLng = (float) $bestCandidate['lng'];
+
+        // Ambil rute geometris turn-by-turn untuk bestCandidate
+        $routeUrl = sprintf(
+            'https://router.project-osrm.org/route/v1/driving/%F,%F;%F,%F?overview=full&geometries=geojson',
+            $origLng, $origLat, $bestLng, $bestLat
+        );
+
+        $routeCacheKey = 'ftth_route_' . md5($routeUrl);
+        $routeData = cache()->get($routeCacheKey);
+
+        if (! $routeData) {
+            try {
+                $ch = curl_init($routeUrl);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GoMSN-FTTH/1.0');
+                curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $res = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+
+                if ($httpCode === 200 && $res) {
+                    $json = json_decode($res, true);
+                    if (($json['code'] ?? '') === 'Ok' && ! empty($json['routes'][0]['geometry']['coordinates'])) {
+                        $leafletCoords = array_map(function ($pt) {
+                            return [(float) $pt[1], (float) $pt[0]];
+                        }, $json['routes'][0]['geometry']['coordinates']);
+
+                        $routeData = [
+                            'distance' => (float) $json['routes'][0]['distance'],
+                            'duration' => (float) ($json['routes'][0]['duration'] ?? 0),
+                            'geometry' => $leafletCoords,
+                        ];
+
+                        cache()->put($routeCacheKey, $routeData, now()->addHours(6));
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        return response()->json([
+            'success' => true,
+            'best_odp_id' => $bestCandidate['id'],
+            'best_distance' => $routeData['distance'] ?? ($minDist !== PHP_FLOAT_MAX ? $minDist : 0),
+            'best_geometry' => $routeData['geometry'] ?? [[$origLat, $origLng], [$bestLat, $bestLng]],
+            'distances' => $candidateDistances,
+        ]);
     }
 }

@@ -241,6 +241,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/gomsn/network', [NetworkOdpController::class, 'index'])->name('gomsn.network.index');
     Route::get('/gomsn/network/coverage', [CoverageController::class, 'coverage'])->name('gomsn.network.coverage');
     Route::get('/gomsn/network/coverage/route', [CoverageController::class, 'getRoute'])->name('gomsn.network.coverage.route');
+    Route::match(['get', 'post'], '/gomsn/network/coverage/best-route', [CoverageController::class, 'bestRoute'])->name('gomsn.network.coverage.best_route');
     Route::get('/coverage', [CoverageController::class, 'coverage'])->name('coverage');
     Route::post('/gomsn/network/olts/{olt}/pons', [NetworkOdpController::class, 'storePon'])->name('gomsn.network.pons.store');
     Route::put('/gomsn/network/pons/{pon}', [NetworkOdpController::class, 'updatePon'])->name('gomsn.network.pons.update');
