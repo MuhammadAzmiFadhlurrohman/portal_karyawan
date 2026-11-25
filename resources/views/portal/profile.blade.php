@@ -16,6 +16,8 @@
             showNewPass: false,
             showConfirmPass: false,
             biometricLoading: false,
+            isIphone: /iPhone/i.test(navigator.userAgent || ''),
+            isApple: /iPhone|iPad|Macintosh/i.test(navigator.userAgent || ''),
             b64UrlToUint8(b64url) {
                 const pad = '='.repeat((4 - (b64url.length % 4)) % 4);
                 const b64 = (b64url + pad).replace(/-/g, '+').replace(/_/g, '/');
@@ -62,19 +64,29 @@
                         user: {
                             ...opts.user,
                             id: this.b64UrlToUint8(opts.user.id)
-                        },
-                        excludeCredentials: (opts.excludeCredentials || []).map(c => ({
+                        }
+                    };
+
+                    if (opts.excludeCredentials && opts.excludeCredentials.length > 0) {
+                        publicKey.excludeCredentials = opts.excludeCredentials.map(c => ({
                             ...c,
                             id: this.b64UrlToUint8(c.id)
-                        }))
-                    };
+                        }));
+                    } else {
+                        delete publicKey.excludeCredentials;
+                    }
 
                     const credential = await navigator.credentials.create({ publicKey });
                     if (!credential) throw new Error('Pendaftaran dibatalkan.');
 
                     const credentialId = this.bufToB64Url(credential.rawId);
+                    const defaultDeviceName = this.isIphone
+                        ? 'iPhone (Face ID)'
+                        : (this.isApple ? 'Apple Device (Face ID / Touch ID)' : '');
+
                     const payload = {
                         credential_id: credentialId,
+                        device_name: defaultDeviceName,
                         client_data_json: this.bufToB64Url(credential.response.clientDataJSON),
                         attestation_object: this.bufToB64Url(credential.response.attestationObject),
                         public_key_spki: typeof credential.response.getPublicKey === 'function' && credential.response.getPublicKey()
@@ -104,15 +116,19 @@
 
                     await Swal.fire({
                         icon: 'success',
-                        title: 'Biometrik Aktif!',
-                        text: 'Sidik jari / Face ID / Windows Hello berhasil didaftarkan untuk login cepat.',
+                        title: this.isIphone ? 'Face ID Aktif!' : 'Biometrik Aktif!',
+                        text: this.isIphone
+                            ? 'Face ID iPhone Anda berhasil didaftarkan. Login berikutnya cukup menatap layar tanpa mengetik password.'
+                            : 'Sidik jari / Face ID / Windows Hello berhasil didaftarkan untuk login cepat.',
                         confirmButtonColor: '#155E63'
                     });
                     window.location.reload();
                 } catch (err) {
                     let msg = err.message || 'Terjadi kesalahan.';
                     if (err.name === 'NotAllowedError') {
-                        msg = 'Proses sensor biometrik dibatalkan atau waktu verifikasi habis.';
+                        msg = this.isIphone
+                            ? 'Verifikasi Face ID dibatalkan atau izin biometrik tidak diberikan.'
+                            : 'Proses sensor biometrik dibatalkan atau waktu verifikasi habis.';
                     } else if (err.name === 'InvalidStateError') {
                         msg = 'Perangkat/biometrik ini sudah terdaftar pada akun Anda.';
                     }
@@ -482,13 +498,20 @@
                     <div class="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-2xl bg-teal-50 text-[#155E63] flex items-center justify-center shrink-0 shadow-2xs">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
-                                </svg>
+                                <template x-if="isApple || isIphone">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M9 9h.01M15 9h.01M10 13h4M9 16c1.5 1.5 4.5 1.5 6 0"/>
+                                    </svg>
+                                </template>
+                                <template x-if="!isApple && !isIphone">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                    </svg>
+                                </template>
                             </div>
                             <div>
-                                <h2 class="text-sm sm:text-base font-bold text-slate-900">Login Biometrik &amp; Passkey</h2>
-                                <p class="text-[11px] text-slate-500">Sidik jari, Face ID, atau Windows Hello</p>
+                                <h2 class="text-sm sm:text-base font-bold text-slate-900" x-text="isIphone ? 'Login Face ID & Passkey' : 'Login Biometrik & Passkey'"></h2>
+                                <p class="text-[11px] text-slate-500" x-text="isIphone ? 'Face ID iPhone (iOS Safari) & Passkey' : 'Sidik jari, Face ID, atau Windows Hello'"></p>
                             </div>
                         </div>
                         @if ($user->webauthnCredentials->isNotEmpty())
@@ -509,9 +532,15 @@
                                 <div class="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-100">
                                     <div class="flex items-center gap-2.5 min-w-0">
                                         <div class="w-8 h-8 rounded-xl bg-white border border-slate-200/80 text-[#155E63] flex items-center justify-center shrink-0">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                                            </svg>
+                                            @if (str_contains(strtolower($cred->device_name), 'iphone') || str_contains(strtolower($cred->device_name), 'face id'))
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M9 9h.01M15 9h.01M10 13h4M9 16c1.5 1.5 4.5 1.5 6 0"/>
+                                                </svg>
+                                            @else
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                                </svg>
+                                            @endif
                                         </div>
                                         <div class="min-w-0">
                                             <p class="font-bold text-slate-800 truncate">{{ $cred->device_name }}</p>
@@ -543,7 +572,8 @@
                         </div>
                     @else
                         <div class="rounded-2xl bg-teal-50/60 border border-teal-100 p-3.5 text-[11.5px] text-teal-900 leading-relaxed">
-                            Aktifkan fitur ini sekali di HP atau laptop Anda agar login berikutnya cukup menempelkan <strong>Sidik Jari / Face ID / Windows Hello</strong> dalam &lt; 1 detik tanpa mengetik password.
+                            <span x-show="isIphone">Aktifkan Face ID di iPhone Anda agar login berikutnya cukup menatap layar HP dalam &lt; 1 detik tanpa mengetik password.</span>
+                            <span x-show="!isIphone">Aktifkan fitur ini sekali di HP atau laptop Anda agar login berikutnya cukup menempelkan <strong>Sidik Jari / Face ID / Windows Hello</strong> dalam &lt; 1 detik tanpa mengetik password.</span>
                         </div>
                     @endif
 
@@ -551,14 +581,21 @@
                             @click="registerBiometric()"
                             :disabled="biometricLoading"
                             class="w-full py-2.5 px-4 rounded-xl border border-[#155E63]/25 bg-teal-50/80 hover:bg-[#155E63] text-[#155E63] hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60">
-                        <svg x-show="!biometricLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
-                        </svg>
+                        <template x-if="!biometricLoading">
+                            <svg x-show="isApple || isIphone" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M9 9h.01M15 9h.01M10 13h4M9 16c1.5 1.5 4.5 1.5 6 0"/>
+                            </svg>
+                        </template>
+                        <template x-if="!biometricLoading">
+                            <svg x-show="!isApple && !isIphone" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                            </svg>
+                        </template>
                         <svg x-show="biometricLoading" x-cloak class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                         </svg>
-                        <span x-text="biometricLoading ? 'Menunggu Verifikasi Sensor...' : 'Aktifkan Sidik Jari / Biometrik di Perangkat Ini'"></span>
+                        <span x-text="biometricLoading ? (isIphone ? 'Menatap Layar / Verifikasi Face ID...' : 'Menunggu Verifikasi Sensor...') : (isIphone ? 'Aktifkan Face ID di iPhone Ini' : (isApple ? 'Aktifkan Face ID / Touch ID di Perangkat Ini' : 'Aktifkan Sidik Jari / Biometrik di Perangkat Ini'))"></span>
                     </button>
                 </div>
             </div>

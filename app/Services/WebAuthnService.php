@@ -101,7 +101,7 @@ class WebAuthnService
                 'id' => $request->getHost(),
             ],
             'user' => [
-                'id' => $this->base64UrlEncode((string) $user->id),
+                'id' => $this->base64UrlEncode(hash('sha256', 'gomsn_user_' . $user->id, true)),
                 'name' => $userName,
                 'displayName' => $user->name,
             ],
@@ -113,6 +113,7 @@ class WebAuthnService
             'timeout' => 60000,
             'excludeCredentials' => $excludeCredentials,
             'authenticatorSelection' => [
+                'authenticatorAttachment' => 'platform',
                 'residentKey' => 'preferred',
                 'requireResidentKey' => false,
                 'userVerification' => 'preferred',
@@ -680,9 +681,9 @@ class WebAuthnService
     {
         $os = 'Perangkat';
         if (str_contains($ua, 'iPhone')) {
-            $os = 'iPhone (Face ID / Touch ID)';
+            $os = 'iPhone (Face ID)';
         } elseif (str_contains($ua, 'iPad')) {
-            $os = 'iPad (Touch ID / Face ID)';
+            $os = 'iPad (Face ID / Touch ID)';
         } elseif (str_contains($ua, 'Android')) {
             $os = 'Android Biometrik';
         } elseif (str_contains($ua, 'Windows')) {

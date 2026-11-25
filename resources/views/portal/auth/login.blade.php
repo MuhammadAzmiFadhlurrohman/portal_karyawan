@@ -358,12 +358,20 @@
         biometricLoading: false,
         biometricError: '',
         hasRegisteredBiometric: false,
+        hasPlatformBiometric: false,
+        isIphone: /iPhone/i.test(navigator.userAgent || ''),
+        isApple: /iPhone|iPad|Macintosh/i.test(navigator.userAgent || ''),
         init() {
             try {
                 const creds = JSON.parse(localStorage.getItem('gomsn_biometric_creds') || '[]');
                 this.hasRegisteredBiometric = Array.isArray(creds) && creds.length > 0 && !!window.PublicKeyCredential;
             } catch (e) {
                 this.hasRegisteredBiometric = false;
+            }
+            if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(available => {
+                    this.hasPlatformBiometric = !!available;
+                }).catch(() => {});
             }
         },
         b64UrlToUint8(b64url) {
@@ -413,12 +421,17 @@
 
                 const publicKey = {
                     ...opts,
-                    challenge: this.b64UrlToUint8(opts.challenge),
-                    allowCredentials: (opts.allowCredentials || []).map(c => ({
+                    challenge: this.b64UrlToUint8(opts.challenge)
+                };
+
+                if (opts.allowCredentials && opts.allowCredentials.length > 0) {
+                    publicKey.allowCredentials = opts.allowCredentials.map(c => ({
                         ...c,
                         id: this.b64UrlToUint8(c.id)
-                    }))
-                };
+                    }));
+                } else {
+                    delete publicKey.allowCredentials;
+                }
 
                 const assertion = await navigator.credentials.get({ publicKey });
                 if (!assertion) throw new Error('Verifikasi biometrik dibatalkan.');
@@ -440,7 +453,9 @@
             } catch (err) {
                 let msg = err.message || 'Login biometrik gagal.';
                 if (err.name === 'NotAllowedError') {
-                    msg = 'Sensor biometrik dibatalkan atau belum ada Passkey aktif di perangkat ini. Masuk dengan password terlebih dahulu lalu aktifkan Biometrik di menu Profil Saya.';
+                    msg = this.isIphone
+                        ? 'Verifikasi Face ID dibatalkan atau belum ada Face ID aktif untuk akun ini. Masuk dengan password dulu lalu aktifkan di menu Profil Saya.'
+                        : 'Sensor biometrik dibatalkan atau belum ada Passkey aktif di perangkat ini. Masuk dengan password terlebih dahulu lalu aktifkan Biometrik di menu Profil Saya.';
                 }
                 this.biometricError = msg;
             } finally {
@@ -756,16 +771,23 @@
                                 </button>
 
                                 <button type="button"
-                                        x-show="hasRegisteredBiometric"
+                                        x-show="hasRegisteredBiometric || hasPlatformBiometric"
                                         x-cloak
                                         @click="loginWithBiometric()"
                                         :disabled="biometricLoading"
-                                        title="Masuk dengan Sidik Jari / Biometrik"
-                                        aria-label="Masuk dengan Sidik Jari / Biometrik"
+                                        :title="isIphone ? 'Masuk dengan Face ID' : (isApple ? 'Masuk dengan Face ID / Touch ID' : 'Masuk dengan Sidik Jari / Biometrik')"
+                                        :aria-label="isIphone ? 'Masuk dengan Face ID' : 'Masuk dengan Sidik Jari / Biometrik'"
                                         class="gomsn-btn-biometric">
-                                    <svg x-show="!biometricLoading" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
-                                    </svg>
+                                    <template x-if="!biometricLoading">
+                                        <svg x-show="isApple || isIphone" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2M9 9h.01M15 9h.01M10 13h4M9 16c1.5 1.5 4.5 1.5 6 0"/>
+                                        </svg>
+                                    </template>
+                                    <template x-if="!biometricLoading">
+                                        <svg x-show="!isApple && !isIphone" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                        </svg>
+                                    </template>
                                     <svg x-show="biometricLoading" x-cloak class="w-4.5 h-4.5 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
