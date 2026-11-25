@@ -30,6 +30,183 @@
             link: {{ Js::from(old('link', '')) }}
         },
         allEmployees: {{ Js::from($employeeJson) }},
+        templates: {{ Js::from($templates) }},
+        templateModalOpen: false,
+        templateSearch: '',
+
+        get filteredTemplates() {
+            if (!this.templateSearch.trim()) return this.templates;
+            const q = this.templateSearch.toLowerCase();
+            return this.templates.filter(t => 
+                (t.name && t.name.toLowerCase().includes(q)) ||
+                (t.title && t.title.toLowerCase().includes(q)) ||
+                (t.body && t.body.toLowerCase().includes(q))
+            );
+        },
+
+        applyTemplate(tpl) {
+            this.form.title = tpl.title || '';
+            this.form.body = tpl.body || '';
+            this.form.type = tpl.type || 'info';
+            this.form.link = tpl.link || '';
+            if (tpl.target_type) {
+                this.targetType = tpl.target_type;
+            }
+            if (tpl.division) {
+                this.selectedDivision = tpl.division;
+            }
+            if (Array.isArray(tpl.user_ids) && tpl.user_ids.length > 0) {
+                this.selectedUserIds = tpl.user_ids;
+            }
+            this.saveDraft();
+            this.templateModalOpen = false;
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Template Diterapkan',
+                    text: 'Template \"' + tpl.name + '\" berhasil dimuat ke dalam form.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            }
+        },
+
+        promptSaveTemplate() {
+            if (!this.form.title.trim() || !this.form.body.trim()) {
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Form Masih Kosong',
+                        text: 'Silakan isi judul dan pesan notifikasi sebelum menyimpannya sebagai template.',
+                        confirmButtonColor: '#155E63'
+                    });
+                } else {
+                    alert('Silakan isi judul dan pesan notifikasi sebelum menyimpannya sebagai template.');
+                }
+                return;
+            }
+
+            if (window.Swal) {
+                Swal.fire({
+                    title: 'Simpan Sebagai Template',
+                    text: 'Beri nama untuk template notifikasi ini agar mudah digunakan kembali nanti:',
+                    input: 'text',
+                    inputValue: this.form.title.substring(0, 45),
+                    inputPlaceholder: 'Misal: Pengumuman Cuti Bersama',
+                    showCancelButton: true,
+                    confirmButtonColor: '#155E63',
+                    confirmButtonText: 'Simpan Template',
+                    cancelButtonText: 'Batal',
+                    inputValidator: (value) => {
+                        if (!value || !value.trim()) {
+                            return 'Nama template tidak boleh kosong!';
+                        }
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.saveTemplateToServer(result.value.trim());
+                    }
+                });
+            } else {
+                const name = prompt('Masukkan nama template:', this.form.title.substring(0, 45));
+                if (name && name.trim()) {
+                    this.saveTemplateToServer(name.trim());
+                }
+            }
+        },
+
+        async saveTemplateToServer(name) {
+            try {
+                const csrfToken = document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content') || document.querySelector('input[name=\"_token\"]')?.value;
+                const res = await fetch(\"{{ route('portal.notifications.templates.store') }}\", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        title: this.form.title,
+                        body: this.form.body,
+                        type: this.form.type,
+                        target_type: this.targetType,
+                        division: this.selectedDivision,
+                        user_ids: this.selectedUserIds,
+                        link: this.form.link
+                    })
+                });
+                const data = await res.json();
+                if (data.success && data.template) {
+                    this.templates.unshift(data.template);
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil Disimpan',
+                            text: data.message,
+                            confirmButtonColor: '#155E63'
+                        });
+                    }
+                } else {
+                    throw new Error(data.message || 'Gagal menyimpan template');
+                }
+            } catch (err) {
+                if (window.Swal) {
+                    Swal.fire('Error', err.message || 'Gagal menyimpan template.', 'error');
+                } else {
+                    alert('Gagal menyimpan template.');
+                }
+            }
+        },
+
+        async deleteTemplateFromServer(tplId, tplName) {
+            if (window.Swal) {
+                const res = await Swal.fire({
+                    icon: 'warning',
+                    title: 'Hapus Template?',
+                    text: 'Apakah Anda yakin ingin menghapus template \"' + tplName + '\"?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e11d48',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal'
+                });
+                if (!res.isConfirmed) return;
+            } else {
+                if (!confirm('Hapus template \"' + tplName + '\"?')) return;
+            }
+
+            try {
+                const csrfToken = document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content') || document.querySelector('input[name=\"_token\"]')?.value;
+                const url = \"{{ url('/portal/notifications/templates') }}/\" + tplId;
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.templates = this.templates.filter(t => t.id !== tplId);
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Terhapus',
+                            text: data.message,
+                            toast: true,
+                            position: 'top-end',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                }
+            } catch (err) {
+                if (window.Swal) Swal.fire('Error', 'Gagal menghapus template.', 'error');
+            }
+        },
         
         init() {
             // Restore from localStorage draft if no flashed old input is present
@@ -342,7 +519,16 @@
                         </h2>
                         <p class="text-[11px] text-slate-500 mt-0.5">Tentukan penerima, kategori notifikasi, dan tuliskan pesan.</p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap justify-end">
+                        <button type="button"
+                                @click="templateModalOpen = true"
+                                title="Pilih pesan dari template yang tersimpan"
+                                class="px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-[10px] font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs">
+                            <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <span>Pilih Template</span>
+                            <span class="px-1.5 py-0.2 rounded-full bg-[#155E63] text-white text-[9px] font-extrabold" x-text="templates.length"></span>
+                        </button>
+
                         <button type="button"
                                 @click="resetForm()"
                                 title="Kosongkan form dan buat pesan baru"
@@ -350,9 +536,6 @@
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                             <span>Kosongkan</span>
                         </button>
-                        <span class="px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200/80 text-teal-700 text-[10px] font-bold">
-                            Pemberitahuan Instan
-                        </span>
                     </div>
                 </div>
 
@@ -606,11 +789,12 @@
                         </div>
                     </div>
 
-                    <!-- SUBMIT BUTTON -->
-                    <div class="pt-2">
+                    <!-- ACTION BUTTONS: SEND BROADCAST & SAVE AS TEMPLATE -->
+                    <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                        <!-- Primary Send Button -->
                         <button type="submit"
                                 :disabled="isSubmitting"
-                                class="w-full py-3 px-5 rounded-xl bg-gradient-to-r from-teal-500 via-[#155E63] to-[#0c4a4f] hover:from-teal-400 hover:to-[#08383c] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-teal-500/25 transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                                class="flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-teal-500 via-[#155E63] to-[#0c4a4f] hover:from-teal-400 hover:to-[#08383c] text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-teal-500/25 transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                             <template x-if="!isSubmitting">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -628,6 +812,17 @@
                                     <span>Sedang Mengirim Notifikasi...</span>
                                 </div>
                             </template>
+                        </button>
+
+                        <!-- Secondary Save as Template Button -->
+                        <button type="button"
+                                @click="promptSaveTemplate()"
+                                title="Simpan judul dan isi pesan saat ini sebagai template baru"
+                                class="py-3 px-4 rounded-xl border border-teal-300 hover:border-teal-400 bg-teal-50/80 hover:bg-teal-100 text-[#155E63] font-bold text-xs transition-all active:scale-[0.99] flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-2xs">
+                            <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                            </svg>
+                            <span>Simpan Template</span>
                         </button>
                     </div>
                 </form>
@@ -742,6 +937,141 @@
                     <p class="leading-relaxed" style="color: #115e59;">
                         Notifikasi dikirimkan langsung melalui <strong>Google FCM v1</strong> dengan prioritas tinggi. Pesan seketika muncul di lock-screen ponsel karyawan meskipun aplikasi sedang tertutup.
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEMPLATE SELECTION MODAL DIALOG (Alpine.js) -->
+        <div x-show="templateModalOpen"
+             x-cloak
+             class="fixed inset-0 z-50 overflow-y-auto"
+             aria-labelledby="template-modal-title" role="dialog" aria-modal="true">
+            <!-- Backdrop -->
+            <div x-show="templateModalOpen"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+                 @click="templateModalOpen = false"></div>
+
+            <div class="flex min-h-full items-center justify-center p-3 text-center sm:p-0">
+                <div x-show="templateModalOpen"
+                     x-transition:enter="ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave="ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full sm:max-w-xl border border-slate-200">
+                    
+                    <!-- Header Modal -->
+                    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between"
+                         style="background: linear-gradient(90deg, #022836 0%, #084c57 100%);">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-teal-400/20 text-cyan-200 flex items-center justify-center">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-sm text-white" id="template-modal-title">Pilih Template Notifikasi</h3>
+                                <p class="text-[10px] text-teal-200">Gunakan template siap pakai untuk mengisi form seketika.</p>
+                            </div>
+                        </div>
+                        <button type="button" @click="templateModalOpen = false" class="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer">
+                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Search Toolbar inside Modal -->
+                    <div class="p-3.5 bg-slate-50 border-b border-slate-100">
+                        <div class="relative">
+                            <input type="text"
+                                   x-model="templateSearch"
+                                   placeholder="Cari nama template, judul, atau kata kunci..."
+                                   class="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-300 text-xs text-slate-800 placeholder-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- List of Templates -->
+                    <div class="p-4 space-y-2.5 max-h-[60vh] overflow-y-auto divide-y divide-slate-100">
+                        <template x-for="tpl in filteredTemplates" :key="tpl.id">
+                            <div class="pt-2.5 first:pt-0">
+                                <div class="p-3 rounded-2xl border border-slate-200 hover:border-teal-400 hover:bg-teal-50/20 transition group space-y-2">
+                                    <!-- Top Row: Name + Badge + Delete Button -->
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="w-2 h-2 rounded-full shrink-0"
+                                                  :class="{
+                                                      'bg-emerald-500': tpl.type === 'announcement',
+                                                      'bg-amber-500': tpl.type === 'warning',
+                                                      'bg-rose-500': tpl.type === 'alert',
+                                                      'bg-teal-600': tpl.type === 'info'
+                                                  }"></span>
+                                            <h4 class="font-bold text-xs sm:text-sm text-slate-800 truncate" x-text="tpl.name"></h4>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase"
+                                                  :class="{
+                                                      'bg-emerald-100 text-emerald-800 border border-emerald-300': tpl.type === 'announcement',
+                                                      'bg-amber-100 text-amber-800 border border-amber-300': tpl.type === 'warning',
+                                                      'bg-rose-100 text-rose-800 border border-rose-300': tpl.type === 'alert',
+                                                      'bg-teal-100 text-teal-800 border border-teal-300': tpl.type === 'info'
+                                                  }"
+                                                  x-text="tpl.type"></span>
+                                            <button type="button"
+                                                    @click="deleteTemplateFromServer(tpl.id, tpl.name)"
+                                                    title="Hapus template ini"
+                                                    class="p-1 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition cursor-pointer">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Middle: Title & Body excerpt -->
+                                    <div class="space-y-0.5 text-left">
+                                        <p class="font-bold text-xs text-slate-900 leading-snug" x-text="tpl.title"></p>
+                                        <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-2" x-text="tpl.body"></p>
+                                    </div>
+
+                                    <!-- Bottom Row: Meta chips & Apply button -->
+                                    <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 text-[10px]">
+                                        <div class="flex items-center gap-1.5 text-slate-400 truncate">
+                                            <span class="inline-flex items-center gap-1">
+                                                <svg class="w-3 h-3 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                                <span x-text="tpl.target_type === 'division' ? 'Divisi: ' + tpl.division : (tpl.target_type === 'selected' ? (tpl.user_ids ? tpl.user_ids.length : 0) + ' Karyawan' : 'Semua Karyawan')"></span>
+                                            </span>
+                                            <template x-if="tpl.link">
+                                                <span class="text-teal-700 font-mono truncate" x-text="'• ' + tpl.link"></span>
+                                            </template>
+                                        </div>
+
+                                        <button type="button"
+                                                @click="applyTemplate(tpl)"
+                                                class="px-3 py-1 rounded-lg bg-[#155E63] hover:bg-[#0e484c] text-white text-[10px] font-bold transition flex items-center gap-1 cursor-pointer shadow-2xs shrink-0 active:scale-95">
+                                            <span>Pakai Template</span>
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div x-show="filteredTemplates.length === 0" class="py-8 text-center text-slate-400 text-xs">
+                            <p class="font-bold text-slate-600">Tidak ada template yang cocok.</p>
+                            <p class="text-[11px] mt-0.5">Anda dapat membuat template baru dengan mengetik pesan lalu klik "Simpan Template".</p>
+                        </div>
+                    </div>
+
+                    <!-- Footer Modal -->
+                    <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span class="text-[11px]">Total <strong class="text-slate-700" x-text="templates.length"></strong> template tersimpan</span>
+                        <button type="button" @click="templateModalOpen = false" class="px-4 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold transition cursor-pointer">
+                            Tutup
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

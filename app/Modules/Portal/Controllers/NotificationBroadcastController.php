@@ -4,9 +4,11 @@ namespace App\Modules\Portal\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\NotificationLog;
+use App\Models\NotificationTemplate;
 use App\Models\User;
 use App\Models\UserFcmToken;
 use App\Services\FcmService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -66,6 +68,55 @@ class NotificationBroadcastController extends Controller
             ->where('event_type', 'broadcast')
             ->count();
 
+        // Fetch or seed default templates
+        $templates = NotificationTemplate::latest('id')->get();
+        if ($templates->isEmpty()) {
+            $defaultTemplates = [
+                [
+                    'name' => 'Pengumuman Libur Nasional',
+                    'title' => 'Pengumuman Hari Libur & Jadwal Operasional',
+                    'body' => 'Diberitahukan kepada seluruh staf dan karyawan bahwa kantor operasional libur dalam rangka Hari Libur Nasional. Untuk jadwal piket shift tetap berjalan normal.',
+                    'type' => 'announcement',
+                    'target_type' => 'all',
+                    'division' => null,
+                    'link' => null,
+                ],
+                [
+                    'name' => 'Jadwal Piket & Shift Kerja',
+                    'title' => 'Peringatan Jadwal Piket & Shift Kerja Mingguan',
+                    'body' => 'Mohon seluruh rekan teknisi dan staf piket memeriksa penempatan jadwal shift dan absensi terbaru pada menu Absensi portal.',
+                    'type' => 'warning',
+                    'target_type' => 'division',
+                    'division' => 'Teknik Bandung',
+                    'link' => '/attendance',
+                ],
+                [
+                    'name' => 'Maintenance Jaringan (NOC)',
+                    'title' => 'Pemberitahuan Pemeliharaan Jaringan Darurat',
+                    'body' => 'Tim NOC akan melakukan maintenance infrastruktur jaringan dan server malam ini. Harap koordinasi dan pantau perkembangan tiket gangguan.',
+                    'type' => 'alert',
+                    'target_type' => 'division',
+                    'division' => 'NOC',
+                    'link' => '/tickets',
+                ],
+                [
+                    'name' => 'Cut-Off Pengajuan Dana & Lembur',
+                    'title' => 'Reminder Batas Akhir Pengajuan Dana & Lembur Bulanan',
+                    'body' => 'Diingatkan kepada seluruh karyawan untuk segera menyelesaikan input dan pengajuan dana operasional maupun lembur sebelum cut-off akhir bulan.',
+                    'type' => 'info',
+                    'target_type' => 'all',
+                    'division' => null,
+                    'link' => '/gomsn/pengajuan',
+                ],
+            ];
+
+            foreach ($defaultTemplates as $dt) {
+                NotificationTemplate::create($dt);
+            }
+
+            $templates = NotificationTemplate::latest('id')->get();
+        }
+
         return view('portal.notifications.index', [
             'employees' => $employees,
             'divisionGroups' => $divisionGroups,
@@ -73,6 +124,7 @@ class NotificationBroadcastController extends Controller
             'registeredDevicesCount' => $registeredDevicesCount,
             'broadcastsTodayCount' => $broadcastsTodayCount,
             'totalBroadcastsCount' => $totalBroadcastsCount,
+            'templates' => $templates,
         ]);
     }
 
@@ -289,5 +341,63 @@ class NotificationBroadcastController extends Controller
         $notificationLog->delete();
 
         return back()->with('status', 'Riwayat siaran notifikasi berhasil dihapus.');
+    }
+
+    /**
+     * Save current form message as a reusable template.
+     */
+    public function saveTemplate(Request $request): JsonResponse
+    {
+        $this->authorizeAdmin($request);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'title' => ['required', 'string', 'max:150'],
+            'body' => ['required', 'string', 'max:1000'],
+            'type' => ['required', 'string', 'in:info,announcement,warning,alert'],
+            'target_type' => ['nullable', 'string', 'in:all,selected,division'],
+            'division' => ['nullable', 'string', 'max:100'],
+            'user_ids' => ['nullable', 'array'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
+            'link' => ['nullable', 'string', 'max:255'],
+        ], [
+            'name.required' => 'Nama template wajib diisi.',
+            'title.required' => 'Judul notifikasi wajib diisi.',
+            'body.required' => 'Isi pesan wajib diisi.',
+        ]);
+
+        $template = NotificationTemplate::create([
+            'user_id' => $request->user()->id,
+            'name' => $validated['name'],
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+            'type' => $validated['type'],
+            'target_type' => $validated['target_type'] ?? 'all',
+            'division' => $validated['division'] ?? null,
+            'user_ids' => !empty($validated['user_ids']) ? array_values(array_map('intval', $validated['user_ids'])) : null,
+            'link' => $validated['link'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Template '{$template->name}' berhasil disimpan!",
+            'template' => $template,
+        ]);
+    }
+
+    /**
+     * Delete a saved template.
+     */
+    public function deleteTemplate(Request $request, NotificationTemplate $template): JsonResponse
+    {
+        $this->authorizeAdmin($request);
+
+        $name = $template->name;
+        $template->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Template '{$name}' berhasil dihapus.",
+        ]);
     }
 }

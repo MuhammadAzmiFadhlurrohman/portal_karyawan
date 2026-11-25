@@ -75,6 +75,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/portal/notifications/history', [NotificationBroadcastController::class, 'history'])->name('portal.notifications.history');
     Route::post('/portal/notifications/send', [NotificationBroadcastController::class, 'send'])->name('portal.notifications.send');
     Route::delete('/portal/notifications/{notificationLog}', [NotificationBroadcastController::class, 'destroy'])->name('portal.notifications.destroy');
+    Route::post('/portal/notifications/templates', [NotificationBroadcastController::class, 'saveTemplate'])->name('portal.notifications.templates.store');
+    Route::delete('/portal/notifications/templates/{template}', [NotificationBroadcastController::class, 'deleteTemplate'])->name('portal.notifications.templates.destroy');
 
     // Fase 1: Modul Absensi Inti — Biometrik Wajah, Geofencing & Jadwal Shift (§5.1, §5.2, §5.9)
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
