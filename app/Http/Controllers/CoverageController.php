@@ -224,4 +224,77 @@ class CoverageController extends Controller
 
         return null;
     }
+
+    /**
+     * API Helper untuk mengambil rute jalan turn-by-turn dari OSRM.
+     * Digunakan agar garis tarikan kabel di peta mengikuti kontur jalan raya, bukan garis lurus.
+     */
+    public function getRoute(Request $request): JsonResponse
+    {
+        $origin = $request->input('origin'); // "lat,lng"
+        $dest = $request->input('dest');     // "lat,lng"
+
+        if (! $origin || ! $dest) {
+            return response()->json(['success' => false, 'message' => 'Origin dan destination wajib diisi.'], 400);
+        }
+
+        $origCoords = explode(',', $origin);
+        $destCoords = explode(',', $dest);
+
+        if (count($origCoords) !== 2 || count($destCoords) !== 2) {
+            return response()->json(['success' => false, 'message' => 'Format koordinat tidak valid.'], 400);
+        }
+
+        $lat1 = (float) trim($origCoords[0]);
+        $lng1 = (float) trim($origCoords[1]);
+        $lat2 = (float) trim($destCoords[0]);
+        $lng2 = (float) trim($destCoords[1]);
+
+        // OSRM menggunakan urutan lng,lat
+        $url = sprintf(
+            'https://router.project-osrm.org/route/v1/driving/%F,%F;%F,%F?overview=full&geometries=geojson',
+            $lng1, $lat1, $lng2, $lat2
+        );
+
+        $cacheKey = 'ftth_route_' . md5($url);
+        $cached = cache()->get($cacheKey);
+        if ($cached) {
+            return response()->json($cached);
+        }
+
+        try {
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GoMSN-FTTH/1.0');
+            curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+            $res = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $res) {
+                $data = json_decode($res, true);
+                if (($data['code'] ?? '') === 'Ok' && ! empty($data['routes'][0]['geometry']['coordinates'])) {
+                    // Konversi koordinat OSRM [lng, lat] ke Leaflet [lat, lng]
+                    $leafletCoords = array_map(function ($pt) {
+                        return [(float) $pt[1], (float) $pt[0]];
+                    }, $data['routes'][0]['geometry']['coordinates']);
+
+                    $result = [
+                        'success' => true,
+                        'distance' => (float) $data['routes'][0]['distance'],
+                        'duration' => (float) ($data['routes'][0]['duration'] ?? 0),
+                        'geometry' => $leafletCoords,
+                    ];
+
+                    cache()->put($cacheKey, $result, now()->addHours(6));
+
+                    return response()->json($result);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fallback gracefully below
+        }
+
+        return response()->json(['success' => false, 'message' => 'Gagal mengambil rute jalan dari OSRM.'], 500);
+    }
 }
