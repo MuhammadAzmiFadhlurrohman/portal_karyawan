@@ -153,6 +153,7 @@
             </a>
 
             <!-- Kirim Notifikasi -->
+            @if (auth()->user() && (auth()->user()->hasRole(['super_admin', 'admin']) || (auth()->user()->can('attendance.employee.manage') && ! auth()->user()->hasRole('hrd'))))
             <a href="{{ route('portal.notifications.index') }}"
                @if (request()->routeIs('portal.notifications.*')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('portal.notifications.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -162,6 +163,7 @@
                 <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
                 @endif
             </a>
+            @endif
 
             <!-- Absen Karyawan -->
             <a href="{{ route('attendance.employee-recap') }}"

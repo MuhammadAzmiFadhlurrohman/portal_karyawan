@@ -17,15 +17,15 @@ use Illuminate\View\View;
 class NotificationBroadcastController extends Controller
 {
     /**
-     * Authorize admin or super_admin or HRD
+     * Authorize admin or super_admin (HRD excluded)
      */
     protected function authorizeAdmin(Request $request): void
     {
         $user = $request->user();
         abort_unless(
-            $user && ($user->hasRole(['super_admin', 'admin', 'hrd']) || $user->can('attendance.employee.manage')),
+            $user && ($user->hasRole(['super_admin', 'admin']) || ($user->can('attendance.employee.manage') && ! $user->hasRole('hrd'))),
             403,
-            'Akses ditolak. Fitur siaran notifikasi hanya untuk Administrator dan HRD.'
+            'Akses ditolak. Fitur siaran notifikasi hanya untuk Administrator.'
         );
     }
 

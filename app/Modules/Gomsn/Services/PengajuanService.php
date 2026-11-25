@@ -346,7 +346,7 @@ class PengajuanService
 
                 // Notif ke tahapan berikutnya (Executive atau Finance)
                 if ($pengajuan->requires_executive_approval) {
-                    $execIds = User::role(['hrd', 'super_admin'])->pluck('id')->toArray();
+                    $execIds = User::role(['ceo', 'super_admin'])->pluck('id')->toArray();
                     app(FcmService::class)->sendToUsers(
                         userIds: $execIds,
                         eventType: 'pengajuan',
