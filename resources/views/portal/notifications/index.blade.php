@@ -16,7 +16,9 @@
         $oldUserIds = array_values(array_map('intval', (array) old('user_ids', [])));
     @endphp
 
-    <div x-data="{
+    <script>
+        function broadcastNotificationApp() {
+            return {
         targetType: {{ Js::from(old('target_type', 'all')) }},
         selectedDivision: {{ Js::from(old('division', 'Teknik Bandung')) }},
         searchQuery: '',
@@ -64,7 +66,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Template Diterapkan',
-                    text: 'Template \"' + tpl.name + '\" berhasil dimuat ke dalam form.',
+                    text: 'Template "' + tpl.name + '" berhasil dimuat ke dalam form.',
                     toast: true,
                     position: 'top-end',
                     timer: 2500,
@@ -119,8 +121,8 @@
 
         async saveTemplateToServer(name) {
             try {
-                const csrfToken = document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content') || document.querySelector('input[name=\"_token\"]')?.value;
-                const res = await fetch(\"{{ route('portal.notifications.templates.store') }}\", {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value;
+                const res = await fetch("{{ route('portal.notifications.templates.store') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -166,7 +168,7 @@
                 const res = await Swal.fire({
                     icon: 'warning',
                     title: 'Hapus Template?',
-                    text: 'Apakah Anda yakin ingin menghapus template \"' + tplName + '\"?',
+                    text: 'Apakah Anda yakin ingin menghapus template "' + tplName + '"?',
                     showCancelButton: true,
                     confirmButtonColor: '#e11d48',
                     cancelButtonColor: '#64748b',
@@ -175,12 +177,12 @@
                 });
                 if (!res.isConfirmed) return;
             } else {
-                if (!confirm('Hapus template \"' + tplName + '\"?')) return;
+                if (!confirm('Hapus template "' + tplName + '"?')) return;
             }
 
             try {
-                const csrfToken = document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content') || document.querySelector('input[name=\"_token\"]')?.value;
-                const url = \"{{ url('/portal/notifications/templates') }}/\" + tplId;
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value;
+                const url = "{{ url('/portal/notifications/templates') }}/" + tplId;
                 const res = await fetch(url, {
                     method: 'DELETE',
                     headers: {
@@ -368,7 +370,11 @@
 
             this.isSubmitting = true;
         }
-    }" class="space-y-5 w-full pb-16">
+    };
+        }
+    </script>
+
+    <div x-data="broadcastNotificationApp()" class="space-y-5 w-full pb-16">
 
         <!-- Top Header Banner (Sculpted Metallic Ocean Teal - Compact & Refined) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-md py-3.5 px-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 select-none"
