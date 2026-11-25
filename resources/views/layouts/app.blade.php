@@ -580,7 +580,7 @@
                     $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
                     $isKelolaKaryawanActive = request()->routeIs('attendance.employee-recap*', 'portal.employees.*', 'portal.notifications.*', 'attendance.reports*');
 
-                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.network.*');
+                    $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.network.*') || request()->routeIs('coverage');
                     $isLainnyaActive = request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.notifications.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
 
                     $isNocRole = $sidebarUser && ($sidebarUser->hasRole(['noc', 'atasan_noc', 'karyawan_noc']) || str_contains(strtolower($sidebarUser->division ?? ''), 'noc'));
@@ -824,6 +824,15 @@
                                         <span>Jaringan OLT, PON &amp; ODP</span>
                                     </a>
 
+                                    <a href="{{ route('gomsn.network.coverage') }}" 
+                                       class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-800 transition-colors">
+                                        <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <span>Cek Coverage ODP (FTTH)</span>
+                                    </a>
+
                                     @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
                                     <a href="{{ route('portal.sessions') }}" 
                                        class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors">
@@ -1051,6 +1060,15 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                                     </svg>
                                     <span>Jaringan OLT, PON &amp; ODP</span>
+                                </a>
+
+                                <a href="{{ route('gomsn.network.coverage') }}" 
+                                   class="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-800 transition-colors">
+                                    <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span>Cek Coverage ODP (FTTH)</span>
                                 </a>
 
                                 @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))

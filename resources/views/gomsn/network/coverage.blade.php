@@ -1,46 +1,736 @@
 <x-app-layout>
+    <!-- ============================================================== -->
+    <!-- LOAD LOCAL LEAFLET ASSETS FIRST BEFORE ALPINE PARSES DOM       -->
+    <!-- ============================================================== -->
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}" />
+    <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
+
+    <!-- Custom CSS for Leaflet & High-Tech FTTH Map Visualizations -->
+    <style>
+        .leaflet-container {
+            font-family: inherit;
+            background: #0f172a !important;
+        }
+        /* Custom Glowing Pulsing Target Ring */
+        .ftth-target-marker {
+            position: relative;
+        }
+        .ftth-pulse-ring {
+            position: absolute;
+            top: -14px;
+            left: -14px;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(225, 29, 72, 0.4);
+            animation: ftthRipple 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+            pointer-events: none;
+        }
+        @keyframes ftthRipple {
+            0% {
+                transform: scale(0.35);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
+        }
+        /* Animated Dash Polyline for Optical Cable */
+        .ftth-cable-line {
+            stroke-dasharray: 8, 8;
+            animation: ftthDash 1.2s linear infinite;
+        }
+        @keyframes ftthDash {
+            to {
+                stroke-dashoffset: -16;
+            }
+        }
+        /* Custom Leaflet Tooltip */
+        .ftth-odp-tooltip {
+            background-color: rgba(15, 23, 42, 0.95) !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(45, 212, 191, 0.5) !important;
+            border-radius: 8px !important;
+            padding: 4px 10px !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+        }
+        .ftth-odp-tooltip::before {
+            border-top-color: rgba(15, 23, 42, 0.95) !important;
+        }
+        /* Leaflet Popups */
+        .leaflet-popup-content-wrapper {
+            border-radius: 14px !important;
+            padding: 4px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25) !important;
+        }
+    </style>
+
+    <!-- DEFINISIKAN ftthCoverageApp() DI ATAS DOM SEBELUM ALPINE MERENDER -->
+    <script>
+        window.ftthCoverageApp = function(allOdps, metrics, initialTarget) {
+            return {
+                allOdps: allOdps || [],
+                metrics: metrics || {},
+                rawInput: '',
+                isSearching: false,
+                isLocating: false,
+                gpsAccuracy: null,
+                targetCoord: null, // [lat, lng]
+                targetLabel: 'Titik Lokasi Target',
+                copiedCoords: false,
+                copiedSummary: false,
+                suggestions: [],
+
+                // Filters
+                filterRadius: 500, // meter
+                filterOnlyAvailableSlot: false,
+                showCircles: true,
+
+                // Computed ODP states
+                nearbyOdps: [],
+                nearestOdp: null,
+                selectedOdp: null,
+
+                // Map objects
+                map: null,
+                currentTile: 'street',
+                tileLayers: {},
+                targetMarker: null,
+                odpMarkersGroup: null,
+                cablePolyline: null,
+                circle150: null,
+                circle300: null,
+                mouseCoordText: 'Arahkan kursor ke peta...',
+
+                // Road route multiplier factor (kontur jalan tiang)
+                ROAD_FACTOR: 1.28,
+                OPTICAL_LOSS_PER_KM: 0.35, // dB/km
+                CABLE_SLACK: 18, // meter
+
+                get activeOdp() {
+                    return this.selectedOdp || this.nearestOdp;
+                },
+
+                get activeDistance() {
+                    if (!this.activeOdp) return 0;
+                    return this.activeOdp.calculatedRouteDist || 0;
+                },
+
+                get activeStraightDistance() {
+                    if (!this.activeOdp) return 0;
+                    return this.activeOdp.calculatedStraightDist || 0;
+                },
+
+                initApp() {
+                    this.$nextTick(() => {
+                        this.initLeafletMap();
+
+                        // Set initial target jika dilempar dari controller query param
+                        if (initialTarget && initialTarget.lat && initialTarget.lng) {
+                            this.setTargetLocation(initialTarget.lat, initialTarget.lng, initialTarget.label || 'Titik Calon Pelanggan');
+                        }
+                    });
+                },
+
+                initLeafletMap() {
+                    if (typeof L === 'undefined') {
+                        console.error('Leaflet library L is not loaded.');
+                        return;
+                    }
+
+                    const defaultCenter = (this.metrics.default_center && this.metrics.default_center.lat)
+                        ? [this.metrics.default_center.lat, this.metrics.default_center.lng]
+                        : [-6.917464, 107.619123];
+
+                    const mapContainer = document.getElementById('coverageMap');
+                    if (!mapContainer) return;
+
+                    this.map = L.map(mapContainer, {
+                        center: defaultCenter,
+                        zoom: 14,
+                        zoomControl: true,
+                        attributionControl: false
+                    });
+
+                    // Define 3 High-Performance Tile Providers
+                    this.tileLayers.street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; OpenStreetMap'
+                    });
+
+                    this.tileLayers.satellite = L.layerGroup([
+                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                            maxZoom: 19
+                        }),
+                        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                            maxZoom: 19
+                        })
+                    ]);
+
+                    this.tileLayers.dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 19,
+                        subdomains: 'abcd'
+                    });
+
+                    // Set default layer
+                    this.tileLayers.street.addTo(this.map);
+
+                    // Marker Groups
+                    this.odpMarkersGroup = L.layerGroup().addTo(this.map);
+
+                    // Event: Klik di sembarang area peta untuk menaruh Target Pin
+                    this.map.on('click', (e) => {
+                        this.setTargetLocation(e.latlng.lat, e.latlng.lng, 'Titik Pilihan Peta');
+                    });
+
+                    // Mousemove coordinate tracking
+                    this.map.on('mousemove', (e) => {
+                        this.mouseCoordText = e.latlng.lat.toFixed(5) + ', ' + e.latlng.lng.toFixed(5);
+                    });
+
+                    // Render semua ODP markers
+                    this.renderAllOdpMarkers();
+
+                    // Force Leaflet to recalculate container geometry
+                    setTimeout(() => {
+                        if (this.map) {
+                            this.map.invalidateSize();
+                        }
+                    }, 250);
+                    setTimeout(() => {
+                        if (this.map) {
+                            this.map.invalidateSize();
+                        }
+                    }, 800);
+                },
+
+                setTileLayer(type) {
+                    if (this.currentTile === type) return;
+                    this.map.removeLayer(this.tileLayers[this.currentTile]);
+                    this.tileLayers[type].addTo(this.map);
+                    this.currentTile = type;
+                },
+
+                renderAllOdpMarkers() {
+                    if (!this.odpMarkersGroup) return;
+                    this.odpMarkersGroup.clearLayers();
+
+                    this.allOdps.forEach(odp => {
+                        const isAvailable = odp.has_slot;
+                        const bgColor = isAvailable ? '#10b981' : '#f43f5e';
+                        const pulseColor = isAvailable ? 'rgba(16, 185, 129, 0.45)' : 'rgba(244, 63, 94, 0.45)';
+
+                        const odpIcon = L.divIcon({
+                            className: 'ftth-odp-marker',
+                            html: `
+                                <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                    <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; filter: drop-shadow(0 2px 5px ${pulseColor});">
+                                        <path fill="${bgColor}" stroke="#ffffff" stroke-width="1.8" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                                        <circle cx="12" cy="9" r="3.2" fill="#ffffff"/>
+                                    </svg>
+                                </div>
+                            `,
+                            iconSize: [28, 28],
+                            iconAnchor: [14, 28],
+                            popupAnchor: [0, -26]
+                        });
+
+                        const marker = L.marker([odp.lat, odp.lng], { icon: odpIcon });
+
+                        marker.bindTooltip(odp.nama_odp, {
+                            permanent: false,
+                            direction: 'top',
+                            className: 'ftth-odp-tooltip'
+                        });
+
+                        marker.on('click', () => {
+                            let distInfo = '';
+                            if (this.targetCoord) {
+                                const stDist = this.calculateHaversine(this.targetCoord[0], this.targetCoord[1], odp.lat, odp.lng);
+                                const rtDist = Math.round(stDist * this.ROAD_FACTOR);
+                                distInfo = `
+                                    <div style="margin-top: 8px; padding: 6px 10px; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 11.5px;">
+                                        <div style="font-weight: 700; color: #0f172a;">Jarak Jalan: <span style="color: #0891b2;">${rtDist} meter</span></div>
+                                        <div style="font-size: 10.5px; color: #64748b;">(Garis lurus: ${Math.round(stDist)}m &bull; Dropcore: ~${Math.round(rtDist + 18)}m)</div>
+                                    </div>
+                                `;
+                            }
+
+                            const popupHtml = `
+                                <div style="font-family: inherit; min-width: 220px; padding: 4px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin-bottom: 8px;">
+                                        <strong style="color: #0f172a; font-size: 13px;">${odp.nama_odp}</strong>
+                                        <span style="background: ${odp.has_slot ? '#d1fae5' : '#ffe4e6'}; color: ${odp.has_slot ? '#065f46' : '#9f1239'}; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 9999px;">
+                                            ${odp.has_slot ? odp.port_tersedia + ' Slot' : 'Penuh'}
+                                        </span>
+                                    </div>
+                                    <div style="font-size: 11.5px; color: #475569; line-height: 1.6;">
+                                        <div><strong>OLT:</strong> ${odp.nama_olt} (${odp.kode_olt})</div>
+                                        <div><strong>PON:</strong> ${odp.nama_pon}</div>
+                                        <div><strong>Kapasitas:</strong> ${odp.port_terpakai} / ${odp.port_max} Terpakai</div>
+                                    </div>
+                                    ${distInfo}
+                                    <button type="button"
+                                            onclick="window.__selectOdpFromPopup(${odp.id})"
+                                            style="margin-top: 10px; width: 100%; padding: 6px 10px; border-radius: 8px; background: #0891b2; color: #ffffff; font-weight: 700; font-size: 11.5px; border: none; cursor: pointer; transition: background 0.2s;">
+                                        Jadikan Target ODP Ini
+                                    </button>
+                                </div>
+                            `;
+
+                            marker.bindPopup(popupHtml).openPopup();
+                        });
+
+                        marker.addTo(this.odpMarkersGroup);
+                    });
+
+                    window.__selectOdpFromPopup = (id) => {
+                        const target = this.allOdps.find(o => o.id === id);
+                        if (target) {
+                            this.selectOdp(target);
+                            this.map.closePopup();
+                        }
+                    };
+                },
+
+                setTargetLocation(lat, lng, label = 'Titik Calon Pelanggan') {
+                    this.targetCoord = [lat, lng];
+                    this.targetLabel = label;
+                    this.rawInput = lat.toFixed(6) + ', ' + lng.toFixed(6);
+
+                    if (this.targetMarker) {
+                        this.targetMarker.setLatLng([lat, lng]);
+                    } else {
+                        const targetIcon = L.divIcon({
+                            className: 'ftth-target-marker',
+                            html: `
+                                <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                                    <div class="ftth-pulse-ring"></div>
+                                    <svg viewBox="0 0 24 24" style="width: 34px; height: 34px; filter: drop-shadow(0 4px 8px rgba(225,29,72,0.65));">
+                                        <path fill="#e11d48" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                                        <circle cx="12" cy="9" r="3.5" fill="#ffffff"/>
+                                    </svg>
+                                </div>
+                            `,
+                            iconSize: [38, 38],
+                            iconAnchor: [19, 36],
+                            popupAnchor: [0, -34]
+                        });
+
+                        this.targetMarker = L.marker([lat, lng], {
+                            icon: targetIcon,
+                            draggable: true,
+                            zIndexOffset: 1000
+                        }).addTo(this.map);
+
+                        this.targetMarker.on('dragend', (e) => {
+                            const newPos = e.target.getLatLng();
+                            this.setTargetLocation(newPos.lat, newPos.lng, 'Titik Pilihan Peta (Digeser)');
+                        });
+                    }
+
+                    this.selectedOdp = null;
+                    this.recalculateAllDistances();
+                    this.updateVisualizations();
+                },
+
+                recalculateAllDistances() {
+                    if (!this.targetCoord) return;
+                    const [tLat, tLng] = this.targetCoord;
+
+                    const calculated = this.allOdps.map(odp => {
+                        const stDist = this.calculateHaversine(tLat, tLng, odp.lat, odp.lng);
+                        const rtDist = stDist * this.ROAD_FACTOR;
+                        return {
+                            ...odp,
+                            calculatedStraightDist: stDist,
+                            calculatedRouteDist: rtDist
+                        };
+                    });
+
+                    let filtered = calculated.filter(odp => {
+                        const matchRadius = odp.calculatedRouteDist <= this.filterRadius;
+                        const matchSlot = this.filterOnlyAvailableSlot ? odp.has_slot : true;
+                        return matchRadius && matchSlot;
+                    });
+
+                    filtered.sort((a, b) => a.calculatedRouteDist - b.calculatedRouteDist);
+                    this.nearbyOdps = filtered.slice(0, 5);
+
+                    if (filtered.length > 0) {
+                        this.nearestOdp = filtered[0];
+                    } else {
+                        calculated.sort((a, b) => a.calculatedRouteDist - b.calculatedRouteDist);
+                        this.nearestOdp = calculated[0] || null;
+                    }
+                },
+
+                applyOdpFilters() {
+                    this.recalculateAllDistances();
+                    this.updateVisualizations();
+                },
+
+                selectOdp(odp) {
+                    this.selectedOdp = odp;
+                    this.updateVisualizations();
+
+                    if (this.map && odp) {
+                        this.map.panTo([odp.lat, odp.lng], { animate: true });
+                    }
+                },
+
+                updateVisualizations() {
+                    if (!this.targetCoord || !this.activeOdp || !this.map) return;
+
+                    const [tLat, tLng] = this.targetCoord;
+                    const oLat = this.activeOdp.lat;
+                    const oLng = this.activeOdp.lng;
+                    const dist = this.activeDistance;
+
+                    const lineColor = this.getTierColor(dist);
+
+                    if (this.cablePolyline) {
+                        this.map.removeLayer(this.cablePolyline);
+                    }
+
+                    this.cablePolyline = L.polyline([[tLat, tLng], [oLat, oLng]], {
+                        color: lineColor,
+                        weight: 4,
+                        opacity: 0.95,
+                        dashArray: '8, 8',
+                        className: 'ftth-cable-line'
+                    }).addTo(this.map);
+
+                    if (this.circle150) this.map.removeLayer(this.circle150);
+                    if (this.circle300) this.map.removeLayer(this.circle300);
+
+                    if (this.showCircles) {
+                        this.circle150 = L.circle([oLat, oLng], {
+                            radius: 150,
+                            color: '#10b981',
+                            fillColor: '#10b981',
+                            fillOpacity: 0.08,
+                            weight: 1.5,
+                            dashArray: '4, 4'
+                        }).addTo(this.map);
+
+                        this.circle300 = L.circle([oLat, oLng], {
+                            radius: 300,
+                            color: '#f59e0b',
+                            fillColor: '#f59e0b',
+                            fillOpacity: 0.04,
+                            weight: 1.5,
+                            dashArray: '6, 6'
+                        }).addTo(this.map);
+                    }
+
+                    const bounds = L.latLngBounds([[tLat, tLng], [oLat, oLng]]);
+                    this.map.fitBounds(bounds, { padding: [70, 70], maxZoom: 17 });
+                },
+
+                toggleCoverageCircles() {
+                    this.showCircles = !this.showCircles;
+                    this.updateVisualizations();
+                },
+
+                focusToTarget() {
+                    if (this.targetCoord && this.map) {
+                        this.map.setView(this.targetCoord, 17, { animate: true });
+                    }
+                },
+
+                fitToAllOdps() {
+                    if (!this.map || this.allOdps.length === 0) return;
+                    const latlngs = this.allOdps.map(o => [o.lat, o.lng]);
+                    if (this.targetCoord) latlngs.push(this.targetCoord);
+                    this.map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40] });
+                },
+
+                calculateHaversine(lat1, lon1, lat2, lon2) {
+                    const R = 6371e3;
+                    const φ1 = lat1 * Math.PI / 180;
+                    const φ2 = lat2 * Math.PI / 180;
+                    const Δφ = (lat2 - lat1) * Math.PI / 180;
+                    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+                    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                              Math.cos(φ1) * Math.cos(φ2) *
+                              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                    return R * c;
+                },
+
+                calculateDropcoreNeed(routeDistance) {
+                    return Math.round(routeDistance + this.CABLE_SLACK);
+                },
+
+                calculateLoss(routeDistance) {
+                    const loss = (routeDistance / 1000) * this.OPTICAL_LOSS_PER_KM;
+                    return loss.toFixed(2);
+                },
+
+                processSmartInput() {
+                    const text = this.rawInput.trim();
+                    if (!text) return;
+
+                    const atMatch = text.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+                    if (atMatch) {
+                        this.setTargetLocation(parseFloat(atMatch[1]), parseFloat(atMatch[2]), 'Dari URL Google Maps');
+                        return;
+                    }
+
+                    const qMatch = text.match(/[?&](?:q|ll|query|destination|daddr)=(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
+                    if (qMatch) {
+                        this.setTargetLocation(parseFloat(qMatch[1]), parseFloat(qMatch[2]), 'Dari URL Google Maps');
+                        return;
+                    }
+
+                    const rawMatch = text.match(/^(-?\d+[\.,]?\d*)[\s,;]+(-?\d+[\.,]?\d*)$/);
+                    if (rawMatch) {
+                        let lat = parseFloat(rawMatch[1].replace(',', '.'));
+                        let lng = parseFloat(rawMatch[2].replace(',', '.'));
+
+                        if (lat >= 95.0 && lat <= 141.5 && lng >= -11.5 && lng <= 6.5) {
+                            const tmp = lat; lat = lng; lng = tmp;
+                        }
+                        if (lat >= 5.5 && lat <= 8.5 && lng >= 105.0 && lng <= 112.0) {
+                            lat = -lat;
+                        }
+
+                        this.setTargetLocation(lat, lng, 'Koordinat Manual');
+                        return;
+                    }
+
+                    this.geocodeAddress(text);
+                },
+
+                async geocodeAddress(query) {
+                    this.isSearching = true;
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=id&limit=1`;
+                        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                        const data = await res.json();
+                        if (data && data.length > 0) {
+                            const item = data[0];
+                            this.setTargetLocation(parseFloat(item.lat), parseFloat(item.lon), item.display_name.split(',')[0]);
+                        } else {
+                            if (window.Swal) {
+                                Swal.fire({ icon: 'info', title: 'Alamat Tidak Ditemukan', text: 'Coba masukkan koordinat angka (contoh: -6.936, 107.590) atau klik langsung di peta.' });
+                            } else {
+                                alert('Alamat tidak ditemukan. Silakan klik langsung pada peta.');
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Geocoding error:', e);
+                    } finally {
+                        this.isSearching = false;
+                    }
+                },
+
+                async handleSearchSuggestions() {
+                    const q = this.rawInput.trim();
+                    if (q.length < 3 || q.includes('http') || /^-?\d/.test(q)) {
+                        this.suggestions = [];
+                        return;
+                    }
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=id&limit=4`;
+                        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                        const data = await res.json();
+                        this.suggestions = data || [];
+                    } catch (e) {
+                        this.suggestions = [];
+                    }
+                },
+
+                selectSuggestion(item) {
+                    this.suggestions = [];
+                    this.setTargetLocation(parseFloat(item.lat), parseFloat(item.lon), item.display_name.split(',')[0]);
+                },
+
+                getCurrentLocation() {
+                    if (!navigator.geolocation) {
+                        alert('Browser Anda tidak mendukung Geolocation GPS.');
+                        return;
+                    }
+                    this.isLocating = true;
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            this.isLocating = false;
+                            this.gpsAccuracy = Math.round(pos.coords.accuracy);
+                            this.setTargetLocation(pos.coords.latitude, pos.coords.longitude, 'Lokasi GPS Saya Saat Ini');
+                        },
+                        (err) => {
+                            this.isLocating = false;
+                            let msg = 'Gagal mendeteksi lokasi GPS.';
+                            if (err.code === 1) msg = 'Izin akses lokasi ditolak oleh pengguna.';
+                            if (window.Swal) {
+                                Swal.fire({ icon: 'warning', title: 'GPS Tidak Terdeteksi', text: msg });
+                            } else {
+                                alert(msg);
+                            }
+                        },
+                        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+                    );
+                },
+
+                getTierTitle(dist) {
+                    if (dist <= 150) return 'SANGAT DIREKOMENDASIKAN (Kualitas Sempurna)';
+                    if (dist <= 250) return 'TERCOVER STANDAR ISP';
+                    if (dist <= 300) return 'BATAS MAKSIMAL (Perlu Penguat Tiang)';
+                    return 'DI LUAR JANGKAUAN / BELUM TERCOVER';
+                },
+
+                getTierDescription(dist) {
+                    if (dist <= 150) return 'Redaman optik prima, tarikan dropcore efisien & aman dari bending.';
+                    if (dist <= 250) return 'Jarak normal FTTH standar industri. Pemasangan aman dilakukan.';
+                    if (dist <= 300) return 'Jarak di batas toleransi. Wajib survey tiang perantara & jalur jalan.';
+                    return 'Jarak > 300 meter. Risiko redaman tinggi & kabel putus. Perlu ODP baru.';
+                },
+
+                getTierClass(dist) {
+                    if (dist <= 150) return 'bg-emerald-50 text-emerald-950 border-emerald-300 dark:bg-emerald-950/80 dark:text-emerald-100 dark:border-emerald-700';
+                    if (dist <= 250) return 'bg-sky-50 text-sky-950 border-sky-300 dark:bg-sky-950/80 dark:text-sky-100 dark:border-sky-700';
+                    if (dist <= 300) return 'bg-amber-50 text-amber-950 border-amber-300 dark:bg-amber-950/80 dark:text-amber-100 dark:border-amber-700';
+                    return 'bg-rose-50 text-rose-950 border-rose-300 dark:bg-rose-950/80 dark:text-rose-100 dark:border-rose-700';
+                },
+
+                getTierIconBg(dist) {
+                    if (dist <= 150) return 'bg-emerald-600 text-white';
+                    if (dist <= 250) return 'bg-sky-600 text-white';
+                    if (dist <= 300) return 'bg-amber-500 text-white';
+                    return 'bg-rose-600 text-white';
+                },
+
+                getTierColor(dist) {
+                    if (dist <= 150) return '#10b981';
+                    if (dist <= 250) return '#0284c7';
+                    if (dist <= 300) return '#f59e0b';
+                    return '#e11d48';
+                },
+
+                getGoogleMapsRouteUrl() {
+                    if (!this.targetCoord || !this.activeOdp) return '#';
+                    return `https://www.google.com/maps/dir/?api=1&origin=${this.targetCoord[0]},${this.targetCoord[1]}&destination=${this.activeOdp.lat},${this.activeOdp.lng}&travelmode=driving`;
+                },
+
+                copyTargetCoords() {
+                    if (!this.targetCoord) return;
+                    const text = `${this.targetCoord[0].toFixed(6)}, ${this.targetCoord[1].toFixed(6)}`;
+                    navigator.clipboard.writeText(text);
+                    this.copiedCoords = true;
+                    setTimeout(() => { this.copiedCoords = false; }, 2000);
+                },
+
+                copyEvaluationSummary() {
+                    if (!this.targetCoord || !this.activeOdp) return;
+                    const text = `*HASIL EVALUASI COVERAGE FTTH (GoMSN)*\n` +
+                        `• Koordinat Target: ${this.targetCoord[0].toFixed(6)}, ${this.targetCoord[1].toFixed(6)}\n` +
+                        `• ODP Terdekat: ${this.activeOdp.nama_odp}\n` +
+                        `• OLT / PON: ${this.activeOdp.nama_olt} / ${this.activeOdp.nama_pon}\n` +
+                        `• Jarak Jalan Tiang: ~${Math.round(this.activeDistance)} meter (Lurus: ${Math.round(this.activeStraightDistance)}m)\n` +
+                        `• Est. Dropcore: ${this.calculateDropcoreNeed(this.activeDistance)} meter (+slack)\n` +
+                        `• Kapasitas Port: ${this.activeOdp.port_terpakai}/${this.activeOdp.port_max} (${this.activeOdp.has_slot ? 'Ada Slot' : 'Penuh'})\n` +
+                        `• Status Kelayakan: ${this.getTierTitle(this.activeDistance)}\n` +
+                        `• Navigasi: ${this.getGoogleMapsRouteUrl()}`;
+
+                    navigator.clipboard.writeText(text);
+                    this.copiedSummary = true;
+                    setTimeout(() => { this.copiedSummary = false; }, 2500);
+
+                    if (window.Swal) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Ringkasan Tersalin ke Clipboard',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                },
+
+                requestNetworkExpansion() {
+                    if (window.Swal) {
+                        Swal.fire({
+                            title: 'Permintaan Perluasan Jaringan ODP',
+                            html: `
+                                <div style="text-align: left; font-size: 13px;">
+                                    <p>Lokasi ini berada pada jarak <strong>${Math.round(this.activeDistance)}m</strong> dari ODP terdekat (<strong>${this.activeOdp ? this.activeOdp.nama_odp : '-'}</strong>).</p>
+                                    <p style="margin-top: 8px;">Kirim data prospek ini ke tim Perencanaan Jaringan (NOC &amp; Project FTTH) untuk agenda penambahan tiang/ODP baru?</p>
+                                </div>
+                            `,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#0891b2',
+                            cancelButtonColor: '#64748b',
+                            confirmButtonText: 'Kirim Permintaan',
+                            cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Prospek Tercatat',
+                                    text: 'Koordinat lokasi telah diteruskan ke daftar prospek perluasan ODP.'
+                                });
+                            }
+                        });
+                    }
+                }
+            };
+        };
+    </script>
+
+    <!-- ============================================================== -->
+    <!-- MAIN INTERACTIVE APP CONTAINER                                 -->
+    <!-- ============================================================== -->
     <div class="space-y-5 max-w-[1600px] mx-auto pb-10 px-2 sm:px-4"
          x-data="ftthCoverageApp(@js($odps), @js($metrics), @js($initialTarget))"
          x-init="initApp()">
 
         <!-- ============================================================== -->
-        <!-- 1. TOP HEADER BANNER (METALLIC OBSIDIAN & TEAL NOC AESTHETIC)  -->
+        <!-- 1. TOP HEADER BANNER (HIGH-CONTRAST METALLIC OBSIDIAN & TEAL)  -->
         <!-- ============================================================== -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_24px_rgba(2,43,58,0.4)] p-4 sm:p-5 select-none"
-             style="background: linear-gradient(135deg, #022836 0%, #033644 30%, #074b59 70%, #0a5e6c 100%);">
+        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/40 shadow-[0_8px_30px_rgba(2,43,58,0.45)] p-4 sm:p-5 select-none"
+             style="background: linear-gradient(135deg, #022330 0%, #033644 35%, #074b59 70%, #085565 100%) !important;">
 
             <!-- High-tech Grid Background Pattern & Gloss Highlight -->
-            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#2dd4bf_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
-            <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/80 to-transparent pointer-events-none"></div>
-            <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-cyan-400/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#2dd4bf_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+            <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#5eead4] to-transparent pointer-events-none"></div>
+            <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-cyan-400/15 rounded-full blur-3xl pointer-events-none"></div>
 
             <div class="relative z-10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                 <!-- Left: Title, Badges & Breadcrumb -->
                 <div class="flex items-start sm:items-center gap-3.5 min-w-0">
                     <a href="{{ route('gomsn.network.index') }}"
-                       class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center shrink-0 shadow-xs transition mt-0.5 sm:mt-0"
-                       title="Kembali ke Manajemen OLT / PON / ODP">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                       class="w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center shrink-0 shadow-xs transition mt-0.5 sm:mt-0"
+                       title="Kembali ke Manajemen OLT, PON & ODP">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                         </svg>
                     </a>
 
-                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
-                        <svg class="w-5 h-5 drop-shadow-[0_0_8px_rgba(45,212,191,0.6)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                    <div class="w-11 h-11 rounded-xl bg-cyan-500/30 border border-cyan-300/50 flex items-center justify-center text-cyan-200 shrink-0 shadow-inner">
+                        <svg class="w-6 h-6 text-cyan-200 drop-shadow-[0_0_10px_rgba(45,212,191,0.8)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
 
                     <div class="min-w-0">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                            <h1 style="color: #ffffff !important;" class="text-lg sm:text-xl font-extrabold tracking-tight flex items-center gap-2 drop-shadow-sm">
                                 <span>Cek Coverage Lokasi ke ODP Terdekat</span>
-                                <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-400/25 text-emerald-200 border border-emerald-300/40">
                                     Presisi FTTH
                                 </span>
                             </h1>
                         </div>
-                        <p class="text-xs text-cyan-100/80 mt-0.5 truncate">
+                        <p style="color: #a7f3d0 !important;" class="text-xs sm:text-[13px] mt-0.5 leading-snug font-medium">
                             Kalkulasi jarak rute kabel tiang, kapasitas port, estimasi dropcore &amp; kelayakan pasang baru.
                         </p>
                     </div>
@@ -49,38 +739,42 @@
                 <!-- Right: High-tech Live Metrics Bar -->
                 <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
                     <!-- Total ODP -->
-                    <div class="px-3 py-1.5 rounded-xl bg-black/25 border border-white/10 backdrop-blur-xs flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <div style="background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;"
+                         class="px-3.5 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2.5 shadow-sm">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
                         <div class="text-left">
-                            <span class="text-[9.5px] uppercase tracking-wider text-cyan-200/70 block leading-tight">Total Node ODP</span>
-                            <span class="font-mono font-bold text-xs text-white" x-text="allOdps.length + ' ODP'"></span>
+                            <span style="color: rgba(204, 251, 241, 0.85) !important;" class="text-[9.5px] uppercase font-bold tracking-wider block leading-tight">Total Node ODP</span>
+                            <span style="color: #ffffff !important;" class="font-mono font-black text-xs sm:text-sm" x-text="allOdps.length + ' ODP'"></span>
                         </div>
                     </div>
 
                     <!-- Port Tersedia -->
-                    <div class="px-3 py-1.5 rounded-xl bg-black/25 border border-white/10 backdrop-blur-xs flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <div style="background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(16, 185, 129, 0.35) !important;"
+                         class="px-3.5 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2.5 shadow-sm">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                         <div class="text-left">
-                            <span class="text-[9.5px] uppercase tracking-wider text-emerald-200/70 block leading-tight">Port Tersedia</span>
-                            <span class="font-mono font-bold text-xs text-emerald-300" x-text="metrics.total_available_ports + ' Port'"></span>
+                            <span style="color: rgba(167, 243, 208, 0.85) !important;" class="text-[9.5px] uppercase font-bold tracking-wider block leading-tight">Port Tersedia</span>
+                            <span style="color: #6ee7b7 !important;" class="font-mono font-black text-xs sm:text-sm" x-text="metrics.total_available_ports + ' Port'"></span>
                         </div>
                     </div>
 
                     <!-- Batas Rekomendasi -->
-                    <div class="hidden md:flex px-3 py-1.5 rounded-xl bg-black/25 border border-white/10 backdrop-blur-xs items-center gap-2">
-                        <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <div style="background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(245, 158, 11, 0.35) !important;"
+                         class="hidden md:flex px-3.5 py-1.5 rounded-xl backdrop-blur-md items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <div class="text-left">
-                            <span class="text-[9.5px] uppercase tracking-wider text-amber-200/70 block leading-tight">Batas Standar</span>
-                            <span class="font-mono font-bold text-xs text-amber-300">&le; 150m (Max 300m)</span>
+                            <span style="color: rgba(254, 243, 199, 0.85) !important;" class="text-[9.5px] uppercase font-bold tracking-wider block leading-tight">Batas Standar</span>
+                            <span style="color: #fde68a !important;" class="font-mono font-black text-xs sm:text-sm">&le; 150m (Max 300m)</span>
                         </div>
                     </div>
 
                     <!-- Link Buka Tabel ODP -->
                     <a href="{{ route('gomsn.network.index') }}"
-                       class="px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-[#022836] font-bold text-xs flex items-center gap-1.5 transition shadow-sm hover:shadow-cyan-400/20">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                       style="background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%) !important; color: #022330 !important;"
+                       class="px-3.5 py-2 rounded-xl font-black text-xs flex items-center gap-1.5 transition shadow-md hover:brightness-110 active:scale-95 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
                         <span>Kelola ODP</span>
@@ -100,7 +794,7 @@
             <div class="lg:col-span-5 space-y-4">
 
                 <!-- CARD A: SMART LOCATION INPUT ENGINE -->
-                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_8px_30px_rgb(15,23,42,0.04)] p-4 sm:p-5 space-y-4">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_8px_30px_rgb(15,23,42,0.05)] p-4 sm:p-5 space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                         <div class="flex items-center gap-2">
                             <span class="flex h-2.5 w-2.5 relative">
@@ -177,7 +871,7 @@
                         <button type="button"
                                 @click="getCurrentLocation()"
                                 :disabled="isLocating"
-                                class="flex-1 py-2 px-3 rounded-xl border border-cyan-500/30 bg-cyan-50/70 hover:bg-cyan-100/80 dark:bg-cyan-950/40 dark:hover:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-60">
+                                class="flex-1 py-2.5 px-3 rounded-xl border border-cyan-500/30 bg-cyan-50/70 hover:bg-cyan-100/80 dark:bg-cyan-950/40 dark:hover:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-60">
                             <svg x-show="!isLocating" class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
@@ -191,8 +885,8 @@
                         </button>
 
                         <!-- Tip Drag / Klik Pin -->
-                        <div class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                             </svg>
                             <span>Klik di peta atau geser pin merah</span>
@@ -243,7 +937,24 @@
                     </div>
                 </div>
 
-                <!-- CARD B: COVERAGE EVALUATION DECISION CARD (PRIMARY RESULT) -->
+                <!-- CARD B1: PROMPT PLACEHOLDER JIKA BELUM MEMILIH LOKASI -->
+                <div x-show="!targetCoord"
+                     class="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center space-y-3">
+                    <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <div class="max-w-xs mx-auto">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100">Pilih Lokasi di Peta</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                            Klik di area mana saja pada peta sebelah kanan, ketik koordinat di atas, atau gunakan tombol <strong>GPS Lokasi Saya</strong> untuk menguji kelayakan jaringan FTTH.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- CARD B2: COVERAGE EVALUATION DECISION CARD (PRIMARY RESULT) -->
                 <div x-show="targetCoord && nearestOdp" x-cloak
                      class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_8px_30px_rgb(15,23,42,0.06)] p-4 sm:p-5 space-y-4 transition-all">
 
@@ -357,7 +1068,6 @@
 
                     <!-- Action Buttons: Google Maps Route + WhatsApp Copier + Register Customer -->
                     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                        <!-- Open in Google Maps Navigation Route -->
                         <a :href="getGoogleMapsRouteUrl()"
                            target="_blank"
                            rel="noopener noreferrer"
@@ -368,7 +1078,6 @@
                             <span>Buka Rute Maps</span>
                         </a>
 
-                        <!-- Salin Ringkasan Evaluasi FTTH ke Clipboard -->
                         <button type="button"
                                 @click="copyEvaluationSummary()"
                                 class="flex-1 py-2.5 px-3 rounded-xl border border-cyan-500/30 bg-cyan-50 hover:bg-cyan-100/80 dark:bg-cyan-950/50 dark:hover:bg-cyan-900/60 text-cyan-800 dark:text-cyan-200 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer">
@@ -552,12 +1261,12 @@
                         </div>
                     </div>
 
-                    <!-- Canvas Map Container -->
-                    <div class="relative w-full min-h-[520px] sm:min-h-[620px] lg:h-[calc(100vh-230px)] bg-slate-100 dark:bg-slate-950">
-                        <div id="coverageMap" class="w-full h-full absolute inset-0 z-0"></div>
+                    <!-- Canvas Map Container (Explicit Height to Guarantee Leaflet Renders) -->
+                    <div class="relative w-full bg-slate-900" style="min-height: 620px; height: calc(100vh - 220px);">
+                        <div id="coverageMap" style="width: 100%; height: 100%; min-height: 620px; position: absolute; inset: 0; z-index: 1;"></div>
 
                         <!-- Bottom Left Map Floating Legend -->
-                        <div class="absolute bottom-3 left-3 z-[400] p-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-lg text-[10.5px] space-y-1.5 select-none">
+                        <div class="absolute bottom-3 left-3 z-[400] p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 shadow-xl text-[10.5px] space-y-1.5 select-none">
                             <span class="font-bold text-slate-800 dark:text-slate-200 block text-[11px] mb-1">Keterangan Node &amp; Marker:</span>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-emerald-500 border border-white shadow-xs"></span>
@@ -578,7 +1287,7 @@
                         </div>
 
                         <!-- Bottom Right Floating Coordinate Cursor -->
-                        <div class="absolute bottom-3 right-3 z-[400] px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-white font-mono text-[10px] hidden sm:block pointer-events-none"
+                        <div class="absolute bottom-3 right-3 z-[400] px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-xs text-white font-mono text-[10.5px] hidden sm:block pointer-events-none"
                              x-text="mouseCoordText">
                         </div>
                     </div>
@@ -587,694 +1296,4 @@
 
         </div>
     </div>
-
-    <!-- ============================================================== -->
-    <!-- LEAFLET.JS CSS & JAVASCRIPT CDN (STANDALONE & LIGHTWEIGHT)      -->
-    <!-- ============================================================== -->
-    @push('scripts')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <!-- Custom CSS for Leaflet Pulsing Markers & Animated Dash Polylines -->
-    <style>
-        .leaflet-container {
-            font-family: inherit;
-        }
-        /* Custom Glowing Pulsing Target Ring */
-        .ftth-target-marker {
-            position: relative;
-        }
-        .ftth-pulse-ring {
-            position: absolute;
-            top: -12px;
-            left: -12px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(244, 63, 94, 0.35);
-            animation: ftthRipple 1.6s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-            pointer-events: none;
-        }
-        @keyframes ftthRipple {
-            0% {
-                transform: scale(0.4);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1.6);
-                opacity: 0;
-            }
-        }
-        /* Animated Dash Polyline for Optical Cable */
-        .ftth-cable-line {
-            stroke-dasharray: 8, 8;
-            animation: ftthDash 1.2s linear infinite;
-        }
-        @keyframes ftthDash {
-            to {
-                stroke-dashoffset: -16;
-            }
-        }
-        /* Custom Leaflet Tooltip */
-        .ftth-odp-tooltip {
-            background-color: rgba(15, 23, 42, 0.92);
-            color: #ffffff;
-            border: 1px solid rgba(45, 212, 191, 0.4);
-            border-radius: 8px;
-            padding: 3px 8px;
-            font-weight: 700;
-            font-size: 11px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-        }
-        .ftth-odp-tooltip::before {
-            border-top-color: rgba(15, 23, 42, 0.92) !important;
-        }
-    </style>
-
-    <script>
-        function ftthCoverageApp(allOdps, metrics, initialTarget) {
-            return {
-                allOdps: allOdps || [],
-                metrics: metrics || {},
-                rawInput: '',
-                isSearching: false,
-                isLocating: false,
-                gpsAccuracy: null,
-                targetCoord: null, // [lat, lng]
-                targetLabel: 'Titik Lokasi Target',
-                copiedCoords: false,
-                copiedSummary: false,
-                suggestions: [],
-
-                // Filters
-                filterRadius: 500, // meter
-                filterOnlyAvailableSlot: false,
-                showCircles: true,
-
-                // Computed ODP states
-                nearbyOdps: [],
-                nearestOdp: null,
-                selectedOdp: null, // manual override by clicking an alternative
-
-                // Map objects
-                map: null,
-                currentTile: 'street',
-                tileLayers: {},
-                targetMarker: null,
-                odpMarkersGroup: null,
-                cablePolyline: null,
-                circle150: null,
-                circle300: null,
-                mouseCoordText: 'Arahkan kursor ke peta...',
-
-                // Road route multiplier factor (kontur jalan tiang)
-                ROAD_FACTOR: 1.28,
-                OPTICAL_LOSS_PER_KM: 0.35, // dB/km
-                CABLE_SLACK: 18, // meter
-
-                get activeOdp() {
-                    return this.selectedOdp || this.nearestOdp;
-                },
-
-                get activeDistance() {
-                    if (!this.activeOdp) return 0;
-                    return this.activeOdp.calculatedRouteDist || 0;
-                },
-
-                get activeStraightDistance() {
-                    if (!this.activeOdp) return 0;
-                    return this.activeOdp.calculatedStraightDist || 0;
-                },
-
-                initApp() {
-                    this.$nextTick(() => {
-                        this.initLeafletMap();
-
-                        // Set initial target jika dilempar dari controller query param
-                        if (initialTarget && initialTarget.lat && initialTarget.lng) {
-                            this.setTargetLocation(initialTarget.lat, initialTarget.lng, initialTarget.label || 'Titik Calon Pelanggan');
-                        }
-                    });
-                },
-
-                initLeafletMap() {
-                    const defaultCenter = (this.metrics.default_center && this.metrics.default_center.lat)
-                        ? [this.metrics.default_center.lat, this.metrics.default_center.lng]
-                        : [-6.917464, 107.619123];
-
-                    this.map = L.map('coverageMap', {
-                        center: defaultCenter,
-                        zoom: 14,
-                        zoomControl: true,
-                        attributionControl: false
-                    });
-
-                    // Define 3 High-Performance Tile Providers
-                    this.tileLayers.street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; OpenStreetMap'
-                    });
-
-                    this.tileLayers.satellite = L.layerGroup([
-                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                            maxZoom: 19
-                        }),
-                        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-                            maxZoom: 19
-                        })
-                    ]);
-
-                    this.tileLayers.dark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                        maxZoom: 19,
-                        subdomains: 'abcd'
-                    });
-
-                    // Set default layer
-                    this.tileLayers.street.addTo(this.map);
-
-                    // Marker Groups
-                    this.odpMarkersGroup = L.layerGroup().addTo(this.map);
-
-                    // Event: Klik di sembarang area peta untuk menaruh Target Pin
-                    this.map.on('click', (e) => {
-                        this.setTargetLocation(e.latlng.lat, e.latlng.lng, 'Titik Pilihan Peta');
-                    });
-
-                    // Mousemove coordinate tracking
-                    this.map.on('mousemove', (e) => {
-                        this.mouseCoordText = e.latlng.lat.toFixed(5) + ', ' + e.latlng.lng.toFixed(5);
-                    });
-
-                    // Render semua ODP markers pertama kali
-                    this.renderAllOdpMarkers();
-                },
-
-                setTileLayer(type) {
-                    if (this.currentTile === type) return;
-                    this.map.removeLayer(this.tileLayers[this.currentTile]);
-                    this.tileLayers[type].addTo(this.map);
-                    this.currentTile = type;
-                },
-
-                renderAllOdpMarkers() {
-                    if (!this.odpMarkersGroup) return;
-                    this.odpMarkersGroup.clearLayers();
-
-                    this.allOdps.forEach(odp => {
-                        // Custom Marker Icon ODP
-                        const isAvailable = odp.has_slot;
-                        const bgColor = isAvailable ? '#10b981' : '#f43f5e';
-                        const pulseClass = isAvailable ? 'drop-shadow-[0_2px_6px_rgba(16,185,129,0.5)]' : 'drop-shadow-[0_2px_6px_rgba(244,63,94,0.5)]';
-
-                        const odpIcon = L.divIcon({
-                            className: 'ftth-odp-marker',
-                            html: `
-                                <div style="position: relative; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                    <svg viewBox="0 0 24 24" class="${pulseClass}" style="width: 26px; height: 26px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
-                                        <path fill="${bgColor}" stroke="#ffffff" stroke-width="1.8" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                                        <circle cx="12" cy="9" r="3" fill="#ffffff"/>
-                                    </svg>
-                                </div>
-                            `,
-                            iconSize: [26, 26],
-                            iconAnchor: [13, 26],
-                            popupAnchor: [0, -24]
-                        });
-
-                        const marker = L.marker([odp.lat, odp.lng], { icon: odpIcon });
-
-                        // Tooltip on Hover
-                        marker.bindTooltip(odp.nama_odp, {
-                            permanent: false,
-                            direction: 'top',
-                            className: 'ftth-odp-tooltip'
-                        });
-
-                        // Interactive Popup on Click
-                        marker.on('click', () => {
-                            let distInfo = '';
-                            if (this.targetCoord) {
-                                const stDist = this.calculateHaversine(this.targetCoord[0], this.targetCoord[1], odp.lat, odp.lng);
-                                const rtDist = Math.round(stDist * this.ROAD_FACTOR);
-                                distInfo = `
-                                    <div style="margin-top: 6px; padding: 6px 8px; border-radius: 6px; background: #f1f5f9; font-size: 11px;">
-                                        <strong>Jarak ke Target:</strong> ${rtDist} meter (Jalan)<br>
-                                        <span style="color: #64748b;">(Garis lurus: ${Math.round(stDist)}m)</span>
-                                    </div>
-                                `;
-                            }
-
-                            const popupHtml = `
-                                <div style="font-family: inherit; min-width: 200px; padding: 2px;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 6px;">
-                                        <strong style="color: #0f172a; font-size: 13px;">${odp.nama_odp}</strong>
-                                        <span style="background: ${odp.has_slot ? '#d1fae5' : '#ffe4e6'}; color: ${odp.has_slot ? '#065f46' : '#9f1239'}; font-size: 10px; font-weight: bold; padding: 1px 6px; border-radius: 9999px;">
-                                            ${odp.has_slot ? odp.port_tersedia + ' Slot' : 'Penuh'}
-                                        </span>
-                                    </div>
-                                    <div style="font-size: 11.5px; color: #475569; line-height: 1.5;">
-                                        <div><strong>OLT:</strong> ${odp.nama_olt} (${odp.kode_olt})</div>
-                                        <div><strong>PON:</strong> ${odp.nama_pon}</div>
-                                        <div><strong>Port:</strong> ${odp.port_terpakai} / ${odp.port_max} Terpakai</div>
-                                    </div>
-                                    ${distInfo}
-                                    <button type="button"
-                                            onclick="window.__selectOdpFromPopup(${odp.id})"
-                                            style="margin-top: 8px; width: 100%; padding: 5px 8px; border-radius: 6px; background: #0891b2; color: #ffffff; font-weight: bold; font-size: 11px; border: none; cursor: pointer;">
-                                        Jadikan Target ODP Ini
-                                    </button>
-                                </div>
-                            `;
-
-                            marker.bindPopup(popupHtml).openPopup();
-                        });
-
-                        marker.addTo(this.odpMarkersGroup);
-                    });
-
-                    // Expose popup callback to window
-                    window.__selectOdpFromPopup = (id) => {
-                        const target = this.allOdps.find(o => o.id === id);
-                        if (target) {
-                            this.selectOdp(target);
-                            this.map.closePopup();
-                        }
-                    };
-                },
-
-                setTargetLocation(lat, lng, label = 'Titik Calon Pelanggan') {
-                    this.targetCoord = [lat, lng];
-                    this.targetLabel = label;
-                    this.rawInput = lat.toFixed(6) + ', ' + lng.toFixed(6);
-
-                    // Render or Move Target Pin
-                    if (this.targetMarker) {
-                        this.targetMarker.setLatLng([lat, lng]);
-                    } else {
-                        const targetIcon = L.divIcon({
-                            className: 'ftth-target-marker',
-                            html: `
-                                <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-                                    <div class="ftth-pulse-ring"></div>
-                                    <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; filter: drop-shadow(0 3px 6px rgba(225,29,72,0.6));">
-                                        <path fill="#e11d48" stroke="#ffffff" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                                        <circle cx="12" cy="9" r="3.5" fill="#ffffff"/>
-                                    </svg>
-                                </div>
-                            `,
-                            iconSize: [36, 36],
-                            iconAnchor: [18, 34],
-                            popupAnchor: [0, -32]
-                        });
-
-                        this.targetMarker = L.marker([lat, lng], {
-                            icon: targetIcon,
-                            draggable: true,
-                            zIndexOffset: 1000
-                        }).addTo(this.map);
-
-                        // Event: Saat pin selesai digeser (dragend)
-                        this.targetMarker.on('dragend', (e) => {
-                            const newPos = e.target.getLatLng();
-                            this.setTargetLocation(newPos.lat, newPos.lng, 'Titik Pilihan Peta (Digeser)');
-                        });
-                    }
-
-                    // Reset manual override jika target berubah
-                    this.selectedOdp = null;
-
-                    // Hitung jarak ke seluruh ODP
-                    this.recalculateAllDistances();
-
-                    // Update visualisasi kabel dan lingkaran radius
-                    this.updateVisualizations();
-                },
-
-                recalculateAllDistances() {
-                    if (!this.targetCoord) return;
-                    const [tLat, tLng] = this.targetCoord;
-
-                    // Hitung jarak Euclidean/Haversine & jarak rute jalan tiang
-                    const calculated = this.allOdps.map(odp => {
-                        const stDist = this.calculateHaversine(tLat, tLng, odp.lat, odp.lng);
-                        const rtDist = stDist * this.ROAD_FACTOR;
-                        return {
-                            ...odp,
-                            calculatedStraightDist: stDist,
-                            calculatedRouteDist: rtDist
-                        };
-                    });
-
-                    // Filter radius dan ketersediaan slot
-                    let filtered = calculated.filter(odp => {
-                        const matchRadius = odp.calculatedRouteDist <= this.filterRadius;
-                        const matchSlot = this.filterOnlyAvailableSlot ? odp.has_slot : true;
-                        return matchRadius && matchSlot;
-                    });
-
-                    // Urutkan berdasarkan jarak jalan terdekat
-                    filtered.sort((a, b) => a.calculatedRouteDist - b.calculatedRouteDist);
-
-                    this.nearbyOdps = filtered.slice(0, 5);
-
-                    // Tentukan nearest ODP (prioritaskan yang masuk filter, atau fallback ke yang terdekat secara global jika kosong)
-                    if (filtered.length > 0) {
-                        this.nearestOdp = filtered[0];
-                    } else {
-                        // Jika filter terlalu ketat, tetap cari ODP terdekat absolut
-                        calculated.sort((a, b) => a.calculatedRouteDist - b.calculatedRouteDist);
-                        this.nearestOdp = calculated[0] || null;
-                    }
-                },
-
-                applyOdpFilters() {
-                    this.recalculateAllDistances();
-                    this.updateVisualizations();
-                },
-
-                selectOdp(odp) {
-                    this.selectedOdp = odp;
-                    this.updateVisualizations();
-
-                    // Pan ke ODP yang dipilih
-                    if (this.map && odp) {
-                        this.map.panTo([odp.lat, odp.lng], { animate: true });
-                    }
-                },
-
-                updateVisualizations() {
-                    if (!this.targetCoord || !this.activeOdp) return;
-
-                    const [tLat, tLng] = this.targetCoord;
-                    const oLat = this.activeOdp.lat;
-                    const oLng = this.activeOdp.lng;
-                    const dist = this.activeDistance;
-
-                    // 1. Gambar Garis Kabel Polyline Dinamis
-                    const lineColor = this.getTierColor(dist);
-
-                    if (this.cablePolyline) {
-                        this.map.removeLayer(this.cablePolyline);
-                    }
-
-                    this.cablePolyline = L.polyline([[tLat, tLng], [oLat, oLng]], {
-                        color: lineColor,
-                        weight: 3.5,
-                        opacity: 0.9,
-                        dashArray: '8, 8',
-                        className: 'ftth-cable-line'
-                    }).addTo(this.map);
-
-                    // 2. Lingkaran Radius Jangkauan (150m dan 300m)
-                    if (this.circle150) this.map.removeLayer(this.circle150);
-                    if (this.circle300) this.map.removeLayer(this.circle300);
-
-                    if (this.showCircles) {
-                        this.circle150 = L.circle([oLat, oLng], {
-                            radius: 150,
-                            color: '#10b981',
-                            fillColor: '#10b981',
-                            fillOpacity: 0.08,
-                            weight: 1.5,
-                            dashArray: '4, 4'
-                        }).addTo(this.map);
-
-                        this.circle300 = L.circle([oLat, oLng], {
-                            radius: 300,
-                            color: '#f59e0b',
-                            fillColor: '#f59e0b',
-                            fillOpacity: 0.04,
-                            weight: 1.5,
-                            dashArray: '6, 6'
-                        }).addTo(this.map);
-                    }
-
-                    // 3. Zoom / Fit Bounds antara Target dan ODP Terpilih
-                    const bounds = L.latLngBounds([[tLat, tLng], [oLat, oLng]]);
-                    this.map.fitBounds(bounds, { padding: [60, 60], maxZoom: 17 });
-                },
-
-                toggleCoverageCircles() {
-                    this.showCircles = !this.showCircles;
-                    this.updateVisualizations();
-                },
-
-                focusToTarget() {
-                    if (this.targetCoord && this.map) {
-                        this.map.setView(this.targetCoord, 17, { animate: true });
-                    }
-                },
-
-                fitToAllOdps() {
-                    if (!this.map || this.allOdps.length === 0) return;
-                    const latlngs = this.allOdps.map(o => [o.lat, o.lng]);
-                    if (this.targetCoord) latlngs.push(this.targetCoord);
-                    this.map.fitBounds(L.latLngBounds(latlngs), { padding: [40, 40] });
-                },
-
-                // Haversine formula (jarak permukaan bumi dalam meter)
-                calculateHaversine(lat1, lon1, lat2, lon2) {
-                    const R = 6371e3; // Earth radius in meters
-                    const φ1 = lat1 * Math.PI / 180;
-                    const φ2 = lat2 * Math.PI / 180;
-                    const Δφ = (lat2 - lat1) * Math.PI / 180;
-                    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-                    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                              Math.cos(φ1) * Math.cos(φ2) *
-                              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-                    return R * c;
-                },
-
-                calculateDropcoreNeed(routeDistance) {
-                    return Math.round(routeDistance + this.CABLE_SLACK);
-                },
-
-                calculateLoss(routeDistance) {
-                    const loss = (routeDistance / 1000) * this.OPTICAL_LOSS_PER_KM;
-                    return loss.toFixed(2);
-                },
-
-                // Smart Input Parser
-                processSmartInput() {
-                    const text = this.rawInput.trim();
-                    if (!text) return;
-
-                    // 1. Cek format Google Maps @lat,lng
-                    const atMatch = text.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-                    if (atMatch) {
-                        this.setTargetLocation(parseFloat(atMatch[1]), parseFloat(atMatch[2]), 'Dari URL Google Maps');
-                        return;
-                    }
-
-                    // 2. Cek query parameter q=lat,lng
-                    const qMatch = text.match(/[?&](?:q|ll|query|destination|daddr)=(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
-                    if (qMatch) {
-                        this.setTargetLocation(parseFloat(qMatch[1]), parseFloat(qMatch[2]), 'Dari URL Google Maps');
-                        return;
-                    }
-
-                    // 3. Cek koordinat mentah lat, lng
-                    const rawMatch = text.match(/^(-?\d+[\.,]?\d*)[\s,;]+(-?\d+[\.,]?\d*)$/);
-                    if (rawMatch) {
-                        let lat = parseFloat(rawMatch[1].replace(',', '.'));
-                        let lng = parseFloat(rawMatch[2].replace(',', '.'));
-
-                        // Swap check untuk Indonesia
-                        if (lat >= 95.0 && lat <= 141.5 && lng >= -11.5 && lng <= 6.5) {
-                            const tmp = lat; lat = lng; lng = tmp;
-                        }
-                        if (lat >= 5.5 && lat <= 8.5 && lng >= 105.0 && lng <= 112.0) {
-                            lat = -lat;
-                        }
-
-                        this.setTargetLocation(lat, lng, 'Koordinat Manual');
-                        return;
-                    }
-
-                    // 4. Jika teks berupa nama jalan / alamat, gunakan Geocoding Nominatim OpenStreetMap
-                    this.geocodeAddress(text);
-                },
-
-                async geocodeAddress(query) {
-                    this.isSearching = true;
-                    try {
-                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=id&limit=1`;
-                        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-                        const data = await res.json();
-                        if (data && data.length > 0) {
-                            const item = data[0];
-                            this.setTargetLocation(parseFloat(item.lat), parseFloat(item.lon), item.display_name.split(',')[0]);
-                        } else {
-                            if (window.Swal) {
-                                Swal.fire({ icon: 'info', title: 'Alamat Tidak Ditemukan', text: 'Coba masukkan koordinat angka (contoh: -6.936, 107.590) atau klik langsung di peta.' });
-                            } else {
-                                alert('Alamat tidak ditemukan. Silakan klik langsung pada peta.');
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Geocoding error:', e);
-                    } finally {
-                        this.isSearching = false;
-                    }
-                },
-
-                async handleSearchSuggestions() {
-                    const q = this.rawInput.trim();
-                    if (q.length < 3 || q.includes('http') || /^-?\d/.test(q)) {
-                        this.suggestions = [];
-                        return;
-                    }
-                    try {
-                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=id&limit=4`;
-                        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-                        const data = await res.json();
-                        this.suggestions = data || [];
-                    } catch (e) {
-                        this.suggestions = [];
-                    }
-                },
-
-                selectSuggestion(item) {
-                    this.suggestions = [];
-                    this.setTargetLocation(parseFloat(item.lat), parseFloat(item.lon), item.display_name.split(',')[0]);
-                },
-
-                // Browser Geolocation API
-                getCurrentLocation() {
-                    if (!navigator.geolocation) {
-                        alert('Browser Anda tidak mendukung Geolocation GPS.');
-                        return;
-                    }
-                    this.isLocating = true;
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            this.isLocating = false;
-                            this.gpsAccuracy = Math.round(pos.coords.accuracy);
-                            this.setTargetLocation(pos.coords.latitude, pos.coords.longitude, 'Lokasi GPS Saya Saat Ini');
-                        },
-                        (err) => {
-                            this.isLocating = false;
-                            let msg = 'Gagal mendeteksi lokasi GPS.';
-                            if (err.code === 1) msg = 'Izin akses lokasi ditolak oleh pengguna.';
-                            if (window.Swal) {
-                                Swal.fire({ icon: 'warning', title: 'GPS Tidak Terdeteksi', text: msg });
-                            } else {
-                                alert(msg);
-                            }
-                        },
-                        { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
-                    );
-                },
-
-                // Multi-Tier Visual Rules
-                getTierTitle(dist) {
-                    if (dist <= 150) return 'SANGAT DIREKOMENDASIKAN (Kualitas Sempurna)';
-                    if (dist <= 250) return 'TERCOVER STANDAR ISP';
-                    if (dist <= 300) return 'BATAS MAKSIMAL (Perlu Penguat Tiang)';
-                    return 'DI LUAR JANGKAUAN / BELUM TERCOVER';
-                },
-
-                getTierDescription(dist) {
-                    if (dist <= 150) return 'Redaman optik prima, tarikan dropcore efisien & aman dari bending.';
-                    if (dist <= 250) return 'Jarak normal FTTH standar industri. Pemasangan aman dilakukan.';
-                    if (dist <= 300) return 'Jarak di batas toleransi. Wajib survey tiang perantara & jalur jalan.';
-                    return 'Jarak > 300 meter. Risiko redaman tinggi & kabel putus. Perlu ODP baru.';
-                },
-
-                getTierClass(dist) {
-                    if (dist <= 150) return 'bg-emerald-50 text-emerald-900 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-100 dark:border-emerald-700';
-                    if (dist <= 250) return 'bg-sky-50 text-sky-900 border-sky-300 dark:bg-sky-950/70 dark:text-sky-100 dark:border-sky-700';
-                    if (dist <= 300) return 'bg-amber-50 text-amber-900 border-amber-300 dark:bg-amber-950/70 dark:text-amber-100 dark:border-amber-700';
-                    return 'bg-rose-50 text-rose-900 border-rose-300 dark:bg-rose-950/70 dark:text-rose-100 dark:border-rose-700';
-                },
-
-                getTierIconBg(dist) {
-                    if (dist <= 150) return 'bg-emerald-600 text-white';
-                    if (dist <= 250) return 'bg-sky-600 text-white';
-                    if (dist <= 300) return 'bg-amber-500 text-white';
-                    return 'bg-rose-600 text-white';
-                },
-
-                getTierColor(dist) {
-                    if (dist <= 150) return '#10b981'; // emerald
-                    if (dist <= 250) return '#0284c7'; // sky
-                    if (dist <= 300) return '#f59e0b'; // amber
-                    return '#e11d48'; // rose
-                },
-
-                getGoogleMapsRouteUrl() {
-                    if (!this.targetCoord || !this.activeOdp) return '#';
-                    return `https://www.google.com/maps/dir/?api=1&origin=${this.targetCoord[0]},${this.targetCoord[1]}&destination=${this.activeOdp.lat},${this.activeOdp.lng}&travelmode=driving`;
-                },
-
-                copyTargetCoords() {
-                    if (!this.targetCoord) return;
-                    const text = `${this.targetCoord[0].toFixed(6)}, ${this.targetCoord[1].toFixed(6)}`;
-                    navigator.clipboard.writeText(text);
-                    this.copiedCoords = true;
-                    setTimeout(() => { this.copiedCoords = false; }, 2000);
-                },
-
-                copyEvaluationSummary() {
-                    if (!this.targetCoord || !this.activeOdp) return;
-                    const text = `*HASIL EVALUASI COVERAGE FTTH (GoMSN)*\n` +
-                        `• Koordinat Target: ${this.targetCoord[0].toFixed(6)}, ${this.targetCoord[1].toFixed(6)}\n` +
-                        `• ODP Terdekat: ${this.activeOdp.nama_odp}\n` +
-                        `• OLT / PON: ${this.activeOdp.nama_olt} / ${this.activeOdp.nama_pon}\n` +
-                        `• Jarak Jalan Tiang: ~${Math.round(this.activeDistance)} meter (Lurus: ${Math.round(this.activeStraightDistance)}m)\n` +
-                        `• Est. Dropcore: ${this.calculateDropcoreNeed(this.activeDistance)} meter (+slack)\n` +
-                        `• Kapasitas Port: ${this.activeOdp.port_terpakai}/${this.activeOdp.port_max} (${this.activeOdp.has_slot ? 'Ada Slot' : 'Penuh'})\n` +
-                        `• Status Kelayakan: ${this.getTierTitle(this.activeDistance)}\n` +
-                        `• Navigasi: ${this.getGoogleMapsRouteUrl()}`;
-
-                    navigator.clipboard.writeText(text);
-                    this.copiedSummary = true;
-                    setTimeout(() => { this.copiedSummary = false; }, 2500);
-
-                    if (window.Swal) {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Ringkasan Tersalin ke Clipboard',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                    }
-                },
-
-                requestNetworkExpansion() {
-                    if (window.Swal) {
-                        Swal.fire({
-                            title: 'Permintaan Perluasan Jaringan ODP',
-                            html: `
-                                <div style="text-align: left; font-size: 13px;">
-                                    <p>Lokasi ini berada pada jarak <strong>${Math.round(this.activeDistance)}m</strong> dari ODP terdekat (<strong>${this.activeOdp ? this.activeOdp.nama_odp : '-'}</strong>).</p>
-                                    <p style="margin-top: 8px;">Kirim data prospek ini ke tim Perencanaan Jaringan (NOC &amp; Project FTTH) untuk agenda penambahan tiang/ODP baru?</p>
-                                </div>
-                            `,
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#0891b2',
-                            cancelButtonColor: '#64748b',
-                            confirmButtonText: 'Kirim Permintaan',
-                            cancelButtonText: 'Batal'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Prospek Tercatat',
-                                    text: 'Koordinat lokasi telah diteruskan ke daftar prospek perluasan ODP.'
-                                });
-                            }
-                        });
-                    }
-                }
-            };
-        }
-    </script>
-    @endpush
 </x-app-layout>
