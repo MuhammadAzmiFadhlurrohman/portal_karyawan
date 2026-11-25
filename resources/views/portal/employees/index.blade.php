@@ -763,6 +763,8 @@
                                 <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">3</span>
                                 <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Penempatan Kerja &amp; Struktur Organisasi</span>
                             </div>
+                            
+                            <!-- Row 1: 4 Kolom Utama Organisasi (Rapi & Sejajar) -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Divisi</label>
@@ -773,19 +775,6 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div x-show="createDivision === 'Teknik'" x-transition class="transition-all">
-                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
-                                        <span>Kantor Penempatan</span>
-                                        <span class="text-[9.5px] font-bold text-teal-800 bg-teal-100/90 px-1.5 py-0.5 rounded">Khusus Teknik</span>
-                                    </label>
-                                    <select name="office" x-model="createOffice" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-teal-400 text-slate-800 font-semibold focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
-                                        <option value="bandung">Kantor Bandung (Pusat)</option>
-                                        <option value="soreang">Kantor Soreang (Operasional)</option>
-                                    </select>
-                                </div>
-                                <template x-if="createDivision !== 'Teknik'">
-                                    <input type="hidden" name="office" value="bandung">
-                                </template>
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jabatan / Posisi</label>
                                     <input type="text" name="position" placeholder="Teknisi Lapangan, NOC..." class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
@@ -805,19 +794,37 @@
                                 </div>
                             </div>
 
-                            <!-- Row 2: Upload Foto Profil & Status Akun Aktif -->
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1">
-                                <div class="sm:col-span-7">
+                            <!-- Row 2: Kantor Penempatan (Teknik), Foto Profil, dan Status Akun -->
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1 items-end">
+                                <!-- Kantor Penempatan Khusus Teknik -->
+                                <div x-show="createDivision === 'Teknik'" x-transition class="sm:col-span-4">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
+                                        <span>Kantor Penempatan</span>
+                                        <span class="text-[9.5px] font-bold text-teal-800 bg-teal-100/90 px-1.5 py-0.5 rounded">Khusus Teknik</span>
+                                    </label>
+                                    <select name="office" x-model="createOffice" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-medium focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition h-[42px]">
+                                        <option value="bandung">Kantor Bandung (Pusat)</option>
+                                        <option value="soreang">Kantor Soreang (Operasional)</option>
+                                    </select>
+                                </div>
+                                <template x-if="createDivision !== 'Teknik'">
+                                    <input type="hidden" name="office" value="bandung">
+                                </template>
+
+                                <!-- Upload Foto Profil -->
+                                <div :class="createDivision === 'Teknik' ? 'sm:col-span-5' : 'sm:col-span-7'">
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Foto Profil Karyawan (Maks. 5MB)</label>
-                                    <div class="px-3.5 py-2 rounded-xl bg-white border border-dashed border-teal-300 flex items-center">
-                                        <input type="file" name="foto" accept="image/*" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#155E63] hover:file:bg-teal-100 cursor-pointer">
+                                    <div class="px-3.5 py-2 rounded-xl bg-white border border-dashed border-teal-300 flex items-center h-[42px]">
+                                        <input type="file" name="foto" accept="image/*" class="w-full text-xs text-slate-600 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#155E63] hover:file:bg-teal-100 cursor-pointer">
                                     </div>
                                 </div>
-                                <div class="sm:col-span-5 flex flex-col justify-end">
+
+                                <!-- Status Akun Aktif -->
+                                <div :class="createDivision === 'Teknik' ? 'sm:col-span-3' : 'sm:col-span-5'">
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Status Akun</label>
                                     <label class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 hover:border-teal-400 flex items-center gap-2.5 cursor-pointer shadow-2xs transition h-[42px]">
                                         <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500">
-                                        <span class="text-slate-800 font-bold text-xs">Akun Aktif Langsung</span>
+                                        <span class="text-slate-800 font-bold text-xs truncate">Akun Aktif Langsung</span>
                                     </label>
                                 </div>
                             </div>
@@ -975,6 +982,8 @@
                                 <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">3</span>
                                 <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Penempatan Kerja &amp; Struktur Organisasi</span>
                             </div>
+                            
+                            <!-- Row 1: 4 Kolom Utama Organisasi (Rapi & Sejajar) -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Divisi</label>
@@ -985,19 +994,6 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div x-show="editForm.division === 'Teknik'" x-transition class="transition-all">
-                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
-                                        <span>Kantor Penempatan</span>
-                                        <span class="text-[9.5px] font-bold text-teal-800 bg-teal-100/90 px-1.5 py-0.5 rounded">Khusus Teknik</span>
-                                    </label>
-                                    <select name="office" x-model="editForm.office" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-teal-400 text-slate-800 font-semibold focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
-                                        <option value="bandung">Kantor Bandung (Pusat)</option>
-                                        <option value="soreang">Kantor Soreang (Operasional)</option>
-                                    </select>
-                                </div>
-                                <template x-if="editForm.division !== 'Teknik'">
-                                    <input type="hidden" name="office" value="bandung">
-                                </template>
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jabatan / Posisi</label>
                                     <input type="text" name="position" x-model="editForm.position" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
@@ -1017,19 +1013,37 @@
                                 </div>
                             </div>
 
-                            <!-- Row 2: Ganti Foto Profil & Status Akun Aktif -->
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1">
-                                <div class="sm:col-span-7">
+                            <!-- Row 2: Kantor Penempatan (Teknik), Foto Profil, dan Status Akun -->
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-1 items-end">
+                                <!-- Kantor Penempatan Khusus Teknik -->
+                                <div x-show="editForm.division === 'Teknik'" x-transition class="sm:col-span-4">
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
+                                        <span>Kantor Penempatan</span>
+                                        <span class="text-[9.5px] font-bold text-teal-800 bg-teal-100/90 px-1.5 py-0.5 rounded">Khusus Teknik</span>
+                                    </label>
+                                    <select name="office" x-model="editForm.office" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-medium focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition h-[42px]">
+                                        <option value="bandung">Kantor Bandung (Pusat)</option>
+                                        <option value="soreang">Kantor Soreang (Operasional)</option>
+                                    </select>
+                                </div>
+                                <template x-if="editForm.division !== 'Teknik'">
+                                    <input type="hidden" name="office" value="bandung">
+                                </template>
+
+                                <!-- Ganti Foto Profil -->
+                                <div :class="editForm.division === 'Teknik' ? 'sm:col-span-5' : 'sm:col-span-7'">
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Ganti Foto Profil (Maks. 5MB)</label>
-                                    <div class="px-3.5 py-2 rounded-xl bg-white border border-dashed border-teal-300 flex items-center">
-                                        <input type="file" name="foto" accept="image/*" class="w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#155E63] hover:file:bg-teal-100 cursor-pointer">
+                                    <div class="px-3.5 py-2 rounded-xl bg-white border border-dashed border-teal-300 flex items-center h-[42px]">
+                                        <input type="file" name="foto" accept="image/*" class="w-full text-xs text-slate-600 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-[#155E63] hover:file:bg-teal-100 cursor-pointer">
                                     </div>
                                 </div>
-                                <div class="sm:col-span-5 flex flex-col justify-end">
+
+                                <!-- Status Akun Aktif -->
+                                <div :class="editForm.division === 'Teknik' ? 'sm:col-span-3' : 'sm:col-span-5'">
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Status Akun</label>
                                     <label class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 hover:border-teal-400 flex items-center gap-2.5 cursor-pointer shadow-2xs transition h-[42px]">
                                         <input type="checkbox" name="is_active" value="1" :checked="editForm.is_active" class="w-4 h-4 rounded text-[#155E63] focus:ring-teal-500">
-                                        <span class="text-slate-800 font-bold text-xs">Status Akun Aktif</span>
+                                        <span class="text-slate-800 font-bold text-xs truncate">Akun Aktif</span>
                                     </label>
                                 </div>
                             </div>
