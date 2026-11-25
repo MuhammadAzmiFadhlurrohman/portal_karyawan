@@ -373,7 +373,7 @@ class EmployeeController extends Controller
             'bank' => ['nullable', 'string', 'max:100'],
             'no_rekening' => ['nullable', 'string', 'max:50'],
             'atas_nama' => ['nullable', 'string', 'max:100'],
-            'potongan_alpa' => ['nullable', 'numeric', 'min:0'],
+            'potongan_alpa' => ['nullable', 'numeric', 'min:0', 'max:50000000'],
             'is_active' => ['nullable', 'boolean'],
             'foto' => ['nullable', 'image', 'max:5120'],
         ]);
@@ -402,7 +402,7 @@ class EmployeeController extends Controller
             'position' => $validated['position'] ?? null,
             'supervisor_id' => $validated['supervisor_id'] ?? null,
             'join_date' => $validated['join_date'] ?? $user->join_date,
-            'potongan_alpa' => $validated['potongan_alpa'] ?? $user->potongan_alpa,
+            'potongan_alpa' => array_key_exists('potongan_alpa', $validated) ? $validated['potongan_alpa'] : $user->potongan_alpa,
             'bank' => $validated['bank'] ?? null,
             'no_rekening' => $validated['no_rekening'] ?? null,
             'atas_nama' => $validated['atas_nama'] ?? null,
@@ -428,6 +428,7 @@ class EmployeeController extends Controller
             'division' => $user->division,
             'role' => $user->getRoleNames()->first(),
             'is_active' => $user->is_active,
+            'potongan_alpa' => $user->potongan_alpa,
         ];
 
         $user->update($userData);
@@ -442,6 +443,7 @@ class EmployeeController extends Controller
                 'division' => $user->division,
                 'role' => $validated['role'],
                 'is_active' => $user->is_active,
+                'potongan_alpa' => $user->potongan_alpa,
             ],
             reason: 'Pembaruan data karyawan oleh Admin',
             actorId: $request->user()->id
@@ -747,6 +749,8 @@ class EmployeeController extends Controller
                 'bank' => $user->bank,
                 'no_rekening' => $user->no_rekening,
                 'atas_nama' => $user->atas_nama,
+                'potongan_alpa' => $user->potongan_alpa !== null ? (float) $user->potongan_alpa : null,
+                'potongan_alpa_formatted' => $user->potongan_alpa !== null ? ('Rp ' . number_format((float) $user->potongan_alpa, 0, ',', '.')) : 'Default (Rp 25.000)',
                 'supervisor_name' => $user->supervisor?->name,
                 'office' => $user->office ?? 'bandung',
                 'office_location_id' => $user->office_location_id ?? 1,

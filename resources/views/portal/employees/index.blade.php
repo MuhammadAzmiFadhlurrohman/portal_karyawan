@@ -82,7 +82,7 @@
                 bank: emp.bank || '',
                 no_rekening: emp.no_rekening || '',
                 atas_nama: emp.atas_nama || '',
-                potongan_alpa: emp.potongan_alpa || '',
+                potongan_alpa: emp.potongan_alpa !== null && emp.potongan_alpa !== undefined && emp.potongan_alpa !== '' ? Math.round(Number(emp.potongan_alpa)) : '',
                 is_active: Boolean(emp.is_active)
             };
             this.isEditOpen = true;
@@ -823,13 +823,13 @@
                             </div>
                         </div>
 
-                        <!-- Section 4: Data Rekening Payroll -->
+                        <!-- Section 4: Data Rekening Payroll & Potongan -->
                         <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
                             <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
                                 <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">4</span>
-                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Payroll (Rekening Bank)</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Payroll &amp; Potongan Absensi</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Bank</label>
                                     <select name="bank" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
@@ -846,6 +846,17 @@
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Atas Nama Rekening</label>
                                     <input type="text" name="atas_nama" placeholder="Sesuai buku tabungan" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
+                                        <span>Potongan Alpa / Hari</span>
+                                        <span class="text-[9.5px] font-bold text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded">Rp / Hari</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400 pointer-events-none">Rp</span>
+                                        <input type="number" name="potongan_alpa" min="0" step="1000" placeholder="Default (25.000)" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono text-xs focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 mt-1 leading-tight">Kosongkan untuk tarif standar perusahaan (Rp 25.000/hari)</p>
                                 </div>
                             </div>
                         </div>
@@ -1024,13 +1035,13 @@
                             </div>
                         </div>
 
-                        <!-- Section 4: Data Rekening Payroll -->
+                        <!-- Section 4: Data Rekening Payroll & Potongan -->
                         <div class="rounded-2xl bg-slate-50/70 border border-slate-200/80 p-4 sm:p-5 space-y-3.5">
                             <div class="flex items-center gap-2 pb-2 border-b border-slate-200/70">
                                 <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">4</span>
-                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Payroll (Rekening Bank)</span>
+                                <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Payroll &amp; Potongan Absensi</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Bank</label>
                                     <select name="bank" x-model="editForm.bank" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
@@ -1047,6 +1058,17 @@
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Atas Nama Rekening</label>
                                     <input type="text" name="atas_nama" x-model="editForm.atas_nama" placeholder="Sesuai buku tabungan" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs flex items-center justify-between">
+                                        <span>Potongan Alpa / Hari</span>
+                                        <span class="text-[9.5px] font-bold text-amber-700 bg-amber-100/90 px-1.5 py-0.5 rounded">Rp / Hari</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-xs font-bold text-slate-400 pointer-events-none">Rp</span>
+                                        <input type="number" name="potongan_alpa" x-model="editForm.potongan_alpa" min="0" step="1000" placeholder="Default (25.000)" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 font-mono text-xs focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 mt-1 leading-tight">Kosongkan untuk tarif standar perusahaan (Rp 25.000/hari)</p>
                                 </div>
                             </div>
                         </div>
@@ -1407,7 +1429,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Rekening Payroll Card -->
+                                <!-- Rekening Payroll & Potongan Card -->
                                 <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-100 text-xs">
                                     <div class="flex items-center gap-2 mb-2.5 text-emerald-900 font-bold">
                                         <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1415,9 +1437,9 @@
                                             <circle cx="12" cy="12" r="2"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 12h.01M18 12h.01"/>
                                         </svg>
-                                        <span>Informasi Rekening Bank Payroll</span>
+                                        <span>Informasi Payroll &amp; Tarif Potongan Absensi</span>
                                     </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px]">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-[11px]">
                                         <div class="p-2 rounded-lg bg-white border border-emerald-100">
                                             <span class="text-slate-400 block text-[10px] uppercase font-bold">Bank</span>
                                             <span class="font-bold text-slate-800 text-xs mt-0.5 block" x-text="summaryData.user?.bank || '-'"></span>
@@ -1429,6 +1451,10 @@
                                         <div class="p-2 rounded-lg bg-white border border-emerald-100">
                                             <span class="text-slate-400 block text-[10px] uppercase font-bold">Atas Nama</span>
                                             <span class="font-bold text-slate-800 text-xs mt-0.5 block" x-text="summaryData.user?.atas_nama || '-'"></span>
+                                        </div>
+                                        <div class="p-2 rounded-lg bg-white border border-emerald-100">
+                                            <span class="text-slate-400 block text-[10px] uppercase font-bold">Tarif Potongan Alpa</span>
+                                            <span class="font-bold text-amber-700 text-xs mt-0.5 block" x-text="summaryData.user?.potongan_alpa_formatted || 'Default (Rp 25.000)'"></span>
                                         </div>
                                     </div>
                                 </div>

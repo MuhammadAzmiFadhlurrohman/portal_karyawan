@@ -131,4 +131,57 @@ class EmployeeManagementTest extends TestCase
         $response->assertSessionHas('error');
         $this->assertDatabaseHas('users', ['id' => $admin->id]);
     }
+
+    public function test_admin_can_set_and_clear_employee_potongan_alpa(): void
+    {
+        $admin = $this->getOrCreateAdmin();
+
+        $emp = User::create([
+            'employee_code' => 'KR99911',
+            'username' => 'test_alpa_user',
+            'name' => 'Karyawan Potongan Alpa Test',
+            'email' => 'alpatest@ptmsn.co.id',
+            'phone' => '087711223344',
+            'password' => Hash::make('password'),
+            'potongan_alpa' => null,
+            'is_active' => true,
+        ]);
+        $emp->assignRole('karyawan');
+
+        // 1. Admin sets custom potongan_alpa to 50000
+        $response = $this->actingAs($admin)->put(route('portal.employees.update', $emp->id), [
+            'name' => $emp->name,
+            'employee_code' => $emp->employee_code,
+            'username' => $emp->username,
+            'email' => $emp->email,
+            'phone' => $emp->phone,
+            'role' => 'karyawan',
+            'potongan_alpa' => 50000,
+            'is_active' => '1',
+        ]);
+
+        $response->assertRedirect(route('portal.employees.index'));
+        $this->assertDatabaseHas('users', [
+            'id' => $emp->id,
+            'potongan_alpa' => '50000.00',
+        ]);
+
+        // 2. Admin clears potongan_alpa back to null (default)
+        $responseClear = $this->actingAs($admin)->put(route('portal.employees.update', $emp->id), [
+            'name' => $emp->name,
+            'employee_code' => $emp->employee_code,
+            'username' => $emp->username,
+            'email' => $emp->email,
+            'phone' => $emp->phone,
+            'role' => 'karyawan',
+            'potongan_alpa' => '',
+            'is_active' => '1',
+        ]);
+
+        $responseClear->assertRedirect(route('portal.employees.index'));
+        $this->assertDatabaseHas('users', [
+            'id' => $emp->id,
+            'potongan_alpa' => null,
+        ]);
+    }
 }
