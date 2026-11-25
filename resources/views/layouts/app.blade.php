@@ -830,7 +830,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         </svg>
-                                        <span>Cek Coverage ODP (FTTH)</span>
+                                        <span>Cek Coverage (FTTH)</span>
                                     </a>
 
                                     @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
@@ -1068,7 +1068,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    <span>Cek Coverage ODP (FTTH)</span>
+                                    <span>Cek Coverage (FTTH)</span>
                                 </a>
 
                                 @if (auth()->user() && auth()->user()->hasRole(['super_admin', 'admin']))
@@ -1861,12 +1861,12 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('gomsn.network.coverage') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-cyan-400 hover:bg-cyan-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
-                            <div class="w-9 h-9 rounded-xl bg-cyan-50 border border-cyan-100 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                        <a href="{{ route('gomsn.network.coverage') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-cyan-400 hover:bg-cyan-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-xs">
+                            <div class="w-9 h-9 rounded-xl bg-cyan-50 border border-cyan-100 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-xs">
                                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             </div>
                             <div class="min-w-0">
-                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-cyan-700 leading-snug">Cek Coverage ODP</span>
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-cyan-700 leading-snug">Cek Coverage</span>
                                 <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Presisi Jarak FTTH</span>
                             </div>
                         </a>
