@@ -40,6 +40,15 @@
 
             <!-- Right: Unified Stats KPI Pill (Matching Roster Shift style) -->
             <div class="relative z-10 flex flex-wrap items-center gap-2.5">
+                <a href="{{ route('gomsn.network.coverage') }}"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/25 hover:bg-cyan-500/40 border border-cyan-400/40 text-cyan-200 hover:text-white font-bold text-xs shadow-xs transition">
+                    <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Cek Coverage ODP</span>
+                </a>
+
                 <div class="flex items-center gap-3 bg-black/25 backdrop-blur-md border border-white/15 px-4 py-2 rounded-xl text-xs font-semibold text-white shadow-xs">
                     <span class="flex items-center gap-1.5" title="Total OLT">
                         <span class="text-teal-200/80 text-[10px] uppercase font-bold tracking-wider">OLT</span>

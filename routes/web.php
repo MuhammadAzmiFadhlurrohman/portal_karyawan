@@ -12,6 +12,7 @@ use App\Modules\Gomsn\Controllers\ChatbotController;
 use App\Modules\Gomsn\Controllers\InventoryController;
 use App\Modules\Gomsn\Controllers\KpiReportController;
 use App\Modules\Gomsn\Controllers\NetworkOdpController;
+use App\Http\Controllers\CoverageController;
 use App\Modules\Gomsn\Controllers\OvertimeController;
 use App\Modules\Gomsn\Controllers\PengajuanController;
 use App\Modules\Portal\Controllers\AuthController;
@@ -238,6 +239,8 @@ Route::middleware('auth')->group(function (): void {
 
     // Manajemen Jaringan: OLT, PON & ODP (NOC & Teknis)
     Route::get('/gomsn/network', [NetworkOdpController::class, 'index'])->name('gomsn.network.index');
+    Route::get('/gomsn/network/coverage', [CoverageController::class, 'coverage'])->name('gomsn.network.coverage');
+    Route::get('/coverage', [CoverageController::class, 'coverage'])->name('coverage');
     Route::post('/gomsn/network/olts/{olt}/pons', [NetworkOdpController::class, 'storePon'])->name('gomsn.network.pons.store');
     Route::put('/gomsn/network/pons/{pon}', [NetworkOdpController::class, 'updatePon'])->name('gomsn.network.pons.update');
     Route::delete('/gomsn/network/pons/{pon}', [NetworkOdpController::class, 'destroyPon'])->name('gomsn.network.pons.destroy');
