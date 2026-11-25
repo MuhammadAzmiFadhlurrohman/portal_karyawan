@@ -555,8 +555,7 @@
                         </a>
                         @endif
 
-                        <!-- 4. Stok Barang Kantor (Khusus Finance & Admin) -->
-                        @if ($navIsFinance)
+                        <!-- 4. Stok Barang Kantor / Gudang -->
                         <a href="{{ route('gomsn.inventory.index') }}"
                            @if (request()->routeIs('gomsn.inventory.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.inventory.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -568,7 +567,6 @@
                             <span class="w-2 h-2 rounded-full bg-white shadow-xs"></span>
                             @endif
                         </a>
-                        @endif
                     </div>
                 </div>
 
@@ -1865,7 +1863,7 @@
                 </div>
 
                 <!-- KATEGORI 4: LAINNYA (KPI, Perangkat, Akun & Pengaturan) -->
-                <div x-show="!sheetSearch || 'lainnya kpi laporan teknisi perangkat sesi profil akun karyawan sdm pengaturan radius absen audit log keluar logout'.includes(sheetSearch.toLowerCase())" class="space-y-2.5 pt-0.5">
+                <div x-show="!sheetSearch || 'lainnya kpi laporan teknisi stok barang gudang inventaris material perangkat sesi profil akun karyawan sdm pengaturan radius absen audit log keluar logout'.includes(sheetSearch.toLowerCase())" class="space-y-2.5 pt-0.5">
                     <div class="flex items-center justify-between pt-0.5">
                         <div class="flex items-center gap-2">
                             <span class="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-slate-600 to-slate-400"></span>
@@ -1881,6 +1879,16 @@
                             <div class="min-w-0">
                                 <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-indigo-800 leading-snug">Laporan KPI</span>
                                 <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Analitik Performa</span>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('gomsn.inventory.index') }}" class="p-3 rounded-2xl border border-slate-200/90 bg-white hover:border-emerald-400 hover:bg-emerald-50/30 hover:shadow-sm active:scale-[0.98] transition-all flex items-center gap-2.5 group shadow-2xs">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <span class="font-bold text-xs text-slate-800 block truncate group-hover:text-emerald-800 leading-snug">Stok Barang</span>
+                                <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight">Stok Gudang</span>
                             </div>
                         </a>
 

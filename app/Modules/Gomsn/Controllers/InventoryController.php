@@ -38,7 +38,13 @@ class InventoryController extends Controller
      */
     public function index(Request $request): View
     {
-        $this->authorizeFinance();
+        $user = auth()->user();
+        if (! $user) {
+            abort(401);
+        }
+
+        $canManage = $user->hasRole(['finance', 'admin', 'super_admin'])
+            || $user->can('gomsn.pengajuan.approve_finance');
 
         $search = trim((string) $request->input('search', ''));
         $status = (string) $request->input('status', 'all');
@@ -103,6 +109,7 @@ class InventoryController extends Controller
             'sortBy' => $sortBy,
             'sortDir' => $sortDir,
             'recentMovements' => $recentMovements,
+            'canManage' => $canManage,
         ]);
     }
 
@@ -351,7 +358,10 @@ class InventoryController extends Controller
      */
     public function movements(MasterMaterial $material): JsonResponse
     {
-        $this->authorizeFinance();
+        $user = auth()->user();
+        if (! $user) {
+            abort(401);
+        }
 
         $movements = $material->movements()
             ->with(['user:id,name,username', 'ticket:id,nomor_tiket'])

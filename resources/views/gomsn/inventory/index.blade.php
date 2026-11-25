@@ -69,13 +69,20 @@
 
                 <div class="min-w-0">
                     <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-1.5 leading-snug">
-                        <span>Manajemen Stok Barang Kantor</span>
+                        <span>{{ ($canManage ?? false) ? 'Manajemen Stok Barang Kantor' : 'Katalog Stok Barang Kantor & Gudang' }}</span>
                     </h1>
                     <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                        Monitoring persediaan material, pencatatan barang operasional baru, dan riwayat mutasi stok secara real-time.
+                        {{ ($canManage ?? false) ? 'Monitoring persediaan material, pencatatan barang operasional baru, dan riwayat mutasi stok secara real-time.' : 'Informasi ketersediaan dan jumlah stok barang di gudang operasional kantor.' }}
                     </p>
                 </div>
             </div>
+
+            @if (! ($canManage ?? false))
+            <div class="relative z-10 hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/20 text-cyan-200 text-xs font-semibold backdrop-blur-xs">
+                <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>Akses Lihat Stok</span>
+            </div>
+            @endif
         </div>
 
         <!-- Top Flash Alerts -->
@@ -91,7 +98,7 @@
         </div>
         @endif
 
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
         <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm space-y-1 shadow-2xs">
             <div class="font-bold flex items-center gap-2">
                 <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -107,6 +114,7 @@
 
         <span class="sr-only">Stok Barang Kantor</span>
 
+        @if ($canManage ?? false)
         <!-- ============================================== -->
         <!-- CARD 1: TAMBAH BARANG BARU (SESUAI MOCKUP)     -->
         <!-- ============================================== -->
@@ -190,6 +198,7 @@
                 </form>
             </div>
         </div>
+        @endif
 
         <!-- ============================================== -->
         <!-- CARD 2: DAFTAR BARANG (SESUAI MOCKUP)          -->
@@ -202,8 +211,20 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
-                    <span>Daftar Barang</span>
+                    <span>Daftar Stok Barang di Gudang</span>
                 </div>
+                @if (! ($canManage ?? false))
+                <button type="button" 
+                        @click="historyModal = true"
+                        class="text-white text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition font-medium"
+                        style="background-color: rgba(255, 255, 255, 0.18) !important; color: #ffffff !important;">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                    </svg>
+                    <span>Riwayat Stok</span>
+                </button>
+                @endif
             </div>
 
             <!-- Search Bar Inline -->
@@ -255,6 +276,7 @@
                             </div>
                         </div>
 
+                        @if ($canManage ?? false)
                         <!-- Bottom: Action Buttons -->
                         <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                             <!-- Edit Button -->
@@ -277,6 +299,7 @@
                                 <span>Hapus</span>
                             </button>
                         </div>
+                        @endif
                     </div>
                 @empty
                     <div class="py-8 text-center text-slate-400 text-xs">
@@ -294,7 +317,9 @@
                             <th class="py-3 px-4 font-bold">Nama Barang</th>
                             <th class="py-3 px-4 font-bold text-center">Jumlah Stok</th>
                             <th class="py-3 px-4 font-bold text-center">Satuan</th>
+                            @if ($canManage ?? false)
                             <th class="py-3 px-4 font-bold text-center w-40">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -330,6 +355,7 @@
                                     <span>{{ $material->satuan }}</span>
                                 </span>
                             </td>
+                            @if ($canManage ?? false)
                             <td class="py-3.5 px-4 text-center">
                                 <div class="inline-flex items-center gap-1.5 justify-center">
                                     <!-- Tombol Edit Orange Sesuai Mockup -->
@@ -355,10 +381,11 @@
                                     </button>
                                 </div>
                             </td>
+                            @endif
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="py-12 text-center text-slate-400">
+                            <td colspan="{{ ($canManage ?? false) ? 5 : 4 }}" class="py-12 text-center text-slate-400">
                                 Tidak ada data barang inventaris yang sesuai.
                             </td>
                         </tr>
@@ -374,6 +401,7 @@
             @endif
         </div>
 
+        @if ($canManage ?? false)
         <!-- ============================================== -->
         <!-- MODAL EDIT BARANG (SESUAI MOCKUP GAMBAR 2)     -->
         <!-- ============================================== -->
@@ -508,6 +536,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- ============================================== -->
         <!-- MODAL RIWAYAT MUTASI STOK KANTOR               -->
