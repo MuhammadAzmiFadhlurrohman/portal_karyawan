@@ -1086,14 +1086,23 @@
 
             <!-- Flash Toast / Status Banner -->
             @if (session('status'))
-            <div class="px-4 sm:px-6 lg:px-8 pt-4">
+            <div x-data="{ show: true }"
+                 x-show="show"
+                 x-init="setTimeout(() => show = false, 7000)"
+                 x-transition:leave="transition ease-in duration-300"
+                 x-transition:leave-start="opacity-100 transform scale-100"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2 scale-95"
+                 class="px-4 sm:px-6 lg:px-8 pt-4">
                 <div role="alert" class="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 px-4 py-3 flex items-center justify-between gap-3 text-emerald-900 dark:text-emerald-200 shadow-xs">
-                    <div class="flex items-center gap-2.5 text-sm font-medium">
+                    <div class="flex items-center gap-2.5 text-sm font-medium min-w-0">
                         <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>{{ session('status') }}</span>
+                        <span class="truncate">{{ session('status') }}</span>
                     </div>
+                    <button type="button" @click="show = false" class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 p-1 rounded-lg hover:bg-emerald-100/50 transition cursor-pointer shrink-0" title="Tutup Notifikasi">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
             </div>
 
