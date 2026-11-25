@@ -137,7 +137,8 @@
 
                 // Map objects
                 map: null,
-                currentTile: document.documentElement.classList.contains('dark') ? 'dark' : 'street',
+                currentTile: (localStorage.getItem('gomsn_theme') === 'dark' || document.documentElement.classList.contains('dark')) ? 'dark' : 'street',
+                userSelectedTile: false,
                 tileLayers: {},
                 targetMarker: null,
                 odpMarkersGroup: null,
@@ -175,10 +176,8 @@
                         // Listen for theme switch events
                         window.addEventListener('gomsn-theme-changed', (e) => {
                             const isDark = e && e.detail && e.detail.dark;
-                            if (this.currentTile === 'street' && isDark) {
-                                this.setTileLayer('dark');
-                            } else if (this.currentTile === 'dark' && !isDark) {
-                                this.setTileLayer('street');
+                            if (!this.userSelectedTile) {
+                                this.setTileLayer(isDark ? 'dark' : 'street', false);
                             }
                         });
 
@@ -251,15 +250,42 @@
                     setTimeout(() => { if (this.map) this.map.invalidateSize(); }, 600);
                 },
 
-                setTileLayer(type) {
-                    if (this.currentTile === type) return;
-                    if (this.tileLayers[this.currentTile]) {
+                setTileLayer(type, manual = true) {
+                    if (manual) this.userSelectedTile = true;
+                    if (this.currentTile === type && this.tileLayers[type] && this.map && this.map.hasLayer(this.tileLayers[type])) return;
+                    if (this.tileLayers[this.currentTile] && this.map && this.map.hasLayer(this.tileLayers[this.currentTile])) {
                         this.map.removeLayer(this.tileLayers[this.currentTile]);
                     }
-                    if (this.tileLayers[type]) {
+                    if (this.tileLayers[type] && this.map) {
                         this.tileLayers[type].addTo(this.map);
                         this.currentTile = type;
                     }
+                },
+
+                resetTarget() {
+                    this.targetCoord = null;
+                    this.rawInput = '';
+                    this.nearbyOdps = [];
+                    this.nearestOdp = null;
+                    this.selectedOdp = null;
+                    this.roadRouteDistance = null;
+                    if (this.targetMarker && this.map) {
+                        this.map.removeLayer(this.targetMarker);
+                        this.targetMarker = null;
+                    }
+                    if (this.cablePolyline && this.map) {
+                        this.map.removeLayer(this.cablePolyline);
+                        this.cablePolyline = null;
+                    }
+                    if (this.circle150 && this.map) {
+                        this.map.removeLayer(this.circle150);
+                        this.circle150 = null;
+                    }
+                    if (this.circle300 && this.map) {
+                        this.map.removeLayer(this.circle300);
+                        this.circle300 = null;
+                    }
+                    this.resetMapView();
                 },
 
                 renderAllOdpMarkers() {
@@ -845,20 +871,20 @@
                 </div>
 
                 <!-- Right: Metrics Status Bar -->
-                <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+                <div class="flex items-center gap-2 sm:gap-2.5 flex-nowrap shrink-0 overflow-x-auto pb-0.5">
                     <!-- Total ODP -->
-                    <div style="background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(255, 255, 255, 0.18) !important;"
-                         class="px-3 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2 shadow-sm">
+                    <div style="background: rgba(0, 0, 0, 0.45) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important;"
+                         class="px-2.5 sm:px-3 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2 shadow-xs shrink-0">
                         <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                         <div class="text-left">
-                            <span style="color: rgba(204, 251, 241, 0.8) !important;" class="text-[9px] uppercase font-bold tracking-wider block leading-tight">Total Node ODP</span>
+                            <span style="color: rgba(204, 251, 241, 0.8) !important;" class="text-[9px] uppercase font-bold tracking-wider block leading-tight">Total Node</span>
                             <span style="color: #ffffff !important;" class="font-mono font-black text-xs" x-text="allOdps.length + ' ODP'"></span>
                         </div>
                     </div>
 
                     <!-- Port Tersedia -->
-                    <div style="background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(16, 185, 129, 0.35) !important;"
-                         class="px-3 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2 shadow-sm">
+                    <div style="background: rgba(0, 0, 0, 0.45) !important; border: 1px solid rgba(16, 185, 129, 0.4) !important;"
+                         class="px-2.5 sm:px-3 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2 shadow-xs shrink-0">
                         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
                         <div class="text-left">
                             <span style="color: rgba(167, 243, 208, 0.8) !important;" class="text-[9px] uppercase font-bold tracking-wider block leading-tight">Port Tersedia</span>
@@ -867,8 +893,8 @@
                     </div>
 
                     <!-- Batas Rekomendasi -->
-                    <div style="background: rgba(0, 0, 0, 0.4) !important; border: 1px solid rgba(245, 158, 11, 0.35) !important;"
-                         class="hidden md:flex px-3 py-1.5 rounded-xl backdrop-blur-md items-center gap-2 shadow-sm">
+                    <div style="background: rgba(0, 0, 0, 0.45) !important; border: 1px solid rgba(245, 158, 11, 0.4) !important;"
+                         class="hidden md:flex px-2.5 sm:px-3 py-1.5 rounded-xl backdrop-blur-md items-center gap-2 shadow-xs shrink-0">
                         <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
@@ -881,7 +907,7 @@
                     <!-- Link Buka Tabel ODP -->
                     <a href="{{ route('gomsn.network.index') }}"
                        style="background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%) !important; color: #022330 !important;"
-                       class="px-3 py-1.5 rounded-xl font-black text-xs flex items-center gap-1.5 transition shadow-sm hover:brightness-110 active:scale-95 cursor-pointer">
+                       class="px-3 py-1.5 rounded-xl font-black text-xs flex items-center gap-1.5 transition shadow-xs hover:brightness-110 active:scale-95 cursor-pointer shrink-0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -921,26 +947,28 @@
                         <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                             Koordinat, Link Google Maps, atau Nama Jalan:
                         </label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                    <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </div>
 
-                            <input type="text"
-                                   x-model="rawInput"
-                                   @keydown.enter.prevent="processSmartInput()"
-                                   @input.debounce.400ms="handleSearchSuggestions()"
-                                   placeholder="Contoh: -6.936988, 107.59045 atau link Maps..."
-                                   class="w-full pl-9 pr-18 py-2 text-xs font-mono rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 placeholder:font-sans focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-600 transition">
+                                <input type="text"
+                                       x-model="rawInput"
+                                       @keydown.enter.prevent="processSmartInput()"
+                                       @input.debounce.400ms="handleSearchSuggestions()"
+                                       placeholder="Contoh: -6.936988, 107.59045 atau link Maps..."
+                                       class="w-full pl-9 pr-3 py-2 text-xs font-mono rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 placeholder:font-sans focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-600 transition">
+                            </div>
 
                             <!-- Tombol Cek -->
                             <button type="button"
                                     @click="processSmartInput()"
                                     :disabled="!rawInput.trim() || isSearching"
-                                    class="absolute right-1 top-1 bottom-1 px-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1 transition cursor-pointer">
+                                    class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 shadow-xs transition cursor-pointer">
                                 <svg x-show="!isSearching" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
@@ -974,48 +1002,58 @@
                     </div>
 
                     <!-- Action Shortcut Buttons: GPS & Click-on-Map Tips -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <!-- GPS Browser Geolocation Button -->
                         <button type="button"
                                 @click="getCurrentLocation()"
                                 :disabled="isLocating"
-                                class="flex-1 py-2 px-3 rounded-xl border border-cyan-500/30 bg-cyan-50/70 hover:bg-cyan-100/80 dark:bg-cyan-950/40 dark:hover:bg-cyan-900/50 text-cyan-800 dark:text-cyan-200 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-60">
-                            <svg x-show="!isLocating" class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                class="py-2 px-3 rounded-xl border border-cyan-500/30 bg-cyan-50/80 hover:bg-cyan-100 dark:bg-cyan-950/40 dark:hover:bg-cyan-900/60 text-cyan-800 dark:text-cyan-200 font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer disabled:opacity-60 shadow-xs">
+                            <svg x-show="!isLocating" class="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            <svg x-show="isLocating" x-cloak class="w-4 h-4 text-cyan-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <svg x-show="isLocating" x-cloak class="w-3.5 h-3.5 text-cyan-600 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                             </svg>
-                            <span x-text="isLocating ? 'Mencari GPS Akurat...' : 'GPS Lokasi Saya'"></span>
+                            <span x-text="isLocating ? 'Mencari GPS...' : 'GPS Lokasi Saya'"></span>
                             <span x-show="gpsAccuracy" x-cloak class="px-1.5 py-0.2 rounded text-[9px] font-mono bg-cyan-200/80 dark:bg-cyan-800 text-cyan-900 dark:text-cyan-100"
                                   x-text="'±' + gpsAccuracy + 'm'"></span>
                         </button>
 
                         <!-- Tip Drag / Klik Pin -->
-                        <div class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5">
+                        <div class="py-2 px-3 rounded-xl bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-[11px] text-slate-600 dark:text-slate-300 flex items-center justify-center gap-1.5 select-none shadow-xs">
                             <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                             </svg>
-                            <span>Klik di peta atau geser pin merah</span>
+                            <span class="truncate">Klik peta / geser pin</span>
                         </div>
                     </div>
 
                     <!-- Target Coordinate Info Pill -->
-                    <div x-show="targetCoord" x-cloak class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2 text-xs">
+                    <div x-show="targetCoord" x-cloak class="p-2.5 rounded-xl bg-cyan-50/70 dark:bg-slate-800/90 border border-cyan-200/80 dark:border-slate-700 flex items-center justify-between gap-2 text-xs shadow-xs">
                         <div class="min-w-0">
-                            <span class="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">Koordinat Terpilih:</span>
+                            <span class="text-[9.5px] uppercase font-bold text-cyan-800 dark:text-cyan-300 block tracking-wider">Titik Target Terpilih:</span>
                             <span class="font-mono font-bold text-slate-800 dark:text-slate-100 truncate block text-[11.5px]"
                                   x-text="targetCoord ? targetCoord[0].toFixed(6) + ', ' + targetCoord[1].toFixed(6) : '-'"></span>
                         </div>
-                        <button type="button"
-                                @click="copyTargetCoords()"
-                                class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium text-[11px] flex items-center gap-1 transition">
-                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                            </svg>
-                            <span x-text="copiedCoords ? 'Tersalin!' : 'Salin'"></span>
-                        </button>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button type="button"
+                                    @click="copyTargetCoords()"
+                                    class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium text-[11px] flex items-center gap-1 transition shadow-xs">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                <span x-text="copiedCoords ? 'Tersalin!' : 'Salin'"></span>
+                            </button>
+                            <button type="button"
+                                    @click="resetTarget()"
+                                    title="Hapus / Reset Titik Target"
+                                    class="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 transition shadow-xs">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Radius & Slot Filters -->
@@ -1045,8 +1083,8 @@
 
                 <!-- CARD B1: PROMPT PLACEHOLDER JIKA BELUM MEMILIH LOKASI -->
                 <div x-show="!targetCoord"
-                     class="bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 p-6 text-center space-y-3">
-                    <div class="w-12 h-12 mx-auto rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                     class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-6 text-center space-y-3 shadow-xs">
+                    <div class="w-12 h-12 mx-auto rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-800 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-inner">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -1183,7 +1221,7 @@
                         <a :href="getGoogleMapsRouteUrl()"
                            target="_blank"
                            rel="noopener noreferrer"
-                           class="flex-1 py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-2xs">
+                           class="flex-1 py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs">
                             <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                             </svg>
@@ -1277,19 +1315,33 @@
                 </div>
 
                 <!-- Petunjuk Standar Tarikan FTTH Info Box -->
-                <div class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 p-3.5 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                    <div class="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200 text-xs">
-                        <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span>Standar Tarikan Jarak Kabel FTTH:</span>
+                <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-3.5 space-y-2.5 text-xs shadow-xs">
+                    <div class="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-100 text-xs">
+                        <div class="w-5 h-5 rounded-md bg-cyan-100 dark:bg-cyan-950/70 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <span>Standar Kebijakan Jarak Tarikan FTTH</span>
                     </div>
-                    <ul class="space-y-1 text-[11px] text-slate-500 dark:text-slate-400 pl-5 list-disc">
-                        <li><strong>&le; 150 meter:</strong> Kualitas redaman prima. Pasang baru instan disetujui.</li>
-                        <li><strong>151 - 250 meter:</strong> Toleransi standar ISP dengan dropcore 1-core.</li>
-                        <li><strong>251 - 300 meter:</strong> Batas maksimal toleransi teknis tiang.</li>
-                        <li><strong>&gt; 300 meter:</strong> Di luar toleransi teknis, wajib ajukan penambahan ODP baru.</li>
-                    </ul>
+                    <div class="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300 pt-0.5">
+                        <div class="flex items-start gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 mt-1 shrink-0"></span>
+                            <p><strong class="text-emerald-700 dark:text-emerald-400">&le; 150 m:</strong> Sangat Direkomendasikan. Redaman optik prima, pasang baru instan.</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-2 h-2 rounded-full bg-sky-500 mt-1 shrink-0"></span>
+                            <p><strong class="text-sky-700 dark:text-sky-400">151 - 250 m:</strong> Tercover Standar ISP toleransi normal dropcore 1-core.</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0"></span>
+                            <p><strong class="text-amber-700 dark:text-amber-400">251 - 300 m:</strong> Batas Maksimal toleransi tiang. Wajib survey lintasan jalan.</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 mt-1 shrink-0"></span>
+                            <p><strong class="text-rose-700 dark:text-rose-400">&gt; 300 m:</strong> Di Luar Jangkauan. Redaman tinggi, butuh perluasan ODP baru.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1300,12 +1352,12 @@
                 <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-[0_4px_24px_rgb(15,23,42,0.06)] overflow-hidden flex flex-col">
 
                     <!-- Top Map Toolbar: Layers + Quick Centering + Legend -->
-                    <div class="p-2.5 sm:px-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900 flex flex-wrap items-center justify-between gap-2 z-10">
+                    <div class="p-2 sm:px-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/90 dark:bg-slate-900 flex flex-wrap items-center justify-between gap-2 z-10 select-none">
                         <!-- Layer Mode Switcher -->
                         <div class="inline-flex rounded-xl p-0.5 bg-slate-200/80 dark:bg-slate-800 text-xs font-semibold">
                             <button type="button"
                                     @click="setTileLayer('street')"
-                                    :class="currentTile === 'street' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'"
+                                    :class="currentTile === 'street' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
                                     class="py-1 px-2.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 text-xs">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
@@ -1315,7 +1367,7 @@
 
                             <button type="button"
                                     @click="setTileLayer('satellite')"
-                                    :class="currentTile === 'satellite' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'"
+                                    :class="currentTile === 'satellite' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
                                     class="py-1 px-2.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 text-xs">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
@@ -1325,7 +1377,7 @@
 
                             <button type="button"
                                     @click="setTileLayer('dark')"
-                                    :class="currentTile === 'dark' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'"
+                                    :class="currentTile === 'dark' ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'"
                                     class="py-1 px-2.5 rounded-lg transition cursor-pointer flex items-center gap-1.5 text-xs">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
@@ -1334,33 +1386,34 @@
                             </button>
                         </div>
 
-                        <!-- Map Controls & Action Shortcuts -->
-                        <div class="flex items-center gap-1.5 flex-wrap text-xs">
+                        <!-- Map View Toggles & Actions -->
+                        <div class="flex items-center gap-2">
+                            <!-- Toggle Circles 150m/300m -->
                             <button type="button"
-                                    @click="toggleCoverageCircles()"
-                                    :class="showCircles ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/60 dark:text-cyan-200 border-cyan-300' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'"
-                                    class="py-1 px-2.5 rounded-lg border font-semibold flex items-center gap-1 transition text-xs"
-                                    title="Tampilkan Lingkaran Radius 150m & 300m">
-                                <span class="w-2 h-2 rounded-full" :class="showCircles ? 'bg-cyan-500' : 'bg-slate-400'"></span>
+                                    @click="toggleCircles()"
+                                    :class="showCircles ? 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-200 border-cyan-400 dark:border-cyan-700' : 'bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700'"
+                                    class="py-1 px-2.5 rounded-xl border font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-xs">
+                                <span class="w-2 h-2 rounded-full" :class="showCircles ? 'bg-cyan-500' : 'bg-slate-300 dark:bg-slate-600'"></span>
                                 <span>Radius 150/300m</span>
                             </button>
 
+                            <!-- Focus Target Button -->
                             <button type="button"
                                     x-show="targetCoord"
-                                    @click="focusToTarget()"
-                                    class="py-1 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1 transition text-xs"
-                                    title="Arahkan Peta ke Titik Target">
+                                    x-cloak
+                                    @click="focusTarget()"
+                                    class="py-1 px-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-xs">
                                 <svg class="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
                                 </svg>
                                 <span>Fokus Target</span>
                             </button>
 
+                            <!-- Reset Zoom Button -->
                             <button type="button"
-                                    @click="fitToAllOdps()"
-                                    class="py-1 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold flex items-center gap-1 transition text-xs"
-                                    title="Lihat Seluruh Jaringan ODP">
-                                <svg class="w-3.5 h-3.5 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    @click="resetMapView()"
+                                    class="py-1 px-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-xs">
+                                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                                 </svg>
                                 <span>Reset Zoom</span>
