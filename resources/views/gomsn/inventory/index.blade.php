@@ -205,81 +205,165 @@
         <!-- ============================================== -->
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <!-- Header Banner Teal -> Dark Slate Sesuai Tema -->
-            <div class="px-5 py-3.5 text-white flex items-center justify-between font-bold text-sm tracking-wide"
+            <div class="px-4 sm:px-5 py-3.5 text-white flex items-center justify-between font-bold text-sm tracking-wide"
                  style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
-                <div class="flex items-center gap-2.5 text-white">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                    <span>Daftar Stok Barang di Gudang</span>
+                <div class="flex items-center gap-2.5 text-white min-w-0">
+                    <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner">
+                        <svg class="w-4.5 h-4.5 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-sm font-bold block truncate text-white">Daftar Stok Gudang</span>
+                    </div>
                 </div>
-                @if (! ($canManage ?? false))
-                <button type="button" 
-                        @click="historyModal = true"
-                        class="text-white text-xs px-3.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition font-medium"
-                        style="background-color: rgba(255, 255, 255, 0.18) !important; color: #ffffff !important;">
-                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
-                    </svg>
-                    <span>Riwayat Stok</span>
-                </button>
-                @endif
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" 
+                            @click="historyModal = true"
+                            class="text-white text-xs px-3 py-1.5 rounded-xl inline-flex items-center gap-1.5 transition font-semibold hover:bg-white/20 active:scale-95 cursor-pointer shadow-2xs"
+                            style="background-color: rgba(255, 255, 255, 0.16) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.25);">
+                        <svg class="w-3.5 h-3.5 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/>
+                        </svg>
+                        <span class="hidden xs:inline sm:inline">Riwayat Stok</span>
+                        <span class="xs:hidden sm:hidden">Riwayat</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Search Bar Inline -->
-            <div class="p-4 sm:p-5 pb-3">
-                <form method="GET" action="{{ route('gomsn.inventory.index') }}" class="flex items-center max-w-full">
-                    <div class="relative flex-1">
+            <!-- Search & Quick Filter Chips -->
+            <div class="p-3.5 sm:p-5 space-y-3 bg-white border-b border-slate-100">
+                <!-- Search Box (Integrated Modern Input) -->
+                <form method="GET" action="{{ route('gomsn.inventory.index') }}" class="relative flex items-center w-full">
+                    <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
                         <input type="text" name="search" value="{{ request('search') }}" 
-                               placeholder="Cari nama barang..."
-                               class="w-full text-xs rounded-l-xl py-2.5 px-3.5 border border-slate-300 border-r-0 focus:ring-teal-700 focus:border-teal-700 placeholder-slate-400 bg-white">
+                               placeholder="Cari nama barang atau kode..." 
+                               class="w-full text-xs pl-10 pr-20 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 text-slate-800 placeholder-slate-400 transition-all">
+                        <button type="submit" 
+                                class="absolute right-1.5 top-1.5 bottom-1.5 px-3.5 rounded-lg bg-[#155E63] hover:bg-[#114b4f] active:scale-95 text-white font-semibold text-xs flex items-center gap-1 transition-all shadow-2xs cursor-pointer">
+                            <span>Cari</span>
+                        </button>
                     </div>
-                    <button type="submit" 
-                            style="background: linear-gradient(135deg, #18C4C4 0%, #155E63 100%) !important; color: #ffffff !important;"
-                            class="hover:opacity-90 text-white font-bold text-xs px-5 py-2.5 rounded-r-xl inline-flex items-center gap-1.5 transition h-[39px] shrink-0 shadow-2xs cursor-pointer">
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                        <span>Cari</span>
-                    </button>
                     @if(request('search'))
-                    <a href="{{ route('gomsn.inventory.index') }}" class="ml-2 text-xs text-slate-500 hover:text-slate-800 underline">Reset</a>
+                    <a href="{{ route('gomsn.inventory.index', ['status' => request('status', 'all')]) }}" class="ml-2 text-xs text-rose-500 hover:text-rose-700 font-semibold whitespace-nowrap p-1.5">
+                        Reset
+                    </a>
                     @endif
                 </form>
+
+                <!-- Quick Filter Status Pills -->
+                @php
+                    $curStatus = request('status', 'all');
+                @endphp
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 pt-0.5 text-xs">
+                    <!-- Semua -->
+                    <a href="{{ route('gomsn.inventory.index', array_filter(['search' => request('search'), 'status' => 'all'])) }}"
+                       class="px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 flex items-center gap-1.5 {{ $curStatus === 'all' ? 'bg-[#155E63] text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80' }}">
+                        <span>Semua</span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full {{ $curStatus === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700' }}">{{ $totalItems }}</span>
+                    </a>
+
+                    <!-- Aman -->
+                    <a href="{{ route('gomsn.inventory.index', array_filter(['search' => request('search'), 'status' => 'aman'])) }}"
+                       class="px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 flex items-center gap-1.5 {{ $curStatus === 'aman' ? 'bg-emerald-600 text-white shadow-2xs' : 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-100/70' }}">
+                        <span class="w-2 h-2 rounded-full {{ $curStatus === 'aman' ? 'bg-white' : 'bg-emerald-500' }}"></span>
+                        <span>Aman</span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full {{ $curStatus === 'aman' ? 'bg-white/20 text-white' : 'bg-emerald-200 text-emerald-800' }}">{{ $safeCount }}</span>
+                    </a>
+
+                    <!-- Menipis -->
+                    <a href="{{ route('gomsn.inventory.index', array_filter(['search' => request('search'), 'status' => 'menipis'])) }}"
+                       class="px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 flex items-center gap-1.5 {{ $curStatus === 'menipis' ? 'bg-amber-600 text-white shadow-2xs' : 'bg-amber-50 text-amber-700 border border-amber-200/60 hover:bg-amber-100/70' }}">
+                        <span class="w-2 h-2 rounded-full {{ $curStatus === 'menipis' ? 'bg-white' : 'bg-amber-500' }}"></span>
+                        <span>Menipis</span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full {{ $curStatus === 'menipis' ? 'bg-white/20 text-white' : 'bg-amber-200 text-amber-800' }}">{{ $lowCount }}</span>
+                    </a>
+
+                    <!-- Habis -->
+                    <a href="{{ route('gomsn.inventory.index', array_filter(['search' => request('search'), 'status' => 'habis'])) }}"
+                       class="px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 flex items-center gap-1.5 {{ $curStatus === 'habis' ? 'bg-rose-600 text-white shadow-2xs' : 'bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-100/70' }}">
+                        <span class="w-2 h-2 rounded-full {{ $curStatus === 'habis' ? 'bg-white' : 'bg-rose-500' }}"></span>
+                        <span>Habis</span>
+                        <span class="text-[10px] px-1.5 py-0.2 rounded-full {{ $curStatus === 'habis' ? 'bg-white/20 text-white' : 'bg-rose-200 text-rose-800' }}">{{ $emptyCount }}</span>
+                    </a>
+                </div>
             </div>
 
             <!-- 1. MOBILE VIEW: Daftar Barang Cards (sm:hidden) -->
-            <div class="sm:hidden divide-y divide-slate-100">
+            <div class="sm:hidden p-3 space-y-2.5 bg-slate-50/50">
                 @forelse ($materials as $material)
-                    <div class="p-4 space-y-2.5 bg-white">
-                        <!-- Top: Nama Barang & Stok Badge -->
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <span class="font-bold text-slate-800 text-xs block truncate">{{ $material->nama }}</span>
-                                <span class="text-[10px] text-slate-400 font-mono block">{{ $material->kode }}</span>
+                    <div class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs transition-all space-y-2.5">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <!-- Status Icon Container -->
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 {{ $material->stok_tersedia <= 0 ? 'bg-rose-50 border border-rose-200/80 text-rose-600' : ($material->stok_tersedia <= ($material->min_stok ?? 2) ? 'bg-amber-50 border border-amber-200/80 text-amber-600' : 'bg-emerald-50 border border-emerald-200/80 text-emerald-600') }}">
+                                    @if ($material->stok_tersedia <= 0)
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    @elseif ($material->stok_tersedia <= ($material->min_stok ?? 2))
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    @else
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                    @endif
+                                </div>
+
+                                <!-- Text Nama & Kode -->
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-xs text-slate-800 truncate leading-snug">
+                                        {{ $material->nama }}
+                                    </h4>
+                                    <div class="flex items-center gap-1.5 mt-1">
+                                        <span class="font-mono text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-medium">
+                                            {{ $material->kode }}
+                                        </span>
+                                        @if ($material->stok_tersedia <= 0)
+                                            <span class="text-[10px] font-bold text-rose-600 flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                                Habis
+                                            </span>
+                                        @elseif ($material->stok_tersedia <= ($material->min_stok ?? 2))
+                                            <span class="text-[10px] font-bold text-amber-600 flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                                Menipis
+                                            </span>
+                                        @else
+                                            <span class="text-[10px] font-semibold text-emerald-600 flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                                Tersedia
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Jumlah Stok Badge -->
                             <div class="text-right shrink-0">
                                 @if ($material->stok_tersedia <= 0)
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-extrabold bg-rose-50 text-rose-700 border border-rose-200">
-                                        {{ number_format($material->stok_tersedia, 0, ',', '.') }} {{ $material->satuan }}
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-black bg-rose-50 text-rose-700 border border-rose-200 shadow-2xs">
+                                        0 <span class="font-semibold text-[10px] ml-1 text-rose-600">{{ $material->satuan }}</span>
                                     </span>
                                 @elseif ($material->stok_tersedia <= ($material->min_stok ?? 2))
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-extrabold bg-amber-50 text-amber-700 border border-amber-200">
-                                        {{ number_format($material->stok_tersedia, 0, ',', '.') }} {{ $material->satuan }}
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-black bg-amber-50 text-amber-700 border border-amber-200 shadow-2xs">
+                                        {{ number_format($material->stok_tersedia, 0, ',', '.') }} <span class="font-semibold text-[10px] ml-1 text-amber-600">{{ $material->satuan }}</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        {{ number_format($material->stok_tersedia, 0, ',', '.') }} {{ $material->satuan }}
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+                                        {{ number_format($material->stok_tersedia, 0, ',', '.') }} <span class="font-semibold text-[10px] ml-1 text-emerald-600">{{ $material->satuan }}</span>
                                     </span>
                                 @endif
                             </div>
                         </div>
 
                         @if ($canManage ?? false)
-                        <!-- Bottom: Action Buttons -->
+                        <!-- Bottom Action Buttons if Finance -->
                         <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                            <!-- Edit Button -->
                             <button type="button" 
                                     @click="openEdit({{ json_encode($material) }})"
                                     class="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs font-semibold transition cursor-pointer">
@@ -288,8 +372,6 @@
                                 </svg>
                                 <span>Edit</span>
                             </button>
-
-                            <!-- Hapus Button -->
                             <button type="button" 
                                     @click="openDelete({{ json_encode($material) }})"
                                     class="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition cursor-pointer">
@@ -302,8 +384,12 @@
                         @endif
                     </div>
                 @empty
-                    <div class="py-8 text-center text-slate-400 text-xs">
-                        Tidak ada data barang inventaris yang sesuai.
+                    <div class="py-10 text-center space-y-2 bg-white rounded-2xl border border-slate-200/80">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        </div>
+                        <p class="text-xs font-bold text-slate-700">Tidak ada barang inventaris</p>
+                        <p class="text-[11px] text-slate-400">Tidak ada barang yang sesuai kriteria pencarian atau filter.</p>
                     </div>
                 @endforelse
             </div>
@@ -329,8 +415,13 @@
                                 {{ $loop->iteration + ($materials->currentPage() - 1) * $materials->perPage() }}
                             </td>
                             <td class="py-3.5 px-4">
-                                <span class="font-semibold text-slate-800 text-xs">{{ $material->nama }}</span>
-                                <span class="block text-[10px] text-slate-400 font-mono">{{ $material->kode }}</span>
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-2 h-2 rounded-full shrink-0 {{ $material->stok_tersedia <= 0 ? 'bg-rose-500 ring-2 ring-rose-200' : ($material->stok_tersedia <= ($material->min_stok ?? 2) ? 'bg-amber-500 ring-2 ring-amber-200' : 'bg-emerald-500 ring-2 ring-emerald-200') }}"></div>
+                                    <div>
+                                        <span class="font-bold text-slate-800 text-xs block leading-snug">{{ $material->nama }}</span>
+                                        <span class="block text-[10px] text-slate-400 font-mono">{{ $material->kode }}</span>
+                                    </div>
+                                </div>
                             </td>
                             <td class="py-3.5 px-4 text-center">
                                 @if ($material->stok_tersedia <= 0)
