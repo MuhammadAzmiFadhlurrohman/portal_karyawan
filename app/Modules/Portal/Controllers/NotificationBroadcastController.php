@@ -66,12 +66,6 @@ class NotificationBroadcastController extends Controller
             ->where('event_type', 'broadcast')
             ->count();
 
-        // Paginated broadcast logs
-        $logs = NotificationLog::query()
-            ->where('event_type', 'broadcast')
-            ->latest('id')
-            ->paginate(15);
-
         return view('portal.notifications.index', [
             'employees' => $employees,
             'divisionGroups' => $divisionGroups,
@@ -79,7 +73,65 @@ class NotificationBroadcastController extends Controller
             'registeredDevicesCount' => $registeredDevicesCount,
             'broadcastsTodayCount' => $broadcastsTodayCount,
             'totalBroadcastsCount' => $totalBroadcastsCount,
+        ]);
+    }
+
+    /**
+     * Display the dedicated broadcast notification history page.
+     */
+    public function history(Request $request): View
+    {
+        $this->authorizeAdmin($request);
+
+        $search = trim((string) $request->input('search', ''));
+        $type = trim((string) $request->input('type', ''));
+        $date = trim((string) $request->input('date', ''));
+
+        $query = NotificationLog::query()
+            ->where('event_type', 'broadcast')
+            ->with('user:id,name,username,foto')
+            ->latest('id');
+
+        // Search filter (keyword in title, body, or recipient)
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('recipient', 'like', "%{$search}%")
+                  ->orWhere('payload', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Type filter (info, announcement, warning, alert)
+        if ($type !== '' && in_array($type, ['info', 'announcement', 'warning', 'alert'], true)) {
+            $query->where('payload', 'like', '%"type":"' . $type . '"%');
+        }
+
+        // Date filter
+        if ($date !== '') {
+            $query->whereDate('created_at', $date);
+        }
+
+        $logs = $query->paginate(15)->withQueryString();
+
+        $totalBroadcastsCount = NotificationLog::query()
+            ->where('event_type', 'broadcast')
+            ->count();
+        $broadcastsTodayCount = NotificationLog::query()
+            ->where('event_type', 'broadcast')
+            ->whereDate('created_at', today())
+            ->count();
+        $totalActiveEmployees = User::where('is_active', true)->count();
+
+        return view('portal.notifications.history', [
             'logs' => $logs,
+            'totalBroadcastsCount' => $totalBroadcastsCount,
+            'broadcastsTodayCount' => $broadcastsTodayCount,
+            'totalActiveEmployees' => $totalActiveEmployees,
+            'currentSearch' => $search,
+            'currentType' => $type,
+            'currentDate' => $date,
         ]);
     }
 
@@ -236,7 +288,6 @@ class NotificationBroadcastController extends Controller
 
         $notificationLog->delete();
 
-        return redirect()->route('portal.notifications.index')
-            ->with('status', 'Riwayat siaran notifikasi berhasil dihapus.');
+        return back()->with('status', 'Riwayat siaran notifikasi berhasil dihapus.');
     }
 }

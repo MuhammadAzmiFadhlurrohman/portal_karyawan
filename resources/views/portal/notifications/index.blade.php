@@ -232,12 +232,21 @@
                 </div>
             </div>
 
-            <!-- Right: Status Badge -->
-            <div class="relative z-10 flex items-center gap-2 shrink-0">
-                <div class="px-3 py-1 rounded-xl bg-white/10 border border-white/15 backdrop-blur-xs flex items-center gap-2 text-white text-[11px]">
+            <!-- Right: Action Buttons & Status Badge -->
+            <div class="relative z-10 flex items-center gap-2.5 shrink-0 flex-wrap sm:flex-nowrap">
+                <a href="{{ route('portal.notifications.history') }}"
+                   class="px-3.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-semibold flex items-center gap-2 transition active:scale-95 shadow-2xs">
+                    <svg class="w-4 h-4 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Riwayat Siaran</span>
+                    <span class="px-1.5 py-0.5 rounded-full bg-teal-400/30 text-teal-200 text-[10px] font-bold">{{ $totalBroadcastsCount }}</span>
+                </a>
+
+                <div class="px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 backdrop-blur-xs flex items-center gap-2 text-white text-[11px]">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="text-teal-100">Karyawan Aktif:</span>
-                    <span class="font-bold text-white">{{ $totalActiveEmployees }} Orang</span>
+                    <span class="text-teal-100 hidden sm:inline">Karyawan:</span>
+                    <span class="font-bold text-white">{{ $totalActiveEmployees }}</span>
                 </div>
             </div>
         </div>
@@ -283,18 +292,23 @@
                 </div>
             </div>
 
-            <!-- 4. Total Siaran Sistem -->
-            <div class="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-purple-300 transition-colors flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100/80 text-purple-600 flex items-center justify-center shrink-0">
-                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
+            <!-- 4. Total Siaran Sistem (Clickable Link to History) -->
+            <a href="{{ route('portal.notifications.history') }}"
+               class="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-purple-300 hover:bg-purple-50/20 transition-all flex items-center justify-between group cursor-pointer"
+               title="Buka Halaman Riwayat Siaran Notifikasi">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-purple-50 border border-purple-100/80 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors flex items-center justify-center shrink-0">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block truncate group-hover:text-purple-700">Total Riwayat ↗</span>
+                        <span class="text-base font-extrabold text-slate-800 leading-tight">{{ $totalBroadcastsCount }}</span>
+                    </div>
                 </div>
-                <div class="min-w-0">
-                    <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block truncate">Total Riwayat</span>
-                    <span class="text-base font-extrabold text-slate-800 leading-tight">{{ $totalBroadcastsCount }}</span>
-                </div>
-            </div>
+                <svg class="w-4 h-4 text-slate-300 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </a>
         </div>
 
         <!-- Mobile View Switcher (Visible only on < lg screens) -->
@@ -730,134 +744,6 @@
                     </p>
                 </div>
             </div>
-        </div>
-
-        <!-- SECTION 2: RIWAYAT SIARAN NOTIFIKASI TERKIRIM (History Table) -->
-        <div class="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-4 sm:p-6 space-y-3.5">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
-                <div>
-                    <h3 class="font-bold text-sm sm:text-base text-slate-800 flex items-center gap-2">
-                        <span>Riwayat Pengiriman Notifikasi</span>
-                    </h3>
-                    <p class="text-[11px] text-slate-500">Daftar pesan dan siaran yang telah dikirimkan ke pengguna.</p>
-                </div>
-                <span class="text-xs font-semibold text-slate-500">
-                    Total {{ $logs->total() }} riwayat siaran
-                </span>
-            </div>
-
-            <!-- Table Container -->
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead class="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200 select-none">
-                        <tr>
-                            <th class="px-3.5 py-3">Waktu Kirim</th>
-                            <th class="px-3.5 py-3">Pengirim</th>
-                            <th class="px-3.5 py-3">Target Penerima</th>
-                            <th class="px-3.5 py-3">Tipe</th>
-                            <th class="px-3.5 py-3">Judul &amp; Pesan</th>
-                            <th class="px-3.5 py-3 text-center">Status</th>
-                            <th class="px-3.5 py-3 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-slate-700">
-                        @forelse ($logs as $log)
-                            @php
-                                $payload = is_array($log->payload) ? $log->payload : json_decode($log->payload, true) ?? [];
-                                $title = $payload['title'] ?? '-';
-                                $body = $payload['body'] ?? ($payload['message'] ?? '-');
-                                $type = $payload['type'] ?? 'info';
-                                $senderName = $payload['sender_name'] ?? ($log->user?->name ?? 'Administrator');
-                                $targetCount = $payload['target_count'] ?? null;
-                            @endphp
-                            <tr class="hover:bg-slate-50/70 transition-colors">
-                                <!-- Waktu Kirim -->
-                                <td class="px-3.5 py-3 whitespace-nowrap text-slate-500">
-                                    <div class="font-semibold text-slate-800">{{ $log->created_at?->timezone('Asia/Jakarta')->translatedFormat('d M Y') }}</div>
-                                    <div class="text-[10px] text-slate-400">{{ $log->created_at?->timezone('Asia/Jakarta')->format('H:i:s') }} WIB</div>
-                                </td>
-
-                                <!-- Pengirim -->
-                                <td class="px-3.5 py-3 whitespace-nowrap font-semibold text-slate-800">
-                                    <div class="flex items-center gap-1.5">
-                                        <div class="w-5 h-5 rounded-full bg-teal-100 text-teal-700 font-bold text-[9px] flex items-center justify-center">
-                                            {{ strtoupper(substr($senderName, 0, 1)) }}
-                                        </div>
-                                        <span class="text-xs">{{ $senderName }}</span>
-                                    </div>
-                                </td>
-
-                                <!-- Target Penerima -->
-                                <td class="px-3.5 py-3 whitespace-nowrap">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
-                                        <svg class="w-3 h-3 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                        {{ $log->recipient ?: ($targetCount ? $targetCount . ' Karyawan' : 'Semua Karyawan') }}
-                                    </span>
-                                </td>
-
-                                <!-- Tipe Notifikasi -->
-                                <td class="px-3.5 py-3 whitespace-nowrap">
-                                    @if ($type === 'announcement')
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Pengumuman</span>
-                                    @elseif ($type === 'warning')
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Penting</span>
-                                    @elseif ($type === 'alert')
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-300">Mendesak</span>
-                                    @else
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-teal-100 text-teal-800 border border-teal-300">Info</span>
-                                    @endif
-                                </td>
-
-                                <!-- Judul & Pesan -->
-                                <td class="px-3.5 py-3 max-w-xs">
-                                    <div class="font-bold text-slate-800 leading-snug line-clamp-1 text-xs">{{ $title }}</div>
-                                    <div class="text-[10px] text-slate-500 leading-tight line-clamp-1 mt-0.5">{{ $body }}</div>
-                                    @if (!empty($payload['link']))
-                                        <div class="text-[9px] text-teal-600 font-mono mt-0.5 truncate">
-                                            Link: {{ $payload['link'] }}
-                                        </div>
-                                    @endif
-                                </td>
-
-                                <!-- Status -->
-                                <td class="px-3.5 py-3 whitespace-nowrap text-center">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                        Terkirim
-                                    </span>
-                                </td>
-
-                                <!-- Aksi Hapus -->
-                                <td class="px-3.5 py-3 whitespace-nowrap text-center">
-                                    <form method="POST" action="{{ route('portal.notifications.destroy', $log) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat siaran ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer" title="Hapus Riwayat">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-slate-400 text-xs">
-                                    <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                                    </div>
-                                    <span>Belum ada riwayat siaran notifikasi.</span>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            @if ($logs->hasPages())
-                <div class="pt-2">
-                    {{ $logs->links() }}
-                </div>
-            @endif
         </div>
     </div>
 </x-layouts.app>

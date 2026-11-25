@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function (): void {
 
     // Pusat Notifikasi & Broadcast Pesan (§4, §6, Admin / HRD)
     Route::get('/portal/notifications', [NotificationBroadcastController::class, 'index'])->name('portal.notifications.index');
+    Route::get('/portal/notifications/history', [NotificationBroadcastController::class, 'history'])->name('portal.notifications.history');
     Route::post('/portal/notifications/send', [NotificationBroadcastController::class, 'send'])->name('portal.notifications.send');
     Route::delete('/portal/notifications/{notificationLog}', [NotificationBroadcastController::class, 'destroy'])->name('portal.notifications.destroy');
 
