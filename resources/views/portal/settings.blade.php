@@ -469,5 +469,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Keamanan Akun Pribadi (Biometrik & Ubah Password) -->
+        @include('portal.partials.security-settings')
     </div>
 </x-layouts.app>

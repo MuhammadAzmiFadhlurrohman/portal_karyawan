@@ -184,9 +184,10 @@ class PortalHubController extends Controller
         ]);
     }
 
-    public function systemSettings(Request $request): View
+    public function systemSettings(Request $request, WebAuthnService $webAuthnService): View
     {
-        $user = $request->user();
+        $webAuthnService->ensureTableExists();
+        $user = $request->user()->load('webauthnCredentials');
         $canManageSystem = $user?->can('portal.settings.manage') || $user?->hasRole(['super_admin', 'admin']);
 
         if (! $canManageSystem) {
@@ -194,6 +195,7 @@ class PortalHubController extends Controller
             $pref = $fcmService->getUserPreferences($user);
 
             return view('portal.user-settings', [
+                'user' => $user,
                 'notificationPreferences' => [
                     'notify_pengajuan' => (bool) $pref->notify_pengajuan,
                     'notify_lembur' => (bool) $pref->notify_lembur,
@@ -220,9 +222,33 @@ class PortalHubController extends Controller
         $historyByKey = $allSettings->groupBy('key');
 
         return view('portal.settings', [
+            'user' => $user,
             'currentSettings' => $currentSettings,
             'historyByKey' => $historyByKey,
         ]);
+    }
+
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'new_password' => ['required', 'min:8', 'confirmed'],
+        ]);
+
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['new_password']),
+            'password_changed_at' => now(),
+        ]);
+
+        AuditLogger::record(
+            action: 'auth.password_changed',
+            auditable: $user,
+            actorId: $user->id
+        );
+
+        return back()->with('status', 'Password akun berhasil diperbarui.');
     }
 
     public function updateSystemSetting(Request $request): RedirectResponse

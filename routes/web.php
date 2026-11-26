@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/portal/delegations', [PortalHubController::class, 'storeDelegation'])->name('portal.delegations.store');
 
     Route::get('/portal/settings', [PortalHubController::class, 'systemSettings'])->name('portal.settings');
+    Route::put('/portal/settings/password', [PortalHubController::class, 'updatePassword'])->name('portal.settings.password');
     Route::post('/portal/settings', [PortalHubController::class, 'updateSystemSetting'])->name('portal.settings.update');
     Route::post('/portal/settings/reset-defaults', [PortalHubController::class, 'resetDefaultSettings'])->name('portal.settings.reset');
     Route::post('/portal/settings/create', [PortalHubController::class, 'createSystemSetting'])->name('portal.settings.create');

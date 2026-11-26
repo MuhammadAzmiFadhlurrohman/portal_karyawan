@@ -384,8 +384,11 @@
             </div>
         </div>
 
-        <!-- 5. Kustomisasi Menu Mobile & Pintasan Akun -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <!-- 5. Keamanan Akun: Login Biometrik & Ubah Password -->
+        @include('portal.partials.security-settings')
+
+        <!-- 6. Kustomisasi Menu Mobile & Pintasan Profil -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <!-- Reset Menu Mobile -->
             <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
@@ -420,23 +423,6 @@
                     <div class="min-w-0">
                         <div class="text-xs font-bold text-slate-800 group-hover:text-teal-700 truncate">Profil, Kontak &amp; Rekening</div>
                         <div class="text-[11px] text-slate-500 truncate mt-0.5">Ubah foto, nomor HP &amp; rekening</div>
-                    </div>
-                </div>
-                <svg class="w-4 h-4 text-slate-400 group-hover:text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            </a>
-
-            <!-- Keamanan & Password -->
-            <a href="{{ route('portal.profile') }}#keamanan"
-               class="p-4 rounded-2xl bg-white border border-slate-200/90 hover:border-teal-400 hover:shadow-sm transition flex items-center justify-between gap-3 group">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="text-xs font-bold text-slate-800 group-hover:text-teal-700 truncate">Keamanan &amp; Password</div>
-                        <div class="text-[11px] text-slate-500 truncate mt-0.5">Ganti password &amp; login biometrik</div>
                     </div>
                 </div>
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-teal-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
