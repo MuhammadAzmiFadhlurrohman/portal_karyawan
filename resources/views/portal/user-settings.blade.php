@@ -2,9 +2,6 @@
     @php
         $userSettingsConfig = [
             'userId' => auth()->id(),
-            'initialPrefs' => $notificationPreferences,
-            'savePrefsUrl' => route('api.fcm.preferences.update', [], false),
-            'csrfToken' => csrf_token(),
         ];
     @endphp
     <script>
@@ -15,6 +12,7 @@
             return {
                 isDark: document.documentElement.classList.contains('dark'),
                 activeAccent: document.documentElement.getAttribute('data-accent') || 'teal',
+                accentDropdownOpen: false,
                 accentThemes: [
                     { name: 'teal', label: 'Ocean Teal', desc: 'Default GoMSN', hex: '#0d9488', soft: '#f0fdfa', gradient: 'linear-gradient(135deg, #0a525f 0%, #0d9488 100%)' },
                     { name: 'blue', label: 'Royal Blue', desc: 'Biru Profesional', hex: '#2563eb', soft: '#eff6ff', gradient: 'linear-gradient(135deg, #102a63 0%, #2563eb 100%)' },
@@ -25,15 +23,6 @@
                     { name: 'amber', label: 'Amber Gold', desc: 'Emas Hangat', hex: '#d97706', soft: '#fffbeb', gradient: 'linear-gradient(135deg, #542807 0%, #d97706 100%)' },
                     { name: 'pink', label: 'Sakura Pink', desc: 'Merah Muda Cerah', hex: '#ec4899', soft: '#fdf2f8', gradient: 'linear-gradient(135deg, #831843 0%, #ec4899 100%)' },
                 ],
-                prefs: {
-                    notify_pengajuan: !!(config.initialPrefs && config.initialPrefs.notify_pengajuan),
-                    notify_lembur: !!(config.initialPrefs && config.initialPrefs.notify_lembur),
-                    notify_tiket: !!(config.initialPrefs && config.initialPrefs.notify_tiket),
-                    notify_absen: !!(config.initialPrefs && config.initialPrefs.notify_absen),
-                },
-                savingPrefs: false,
-                savedNotice: false,
-                saveError: '',
                 hasCustomMobileMenu: false,
                 mobileStorageKey: 'gomsn_mobile_menu_user_' + (config.userId || 0),
 
@@ -55,6 +44,7 @@
 
                 setAccent(name) {
                     this.activeAccent = name;
+                    this.accentDropdownOpen = false;
                     if (typeof window.setGomsnAccent === 'function') {
                         window.setGomsnAccent(name);
                     }
@@ -81,56 +71,6 @@
                         document.documentElement.classList.toggle('dark', targetDark);
                         try { localStorage.setItem('gomsn_theme', mode); } catch (e) {}
                         this.isDark = targetDark;
-                    }
-                },
-
-                async togglePref(key) {
-                    if (this.savingPrefs) return;
-                    const prev = !!this.prefs[key];
-                    this.prefs[key] = !prev;
-                    this.savingPrefs = true;
-                    this.savedNotice = false;
-                    this.saveError = '';
-
-                    try {
-                        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-                        const csrf = (csrfMeta && csrfMeta.getAttribute('content')) || config.csrfToken || '';
-                        const res = await fetch(config.savePrefsUrl || '/api/fcm/preferences', {
-                            method: 'POST',
-                            credentials: 'same-origin',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': csrf
-                            },
-                            body: JSON.stringify({
-                                notify_pengajuan: !!this.prefs.notify_pengajuan,
-                                notify_lembur: !!this.prefs.notify_lembur,
-                                notify_tiket: !!this.prefs.notify_tiket,
-                                notify_absen: !!this.prefs.notify_absen,
-                            })
-                        });
-                        if (!res.ok) {
-                            throw new Error('HTTP ' + res.status);
-                        }
-                        const data = await res.json();
-                        if (data && data.preferences) {
-                            this.prefs.notify_pengajuan = !!data.preferences.notify_pengajuan;
-                            this.prefs.notify_lembur = !!data.preferences.notify_lembur;
-                            this.prefs.notify_tiket = !!data.preferences.notify_tiket;
-                            this.prefs.notify_absen = !!data.preferences.notify_absen;
-                        }
-                        this.savedNotice = true;
-                        setTimeout(() => { this.savedNotice = false; }, 2200);
-                    } catch (err) {
-                        this.prefs[key] = prev;
-                        this.saveError = 'Gagal menyimpan (' + (err.message || 'error') + ')';
-                        if (window.Toast) {
-                            window.Toast.fire({ icon: 'error', title: 'Gagal menyimpan pengaturan notifikasi.' });
-                        }
-                    } finally {
-                        this.savingPrefs = false;
                     }
                 },
 
@@ -169,13 +109,13 @@
                         Pengaturan Preferensi
                     </h1>
                     <p class="text-xs text-white/80 mt-0.5 leading-snug">
-                        Atur mode tampilan, warna tema aplikasi, notifikasi pribadi, dan tata letak menu sesuai selera Anda
+                        Atur mode tampilan, warna tema aplikasi, keamanan akun, dan tata letak menu sesuai selera Anda
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- 2. Warna Tema Aplikasi (Tidak Hanya Hijau!) -->
+        <!-- 2. Warna Tema Aplikasi (Dropdown di Mobile, Grid di Desktop) -->
         <div class="rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden">
             <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
@@ -190,12 +130,91 @@
                         <p class="text-[11px] text-slate-500">Ubah warna utama sidebar, header, dan aksen tombol aplikasi</p>
                     </div>
                 </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold text-white shrink-0"
+                <span class="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold text-white shrink-0"
                       :style="'background: ' + getActiveAccentObj().hex"
                       x-text="getActiveAccentObj().label"></span>
             </div>
 
-            <div class="p-5 grid grid-cols-2 sm:grid-cols-4 gap-3" data-accent-swatch="true">
+            <!-- Mobile Dropdown Selector -->
+            <div class="p-4 sm:hidden" data-accent-swatch="true">
+                <button type="button"
+                        @click="accentDropdownOpen = !accentDropdownOpen"
+                        :aria-expanded="accentDropdownOpen"
+                        class="w-full p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between gap-3 cursor-pointer"
+                        :style="isDark
+                            ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex}22;`
+                            : `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().soft};`">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-9 h-9 rounded-xl shrink-0 flex items-center justify-center text-white shadow-sm"
+                             :style="`background: ${getActiveAccentObj().gradient};`">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-bold truncate"
+                                 :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'"
+                                 x-text="getActiveAccentObj().label"></div>
+                            <div class="text-[11px] truncate mt-0.5"
+                                 :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'"
+                                 x-text="getActiveAccentObj().desc"></div>
+                        </div>
+                    </div>
+                    <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200"
+                         :class="accentDropdownOpen ? 'rotate-180' : ''"
+                         :style="isDark ? 'background: rgba(255,255,255,0.08); color: #e2e8f0;' : 'background: rgba(15,23,42,0.06); color: #475569;'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </button>
+
+                <!-- Dropdown Options List -->
+                <div x-show="accentDropdownOpen"
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 -translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-1"
+                     class="mt-2.5 rounded-2xl border overflow-hidden divide-y"
+                     :style="isDark
+                        ? 'border-color: rgba(148, 163, 184, 0.22); background: rgba(15, 23, 42, 0.72);'
+                        : 'border-color: #e2e8f0; background: #ffffff;'">
+                    <template x-for="item in accentThemes" :key="'mob-' + item.name">
+                        <button type="button"
+                                @click="setAccent(item.name)"
+                                class="w-full px-3.5 py-2.5 text-left transition flex items-center justify-between gap-3 cursor-pointer"
+                                :style="activeAccent === item.name
+                                    ? (isDark ? `background: ${item.hex}26;` : `background: ${item.soft};`)
+                                    : (isDark ? 'background: transparent; border-color: rgba(148,163,184,0.12);' : 'background: transparent; border-color: #f1f5f9;')">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white shadow-2xs"
+                                     :style="`background: ${item.gradient};`">
+                                    <svg x-show="activeAccent === item.name" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-xs font-bold truncate"
+                                         :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'"
+                                         x-text="item.label"></div>
+                                    <div class="text-[10.5px] truncate"
+                                         :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'"
+                                         x-text="item.desc"></div>
+                                </div>
+                            </div>
+                            <span x-show="activeAccent === item.name"
+                                  class="px-2 py-0.5 rounded-full text-[10px] font-bold text-white shrink-0"
+                                  :style="`background: ${item.hex};`">Aktif</span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Desktop Grid Selector -->
+            <div class="hidden sm:grid sm:grid-cols-4 gap-3 p-5" data-accent-swatch="true">
                 <template x-for="item in accentThemes" :key="item.name">
                     <button type="button"
                             @click="setAccent(item.name)"
@@ -296,95 +315,7 @@
             </div>
         </div>
 
-        <!-- 4. Preferensi Notifikasi Push -->
-        <div class="rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-teal-50 border border-teal-200/70 text-teal-600 flex items-center justify-center shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 class="text-sm font-bold text-slate-800">Notifikasi Aplikasi</h2>
-                        <p class="text-[11px] text-slate-500">Pilih jenis pemberitahuan push yang ingin Anda terima</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span x-show="saveError" x-cloak class="text-[11px] font-semibold text-rose-600" x-text="saveError"></span>
-                    <span x-show="savingPrefs" x-cloak class="text-[11px] font-semibold text-teal-600">Menyimpan...</span>
-                    <span x-show="savedNotice && !savingPrefs" x-cloak class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">Tersimpan</span>
-                </div>
-            </div>
-
-            <div class="divide-y divide-slate-100">
-                <!-- Pengajuan -->
-                <div class="px-5 py-3.5 flex items-center justify-between gap-4">
-                    <div class="min-w-0">
-                        <div class="text-xs font-bold text-slate-800">Pengajuan &amp; Kasbon</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">Status persetujuan atasan, pencairan dana, dan pengajuan stok</div>
-                    </div>
-                    <button type="button"
-                            @click="togglePref('notify_pengajuan')"
-                            :aria-pressed="prefs.notify_pengajuan"
-                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
-                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_pengajuan ? getActiveAccentObj().hex : '#cbd5e1'};`">
-                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
-                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_pengajuan ? '20px' : '0px'});`"></span>
-                    </button>
-                </div>
-
-                <!-- Lembur -->
-                <div class="px-5 py-3.5 flex items-center justify-between gap-4">
-                    <div class="min-w-0">
-                        <div class="text-xs font-bold text-slate-800">Lembur &amp; SPK</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">Pembaruan status persetujuan dan pembayaran lembur</div>
-                    </div>
-                    <button type="button"
-                            @click="togglePref('notify_lembur')"
-                            :aria-pressed="prefs.notify_lembur"
-                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
-                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_lembur ? getActiveAccentObj().hex : '#cbd5e1'};`">
-                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
-                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_lembur ? '20px' : '0px'});`"></span>
-                    </button>
-                </div>
-
-                <!-- Tiket -->
-                <div class="px-5 py-3.5 flex items-center justify-between gap-4">
-                    <div class="min-w-0">
-                        <div class="text-xs font-bold text-slate-800">Tiket Gangguan</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">Penugasan tiket baru, pesan balasan, dan pembaruan SLA</div>
-                    </div>
-                    <button type="button"
-                            @click="togglePref('notify_tiket')"
-                            :aria-pressed="prefs.notify_tiket"
-                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
-                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_tiket ? getActiveAccentObj().hex : '#cbd5e1'};`">
-                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
-                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_tiket ? '20px' : '0px'});`"></span>
-                    </button>
-                </div>
-
-                <!-- Absensi -->
-                <div class="px-5 py-3.5 flex items-center justify-between gap-4">
-                    <div class="min-w-0">
-                        <div class="text-xs font-bold text-slate-800">Absensi &amp; Pengingat</div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">Pengingat jam masuk/pulang, status cuti, izin, dan koreksi absen</div>
-                    </div>
-                    <button type="button"
-                            @click="togglePref('notify_absen')"
-                            :aria-pressed="prefs.notify_absen"
-                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
-                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_absen ? getActiveAccentObj().hex : '#cbd5e1'};`">
-                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
-                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_absen ? '20px' : '0px'});`"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5. Keamanan Akun: Login Biometrik & Ubah Password -->
+        <!-- 4. Keamanan Akun: Login Biometrik & Ubah Password -->
         @include('portal.partials.security-settings')
 
         <!-- 6. Kustomisasi Menu Mobile & Pintasan Profil -->
