@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/portal/employees/{user}/reset-face', [EmployeeController::class, 'resetFace'])->name('portal.employees.reset-face');
 
     // Pusat Notifikasi & Broadcast Pesan (§4, §6, Admin / HRD)
+    Route::get('/portal/inbox', [PortalHubController::class, 'notificationsInbox'])->name('portal.notifications.inbox');
     Route::get('/portal/notifications', [NotificationBroadcastController::class, 'index'])->name('portal.notifications.index');
     Route::get('/portal/notifications/history', [NotificationBroadcastController::class, 'history'])->name('portal.notifications.history');
     Route::post('/portal/notifications/send', [NotificationBroadcastController::class, 'send'])->name('portal.notifications.send');

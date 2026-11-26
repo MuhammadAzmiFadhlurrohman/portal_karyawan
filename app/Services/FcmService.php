@@ -204,6 +204,33 @@ class FcmService
             return 0;
         }
 
+        // Catat notifikasi non-broadcast ke notification_logs agar tampil di halaman Notifikasi user
+        if ($eventType !== 'broadcast') {
+            $nowTs = now();
+            foreach ($allowedUserIds as $uid) {
+                try {
+                    \App\Models\NotificationLog::query()->create([
+                        'user_id' => $uid,
+                        'channel' => 'fcm_web_push',
+                        'event_type' => $eventType,
+                        'recipient' => 'user:' . $uid,
+                        'payload' => [
+                            'title' => (string) $title,
+                            'body' => (string) $body,
+                            'link' => (string) $deepLink,
+                            'type' => (string) ($extraData['category'] ?? 'info'),
+                            'sender_name' => (string) ($extraData['author'] ?? 'Sistem GoMSN'),
+                        ],
+                        'status' => 'sent',
+                        'attempts' => 1,
+                        'sent_at' => $nowTs,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::debug('Skip inbox log: ' . $e->getMessage());
+                }
+            }
+        }
+
         // 2. Permanently prune any older duplicate tokens per user in the DB table
         foreach ($allowedUserIds as $uid) {
             $latestTokenId = UserFcmToken::where('user_id', $uid)

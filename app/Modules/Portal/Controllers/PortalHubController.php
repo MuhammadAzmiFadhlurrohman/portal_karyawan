@@ -251,6 +251,90 @@ class PortalHubController extends Controller
         return back()->with('status', 'Password akun berhasil diperbarui.');
     }
 
+    public function notificationsInbox(Request $request): View
+    {
+        $user = $request->user();
+        $userId = (int) $user->id;
+        $category = trim((string) $request->query('category', 'all'));
+        $search = trim((string) $request->query('q', ''));
+
+        $logs = \App\Models\NotificationLog::query()
+            ->where(function ($q) use ($userId) {
+                // Notifikasi personal untuk user ini
+                $q->where(function ($sub) use ($userId) {
+                    $sub->where('user_id', $userId)
+                        ->where('event_type', '!=', 'broadcast');
+                })
+                // Atau broadcast pengumuman yang mencakup user ini
+                ->orWhere(function ($sub) use ($userId) {
+                    $sub->where('event_type', 'broadcast')
+                        ->where(function ($b) use ($userId) {
+                            $b->whereJsonContains('payload->user_ids', $userId)
+                              ->orWhere('payload->target_type', 'all');
+                        });
+                });
+            })
+            ->orderByDesc('sent_at')
+            ->orderByDesc('id')
+            ->limit(100)
+            ->get();
+
+        $items = $logs->map(function ($log) {
+            $payload = is_array($log->payload) ? $log->payload : [];
+            $eventType = strtolower((string) ($log->event_type ?: 'info'));
+            $cat = match (true) {
+                $eventType === 'broadcast' => 'pengumuman',
+                str_contains($eventType, 'pengajuan') || str_contains($eventType, 'kasbon') => 'pengajuan',
+                str_contains($eventType, 'lembur') || str_contains($eventType, 'overtime') => 'lembur',
+                str_contains($eventType, 'tiket') || str_contains($eventType, 'ticket') => 'tiket',
+                str_contains($eventType, 'absen') || str_contains($eventType, 'cuti') || str_contains($eventType, 'leave') => 'absensi',
+                default => 'lainnya',
+            };
+
+            return [
+                'id' => $log->id,
+                'category' => $cat,
+                'event_type' => $eventType,
+                'type' => $payload['type'] ?? 'info',
+                'title' => $payload['title'] ?? ucfirst(str_replace('_', ' ', $eventType)),
+                'body' => $payload['body'] ?? ($payload['message'] ?? ''),
+                'link' => $payload['link'] ?? ($payload['deep_link'] ?? null),
+                'sender_name' => $payload['sender_name'] ?? ($payload['author'] ?? 'Sistem GoMSN'),
+                'sent_at' => $log->sent_at ?? $log->created_at,
+                'timestamp' => ($log->sent_at ?? $log->created_at)?->timestamp ?? 0,
+            ];
+        });
+
+        $counts = [
+            'all' => $items->count(),
+            'pengumuman' => $items->where('category', 'pengumuman')->count(),
+            'pengajuan' => $items->where('category', 'pengajuan')->count(),
+            'lembur' => $items->where('category', 'lembur')->count(),
+            'tiket' => $items->where('category', 'tiket')->count(),
+            'absensi' => $items->where('category', 'absensi')->count(),
+        ];
+
+        if ($category !== 'all' && $category !== '') {
+            $items = $items->where('category', $category)->values();
+        }
+
+        if ($search !== '') {
+            $needle = mb_strtolower($search);
+            $items = $items->filter(function ($it) use ($needle) {
+                return str_contains(mb_strtolower($it['title']), $needle)
+                    || str_contains(mb_strtolower($it['body']), $needle)
+                    || str_contains(mb_strtolower($it['sender_name']), $needle);
+            })->values();
+        }
+
+        return view('portal.notifications.inbox', [
+            'notifications' => $items,
+            'counts' => $counts,
+            'activeCategory' => $category,
+            'search' => $search,
+        ]);
+    }
+
     public function updateSystemSetting(Request $request): RedirectResponse
     {
         abort_unless($request->user()?->can('portal.settings.manage') || $request->user()?->hasRole(['super_admin', 'admin']), 403);
