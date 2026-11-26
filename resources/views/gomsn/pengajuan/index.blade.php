@@ -1419,7 +1419,7 @@
                                 <span>Rincian Item Pengajuan</span>
                             </div>
                             <span class="text-[11px] font-normal text-slate-400 font-mono" x-show="activeItem?.details?.length">
-                                (<span x-text="activeItem.details.length"></span> item)
+                                (<span x-text="activeItem?.details?.length || 0"></span> item)
                             </span>
                         </div>
 
