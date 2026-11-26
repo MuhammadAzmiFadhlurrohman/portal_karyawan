@@ -570,18 +570,26 @@
                     </div>
                 </div>
 
-                <!-- Bagian 2 & 3: Absensi & Cuti / Pekerjaan & Tiketing (Urutan disesuaikan role NOC) -->
+                <!-- Bagian 2 & 3: Absensi & Cuti / Kelola Karyawan / Pekerjaan & Tiketing (Urutan disesuaikan role NOC) -->
                 @php
                     $sidebarUser = auth()->user();
                     $canViewReports = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin']) && ! $sidebarUser->hasRole('finance') && strtolower($sidebarUser->division ?? '') !== 'finance';
                     $isHrdRole = $sidebarUser && $sidebarUser->hasRole('hrd') && ! $sidebarUser->hasRole(['super_admin', 'admin']);
                     $canViewEmployeeRecap = $sidebarUser && $sidebarUser->hasRole(['super_admin', 'admin', 'hrd']);
-                    $isAbsensiActive = request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals');
+
+                    $isOvertimeRoute = request()->routeIs('gomsn.overtime.*');
+                    $isOvertimeSaya = $isOvertimeRoute && request('view_mode') === 'saya';
+                    $isOvertimeKaryawan = $isOvertimeRoute && request('view_mode') !== 'saya';
+
+                    $isKelolaKaryawanActive = request()->routeIs('portal.employees.*', 'attendance.employee-recap*', 'attendance.leaves.approvals*', 'gomsn.car-usage.*')
+                        || ($isOvertimeKaryawan && $isHrdRole)
+                        || ($isHrdRole && request()->routeIs('attendance.leaderboard'));
+
+                    $isAbsensiActive = (request()->routeIs('attendance.*') && ! request()->routeIs('attendance.corrections.approvals')) && ! $isKelolaKaryawanActive;
                     $isRiwayatActive = request()->routeIs('attendance.history', 'attendance.reports*');
-                    $isKelolaKaryawanActive = request()->routeIs('attendance.employee-recap*', 'portal.employees.*', 'portal.notifications.*', 'attendance.reports*');
 
                     $isTiketingActive = request()->routeIs('tickets.*') || request()->routeIs('gomsn.network.*') || request()->routeIs('coverage');
-                    $isLainnyaActive = request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.employees.*') || request()->routeIs('portal.notifications.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
+                    $isLainnyaActive = request()->routeIs('gomsn.analytics.*') || request()->routeIs('portal.sessions') || request()->routeIs('portal.notifications.*') || request()->routeIs('portal.settings') || request()->routeIs('portal.audit');
 
                     $isNocRole = $sidebarUser && ($sidebarUser->hasRole(['noc', 'atasan_noc', 'karyawan_noc']) || str_contains(strtolower($sidebarUser->division ?? ''), 'noc'));
                 @endphp
@@ -590,9 +598,11 @@
                     <!-- Role NOC: Menu Pekerjaan & Tiketing berada di atas Absensi & Cuti -->
                     @include('layouts.partials.sidebar-tiketing')
                     @include('layouts.partials.sidebar-absensi')
+                    @include('layouts.partials.sidebar-kelola-karyawan')
                 @else
-                    <!-- Default: Menu Absensi & Cuti lalu Pekerjaan & Tiketing -->
+                    <!-- Default: Menu Absensi & Cuti, Kelola Karyawan, lalu Pekerjaan & Tiketing -->
                     @include('layouts.partials.sidebar-absensi')
+                    @include('layouts.partials.sidebar-kelola-karyawan')
                     @include('layouts.partials.sidebar-tiketing')
                 @endif
 
@@ -609,6 +619,9 @@
                         @if ($isAbsensiActive)
                             sessionStorage.setItem('gomsn_sb_absensi', '1');
                         @endif
+                        @if ($isKelolaKaryawanActive)
+                            sessionStorage.setItem('gomsn_sb_kelola_karyawan', '1');
+                        @endif
                         @if ($isRiwayatActive)
                             sessionStorage.setItem('gomsn_sb_riwayat', '1');
                         @endif
@@ -622,6 +635,10 @@
                         var elAbsensi = document.getElementById('sb-menu-absensi');
                         if (elAbsensi && sessionStorage.getItem('gomsn_sb_absensi') === '1') {
                             elAbsensi.style.display = '';
+                        }
+                        var elKelola = document.getElementById('sb-menu-kelola-karyawan');
+                        if (elKelola && sessionStorage.getItem('gomsn_sb_kelola_karyawan') === '1') {
+                            elKelola.style.display = '';
                         }
                         var elRiwayat = document.getElementById('sb-menu-riwayat');
                         if (elRiwayat && sessionStorage.getItem('gomsn_sb_riwayat') === '1') {
