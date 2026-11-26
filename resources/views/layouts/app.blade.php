@@ -395,14 +395,34 @@
             color: #f8fafc !important;
         }
 
-        /* Floating Chatbot Tab & Header mengikuti tema warna aplikasi */
+        /* Floating Chatbot Tab, Header, Bubble, Avatar & Buttons mengikuti tema warna aplikasi */
         html[data-accent]:not([data-accent="teal"]) .chatbot-docked-tab,
-        html[data-accent]:not([data-accent="teal"]) .chatbot-header {
+        html[data-accent]:not([data-accent="teal"]) .chatbot-header,
+        html[data-accent]:not([data-accent="teal"]) .chatbot-header-bar {
             background: var(--gomsn-header-bg) !important;
             border-color: rgba(255, 255, 255, 0.22) !important;
         }
-        html[data-accent]:not([data-accent="teal"]) .chatbot-send-btn {
+        html[data-accent]:not([data-accent="teal"]) .chatbot-bubble-user {
             background: var(--gomsn-active-bg) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .chatbot-avatar.is-bot {
+            background: var(--gomsn-active-bg) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .chatbot-send-btn,
+        html[data-accent]:not([data-accent="teal"]) button.chatbot-send-btn {
+            background: var(--gomsn-active-bg) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .chatbot-action-btn {
+            background: var(--color-teal-50) !important;
+            border-color: var(--color-teal-200) !important;
+            color: var(--color-teal-800) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .chatbot-action-btn:hover {
+            background: var(--color-teal-100) !important;
+            border-color: var(--color-teal-300) !important;
         }
 
         /* Hero Banner Mobile 4-Dot Accent */

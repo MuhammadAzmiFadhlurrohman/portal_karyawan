@@ -15,7 +15,7 @@
             padding-bottom: 12px !important;
             padding-left: 5px !important;
             padding-right: 7px !important;
-            background: linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%) !important;
+            background: var(--gomsn-header-bg, linear-gradient(180deg, #093c40 0%, #0d5f66 45%, #13808a 100%)) !important;
             border-top-left-radius: 16px !important;
             border-bottom-left-radius: 16px !important;
             border-top-right-radius: 0 !important;
@@ -227,10 +227,10 @@
             justify-content: center !important;
         }
         .chatbot-avatar.is-bot {
-            background: linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%) !important;
+            background: var(--gomsn-active-bg, linear-gradient(135deg, #0e4c50 0%, #155E63 55%, #17a9a9 100%)) !important;
             color: #ffffff !important;
             border: 1.5px solid #ffffff !important;
-            box-shadow: 0 2px 6px rgba(14, 76, 80, 0.22) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
         }
         .chatbot-avatar.is-user {
             background: #e2e8f0 !important;
@@ -246,9 +246,9 @@
         .chatbot-bubble-user {
             max-width: calc(100% - 64px) !important;
             padding: 9px 14px !important;
-            background: linear-gradient(135deg, #0e5257 0%, #155E63 100%) !important;
+            background: var(--gomsn-active-bg, linear-gradient(135deg, #0e5257 0%, #155E63 100%)) !important;
             color: #ffffff !important;
-            box-shadow: 0 2px 6px rgba(14, 76, 80, 0.22) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18) !important;
         }
         .chatbot-bubble-bot {
             max-width: calc(100% - 48px) !important;
@@ -286,9 +286,9 @@
             width: 100% !important;
             padding: 8px 12px !important;
             border-radius: 10px !important;
-            background: #f0fdfa !important;
-            border: 1px solid #99f6e4 !important;
-            color: #0f5c5c !important;
+            background: var(--color-teal-50, #f0fdfa) !important;
+            border: 1px solid var(--color-teal-200, #99f6e4) !important;
+            color: var(--color-teal-800, #0f5c5c) !important;
             font-size: 12px !important;
             font-weight: 600 !important;
             line-height: 1.35 !important;
@@ -296,8 +296,8 @@
             transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease !important;
         }
         .chatbot-action-btn:hover {
-            background: #ccfbf1 !important;
-            border-color: #5eead4 !important;
+            background: var(--color-teal-100, #ccfbf1) !important;
+            border-color: var(--color-teal-300, #5eead4) !important;
         }
         .chatbot-action-btn:active {
             transform: scale(0.985) !important;
@@ -597,7 +597,7 @@
         
         <!-- Header -->
         <div class="chatbot-header-bar px-3.5 py-3 sm:px-4 sm:py-3.5 text-white flex items-center justify-between shrink-0 relative overflow-hidden border-b border-white/10"
-             style="background: linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%) !important;">
+             style="background: var(--gomsn-header-bg, linear-gradient(135deg, #0e4c50 0%, #155E63 50%, #17a9a9 100%)) !important;">
         
             <!-- Subtle decorative background glow -->
             <div class="absolute -top-10 -right-10 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
@@ -616,7 +616,7 @@
                     <!-- Online Pulse Dot -->
                     <span class="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-[#155E63]"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-emerald-400 border-2 border-white/40"></span>
                     </span>
                 </div>
 
@@ -725,11 +725,11 @@
                                      alt="Profil Saya"
                                      onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"
                                      class="w-full h-full object-cover object-top rounded-full">
-                                <div style="display: none; font-size: 11px;" class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white items-center justify-center font-bold">
+                                <div style="display: none; font-size: 11px; background: var(--gomsn-active-bg, linear-gradient(to top right, #18C4C4, #0D9488));" class="w-full h-full rounded-full text-white items-center justify-center font-bold">
                                     {{ $chatUserInitials }}
                                 </div>
                             @else
-                                <div style="font-size: 11px;" class="w-full h-full rounded-full bg-gradient-to-tr from-[#18C4C4] to-[#0D9488] text-white flex items-center justify-center font-bold">
+                                <div style="font-size: 11px; background: var(--gomsn-active-bg, linear-gradient(to top right, #18C4C4, #0D9488));" class="w-full h-full rounded-full text-white flex items-center justify-center font-bold">
                                     {{ $chatUserInitials }}
                                 </div>
                             @endif
@@ -750,9 +750,9 @@
                 </div>
                 <div class="chatbot-bubble chatbot-bubble-bot flex items-center gap-2" style="padding: 9px 14px;">
                     <div class="flex items-center gap-1 py-0.5">
-                        <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-                        <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-                        <span class="w-1.5 h-1.5 bg-[#155E63] rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                        <span class="w-1.5 h-1.5 rounded-full animate-bounce" style="background-color: var(--gomsn-accent, #155E63); animation-delay: 0ms"></span>
+                        <span class="w-1.5 h-1.5 rounded-full animate-bounce" style="background-color: var(--gomsn-accent, #155E63); animation-delay: 150ms"></span>
+                        <span class="w-1.5 h-1.5 rounded-full animate-bounce" style="background-color: var(--gomsn-accent, #155E63); animation-delay: 300ms"></span>
                     </div>
                     <span class="text-[11.5px] text-slate-500 font-medium">Asisten sedang mengetik...</span>
                 </div>
@@ -830,7 +830,7 @@
             <button type="button" 
                     @click="toggleVoiceInput()"
                     :title="isListening ? 'Berhenti mendengarkan' : 'Bicara untuk mengetik (Voice-to-Text)'"
-                    :class="isListening ? 'bg-rose-50 text-rose-600 border border-rose-300' : 'bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-[#0D9488]'"
+                    :class="isListening ? 'bg-rose-50 text-rose-600 border border-rose-300' : 'bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-teal-600'"
                     class="h-10 w-10 rounded-xl flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
                 <svg class="w-5 h-5" :class="isListening ? 'text-rose-600 animate-pulse' : 'text-slate-600'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
@@ -839,7 +839,8 @@
             </button>
             <button type="submit" 
                     :disabled="loading || !inputQuery.trim()" 
-                    class="h-10 px-4 sm:px-5 rounded-xl bg-[#155E63] hover:bg-[#18C4C4] disabled:opacity-50 text-white font-medium text-xs sm:text-sm flex items-center justify-center transition cursor-pointer shrink-0 active:scale-95">
+                    style="background: var(--gomsn-active-bg, linear-gradient(90deg, #18C4C4 0%, #0D9488 100%));"
+                    class="chatbot-send-btn h-10 px-4 sm:px-5 rounded-xl disabled:opacity-50 text-white font-medium text-xs sm:text-sm flex items-center justify-center transition cursor-pointer shrink-0 active:scale-95 shadow-sm">
                 Kirim
             </button>
         </form>
