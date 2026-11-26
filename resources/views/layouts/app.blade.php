@@ -402,6 +402,65 @@
         html[data-accent]:not([data-accent="teal"]) .chatbot-send-btn {
             background: var(--gomsn-active-bg) !important;
         }
+
+        /* Hero Banner Mobile 4-Dot Accent */
+        html[data-accent]:not([data-accent="teal"]) .hh-mobile-dots span {
+            background: var(--gomsn-accent-light) !important;
+            box-shadow: 0 0 8px var(--gomsn-accent-light) !important;
+        }
+
+        /* PWA Install Banner ("Aplikasi Mobile PT MSN") mengikuti tema warna aplikasi */
+        html[data-accent]:not([data-accent="teal"]) .pwa-banner {
+            background: var(--gomsn-header-bg) !important;
+            border-color: rgba(255, 255, 255, 0.18) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .pwa-cta {
+            background: var(--gomsn-active-bg) !important;
+            border-color: rgba(255, 255, 255, 0.32) !important;
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.42) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .pwa-wave-svg,
+        html[data-accent]:not([data-accent="teal"]) .pwa-rim,
+        html[data-accent]:not([data-accent="teal"]) .pwa-glow {
+            filter: var(--gomsn-sidebar-wave-filter) !important;
+        }
+
+        /* Mobile Topbar Pocket & Border menyatu rapi dengan tema */
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar {
+            border-color: rgba(255, 255, 255, 0.22) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar-pocket #mobilePocketGrad stop {
+            stop-color: #020617 !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar-pocket #mobileHighlightStroke stop {
+            stop-color: var(--gomsn-accent-light) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar-pocket svg path:first-child {
+            opacity: 0.42 !important;
+        }
+
+        /* Mobile Bottom Navigation Bar mengikuti tema warna aplikasi */
+        html[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] {
+            border-color: rgba(148, 163, 184, 0.35) !important;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] .gomsn-nav-wave path {
+            fill: var(--gomsn-accent) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] .gomsn-nav-mound-stroke {
+            stroke: var(--gomsn-accent-light) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] .from-emerald-500 {
+            background: var(--gomsn-active-bg) !important;
+        }
+        html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] {
+            border-color: rgba(255, 255, 255, 0.16) !important;
+        }
+        html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] svg.text-\[\#0f766e\],
+        html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] svg.text-\[\#115e59\],
+        html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] span.text-\[\#0f766e\] {
+            color: var(--gomsn-accent-light) !important;
+        }
         ::view-transition-old(desktop-sidebar),
         ::view-transition-new(desktop-sidebar) {
             animation: none;
@@ -1004,7 +1063,7 @@
                     <!-- Right: Actions inside sculpted bezel (Pocket Crease always sits cleanly to the left of Dark Mode Orb) -->
                     <div class="relative z-10 h-full flex items-center gap-2 pl-11 pr-3.5">
                         <!-- Sculpted Aerodynamic Wave SVG on Right Pocket (Anchored to left edge of action group) -->
-                        <div class="absolute inset-0 pointer-events-none overflow-hidden rounded-r-[22px] z-0">
+                        <div class="gomsn-mobile-topbar-pocket absolute inset-0 pointer-events-none overflow-hidden rounded-r-[22px] z-0">
                             <svg class="absolute left-0 top-0 h-full w-[500px] max-w-none" viewBox="0 0 500 48" fill="none" preserveAspectRatio="none">
                                 <path d="M 38 0 C 28 14 14 28 0 38 L 0 48 L 500 48 L 500 0 Z" fill="url(#mobilePocketGrad)" opacity="0.88"/>
                                 <path d="M 38 0 C 28 14 14 28 0 38 L 0 48" stroke="url(#mobileHighlightStroke)" stroke-width="2" stroke-linecap="round"/>
@@ -1480,9 +1539,9 @@
         <nav aria-label="Navigasi Cepat Mobile" 
              class="pointer-events-auto bg-gradient-to-r from-emerald-50/70 via-white to-teal-50/80 backdrop-blur-md rounded-[24px] shadow-[0_10px_30px_rgba(13,148,136,0.18)] border border-teal-200/90 h-[58px] px-2 flex items-center justify-around relative">
             
-            <!-- Soft Ambient Teal Wave Background on Right Side (matching reference image) -->
-            <div class="absolute right-0 top-0 bottom-0 w-2/5 rounded-r-[24px] bg-gradient-to-l from-emerald-500/15 via-teal-300/10 to-transparent pointer-events-none"></div>
-            <svg class="absolute right-0 bottom-0 h-full w-40 pointer-events-none opacity-35" viewBox="0 0 144 58" fill="none">
+            <!-- Soft Ambient Wave Background on Right Side -->
+            <div class="absolute right-0 top-0 bottom-0 w-2/5 rounded-r-[24px] bg-gradient-to-l from-teal-500/15 via-teal-300/10 to-transparent pointer-events-none"></div>
+            <svg class="gomsn-nav-wave absolute right-0 bottom-0 h-full w-40 pointer-events-none opacity-35" viewBox="0 0 144 58" fill="none">
                 <path d="M 0 58 C 45 22 85 50 144 14 L 144 58 Z" fill="#0d9488"/>
             </svg>
 
@@ -1537,7 +1596,7 @@
                     <!-- Mound Fill connecting to navbar body -->
                     <path class="mobile-nav-mound-fill" d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21 L 82,25 L 0,25 Z" fill="#ffffff"/>
                     <!-- Crisp Top Stroke connecting with navbar border -->
-                    <path d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21" fill="none" stroke="rgba(45, 212, 191, 0.9)" stroke-width="1.6"/>
+                    <path class="gomsn-nav-mound-stroke" d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21" fill="none" stroke="rgba(45, 212, 191, 0.9)" stroke-width="1.6"/>
                 </svg>
 
                 <!-- Elevated 3D Glossy Sphere Button with theme-aware gloss -->
