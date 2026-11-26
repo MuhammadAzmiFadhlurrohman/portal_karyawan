@@ -1278,40 +1278,6 @@
                         <span class="text-teal-700 font-mono text-[11px]">WIB</span>
                     </div>
 
-                    <!-- Elegant Interactive Dark / Light Mode Toggle Switch -->
-                    <button type="button"
-                            @click="window.toggleGomsnTheme($event)"
-                            :title="isDarkMode ? 'Mode Gelap Aktif — Klik untuk Mode Terang' : 'Mode Terang Aktif — Klik untuk Mode Gelap'"
-                            aria-label="Toggle Dark Mode"
-                            class="theme-toggle-desktop group relative inline-flex items-center justify-center h-9 px-2 rounded-xl border border-slate-200/80 bg-slate-50/90 hover:bg-white hover:border-teal-400/80 shadow-2xs hover:shadow-md transition-all duration-300 cursor-pointer select-none overflow-hidden">
-                        
-                        <!-- Subtle Ambient Hover Halo -->
-                        <span class="absolute inset-0 bg-gradient-to-r from-amber-400/0 via-teal-400/10 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></span>
-
-                        <!-- Sliding Track with Sun & Moon Morph -->
-                        <div class="theme-switch-track relative w-11 h-5.5 rounded-full p-0.5 flex items-center justify-between transition-colors duration-500 bg-slate-200/90 border border-slate-300/60">
-                            <!-- Track Background Stars (Visible in Dark Mode) -->
-                            <span class="theme-track-stars absolute left-1.5 top-1 text-[7px] text-cyan-200 opacity-0 transition-opacity duration-500 select-none pointer-events-none">✦</span>
-                            <span class="theme-track-stars absolute left-3.5 bottom-1 text-[5px] text-teal-300 opacity-0 transition-opacity duration-500 select-none pointer-events-none">★</span>
-
-                            <!-- Track Background Clouds/Ray Dot (Visible in Light Mode) -->
-                            <span class="theme-track-sunray absolute right-2 top-1.5 w-1.5 h-1.5 rounded-full bg-amber-400/60 transition-opacity duration-500 pointer-events-none"></span>
-
-                            <!-- Gliding Thumb Orb -->
-                            <div class="theme-switch-thumb relative z-10 w-4.5 h-4.5 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform duration-500">
-                                <!-- Sun Icon -->
-                                <svg class="theme-icon-sun w-3 h-3 text-amber-500 transition-all duration-500" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.35"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                                </svg>
-                                <!-- Moon Icon -->
-                                <svg class="theme-icon-moon w-3 h-3 text-cyan-300 transition-all duration-500 absolute" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" fill="currentColor" fill-opacity="0.35" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </button>
-
                     <!-- Divider -->
                     <div class="h-6 w-px bg-slate-200"></div>
 
