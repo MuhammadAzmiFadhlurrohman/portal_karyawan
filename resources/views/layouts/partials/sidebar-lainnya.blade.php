@@ -67,7 +67,6 @@
         </a>
         @endif
 
-        @can('portal.settings.manage')
         <a href="{{ route('portal.settings') }}"
            @if (request()->routeIs('portal.settings')) data-sidebar-active="true" style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
            class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('portal.settings') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
@@ -77,7 +76,6 @@
             <span class="ml-auto w-2 h-2 rounded-full bg-white shadow-xs"></span>
             @endif
         </a>
-        @endcan
 
         @can('portal.audit.view')
         <a href="{{ route('portal.audit') }}"

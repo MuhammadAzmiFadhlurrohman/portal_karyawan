@@ -186,11 +186,26 @@ class PortalHubController extends Controller
 
     public function systemSettings(Request $request): View
     {
-        abort_unless($request->user()?->can('portal.settings.manage') || $request->user()?->hasRole(['super_admin', 'admin']), 403);
+        $user = $request->user();
+        $canManageSystem = $user?->can('portal.settings.manage') || $user?->hasRole(['super_admin', 'admin']);
+
+        if (! $canManageSystem) {
+            $fcmService = app(\App\Services\FcmService::class);
+            $pref = $fcmService->getUserPreferences($user);
+
+            return view('portal.user-settings', [
+                'notificationPreferences' => [
+                    'notify_pengajuan' => (bool) $pref->notify_pengajuan,
+                    'notify_lembur' => (bool) $pref->notify_lembur,
+                    'notify_tiket' => (bool) $pref->notify_tiket,
+                    'notify_absen' => (bool) ($pref->notify_absen ?? true),
+                ],
+            ]);
+        }
 
         // Otomatis isi parameter default jika database parameter masih kosong
         if (SystemSetting::query()->count() === 0) {
-            SystemSettingService::ensureDefaults($request->user()?->id);
+            SystemSettingService::ensureDefaults($user?->id);
         }
 
         $allSettings = SystemSetting::query()
