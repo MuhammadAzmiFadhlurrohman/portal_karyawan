@@ -299,11 +299,12 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- FLOATING DRAG GHOST CARD (MENGIKUTI JARI SAAT TARIK GESER)     -->
+    <!-- FLOATING DRAG GHOST CARD (GPU 60FPS MENGIKUTI JARI)            -->
     <!-- ============================================================== -->
     <template x-if="draggingItem">
-        <div class="rounded-2xl bg-white overflow-hidden"
-             :style="`position: fixed; z-index: 9990; pointer-events: none; left: ${dragPos.x}px; top: ${dragPos.y}px; width: ${dragPos.width}px; transform: scale(1.04) rotate(-1deg); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28); border: 2px solid #0d9488; opacity: 0.96;`">
+        <div x-ref="dragGhost"
+             class="rounded-2xl bg-white overflow-hidden"
+             :style="`position: fixed; top: 0; left: 0; z-index: 9990; pointer-events: none; width: ${dragPos.width}px; will-change: transform; transform: translate3d(${dragPos.x}px, ${dragPos.y}px, 0) scale(1.04) rotate(-0.8deg); box-shadow: 0 22px 44px rgba(15, 23, 42, 0.24), 0 4px 12px rgba(13, 148, 136, 0.16); border: 2px solid #0d9488; opacity: 0.98;`">
             <div class="p-3 flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                      :style="getIconBoxStyle(draggingItem.item)">
@@ -551,7 +552,11 @@ function mobileMenuCustomizer(userId) {
         editingItem: null,
         editingCategory: null,
         draggingItem: null,
+        isDropping: false,
         dragPos: { x: 0, y: 0, width: 160, offsetX: 0, offsetY: 0 },
+        lastPointer: { x: 0, y: 0 },
+        dragRafId: null,
+        lastSwapAt: 0,
         holdTimer: null,
         pendingDrag: null,
         justDragged: false,
@@ -1118,7 +1123,7 @@ function mobileMenuCustomizer(userId) {
         },
 
         beginItemDrag(e, catKey, item, cardEl) {
-            if (!this.isEditMode || !cardEl) return;
+            if (!this.isEditMode || !cardEl || this.isDropping) return;
             clearTimeout(this.holdTimer);
             this.pendingDrag = null;
 
@@ -1126,7 +1131,7 @@ function mobileMenuCustomizer(userId) {
             const offsetX = Math.min(Math.max(e.clientX - rect.left, 20), rect.width - 20);
             const offsetY = Math.min(Math.max(e.clientY - rect.top, 20), rect.height - 20);
 
-            this.draggingItem = { id: item.id, catKey, item };
+            this.lastPointer = { x: e.clientX, y: e.clientY };
             this.dragPos = {
                 x: e.clientX - offsetX,
                 y: e.clientY - offsetY,
@@ -1134,11 +1139,56 @@ function mobileMenuCustomizer(userId) {
                 offsetX,
                 offsetY
             };
+            this.draggingItem = { id: item.id, catKey, item };
             this.justDragged = true;
+            this.lastSwapAt = 0;
 
             if (navigator.vibrate) {
-                try { navigator.vibrate(15); } catch (_) {}
+                try { navigator.vibrate(14); } catch (_) {}
             }
+
+            this.startDragRafLoop();
+        },
+
+        startDragRafLoop() {
+            if (this.dragRafId) cancelAnimationFrame(this.dragRafId);
+            const tick = () => {
+                if (!this.draggingItem || this.isDropping) {
+                    this.dragRafId = null;
+                    return;
+                }
+
+                // Update posisi ghost card langsung via GPU transform (60fps mulus tanpa re-render Alpine)
+                const gx = this.lastPointer.x - this.dragPos.offsetX;
+                const gy = this.lastPointer.y - this.dragPos.offsetY;
+                const ghostEl = this.$refs.dragGhost;
+                if (ghostEl) {
+                    ghostEl.style.transform = `translate3d(${gx}px, ${gy}px, 0) scale(1.04) rotate(-0.8deg)`;
+                }
+
+                // Smooth auto-scroll kontinu saat jari dekat tepi atas/bawah area scroll
+                const scrollEl = this.$refs.sheetScrollArea;
+                if (scrollEl) {
+                    const sr = scrollEl.getBoundingClientRect();
+                    const edgeZone = 72;
+                    let scrolled = false;
+                    if (this.lastPointer.y < sr.top + edgeZone) {
+                        const ratio = Math.min(1, (sr.top + edgeZone - this.lastPointer.y) / edgeZone);
+                        scrollEl.scrollTop -= Math.max(3, Math.round(ratio * 14));
+                        scrolled = true;
+                    } else if (this.lastPointer.y > sr.bottom - edgeZone) {
+                        const ratio = Math.min(1, (this.lastPointer.y - (sr.bottom - edgeZone)) / edgeZone);
+                        scrollEl.scrollTop += Math.max(3, Math.round(ratio * 14));
+                        scrolled = true;
+                    }
+                    if (scrolled) {
+                        this.detectDragTarget(this.lastPointer.x, this.lastPointer.y);
+                    }
+                }
+
+                this.dragRafId = requestAnimationFrame(tick);
+            };
+            this.dragRafId = requestAnimationFrame(tick);
         },
 
         onItemPointerMove(e) {
@@ -1147,35 +1197,31 @@ function mobileMenuCustomizer(userId) {
                 const dx = Math.abs(e.clientX - this.pendingDrag.startX);
                 const dy = Math.abs(e.clientY - this.pendingDrag.startY);
                 if (dx > 10 && dx > dy) {
-                    // Geser horizontal: langsung mulai drag
                     const p = this.pendingDrag;
                     this.beginItemDrag(e, p.catKey, p.item, p.cardEl);
                 } else if (dy > 12) {
-                    // Scroll vertikal normal: batalkan pending drag
                     clearTimeout(this.holdTimer);
                     this.pendingDrag = null;
                 }
                 return;
             }
 
-            if (!this.draggingItem) return;
+            if (!this.draggingItem || this.isDropping) return;
 
-            this.dragPos.x = e.clientX - this.dragPos.offsetX;
-            this.dragPos.y = e.clientY - this.dragPos.offsetY;
+            this.lastPointer.x = e.clientX;
+            this.lastPointer.y = e.clientY;
 
-            // Auto-scroll area menu jika jari dekat tepi atas/bawah
-            const scrollEl = this.$refs.sheetScrollArea;
-            if (scrollEl) {
-                const sr = scrollEl.getBoundingClientRect();
-                if (e.clientY < sr.top + 55) {
-                    scrollEl.scrollTop -= 10;
-                } else if (e.clientY > sr.bottom - 55) {
-                    scrollEl.scrollTop += 10;
-                }
-            }
+            this.detectDragTarget(e.clientX, e.clientY);
+        },
 
-            // Deteksi kartu target atau kategori target di bawah posisi jari/kursor (bebas pindah antar kategori!)
-            const el = document.elementFromPoint(e.clientX, e.clientY);
+        detectDragTarget(clientX, clientY) {
+            if (!this.draggingItem || this.isDropping) return;
+
+            // Cooldown tipis (130ms) agar kartu tidak jitter / bolak-balik saat bergeser
+            const now = performance.now();
+            if (now - this.lastSwapAt < 130) return;
+
+            const el = document.elementFromPoint(clientX, clientY);
             if (!el) return;
 
             const targetCard = el.closest('[data-menu-item-id]');
@@ -1183,19 +1229,72 @@ function mobileMenuCustomizer(userId) {
                 const targetId = targetCard.getAttribute('data-menu-item-id');
                 const targetCat = targetCard.getAttribute('data-menu-cat');
                 if (targetCat && targetId && targetId !== this.draggingItem.id) {
+                    this.lastSwapAt = now;
                     this.moveItemAcrossCategories(this.draggingItem.catKey, targetCat, this.draggingItem.id, targetId);
                 }
                 return;
             }
 
-            // Jika diarahkan ke area kategori lain (misal kategori kosong atau ruang kosong di grid kategori lain)
             const dropCatEl = el.closest('[data-drop-cat]');
             if (dropCatEl) {
                 const targetCat = dropCatEl.getAttribute('data-drop-cat');
                 if (targetCat && targetCat !== this.draggingItem.catKey) {
+                    this.lastSwapAt = now;
                     this.moveItemAcrossCategories(this.draggingItem.catKey, targetCat, this.draggingItem.id, null);
                 }
             }
+        },
+
+        captureCardPositions() {
+            const positions = {};
+            const root = this.$refs.sheetScrollArea;
+            if (!root) return positions;
+            root.querySelectorAll('[data-menu-item-id]').forEach(el => {
+                const id = el.getAttribute('data-menu-item-id');
+                if (id) {
+                    const r = el.getBoundingClientRect();
+                    positions[id] = { left: r.left, top: r.top };
+                }
+            });
+            return positions;
+        },
+
+        playFlipAnimation(oldPositions, excludeId) {
+            this.$nextTick(() => {
+                const root = this.$refs.sheetScrollArea;
+                if (!root) return;
+                const cardsToAnimate = [];
+                root.querySelectorAll('[data-menu-item-id]').forEach(el => {
+                    const id = el.getAttribute('data-menu-item-id');
+                    if (!id || id === excludeId || !oldPositions[id]) return;
+                    const newRect = el.getBoundingClientRect();
+                    const dx = oldPositions[id].left - newRect.left;
+                    const dy = oldPositions[id].top - newRect.top;
+                    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+                        el.style.transition = 'none';
+                        el.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+                        cardsToAnimate.push(el);
+                    }
+                });
+
+                if (cardsToAnimate.length === 0) return;
+
+                // Force reflow sekali untuk semua kartu
+                void root.offsetHeight;
+
+                requestAnimationFrame(() => {
+                    cardsToAnimate.forEach(el => {
+                        el.style.transition = 'transform 240ms cubic-bezier(0.22, 1, 0.36, 1)';
+                        el.style.transform = 'translate3d(0, 0, 0)';
+                        setTimeout(() => {
+                            if (el.style) {
+                                el.style.transition = '';
+                                el.style.transform = '';
+                            }
+                        }, 260);
+                    });
+                });
+            });
         },
 
         moveItemAcrossCategories(fromCat, toCat, draggedId, targetId) {
@@ -1203,6 +1302,9 @@ function mobileMenuCustomizer(userId) {
             const sourceList = [...(this.customizations.layout[fromCat] || [])];
             const fromIdx = sourceList.indexOf(draggedId);
             if (fromIdx === -1) return;
+
+            // Rekam posisi awal semua kartu untuk animasi FLIP yang mulus
+            const oldPositions = this.captureCardPositions();
 
             if (fromCat === toCat) {
                 const toIdx = sourceList.indexOf(targetId);
@@ -1229,6 +1331,7 @@ function mobileMenuCustomizer(userId) {
             }
 
             this.saveCustomizations();
+            this.playFlipAnimation(oldPositions, draggedId);
 
             if (navigator.vibrate) {
                 try { navigator.vibrate(8); } catch (_) {}
@@ -1238,9 +1341,32 @@ function mobileMenuCustomizer(userId) {
         endItemDrag() {
             clearTimeout(this.holdTimer);
             this.pendingDrag = null;
-            if (this.draggingItem) {
+            if (!this.draggingItem || this.isDropping) return;
+
+            if (this.dragRafId) {
+                cancelAnimationFrame(this.dragRafId);
+                this.dragRafId = null;
+            }
+
+            // Animasi snap-drop mulus menuju slot tujuan
+            const root = this.$refs.sheetScrollArea;
+            const ghostEl = this.$refs.dragGhost;
+            const placeholderEl = root ? root.querySelector(`[data-menu-item-id="${this.draggingItem.id}"]`) : null;
+
+            if (ghostEl && placeholderEl) {
+                this.isDropping = true;
+                const pr = placeholderEl.getBoundingClientRect();
+                ghostEl.style.transition = 'transform 190ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 190ms ease, opacity 190ms ease';
+                ghostEl.style.transform = `translate3d(${pr.left}px, ${pr.top}px, 0) scale(1) rotate(0deg)`;
+                ghostEl.style.boxShadow = '0 4px 12px rgba(15, 23, 42, 0.08)';
+                setTimeout(() => {
+                    this.draggingItem = null;
+                    this.isDropping = false;
+                    setTimeout(() => { this.justDragged = false; }, 100);
+                }, 195);
+            } else {
                 this.draggingItem = null;
-                setTimeout(() => { this.justDragged = false; }, 120);
+                setTimeout(() => { this.justDragged = false; }, 100);
             }
         },
 
