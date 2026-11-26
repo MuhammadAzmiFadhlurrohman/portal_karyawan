@@ -813,7 +813,76 @@
                                 ->count();
                         }
                     }
+
+                    // Data ringkas notifikasi & aksi pending untuk badge lonceng di header (Desktop & Mobile)
+                    $navBellActionCount = ($totalPengajuanBadges ?? 0) + ($navAssignedTicketCount ?? 0);
+                    $navBellNotifItems = [];
+                    if ($navUser) {
+                        try {
+                            $navBellUid = (int) $navUser->id;
+                            $navBellLogs = \App\Models\NotificationLog::query()
+                                ->whereNotIn('event_type', ['shift_reminder_clock_in', 'shift_reminder_clock_out'])
+                                ->where(function ($q) use ($navBellUid) {
+                                    $q->where(function ($sub) use ($navBellUid) {
+                                        $sub->where('user_id', $navBellUid)->where('event_type', '!=', 'broadcast');
+                                    })->orWhere(function ($sub) use ($navBellUid) {
+                                        $sub->where('event_type', 'broadcast')->where(function ($b) use ($navBellUid) {
+                                            $b->whereJsonContains('payload->user_ids', $navBellUid)
+                                              ->orWhere('payload->target_type', 'all');
+                                        });
+                                    });
+                                })
+                                ->orderByDesc('sent_at')
+                                ->orderByDesc('id')
+                                ->limit(30)
+                                ->get(['id', 'payload', 'sent_at', 'created_at']);
+
+                            foreach ($navBellLogs as $bl) {
+                                $bp = is_array($bl->payload) ? $bl->payload : [];
+                                $bt = mb_strtolower((string) ($bp['title'] ?? ''));
+                                if (str_contains($bt, 'pengingat absen masuk') || str_contains($bt, 'pengingat absen pulang')) {
+                                    continue;
+                                }
+                                $navBellNotifItems[] = [
+                                    'id' => $bl->id,
+                                    'ts' => ($bl->sent_at ?? $bl->created_at)?->timestamp ?? 0,
+                                ];
+                            }
+                        } catch (\Throwable $e) {
+                            $navBellNotifItems = [];
+                        }
+                    }
+                    $navBellConfig = [
+                        'userId' => $navUser?->id ?? 0,
+                        'actionCount' => $navBellActionCount,
+                        'items' => $navBellNotifItems,
+                    ];
                 @endphp
+                <script>
+                    window.__gomsnBellConfig = @json($navBellConfig);
+                    function gomsnHeaderBell() {
+                        const cfg = window.__gomsnBellConfig || {};
+                        const uid = cfg.userId || 0;
+                        return {
+                            badgeCount: 0,
+                            init() {
+                                this.recalc();
+                                window.addEventListener('gomsn-notif-updated', () => this.recalc());
+                                window.addEventListener('storage', () => this.recalc());
+                            },
+                            recalc() {
+                                let unread = 0;
+                                try {
+                                    const lastTs = parseInt(localStorage.getItem('gomsn_notif_read_ts_' + uid) || '0', 10) || 0;
+                                    const readIds = JSON.parse(localStorage.getItem('gomsn_notif_read_ids_' + uid) || '[]') || [];
+                                    const dismissed = JSON.parse(localStorage.getItem('gomsn_notif_dismissed_ids_' + uid) || '[]') || [];
+                                    unread = (cfg.items || []).filter(it => !dismissed.includes(it.id) && !readIds.includes(it.id) && it.ts > lastTs).length;
+                                } catch (e) {}
+                                this.badgeCount = (cfg.actionCount || 0) + unread;
+                            }
+                        };
+                    }
+                </script>
                 <div class="space-y-1">
                     <div class="pt-2.5 pb-1 px-3 flex items-center justify-between text-white/90 select-none">
                         <div class="flex items-center gap-2 flex-1">
@@ -1086,14 +1155,18 @@
                             </svg>
                         </div>
 
-                        <!-- Mobile Notification Bell Button (Mengarah ke Pusat Notifikasi) -->
+                        <!-- Mobile Notification Bell Button (Mengarah ke Pusat Notifikasi + Badge Unread) -->
                         <a href="{{ route('portal.notifications.inbox') }}"
+                           x-data="gomsnHeaderBell()"
                            title="Notifikasi"
                            aria-label="Notifikasi"
                            class="relative z-10 w-[33px] h-[33px] rounded-full bg-white/12 hover:bg-white/22 active:scale-90 border {{ request()->routeIs('portal.notifications.inbox') ? 'border-white/70 bg-white/25' : 'border-white/25' }} flex items-center justify-center text-white shadow-sm transition-all duration-200 cursor-pointer shrink-0">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
+                            <span x-show="badgeCount > 0" x-cloak
+                                  class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center ring-2 ring-slate-900/40 shadow-xs"
+                                  x-text="badgeCount > 9 ? '9+' : badgeCount"></span>
                         </a>
 
                         <!-- Avatar with Solid White Ring + Name & Division + Chevron Down (Dropdown Menu) -->
@@ -1288,14 +1361,18 @@
                         <span class="text-teal-700 font-mono text-[11px]">WIB</span>
                     </div>
 
-                    <!-- Tombol Notifikasi Desktop (Di Samping Profile, Rapi & Sesuai Tema) -->
+                    <!-- Tombol Notifikasi Desktop (Di Samping Profile, Rapi, Sesuai Tema + Badge Unread) -->
                     <a href="{{ route('portal.notifications.inbox') }}"
+                       x-data="gomsnHeaderBell()"
                        title="Pusat Notifikasi"
                        aria-label="Pusat Notifikasi"
                        class="relative inline-flex items-center justify-center w-9 h-9 rounded-xl border transition-all duration-200 shadow-2xs cursor-pointer {{ request()->routeIs('portal.notifications.inbox') ? 'bg-teal-50 border-teal-400 text-teal-700' : 'bg-slate-50/90 hover:bg-white border-slate-200/80 hover:border-teal-400 text-slate-600 hover:text-teal-600' }}">
-                        <svg class="w-4.5 h-4.5 {{ request()->routeIs('portal.notifications.inbox') ? 'text-teal-600' : 'text-teal-600' }}" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                        <svg class="w-4.5 h-4.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
+                        <span x-show="badgeCount > 0" x-cloak
+                              class="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-500 text-white text-[9.5px] font-black flex items-center justify-center ring-2 ring-white shadow-xs"
+                              x-text="badgeCount > 9 ? '9+' : badgeCount"></span>
                     </a>
 
                     <!-- Divider -->

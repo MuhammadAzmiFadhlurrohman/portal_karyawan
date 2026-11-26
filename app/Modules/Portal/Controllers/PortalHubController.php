@@ -258,15 +258,160 @@ class PortalHubController extends Controller
         $category = trim((string) $request->query('category', 'all'));
         $search = trim((string) $request->query('q', ''));
 
+        // 1. Kumpulkan item "Perlu Tindakan Anda" sesuai role & izin user
+        $actionItems = [];
+        $isHrdOnly = $user->hasRole('hrd') && ! $user->hasRole(['super_admin', 'admin']);
+        $canApprovePengajuan = ! $isHrdOnly && ($user->can('gomsn.pengajuan.approve_atasan') || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
+        $canApproveKoreksi = ! $isHrdOnly && ($user->can('attendance.correction.approve') || $user->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi', 'super_admin', 'admin']));
+        $isAtasan = $canApprovePengajuan || $user->can('gomsn.lembur.approve');
+        $isFinance = $user->hasRole(['finance', 'admin', 'super_admin']) || $user->can('gomsn.pengajuan.approve_finance');
+
+        if ($canApprovePengajuan) {
+            $qPengajuan = \App\Models\Pengajuan::where('status', 'menunggu_atasan')->where('user_id', '!=', $userId);
+            if (! $user->hasRole(['super_admin', 'admin'])) {
+                $qPengajuan->where('atasan_id', $userId);
+            }
+            $cnt = $qPengajuan->count();
+            if ($cnt > 0) {
+                $actionItems[] = [
+                    'key' => 'approve_pengajuan',
+                    'title' => 'Persetujuan Pengajuan',
+                    'desc' => "{$cnt} pengajuan kasbon / pembelian menunggu persetujuan Anda.",
+                    'count' => $cnt,
+                    'url' => route('gomsn.pengajuan.approvals'),
+                    'cta' => 'Tinjau & Setujui',
+                    'color' => 'amber',
+                    'icon' => 'wallet',
+                ];
+            }
+        }
+
+        if ($isFinance) {
+            $finCnt = \App\Models\Pengajuan::where('status', 'menunggu_finance')->count();
+            if ($finCnt > 0) {
+                $actionItems[] = [
+                    'key' => 'finance_disburse',
+                    'title' => 'Pencairan Finance',
+                    'desc' => "{$finCnt} pengajuan disetujui menunggu proses pencairan dana.",
+                    'count' => $finCnt,
+                    'url' => route('gomsn.pengajuan.approvals'),
+                    'cta' => 'Proses Pencairan',
+                    'color' => 'emerald',
+                    'icon' => 'wallet',
+                ];
+            }
+        }
+
+        if ($isAtasan) {
+            $qLembur = \App\Models\Lembur::where('status', 'pending')->where('user_id', '!=', $userId);
+            if (! $user->hasRole(['super_admin', 'admin', 'hrd'])) {
+                $qLembur->where(function ($q) use ($user, $userId) {
+                    $q->where('atasan_id', $userId);
+                    if (! empty($user->division)) {
+                        $q->orWhereHas('user', fn ($qu) => $qu->whereRaw('LOWER(division) = ?', [strtolower($user->division)]));
+                    }
+                });
+            }
+            $cnt = $qLembur->count();
+            if ($cnt > 0) {
+                $actionItems[] = [
+                    'key' => 'approve_lembur',
+                    'title' => 'Persetujuan Lembur',
+                    'desc' => "{$cnt} pengajuan lembur tim menunggu persetujuan.",
+                    'count' => $cnt,
+                    'url' => route('gomsn.overtime.index'),
+                    'cta' => 'Buka Lembur',
+                    'color' => 'blue',
+                    'icon' => 'clock',
+                ];
+            }
+        }
+
+        if ($canApproveKoreksi) {
+            $qKor = \App\Models\AttendanceCorrection::whereIn('status', ['pending_supervisor', 'pending_hrd']);
+            if (! $user->hasRole(['super_admin', 'admin'])) {
+                $qKor->where('user_id', '!=', $userId);
+                if (! empty($user->division)) {
+                    $qKor->whereHas('user', fn ($qu) => $qu->whereRaw('LOWER(division) = ?', [strtolower($user->division)]));
+                }
+            }
+            $cnt = $qKor->count();
+            if ($cnt > 0) {
+                $actionItems[] = [
+                    'key' => 'approve_koreksi',
+                    'title' => 'Koreksi Kehadiran',
+                    'desc' => "{$cnt} pengajuan koreksi absen menunggu tinjauan Anda.",
+                    'count' => $cnt,
+                    'url' => route('attendance.corrections.approvals'),
+                    'cta' => 'Periksa Koreksi',
+                    'color' => 'teal',
+                    'icon' => 'calendar',
+                ];
+            }
+        }
+
+        if ($isHrdOnly || $user->hasRole(['super_admin', 'admin'])) {
+            $leaveCnt = \App\Models\Leave::whereIn('status', ['pending_hrd', 'pending_supervisor'])->count();
+            if ($leaveCnt > 0) {
+                $actionItems[] = [
+                    'key' => 'approve_leave',
+                    'title' => 'Pengajuan Cuti & Izin',
+                    'desc' => "{$leaveCnt} permohonan cuti/izin karyawan menunggu verifikasi HRD.",
+                    'count' => $leaveCnt,
+                    'url' => route('attendance.leaves.approvals'),
+                    'cta' => 'Verifikasi Cuti',
+                    'color' => 'purple',
+                    'icon' => 'calendar',
+                ];
+            }
+        }
+
+        // Pengajuan milik sendiri yang butuh upload nota / LPJ
+        $lpjCnt = \App\Models\Pengajuan::where('user_id', $userId)->where('status', 'menunggu_bukti')->count();
+        if ($lpjCnt > 0) {
+            $actionItems[] = [
+                'key' => 'upload_lpj',
+                'title' => 'Upload Nota / LPJ',
+                'desc' => "{$lpjCnt} pengajuan Anda sudah cair dan menunggu bukti pengeluaran.",
+                'count' => $lpjCnt,
+                'url' => route('gomsn.pengajuan.index'),
+                'cta' => 'Unggah Nota',
+                'color' => 'amber',
+                'icon' => 'wallet',
+            ];
+        }
+
+        // Tiket gangguan aktif yang ditugaskan
+        $userRoles = $user->roles->pluck('name')->toArray();
+        $isAtasanTeknik = ! empty(array_intersect(['super_admin', 'admin', 'atasan_teknik', 'atasan_umum', 'atasan', 'manager_teknisi'], $userRoles));
+        $ticketCnt = $isAtasanTeknik
+            ? \App\Models\Tiket::whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
+                ->where(fn ($q) => $q->doesntHave('ticketAssignees')->orWhereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $userId)))
+                ->count()
+            : \App\Models\Tiket::whereIn('status', ['OPEN', 'PROSES', 'PENDING_VERIFIKASI'])
+                ->whereHas('ticketAssignees', fn ($sq) => $sq->where('user_id', $userId))
+                ->count();
+        if ($ticketCnt > 0) {
+            $actionItems[] = [
+                'key' => 'active_tickets',
+                'title' => 'Tiket Gangguan Aktif',
+                'desc' => "{$ticketCnt} tiket gangguan sedang aktif dan memerlukan penanganan.",
+                'count' => $ticketCnt,
+                'url' => route('tickets.index'),
+                'cta' => 'Lihat Tiket',
+                'color' => 'rose',
+                'icon' => 'ticket',
+            ];
+        }
+
+        // 2. Kumpulkan riwayat notifikasi (tanpa pengingat absen masuk/pulang)
         $logs = \App\Models\NotificationLog::query()
             ->whereNotIn('event_type', ['shift_reminder_clock_in', 'shift_reminder_clock_out'])
             ->where(function ($q) use ($userId) {
-                // Notifikasi personal untuk user ini
                 $q->where(function ($sub) use ($userId) {
                     $sub->where('user_id', $userId)
                         ->where('event_type', '!=', 'broadcast');
                 })
-                // Atau broadcast pengumuman yang mencakup user ini
                 ->orWhere(function ($sub) use ($userId) {
                     $sub->where('event_type', 'broadcast')
                         ->where(function ($b) use ($userId) {
@@ -280,13 +425,18 @@ class PortalHubController extends Controller
             ->limit(100)
             ->get();
 
+        $now = now('Asia/Jakarta');
+        $todayStart = $now->copy()->startOfDay();
+        $yesterdayStart = $now->copy()->subDay()->startOfDay();
+        $weekStart = $now->copy()->subDays(7)->startOfDay();
+
         $items = $logs->filter(function ($log) {
             $payload = is_array($log->payload) ? $log->payload : [];
             $title = mb_strtolower((string) ($payload['title'] ?? ''));
 
             return ! str_contains($title, 'pengingat absen masuk')
                 && ! str_contains($title, 'pengingat absen pulang');
-        })->map(function ($log) {
+        })->map(function ($log) use ($todayStart, $yesterdayStart, $weekStart) {
             $payload = is_array($log->payload) ? $log->payload : [];
             $eventType = strtolower((string) ($log->event_type ?: 'info'));
             $cat = match (true) {
@@ -298,6 +448,18 @@ class PortalHubController extends Controller
                 default => 'lainnya',
             };
 
+            $sentAt = ($log->sent_at ?? $log->created_at)?->copy()->timezone('Asia/Jakarta');
+            $timeGroup = 'older';
+            if ($sentAt) {
+                if ($sentAt->greaterThanOrEqualTo($todayStart)) {
+                    $timeGroup = 'today';
+                } elseif ($sentAt->greaterThanOrEqualTo($yesterdayStart)) {
+                    $timeGroup = 'yesterday';
+                } elseif ($sentAt->greaterThanOrEqualTo($weekStart)) {
+                    $timeGroup = 'this_week';
+                }
+            }
+
             return [
                 'id' => $log->id,
                 'category' => $cat,
@@ -307,10 +469,13 @@ class PortalHubController extends Controller
                 'body' => $payload['body'] ?? ($payload['message'] ?? ''),
                 'link' => $payload['link'] ?? ($payload['deep_link'] ?? null),
                 'sender_name' => $payload['sender_name'] ?? ($payload['author'] ?? 'Sistem GoMSN'),
-                'sent_at' => $log->sent_at ?? $log->created_at,
-                'timestamp' => ($log->sent_at ?? $log->created_at)?->timestamp ?? 0,
+                'sent_at' => $sentAt,
+                'sent_human' => $sentAt ? $sentAt->diffForHumans() : '-',
+                'sent_formatted' => $sentAt ? $sentAt->format('d M Y, H:i') : '',
+                'timestamp' => $sentAt?->timestamp ?? 0,
+                'time_group' => $timeGroup,
             ];
-        });
+        })->values();
 
         $counts = [
             'all' => $items->count(),
@@ -335,6 +500,7 @@ class PortalHubController extends Controller
         }
 
         return view('portal.notifications.inbox', [
+            'actionItems' => $actionItems,
             'notifications' => $items,
             'counts' => $counts,
             'activeCategory' => $category,
