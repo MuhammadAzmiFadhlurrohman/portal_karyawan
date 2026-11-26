@@ -63,6 +63,7 @@
                 },
 
                 setTheme(mode, event) {
+                    this.accentDropdownOpen = false;
                     const targetDark = mode === 'dark';
                     if (this.isDark === targetDark) return;
                     if (typeof window.toggleGomsnTheme === 'function') {
@@ -136,7 +137,7 @@
             </div>
 
             <!-- Mobile Dropdown Selector -->
-            <div class="p-4 sm:hidden" data-accent-swatch="true">
+            <div class="p-4 sm:hidden relative" data-accent-swatch="true" @click.outside="accentDropdownOpen = false">
                 <button type="button"
                         @click="accentDropdownOpen = !accentDropdownOpen"
                         :aria-expanded="accentDropdownOpen"
@@ -172,23 +173,19 @@
                 <!-- Dropdown Options List -->
                 <div x-show="accentDropdownOpen"
                      x-cloak
+                     style="display: none;"
                      x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 -translate-y-1"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-100"
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 -translate-y-1"
-                     class="mt-2.5 rounded-2xl border overflow-hidden divide-y"
-                     :style="isDark
-                        ? 'border-color: rgba(148, 163, 184, 0.22); background: rgba(15, 23, 42, 0.72);'
-                        : 'border-color: #e2e8f0; background: #ffffff;'">
+                     class="mt-2.5 rounded-2xl border border-slate-200 dark:border-slate-700/60 bg-white dark:bg-slate-900 shadow-sm overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
                     <template x-for="item in accentThemes" :key="'mob-' + item.name">
                         <button type="button"
                                 @click="setAccent(item.name)"
-                                class="w-full px-3.5 py-2.5 text-left transition flex items-center justify-between gap-3 cursor-pointer"
-                                :style="activeAccent === item.name
-                                    ? (isDark ? `background: ${item.hex}26;` : `background: ${item.soft};`)
-                                    : (isDark ? 'background: transparent; border-color: rgba(148,163,184,0.12);' : 'background: transparent; border-color: #f1f5f9;')">
+                                class="w-full px-3.5 py-2.5 text-left transition flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                                :class="activeAccent === item.name ? 'bg-slate-50/80 dark:bg-slate-800/80' : ''">
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white shadow-2xs"
                                      :style="`background: ${item.gradient};`">
@@ -197,11 +194,9 @@
                                     </svg>
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="text-xs font-bold truncate"
-                                         :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'"
+                                    <div class="text-xs font-bold truncate text-slate-800 dark:text-slate-100"
                                          x-text="item.label"></div>
-                                    <div class="text-[10.5px] truncate"
-                                         :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'"
+                                    <div class="text-[10.5px] truncate text-slate-500 dark:text-slate-400"
                                          x-text="item.desc"></div>
                                 </div>
                             </div>
