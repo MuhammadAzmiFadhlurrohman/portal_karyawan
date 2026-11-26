@@ -30,6 +30,11 @@
                 }
                 var savedAccent = localStorage.getItem('gomsn_accent_theme') || 'teal';
                 document.documentElement.setAttribute('data-accent', savedAccent);
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof window.syncGomsnInlineAccent === 'function') {
+                        window.syncGomsnInlineAccent(savedAccent);
+                    }
+                });
             } catch (e) {}
         })();
 
@@ -56,7 +61,6 @@
                 if (el.id === 'desktop-sidebar' || el.classList.contains('gomsn-home-orb') || el.closest('[data-accent-swatch="true"]') || el.hasAttribute('data-gomsn-no-accent')) continue;
                 var orig = el.getAttribute('data-gomsn-orig-bg');
                 if (orig === null) {
-                    // Hanya periksa properti background-nya saja (BUKAN color/border agar ikon badge tidak ketimpa!)
                     var bgOnly = (el.style.background || el.style.backgroundImage || el.style.backgroundColor || '').toLowerCase();
                     if (!bgOnly) continue;
                     var isHeader = headerHexes.some(function(h) { return bgOnly.indexOf(h) !== -1; });
@@ -76,13 +80,6 @@
                 }
             }
         };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var saved = document.documentElement.getAttribute('data-accent') || 'teal';
-            if (saved !== 'teal') {
-                window.syncGomsnInlineAccent(saved);
-            }
-        });
 
         window.toggleGomsnTheme = function(event) {
             var html = document.documentElement;
@@ -157,8 +154,8 @@
             }, 520);
         };
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
+    <!-- CRITICAL INSTANT THEME VARS (Render synchronously before any CSS/JS bundles) -->
+    <style id="gomsn-theme-vars">
         @view-transition {
             navigation: auto;
         }
@@ -320,19 +317,23 @@
             --color-teal-950: #500724;
         }
 
+        /* Komponen utama aplikasi: bind instan ke CSS Variables */
         #desktop-sidebar {
             background: var(--gomsn-sidebar-bg) !important;
         }
         html[data-accent]:not([data-accent="teal"]) #desktop-sidebar > div:first-child {
             filter: var(--gomsn-sidebar-wave-filter);
         }
-        html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar,
-        html[data-accent]:not([data-accent="teal"]) .gomsn-sheet-header,
-        html[data-accent]:not([data-accent="teal"]) .gomsn-themed-banner {
+        .gomsn-mobile-topbar,
+        .gomsn-sheet-header,
+        .gomsn-themed-banner {
             background: var(--gomsn-header-bg) !important;
         }
-        html[data-accent]:not([data-accent="teal"]) .gomsn-home-orb {
+        .gomsn-home-orb {
             background: var(--gomsn-orb-bg) !important;
+        }
+        [data-sidebar-active="true"] {
+            background: var(--gomsn-active-bg) !important;
         }
         html[data-accent]:not([data-accent="teal"]) .text-\[\#0f766e\],
         html[data-accent]:not([data-accent="teal"]) .text-\[\#115e59\],
@@ -561,6 +562,7 @@
 
 
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-full bg-[#F8FAFC] text-slate-900 font-sans antialiased"
       x-data="{ bottomSheetOpen: false, isDarkMode: document.documentElement.classList.contains('dark') }"
@@ -750,7 +752,7 @@
                 <!-- Portal Hub Utama -->
                 <div>
                     <a href="{{ route('portal.hub') }}"
-                       @if (request()->routeIs('portal.hub')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                       @if (request()->routeIs('portal.hub')) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                        class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all {{ request()->routeIs('portal.hub') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white font-medium hover:bg-white/15' }}">
                         <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         <span>Dashboard</span>
@@ -907,7 +909,7 @@
                     <div class="space-y-1">
                         <!-- 1. Pengajuan Saya (Mandiri) -->
                         <a href="{{ route('gomsn.pengajuan.index') }}"
-                           @if (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                            class="flex items-center gap-3 px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ (request()->routeIs('gomsn.pengajuan.index') || request()->routeIs('gomsn.pengajuan.create') || (request()->routeIs('gomsn.pengajuan.show') && ! request()->routeIs('gomsn.pengajuan.approvals'))) ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             <span>{{ $navCanApprovePengajuan ? 'Pengajuan Saya' : 'Pengajuan' }}</span>
@@ -919,7 +921,7 @@
                         <!-- 2. Pengajuan Karyawan (Khusus Atasan — Tidak Muncul di Role HRD) -->
                         @if ($navCanApprovePengajuan)
                         <a href="{{ route('gomsn.pengajuan.approvals') }}"
-                           @if (request()->routeIs('gomsn.pengajuan.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('gomsn.pengajuan.approvals')) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('gomsn.pengajuan.approvals') ? 'text-white' : 'text-amber-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -936,7 +938,7 @@
                         <!-- 3. Pengajuan Absen (Khusus Atasan & Admin: Koreksi Kehadiran Mandiri Karyawan) -->
                         @if ($navCanApproveKoreksi)
                         <a href="{{ route('attendance.corrections.approvals') }}"
-                           @if (request()->routeIs('attendance.corrections.approvals')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('attendance.corrections.approvals')) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 {{ request()->routeIs('attendance.corrections.approvals') ? 'text-white' : 'text-emerald-300' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -959,7 +961,7 @@
                         @if ($isHrdRole)
                         <!-- Khusus HRD: Tombol Lembur Saya (Pengajuan & Riwayat Milik Sendiri) -->
                         <a href="{{ route('gomsn.overtime.index', ['view_mode' => 'saya']) }}"
-                           @if ($isOvertimeSaya) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if ($isOvertimeSaya) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ $isOvertimeSaya ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -971,7 +973,7 @@
                         </a>
                         @elseif (! $navIsHrdOnly)
                         <a href="{{ route('gomsn.overtime.index') }}"
-                           @if ($isOvertimeRoute) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if ($isOvertimeRoute) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ $isOvertimeRoute ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -989,7 +991,7 @@
 
                         <!-- 4. Stok Barang Kantor / Gudang -->
                         <a href="{{ route('gomsn.inventory.index') }}"
-                           @if (request()->routeIs('gomsn.inventory.*')) style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%) !important;" @endif
+                           @if (request()->routeIs('gomsn.inventory.*')) data-sidebar-active="true" style="background: var(--gomsn-active-bg) !important;" @endif
                            class="flex items-center justify-between px-3 py-2 rounded-xl text-[11px] font-semibold transition-all duration-200 {{ request()->routeIs('gomsn.inventory.*') ? 'text-white font-bold shadow-md border border-white/25' : 'text-white/90 font-medium hover:bg-white/10 hover:text-white' }}">
                             <div class="flex items-center gap-3">
                                 <svg class="w-4 h-4 shrink-0 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -1126,7 +1128,7 @@
             <!-- Mobile Fixed Header (Sculpted Metallic Teal Bar - Always Pinned on Scroll) -->
             <div class="md:hidden fixed top-0 inset-x-0 z-50 pt-2 px-3 pb-1.5 bg-slate-50/95 backdrop-blur-md select-none">
                 <div class="gomsn-mobile-topbar relative h-[48px] w-full rounded-[22px] flex items-center justify-between pl-3.5 pr-0 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
-                     style="background: linear-gradient(100deg, #07383c 0%, #0c4d53 28%, #105c64 52%, #0a4449 82%, #063135 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <!-- Decorative Background & Highlights Layer (Clipped to Pill Corners) -->
                     <div class="absolute inset-0 rounded-[22px] overflow-hidden pointer-events-none">

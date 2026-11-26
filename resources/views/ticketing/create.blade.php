@@ -14,8 +14,8 @@
 })">
 
     <!-- Top Header Banner (Corporate Ocean Teal Gradient - Compact Sleek) -->
-    <div class="rounded-2xl px-5 py-4 sm:px-6 sm:py-4.5 text-white shadow-lg relative overflow-hidden"
-         style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
+    <div class="gomsn-themed-banner rounded-2xl px-5 py-4 sm:px-6 sm:py-4.5 text-white shadow-lg relative overflow-hidden"
+         style="background: var(--gomsn-header-bg) !important;">
         <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-[#18C4C4]/10 blur-2xl pointer-events-none"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3.5">

@@ -3,8 +3,8 @@
 @section('content')
 <div class="space-y-6">
     <!-- Header Banner: Compact Ocean Teal Corporate Theme -->
-    <div class="relative overflow-hidden rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4 text-white shadow-md border border-teal-500/20"
-         style="background: linear-gradient(135deg, #022836 0%, #053b47 35%, #0a525f 75%, #084c57 100%);">
+    <div class="gomsn-themed-banner relative overflow-hidden rounded-2xl px-5 py-3.5 sm:px-6 sm:py-4 text-white shadow-md border border-teal-500/20"
+         style="background: var(--gomsn-header-bg) !important;">
         <!-- Ambient decorative glows (subtle) -->
         <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-[#18C4C4]/15 blur-2xl pointer-events-none"></div>
 

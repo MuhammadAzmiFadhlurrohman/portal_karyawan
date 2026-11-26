@@ -17,8 +17,8 @@
         @endphp
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-        <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_8px_28px_rgba(2,43,58,0.28)] p-4 sm:py-5 sm:px-6 flex items-center justify-between gap-3.5 sm:gap-4 select-none"
-             style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
+        <div class="gomsn-themed-banner relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_8px_28px_rgba(2,43,58,0.28)] p-4 sm:py-5 sm:px-6 flex items-center justify-between gap-3.5 sm:gap-4 select-none"
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Ambient Glow Orbs & Gloss Highlights -->
             <div class="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-teal-400/15 blur-2xl pointer-events-none"></div>

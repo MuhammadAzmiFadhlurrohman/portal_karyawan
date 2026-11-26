@@ -6,7 +6,7 @@
     <div class="space-y-5 w-full pb-20">
         <!-- 1. Header Banner (Full Width & Mengikuti Warna Tema Aplikasi) -->
         <div class="gomsn-themed-banner relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.28)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 30%, #0a525f 70%, #0e6774 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"></div>
             <div class="relative z-10 flex items-center gap-3.5 min-w-0">
                 <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0 shadow-inner">

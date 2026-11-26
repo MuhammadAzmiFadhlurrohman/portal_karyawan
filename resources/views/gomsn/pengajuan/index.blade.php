@@ -66,8 +66,8 @@
     }" class="w-full space-y-5">
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+        <div class="gomsn-themed-banner relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -1450,7 +1450,7 @@
                                             <td class="py-3 px-4 text-right font-bold text-slate-900 font-mono" x-text="detail.subtotal"></td>
                                         </tr>
                                     </template>
-                                    <template x-if="!activeItem?.details || activeItem.details.length === 0">
+                                    <template x-if="!activeItem?.details?.length">
                                         <tr>
                                             <td colspan="5" class="py-6 text-center text-slate-400">
                                                 Tidak ada rincian item barang/dana.
@@ -1493,7 +1493,7 @@
                                     </div>
                                 </div>
                             </template>
-                            <template x-if="!activeItem?.details || activeItem.details.length === 0">
+                            <template x-if="!activeItem?.details?.length">
                                 <div class="py-6 text-center text-slate-400 text-xs">
                                     Tidak ada rincian item barang/dana.
                                 </div>

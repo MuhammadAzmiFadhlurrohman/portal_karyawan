@@ -56,7 +56,7 @@
 
         <!-- Sheet Header Bar (Ocean Teal Gradient / Mengikuti Warna Tema Aplikasi) -->
         <div class="gomsn-sheet-header relative z-10 shrink-0 select-none overflow-hidden" 
-             style="background: linear-gradient(135deg, #073337 0%, #0d5257 50%, #08383c 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
 
