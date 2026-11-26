@@ -40,8 +40,47 @@
             try {
                 localStorage.setItem('gomsn_accent_theme', next);
             } catch (e) {}
+            if (typeof window.syncGomsnInlineAccent === 'function') {
+                window.syncGomsnInlineAccent(next);
+            }
             window.dispatchEvent(new CustomEvent('gomsn-accent-changed', { detail: { accent: next } }));
         };
+
+        window.syncGomsnInlineAccent = function(accent) {
+            var current = accent || document.documentElement.getAttribute('data-accent') || 'teal';
+            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b'];
+            var buttonHexes = ['#18c4c4', '#0d9488', '#0f766e', '#155e63', '#115e59'];
+            var els = document.querySelectorAll('[style*="background"]');
+            for (var i = 0; i < els.length; i++) {
+                var el = els[i];
+                if (el.id === 'desktop-sidebar' || el.classList.contains('gomsn-home-orb') || el.closest('[data-accent-swatch="true"]')) continue;
+                var orig = el.getAttribute('data-gomsn-orig-bg');
+                if (orig === null) {
+                    var rawStyle = (el.getAttribute('style') || '').toLowerCase();
+                    var isHeader = headerHexes.some(function(h) { return rawStyle.indexOf(h) !== -1; });
+                    var isBtn = !isHeader && buttonHexes.some(function(h) { return rawStyle.indexOf(h) !== -1; });
+                    if (!isHeader && !isBtn) continue;
+                    el.setAttribute('data-gomsn-orig-bg', el.style.background || el.style.backgroundImage || '');
+                    el.setAttribute('data-gomsn-bg-role', isHeader ? 'header' : 'active');
+                }
+                var role = el.getAttribute('data-gomsn-bg-role');
+                if (current === 'teal') {
+                    var saved = el.getAttribute('data-gomsn-orig-bg') || '';
+                    el.style.setProperty('background', saved, 'important');
+                } else if (role === 'header') {
+                    el.style.setProperty('background', 'var(--gomsn-header-bg)', 'important');
+                } else if (role === 'active') {
+                    el.style.setProperty('background', 'var(--gomsn-active-bg)', 'important');
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var saved = document.documentElement.getAttribute('data-accent') || 'teal';
+            if (saved !== 'teal') {
+                window.syncGomsnInlineAccent(saved);
+            }
+        });
 
         window.toggleGomsnTheme = function(event) {
             var html = document.documentElement;
@@ -126,7 +165,7 @@
         }
 
         /* ==============================================================
-           GLOBAL APP COLOR THEMES (KUSTOMISASI WARNA TEMA PER USER)
+           GLOBAL APP COLOR THEMES (KUSTOMISASI WARNA TEMA SELURUH HALAMAN)
            ============================================================== */
         :root,
         html[data-accent="teal"] {
@@ -136,6 +175,7 @@
             --gomsn-header-bg: linear-gradient(100deg, #07383c 0%, #0c4d53 28%, #105c64 52%, #0a4449 82%, #063135 100%);
             --gomsn-active-bg: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #10b981 0%, #0d9488 45%, #065f46 100%);
+            --gomsn-sidebar-wave-filter: none;
         }
         html[data-accent="blue"] {
             --gomsn-accent: #2563eb;
@@ -144,6 +184,18 @@
             --gomsn-header-bg: linear-gradient(100deg, #0f2557 0%, #173b85 35%, #1d4ed8 65%, #163578 100%);
             --gomsn-active-bg: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #60a5fa 0%, #2563eb 48%, #1e3a8a 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(42deg);
+            --color-teal-50: var(--color-blue-50);
+            --color-teal-100: var(--color-blue-100);
+            --color-teal-200: var(--color-blue-200);
+            --color-teal-300: var(--color-blue-300);
+            --color-teal-400: var(--color-blue-400);
+            --color-teal-500: var(--color-blue-500);
+            --color-teal-600: var(--color-blue-600);
+            --color-teal-700: var(--color-blue-700);
+            --color-teal-800: var(--color-blue-800);
+            --color-teal-900: var(--color-blue-900);
+            --color-teal-950: var(--color-blue-950);
         }
         html[data-accent="indigo"] {
             --gomsn-accent: #4f46e5;
@@ -152,6 +204,18 @@
             --gomsn-header-bg: linear-gradient(100deg, #1b1852 0%, #2a247a 35%, #3730a3 65%, #201c5e 100%);
             --gomsn-active-bg: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #818cf8 0%, #4f46e5 48%, #312e81 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(68deg);
+            --color-teal-50: var(--color-indigo-50);
+            --color-teal-100: var(--color-indigo-100);
+            --color-teal-200: var(--color-indigo-200);
+            --color-teal-300: var(--color-indigo-300);
+            --color-teal-400: var(--color-indigo-400);
+            --color-teal-500: var(--color-indigo-500);
+            --color-teal-600: var(--color-indigo-600);
+            --color-teal-700: var(--color-indigo-700);
+            --color-teal-800: var(--color-indigo-800);
+            --color-teal-900: var(--color-indigo-900);
+            --color-teal-950: var(--color-indigo-950);
         }
         html[data-accent="emerald"] {
             --gomsn-accent: #059669;
@@ -160,6 +224,18 @@
             --gomsn-header-bg: linear-gradient(100deg, #053828 0%, #065f46 40%, #047857 70%, #053b2a 100%);
             --gomsn-active-bg: linear-gradient(90deg, #10b981 0%, #059669 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #34d399 0%, #059669 48%, #064e3b 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(-18deg);
+            --color-teal-50: var(--color-emerald-50);
+            --color-teal-100: var(--color-emerald-100);
+            --color-teal-200: var(--color-emerald-200);
+            --color-teal-300: var(--color-emerald-300);
+            --color-teal-400: var(--color-emerald-400);
+            --color-teal-500: var(--color-emerald-500);
+            --color-teal-600: var(--color-emerald-600);
+            --color-teal-700: var(--color-emerald-700);
+            --color-teal-800: var(--color-emerald-800);
+            --color-teal-900: var(--color-emerald-900);
+            --color-teal-950: var(--color-emerald-950);
         }
         html[data-accent="purple"] {
             --gomsn-accent: #7c3aed;
@@ -168,6 +244,18 @@
             --gomsn-header-bg: linear-gradient(100deg, #2b1254 0%, #4c1d95 40%, #6d28d9 70%, #341666 100%);
             --gomsn-active-bg: linear-gradient(90deg, #a855f7 0%, #7c3aed 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #c084fc 0%, #7c3aed 48%, #4c1d95 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(100deg);
+            --color-teal-50: var(--color-purple-50);
+            --color-teal-100: var(--color-purple-100);
+            --color-teal-200: var(--color-purple-200);
+            --color-teal-300: var(--color-purple-300);
+            --color-teal-400: var(--color-purple-400);
+            --color-teal-500: var(--color-purple-500);
+            --color-teal-600: var(--color-purple-600);
+            --color-teal-700: var(--color-purple-700);
+            --color-teal-800: var(--color-purple-800);
+            --color-teal-900: var(--color-purple-900);
+            --color-teal-950: var(--color-purple-950);
         }
         html[data-accent="rose"] {
             --gomsn-accent: #e11d48;
@@ -176,6 +264,18 @@
             --gomsn-header-bg: linear-gradient(100deg, #4c0b1d 0%, #881337 40%, #be123c 70%, #570e22 100%);
             --gomsn-active-bg: linear-gradient(90deg, #f43f5e 0%, #e11d48 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #fb7185 0%, #e11d48 48%, #881337 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(165deg);
+            --color-teal-50: var(--color-rose-50);
+            --color-teal-100: var(--color-rose-100);
+            --color-teal-200: var(--color-rose-200);
+            --color-teal-300: var(--color-rose-300);
+            --color-teal-400: var(--color-rose-400);
+            --color-teal-500: var(--color-rose-500);
+            --color-teal-600: var(--color-rose-600);
+            --color-teal-700: var(--color-rose-700);
+            --color-teal-800: var(--color-rose-800);
+            --color-teal-900: var(--color-rose-900);
+            --color-teal-950: var(--color-rose-950);
         }
         html[data-accent="amber"] {
             --gomsn-accent: #d97706;
@@ -184,6 +284,18 @@
             --gomsn-header-bg: linear-gradient(100deg, #472105 0%, #78350f 40%, #b45309 70%, #542807 100%);
             --gomsn-active-bg: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #fbbf24 0%, #d97706 48%, #78350f 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(-135deg);
+            --color-teal-50: var(--color-amber-50);
+            --color-teal-100: var(--color-amber-100);
+            --color-teal-200: var(--color-amber-200);
+            --color-teal-300: var(--color-amber-300);
+            --color-teal-400: var(--color-amber-400);
+            --color-teal-500: var(--color-amber-500);
+            --color-teal-600: var(--color-amber-600);
+            --color-teal-700: var(--color-amber-700);
+            --color-teal-800: var(--color-amber-800);
+            --color-teal-900: var(--color-amber-900);
+            --color-teal-950: var(--color-amber-950);
         }
         html[data-accent="slate"] {
             --gomsn-accent: #334155;
@@ -192,21 +304,42 @@
             --gomsn-header-bg: linear-gradient(100deg, #0f172a 0%, #1e293b 40%, #334155 70%, #172033 100%);
             --gomsn-active-bg: linear-gradient(90deg, #64748b 0%, #475569 100%);
             --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #94a3b8 0%, #475569 48%, #1e293b 100%);
+            --gomsn-sidebar-wave-filter: saturate(0.1);
+            --color-teal-50: var(--color-slate-50);
+            --color-teal-100: var(--color-slate-100);
+            --color-teal-200: var(--color-slate-200);
+            --color-teal-300: var(--color-slate-300);
+            --color-teal-400: var(--color-slate-400);
+            --color-teal-500: var(--color-slate-500);
+            --color-teal-600: var(--color-slate-600);
+            --color-teal-700: var(--color-slate-700);
+            --color-teal-800: var(--color-slate-800);
+            --color-teal-900: var(--color-slate-900);
+            --color-teal-950: var(--color-slate-950);
         }
 
-        html[data-accent]:not([data-accent="teal"]) #desktop-sidebar {
+        #desktop-sidebar {
             background: var(--gomsn-sidebar-bg) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) #desktop-sidebar > div:first-child {
+            filter: var(--gomsn-sidebar-wave-filter);
         }
         html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar,
         html[data-accent]:not([data-accent="teal"]) .gomsn-sheet-header,
         html[data-accent]:not([data-accent="teal"]) .gomsn-themed-banner {
             background: var(--gomsn-header-bg) !important;
         }
-        html[data-accent]:not([data-accent="teal"]) [data-sidebar-active="true"] {
-            background: var(--gomsn-active-bg) !important;
-        }
         html[data-accent]:not([data-accent="teal"]) .gomsn-home-orb {
             background: var(--gomsn-orb-bg) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#0f766e\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#115e59\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#155E63\] {
+            color: var(--gomsn-accent) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .bg-\[\#155E63\],
+        html[data-accent]:not([data-accent="teal"]) .bg-\[\#0f766e\] {
+            background-color: var(--gomsn-accent) !important;
         }
         ::view-transition-old(desktop-sidebar),
         ::view-transition-new(desktop-sidebar) {
@@ -363,8 +496,7 @@
     <div class="min-h-screen flex flex-row">
         <!-- Left Sidebar Navigation (Desktop Only: hidden on mobile, md:flex) -->
         <aside id="desktop-sidebar"
-               style="background: linear-gradient(180deg, #022836 0%, #053b47 22%, #094d5a 50%, #0c5a68 75%, #031e26 100%) !important;"
-               class="hidden md:flex md:sticky top-0 inset-y-0 left-0 z-40 w-64 text-white flex-col justify-between h-screen shadow-2xl shrink-0 border-r border-[#14b8a6]/25 relative overflow-hidden select-none">
+               class="hidden md:flex md:sticky top-0 inset-y-0 left-0 z-40 w-64 text-white flex-col justify-between h-screen shadow-2xl shrink-0 border-r border-teal-400/25 relative overflow-hidden select-none">
             
             <!-- Ambient Sculpted Waves & Clean Parallel Fiber Contours -->
             <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
@@ -1363,9 +1495,9 @@
                     <path d="M 0,21 C 18,21 27,1 41,1 C 55,1 64,21 82,21" fill="none" stroke="rgba(45, 212, 191, 0.9)" stroke-width="1.6"/>
                 </svg>
 
-                <!-- Elevated 3D Glossy Sphere Button with fresh rich green-teal gloss -->
+                <!-- Elevated 3D Glossy Sphere Button with theme-aware gloss -->
                 <div class="gomsn-home-orb absolute -top-4 w-[48px] h-[48px] rounded-full flex items-center justify-center text-white border-[2.5px] border-white shadow-[0_6px_18px_rgba(13,148,136,0.42)] transition-transform duration-200 transform group-hover:scale-105 active:scale-95 overflow-hidden"
-                     style="background: radial-gradient(circle at 50% 25%, #10b981 0%, #0d9488 45%, #065f46 100%) !important;">
+                     style="background: var(--gomsn-orb-bg, radial-gradient(circle at 50% 25%, #10b981 0%, #0d9488 45%, #065f46 100%));">
                     
                     <!-- Specular Curved Gloss Arc (Bubble glass reflection on top) -->
                     <div class="absolute top-1 inset-x-2 h-[18px] rounded-full bg-gradient-to-b from-white/75 via-white/25 to-transparent pointer-events-none"></div>

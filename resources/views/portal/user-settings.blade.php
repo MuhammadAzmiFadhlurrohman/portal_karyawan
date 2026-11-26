@@ -195,7 +195,7 @@
                       x-text="getActiveAccentObj().label"></span>
             </div>
 
-            <div class="p-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-5 grid grid-cols-2 sm:grid-cols-4 gap-3" data-accent-swatch="true">
                 <template x-for="item in accentThemes" :key="item.name">
                     <button type="button"
                             @click="setAccent(item.name)"
