@@ -1086,23 +1086,6 @@
                             </svg>
                         </div>
 
-                        <!-- Mobile Dark Mode Toggle Button (Sculpted Glass Orb) -->
-                        <button type="button"
-                                @click="window.toggleGomsnTheme($event)"
-                                :title="isDarkMode ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'"
-                                aria-label="Toggle Dark Mode"
-                                class="theme-toggle-mobile relative z-10 w-[33px] h-[33px] rounded-full bg-white/12 hover:bg-white/22 active:scale-90 border border-white/25 flex items-center justify-center text-white shadow-sm transition-all duration-300 cursor-pointer overflow-hidden shrink-0">
-                            <!-- Sun Icon (Visible in Light Mode) -->
-                            <svg class="theme-icon-sun w-4 h-4 text-amber-300 drop-shadow-[0_0_6px_rgba(251,191,36,0.65)] transition-all duration-500" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="4" fill="currentColor" fill-opacity="0.35"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                            </svg>
-                            <!-- Moon Icon (Visible in Dark Mode) -->
-                            <svg class="theme-icon-moon w-4 h-4 text-cyan-200 drop-shadow-[0_0_8px_rgba(56,189,248,0.8)] transition-all duration-500 absolute" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" fill="currentColor" fill-opacity="0.3" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-                            </svg>
-                        </button>
-
                         <!-- Avatar with Solid White Ring + Name & Division + Chevron Down (Dropdown Menu) -->
                         <div class="relative z-10" x-data="{ mobileUserMenuOpen: false }" @click.outside="mobileUserMenuOpen = false">
                             <button @click="mobileUserMenuOpen = !mobileUserMenuOpen"
