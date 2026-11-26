@@ -1052,6 +1052,8 @@
 
                         @if ($isAbsensiActive)
                             sessionStorage.setItem('gomsn_sb_absensi', '1');
+                        @else
+                            sessionStorage.removeItem('gomsn_sb_absensi');
                         @endif
                         @if ($isKelolaKaryawanActive)
                             sessionStorage.setItem('gomsn_sb_kelola_karyawan', '1');
@@ -1061,14 +1063,20 @@
                         @endif
                         @if ($isTiketingActive)
                             sessionStorage.setItem('gomsn_sb_tiketing', '1');
+                        @else
+                            sessionStorage.removeItem('gomsn_sb_tiketing');
                         @endif
                         @if ($isLainnyaActive)
                             sessionStorage.setItem('gomsn_sb_lainnya', '1');
                         @endif
 
                         var elAbsensi = document.getElementById('sb-menu-absensi');
-                        if (elAbsensi && sessionStorage.getItem('gomsn_sb_absensi') === '1') {
-                            elAbsensi.style.display = '';
+                        if (elAbsensi) {
+                            @if ($isAbsensiActive)
+                                elAbsensi.style.display = '';
+                            @else
+                                elAbsensi.style.display = 'none';
+                            @endif
                         }
                         var elKelola = document.getElementById('sb-menu-kelola-karyawan');
                         if (elKelola && sessionStorage.getItem('gomsn_sb_kelola_karyawan') === '1') {
@@ -1079,8 +1087,12 @@
                             elRiwayat.style.display = '';
                         }
                         var elTiketing = document.getElementById('sb-menu-tiketing');
-                        if (elTiketing && sessionStorage.getItem('gomsn_sb_tiketing') === '1') {
-                            elTiketing.style.display = '';
+                        if (elTiketing) {
+                            @if ($isTiketingActive)
+                                elTiketing.style.display = '';
+                            @else
+                                elTiketing.style.display = 'none';
+                            @endif
                         }
                         var elLainnya = document.getElementById('sb-menu-lainnya');
                         if (elLainnya && sessionStorage.getItem('gomsn_sb_lainnya') === '1') {
