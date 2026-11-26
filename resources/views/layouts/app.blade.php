@@ -456,8 +456,10 @@
             background: var(--gomsn-active-bg) !important;
         }
         html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] {
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.96) 0%, rgba(19, 28, 46, 0.98) 100%) !important;
             border-color: rgba(255, 255, 255, 0.16) !important;
         }
+        html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] svg.w-\[22px\],
         html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] svg.text-\[\#0f766e\],
         html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] svg.text-\[\#115e59\],
         html.dark[data-accent]:not([data-accent="teal"]) nav[aria-label="Navigasi Cepat Mobile"] span.text-\[\#0f766e\] {

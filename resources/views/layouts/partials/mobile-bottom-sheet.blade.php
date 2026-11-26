@@ -577,16 +577,16 @@ function mobileMenuCustomizer(userId) {
         },
 
         colorPalette: [
-            { name: 'teal', label: 'Teal GoMSN', previewHex: '#0d9488', bg: '#f0fdfa', border: '#99f6e4' },
-            { name: 'emerald', label: 'Emerald Hijau', previewHex: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
-            { name: 'cyan', label: 'Cyan Biru Laut', previewHex: '#06b6d4', bg: '#ecfeff', border: '#a5f3fc' },
-            { name: 'blue', label: 'Biru Royal', previewHex: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
-            { name: 'indigo', label: 'Indigo / Navy', previewHex: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
-            { name: 'purple', label: 'Ungu Cerah', previewHex: '#a855f7', bg: '#faf5ff', border: '#e9d5ff' },
-            { name: 'rose', label: 'Rose / Merah', previewHex: '#f43f5e', bg: '#fff1f2', border: '#fecdd3' },
-            { name: 'amber', label: 'Amber / Emas', previewHex: '#d97706', bg: '#fffbeb', border: '#fde68a' },
-            { name: 'orange', label: 'Oranye Terang', previewHex: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
-            { name: 'slate', label: 'Slate Elegan', previewHex: '#475569', bg: '#f1f5f9', border: '#cbd5e1' },
+            { name: 'teal', label: 'Teal GoMSN', previewHex: '#0d9488', darkColor: '#5eead4', bg: '#f0fdfa', border: '#99f6e4' },
+            { name: 'emerald', label: 'Emerald Hijau', previewHex: '#10b981', darkColor: '#6ee7b7', bg: '#ecfdf5', border: '#a7f3d0' },
+            { name: 'cyan', label: 'Cyan Biru Laut', previewHex: '#06b6d4', darkColor: '#67e8f9', bg: '#ecfeff', border: '#a5f3fc' },
+            { name: 'blue', label: 'Biru Royal', previewHex: '#2563eb', darkColor: '#93c5fd', bg: '#eff6ff', border: '#bfdbfe' },
+            { name: 'indigo', label: 'Indigo / Navy', previewHex: '#6366f1', darkColor: '#a5b4fc', bg: '#eef2ff', border: '#c7d2fe' },
+            { name: 'purple', label: 'Ungu Cerah', previewHex: '#a855f7', darkColor: '#d8b4fe', bg: '#faf5ff', border: '#e9d5ff' },
+            { name: 'rose', label: 'Rose / Merah', previewHex: '#f43f5e', darkColor: '#fda4af', bg: '#fff1f2', border: '#fecdd3' },
+            { name: 'amber', label: 'Amber / Emas', previewHex: '#d97706', darkColor: '#fcd34d', bg: '#fffbeb', border: '#fde68a' },
+            { name: 'orange', label: 'Oranye Terang', previewHex: '#ea580c', darkColor: '#fdba74', bg: '#fff7ed', border: '#fed7aa' },
+            { name: 'slate', label: 'Slate Elegan', previewHex: '#475569', darkColor: '#cbd5e1', bg: '#f1f5f9', border: '#cbd5e1' },
         ],
 
         categories: [
@@ -1429,20 +1429,33 @@ function mobileMenuCustomizer(userId) {
 
         getCardStyle(item) {
             const p = this.getPaletteObj(this.getItemColor(item));
+            const dark = !!this.isDarkMode || document.documentElement.classList.contains('dark');
             if (this.draggingItem && this.draggingItem.id === item.id) {
-                return 'border: 2px dashed #0d9488; background: #f0fdfa; opacity: 0.35;';
+                return dark
+                    ? 'border: 2px dashed #5eead4; background: rgba(13, 148, 136, 0.14); opacity: 0.35;'
+                    : 'border: 2px dashed #0d9488; background: #f0fdfa; opacity: 0.35;';
             }
             if (this.isEditMode) {
-                return 'border: 1px solid #99f6e4; background: #ffffff; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);';
+                return dark
+                    ? 'border: 1px solid rgba(94, 234, 212, 0.4); background: rgba(30, 41, 59, 0.85); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);'
+                    : 'border: 1px solid #99f6e4; background: #ffffff; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);';
             }
             if (this.hasCustomColor(item)) {
-                return `border: 1px solid ${p.border}; background: linear-gradient(135deg, #ffffff 60%, ${p.bg} 100%);`;
+                return dark
+                    ? `border: 1px solid ${p.previewHex}55; background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 55%, ${p.previewHex}22 100%);`
+                    : `border: 1px solid ${p.border}; background: linear-gradient(135deg, #ffffff 60%, ${p.bg} 100%);`;
             }
-            return 'border: 1px solid rgba(226, 232, 240, 0.9); background: #ffffff;';
+            return dark
+                ? 'border: 1px solid rgba(148, 163, 184, 0.16); background: rgba(30, 41, 59, 0.72);'
+                : 'border: 1px solid rgba(226, 232, 240, 0.9); background: #ffffff;';
         },
 
         getIconBoxStyle(item) {
             const p = this.getPaletteObj(this.getItemColor(item));
+            const dark = !!this.isDarkMode || document.documentElement.classList.contains('dark');
+            if (dark) {
+                return `background: ${p.previewHex}24; color: ${p.darkColor || '#f8fafc'}; border: 1px solid ${p.previewHex}45;`;
+            }
             return `background: ${p.bg}; color: ${p.previewHex}; border: 1px solid ${p.border};`;
         },
 
