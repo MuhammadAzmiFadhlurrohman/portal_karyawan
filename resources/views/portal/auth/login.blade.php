@@ -10,6 +10,9 @@
             background-color: #ffffff !important;
             overflow: hidden !important;
         }
+        html.dark, html.dark body {
+            background-color: #0b0f19 !important;
+        }
         #main-content {
             height: 100% !important;
             height: 100dvh !important;
@@ -31,11 +34,15 @@
             justify-content: space-between;
             align-items: center;
             overflow: hidden !important;
-            background: linear-gradient(180deg, #eef7f9 0%, #f7fbfc 60%, #e4f4f5 100%);
+            background: linear-gradient(180deg, var(--color-teal-50, #eef7f9) 0%, #ffffff 60%, var(--color-teal-50, #e4f4f5) 100%);
+            transition: background 0.3s ease;
+        }
+        html.dark .gomsn-login-page {
+            background: linear-gradient(180deg, #070a12 0%, #0b0f19 50%, #0f172a 100%);
         }
 
         /* =========================================================
-           HERO BACKDROP (MOBILE: TOP HALF | DESKTOP: LEFT CURVED HALF)
+           HERO BACKDROP (ADAPTIVE TO SELECTED THEME ACCENT)
            ========================================================= */
         .gomsn-hero-bg {
             position: absolute;
@@ -44,12 +51,10 @@
             right: 0;
             height: 54%;
             min-height: 340px;
-            background:
-                radial-gradient(circle at 86% 14%, rgba(25, 211, 197, 0.42) 0%, rgba(13, 148, 136, 0.16) 32%, transparent 62%),
-                radial-gradient(circle at 18% 18%, rgba(12, 92, 98, 0.55) 0%, transparent 55%),
-                linear-gradient(145deg, #032c33 0%, #05444c 42%, #08686d 78%, #0a7f82 100%);
+            background: var(--gomsn-header-bg, linear-gradient(145deg, #032c33 0%, #05444c 42%, #08686d 78%, #0a7f82 100%));
             z-index: 0;
             pointer-events: none;
+            transition: background 0.3s ease;
         }
 
         /* Subtle Top-Left Dot Matrix */
@@ -59,7 +64,7 @@
             left: 0;
             width: 240px;
             height: 220px;
-            background-image: radial-gradient(rgba(153, 246, 228, 0.32) 1.4px, transparent 1.4px);
+            background-image: radial-gradient(rgba(255, 255, 255, 0.35) 1.4px, transparent 1.4px);
             background-size: 16px 16px;
             mask-image: radial-gradient(ellipse at 10% 10%, black 15%, transparent 72%);
             -webkit-mask-image: radial-gradient(ellipse at 10% 10%, black 15%, transparent 72%);
@@ -72,8 +77,8 @@
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(125deg, transparent 22%, rgba(45, 212, 191, 0.08) 38%, rgba(20, 184, 166, 0.14) 50%, transparent 65%),
-                linear-gradient(155deg, transparent 48%, rgba(94, 234, 212, 0.08) 62%, transparent 76%);
+                linear-gradient(125deg, transparent 22%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.14) 50%, transparent 65%),
+                linear-gradient(155deg, transparent 48%, rgba(255, 255, 255, 0.08) 62%, transparent 76%);
             pointer-events: none;
         }
 
@@ -86,6 +91,7 @@
             height: 290px;
             opacity: 0.50;
             pointer-events: none;
+            transition: filter 0.3s ease;
         }
 
         /* Mid Wave Divider (Mobile/Tablet Horizontal) */
@@ -98,6 +104,7 @@
             width: calc(100% + 4px);
             height: 115px;
             pointer-events: none;
+            transition: filter 0.3s ease;
         }
 
         /* Mid Wave Divider (Desktop Vertical Organic Curve) */
@@ -110,6 +117,18 @@
             width: 150px;
             height: calc(100% + 4px);
             pointer-events: none;
+            transition: filter 0.3s ease;
+        }
+
+        /* Apply theme wave filter to SVGs for non-default accents */
+        html[data-accent]:not([data-accent="teal"]) .gomsn-globe,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-hero-beam,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-dot-grid,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mid-wave-mobile,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mid-wave-desktop,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-card-top-wave,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-footer-wave {
+            filter: var(--gomsn-sidebar-wave-filter);
         }
 
         /* Faint City Skyline Silhouettes on Lower Edges */
@@ -152,13 +171,20 @@
             background: #FFFFFF;
             border-radius: 26px;
             box-shadow:
-                0 24px 60px -16px rgba(4, 47, 54, 0.22),
-                0 6px 20px -6px rgba(4, 47, 54, 0.08),
-                0 0 0 1px rgba(15, 118, 110, 0.08);
+                0 24px 60px -16px rgba(0, 0, 0, 0.18),
+                0 6px 20px -6px rgba(0, 0, 0, 0.08),
+                0 0 0 1px var(--color-teal-200, rgba(15, 118, 110, 0.12));
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        html.dark .gomsn-card {
+            background: #0f172a;
+            box-shadow:
+                0 24px 60px -16px rgba(0, 0, 0, 0.65),
+                0 0 0 1px rgba(255, 255, 255, 0.08);
         }
 
-        /* Input Styling matching reference (clean single focus border + autofill fix) */
+        /* Input Styling matching theme */
         .gomsn-input {
             width: 100%;
             height: 45px;
@@ -173,11 +199,20 @@
             outline: none !important;
             -webkit-appearance: none;
         }
+        html.dark .gomsn-input {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #f8fafc;
+        }
         .gomsn-input:focus {
             background-color: #FFFFFF;
-            border-color: #0F8B8D;
-            box-shadow: 0 0 0 3px rgba(15, 139, 141, 0.16);
+            border-color: var(--gomsn-accent, #0F8B8D);
+            box-shadow: 0 0 0 3px var(--color-teal-200, rgba(15, 139, 141, 0.2));
             outline: none !important;
+        }
+        html.dark .gomsn-input:focus {
+            background-color: #1e293b;
+            border-color: var(--gomsn-accent, #0F8B8D);
         }
         .gomsn-input:-webkit-autofill,
         .gomsn-input:-webkit-autofill:hover,
@@ -186,12 +221,38 @@
             -webkit-text-fill-color: #0F2433 !important;
             transition: background-color 5000s ease-in-out 0s;
         }
+        html.dark .gomsn-input:-webkit-autofill,
+        html.dark .gomsn-input:-webkit-autofill:hover,
+        html.dark .gomsn-input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #1e293b inset !important;
+            -webkit-text-fill-color: #f8fafc !important;
+        }
         .gomsn-input:focus:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset, 0 0 0 3px rgba(15, 139, 141, 0.16) !important;
+            -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset, 0 0 0 3px var(--color-teal-200, rgba(15, 139, 141, 0.2)) !important;
+        }
+        html.dark .gomsn-input:focus:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px #1e293b inset, 0 0 0 3px var(--color-teal-200, rgba(15, 139, 141, 0.2)) !important;
         }
         .gomsn-input::placeholder {
             color: #8A9BAD;
             font-weight: 400;
+        }
+
+        /* Theme helper classes */
+        .gomsn-theme-text {
+            color: var(--gomsn-accent, #0b5e63) !important;
+            transition: color 0.3s ease;
+        }
+        .gomsn-theme-icon-bg {
+            background-color: var(--color-teal-50, #e3f7f5) !important;
+            transition: background-color 0.3s ease;
+        }
+        .gomsn-theme-icon-border {
+            border-color: var(--color-teal-200, #cdeee9) !important;
+            transition: border-color 0.3s ease;
+        }
+        .group:focus-within .gomsn-field-icon {
+            color: var(--gomsn-accent, #0b5e63) !important;
         }
 
         /* Custom Checkbox */
@@ -210,8 +271,8 @@
             flex-shrink: 0;
         }
         .gomsn-checkbox:checked {
-            background-color: #1A73E8;
-            border-color: #1A73E8;
+            background-color: var(--gomsn-accent, #1A73E8);
+            border-color: var(--gomsn-accent, #1A73E8);
         }
         .gomsn-checkbox:checked::before {
             content: "";
@@ -223,7 +284,7 @@
             background-position: center;
         }
         .gomsn-checkbox:focus-visible {
-            outline: 2px solid #1A73E8;
+            outline: 2px solid var(--gomsn-accent, #1A73E8);
             outline-offset: 2px;
         }
 
@@ -234,7 +295,7 @@
             height: 49px;
             padding: 0 20px;
             border-radius: 14px;
-            background: linear-gradient(90deg, #043239 0%, #075259 48%, #0b8a87 100%);
+            background: var(--gomsn-active-bg, linear-gradient(90deg, #043239 0%, #075259 48%, #0b8a87 100%));
             color: #FFFFFF;
             font-size: 15px;
             font-weight: 700;
@@ -244,18 +305,18 @@
             justify-content: center;
             gap: 10px;
             box-shadow:
-                0 12px 26px -6px rgba(6, 82, 89, 0.48),
-                inset 0 1px 0 rgba(255, 255, 255, 0.22);
+                0 12px 26px -6px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
             border: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
         }
         .gomsn-btn-submit:hover {
-            filter: brightness(1.07);
+            filter: brightness(1.08);
             transform: translateY(-1px);
             box-shadow:
-                0 16px 30px -6px rgba(6, 82, 89, 0.56),
-                inset 0 1px 0 rgba(255, 255, 255, 0.28);
+                0 16px 30px -6px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
         .gomsn-btn-submit:active {
             transform: translateY(0);
@@ -266,9 +327,9 @@
             height: 49px;
             flex-shrink: 0;
             border-radius: 14px;
-            background: #F1F8F8;
-            border: 1.5px solid rgba(11, 138, 135, 0.3);
-            color: #085E63;
+            background: var(--color-teal-50, #F1F8F8);
+            border: 1.5px solid var(--color-teal-200, rgba(11, 138, 135, 0.3));
+            color: var(--gomsn-accent, #085E63);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -276,8 +337,8 @@
             transition: all 0.2s ease;
         }
         .gomsn-btn-biometric:hover:not(:disabled) {
-            background: #E2F5F4;
-            border-color: #0B8A87;
+            background: var(--color-teal-100, #E2F5F4);
+            border-color: var(--gomsn-accent, #0B8A87);
             transform: translateY(-1px);
         }
         .gomsn-btn-biometric:disabled {
@@ -303,7 +364,6 @@
 
         /* =========================================================
            TABLET & DESKTOP RESPONSIVE (>= 1024px)
-           Two-column balanced layout fitting 100% in 1 viewport!
            ========================================================= */
         @media (min-width: 1024px) {
             .gomsn-hero-bg {
@@ -314,10 +374,7 @@
                 width: 55%;
                 height: 100%;
                 min-height: 100dvh;
-                background:
-                    radial-gradient(circle at 76% 24%, rgba(25, 211, 197, 0.34) 0%, rgba(13, 148, 136, 0.14) 36%, transparent 65%),
-                    radial-gradient(circle at 18% 20%, rgba(12, 92, 98, 0.52) 0%, transparent 55%),
-                    linear-gradient(155deg, #032b32 0%, #05444c 45%, #08686d 82%, #0a7f82 100%);
+                background: var(--gomsn-sidebar-bg, linear-gradient(155deg, #032b32 0%, #05444c 45%, #08686d 82%, #0a7f82 100%));
             }
             .gomsn-mid-wave-mobile {
                 display: none;
@@ -465,7 +522,99 @@
     }">
 
         <!-- ============================================================== -->
-        <!-- LAYER 1: DARK TEAL HERO BACKGROUND + GLOBE + ORGANIC WAVES     -->
+        <!-- FLOATING TOP-RIGHT THEME & DISPLAY SWITCHER                   -->
+        <!-- ============================================================== -->
+        <div class="absolute top-3 right-3 sm:top-4 sm:right-5 z-20 flex items-center gap-2 select-none"
+             x-data="{
+                dropdownOpen: false,
+                activeAccent: document.documentElement.getAttribute('data-accent') || 'teal',
+                isDark: document.documentElement.classList.contains('dark'),
+                themes: [
+                    { key: 'teal', name: 'Ocean Teal', color: '#0d9488' },
+                    { key: 'blue', name: 'Royal Blue', color: '#2563eb' },
+                    { key: 'indigo', name: 'Indigo', color: '#4f46e5' },
+                    { key: 'emerald', name: 'Emerald', color: '#059669' },
+                    { key: 'purple', name: 'Royal Purple', color: '#7c3aed' },
+                    { key: 'rose', name: 'Crimson Rose', color: '#e11d48' },
+                    { key: 'amber', name: 'Amber Gold', color: '#d97706' },
+                    { key: 'pink', name: 'Sakura Pink', color: '#ec4899' },
+                ],
+                setAccent(key) {
+                    this.activeAccent = key;
+                    if (typeof window.setGomsnAccent === 'function') {
+                        window.setGomsnAccent(key);
+                    }
+                    this.dropdownOpen = false;
+                },
+                toggleDark(e) {
+                    if (typeof window.toggleGomsnTheme === 'function') {
+                        window.toggleGomsnTheme(e);
+                        this.isDark = !this.isDark;
+                    }
+                }
+             }">
+            <!-- Theme Palette Dropdown -->
+            <div class="relative" @click.outside="dropdownOpen = false">
+                <button
+                    type="button"
+                    @click="dropdownOpen = !dropdownOpen"
+                    class="h-8 sm:h-9 px-2.5 sm:px-3 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/25 backdrop-blur-md text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                    title="Pilih Warna Tema">
+                    <span class="w-3.5 h-3.5 rounded-full border border-white/50 shadow-2xs shrink-0"
+                          :style="'background-color: var(--gomsn-accent, #0d9488)'"></span>
+                    <span class="hidden sm:inline text-[11px] font-semibold text-white/90">Tema</span>
+                    <svg class="w-3.5 h-3.5 text-white/80 transition-transform duration-200" :class="dropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="dropdownOpen"
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                     class="absolute right-0 mt-2 w-48 py-1.5 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 z-30">
+                    <div class="px-3 py-1 text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">
+                        Pilih Warna Tema
+                    </div>
+                    <template x-for="t in themes" :key="t.key">
+                        <button
+                            type="button"
+                            @click="setAccent(t.key)"
+                            class="w-full flex items-center justify-between px-3 py-1.5 text-xs text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-pointer"
+                            :class="activeAccent === t.key ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300'">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full shrink-0" :style="'background-color: ' + t.color"></span>
+                                <span x-text="t.name"></span>
+                            </div>
+                            <svg x-show="activeAccent === t.key" class="w-3.5 h-3.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Light / Dark Mode Toggle Button -->
+            <button
+                type="button"
+                @click="toggleDark($event)"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 border border-white/25 backdrop-blur-md text-white flex items-center justify-center shadow-sm transition-all cursor-pointer"
+                :title="isDark ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'">
+                <svg x-show="!isDark" class="w-4 h-4 text-amber-200" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                </svg>
+                <svg x-show="isDark" x-cloak class="w-4 h-4 text-sky-200" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- LAYER 1: THEMED HERO BACKGROUND + GLOBE + ORGANIC WAVES        -->
         <!-- ============================================================== -->
         <div class="gomsn-hero-bg">
             <div class="gomsn-dot-grid"></div>
@@ -579,18 +728,18 @@
                 </div>
 
                 <!-- Italic Tagline -->
-                <p class="mt-1.5 lg:mt-2.5 text-[12.5px] sm:text-[13.5px] lg:text-[15px] italic text-teal-50/90 font-normal tracking-wide max-w-md mx-auto">
+                <p class="mt-1.5 lg:mt-2.5 text-[12.5px] sm:text-[13.5px] lg:text-[15px] italic text-white/95 font-normal tracking-wide max-w-md mx-auto">
                     Melayani dengan Solusi, Terhubung untuk Masa Depan
                 </p>
 
                 <!-- Desktop-only Subtle System Pill -->
-                <div class="hidden lg:inline-flex items-center gap-2 mt-6 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-xs text-[12px] text-teal-100/90 font-medium">
+                <div class="hidden lg:inline-flex items-center gap-2 mt-6 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-xs text-[12px] text-white/95 font-medium">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span>Portal Operasional &amp; HRIS Terpadu</span>
                 </div>
 
                 <!-- Desktop-only Copyright under Pill Badge -->
-                <p class="hidden lg:block mt-3.5 text-[12px] text-teal-100/80 font-normal tracking-wide">
+                <p class="hidden lg:block mt-3.5 text-[12px] text-white/75 font-normal tracking-wide">
                     &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
                 </p>
             </div>
@@ -598,8 +747,8 @@
             <!-- Floating White Login Card (Bottom on Mobile, Right Column on Desktop) -->
             <div class="w-full lg:w-[50%] flex justify-center lg:justify-end shrink-0">
                 <div class="gomsn-card">
-                    <!-- Signature Top Curved Teal Wave Ribbon inside Card -->
-                    <div class="relative w-full h-9 sm:h-11 overflow-hidden pointer-events-none select-none">
+                    <!-- Signature Top Curved Wave Ribbon inside Card -->
+                    <div class="relative w-full h-9 sm:h-11 overflow-hidden pointer-events-none select-none gomsn-card-top-wave">
                         <svg class="w-full h-full block" viewBox="0 0 460 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <defs>
                                 <linearGradient id="cardTopWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -622,31 +771,31 @@
                     <div class="px-6 sm:px-8 pb-5 sm:pb-6 -mt-3 relative z-10">
                         <!-- Lock Icon Badge with subtle side lines -->
                         <div class="flex items-center justify-center gap-4 mb-2.5">
-                            <span class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200"></span>
-                            <div class="w-11 h-11 rounded-full bg-[#e3f7f5] border border-[#cdeee9] flex items-center justify-center shadow-2xs shrink-0">
-                                <svg class="w-5 h-5 text-[#0b5e63]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <span class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200 dark:via-slate-700 dark:to-slate-700"></span>
+                            <div class="w-11 h-11 rounded-full gomsn-theme-icon-bg gomsn-theme-icon-border border flex items-center justify-center shadow-2xs shrink-0">
+                                <svg class="w-5 h-5 gomsn-theme-text" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <rect x="5" y="11" width="14" height="10" rx="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
                                     <circle cx="12" cy="16" r="1.2" fill="currentColor" stroke="none"/>
                                 </svg>
                             </div>
-                            <span class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200"></span>
+                            <span class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200 dark:via-slate-700 dark:to-slate-700"></span>
                         </div>
 
                         <!-- Card Heading -->
                         <div class="text-center mb-4">
-                            <h2 style="color: #0b2333 !important;" class="font-heading text-[23px] sm:text-[26px] font-extrabold text-[#0b2333] tracking-tight leading-tight">
+                            <h2 style="color: #0b2333 !important;" class="font-heading text-[23px] sm:text-[26px] font-extrabold text-[#0b2333] dark:text-white tracking-tight leading-tight">
                                 Masuk ke Akun
                             </h2>
-                            <p style="color: #64748b !important;" class="text-[12.5px] sm:text-[13px] text-slate-500 mt-1">
+                            <p style="color: #64748b !important;" class="text-[12.5px] sm:text-[13px] text-slate-500 dark:text-slate-400 mt-1">
                                 Silakan login untuk mengakses layanan GOMSN
                             </p>
                         </div>
 
                         <!-- Status / Error Alerts -->
                         @if (session('status'))
-                        <div class="mb-3 p-2.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-900 text-xs flex items-center gap-2">
-                            <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="mb-3 p-2.5 rounded-xl border text-xs flex items-center gap-2" style="background-color: var(--color-teal-50, #f0fdfa); border-color: var(--color-teal-200, #99f6e4); color: var(--color-teal-900, #134e4a);">
+                            <svg class="w-4 h-4 gomsn-theme-text shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
                             <span>{{ session('status') }}</span>
@@ -689,14 +838,14 @@
 
                             <!-- Field 1: Username -->
                             <div>
-                                <label for="identifier" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
-                                    <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <label for="identifier" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] dark:text-slate-200 mb-1.5">
+                                    <svg class="w-4 h-4 gomsn-theme-text shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                     </svg>
                                     <span>Username</span>
                                 </label>
                                 <div class="relative flex items-center group">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0e7478]/85 group-focus-within:text-[#0b5e63] transition-colors">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:gomsn-theme-text transition-colors">
                                         <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                         </svg>
@@ -716,14 +865,14 @@
 
                             <!-- Field 2: Kata Sandi (Password) -->
                             <div>
-                                <label for="password" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] mb-1.5">
-                                    <svg class="w-4 h-4 text-[#0e7478] shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <label for="password" class="flex items-center gap-2 text-[13px] font-bold text-[#0f2937] dark:text-slate-200 mb-1.5">
+                                    <svg class="w-4 h-4 gomsn-theme-text shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
                                     </svg>
                                     <span>Kata Sandi (Password)</span>
                                 </label>
                                 <div class="relative flex items-center group">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#0b5e63] transition-colors">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:gomsn-theme-text transition-colors">
                                         <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <rect x="5" y="11" width="14" height="10" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
                                             <path d="M8 11V7a4 4 0 118 0v4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -742,7 +891,7 @@
                                     <button
                                         type="button"
                                         @click="showPw = !showPw"
-                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-[#0b5e63] cursor-pointer focus:outline-none transition-colors"
+                                        class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:gomsn-theme-text cursor-pointer focus:outline-none transition-colors"
                                         title="Tampilkan / Sembunyikan kata sandi"
                                         tabindex="-1"
                                     >
@@ -806,7 +955,7 @@
         <footer class="relative z-10 w-full select-none lg:hidden mt-auto shrink-0">
             <!-- Smooth Wave Transition Header -->
             <div class="w-full h-10 sm:h-12 overflow-hidden leading-none pointer-events-none -mb-[1px]">
-                <svg class="w-full h-full block" viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <svg class="w-full h-full block gomsn-footer-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <defs>
                         <linearGradient id="footerDarkWave" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stop-color="#03262c" />
@@ -822,9 +971,9 @@
                     <path d="M0,38 C380,84 720,86 1060,46 C1240,26 1360,24 1440,32 L1440,90 L0,90 Z" fill="url(#footerDarkWave)" />
                 </svg>
             </div>
-            <!-- Solid Dark Teal Base with Centered Copyright -->
-            <div class="bg-[#043239] pt-1 pb-3.5 sm:pb-4 px-4 text-center" style="padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));">
-                <p class="text-[11px] sm:text-xs text-teal-100/90 font-normal tracking-wide">
+            <!-- Base with Centered Copyright -->
+            <div class="gomsn-footer-base pt-1 pb-3.5 sm:pb-4 px-4 text-center transition-colors" style="background: var(--gomsn-header-bg, #043239); padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));">
+                <p class="text-[11px] sm:text-xs text-white/85 font-normal tracking-wide">
                     &copy; {{ date('Y') }} PT. Media Solusi Network. All Rights Reserved.
                 </p>
             </div>
