@@ -3,9 +3,148 @@
         window.__gomsnUserSettingsConfig = @json([
             'userId' => auth()->id(),
             'initialPrefs' => $notificationPreferences,
-            'savePrefsUrl' => route('api.fcm.preferences.update'),
+            'savePrefsUrl' => route('api.fcm.preferences.update', [], false),
             'csrfToken' => csrf_token(),
         ]);
+
+        function userSettingsPage() {
+            const config = window.__gomsnUserSettingsConfig || {};
+            return {
+                isDark: document.documentElement.classList.contains('dark'),
+                activeAccent: document.documentElement.getAttribute('data-accent') || 'teal',
+                accentThemes: [
+                    { name: 'teal', label: 'Ocean Teal', desc: 'Default GoMSN', hex: '#0d9488', soft: '#f0fdfa', gradient: 'linear-gradient(135deg, #0a525f 0%, #0d9488 100%)' },
+                    { name: 'blue', label: 'Royal Blue', desc: 'Biru Profesional', hex: '#2563eb', soft: '#eff6ff', gradient: 'linear-gradient(135deg, #102a63 0%, #2563eb 100%)' },
+                    { name: 'indigo', label: 'Indigo', desc: 'Navy Elegan', hex: '#4f46e5', soft: '#eef2ff', gradient: 'linear-gradient(135deg, #1f1b5c 0%, #4f46e5 100%)' },
+                    { name: 'emerald', label: 'Emerald', desc: 'Hijau Segar', hex: '#059669', soft: '#ecfdf5', gradient: 'linear-gradient(135deg, #064230 0%, #059669 100%)' },
+                    { name: 'purple', label: 'Royal Purple', desc: 'Ungu Modern', hex: '#7c3aed', soft: '#faf5ff', gradient: 'linear-gradient(135deg, #311761 0%, #7c3aed 100%)' },
+                    { name: 'rose', label: 'Crimson Rose', desc: 'Merah Berani', hex: '#e11d48', soft: '#fff1f2', gradient: 'linear-gradient(135deg, #570e22 0%, #e11d48 100%)' },
+                    { name: 'amber', label: 'Amber Gold', desc: 'Emas Hangat', hex: '#d97706', soft: '#fffbeb', gradient: 'linear-gradient(135deg, #542807 0%, #d97706 100%)' },
+                    { name: 'slate', label: 'Midnight Slate', desc: 'Gelap Minimalis', hex: '#334155', soft: '#f1f5f9', gradient: 'linear-gradient(135deg, #0f172a 0%, #475569 100%)' },
+                ],
+                prefs: {
+                    notify_pengajuan: !!(config.initialPrefs && config.initialPrefs.notify_pengajuan),
+                    notify_lembur: !!(config.initialPrefs && config.initialPrefs.notify_lembur),
+                    notify_tiket: !!(config.initialPrefs && config.initialPrefs.notify_tiket),
+                    notify_absen: !!(config.initialPrefs && config.initialPrefs.notify_absen),
+                },
+                savingPrefs: false,
+                savedNotice: false,
+                saveError: '',
+                hasCustomMobileMenu: false,
+                mobileStorageKey: 'gomsn_mobile_menu_user_' + (config.userId || 0),
+
+                init() {
+                    this.checkMobileMenuStorage();
+                    window.addEventListener('gomsn-theme-changed', (e) => {
+                        this.isDark = !!(e.detail && e.detail.dark);
+                    });
+                    window.addEventListener('gomsn-accent-changed', (e) => {
+                        if (e.detail && e.detail.accent) {
+                            this.activeAccent = e.detail.accent;
+                        }
+                    });
+                },
+
+                getActiveAccentObj() {
+                    return this.accentThemes.find(t => t.name === this.activeAccent) || this.accentThemes[0];
+                },
+
+                setAccent(name) {
+                    this.activeAccent = name;
+                    if (typeof window.setGomsnAccent === 'function') {
+                        window.setGomsnAccent(name);
+                    }
+                    if (window.Toast) {
+                        const obj = this.getActiveAccentObj();
+                        window.Toast.fire({ icon: 'success', title: 'Warna tema diubah ke ' + obj.label });
+                    }
+                },
+
+                checkMobileMenuStorage() {
+                    try {
+                        this.hasCustomMobileMenu = !!localStorage.getItem(this.mobileStorageKey);
+                    } catch (e) {
+                        this.hasCustomMobileMenu = false;
+                    }
+                },
+
+                setTheme(mode, event) {
+                    const targetDark = mode === 'dark';
+                    if (this.isDark === targetDark) return;
+                    if (typeof window.toggleGomsnTheme === 'function') {
+                        window.toggleGomsnTheme(event);
+                    } else {
+                        document.documentElement.classList.toggle('dark', targetDark);
+                        try { localStorage.setItem('gomsn_theme', mode); } catch (e) {}
+                        this.isDark = targetDark;
+                    }
+                },
+
+                async togglePref(key) {
+                    if (this.savingPrefs) return;
+                    const prev = !!this.prefs[key];
+                    this.prefs[key] = !prev;
+                    this.savingPrefs = true;
+                    this.savedNotice = false;
+                    this.saveError = '';
+
+                    try {
+                        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                        const csrf = (csrfMeta && csrfMeta.getAttribute('content')) || config.csrfToken || '';
+                        const res = await fetch(config.savePrefsUrl || '/api/fcm/preferences', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrf
+                            },
+                            body: JSON.stringify({
+                                notify_pengajuan: !!this.prefs.notify_pengajuan,
+                                notify_lembur: !!this.prefs.notify_lembur,
+                                notify_tiket: !!this.prefs.notify_tiket,
+                                notify_absen: !!this.prefs.notify_absen,
+                            })
+                        });
+                        if (!res.ok) {
+                            throw new Error('HTTP ' + res.status);
+                        }
+                        const data = await res.json();
+                        if (data && data.preferences) {
+                            this.prefs.notify_pengajuan = !!data.preferences.notify_pengajuan;
+                            this.prefs.notify_lembur = !!data.preferences.notify_lembur;
+                            this.prefs.notify_tiket = !!data.preferences.notify_tiket;
+                            this.prefs.notify_absen = !!data.preferences.notify_absen;
+                        }
+                        this.savedNotice = true;
+                        setTimeout(() => { this.savedNotice = false; }, 2200);
+                    } catch (err) {
+                        this.prefs[key] = prev;
+                        this.saveError = 'Gagal menyimpan (' + (err.message || 'error') + ')';
+                        if (window.Toast) {
+                            window.Toast.fire({ icon: 'error', title: 'Gagal menyimpan pengaturan notifikasi.' });
+                        }
+                    } finally {
+                        this.savingPrefs = false;
+                    }
+                },
+
+                resetMobileMenu() {
+                    if (!this.hasCustomMobileMenu) return;
+                    if (confirm('Kembalikan urutan, judul grup, nama, dan warna menu mobile Anda ke default?')) {
+                        try {
+                            localStorage.removeItem(this.mobileStorageKey);
+                            this.hasCustomMobileMenu = false;
+                            if (window.Toast) {
+                                window.Toast.fire({ icon: 'success', title: 'Susunan menu mobile berhasil dikembalikan ke default.' });
+                            }
+                        } catch (e) {}
+                    }
+                }
+            };
+        }
     </script>
 
     <div class="space-y-5 w-full pb-20"
@@ -156,8 +295,11 @@
                         <p class="text-[11px] text-slate-500">Pilih jenis pemberitahuan push yang ingin Anda terima</p>
                     </div>
                 </div>
-                <span x-show="savingPrefs" x-cloak class="text-[11px] font-semibold text-teal-600">Menyimpan...</span>
-                <span x-show="savedNotice && !savingPrefs" x-cloak class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">Tersimpan</span>
+                <div class="flex items-center gap-2 shrink-0">
+                    <span x-show="saveError" x-cloak class="text-[11px] font-semibold text-rose-600" x-text="saveError"></span>
+                    <span x-show="savingPrefs" x-cloak class="text-[11px] font-semibold text-teal-600">Menyimpan...</span>
+                    <span x-show="savedNotice && !savingPrefs" x-cloak class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">Tersimpan</span>
+                </div>
             </div>
 
             <div class="divide-y divide-slate-100">
@@ -170,10 +312,10 @@
                     <button type="button"
                             @click="togglePref('notify_pengajuan')"
                             :aria-pressed="prefs.notify_pengajuan"
-                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200"
-                            :style="prefs.notify_pengajuan ? `background: ${getActiveAccentObj().hex};` : 'background: #cbd5e1;'">
-                        <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition duration-200"
-                              :style="prefs.notify_pengajuan ? 'transform: translateX(20px);' : 'transform: translateX(0px);'"></span>
+                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
+                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_pengajuan ? getActiveAccentObj().hex : '#cbd5e1'};`">
+                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
+                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_pengajuan ? '20px' : '0px'});`"></span>
                     </button>
                 </div>
 
@@ -186,10 +328,10 @@
                     <button type="button"
                             @click="togglePref('notify_lembur')"
                             :aria-pressed="prefs.notify_lembur"
-                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200"
-                            :style="prefs.notify_lembur ? `background: ${getActiveAccentObj().hex};` : 'background: #cbd5e1;'">
-                        <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition duration-200"
-                              :style="prefs.notify_lembur ? 'transform: translateX(20px);' : 'transform: translateX(0px);'"></span>
+                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
+                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_lembur ? getActiveAccentObj().hex : '#cbd5e1'};`">
+                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
+                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_lembur ? '20px' : '0px'});`"></span>
                     </button>
                 </div>
 
@@ -202,10 +344,10 @@
                     <button type="button"
                             @click="togglePref('notify_tiket')"
                             :aria-pressed="prefs.notify_tiket"
-                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200"
-                            :style="prefs.notify_tiket ? `background: ${getActiveAccentObj().hex};` : 'background: #cbd5e1;'">
-                        <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition duration-200"
-                              :style="prefs.notify_tiket ? 'transform: translateX(20px);' : 'transform: translateX(0px);'"></span>
+                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
+                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_tiket ? getActiveAccentObj().hex : '#cbd5e1'};`">
+                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
+                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_tiket ? '20px' : '0px'});`"></span>
                     </button>
                 </div>
 
@@ -218,10 +360,10 @@
                     <button type="button"
                             @click="togglePref('notify_absen')"
                             :aria-pressed="prefs.notify_absen"
-                            class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200"
-                            :style="prefs.notify_absen ? `background: ${getActiveAccentObj().hex};` : 'background: #cbd5e1;'">
-                        <span class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition duration-200"
-                              :style="prefs.notify_absen ? 'transform: translateX(20px);' : 'transform: translateX(0px);'"></span>
+                            class="relative inline-flex shrink-0 cursor-pointer rounded-full transition-colors duration-200 items-center"
+                            :style="`width: 44px; height: 24px; padding: 2px; border: none; background: ${prefs.notify_absen ? getActiveAccentObj().hex : '#cbd5e1'};`">
+                        <span class="pointer-events-none block rounded-full bg-white shadow-sm transition-transform duration-200"
+                              :style="`width: 20px; height: 20px; transform: translateX(${prefs.notify_absen ? '20px' : '0px'});`"></span>
                     </button>
                 </div>
             </div>
@@ -287,123 +429,4 @@
         </div>
 
     </div>
-
-    <script>
-        function userSettingsPage() {
-            const config = window.__gomsnUserSettingsConfig || {};
-            return {
-                isDark: document.documentElement.classList.contains('dark'),
-                activeAccent: document.documentElement.getAttribute('data-accent') || 'teal',
-                accentThemes: [
-                    { name: 'teal', label: 'Ocean Teal', desc: 'Default GoMSN', hex: '#0d9488', soft: '#f0fdfa', gradient: 'linear-gradient(135deg, #0a525f 0%, #0d9488 100%)' },
-                    { name: 'blue', label: 'Royal Blue', desc: 'Biru Profesional', hex: '#2563eb', soft: '#eff6ff', gradient: 'linear-gradient(135deg, #102a63 0%, #2563eb 100%)' },
-                    { name: 'indigo', label: 'Indigo', desc: 'Navy Elegan', hex: '#4f46e5', soft: '#eef2ff', gradient: 'linear-gradient(135deg, #1f1b5c 0%, #4f46e5 100%)' },
-                    { name: 'emerald', label: 'Emerald', desc: 'Hijau Segar', hex: '#059669', soft: '#ecfdf5', gradient: 'linear-gradient(135deg, #064230 0%, #059669 100%)' },
-                    { name: 'purple', label: 'Royal Purple', desc: 'Ungu Modern', hex: '#7c3aed', soft: '#faf5ff', gradient: 'linear-gradient(135deg, #311761 0%, #7c3aed 100%)' },
-                    { name: 'rose', label: 'Crimson Rose', desc: 'Merah Berani', hex: '#e11d48', soft: '#fff1f2', gradient: 'linear-gradient(135deg, #570e22 0%, #e11d48 100%)' },
-                    { name: 'amber', label: 'Amber Gold', desc: 'Emas Hangat', hex: '#d97706', soft: '#fffbeb', gradient: 'linear-gradient(135deg, #542807 0%, #d97706 100%)' },
-                    { name: 'slate', label: 'Midnight Slate', desc: 'Gelap Minimalis', hex: '#334155', soft: '#f1f5f9', gradient: 'linear-gradient(135deg, #0f172a 0%, #475569 100%)' },
-                ],
-                prefs: Object.assign({
-                    notify_pengajuan: true,
-                    notify_lembur: true,
-                    notify_tiket: true,
-                    notify_absen: true,
-                }, config.initialPrefs || {}),
-                savingPrefs: false,
-                savedNotice: false,
-                hasCustomMobileMenu: false,
-                mobileStorageKey: 'gomsn_mobile_menu_user_' + (config.userId || 0),
-
-                init() {
-                    this.checkMobileMenuStorage();
-                    window.addEventListener('gomsn-theme-changed', (e) => {
-                        this.isDark = !!(e.detail && e.detail.dark);
-                    });
-                    window.addEventListener('gomsn-accent-changed', (e) => {
-                        if (e.detail && e.detail.accent) {
-                            this.activeAccent = e.detail.accent;
-                        }
-                    });
-                },
-
-                getActiveAccentObj() {
-                    return this.accentThemes.find(t => t.name === this.activeAccent) || this.accentThemes[0];
-                },
-
-                setAccent(name) {
-                    this.activeAccent = name;
-                    if (typeof window.setGomsnAccent === 'function') {
-                        window.setGomsnAccent(name);
-                    }
-                    if (window.Toast) {
-                        const obj = this.getActiveAccentObj();
-                        window.Toast.fire({ icon: 'success', title: 'Warna tema diubah ke ' + obj.label });
-                    }
-                },
-
-                checkMobileMenuStorage() {
-                    try {
-                        this.hasCustomMobileMenu = !!localStorage.getItem(this.mobileStorageKey);
-                    } catch (e) {
-                        this.hasCustomMobileMenu = false;
-                    }
-                },
-
-                setTheme(mode, event) {
-                    const targetDark = mode === 'dark';
-                    if (this.isDark === targetDark) return;
-                    if (typeof window.toggleGomsnTheme === 'function') {
-                        window.toggleGomsnTheme(event);
-                    } else {
-                        document.documentElement.classList.toggle('dark', targetDark);
-                        try { localStorage.setItem('gomsn_theme', mode); } catch (e) {}
-                        this.isDark = targetDark;
-                    }
-                },
-
-                async togglePref(key) {
-                    const prev = this.prefs[key];
-                    this.prefs[key] = !prev;
-                    this.savingPrefs = true;
-                    this.savedNotice = false;
-
-                    try {
-                        const res = await fetch(config.savePrefsUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': config.csrfToken
-                            },
-                            body: JSON.stringify(this.prefs)
-                        });
-                        if (!res.ok) throw new Error('Gagal menyimpan preferensi');
-                        this.savedNotice = true;
-                        setTimeout(() => { this.savedNotice = false; }, 2200);
-                    } catch (err) {
-                        this.prefs[key] = prev;
-                        if (window.Toast) {
-                            window.Toast.fire({ icon: 'error', title: 'Gagal menyimpan pengaturan notifikasi.' });
-                        }
-                    } finally {
-                        this.savingPrefs = false;
-                    }
-                },
-
-                resetMobileMenu() {
-                    if (!this.hasCustomMobileMenu) return;
-                    if (confirm('Kembalikan urutan, judul grup, nama, dan warna menu mobile Anda ke default?')) {
-                        try {
-                            localStorage.removeItem(this.mobileStorageKey);
-                            this.hasCustomMobileMenu = false;
-                            if (window.Toast) {
-                                window.Toast.fire({ icon: 'success', title: 'Susunan menu mobile berhasil dikembalikan ke default.' });
-                            }
-                        } catch (e) {}
-                    }
-                }
-            };
-        }
-    </script>
 </x-layouts.app>
