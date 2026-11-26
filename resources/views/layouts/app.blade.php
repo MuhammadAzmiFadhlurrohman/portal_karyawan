@@ -48,8 +48,8 @@
 
         window.syncGomsnInlineAccent = function(accent) {
             var current = accent || document.documentElement.getAttribute('data-accent') || 'teal';
-            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b'];
-            var buttonHexes = ['#18c4c4', '#0d9488', '#0f766e', '#155e63', '#115e59'];
+            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b', '#094747', '#0d5f5f', '#093c40', '#06404d', '#0e6774', '#084c57', '#0c5a68', '#0a4247', '#05282c'];
+            var buttonHexes = ['#18c4c4', '#0d9488', '#0f766e', '#155e63', '#115e59', '#029990', '#038078', '#015c57'];
             var els = document.querySelectorAll('[style*="background"]');
             for (var i = 0; i < els.length; i++) {
                 var el = els[i];
@@ -338,8 +338,69 @@
             color: var(--gomsn-accent) !important;
         }
         html[data-accent]:not([data-accent="teal"]) .bg-\[\#155E63\],
-        html[data-accent]:not([data-accent="teal"]) .bg-\[\#0f766e\] {
+        html[data-accent]:not([data-accent="teal"]) .bg-\[\#0f766e\],
+        html[data-accent]:not([data-accent="teal"]) .hover\:bg-\[\#114b4f\]:hover {
             background-color: var(--gomsn-accent) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) #desktop-sidebar .bg-gradient-to-tr,
+        html[data-accent]:not([data-accent="teal"]) .from-\[\#18C4C4\],
+        html[data-accent]:not([data-accent="teal"]) .from-\[\#093c40\] {
+            background: var(--gomsn-active-bg) !important;
+        }
+
+        /* Dashboard Hero Banner (.hh) mengikuti tema warna aplikasi */
+        html[data-accent]:not([data-accent="teal"]) .hh {
+            background: var(--gomsn-header-bg) !important;
+            border-color: rgba(255, 255, 255, 0.16) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-circle-layer {
+            background: var(--gomsn-orb-bg) !important;
+            box-shadow: 0 0 48px -8px rgba(0, 0, 0, 0.45), inset 0 2px 22px rgba(255, 255, 255, 0.28) !important;
+            border-color: rgba(255, 255, 255, 0.28) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-cta {
+            background: var(--gomsn-active-bg) !important;
+            border-color: rgba(255, 255, 255, 0.35) !important;
+            box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-name .b {
+            background: linear-gradient(110deg, #ffffff 0%, var(--gomsn-accent-light) 55%, #ffffff 100%) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-glow1,
+        html[data-accent]:not([data-accent="teal"]) .hh-glow2,
+        html[data-accent]:not([data-accent="teal"]) .hh-bg-svg,
+        html[data-accent]:not([data-accent="teal"]) .hh-rim,
+        html[data-accent]:not([data-accent="teal"]) .hh-circle-ring,
+        html[data-accent]:not([data-accent="teal"]) .hh-arc-overlay {
+            filter: var(--gomsn-sidebar-wave-filter) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-hello-line,
+        html[data-accent]:not([data-accent="teal"]) .hh-date-dot {
+            background: var(--gomsn-accent-light) !important;
+            box-shadow: 0 0 8px var(--gomsn-accent-light) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-pill svg {
+            color: var(--gomsn-accent-light) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .hh-date,
+        html[data-accent]:not([data-accent="teal"]) .hh-pill,
+        html[data-accent]:not([data-accent="teal"]) .hh-check {
+            background: rgba(15, 23, 42, 0.55) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            color: #f8fafc !important;
+        }
+
+        /* Floating Chatbot Tab & Header mengikuti tema warna aplikasi */
+        html[data-accent]:not([data-accent="teal"]) .chatbot-docked-tab,
+        html[data-accent]:not([data-accent="teal"]) .chatbot-header {
+            background: var(--gomsn-header-bg) !important;
+            border-color: rgba(255, 255, 255, 0.22) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .chatbot-send-btn {
+            background: var(--gomsn-active-bg) !important;
         }
         ::view-transition-old(desktop-sidebar),
         ::view-transition-new(desktop-sidebar) {
