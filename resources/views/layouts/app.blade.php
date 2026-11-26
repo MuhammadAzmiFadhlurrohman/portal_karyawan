@@ -48,19 +48,21 @@
 
         window.syncGomsnInlineAccent = function(accent) {
             var current = accent || document.documentElement.getAttribute('data-accent') || 'teal';
-            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b', '#094747', '#0d5f5f', '#093c40', '#06404d', '#0e6774', '#084c57', '#0c5a68', '#0a4247', '#05282c'];
-            var buttonHexes = ['#18c4c4', '#0d9488', '#0f766e', '#155e63', '#115e59', '#029990', '#038078', '#015c57'];
+            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b', '#094747', '#0d5f5f', '#093c40', '#06404d', '#0e6774', '#084c57', '#0c5a68', '#0a4247', '#05282c', 'rgb(2, 40, 54)', 'rgb(5, 59, 71)', 'rgb(10, 82, 95)', 'rgb(7, 56, 60)', 'rgb(7, 51, 55)', 'rgb(15, 76, 92)', 'rgb(0, 127, 140)', 'rgb(9, 71, 71)', 'rgb(13, 95, 95)', 'rgb(9, 60, 64)'];
+            var buttonHexes = ['#18c4c4', '#0d9488', '#0f766e', '#155e63', '#115e59', '#029990', '#038078', '#015c57', 'rgb(24, 196, 196)', 'rgb(13, 148, 136)', 'rgb(15, 118, 110)', 'rgb(21, 94, 99)'];
             var els = document.querySelectorAll('[style*="background"]');
             for (var i = 0; i < els.length; i++) {
                 var el = els[i];
-                if (el.id === 'desktop-sidebar' || el.classList.contains('gomsn-home-orb') || el.closest('[data-accent-swatch="true"]')) continue;
+                if (el.id === 'desktop-sidebar' || el.classList.contains('gomsn-home-orb') || el.closest('[data-accent-swatch="true"]') || el.hasAttribute('data-gomsn-no-accent')) continue;
                 var orig = el.getAttribute('data-gomsn-orig-bg');
                 if (orig === null) {
-                    var rawStyle = (el.getAttribute('style') || '').toLowerCase();
-                    var isHeader = headerHexes.some(function(h) { return rawStyle.indexOf(h) !== -1; });
-                    var isBtn = !isHeader && buttonHexes.some(function(h) { return rawStyle.indexOf(h) !== -1; });
+                    // Hanya periksa properti background-nya saja (BUKAN color/border agar ikon badge tidak ketimpa!)
+                    var bgOnly = (el.style.background || el.style.backgroundImage || el.style.backgroundColor || '').toLowerCase();
+                    if (!bgOnly) continue;
+                    var isHeader = headerHexes.some(function(h) { return bgOnly.indexOf(h) !== -1; });
+                    var isBtn = !isHeader && buttonHexes.some(function(h) { return bgOnly.indexOf(h) !== -1; });
                     if (!isHeader && !isBtn) continue;
-                    el.setAttribute('data-gomsn-orig-bg', el.style.background || el.style.backgroundImage || '');
+                    el.setAttribute('data-gomsn-orig-bg', el.style.background || el.style.backgroundImage || el.style.backgroundColor || '');
                     el.setAttribute('data-gomsn-bg-role', isHeader ? 'header' : 'active');
                 }
                 var role = el.getAttribute('data-gomsn-bg-role');

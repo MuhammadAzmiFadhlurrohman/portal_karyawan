@@ -201,8 +201,12 @@
                             @click="setAccent(item.name)"
                             class="p-3.5 rounded-2xl border-2 text-left transition-all flex items-center gap-3 cursor-pointer"
                             :style="activeAccent === item.name
-                                ? `border-color: ${item.hex}; background: ${item.soft}; box-shadow: 0 4px 12px ${item.hex}22;`
-                                : 'border-color: #e2e8f0; background: #ffffff;'">
+                                ? (isDark
+                                    ? `border-color: ${item.hex}; background: ${item.hex}26; box-shadow: 0 4px 14px ${item.hex}30;`
+                                    : `border-color: ${item.hex}; background: ${item.soft}; box-shadow: 0 4px 12px ${item.hex}22;`)
+                                : (isDark
+                                    ? 'border-color: rgba(148, 163, 184, 0.2); background: rgba(15, 23, 42, 0.5);'
+                                    : 'border-color: #e2e8f0; background: #ffffff;')">
                         <div class="w-9 h-9 rounded-xl shrink-0 flex items-center justify-center text-white shadow-sm"
                              :style="`background: ${item.gradient};`">
                             <svg x-show="activeAccent === item.name" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
@@ -210,8 +214,12 @@
                             </svg>
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs font-bold text-slate-800 truncate" x-text="item.label"></div>
-                            <div class="text-[10px] text-slate-500 truncate mt-0.5" x-text="item.desc"></div>
+                            <div class="text-xs font-bold truncate"
+                                 :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'"
+                                 x-text="item.label"></div>
+                            <div class="text-[10px] truncate mt-0.5"
+                                 :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'"
+                                 x-text="item.desc"></div>
                         </div>
                     </button>
                 </template>
@@ -237,12 +245,14 @@
                       x-text="isDark ? 'Mode Gelap' : 'Mode Terang'"></span>
             </div>
 
-            <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3" data-accent-swatch="true">
                 <!-- Pilihan Mode Terang -->
                 <button type="button"
                         @click="setTheme('light', $event)"
                         class="p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between gap-3 cursor-pointer"
-                        :style="!isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().soft};` : 'border-color: #e2e8f0; background: #ffffff;'">
+                        :style="!isDark
+                            ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().soft};`
+                            : 'border-color: rgba(148, 163, 184, 0.2); background: rgba(15, 23, 42, 0.5);'">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-500 flex items-center justify-center shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -250,12 +260,12 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-slate-800">Mode Terang (Light)</div>
-                            <div class="text-[11px] text-slate-500 mt-0.5">Cerahkan layar untuk penggunaan siang hari</div>
+                            <div class="text-xs font-bold" :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'">Mode Terang (Light)</div>
+                            <div class="text-[11px] mt-0.5" :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'">Cerahkan layar untuk penggunaan siang hari</div>
                         </div>
                     </div>
                     <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-white"
-                         :style="!isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex};` : 'border-color: #cbd5e1;'">
+                         :style="!isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex};` : 'border-color: #64748b;'">
                         <svg x-show="!isDark" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     </div>
                 </button>
@@ -264,7 +274,9 @@
                 <button type="button"
                         @click="setTheme('dark', $event)"
                         class="p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between gap-3 cursor-pointer"
-                        :style="isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().soft};` : 'border-color: #e2e8f0; background: #ffffff;'">
+                        :style="isDark
+                            ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex}26;`
+                            : 'border-color: #e2e8f0; background: #ffffff;'">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-cyan-300 flex items-center justify-center shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
@@ -272,8 +284,8 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="text-xs font-bold text-slate-800">Mode Gelap (Dark)</div>
-                            <div class="text-[11px] text-slate-500 mt-0.5">Nyaman di mata saat kondisi minim cahaya</div>
+                            <div class="text-xs font-bold" :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'">Mode Gelap (Dark)</div>
+                            <div class="text-[11px] mt-0.5" :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'">Nyaman di mata saat kondisi minim cahaya</div>
                         </div>
                     </div>
                     <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-white"

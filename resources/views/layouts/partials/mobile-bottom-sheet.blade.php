@@ -224,7 +224,8 @@
                                     
                                     <div class="flex items-center gap-2.5 min-w-0 pointer-events-none">
                                         <!-- Icon Container dengan Warna Kustom (Inline Style) -->
-                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-2xs"
+                                        <div data-gomsn-no-accent="true"
+                                             class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-2xs"
                                              :style="getIconBoxStyle(item)">
                                             <div x-html="item.iconSvg"></div>
                                         </div>
