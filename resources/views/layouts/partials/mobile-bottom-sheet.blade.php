@@ -90,12 +90,8 @@
                         <div class="flex items-center gap-1.5">
                             <h3 class="font-extrabold text-[14px] text-white tracking-tight leading-snug truncate">Menu Layanan</h3>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-1 min-w-0">
-                            <span class="text-xs font-semibold text-teal-50/95 truncate">{{ $navUser?->name ?? 'User' }}</span>
-                            <span class="text-teal-300/50 text-xs">•</span>
-                            <span class="text-[10px] font-bold uppercase tracking-wide text-teal-100 bg-white/12 px-2 py-0.5 rounded-md border border-white/15 shrink-0">
-                                {{ $navUser?->division ?: ($navUser?->getRoleNames()?->first() ? ucfirst($navUser->getRoleNames()->first()) : 'MSN') }}
-                            </span>
+                        <div class="mt-1 min-w-0">
+                            <span class="text-xs font-semibold text-teal-50/95 truncate block">{{ $navUser?->name ?? 'User' }}</span>
                         </div>
                     </div>
                 </div>
