@@ -154,7 +154,7 @@
                  class="px-5 pb-3 pt-2 text-xs text-white/90 border-t border-white/10 flex items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2 min-w-0">
                     <span class="w-2 h-2 rounded-full bg-[#5eead4] shrink-0 animate-pulse"></span>
-                    <span class="text-[11px] leading-snug text-teal-100">Gunakan <b class="text-white">◀ / ▶</b> untuk geser urutan, atau <b class="text-white">Ubah</b> untuk ganti nama &amp; warna.</span>
+                    <span class="text-[11px] leading-snug text-teal-100"><b class="text-white">Tarik &amp; geser</b> kartu untuk ubah urutan, atau ketuk <b class="text-white">Ubah</b> untuk ganti nama &amp; warna.</span>
                 </div>
                 <button type="button" 
                         @click="resetCustomizations()"
@@ -166,7 +166,7 @@
         </div>
 
         <!-- Scrollable Content of Menus -->
-        <div class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1 max-h-[calc(88vh-140px)] relative z-10">
+        <div x-ref="sheetScrollArea" class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1 max-h-[calc(88vh-140px)] relative z-10">
             
             <!-- Loop Per Kategori Menu -->
             <template x-for="(cat, catIndex) in categories" :key="cat.key">
@@ -185,16 +185,21 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <template x-for="(item, itemIndex) in getCategoryItems(cat.key)" :key="item.id">
                             <div x-show="item.visible && (!sheetSearch || isItemMatch(item))"
-                                 class="relative group rounded-2xl transition-all duration-200 flex flex-col overflow-hidden bg-white shadow-2xs"
+                                 :data-menu-item-id="item.id"
+                                 :data-menu-cat="cat.key"
+                                 @pointerdown="if (isEditMode) handleCardPointerDown($event, cat.key, item, $el)"
+                                 class="relative group rounded-2xl transition-all duration-150 flex flex-col overflow-hidden bg-white shadow-2xs select-none"
                                  :style="getCardStyle(item)">
                                 
                                 <!-- Area Kartu Utama -->
                                 <a :href="isEditMode ? 'javascript:void(0)' : item.url" 
-                                   @click="if (isEditMode) { $event.preventDefault(); openEditModal(item); }"
+                                   @click="if (isEditMode) { $event.preventDefault(); if (!justDragged) openEditModal(item); }"
                                    class="p-3 flex items-center justify-between gap-2 transition-all flex-1"
-                                   :title="isEditMode ? 'Ketuk untuk mengubah nama dan warna' : getItemTitle(item)">
+                                   :style="isEditMode ? 'cursor: grab;' : ''"
+                                   draggable="false"
+                                   :title="isEditMode ? 'Tahan & tarik untuk geser urutan, atau ketuk untuk ubah' : getItemTitle(item)">
                                     
-                                    <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="flex items-center gap-2.5 min-w-0 pointer-events-none">
                                         <!-- Icon Container dengan Warna Kustom (Inline Style) -->
                                         <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-2xs"
                                              :style="getIconBoxStyle(item)">
@@ -217,36 +222,29 @@
                                     </template>
                                 </a>
 
-                                <!-- Bar Kontrol Edit (Di Bawah Kartu - Tidak Menutupi Teks!) -->
+                                <!-- Bar Kontrol Edit: Grip Tarik Geser + Tombol Ubah -->
                                 <div x-show="isEditMode" 
                                      class="bg-slate-50 border-t border-slate-200"
                                      style="padding: 5px 6px;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
-                                        <!-- Tombol Geser Maju / Kiri -->
-                                        <button type="button" 
-                                                @click.stop="moveItem(cat.key, itemIndex, -1)"
-                                                :disabled="itemIndex === 0"
-                                                :style="'width: 28px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; border: none; ' + (itemIndex === 0 ? 'background: #e2e8f0; color: #94a3b8; cursor: not-allowed;' : 'background: #1e293b; color: #ffffff; cursor: pointer;')"
-                                                title="Geser Posisi Maju">
-                                            ◀
-                                        </button>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                                        <!-- Handle Tarik Geser (touch-action: none untuk drag instan tanpa bentrok scroll) -->
+                                        <div @pointerdown.stop.prevent="beginItemDrag($event, cat.key, item, $el.closest('[data-menu-item-id]'))"
+                                             style="flex: 1; height: 26px; border-radius: 8px; background: #e2e8f0; color: #334155; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; padding: 0 6px;"
+                                             title="Tarik untuk geser posisi">
+                                            <svg style="width: 12px; height: 12px; flex-shrink: 0; color: #475569;" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M7 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm7-12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                            </svg>
+                                            <span>Geser</span>
+                                        </div>
 
                                         <!-- Tombol Edit Nama & Warna -->
                                         <button type="button" 
+                                                @pointerdown.stop
                                                 @click.stop="openEditModal(item)"
-                                                style="flex: 1; height: 26px; border-radius: 8px; background: #0d9488; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; border: none; cursor: pointer; padding: 0 6px;"
+                                                style="height: 26px; border-radius: 8px; background: #0d9488; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; border: none; cursor: pointer; padding: 0 9px; flex-shrink: 0;"
                                                 title="Ganti Nama & Warna">
                                             <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                             <span>Ubah</span>
-                                        </button>
-
-                                        <!-- Tombol Geser Mundur / Kanan -->
-                                        <button type="button" 
-                                                @click.stop="moveItem(cat.key, itemIndex, 1)"
-                                                :disabled="itemIndex === getCategoryItems(cat.key).length - 1"
-                                                :style="'width: 28px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; border: none; ' + (itemIndex === getCategoryItems(cat.key).length - 1 ? 'background: #e2e8f0; color: #94a3b8; cursor: not-allowed;' : 'background: #1e293b; color: #ffffff; cursor: pointer;')"
-                                                title="Geser Posisi Mundur">
-                                            ▶
                                         </button>
                                     </div>
                                 </div>
@@ -276,6 +274,27 @@
 
         </div>
     </div>
+
+    <!-- ============================================================== -->
+    <!-- FLOATING DRAG GHOST CARD (MENGIKUTI JARI SAAT TARIK GESER)     -->
+    <!-- ============================================================== -->
+    <template x-if="draggingItem">
+        <div class="rounded-2xl bg-white overflow-hidden"
+             :style="`position: fixed; z-index: 9990; pointer-events: none; left: ${dragPos.x}px; top: ${dragPos.y}px; width: ${dragPos.width}px; transform: scale(1.04) rotate(-1deg); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28); border: 2px solid #0d9488; opacity: 0.96;`">
+            <div class="p-3 flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                     :style="getIconBoxStyle(draggingItem.item)">
+                    <div x-html="draggingItem.item.iconSvg"></div>
+                </div>
+                <div class="min-w-0">
+                    <span class="font-bold text-xs text-slate-900 block truncate leading-snug"
+                          x-text="getItemTitle(draggingItem.item)"></span>
+                    <span class="text-[10px] text-slate-500 block truncate mt-0.5 leading-tight"
+                          x-text="getItemSubtitle(draggingItem.item)"></span>
+                </div>
+            </div>
+        </div>
+    </template>
 
     <!-- ============================================================== -->
     <!-- MODAL EDIT NAMA & WARNA MENU (Z-INDEX TINGGI DI ATAS SHEET)    -->
@@ -411,6 +430,11 @@ function mobileMenuCustomizer(userId) {
         sheetTranslateY: 0,
         isEditMode: false,
         editingItem: null,
+        draggingItem: null,
+        dragPos: { x: 0, y: 0, width: 160, offsetX: 0, offsetY: 0 },
+        holdTimer: null,
+        pendingDrag: null,
+        justDragged: false,
         storageKey: 'gomsn_mobile_menu_user_' + userId,
         customizations: {},
         editForm: {
@@ -798,6 +822,15 @@ function mobileMenuCustomizer(userId) {
 
         init() {
             this.loadCustomizations();
+
+            window.addEventListener('pointermove', (e) => this.onItemPointerMove(e), { passive: false });
+            window.addEventListener('pointerup', () => this.endItemDrag());
+            window.addEventListener('pointercancel', () => this.endItemDrag());
+            window.addEventListener('touchmove', (e) => {
+                if (this.draggingItem) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
         },
 
         loadCustomizations() {
@@ -844,22 +877,120 @@ function mobileMenuCustomizer(userId) {
             return items;
         },
 
-        moveItem(catKey, currentIndex, delta) {
-            const currentItems = this.getCategoryItems(catKey);
-            const targetIndex = currentIndex + delta;
-            if (targetIndex < 0 || targetIndex >= currentItems.length) return;
+        handleCardPointerDown(e, catKey, item, cardEl) {
+            if (!this.isEditMode || !cardEl) return;
+            if (e.button && e.button !== 0) return;
 
-            // Swap
-            const itemA = currentItems[currentIndex];
-            const itemB = currentItems[targetIndex];
-            currentItems[currentIndex] = itemB;
-            currentItems[targetIndex] = itemA;
+            const startX = e.clientX;
+            const startY = e.clientY;
+            this.pendingDrag = { catKey, item, cardEl, startX, startY };
+
+            clearTimeout(this.holdTimer);
+            this.holdTimer = setTimeout(() => {
+                if (this.pendingDrag && this.pendingDrag.item.id === item.id) {
+                    this.beginItemDrag({ clientX: this.pendingDrag.startX, clientY: this.pendingDrag.startY }, catKey, item, cardEl);
+                    this.pendingDrag = null;
+                }
+            }, 170);
+        },
+
+        beginItemDrag(e, catKey, item, cardEl) {
+            if (!this.isEditMode || !cardEl) return;
+            clearTimeout(this.holdTimer);
+            this.pendingDrag = null;
+
+            const rect = cardEl.getBoundingClientRect();
+            const offsetX = Math.min(Math.max(e.clientX - rect.left, 20), rect.width - 20);
+            const offsetY = Math.min(Math.max(e.clientY - rect.top, 20), rect.height - 20);
+
+            this.draggingItem = { id: item.id, catKey, item };
+            this.dragPos = {
+                x: e.clientX - offsetX,
+                y: e.clientY - offsetY,
+                width: rect.width,
+                offsetX,
+                offsetY
+            };
+            this.justDragged = true;
+
+            if (navigator.vibrate) {
+                try { navigator.vibrate(15); } catch (_) {}
+            }
+        },
+
+        onItemPointerMove(e) {
+            // Jika sedang menunggu long-press pada kartu, cek apakah user menggeser jari
+            if (this.pendingDrag && !this.draggingItem) {
+                const dx = Math.abs(e.clientX - this.pendingDrag.startX);
+                const dy = Math.abs(e.clientY - this.pendingDrag.startY);
+                if (dx > 10 && dx > dy) {
+                    // Geser horizontal: langsung mulai drag
+                    const p = this.pendingDrag;
+                    this.beginItemDrag(e, p.catKey, p.item, p.cardEl);
+                } else if (dy > 12) {
+                    // Scroll vertikal normal: batalkan pending drag
+                    clearTimeout(this.holdTimer);
+                    this.pendingDrag = null;
+                }
+                return;
+            }
+
+            if (!this.draggingItem) return;
+
+            this.dragPos.x = e.clientX - this.dragPos.offsetX;
+            this.dragPos.y = e.clientY - this.dragPos.offsetY;
+
+            // Auto-scroll area menu jika jari dekat tepi atas/bawah
+            const scrollEl = this.$refs.sheetScrollArea;
+            if (scrollEl) {
+                const sr = scrollEl.getBoundingClientRect();
+                if (e.clientY < sr.top + 55) {
+                    scrollEl.scrollTop -= 10;
+                } else if (e.clientY > sr.bottom - 55) {
+                    scrollEl.scrollTop += 10;
+                }
+            }
+
+            // Deteksi kartu target di bawah posisi jari/kursor
+            const el = document.elementFromPoint(e.clientX, e.clientY);
+            const targetCard = el ? el.closest('[data-menu-item-id]') : null;
+            if (!targetCard) return;
+
+            const targetId = targetCard.getAttribute('data-menu-item-id');
+            const targetCat = targetCard.getAttribute('data-menu-cat');
+
+            if (targetCat === this.draggingItem.catKey && targetId && targetId !== this.draggingItem.id) {
+                this.reorderItemToTarget(targetCat, this.draggingItem.id, targetId);
+            }
+        },
+
+        reorderItemToTarget(catKey, draggedId, targetId) {
+            const currentItems = this.getCategoryItems(catKey);
+            const fromIdx = currentItems.findIndex(i => i.id === draggedId);
+            const toIdx = currentItems.findIndex(i => i.id === targetId);
+            if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
+
+            const [moved] = currentItems.splice(fromIdx, 1);
+            currentItems.splice(toIdx, 0, moved);
 
             if (!this.customizations.orders) {
                 this.customizations.orders = {};
             }
             this.customizations.orders[catKey] = currentItems.map(i => i.id);
             this.saveCustomizations();
+
+            if (navigator.vibrate) {
+                try { navigator.vibrate(8); } catch (_) {}
+            }
+        },
+
+        endItemDrag() {
+            clearTimeout(this.holdTimer);
+            this.pendingDrag = null;
+            if (this.draggingItem) {
+                this.draggingItem = null;
+                setTimeout(() => { this.justDragged = false; }, 120);
+            }
         },
 
         openEditModal(item) {
@@ -922,6 +1053,9 @@ function mobileMenuCustomizer(userId) {
 
         getCardStyle(item) {
             const p = this.getPaletteObj(this.getItemColor(item));
+            if (this.draggingItem && this.draggingItem.id === item.id) {
+                return 'border: 2px dashed #0d9488; background: #f0fdfa; opacity: 0.35;';
+            }
             if (this.isEditMode) {
                 return 'border: 1.5px solid #2dd4bf; background: #ffffff;';
             }
