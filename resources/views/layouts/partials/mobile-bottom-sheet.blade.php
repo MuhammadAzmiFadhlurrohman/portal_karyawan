@@ -89,9 +89,6 @@
                     <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
                             <h3 class="font-extrabold text-[14px] text-white tracking-tight leading-snug truncate">Menu Layanan</h3>
-                            <span x-show="!isEditMode" class="text-[9px] font-extrabold tracking-wider px-1.5 py-0.5 rounded-md bg-[#18C4C4]/20 text-[#5eead4] border border-[#5eead4]/35 shrink-0">
-                                GOMSN
-                            </span>
                         </div>
                         <div class="flex items-center gap-1.5 mt-1 min-w-0">
                             <span class="text-xs font-semibold text-teal-50/95 truncate">{{ $navUser?->name ?? 'User' }}</span>
