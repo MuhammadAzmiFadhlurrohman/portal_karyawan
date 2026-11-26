@@ -180,16 +180,21 @@
                                   :style="hasCustomCategoryColor(cat) ? getCategoryIndicatorStyle(cat) : ''"></span>
                             <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 truncate"
                                   x-text="getCategoryTitle(cat)"></span>
-                            <button type="button"
-                                    x-show="isEditMode"
-                                    @click.stop="openCategoryEditModal(cat)"
-                                    style="padding: 2px 7px; border-radius: 6px; background: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; flex-shrink: 0;"
-                                    title="Ubah Judul Kategori">
-                                <svg style="width: 10px; height: 10px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                <span>Edit Judul</span>
-                            </button>
                         </div>
-                        <span class="text-[10px] text-slate-400 font-medium shrink-0" x-text="getCategorySubtitle(cat)"></span>
+
+                        <!-- Normal Mode: Subtitle Kanan -->
+                        <span x-show="!isEditMode" class="text-[10px] text-slate-400 font-medium shrink-0" x-text="getCategorySubtitle(cat)"></span>
+
+                        <!-- Edit Mode: Tombol Edit Judul sejajar 1 baris rapi di kanan -->
+                        <button type="button"
+                                x-show="isEditMode"
+                                @click.stop="openCategoryEditModal(cat)"
+                                class="inline-flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer transition active:scale-95"
+                                style="height: 24px; padding: 0 9px; border-radius: 999px; background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; font-size: 10px; font-weight: 700;"
+                                title="Ubah Judul Kategori">
+                            <svg style="width: 10px; height: 10px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <span>Edit Judul</span>
+                        </button>
                     </div>
 
                     <!-- Dropzone Kosong jika semua menu di grup ini dipindahkan -->
@@ -1303,7 +1308,7 @@ function mobileMenuCustomizer(userId) {
                 return 'border: 2px dashed #0d9488; background: #f0fdfa; opacity: 0.35;';
             }
             if (this.isEditMode) {
-                return 'border: 1.5px solid #2dd4bf; background: #ffffff;';
+                return 'border: 1px solid #99f6e4; background: #ffffff; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);';
             }
             if (this.hasCustomColor(item)) {
                 return `border: 1px solid ${p.border}; background: linear-gradient(135deg, #ffffff 60%, ${p.bg} 100%);`;
