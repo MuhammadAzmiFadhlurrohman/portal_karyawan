@@ -1,11 +1,14 @@
 <x-layouts.app title="Pengaturan">
-    <script>
-        window.__gomsnUserSettingsConfig = @json([
+    @php
+        $userSettingsConfig = [
             'userId' => auth()->id(),
             'initialPrefs' => $notificationPreferences,
             'savePrefsUrl' => route('api.fcm.preferences.update', [], false),
             'csrfToken' => csrf_token(),
-        ]);
+        ];
+    @endphp
+    <script>
+        window.__gomsnUserSettingsConfig = @json($userSettingsConfig);
 
         function userSettingsPage() {
             const config = window.__gomsnUserSettingsConfig || {};
