@@ -170,19 +170,40 @@
             
             <!-- Loop Per Kategori Menu -->
             <template x-for="(cat, catIndex) in categories" :key="cat.key">
-                <div x-show="cat.visible && (!sheetSearch || isCategoryMatch(cat))" class="space-y-2.5">
+                <div x-show="cat.visible && (isEditMode || getCategoryItems(cat.key).length > 0) && (!sheetSearch || isCategoryMatch(cat))"
+                     :data-drop-cat="cat.key"
+                     class="space-y-2.5 rounded-2xl transition-colors"
+                     :style="draggingItem && draggingItem.catKey !== cat.key ? 'padding: 6px; margin: -6px; background: rgba(240, 253, 250, 0.55);' : ''">
                     
-                    <!-- Kategori Header -->
-                    <div class="flex items-center justify-between pt-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-3.5 rounded-full" :class="cat.indicatorClass"></span>
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700" x-text="cat.title"></span>
+                    <!-- Kategori Header (Bisa Di-Edit di Mode Atur Menu) -->
+                    <div class="flex items-center justify-between gap-2 pt-0.5">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="w-1.5 h-3.5 rounded-full shrink-0"
+                                  :class="!hasCustomCategoryColor(cat) ? cat.indicatorClass : ''"
+                                  :style="hasCustomCategoryColor(cat) ? getCategoryIndicatorStyle(cat) : ''"></span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 truncate"
+                                  x-text="getCategoryTitle(cat)"></span>
+                            <button type="button"
+                                    x-show="isEditMode"
+                                    @click.stop="openCategoryEditModal(cat)"
+                                    style="padding: 2px 7px; border-radius: 6px; background: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; cursor: pointer; flex-shrink: 0;"
+                                    title="Ubah Judul Kategori">
+                                <svg style="width: 10px; height: 10px;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                <span>Edit Judul</span>
+                            </button>
                         </div>
-                        <span class="text-[10px] text-slate-400 font-medium" x-text="cat.subtitle"></span>
+                        <span class="text-[10px] text-slate-400 font-medium shrink-0" x-text="getCategorySubtitle(cat)"></span>
+                    </div>
+
+                    <!-- Dropzone Kosong jika semua menu di grup ini dipindahkan -->
+                    <div x-show="isEditMode && getCategoryItems(cat.key).length === 0"
+                         :data-drop-cat="cat.key"
+                         style="border: 1.5px dashed #94a3b8; border-radius: 14px; padding: 14px 12px; text-align: center; font-size: 11px; color: #64748b; background: #f8fafc;">
+                        Tarik &amp; letakkan kartu menu ke sini
                     </div>
 
                     <!-- Grid Item Menu -->
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-2.5" :data-drop-cat="cat.key">
                         <template x-for="(item, itemIndex) in getCategoryItems(cat.key)" :key="item.id">
                             <div x-show="item.visible && (!sheetSearch || isItemMatch(item))"
                                  :data-menu-item-id="item.id"
@@ -416,6 +437,102 @@
         </div>
     </div>
 
+    <!-- ============================================================== -->
+    <!-- MODAL EDIT JUDUL KATEGORI / GRUP MENU (Z-INDEX 9999)          -->
+    <!-- ============================================================== -->
+    <div x-show="editingCategory !== null"
+         x-cloak
+         class="fixed inset-0 flex items-center justify-center p-4"
+         style="z-index: 9999;"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+
+        <div class="fixed inset-0" style="background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(4px);" @click="editingCategory = null"></div>
+
+        <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 overflow-y-auto"
+             style="position: relative; z-index: 10; max-height: 90vh;"
+             @click.stop>
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-xs border border-teal-100">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h7"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-sm text-slate-900 leading-tight">Edit Judul Grup</h4>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Ubah nama bagian &amp; label sesuai keinginan</p>
+                    </div>
+                </div>
+                <button type="button" @click="editingCategory = null" class="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center text-sm font-bold">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Modal Form -->
+            <div class="space-y-4 pt-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Judul Grup Menu
+                    </label>
+                    <input type="text"
+                           x-model="categoryForm.title"
+                           placeholder="Contoh: Menu Favorit"
+                           class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 font-semibold text-slate-800">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        Label Kanan (Opsional)
+                    </label>
+                    <input type="text"
+                           x-model="categoryForm.subtitle"
+                           placeholder="Contoh: Akses Cepat"
+                           class="w-full px-3.5 py-2.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-slate-600">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">
+                        Warna Garis Indikator
+                    </label>
+                    <div class="grid grid-cols-5 gap-2.5">
+                        <template x-for="c in colorPalette" :key="c.name">
+                            <button type="button"
+                                    @click="categoryForm.color = c.name"
+                                    :title="c.label"
+                                    class="h-9 rounded-xl flex items-center justify-center transition-all relative cursor-pointer"
+                                    :class="categoryForm.color === c.name ? 'ring-2 ring-offset-2 ring-slate-800 scale-105 shadow-md' : 'opacity-85 hover:opacity-100 shadow-2xs'"
+                                    :style="'background: ' + c.previewHex">
+                                <template x-if="categoryForm.color === c.name">
+                                    <svg class="w-4 h-4 text-white drop-shadow-xs" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </template>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 pt-2">
+                    <button type="button"
+                            @click="editingCategory = null"
+                            class="flex-1 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="button"
+                            @click="saveCategoryEdit()"
+                            style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;"
+                            class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold shadow-md hover:brightness-105 active:scale-95 transition">
+                        Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- ============================================================== -->
@@ -430,6 +547,7 @@ function mobileMenuCustomizer(userId) {
         sheetTranslateY: 0,
         isEditMode: false,
         editingItem: null,
+        editingCategory: null,
         draggingItem: null,
         dragPos: { x: 0, y: 0, width: 160, offsetX: 0, offsetY: 0 },
         holdTimer: null,
@@ -442,6 +560,12 @@ function mobileMenuCustomizer(userId) {
             title: '',
             subtitle: '',
             color: 'teal'
+        },
+        categoryForm: {
+            key: '',
+            title: '',
+            subtitle: '',
+            color: ''
         },
 
         colorPalette: [
@@ -822,6 +946,7 @@ function mobileMenuCustomizer(userId) {
 
         init() {
             this.loadCustomizations();
+            this.ensureLayout();
 
             window.addEventListener('pointermove', (e) => this.onItemPointerMove(e), { passive: false });
             window.addEventListener('pointerup', () => this.endItemDrag());
@@ -831,6 +956,63 @@ function mobileMenuCustomizer(userId) {
                     e.preventDefault();
                 }
             }, { passive: false });
+        },
+
+        getAllItemsMap() {
+            const map = {};
+            for (const cat of this.categories) {
+                for (const item of cat.items) {
+                    map[item.id] = item;
+                }
+            }
+            return map;
+        },
+
+        ensureLayout() {
+            const allMap = this.getAllItemsMap();
+            const assigned = new Set();
+
+            if (!this.customizations.layout || typeof this.customizations.layout !== 'object') {
+                this.customizations.layout = {};
+                for (const cat of this.categories) {
+                    let ids = cat.items.map(i => i.id);
+                    // Migrasi dari legacy orders jika ada
+                    const legacyOrder = this.customizations.orders && this.customizations.orders[cat.key];
+                    if (legacyOrder && Array.isArray(legacyOrder)) {
+                        ids.sort((a, b) => {
+                            const idxA = legacyOrder.indexOf(a);
+                            const idxB = legacyOrder.indexOf(b);
+                            if (idxA === -1 && idxB === -1) return 0;
+                            if (idxA === -1) return 1;
+                            if (idxB === -1) return -1;
+                            return idxA - idxB;
+                        });
+                    }
+                    this.customizations.layout[cat.key] = ids;
+                }
+            }
+
+            // Bersihkan item yang tidak lagi tersedia & kumpulkan ID yang sudah terpasang
+            for (const cat of this.categories) {
+                if (!Array.isArray(this.customizations.layout[cat.key])) {
+                    this.customizations.layout[cat.key] = [];
+                }
+                this.customizations.layout[cat.key] = this.customizations.layout[cat.key].filter(id => {
+                    if (!allMap[id] || assigned.has(id)) return false;
+                    assigned.add(id);
+                    return true;
+                });
+            }
+
+            // Tambahkan item baru yang belum terdaftar ke kategori default-nya
+            for (const cat of this.categories) {
+                for (const item of cat.items) {
+                    if (!assigned.has(item.id)) {
+                        this.customizations.layout[cat.key].push(item.id);
+                        assigned.add(item.id);
+                    }
+                }
+            }
         },
 
         loadCustomizations() {
@@ -851,30 +1033,69 @@ function mobileMenuCustomizer(userId) {
         },
 
         resetCustomizations() {
-            if (confirm('Kembalikan semua susunan urutan, nama, dan warna menu ke default bawaan?')) {
+            if (confirm('Kembalikan semua susunan urutan, judul grup, nama, dan warna menu ke default bawaan?')) {
                 localStorage.removeItem(this.storageKey);
                 this.customizations = {};
+                this.ensureLayout();
                 this.isEditMode = false;
             }
         },
 
         getCategoryItems(catKey) {
-            const cat = this.categories.find(c => c.key === catKey);
-            if (!cat) return [];
-            
-            const items = [...cat.items];
-            const savedOrder = this.customizations.orders && this.customizations.orders[catKey];
-            if (savedOrder && Array.isArray(savedOrder)) {
-                items.sort((a, b) => {
-                    const idxA = savedOrder.indexOf(a.id);
-                    const idxB = savedOrder.indexOf(b.id);
-                    if (idxA === -1 && idxB === -1) return 0;
-                    if (idxA === -1) return 1;
-                    if (idxB === -1) return -1;
-                    return idxA - idxB;
-                });
+            const allMap = this.getAllItemsMap();
+            const ids = (this.customizations.layout && this.customizations.layout[catKey]) || [];
+            return ids.map(id => allMap[id]).filter(Boolean);
+        },
+
+        getCategoryTitle(cat) {
+            if (this.customizations.categories && this.customizations.categories[cat.key] && this.customizations.categories[cat.key].title) {
+                return this.customizations.categories[cat.key].title;
             }
-            return items;
+            return cat.title;
+        },
+
+        getCategorySubtitle(cat) {
+            if (this.customizations.categories && this.customizations.categories[cat.key] && typeof this.customizations.categories[cat.key].subtitle === 'string') {
+                return this.customizations.categories[cat.key].subtitle;
+            }
+            return cat.subtitle;
+        },
+
+        hasCustomCategoryColor(cat) {
+            return !!(this.customizations.categories && this.customizations.categories[cat.key] && this.customizations.categories[cat.key].color);
+        },
+
+        getCategoryIndicatorStyle(cat) {
+            const colorName = this.customizations.categories && this.customizations.categories[cat.key] && this.customizations.categories[cat.key].color;
+            if (!colorName) return '';
+            const p = this.getPaletteObj(colorName);
+            return `background: ${p.previewHex};`;
+        },
+
+        openCategoryEditModal(cat) {
+            this.editingCategory = cat;
+            const saved = (this.customizations.categories && this.customizations.categories[cat.key]) || {};
+            this.categoryForm = {
+                key: cat.key,
+                title: saved.title || cat.title,
+                subtitle: typeof saved.subtitle === 'string' ? saved.subtitle : cat.subtitle,
+                color: saved.color || 'teal'
+            };
+        },
+
+        saveCategoryEdit() {
+            if (!this.editingCategory) return;
+            const key = this.editingCategory.key;
+            if (!this.customizations.categories) {
+                this.customizations.categories = {};
+            }
+            this.customizations.categories[key] = {
+                title: (this.categoryForm.title || '').trim() || this.editingCategory.title,
+                subtitle: (this.categoryForm.subtitle || '').trim(),
+                color: this.categoryForm.color || ''
+            };
+            this.saveCustomizations();
+            this.editingCategory = null;
         },
 
         handleCardPointerDown(e, catKey, item, cardEl) {
@@ -951,32 +1172,60 @@ function mobileMenuCustomizer(userId) {
                 }
             }
 
-            // Deteksi kartu target di bawah posisi jari/kursor
+            // Deteksi kartu target atau kategori target di bawah posisi jari/kursor (bebas pindah antar kategori!)
             const el = document.elementFromPoint(e.clientX, e.clientY);
-            const targetCard = el ? el.closest('[data-menu-item-id]') : null;
-            if (!targetCard) return;
+            if (!el) return;
 
-            const targetId = targetCard.getAttribute('data-menu-item-id');
-            const targetCat = targetCard.getAttribute('data-menu-cat');
+            const targetCard = el.closest('[data-menu-item-id]');
+            if (targetCard) {
+                const targetId = targetCard.getAttribute('data-menu-item-id');
+                const targetCat = targetCard.getAttribute('data-menu-cat');
+                if (targetCat && targetId && targetId !== this.draggingItem.id) {
+                    this.moveItemAcrossCategories(this.draggingItem.catKey, targetCat, this.draggingItem.id, targetId);
+                }
+                return;
+            }
 
-            if (targetCat === this.draggingItem.catKey && targetId && targetId !== this.draggingItem.id) {
-                this.reorderItemToTarget(targetCat, this.draggingItem.id, targetId);
+            // Jika diarahkan ke area kategori lain (misal kategori kosong atau ruang kosong di grid kategori lain)
+            const dropCatEl = el.closest('[data-drop-cat]');
+            if (dropCatEl) {
+                const targetCat = dropCatEl.getAttribute('data-drop-cat');
+                if (targetCat && targetCat !== this.draggingItem.catKey) {
+                    this.moveItemAcrossCategories(this.draggingItem.catKey, targetCat, this.draggingItem.id, null);
+                }
             }
         },
 
-        reorderItemToTarget(catKey, draggedId, targetId) {
-            const currentItems = this.getCategoryItems(catKey);
-            const fromIdx = currentItems.findIndex(i => i.id === draggedId);
-            const toIdx = currentItems.findIndex(i => i.id === targetId);
-            if (fromIdx === -1 || toIdx === -1 || fromIdx === toIdx) return;
+        moveItemAcrossCategories(fromCat, toCat, draggedId, targetId) {
+            this.ensureLayout();
+            const sourceList = [...(this.customizations.layout[fromCat] || [])];
+            const fromIdx = sourceList.indexOf(draggedId);
+            if (fromIdx === -1) return;
 
-            const [moved] = currentItems.splice(fromIdx, 1);
-            currentItems.splice(toIdx, 0, moved);
-
-            if (!this.customizations.orders) {
-                this.customizations.orders = {};
+            if (fromCat === toCat) {
+                const toIdx = sourceList.indexOf(targetId);
+                if (toIdx === -1 || fromIdx === toIdx) return;
+                sourceList.splice(fromIdx, 1);
+                sourceList.splice(toIdx, 0, draggedId);
+                this.customizations.layout[fromCat] = sourceList;
+            } else {
+                sourceList.splice(fromIdx, 1);
+                const targetList = [...(this.customizations.layout[toCat] || [])];
+                if (targetId) {
+                    const toIdx = targetList.indexOf(targetId);
+                    if (toIdx !== -1) {
+                        targetList.splice(toIdx, 0, draggedId);
+                    } else {
+                        targetList.push(draggedId);
+                    }
+                } else {
+                    targetList.push(draggedId);
+                }
+                this.customizations.layout[fromCat] = sourceList;
+                this.customizations.layout[toCat] = targetList;
+                this.draggingItem.catKey = toCat;
             }
-            this.customizations.orders[catKey] = currentItems.map(i => i.id);
+
             this.saveCustomizations();
 
             if (navigator.vibrate) {
