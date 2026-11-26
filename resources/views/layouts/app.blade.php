@@ -882,23 +882,14 @@
                     window.__gomsnBellConfig = @json($navBellConfig);
                     function gomsnHeaderBell() {
                         const cfg = window.__gomsnBellConfig || {};
-                        const uid = cfg.userId || 0;
                         return {
-                            badgeCount: 0,
+                            badgeCount: cfg.actionCount || 0,
                             init() {
                                 this.recalc();
                                 window.addEventListener('gomsn-notif-updated', () => this.recalc());
-                                window.addEventListener('storage', () => this.recalc());
                             },
                             recalc() {
-                                let unread = 0;
-                                try {
-                                    const lastTs = parseInt(localStorage.getItem('gomsn_notif_read_ts_' + uid) || '0', 10) || 0;
-                                    const readIds = JSON.parse(localStorage.getItem('gomsn_notif_read_ids_' + uid) || '[]') || [];
-                                    const dismissed = JSON.parse(localStorage.getItem('gomsn_notif_dismissed_ids_' + uid) || '[]') || [];
-                                    unread = (cfg.items || []).filter(it => !dismissed.includes(it.id) && !readIds.includes(it.id) && it.ts > lastTs).length;
-                                } catch (e) {}
-                                this.badgeCount = (cfg.actionCount || 0) + unread;
+                                this.badgeCount = cfg.actionCount || 0;
                             }
                         };
                     }
