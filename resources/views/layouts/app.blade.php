@@ -28,8 +28,20 @@
                     document.documentElement.classList.remove('dark');
                     document.documentElement.style.colorScheme = 'light';
                 }
+                var savedAccent = localStorage.getItem('gomsn_accent_theme') || 'teal';
+                document.documentElement.setAttribute('data-accent', savedAccent);
             } catch (e) {}
         })();
+
+        window.setGomsnAccent = function(accent) {
+            var valid = ['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'slate'];
+            var next = valid.indexOf(accent) !== -1 ? accent : 'teal';
+            document.documentElement.setAttribute('data-accent', next);
+            try {
+                localStorage.setItem('gomsn_accent_theme', next);
+            } catch (e) {}
+            window.dispatchEvent(new CustomEvent('gomsn-accent-changed', { detail: { accent: next } }));
+        };
 
         window.toggleGomsnTheme = function(event) {
             var html = document.documentElement;
@@ -111,6 +123,90 @@
         }
         #desktop-sidebar {
             view-transition-name: desktop-sidebar;
+        }
+
+        /* ==============================================================
+           GLOBAL APP COLOR THEMES (KUSTOMISASI WARNA TEMA PER USER)
+           ============================================================== */
+        :root,
+        html[data-accent="teal"] {
+            --gomsn-accent: #0d9488;
+            --gomsn-accent-light: #5eead4;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #022836 0%, #053b47 22%, #094d5a 50%, #0c5a68 75%, #031e26 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #07383c 0%, #0c4d53 28%, #105c64 52%, #0a4449 82%, #063135 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #10b981 0%, #0d9488 45%, #065f46 100%);
+        }
+        html[data-accent="blue"] {
+            --gomsn-accent: #2563eb;
+            --gomsn-accent-light: #93c5fd;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #0b1b3f 0%, #102a63 25%, #163b87 55%, #1d4ed8 85%, #0a1633 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #0f2557 0%, #173b85 35%, #1d4ed8 65%, #163578 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #60a5fa 0%, #2563eb 48%, #1e3a8a 100%);
+        }
+        html[data-accent="indigo"] {
+            --gomsn-accent: #4f46e5;
+            --gomsn-accent-light: #a5b4fc;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #14123b 0%, #1f1b5c 25%, #2e2982 55%, #3730a3 85%, #100e2e 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #1b1852 0%, #2a247a 35%, #3730a3 65%, #201c5e 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #818cf8 0%, #4f46e5 48%, #312e81 100%);
+        }
+        html[data-accent="emerald"] {
+            --gomsn-accent: #059669;
+            --gomsn-accent-light: #6ee7b7;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #03261b 0%, #064230 25%, #065f46 55%, #047857 85%, #021d15 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #053828 0%, #065f46 40%, #047857 70%, #053b2a 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #34d399 0%, #059669 48%, #064e3b 100%);
+        }
+        html[data-accent="purple"] {
+            --gomsn-accent: #7c3aed;
+            --gomsn-accent-light: #d8b4fe;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #1f0e3d 0%, #311761 25%, #4c1d95 55%, #5b21b6 85%, #170a2e 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #2b1254 0%, #4c1d95 40%, #6d28d9 70%, #341666 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #a855f7 0%, #7c3aed 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #c084fc 0%, #7c3aed 48%, #4c1d95 100%);
+        }
+        html[data-accent="rose"] {
+            --gomsn-accent: #e11d48;
+            --gomsn-accent-light: #fda4af;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #360815 0%, #570e22 25%, #881337 55%, #9f1239 85%, #290510 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #4c0b1d 0%, #881337 40%, #be123c 70%, #570e22 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #f43f5e 0%, #e11d48 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #fb7185 0%, #e11d48 48%, #881337 100%);
+        }
+        html[data-accent="amber"] {
+            --gomsn-accent: #d97706;
+            --gomsn-accent-light: #fcd34d;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #331804 0%, #542807 25%, #78350f 55%, #92400e 85%, #261203 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #472105 0%, #78350f 40%, #b45309 70%, #542807 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #fbbf24 0%, #d97706 48%, #78350f 100%);
+        }
+        html[data-accent="slate"] {
+            --gomsn-accent: #334155;
+            --gomsn-accent-light: #cbd5e1;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #0b1120 0%, #152036 25%, #1e293b 55%, #334155 85%, #090e1a 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #0f172a 0%, #1e293b 40%, #334155 70%, #172033 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #64748b 0%, #475569 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #94a3b8 0%, #475569 48%, #1e293b 100%);
+        }
+
+        html[data-accent]:not([data-accent="teal"]) #desktop-sidebar {
+            background: var(--gomsn-sidebar-bg) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .gomsn-mobile-topbar,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-sheet-header,
+        html[data-accent]:not([data-accent="teal"]) .gomsn-themed-banner {
+            background: var(--gomsn-header-bg) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) [data-sidebar-active="true"] {
+            background: var(--gomsn-active-bg) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .gomsn-home-orb {
+            background: var(--gomsn-orb-bg) !important;
         }
         ::view-transition-old(desktop-sidebar),
         ::view-transition-new(desktop-sidebar) {
@@ -693,7 +789,7 @@
         <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
             <!-- Mobile Fixed Header (Sculpted Metallic Teal Bar - Always Pinned on Scroll) -->
             <div class="md:hidden fixed top-0 inset-x-0 z-50 pt-2 px-3 pb-1.5 bg-slate-50/95 backdrop-blur-md select-none">
-                <div class="relative h-[48px] w-full rounded-[22px] flex items-center justify-between pl-3.5 pr-0 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
+                <div class="gomsn-mobile-topbar relative h-[48px] w-full rounded-[22px] flex items-center justify-between pl-3.5 pr-0 border border-[#1cd8d2]/35 shadow-[0_4px_18px_rgba(4,40,44,0.38)]"
                      style="background: linear-gradient(100deg, #07383c 0%, #0c4d53 28%, #105c64 52%, #0a4449 82%, #063135 100%);">
                     
                     <!-- Decorative Background & Highlights Layer (Clipped to Pill Corners) -->
@@ -1268,7 +1364,7 @@
                 </svg>
 
                 <!-- Elevated 3D Glossy Sphere Button with fresh rich green-teal gloss -->
-                <div class="absolute -top-4 w-[48px] h-[48px] rounded-full flex items-center justify-center text-white border-[2.5px] border-white shadow-[0_6px_18px_rgba(13,148,136,0.42)] transition-transform duration-200 transform group-hover:scale-105 active:scale-95 overflow-hidden"
+                <div class="gomsn-home-orb absolute -top-4 w-[48px] h-[48px] rounded-full flex items-center justify-center text-white border-[2.5px] border-white shadow-[0_6px_18px_rgba(13,148,136,0.42)] transition-transform duration-200 transform group-hover:scale-105 active:scale-95 overflow-hidden"
                      style="background: radial-gradient(circle at 50% 25%, #10b981 0%, #0d9488 45%, #065f46 100%) !important;">
                     
                     <!-- Specular Curved Gloss Arc (Bubble glass reflection on top) -->

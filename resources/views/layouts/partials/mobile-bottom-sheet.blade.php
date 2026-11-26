@@ -54,8 +54,8 @@
         <div class="bottom-sheet-bg-pattern absolute inset-0 pointer-events-none z-0" 
              style="background-color: #FFFFFF; background-image: radial-gradient(rgba(148, 163, 184, 0.14) 0.75px, transparent 0.75px); background-size: 20px 20px;"></div>
 
-        <!-- Sheet Header Bar (Ocean Teal Gradient) -->
-        <div class="relative z-10 shrink-0 select-none overflow-hidden" 
+        <!-- Sheet Header Bar (Ocean Teal Gradient / Mengikuti Warna Tema Aplikasi) -->
+        <div class="gomsn-sheet-header relative z-10 shrink-0 select-none overflow-hidden" 
              style="background: linear-gradient(135deg, #073337 0%, #0d5257 50%, #08383c 100%);">
             
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
