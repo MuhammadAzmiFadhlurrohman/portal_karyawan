@@ -86,6 +86,25 @@ return [
             ]) : [],
         ],
 
+        'ims' => [
+            'driver' => env('IMS_DB_CONNECTION', 'mysql'),
+            'host' => env('IMS_DB_HOST', '127.0.0.1'),
+            'port' => env('IMS_DB_PORT', '3306'),
+            'database' => env('IMS_DB_DATABASE', 'ims'),
+            'username' => env('IMS_DB_USERNAME', 'root'),
+            'password' => env('IMS_DB_PASSWORD', ''),
+            'unix_socket' => env('IMS_DB_SOCKET', ''),
+            'charset' => env('IMS_DB_CHARSET', 'utf8mb4'),
+            'collation' => env('IMS_DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::ATTR_EMULATE_PREPARES => true,
+            ]) : [],
+        ],
+
         'ims_v3' => [
             'driver' => env('IMS_DB_CONNECTION', 'mysql'),
             'host' => env('IMS_DB_HOST', '127.0.0.1'),

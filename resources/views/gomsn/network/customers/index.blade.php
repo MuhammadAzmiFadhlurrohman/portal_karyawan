@@ -58,6 +58,17 @@
                     </span>
                 </div>
 
+                <form action="{{ route('gomsn.network.odps.sync-ims', ['olt' => $olt->id, 'pon' => $pon->id, 'odp' => $odp->id]) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                            title="Tarik & perbarui data alamat, no HP, layanan, status & note dari database IMS"
+                            style="background: #0d9488 !important; color: #ffffff !important;"
+                            class="px-3.5 py-2 rounded-xl font-bold text-xs shadow-xs hover:opacity-90 transition-all flex items-center gap-1.5 border border-teal-400/30 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <span>Sinkronkan IMS</span>
+                    </button>
+                </form>
+
                 <button type="button" onclick="openHistoryModal()"
                         style="background: #0284c7 !important; color: #ffffff !important;"
                         class="px-3.5 py-2 rounded-xl font-bold text-xs shadow-xs hover:opacity-90 transition-all flex items-center gap-1.5 border border-sky-400/30">
@@ -168,8 +179,17 @@
                                         <span class="text-[10px] text-slate-400 font-mono font-medium">{{ $c->nomor_internet }}</span>
                                         <span class="font-extrabold text-slate-900 text-[13px] sm:text-xs tracking-tight leading-snug">{{ $c->nama_user }}</span>
                                         <div class="flex flex-wrap items-center gap-1 mt-0.5">
-                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-extrabold uppercase bg-emerald-50 text-emerald-600 border border-emerald-200/60">
-                                                {{ $c->status ?? 'AKTIF' }}
+                                            @php
+                                                $st = strtolower(trim($c->status ?? 'aktif'));
+                                                $badgeClass = match(true) {
+                                                    in_array($st, ['aktif', 'active', 'live', '1']) => 'bg-emerald-50 text-emerald-600 border border-emerald-200/60',
+                                                    in_array($st, ['suspend', 'isolir']) => 'bg-amber-50 text-amber-700 border border-amber-200/60',
+                                                    in_array($st, ['terminasi', 'putus', 'berhenti', 'nonaktif']) => 'bg-rose-50 text-rose-600 border border-rose-200/60',
+                                                    default => 'bg-slate-50 text-slate-600 border border-slate-200/60',
+                                                };
+                                            @endphp
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-extrabold uppercase {{ $badgeClass }}">
+                                                {{ $c->status ?: 'AKTIF' }}
                                             </span>
                                             @if ($c->nomor)
                                                 <span class="md:hidden text-[10px] font-mono text-slate-500">&bull; {{ $c->nomor }}</span>

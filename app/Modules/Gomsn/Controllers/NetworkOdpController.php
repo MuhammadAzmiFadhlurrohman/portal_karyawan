@@ -11,6 +11,8 @@ use App\Models\Pon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class NetworkOdpController extends Controller
@@ -251,15 +253,83 @@ class NetworkOdpController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('nama_user', 'like', "%{$search}%")
                     ->orWhere('nomor_internet', 'like', "%{$search}%")
-                    ->orWhere('alamat', 'like', "%{$search}%");
+                    ->orWhere('alamat', 'like', "%{$search}%")
+                    ->orWhere('nomor', 'like', "%{$search}%")
+                    ->orWhere('layanan', 'like', "%{$search}%")
+                    ->orWhere('note', 'like', "%{$search}%");
             });
         }
 
         $customers = $query->orderBy('id', 'asc')->paginate(30)->withQueryString();
+        
+        // Auto-enrich data dari view_batchjob IMS untuk pelanggan yang datanya masih kosong
+        $this->enrichCustomersWithImsData($customers);
+
         $histories = $odp->histories()->take(40)->get();
         $canManage = $this->canManageNetwork();
 
         return view('gomsn.network.customers.index', compact('olt', 'pon', 'odp', 'customers', 'histories', 'canManage'));
+    }
+
+    /**
+     * Sinkronkan data seluruh pelanggan pada ODP dari database IMS (view_batchjob).
+     */
+    public function syncImsOdp(Olt $olt, Pon $pon, Odp $odp): RedirectResponse
+    {
+        $customers = $odp->customers()->get();
+        $cids = $customers->pluck('nomor_internet')->filter()->unique()->toArray();
+
+        if (empty($cids)) {
+            return back()->with('info', "Tidak ada pelanggan terdaftar di ODP {$odp->nama_odp} untuk disinkronkan.");
+        }
+
+        try {
+            $imsRecords = DB::connection('ims')
+                ->table('view_batchjob')
+                ->whereIn('nomor_internet', $cids)
+                ->get([
+                    'nomor_internet',
+                    'alamat_pasang',
+                    'nomor_hp',
+                    'nama_kategori_bandwith',
+                    'desc_registrasi',
+                    'aktivasi_note_finish',
+                ])
+                ->keyBy('nomor_internet');
+
+            $updated = 0;
+            foreach ($customers as $c) {
+                if (isset($imsRecords[$c->nomor_internet])) {
+                    $ims = $imsRecords[$c->nomor_internet];
+                    $updates = [];
+
+                    if (!empty($ims->alamat_pasang) && $c->alamat !== $ims->alamat_pasang) {
+                        $updates['alamat'] = $ims->alamat_pasang;
+                    }
+                    if (!empty($ims->nomor_hp) && $c->nomor !== $ims->nomor_hp) {
+                        $updates['nomor'] = $ims->nomor_hp;
+                    }
+                    if (!empty($ims->nama_kategori_bandwith) && $c->layanan !== $ims->nama_kategori_bandwith) {
+                        $updates['layanan'] = $ims->nama_kategori_bandwith;
+                    }
+                    if (!empty($ims->desc_registrasi) && $c->status !== $ims->desc_registrasi) {
+                        $updates['status'] = $ims->desc_registrasi;
+                    }
+                    if (!empty($ims->aktivasi_note_finish) && $c->note !== $ims->aktivasi_note_finish) {
+                        $updates['note'] = $ims->aktivasi_note_finish;
+                    }
+
+                    if (!empty($updates)) {
+                        $c->updateQuietly($updates);
+                        $updated++;
+                    }
+                }
+            }
+
+            return back()->with('success', "Berhasil menyinkronkan {$updated} data pelanggan dari database IMS.");
+        } catch (\Throwable $e) {
+            return back()->with('error', "Gagal menyinkronkan ke IMS: " . $e->getMessage());
+        }
     }
 
     /**
@@ -281,16 +351,46 @@ class NetworkOdpController extends Controller
 
         $oltName = $odp->pon?->olt?->kode ?? $odp->pon?->olt?->nama_olt ?? 'MSN';
 
+        // Auto-fetch data dari IMS jika input kosong
+        $layanan = $validated['layanan'] ?? null;
+        $alamat = $validated['alamat'] ?? null;
+        $nomor = $validated['nomor'] ?? null;
+        $note = $validated['note'] ?? null;
+        $status = 'aktif';
+
+        try {
+            $ims = DB::connection('ims')
+                ->table('view_batchjob')
+                ->where('nomor_internet', $validated['nomor_internet'])
+                ->first([
+                    'alamat_pasang',
+                    'nomor_hp',
+                    'nama_kategori_bandwith',
+                    'desc_registrasi',
+                    'aktivasi_note_finish',
+                ]);
+
+            if ($ims) {
+                $alamat = $alamat ?: $ims->alamat_pasang;
+                $nomor = $nomor ?: $ims->nomor_hp;
+                $layanan = $layanan ?: $ims->nama_kategori_bandwith;
+                $status = $ims->desc_registrasi ?: $status;
+                $note = $note ?: $ims->aktivasi_note_finish;
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Gagal fetch data IMS saat storeCustomer: " . $e->getMessage());
+        }
+
         $customer = $odp->customers()->create([
             'nomor_internet' => $validated['nomor_internet'],
             'nama_user' => $validated['nama_user'],
             'keterangan' => $validated['keterangan'] ?? null,
-            'layanan' => $validated['layanan'] ?? null,
-            'alamat' => $validated['alamat'] ?? null,
-            'nomor' => $validated['nomor'] ?? null,
+            'layanan' => $layanan,
+            'alamat' => $alamat,
+            'nomor' => $nomor,
             'olt_name' => $oltName,
-            'note' => $validated['note'] ?? null,
-            'status' => 'aktif',
+            'note' => $note,
+            'status' => $status,
         ]);
 
         // Catat riwayat
@@ -395,5 +495,71 @@ class NetworkOdpController extends Controller
             'odp' => $odp->nama_odp,
             'histories' => $histories,
         ]);
+    }
+
+    /**
+     * Sinkronkan data pelanggan yang kosong dari database IMS (view_batchjob).
+     * Mapping:
+     * - alamat = alamat_pasang
+     * - nomor = nomor_hp
+     * - layanan = nama_kategori_bandwith
+     * - status = desc_registrasi
+     * - note = aktivasi_note_finish
+     */
+    protected function enrichCustomersWithImsData($customers): void
+    {
+        try {
+            $cids = $customers->getCollection()->pluck('nomor_internet')->filter()->unique()->toArray();
+            if (empty($cids)) {
+                return;
+            }
+
+            $imsRecords = DB::connection('ims')
+                ->table('view_batchjob')
+                ->whereIn('nomor_internet', $cids)
+                ->get([
+                    'nomor_internet',
+                    'alamat_pasang',
+                    'nomor_hp',
+                    'nama_kategori_bandwith',
+                    'desc_registrasi',
+                    'aktivasi_note_finish',
+                ])
+                ->keyBy('nomor_internet');
+
+            foreach ($customers->getCollection() as $c) {
+                if (isset($imsRecords[$c->nomor_internet])) {
+                    $ims = $imsRecords[$c->nomor_internet];
+                    $updates = [];
+
+                    if (empty($c->alamat) && !empty($ims->alamat_pasang)) {
+                        $c->alamat = $ims->alamat_pasang;
+                        $updates['alamat'] = $ims->alamat_pasang;
+                    }
+                    if (empty($c->nomor) && !empty($ims->nomor_hp)) {
+                        $c->nomor = $ims->nomor_hp;
+                        $updates['nomor'] = $ims->nomor_hp;
+                    }
+                    if ((empty($c->layanan) || $c->layanan === 'BROADBAND FREE') && !empty($ims->nama_kategori_bandwith)) {
+                        $c->layanan = $ims->nama_kategori_bandwith;
+                        $updates['layanan'] = $ims->nama_kategori_bandwith;
+                    }
+                    if (!empty($ims->desc_registrasi) && $c->status !== $ims->desc_registrasi) {
+                        $c->status = $ims->desc_registrasi;
+                        $updates['status'] = $ims->desc_registrasi;
+                    }
+                    if (empty($c->note) && !empty($ims->aktivasi_note_finish)) {
+                        $c->note = $ims->aktivasi_note_finish;
+                        $updates['note'] = $ims->aktivasi_note_finish;
+                    }
+
+                    if (!empty($updates)) {
+                        $c->updateQuietly($updates);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Gagal sinkron data IMS (view_batchjob): ' . $e->getMessage());
+        }
     }
 }

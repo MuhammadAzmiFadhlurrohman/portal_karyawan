@@ -257,6 +257,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/gomsn/network/customers/{customer}', [NetworkOdpController::class, 'updateCustomer'])->name('gomsn.network.customers.update');
     Route::delete('/gomsn/network/customers/{customer}', [NetworkOdpController::class, 'destroyCustomer'])->name('gomsn.network.customers.destroy');
     Route::get('/gomsn/network/odps/{odp}/histories', [NetworkOdpController::class, 'histories'])->name('gomsn.network.odps.histories');
+    Route::post('/gomsn/network/olts/{olt}/pons/{pon}/odps/{odp}/sync-ims', [NetworkOdpController::class, 'syncImsOdp'])->name('gomsn.network.odps.sync-ims');
 
     // Chatbot Asisten API (§5.8)
     Route::post('/api/chatbot/ask', [ChatbotController::class, 'ask'])->name('api.chatbot.ask');
