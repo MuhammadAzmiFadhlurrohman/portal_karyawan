@@ -23,7 +23,7 @@
                     { name: 'purple', label: 'Royal Purple', desc: 'Ungu Modern', hex: '#7c3aed', soft: '#faf5ff', gradient: 'linear-gradient(135deg, #311761 0%, #7c3aed 100%)' },
                     { name: 'rose', label: 'Crimson Rose', desc: 'Merah Berani', hex: '#e11d48', soft: '#fff1f2', gradient: 'linear-gradient(135deg, #570e22 0%, #e11d48 100%)' },
                     { name: 'amber', label: 'Amber Gold', desc: 'Emas Hangat', hex: '#d97706', soft: '#fffbeb', gradient: 'linear-gradient(135deg, #542807 0%, #d97706 100%)' },
-                    { name: 'slate', label: 'Midnight Slate', desc: 'Gelap Minimalis', hex: '#334155', soft: '#f1f5f9', gradient: 'linear-gradient(135deg, #0f172a 0%, #475569 100%)' },
+                    { name: 'pink', label: 'Sakura Pink', desc: 'Merah Muda Cerah', hex: '#ec4899', soft: '#fdf2f8', gradient: 'linear-gradient(135deg, #831843 0%, #ec4899 100%)' },
                 ],
                 prefs: {
                     notify_pengajuan: !!(config.initialPrefs && config.initialPrefs.notify_pengajuan),

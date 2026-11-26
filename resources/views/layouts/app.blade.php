@@ -34,7 +34,7 @@
         })();
 
         window.setGomsnAccent = function(accent) {
-            var valid = ['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'slate'];
+            var valid = ['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'pink'];
             var next = valid.indexOf(accent) !== -1 ? accent : 'teal';
             document.documentElement.setAttribute('data-accent', next);
             try {
@@ -299,25 +299,25 @@
             --color-teal-900: var(--color-amber-900);
             --color-teal-950: var(--color-amber-950);
         }
-        html[data-accent="slate"] {
-            --gomsn-accent: #334155;
-            --gomsn-accent-light: #cbd5e1;
-            --gomsn-sidebar-bg: linear-gradient(180deg, #0b1120 0%, #152036 25%, #1e293b 55%, #334155 85%, #090e1a 100%);
-            --gomsn-header-bg: linear-gradient(100deg, #0f172a 0%, #1e293b 40%, #334155 70%, #172033 100%);
-            --gomsn-active-bg: linear-gradient(90deg, #64748b 0%, #475569 100%);
-            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #94a3b8 0%, #475569 48%, #1e293b 100%);
-            --gomsn-sidebar-wave-filter: saturate(0.1);
-            --color-teal-50: var(--color-slate-50);
-            --color-teal-100: var(--color-slate-100);
-            --color-teal-200: var(--color-slate-200);
-            --color-teal-300: var(--color-slate-300);
-            --color-teal-400: var(--color-slate-400);
-            --color-teal-500: var(--color-slate-500);
-            --color-teal-600: var(--color-slate-600);
-            --color-teal-700: var(--color-slate-700);
-            --color-teal-800: var(--color-slate-800);
-            --color-teal-900: var(--color-slate-900);
-            --color-teal-950: var(--color-slate-950);
+        html[data-accent="pink"] {
+            --gomsn-accent: #ec4899;
+            --gomsn-accent-light: #f9a8d4;
+            --gomsn-sidebar-bg: linear-gradient(180deg, #3b0a24 0%, #61123d 25%, #831843 55%, #be185d 85%, #2b071a 100%);
+            --gomsn-header-bg: linear-gradient(100deg, #500724 0%, #831843 40%, #db2777 75%, #61123d 100%);
+            --gomsn-active-bg: linear-gradient(90deg, #f472b6 0%, #ec4899 100%);
+            --gomsn-orb-bg: radial-gradient(circle at 50% 25%, #f9a8d4 0%, #ec4899 48%, #831843 100%);
+            --gomsn-sidebar-wave-filter: hue-rotate(142deg);
+            --color-teal-50: #fdf2f8;
+            --color-teal-100: #fce7f3;
+            --color-teal-200: #fbcfe8;
+            --color-teal-300: #f9a8d4;
+            --color-teal-400: #f472b6;
+            --color-teal-500: #ec4899;
+            --color-teal-600: #db2777;
+            --color-teal-700: #be185d;
+            --color-teal-800: #9d174d;
+            --color-teal-900: #831843;
+            --color-teal-950: #500724;
         }
 
         #desktop-sidebar {
