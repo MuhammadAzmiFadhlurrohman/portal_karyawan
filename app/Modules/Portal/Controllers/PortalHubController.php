@@ -259,6 +259,7 @@ class PortalHubController extends Controller
         $search = trim((string) $request->query('q', ''));
 
         $logs = \App\Models\NotificationLog::query()
+            ->whereNotIn('event_type', ['shift_reminder_clock_in', 'shift_reminder_clock_out'])
             ->where(function ($q) use ($userId) {
                 // Notifikasi personal untuk user ini
                 $q->where(function ($sub) use ($userId) {
@@ -279,7 +280,13 @@ class PortalHubController extends Controller
             ->limit(100)
             ->get();
 
-        $items = $logs->map(function ($log) {
+        $items = $logs->filter(function ($log) {
+            $payload = is_array($log->payload) ? $log->payload : [];
+            $title = mb_strtolower((string) ($payload['title'] ?? ''));
+
+            return ! str_contains($title, 'pengingat absen masuk')
+                && ! str_contains($title, 'pengingat absen pulang');
+        })->map(function ($log) {
             $payload = is_array($log->payload) ? $log->payload : [];
             $eventType = strtolower((string) ($log->event_type ?: 'info'));
             $cat = match (true) {

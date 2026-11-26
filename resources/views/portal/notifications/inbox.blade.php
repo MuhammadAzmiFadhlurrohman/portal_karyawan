@@ -51,7 +51,7 @@
                         Pusat Notifikasi
                     </h1>
                     <p class="text-xs text-white/80 mt-0.5 leading-snug">
-                        Pengumuman perusahaan, status pengajuan, lembur, tiket, dan pengingat absensi Anda
+                        Pengumuman perusahaan, status pengajuan, lembur, tiket, dan absensi Anda
                     </p>
                 </div>
             </div>

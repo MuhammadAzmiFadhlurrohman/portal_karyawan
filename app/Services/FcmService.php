@@ -204,8 +204,10 @@ class FcmService
             return 0;
         }
 
-        // Catat notifikasi non-broadcast ke notification_logs agar tampil di halaman Notifikasi user
-        if ($eventType !== 'broadcast') {
+        // Catat notifikasi non-broadcast (selain pengingat absen masuk/pulang) ke notification_logs agar tampil di Pusat Notifikasi
+        $extraTag = (string) ($extraData['tag'] ?? '');
+        $isShiftReminder = str_starts_with($extraTag, 'shift-reminder-');
+        if ($eventType !== 'broadcast' && ! $isShiftReminder) {
             $nowTs = now();
             foreach ($allowedUserIds as $uid) {
                 try {
