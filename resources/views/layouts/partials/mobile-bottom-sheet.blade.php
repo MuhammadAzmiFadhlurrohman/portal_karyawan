@@ -87,9 +87,9 @@
                     </div>
 
                     <div class="min-w-0">
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-extrabold text-[15px] text-white tracking-tight leading-snug truncate">Semua Layanan Portal</h3>
-                            <span class="text-[9px] font-extrabold tracking-wider px-2 py-0.5 rounded-md bg-[#18C4C4]/20 text-[#5eead4] border border-[#5eead4]/35 shrink-0">
+                        <div class="flex items-center gap-1.5">
+                            <h3 class="font-extrabold text-[14px] text-white tracking-tight leading-snug truncate">Menu Layanan</h3>
+                            <span x-show="!isEditMode" class="text-[9px] font-extrabold tracking-wider px-1.5 py-0.5 rounded-md bg-[#18C4C4]/20 text-[#5eead4] border border-[#5eead4]/35 shrink-0">
                                 GOMSN
                             </span>
                         </div>
@@ -151,21 +151,22 @@
             <!-- Banner Kustomisasi Menu Aktif -->
             <div x-show="isEditMode" 
                  x-transition
-                 class="px-5 pb-3 pt-1 text-xs text-white/90 border-t border-white/10 flex items-center justify-between gap-3">
+                 class="px-5 pb-3 pt-2 text-xs text-white/90 border-t border-white/10 flex items-center justify-between gap-2.5">
                 <div class="flex items-center gap-2 min-w-0">
-                    <span class="w-2 h-2 rounded-full bg-[#5eead4] animate-ping"></span>
-                    <span class="text-[11px] truncate text-teal-100">Ketuk ikon <b class="text-white">Pensil</b> untuk ganti nama/warna, atau <b class="text-white">Panah</b> untuk geser posisi.</span>
+                    <span class="w-2 h-2 rounded-full bg-[#5eead4] shrink-0 animate-pulse"></span>
+                    <span class="text-[11px] leading-snug text-teal-100">Gunakan <b class="text-white">◀ / ▶</b> untuk geser urutan, atau <b class="text-white">Ubah</b> untuk ganti nama &amp; warna.</span>
                 </div>
                 <button type="button" 
                         @click="resetCustomizations()"
-                        class="px-2 py-1 text-[10px] font-bold text-rose-300 hover:text-rose-100 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/30 rounded-lg shrink-0 transition">
-                    Reset Default
+                        style="background: rgba(244, 63, 94, 0.22); border: 1px solid rgba(251, 113, 133, 0.45); color: #fecdd3;"
+                        class="px-2.5 py-1.5 text-[10px] font-bold rounded-lg shrink-0 transition active:scale-95 cursor-pointer">
+                    Reset
                 </button>
             </div>
         </div>
 
         <!-- Scrollable Content of Menus -->
-        <div class="p-5 overflow-y-auto space-y-5 flex-1 max-h-[calc(88vh-140px)] relative z-10">
+        <div class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1 max-h-[calc(88vh-140px)] relative z-10">
             
             <!-- Loop Per Kategori Menu -->
             <template x-for="(cat, catIndex) in categories" :key="cat.key">
@@ -184,27 +185,25 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <template x-for="(item, itemIndex) in getCategoryItems(cat.key)" :key="item.id">
                             <div x-show="item.visible && (!sheetSearch || isItemMatch(item))"
-                                 class="relative group rounded-2xl transition-all duration-200"
-                                 :class="isEditMode ? 'ring-2 ring-teal-400/40 ring-offset-1 bg-white shadow-xs' : ''">
+                                 class="relative group rounded-2xl transition-all duration-200 flex flex-col overflow-hidden bg-white shadow-2xs"
+                                 :style="getCardStyle(item)">
                                 
-                                <!-- Normal Mode: Link Asli -->
+                                <!-- Area Kartu Utama -->
                                 <a :href="isEditMode ? 'javascript:void(0)' : item.url" 
-                                   @click="if (isEditMode) openEditModal(item)"
-                                   :class="getCardClasses(item)"
-                                   class="p-3 rounded-2xl border bg-white flex items-center justify-between gap-2 transition-all shadow-2xs h-full"
-                                   :title="isEditMode ? 'Klik untuk mengubah nama dan warna' : item.title">
+                                   @click="if (isEditMode) { $event.preventDefault(); openEditModal(item); }"
+                                   class="p-3 flex items-center justify-between gap-2 transition-all flex-1"
+                                   :title="isEditMode ? 'Ketuk untuk mengubah nama dan warna' : getItemTitle(item)">
                                     
                                     <div class="flex items-center gap-2.5 min-w-0">
-                                        <!-- Icon Container dengan Warna Kustom -->
-                                        <div :class="getIconBoxClasses(item)" 
-                                             class="w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 transition-colors shadow-2xs">
+                                        <!-- Icon Container dengan Warna Kustom (Inline Style) -->
+                                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors shadow-2xs"
+                                             :style="getIconBoxStyle(item)">
                                             <div x-html="item.iconSvg"></div>
                                         </div>
 
                                         <!-- Text Title & Subtitle Kustom -->
                                         <div class="min-w-0">
                                             <span class="font-bold text-xs text-slate-800 block truncate leading-snug"
-                                                  :class="getTextHoverClass(item)"
                                                   x-text="getItemTitle(item)"></span>
                                             <span class="text-[10px] text-slate-400 block truncate mt-0.5 leading-tight"
                                                   x-text="getItemSubtitle(item)"></span>
@@ -218,37 +217,38 @@
                                     </template>
                                 </a>
 
-                                <!-- Edit Controls Overlay (Hanya tampil saat Edit Mode aktif) -->
+                                <!-- Bar Kontrol Edit (Di Bawah Kartu - Tidak Menutupi Teks!) -->
                                 <div x-show="isEditMode" 
-                                     class="absolute top-1 right-1 flex items-center gap-1 z-20">
-                                    
-                                    <!-- Tombol Geser Maju / Kiri (▲ / ◀) -->
-                                    <button type="button" 
-                                            @click.stop="moveItem(cat.key, itemIndex, -1)"
-                                            :disabled="itemIndex === 0"
-                                            :class="itemIndex === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-700 active:scale-90'"
-                                            class="w-6 h-6 rounded-lg bg-slate-800/80 text-white flex items-center justify-center text-[10px] font-bold shadow-xs transition"
-                                            title="Geser Posisi Maju">
-                                        ◀
-                                    </button>
+                                     class="bg-slate-50 border-t border-slate-200"
+                                     style="padding: 5px 6px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">
+                                        <!-- Tombol Geser Maju / Kiri -->
+                                        <button type="button" 
+                                                @click.stop="moveItem(cat.key, itemIndex, -1)"
+                                                :disabled="itemIndex === 0"
+                                                :style="'width: 28px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; border: none; ' + (itemIndex === 0 ? 'background: #e2e8f0; color: #94a3b8; cursor: not-allowed;' : 'background: #1e293b; color: #ffffff; cursor: pointer;')"
+                                                title="Geser Posisi Maju">
+                                            ◀
+                                        </button>
 
-                                    <!-- Tombol Edit Nama & Warna (Pensil) -->
-                                    <button type="button" 
-                                            @click.stop="openEditModal(item)"
-                                            class="w-6 h-6 rounded-lg bg-teal-600 hover:bg-teal-700 active:scale-90 text-white flex items-center justify-center text-xs shadow-xs transition"
-                                            title="Ganti Nama & Warna">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                                    </button>
+                                        <!-- Tombol Edit Nama & Warna -->
+                                        <button type="button" 
+                                                @click.stop="openEditModal(item)"
+                                                style="flex: 1; height: 26px; border-radius: 8px; background: #0d9488; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; border: none; cursor: pointer; padding: 0 6px;"
+                                                title="Ganti Nama & Warna">
+                                            <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            <span>Ubah</span>
+                                        </button>
 
-                                    <!-- Tombol Geser Mundur / Kanan (▼ / ▶) -->
-                                    <button type="button" 
-                                            @click.stop="moveItem(cat.key, itemIndex, 1)"
-                                            :disabled="itemIndex === getCategoryItems(cat.key).length - 1"
-                                            :class="itemIndex === getCategoryItems(cat.key).length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-700 active:scale-90'"
-                                            class="w-6 h-6 rounded-lg bg-slate-800/80 text-white flex items-center justify-center text-[10px] font-bold shadow-xs transition"
-                                            title="Geser Posisi Mundur">
-                                        ▶
-                                    </button>
+                                        <!-- Tombol Geser Mundur / Kanan -->
+                                        <button type="button" 
+                                                @click.stop="moveItem(cat.key, itemIndex, 1)"
+                                                :disabled="itemIndex === getCategoryItems(cat.key).length - 1"
+                                                :style="'width: 28px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; border: none; ' + (itemIndex === getCategoryItems(cat.key).length - 1 ? 'background: #e2e8f0; color: #94a3b8; cursor: not-allowed;' : 'background: #1e293b; color: #ffffff; cursor: pointer;')"
+                                                title="Geser Posisi Mundur">
+                                            ▶
+                                        </button>
+                                    </div>
                                 </div>
 
                             </div>
@@ -278,21 +278,23 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- MODAL EDIT NAMA & WARNA MENU                                  -->
+    <!-- MODAL EDIT NAMA & WARNA MENU (Z-INDEX TINGGI DI ATAS SHEET)    -->
     <!-- ============================================================== -->
     <div x-show="editingItem !== null" 
          x-cloak 
-         class="fixed inset-0 z-60 flex items-center justify-center p-4"
+         class="fixed inset-0 flex items-center justify-center p-4"
+         style="z-index: 9999;"
          x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 scale-95"
-         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
          x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95">
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
         
-        <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs" @click="editingItem = null"></div>
+        <div class="fixed inset-0" style="background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(4px);" @click="editingItem = null"></div>
 
-        <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 z-10 overflow-hidden"
+        <div class="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 overflow-y-auto"
+             style="position: relative; z-index: 10; max-height: 90vh;"
              @click.stop>
             
             <!-- Modal Header -->
@@ -363,10 +365,10 @@
                         Pratinjau Tampilan
                     </label>
                     <div class="p-3 rounded-2xl border bg-white flex items-center gap-2.5 shadow-2xs"
-                         :style="'border-color: ' + getPaletteHex(editForm.color) + '40;'">
+                         :style="'border-color: ' + getPaletteObj(editForm.color).border + '; background: linear-gradient(135deg, #ffffff 55%, ' + getPaletteObj(editForm.color).bg + ' 100%);'">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-2xs"
-                             :style="'background: ' + getPaletteHex(editForm.color) + '15; color: ' + getPaletteHex(editForm.color) + '; border: 1px solid ' + getPaletteHex(editForm.color) + '30;'">
-                            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                             :style="'background: ' + getPaletteObj(editForm.color).bg + '; color: ' + getPaletteObj(editForm.color).previewHex + '; border: 1px solid ' + getPaletteObj(editForm.color).border + ';'">
+                            <div x-html="editingItem ? editingItem.iconSvg : ''"></div>
                         </div>
                         <div class="min-w-0">
                             <span class="font-bold text-xs text-slate-900 block truncate leading-snug" x-text="editForm.title || 'Nama Menu'"></span>
@@ -419,16 +421,16 @@ function mobileMenuCustomizer(userId) {
         },
 
         colorPalette: [
-            { name: 'teal', label: 'Teal GoMSN', previewHex: '#0d9488' },
-            { name: 'emerald', label: 'Emerald Hijau', previewHex: '#10b981' },
-            { name: 'cyan', label: 'Cyan Biru Laut', previewHex: '#06b6d4' },
-            { name: 'blue', label: 'Biru Royal', previewHex: '#2563eb' },
-            { name: 'indigo', label: 'Indigo / Navy', previewHex: '#6366f1' },
-            { name: 'purple', label: 'Ungu Cerah', previewHex: '#a855f7' },
-            { name: 'rose', label: 'Rose / Merah', previewHex: '#f43f5e' },
-            { name: 'amber', label: 'Amber / Emas', previewHex: '#f59e0b' },
-            { name: 'orange', label: 'Oranye Terang', previewHex: '#f97316' },
-            { name: 'slate', label: 'Slate Elegan', previewHex: '#475569' },
+            { name: 'teal', label: 'Teal GoMSN', previewHex: '#0d9488', bg: '#f0fdfa', border: '#99f6e4' },
+            { name: 'emerald', label: 'Emerald Hijau', previewHex: '#10b981', bg: '#ecfdf5', border: '#a7f3d0' },
+            { name: 'cyan', label: 'Cyan Biru Laut', previewHex: '#06b6d4', bg: '#ecfeff', border: '#a5f3fc' },
+            { name: 'blue', label: 'Biru Royal', previewHex: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
+            { name: 'indigo', label: 'Indigo / Navy', previewHex: '#6366f1', bg: '#eef2ff', border: '#c7d2fe' },
+            { name: 'purple', label: 'Ungu Cerah', previewHex: '#a855f7', bg: '#faf5ff', border: '#e9d5ff' },
+            { name: 'rose', label: 'Rose / Merah', previewHex: '#f43f5e', bg: '#fff1f2', border: '#fecdd3' },
+            { name: 'amber', label: 'Amber / Emas', previewHex: '#d97706', bg: '#fffbeb', border: '#fde68a' },
+            { name: 'orange', label: 'Oranye Terang', previewHex: '#ea580c', bg: '#fff7ed', border: '#fed7aa' },
+            { name: 'slate', label: 'Slate Elegan', previewHex: '#475569', bg: '#f1f5f9', border: '#cbd5e1' },
         ],
 
         categories: [
@@ -906,60 +908,32 @@ function mobileMenuCustomizer(userId) {
             return item.defaultColor || 'teal';
         },
 
+        getPaletteObj(colorName) {
+            return this.colorPalette.find(c => c.name === colorName) || this.colorPalette[0];
+        },
+
         getPaletteHex(colorName) {
-            const p = this.colorPalette.find(c => c.name === colorName);
-            return p ? p.previewHex : '#0d9488';
+            return this.getPaletteObj(colorName).previewHex;
         },
 
-        getCardClasses(item) {
-            const c = this.getItemColor(item);
-            const map = {
-                teal: 'border-slate-200/90 hover:border-teal-400 hover:bg-teal-50/30',
-                emerald: 'border-slate-200/90 hover:border-emerald-400 hover:bg-emerald-50/30',
-                cyan: 'border-slate-200/90 hover:border-cyan-400 hover:bg-cyan-50/30',
-                blue: 'border-slate-200/90 hover:border-blue-400 hover:bg-blue-50/30',
-                indigo: 'border-slate-200/90 hover:border-indigo-400 hover:bg-indigo-50/30',
-                purple: 'border-slate-200/90 hover:border-purple-400 hover:bg-purple-50/30',
-                rose: 'border-slate-200/90 hover:border-rose-400 hover:bg-rose-50/30',
-                amber: 'border-slate-200/90 hover:border-amber-400 hover:bg-amber-50/30',
-                orange: 'border-slate-200/90 hover:border-orange-400 hover:bg-orange-50/30',
-                slate: 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50',
-            };
-            return map[c] || map.teal;
+        hasCustomColor(item) {
+            return !!(this.customizations.items && this.customizations.items[item.id] && this.customizations.items[item.id].color);
         },
 
-        getIconBoxClasses(item) {
-            const c = this.getItemColor(item);
-            const map = {
-                teal: 'bg-teal-50 border-teal-100 text-teal-600 group-hover:bg-[#155E63] group-hover:text-white',
-                emerald: 'bg-emerald-50 border-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white',
-                cyan: 'bg-cyan-50 border-cyan-100 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white',
-                blue: 'bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white',
-                indigo: 'bg-indigo-50 border-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white',
-                purple: 'bg-purple-50 border-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white',
-                rose: 'bg-rose-50 border-rose-100 text-rose-600 group-hover:bg-rose-600 group-hover:text-white',
-                amber: 'bg-amber-50 border-amber-100 text-amber-600 group-hover:bg-amber-600 group-hover:text-white',
-                orange: 'bg-orange-50 border-orange-100 text-orange-600 group-hover:bg-orange-600 group-hover:text-white',
-                slate: 'bg-slate-100 border-slate-200 text-slate-600 group-hover:bg-slate-700 group-hover:text-white',
-            };
-            return map[c] || map.teal;
+        getCardStyle(item) {
+            const p = this.getPaletteObj(this.getItemColor(item));
+            if (this.isEditMode) {
+                return 'border: 1.5px solid #2dd4bf; background: #ffffff;';
+            }
+            if (this.hasCustomColor(item)) {
+                return `border: 1px solid ${p.border}; background: linear-gradient(135deg, #ffffff 60%, ${p.bg} 100%);`;
+            }
+            return 'border: 1px solid rgba(226, 232, 240, 0.9); background: #ffffff;';
         },
 
-        getTextHoverClass(item) {
-            const c = this.getItemColor(item);
-            const map = {
-                teal: 'group-hover:text-[#155E63]',
-                emerald: 'group-hover:text-emerald-700',
-                cyan: 'group-hover:text-cyan-700',
-                blue: 'group-hover:text-blue-700',
-                indigo: 'group-hover:text-indigo-700',
-                purple: 'group-hover:text-purple-700',
-                rose: 'group-hover:text-rose-700',
-                amber: 'group-hover:text-amber-700',
-                orange: 'group-hover:text-orange-700',
-                slate: 'group-hover:text-slate-900',
-            };
-            return map[c] || map.teal;
+        getIconBoxStyle(item) {
+            const p = this.getPaletteObj(this.getItemColor(item));
+            return `background: ${p.bg}; color: ${p.previewHex}; border: 1px solid ${p.border};`;
         },
 
         isItemMatch(item) {
