@@ -264,52 +264,56 @@
                       x-text="isDark ? 'Mode Gelap' : 'Mode Terang'"></span>
             </div>
 
-            <div class="p-4 sm:p-5 grid grid-cols-2 gap-2.5 sm:gap-3" data-accent-swatch="true">
+            <div class="p-4 sm:p-5 grid grid-cols-2 gap-3" data-accent-swatch="true">
                 <!-- Pilihan Mode Terang -->
                 <button type="button"
                         @click="setTheme('light', $event)"
-                        class="relative p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 cursor-pointer"
+                        class="p-4 rounded-2xl border-2 text-left transition-all flex flex-col justify-between gap-3 cursor-pointer"
                         :style="!isDark
                             ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().soft}; box-shadow: 0 4px 12px ${getActiveAccentObj().hex}20;`
                             : 'border-color: rgba(148, 163, 184, 0.2); background: rgba(15, 23, 42, 0.5);'">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 min-w-0">
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-500 flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <!-- Baris Atas: Ikon + Indikator Centang Sejajar Kanan -->
+                    <div class="flex items-center justify-between w-full">
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-500 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                         </div>
-                        <div class="min-w-0">
-                            <div class="text-xs font-bold leading-snug" :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'">Mode Terang</div>
-                            <div class="text-[10.5px] sm:text-[11px] mt-0.5 leading-snug" :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'">Cerah untuk siang hari</div>
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-white"
+                             :style="!isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex};` : 'border-color: #64748b;'">
+                            <svg x-show="!isDark" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                         </div>
                     </div>
-                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-white absolute top-3.5 right-3.5 sm:static"
-                         :style="!isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex};` : 'border-color: #64748b;'">
-                        <svg x-show="!isDark" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <!-- Baris Bawah: Judul & Keterangan -->
+                    <div class="min-w-0">
+                        <div class="text-xs sm:text-sm font-bold leading-snug" :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'">Mode Terang</div>
+                        <div class="text-[10.5px] sm:text-[11px] mt-0.5 leading-snug" :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'">Cerah untuk siang hari</div>
                     </div>
                 </button>
 
                 <!-- Pilihan Mode Gelap -->
                 <button type="button"
                         @click="setTheme('dark', $event)"
-                        class="relative p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 cursor-pointer"
+                        class="p-4 rounded-2xl border-2 text-left transition-all flex flex-col justify-between gap-3 cursor-pointer"
                         :style="isDark
                             ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex}26; box-shadow: 0 4px 14px ${getActiveAccentObj().hex}2e;`
                             : 'border-color: #e2e8f0; background: #ffffff;'">
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3 min-w-0">
-                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-800 border border-slate-700 text-cyan-300 flex items-center justify-center shrink-0">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
+                    <!-- Baris Atas: Ikon + Indikator Centang Sejajar Kanan -->
+                    <div class="flex items-center justify-between w-full">
+                        <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 text-cyan-300 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.1" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                             </svg>
                         </div>
-                        <div class="min-w-0">
-                            <div class="text-xs font-bold leading-snug" :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'">Mode Gelap</div>
-                            <div class="text-[10.5px] sm:text-[11px] mt-0.5 leading-snug" :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'">Nyaman minim cahaya</div>
+                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-white"
+                             :style="isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex};` : 'border-color: #cbd5e1;'">
+                            <svg x-show="isDark" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                         </div>
                     </div>
-                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 text-white absolute top-3.5 right-3.5 sm:static"
-                         :style="isDark ? `border-color: ${getActiveAccentObj().hex}; background: ${getActiveAccentObj().hex};` : 'border-color: #cbd5e1;'">
-                        <svg x-show="isDark" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <!-- Baris Bawah: Judul & Keterangan -->
+                    <div class="min-w-0">
+                        <div class="text-xs sm:text-sm font-bold leading-snug" :style="isDark ? 'color: #f8fafc;' : 'color: #1e293b;'">Mode Gelap</div>
+                        <div class="text-[10.5px] sm:text-[11px] mt-0.5 leading-snug" :style="isDark ? 'color: #94a3b8;' : 'color: #64748b;'">Nyaman minim cahaya</div>
                     </div>
                 </button>
             </div>
