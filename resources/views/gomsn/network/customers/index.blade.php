@@ -161,7 +161,6 @@
                             <th class="hidden md:table-cell py-3 px-4 min-w-[110px]">NOMOR / BW</th>
                             <th class="hidden lg:table-cell py-3 px-3 text-center w-20">OLT</th>
                             <th class="py-3 px-2 sm:px-4 text-center sm:text-left">PORT / NOTE</th>
-                            <th class="hidden xl:table-cell py-3 px-4 min-w-[140px]">KETERANGAN</th>
                             <th class="py-3 pl-2 pr-4 sm:px-3 text-right sm:text-center w-24">AKSI</th>
                         </tr>
                     </thead>
@@ -228,13 +227,6 @@
                                     {{ $c->note ?: '-' }}
                                 </td>
 
-                                <!-- Keterangan -->
-                                <td class="hidden xl:table-cell py-3.5 px-4 text-slate-500 text-[11px]">
-                                    <div class="max-w-[180px] truncate" title="{{ $c->keterangan }}">
-                                        {{ $c->keterangan ?: '-' }}
-                                    </div>
-                                </td>
-
                                 <!-- Aksi Buttons -->
                                 <td class="py-3.5 pl-2 pr-4 sm:px-3 text-right sm:text-center">
                                     @if ($canManage)
@@ -266,7 +258,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="py-12 text-center text-slate-400 text-xs">
+                                <td colspan="8" class="py-12 text-center text-slate-400 text-xs">
                                     <div class="flex flex-col items-center justify-center gap-2">
                                         <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                         <span>Belum ada pelanggan terhubung di ODP {{ $odp->nama_odp }}. Silakan tambahkan melalui form di atas.</span>
