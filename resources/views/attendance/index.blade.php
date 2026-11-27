@@ -186,14 +186,12 @@
 
             <!-- Center Visual & Status Hero Box -->
             @php
-                $attendanceIllustration = auth()->user()?->attendance_avatar_url ?? (asset('assets/logo/absenpria.jpg') . '?v=2');
+                $attendanceIllustration = auth()->user()?->attendance_avatar_url ?? (asset('assets/logo/absenpria.png') . '?v=3');
             @endphp
-            <div class="rounded-2xl bg-gradient-to-b from-slate-50/80 via-teal-50/25 to-slate-50/50 border border-slate-100 py-6 px-4 flex flex-col items-center justify-center text-center space-y-3.5">
+            <div class="rounded-2xl bg-gradient-to-b from-slate-50/80 via-teal-50/25 to-slate-50/50 border border-slate-100 py-6 px-4 flex flex-col items-center justify-center text-center space-y-3">
                 @if (! $todayAttendance)
                     <div class="relative inline-flex items-center justify-center">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border-2 border-slate-200 ring-8 ring-slate-100/80 flex items-center justify-center shadow-xs overflow-hidden p-2.5" style="--tw-ring-color: rgba(241, 245, 249, 0.85);">
-                            <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-full h-full object-contain object-center select-none">
-                        </div>
+                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-slate-800">Belum Absen Masuk</p>
@@ -203,10 +201,8 @@
                     </div>
                 @elseif (! $todayAttendance->clock_out_at)
                     <div class="relative inline-flex items-center justify-center">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border-2 border-emerald-300 ring-8 ring-emerald-50/80 flex items-center justify-center shadow-xs overflow-hidden p-2.5" style="--tw-ring-color: rgba(236, 253, 245, 0.85);">
-                            <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-full h-full object-contain object-center select-none">
-                        </div>
-                        <span class="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
+                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
+                        <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                         </span>
                     </div>
@@ -218,10 +214,8 @@
                     </div>
                 @else
                     <div class="relative inline-flex items-center justify-center">
-                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border-2 border-teal-300 ring-8 ring-teal-50/70 flex items-center justify-center shadow-xs overflow-hidden p-2.5" style="--tw-ring-color: rgba(240, 253, 250, 0.8);">
-                            <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-full h-full object-contain object-center select-none">
-                        </div>
-                        <span class="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-[#155E63] border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
+                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
+                        <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#155E63] border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </span>
                     </div>

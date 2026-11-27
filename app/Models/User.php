@@ -452,9 +452,13 @@ class User extends Authenticatable
      */
     public function getAttendanceAvatarUrlAttribute(): string
     {
-        $file = $this->isPerempuan() ? 'assets/logo/absenperempuan.jpg' : 'assets/logo/absenpria.jpg';
+        $file = $this->isPerempuan() ? 'assets/logo/absenperempuan.png' : 'assets/logo/absenpria.png';
         $fullPath = public_path($file);
-        $version = is_file($fullPath) ? filemtime($fullPath) : '2';
+        if (! is_file($fullPath)) {
+            $file = $this->isPerempuan() ? 'assets/logo/absenperempuan.jpg' : 'assets/logo/absenpria.jpg';
+            $fullPath = public_path($file);
+        }
+        $version = is_file($fullPath) ? filemtime($fullPath) : '3';
 
         return asset($file) . '?v=' . $version;
     }
