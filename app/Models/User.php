@@ -480,6 +480,34 @@ class User extends Authenticatable
     }
 
     /**
+     * Get customized success/checkmark character illustration URL (Pria vs Perempuan).
+     */
+    public function getSuccessAvatarUrlAttribute(): string
+    {
+        return $this->getSuccessAvatarUrlForTheme('teal');
+    }
+
+    /**
+     * Get theme-aware success/checkmark character illustration URL.
+     */
+    public function getSuccessAvatarUrlForTheme(?string $theme = 'teal'): string
+    {
+        $validThemes = ['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'pink'];
+        $accent = in_array($theme, $validThemes, true) ? $theme : 'teal';
+        $prefix = $this->isPerempuan() ? 'ceklisperempuan' : 'ceklispria';
+
+        $file = "assets/logo/{$prefix}-{$accent}.png";
+        $fullPath = public_path($file);
+        if (! is_file($fullPath)) {
+            $file = "assets/logo/{$prefix}.png";
+            $fullPath = public_path($file);
+        }
+        $version = is_file($fullPath) ? filemtime($fullPath) : '1';
+
+        return asset($file) . '?v=' . $version;
+    }
+
+    /**
      * Determine if user is female.
      */
     public function isPerempuan(): bool

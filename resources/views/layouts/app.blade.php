@@ -577,7 +577,29 @@
             background-clip: padding-box;
         }
 
-
+        /* Custom Character Checkmark Icon in SweetAlert2 Success Toast */
+        .swal2-popup.swal2-toast .swal2-icon.gomsn-toast-custom-icon {
+            border: none !important;
+            background: transparent !important;
+            width: 46px !important;
+            height: 46px !important;
+            min-width: 46px !important;
+            margin: 0 0.65rem 0 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+        .swal2-popup.swal2-toast .swal2-icon.gomsn-toast-custom-icon::before,
+        .swal2-popup.swal2-toast .swal2-icon.gomsn-toast-custom-icon::after {
+            display: none !important;
+        }
+        .swal2-popup.swal2-toast .swal2-icon.gomsn-toast-custom-icon .swal2-icon-content {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            font-size: inherit !important;
+        }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -1800,18 +1822,72 @@
     @endauth
 
     <!-- SweetAlert2 Toast Global Notifier (Ujung Kanan Atas) -->
+    @php
+        $toastAuthUser = auth()->user();
+        $toastCeklisThemeUrls = [];
+        foreach (['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'pink'] as $tKey) {
+            $toastCeklisThemeUrls[$tKey] = $toastAuthUser
+                ? $toastAuthUser->getSuccessAvatarUrlForTheme($tKey)
+                : (asset("assets/logo/ceklispria-{$tKey}.png") . '?v=1');
+        }
+        $toastDefaultCeklisUrl = $toastAuthUser
+            ? asset('assets/logo/' . ($toastAuthUser->isPerempuan() ? 'ceklisperempuan.png' : 'ceklispria.png')) . '?v=1'
+            : (asset('assets/logo/ceklispria.png') . '?v=1');
+    @endphp
     <script>
+        window.__gomsnSuccessToastMap = @json($toastCeklisThemeUrls);
+        window.__gomsnSuccessToastDefault = @json($toastDefaultCeklisUrl);
+        window.getGomsnSuccessToastIconHtml = function() {
+            var accent = document.documentElement.getAttribute('data-accent') || 'teal';
+            var map = window.__gomsnSuccessToastMap || {};
+            var url = map[accent] || window.__gomsnSuccessToastDefault;
+            return '<img src="' + url + '" alt="Berhasil" class="w-11 h-11 object-contain select-none drop-shadow-xs">';
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Override window.showToast to use character checkmark image for 'success'
+            if (window.Toast) {
+                window.showToast = function(icon, message, title = '') {
+                    var isSuccess = icon === 'success';
+                    var opts = {
+                        icon: icon,
+                        title: title ? '<strong>' + title + '</strong><br><span class="text-xs font-normal text-slate-600">' + message + '</span>' : message
+                    };
+                    if (isSuccess && typeof window.getGomsnSuccessToastIconHtml === 'function') {
+                        opts.iconHtml = window.getGomsnSuccessToastIconHtml();
+                        opts.customClass = {
+                            popup: 'rounded-2xl shadow-2xl border border-slate-100 text-xs sm:text-sm font-sans select-none',
+                            title: 'font-semibold text-slate-800 text-xs sm:text-sm',
+                            icon: 'gomsn-toast-custom-icon border-0'
+                        };
+                    }
+                    return window.Toast.fire(opts);
+                };
+            }
+
             function triggerToast(icon, message) {
                 if (!message) return;
                 const fire = () => {
+                    const isSuccess = icon === 'success';
+                    const customIconHtml = (isSuccess && typeof window.getGomsnSuccessToastIconHtml === 'function')
+                        ? window.getGomsnSuccessToastIconHtml()
+                        : undefined;
                     if (window.Toast) {
-                        window.Toast.fire({
+                        const opts = {
                             icon: icon,
                             title: message
-                        });
+                        };
+                        if (isSuccess && customIconHtml) {
+                            opts.iconHtml = customIconHtml;
+                            opts.customClass = {
+                                popup: 'rounded-2xl shadow-2xl border border-slate-100 text-xs sm:text-sm font-sans select-none',
+                                title: 'font-semibold text-slate-800 text-xs sm:text-sm',
+                                icon: 'gomsn-toast-custom-icon border-0'
+                            };
+                        }
+                        window.Toast.fire(opts);
                     } else if (window.Swal) {
-                        Swal.fire({
+                        const opts = {
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
@@ -1821,10 +1897,15 @@
                             customClass: {
                                 popup: 'rounded-2xl shadow-2xl border border-slate-100 text-xs sm:text-sm font-sans select-none',
                                 title: 'font-semibold text-slate-800 text-xs sm:text-sm',
+                                icon: isSuccess ? 'gomsn-toast-custom-icon border-0' : ''
                             },
                             icon: icon,
                             title: message
-                        });
+                        };
+                        if (isSuccess && customIconHtml) {
+                            opts.iconHtml = customIconHtml;
+                        }
+                        Swal.fire(opts);
                     }
                 };
 

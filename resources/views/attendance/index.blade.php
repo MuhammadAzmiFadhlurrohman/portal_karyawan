@@ -188,17 +188,22 @@
             @php
                 $authUser = auth()->user();
                 $attendanceThemeUrls = [];
+                $attendanceSuccessThemeUrls = [];
                 foreach (['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'pink'] as $themeKey) {
                     $attendanceThemeUrls[$themeKey] = $authUser
                         ? $authUser->getAttendanceAvatarUrlForTheme($themeKey)
                         : (asset("assets/logo/absenpria-{$themeKey}.png") . '?v=4');
+                    $attendanceSuccessThemeUrls[$themeKey] = $authUser
+                        ? $authUser->getSuccessAvatarUrlForTheme($themeKey)
+                        : (asset("assets/logo/ceklispria-{$themeKey}.png") . '?v=1');
                 }
                 $attendanceIllustration = $attendanceThemeUrls['teal'];
+                $attendanceSuccessIllustration = $attendanceSuccessThemeUrls['teal'];
             @endphp
             <div class="rounded-2xl bg-gradient-to-b from-slate-50/80 via-teal-50/25 to-slate-50/50 border border-slate-100 py-6 px-4 flex flex-col items-center justify-center text-center space-y-3">
                 @if (! $todayAttendance)
                     <div class="relative inline-flex items-center justify-center">
-                        <img data-gomsn-attendance-illust="true" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
+                        <img data-gomsn-attendance-illust="scan" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-slate-800">Belum Absen Masuk</p>
@@ -208,10 +213,7 @@
                     </div>
                 @elseif (! $todayAttendance->clock_out_at)
                     <div class="relative inline-flex items-center justify-center">
-                        <img data-gomsn-attendance-illust="true" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
-                        <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        </span>
+                        <img data-gomsn-attendance-illust="success" src="{{ $attendanceSuccessIllustration }}" alt="Sudah Absen Masuk" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-emerald-800">Sudah Absen Masuk</p>
@@ -221,10 +223,7 @@
                     </div>
                 @else
                     <div class="relative inline-flex items-center justify-center">
-                        <img data-gomsn-attendance-illust="true" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
-                        <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#155E63] border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </span>
+                        <img data-gomsn-attendance-illust="success" src="{{ $attendanceSuccessIllustration }}" alt="Absensi Selesai" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-[#155E63]">Absensi Selesai Hari Ini</p>
@@ -235,14 +234,22 @@
                 @endif
                 <script>
                     (function() {
-                        var map = @json($attendanceThemeUrls);
+                        var scanMap = @json($attendanceThemeUrls);
+                        var successMap = @json($attendanceSuccessThemeUrls);
                         var applyIllustTheme = function(accent) {
-                            var key = (accent && map[accent]) ? accent : (document.documentElement.getAttribute('data-accent') || 'teal');
-                            var url = map[key] || map['teal'];
-                            var imgs = document.querySelectorAll('img[data-gomsn-attendance-illust="true"]');
-                            for (var i = 0; i < imgs.length; i++) {
-                                if (imgs[i].getAttribute('src') !== url) {
-                                    imgs[i].setAttribute('src', url);
+                            var key = (accent && scanMap[accent]) ? accent : (document.documentElement.getAttribute('data-accent') || 'teal');
+                            var scanUrl = scanMap[key] || scanMap['teal'];
+                            var successUrl = successMap[key] || successMap['teal'];
+                            var scanImgs = document.querySelectorAll('img[data-gomsn-attendance-illust="scan"]');
+                            for (var i = 0; i < scanImgs.length; i++) {
+                                if (scanImgs[i].getAttribute('src') !== scanUrl) {
+                                    scanImgs[i].setAttribute('src', scanUrl);
+                                }
+                            }
+                            var okImgs = document.querySelectorAll('img[data-gomsn-attendance-illust="success"]');
+                            for (var j = 0; j < okImgs.length; j++) {
+                                if (okImgs[j].getAttribute('src') !== successUrl) {
+                                    okImgs[j].setAttribute('src', successUrl);
                                 }
                             }
                         };
