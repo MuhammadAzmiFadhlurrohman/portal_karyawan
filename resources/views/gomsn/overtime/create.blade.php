@@ -79,7 +79,7 @@
                 </span>
             </div>
 
-            <form method="POST" action="{{ route('gomsn.overtime.store') }}" class="p-6 sm:p-9 space-y-6 sm:space-y-7">
+            <form method="POST" action="{{ route('gomsn.overtime.store') }}" @submit="if(canSubmit && !submitting){ submitting = true; } else { $event.preventDefault(); }" class="p-6 sm:p-9 space-y-6 sm:space-y-7">
                 @csrf
 
                 <!-- Row 1: Tanggal Lembur & Jenis Lembur in 2 Columns -->
@@ -221,14 +221,18 @@
                             Batal
                         </a>
                         <button type="submit"
-                                :disabled="!canSubmit"
-                                :class="canSubmit ? 'opacity-100 hover:opacity-90 shadow-md cursor-pointer' : 'opacity-50 cursor-not-allowed'"
+                                :disabled="!canSubmit || submitting"
+                                :class="canSubmit && !submitting ? 'opacity-100 hover:opacity-90 shadow-md cursor-pointer' : 'opacity-50 cursor-not-allowed'"
                                 style="background: var(--gomsn-active-bg) !important;"
                                 class="px-7 py-3 text-white font-bold text-sm rounded-xl inline-flex items-center justify-center gap-2 transition duration-200">
-                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg x-show="submitting" class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            <svg x-show="!submitting" class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
-                            <span>Simpan &amp; Ajukan Lembur</span>
+                            <span x-text="submitting ? 'Mengajukan...' : 'Ajukan Lembur'">Ajukan Lembur</span>
                         </button>
                     </div>
                 </div>
@@ -249,6 +253,7 @@
                 jamSelesai: '{{ old('jam_selesai', '') }}',
                 alasan: '{{ old('alasan', '') }}',
                 checking: false,
+                submitting: false,
                 attendanceChecked: false,
                 hasAttendance: false,
                 attendanceData: {},
