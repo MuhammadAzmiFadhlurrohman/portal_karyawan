@@ -205,10 +205,10 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Disetujui -->
+                <!-- Card 2: Total Disetujui -->
                 <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
                     <div class="min-w-0">
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Disetujui</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Disetujui</span>
                         <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['approved'] }}</span>
                     </div>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
@@ -218,10 +218,10 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Ditolak -->
+                <!-- Card 3: Total Ditolak -->
                 <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
                     <div class="min-w-0">
-                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Ditolak</span>
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Ditolak</span>
                         <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['rejected'] }}</span>
                     </div>
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
@@ -720,6 +720,64 @@
             <!-- ============================================== -->
             <!-- TAMPILAN STANDAR (KARYAWAN / ATASAN / ADMIN)   -->
             <!-- ============================================== -->
+
+            <!-- 4 KPI Stats Summary Cards (Total Pengajuan, Total Disetujui, Total Ditolak, Total Dana) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <!-- Card 1: Total Pengajuan -->
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Pengajuan</span>
+                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['total'] }}</span>
+                    </div>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Disetujui -->
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Disetujui</span>
+                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['approved'] }}</span>
+                    </div>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Ditolak -->
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Ditolak</span>
+                        <span class="text-xl sm:text-2xl font-heading font-extrabold text-slate-900">{{ $financeMetrics['rejected'] }}</span>
+                    </div>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 4: Total Dana -->
+                <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/80 shadow-xs flex items-center justify-between gap-2.5">
+                    <div class="min-w-0">
+                        <span class="text-[11px] sm:text-xs font-semibold text-slate-500 block mb-0.5 truncate">Total Dana</span>
+                        <span class="text-sm sm:text-xl font-heading font-extrabold text-slate-900 block truncate">
+                            Rp {{ number_format($financeMetrics['total_dana'], 0, ',', '.') }}
+                        </span>
+                    </div>
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/>
+                            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
 
             <!-- Navigation Tabs (Untuk Atasan / Admin) -->
             @if ($isAtasan || $isSuperAdmin)
