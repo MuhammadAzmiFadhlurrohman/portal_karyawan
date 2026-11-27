@@ -727,9 +727,9 @@
                          class="h-14 sm:h-16 lg:h-20 w-auto max-w-[260px] sm:max-w-[300px] lg:max-w-[360px] object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.35)] transition-transform duration-200 hover:scale-105">
                 </div>
 
-                <!-- Italic Tagline -->
-                <p class="mt-1.5 lg:mt-2.5 text-[12.5px] sm:text-[13.5px] lg:text-[15px] italic text-white/95 font-normal tracking-wide max-w-md mx-auto">
-                    Melayani dengan Solusi, Terhubung untuk Masa Depan
+                <!-- Subtitle Sesuai Isi Aplikasi -->
+                <p class="mt-1.5 lg:mt-2.5 text-[12.5px] sm:text-[13.5px] lg:text-[15px] text-white/95 font-medium tracking-wide max-w-md mx-auto">
+                    Portal Terpadu Operasional, Absensi &amp; Layanan Karyawan
                 </p>
 
                 <!-- Desktop-only Subtle System Pill -->
