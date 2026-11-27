@@ -186,12 +186,19 @@
 
             <!-- Center Visual & Status Hero Box -->
             @php
-                $attendanceIllustration = auth()->user()?->attendance_avatar_url ?? (asset('assets/logo/absenpria.png') . '?v=3');
+                $authUser = auth()->user();
+                $attendanceThemeUrls = [];
+                foreach (['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'pink'] as $themeKey) {
+                    $attendanceThemeUrls[$themeKey] = $authUser
+                        ? $authUser->getAttendanceAvatarUrlForTheme($themeKey)
+                        : (asset("assets/logo/absenpria-{$themeKey}.png") . '?v=4');
+                }
+                $attendanceIllustration = $attendanceThemeUrls['teal'];
             @endphp
             <div class="rounded-2xl bg-gradient-to-b from-slate-50/80 via-teal-50/25 to-slate-50/50 border border-slate-100 py-6 px-4 flex flex-col items-center justify-center text-center space-y-3">
                 @if (! $todayAttendance)
                     <div class="relative inline-flex items-center justify-center">
-                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
+                        <img data-gomsn-attendance-illust="true" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-slate-800">Belum Absen Masuk</p>
@@ -201,7 +208,7 @@
                     </div>
                 @elseif (! $todayAttendance->clock_out_at)
                     <div class="relative inline-flex items-center justify-center">
-                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
+                        <img data-gomsn-attendance-illust="true" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                         <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                         </span>
@@ -214,7 +221,7 @@
                     </div>
                 @else
                     <div class="relative inline-flex items-center justify-center">
-                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
+                        <img data-gomsn-attendance-illust="true" src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-28 h-28 sm:w-32 sm:h-32 object-contain object-center select-none drop-shadow-xs">
                         <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#155E63] border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </span>
@@ -226,6 +233,25 @@
                         </p>
                     </div>
                 @endif
+                <script>
+                    (function() {
+                        var map = @json($attendanceThemeUrls);
+                        var applyIllustTheme = function(accent) {
+                            var key = (accent && map[accent]) ? accent : (document.documentElement.getAttribute('data-accent') || 'teal');
+                            var url = map[key] || map['teal'];
+                            var imgs = document.querySelectorAll('img[data-gomsn-attendance-illust="true"]');
+                            for (var i = 0; i < imgs.length; i++) {
+                                if (imgs[i].getAttribute('src') !== url) {
+                                    imgs[i].setAttribute('src', url);
+                                }
+                            }
+                        };
+                        applyIllustTheme();
+                        window.addEventListener('gomsn-accent-changed', function(e) {
+                            applyIllustTheme(e && e.detail ? e.detail.accent : null);
+                        });
+                    })();
+                </script>
             </div>
 
             <!-- 2-Column Check-In & Check-Out Time Summary Boxes -->

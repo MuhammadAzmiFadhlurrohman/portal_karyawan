@@ -452,13 +452,29 @@ class User extends Authenticatable
      */
     public function getAttendanceAvatarUrlAttribute(): string
     {
-        $file = $this->isPerempuan() ? 'assets/logo/absenperempuan.png' : 'assets/logo/absenpria.png';
+        return $this->getAttendanceAvatarUrlForTheme('teal');
+    }
+
+    /**
+     * Get theme-aware attendance illustration URL (teal, blue, indigo, emerald, purple, rose, amber, pink).
+     */
+    public function getAttendanceAvatarUrlForTheme(?string $theme = 'teal'): string
+    {
+        $validThemes = ['teal', 'blue', 'indigo', 'emerald', 'purple', 'rose', 'amber', 'pink'];
+        $accent = in_array($theme, $validThemes, true) ? $theme : 'teal';
+        $prefix = $this->isPerempuan() ? 'absenperempuan' : 'absenpria';
+
+        $file = "assets/logo/{$prefix}-{$accent}.png";
         $fullPath = public_path($file);
         if (! is_file($fullPath)) {
-            $file = $this->isPerempuan() ? 'assets/logo/absenperempuan.jpg' : 'assets/logo/absenpria.jpg';
+            $file = "assets/logo/{$prefix}.png";
             $fullPath = public_path($file);
         }
-        $version = is_file($fullPath) ? filemtime($fullPath) : '3';
+        if (! is_file($fullPath)) {
+            $file = "assets/logo/{$prefix}.jpg";
+            $fullPath = public_path($file);
+        }
+        $version = is_file($fullPath) ? filemtime($fullPath) : '4';
 
         return asset($file) . '?v=' . $version;
     }
