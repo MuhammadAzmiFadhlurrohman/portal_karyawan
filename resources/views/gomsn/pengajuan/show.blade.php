@@ -189,19 +189,7 @@
             </div>
         </div>
 
-        <!-- Flash Success Notification -->
-        @if (session('success'))
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium flex items-center gap-3 shadow-2xs">
-            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm shrink-0">
-                ✓
-            </div>
-            <div class="flex-1">
-                {{ session('success') }}
-            </div>
-        </div>
-        @endif
-
-        <!-- Error / Overdue Alerts -->
+        <!-- Error / Overdue Alerts (Success toast handled globally at top-right) -->
         @if ($errors->any())
         <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-medium flex items-center gap-3 shadow-2xs">
             <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-sm shrink-0">

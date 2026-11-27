@@ -117,16 +117,7 @@
             </div>
         </div>
 
-        <!-- Flash Alerts -->
-        @if (session('success'))
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium flex items-center justify-between shadow-2xs">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>{{ session('success') }}</span>
-            </div>
-        </div>
-        @endif
-
+        <!-- Flash Alerts (Success toast handled globally at top-right) -->
         @if (session('error'))
         <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-medium flex items-center justify-between shadow-2xs">
             <div class="flex items-center gap-2">
