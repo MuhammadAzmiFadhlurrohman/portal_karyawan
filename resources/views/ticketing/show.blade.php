@@ -649,11 +649,13 @@
                         STATUS: OVERDUE INTERVAL
                     </span>
                 </div>
-                <button type="button" onclick="switchTab('tab-chronology'); document.getElementById('quick-chat-input').focus();"
+                @can('chat', $tiket)
+                <button type="button" onclick="switchTab('tab-chronology'); if(document.getElementById('quick-chat-input')) document.getElementById('quick-chat-input').focus();"
                         class="px-4 py-2 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition cursor-pointer flex items-center gap-1.5">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     <span>Kirim Update Sekarang</span>
                 </button>
+                @endcan
             </div>
         </div>
     @elseif($intervalStatus === 'STOP_CLOCK')
@@ -1650,18 +1652,18 @@
                 </button>
             </div>
 
-            @if(in_array($tiket->status, ['CLOSE', 'CANCELLED'], true))
-            <!-- Banner Tiket Ditutup (Closing Selesai) -->
-            <div class="p-3.5 bg-slate-100/90 border-t border-slate-200 text-center text-xs text-slate-600 font-semibold flex items-center justify-center gap-2 select-none shrink-0 shadow-2xs">
-                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                    </svg>
+            @can('chat', $tiket)
+                @if(in_array($tiket->status, ['CLOSE', 'CANCELLED'], true))
+                <!-- Banner Tiket Selesai / Ditutup untuk Tim Berkepentingan -->
+                <div class="px-3.5 py-2 bg-emerald-50/80 border-t border-emerald-200 text-center text-xs text-emerald-800 font-semibold flex items-center justify-center gap-2 select-none shrink-0 shadow-2xs">
+                    <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <span>Tiket berstatus <strong class="text-emerald-950 font-bold">{{ $tiket->status }}</strong> &bull; Chat koordinasi aktif khusus Admin, Semua Atasan, CEO, NOC &amp; Tim Teknik yang Ditugaskan.</span>
                 </div>
-                <span>Tiket telah berstatus <strong class="text-slate-800">{{ $tiket->status }}</strong>. Pengiriman kronologis &amp; update koordinasi lapangan telah ditutup.</span>
-            </div>
-            @else
-            @can('update', $tiket)
+                @endif
             <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
             <div class="chat-quick-templates-bar px-3 sm:px-4 py-1.5 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
                  style="scrollbar-width: none; -ms-overflow-style: none;">
@@ -1970,13 +1972,12 @@
                 </div>
             </form>
             @else
-            <!-- Read-Only Banner for Non-Assigned Technicians (AC-05) -->
+            <!-- Read-Only Banner for Non-Assigned / Non-Authorized Users -->
             <div class="p-3.5 bg-slate-50/90 border-t border-slate-200 text-center text-xs text-slate-500 font-medium flex items-center justify-center gap-2 select-none shrink-0">
                 <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                <span>Mode Hanya Baca: Anda tidak memiliki hak akses mengirim koordinasi pada tiket ini (Khusus PIC &amp; Tim Penanganan).</span>
+                <span>Mode Hanya Baca: Anda tidak memiliki hak akses mengirim koordinasi pada tiket ini (Khusus Admin, Semua Atasan, CEO, NOC, dan Teknisi yang ditugaskan).</span>
             </div>
             @endcan
-            @endif
         </div>
     </div>
 

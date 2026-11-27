@@ -74,6 +74,48 @@ class TicketPolicy
     }
 
     /**
+     * Determine whether the user can chat/send chronology messages in the ticket.
+     * Hanya yang berkepentingan: Admin, Semua Atasan, CEO, NOC, dan Teknik yang ditugaskan.
+     */
+    public function chat(User $user, Tiket $tiket): bool
+    {
+        // 1. Admin & Super Admin
+        if ($user->hasRole(['super_admin', 'admin'])) {
+            return true;
+        }
+
+        // 2. Semua Atasan (Manager Teknisi, Atasan Teknik, Atasan NOC, Atasan Umum, atau supervisor akun)
+        if ($user->hasRole(['manager_teknisi', 'atasan_teknik', 'atasan_noc', 'atasan', 'atasan_umum']) || $user->isAtasan()) {
+            return true;
+        }
+
+        // 3. CEO & Executive
+        if ($user->hasRole(['ceo', 'executive'])) {
+            return true;
+        }
+
+        // 4. NOC & Helpdesk / Pembuat Tiket
+        if ($user->hasRole(['noc', 'atasan_noc', 'helpdesk']) || strtolower($user->division ?? '') === 'noc' || $user->id === $tiket->created_by) {
+            return true;
+        }
+
+        // 5. Tim Teknik / Teknisi yang ditugaskan pada tiket ini
+        if ($tiket->ticketAssignees()->where('user_id', $user->id)->exists()) {
+            return true;
+        }
+
+        if (!empty($tiket->team_members) && is_array($tiket->team_members)) {
+            foreach ($tiket->team_members as $member) {
+                if (strcasecmp(trim((string)$member), trim($user->name)) === 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine whether the technician can submit Closing Awal (§7.2, §7.6).
      */
     public function closingAwal(User $user, Tiket $tiket): bool

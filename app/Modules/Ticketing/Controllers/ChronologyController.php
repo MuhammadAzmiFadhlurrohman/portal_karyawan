@@ -25,19 +25,19 @@ class ChronologyController extends Controller
      */
     public function store(Request $request, Tiket $tiket): RedirectResponse|JsonResponse
     {
-        // Tiket yang sudah CLOSE atau CANCELLED tidak boleh ditambah kronologis lagi
-        if (in_array($tiket->status, ['CLOSE', 'CANCELLED'], true)) {
+        // Otorisasi Chat: Hanya pihak berkepentingan (admin, semua atasan, ceo, noc, dan teknik yang ditugaskan)
+        Gate::authorize('chat', $tiket);
+
+        // Tiket yang CANCELLED tidak boleh ditambah kronologis lagi
+        if ($tiket->status === 'CANCELLED') {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Tiket sudah ditutup (' . $tiket->status . '). Tidak dapat mengirim update kronologis lagi.',
+                    'message' => 'Tiket sudah dibatalkan (' . $tiket->status . '). Tidak dapat mengirim update kronologis lagi.',
                 ], 422);
             }
-            return back()->with('error', 'Tiket sudah ditutup (' . $tiket->status . '). Tidak dapat mengirim update kronologis lagi.');
+            return back()->with('error', 'Tiket sudah dibatalkan (' . $tiket->status . '). Tidak dapat mengirim update kronologis lagi.');
         }
-
-        // AC-05: Non-assigned technician write attempt is rejected with 403!
-        Gate::authorize('update', $tiket);
 
         $validated = $request->validate([
             'category' => ['nullable', 'string'],
