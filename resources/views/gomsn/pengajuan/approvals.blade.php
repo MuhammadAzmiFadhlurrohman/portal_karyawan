@@ -256,8 +256,8 @@
         <!-- Daftar Pengajuan (Responsive Card Grid) -->
         <div class="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <!-- Header Banner -->
-            <div class="px-5 py-4 text-white flex items-center justify-between font-bold text-sm tracking-wide"
-                 style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+            <div class="gomsn-themed-banner px-5 py-4 text-white flex items-center justify-between font-bold text-sm tracking-wide"
+                 style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                 <div class="flex items-center gap-2.5 text-white">
                     <span class="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center font-mono text-sm font-bold">#</span>
                     <span>Daftar Pengajuan</span>

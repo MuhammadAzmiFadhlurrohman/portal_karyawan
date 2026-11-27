@@ -53,7 +53,7 @@
 
         window.syncGomsnInlineAccent = function(accent) {
             var current = accent || document.documentElement.getAttribute('data-accent') || 'teal';
-            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b', '#094747', '#0d5f5f', '#093c40', '#06404d', '#0e6774', '#084c57', '#0c5a68', '#0a4247', '#05282c', 'rgb(2, 40, 54)', 'rgb(5, 59, 71)', 'rgb(10, 82, 95)', 'rgb(7, 56, 60)', 'rgb(7, 51, 55)', 'rgb(15, 76, 92)', 'rgb(0, 127, 140)', 'rgb(9, 71, 71)', 'rgb(13, 95, 95)', 'rgb(9, 60, 64)'];
+            var headerHexes = ['#022836', '#053b47', '#0a525f', '#07383c', '#073337', '#0f4c5c', '#007f8c', '#052629', '#0b464b', '#094747', '#0d5f5f', '#093c40', '#06404d', '#0e6774', '#084c57', '#0c5a68', '#0a4247', '#05282c', '#072a2d', '#0e5458', '#17555b', 'rgb(2, 40, 54)', 'rgb(5, 59, 71)', 'rgb(10, 82, 95)', 'rgb(7, 56, 60)', 'rgb(7, 51, 55)', 'rgb(15, 76, 92)', 'rgb(0, 127, 140)', 'rgb(9, 71, 71)', 'rgb(13, 95, 95)', 'rgb(9, 60, 64)', 'rgb(7, 42, 45)', 'rgb(14, 84, 88)'];
             var buttonHexes = ['#18c4c4', '#0d9488', '#0f766e', '#155e63', '#115e59', '#029990', '#038078', '#015c57', 'rgb(24, 196, 196)', 'rgb(13, 148, 136)', 'rgb(15, 118, 110)', 'rgb(21, 94, 99)'];
             var els = document.querySelectorAll('[style*="background"]');
             for (var i = 0; i < els.length; i++) {
@@ -343,6 +343,10 @@
         html[data-accent]:not([data-accent="teal"]) .text-\[\#00897B\],
         html[data-accent]:not([data-accent="teal"]) .text-\[\#009688\] {
             color: var(--gomsn-accent) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#18C4C4\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#18c4c4\] {
+            color: var(--gomsn-accent-light) !important;
         }
         html[data-accent]:not([data-accent="teal"]) .border-\[\#0D9488\],
         html[data-accent]:not([data-accent="teal"]) .border-\[\#0d9488\],

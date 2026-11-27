@@ -393,12 +393,12 @@
 
             <!-- 3. Daftar Pengajuan (Finance) -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-4 sm:px-5 py-3.5 flex items-center justify-between text-white">
+                <div style="background: var(--gomsn-header-bg) !important;" class="gomsn-themed-banner px-4 sm:px-5 py-3.5 flex items-center justify-between text-white">
                     <div class="flex items-center gap-2 font-bold text-sm">
                         <span class="text-[#18C4C4] font-extrabold">#</span>
                         <span>Daftar Pengajuan Karyawan</span>
                     </div>
-                    <span class="text-xs font-semibold text-teal-100/90 bg-white/10 px-2.5 py-1 rounded-full">
+                    <span class="text-xs font-semibold text-white/90 bg-white/10 px-2.5 py-1 rounded-full">
                         Total: {{ $pengajuanList->total() }} data
                     </span>
                 </div>
@@ -965,12 +965,12 @@
 
             <!-- Daftar Pengajuan Standar -->
             <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-4 sm:px-5 py-3.5 flex items-center justify-between text-white">
+                <div style="background: var(--gomsn-header-bg) !important;" class="gomsn-themed-banner px-4 sm:px-5 py-3.5 flex items-center justify-between text-white">
                     <div class="flex items-center gap-2 font-bold text-sm">
                         <span class="text-[#18C4C4] font-extrabold">#</span>
                         <span>Daftar Pengajuan</span>
                     </div>
-                    <span class="text-xs font-semibold text-teal-100/90 bg-white/10 px-2.5 py-1 rounded-full">
+                    <span class="text-xs font-semibold text-white/90 bg-white/10 px-2.5 py-1 rounded-full">
                         Total: {{ $pengajuanList->total() }} data
                     </span>
                 </div>
@@ -1339,8 +1339,8 @@
             <div class="relative bg-white rounded-2xl max-w-4xl lg:max-w-5xl w-full shadow-2xl overflow-hidden border border-slate-200 transform transition-all my-auto sm:my-8 max-h-[94vh] sm:max-h-[90vh] flex flex-col"
                  @click.away="showModal = false">
 
-                <!-- Header Modal Sesuai Tema (#155E63 -> #1F2937) -->
-                <div class="px-4 py-3 sm:px-6 sm:py-4 text-white flex items-center justify-between shrink-0" style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                <!-- Header Modal Sesuai Tema -->
+                <div class="gomsn-themed-banner px-4 py-3 sm:px-6 sm:py-4 text-white flex items-center justify-between shrink-0" style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0 shadow-inner">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
