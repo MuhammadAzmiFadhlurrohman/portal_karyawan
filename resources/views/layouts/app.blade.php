@@ -2032,7 +2032,42 @@
                         }
                     });
                 }
+
+                // Global Anti-Double-Submit & Button Loading Spinner for POST/PUT/DELETE forms
+                const method = (form.getAttribute('method') || 'GET').toUpperCase();
+                if (method === 'POST' && !e.defaultPrevented && !form.hasAttribute('data-no-loading')) {
+                    if (form.dataset.gomsnSubmitting === 'true') {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return;
+                    }
+                    form.dataset.gomsnSubmitting = 'true';
+
+                    const submitBtn = e.submitter || form.querySelector('button[type="submit"]');
+                    if (submitBtn && !submitBtn.hasAttribute('data-custom-loading')) {
+                        setTimeout(() => {
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('opacity-75', 'cursor-not-allowed', 'pointer-events-none');
+                            if (!submitBtn.querySelector('.gomsn-btn-spinner')) {
+                                const spinner = document.createElement('span');
+                                spinner.className = 'gomsn-btn-spinner inline-flex items-center mr-1.5';
+                                spinner.innerHTML = '<svg class="w-4 h-4 animate-spin text-current shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle><path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                                const existingSvg = submitBtn.querySelector('svg');
+                                if (existingSvg) {
+                                    existingSvg.style.display = 'none';
+                                }
+                                submitBtn.insertBefore(spinner, submitBtn.firstChild);
+                            }
+                        }, 0);
+                    }
+                }
             }, true);
+
+            window.addEventListener('pageshow', function() {
+                document.querySelectorAll('form[data-gomsn-submitting]').forEach(function(f) {
+                    delete f.dataset.gomsnSubmitting;
+                });
+            });
 
             document.addEventListener('click', function(e) {
                 const btn = e.target.closest('button[onclick*="confirm("], a[onclick*="confirm("], [data-confirm]');

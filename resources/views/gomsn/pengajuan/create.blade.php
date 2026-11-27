@@ -84,6 +84,7 @@
                 return {
                     jenis: 'BELI',
                     hasOverdue: {{ $hasOverdue ? 'true' : 'false' }},
+                    isSubmitting: false,
                     items: [
                         {
                             nama_barang: '',
@@ -155,7 +156,7 @@
 
         <!-- Main Form Container -->
         <div x-data="pengajuanAppForm()" x-cloak class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-            <form method="POST" action="{{ route('gomsn.pengajuan.store') }}" class="p-3.5 sm:p-7 space-y-6">
+            <form method="POST" action="{{ route('gomsn.pengajuan.store') }}" @submit="if (isSubmitting) { $event.preventDefault(); return; } isSubmitting = true;" class="p-3.5 sm:p-7 space-y-6">
                 @csrf
 
                 <!-- ========================================== -->
@@ -534,11 +535,16 @@
                        class="py-3.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-sm font-bold text-center transition">
                         Batal
                     </a>
-                    <button type="submit" :disabled="hasOverdue"
+                    <button type="submit" :disabled="hasOverdue || isSubmitting"
+                            data-custom-loading="true"
                             style="background: var(--gomsn-active-bg); color: #ffffff;"
-                            class="py-3.5 px-6 rounded-xl hover:opacity-95 active:scale-[0.99] text-white font-bold text-sm inline-flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-                        <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                        <span>Kirim Pengajuan Sekarang</span>
+                            class="py-3.5 px-6 rounded-xl hover:opacity-95 active:scale-[0.99] text-white font-bold text-sm inline-flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-65 disabled:cursor-not-allowed cursor-pointer">
+                        <svg x-show="!isSubmitting" class="w-4.5 h-4.5 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        <svg x-show="isSubmitting" x-cloak class="w-4.5 h-4.5 text-white animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3.5"></circle>
+                            <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span x-text="isSubmitting ? 'Mengirim Pengajuan...' : 'Kirim Pengajuan Sekarang'">Kirim Pengajuan Sekarang</span>
                     </button>
                 </div>
             </form>
