@@ -337,11 +337,28 @@
         }
         html[data-accent]:not([data-accent="teal"]) .text-\[\#0f766e\],
         html[data-accent]:not([data-accent="teal"]) .text-\[\#115e59\],
-        html[data-accent]:not([data-accent="teal"]) .text-\[\#155E63\] {
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#155E63\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#0D9488\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#0d9488\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#00897B\],
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#009688\] {
             color: var(--gomsn-accent) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .border-\[\#0D9488\],
+        html[data-accent]:not([data-accent="teal"]) .border-\[\#0d9488\],
+        html[data-accent]:not([data-accent="teal"]) .focus\:border-\[\#0D9488\]:focus,
+        html[data-accent]:not([data-accent="teal"]) .focus\:border-\[\#009688\]:focus {
+            border-color: var(--gomsn-accent) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .ring-\[\#0D9488\]\/15 {
+            --tw-ring-color: color-mix(in srgb, var(--gomsn-accent) 18%, transparent) !important;
         }
         html[data-accent]:not([data-accent="teal"]) .bg-\[\#155E63\],
         html[data-accent]:not([data-accent="teal"]) .bg-\[\#0f766e\],
+        html[data-accent]:not([data-accent="teal"]) .bg-\[\#0D9488\],
+        html[data-accent]:not([data-accent="teal"]) .bg-\[\#0d9488\],
+        html[data-accent]:not([data-accent="teal"]) .bg-\[\#009688\],
+        html[data-accent]:not([data-accent="teal"]) .hover\:bg-\[\#00796B\]:hover,
         html[data-accent]:not([data-accent="teal"]) .hover\:bg-\[\#114b4f\]:hover {
             background-color: var(--gomsn-accent) !important;
         }

@@ -1,9 +1,9 @@
 <x-app-layout>
     <div class="w-full space-y-5 pb-10">
         
-        <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
-        <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+        <!-- Top Page Header Banner (Mengikuti Tema Warna Aplikasi) -->
+        <div class="gomsn-themed-banner relative overflow-hidden rounded-2xl border border-white/15 shadow-[0_4px_20px_rgba(15,23,42,0.22)] p-4 sm:py-4.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 select-none"
+             style="background: var(--gomsn-header-bg);">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -466,9 +466,10 @@
 
                         <!-- Total Dana Banner (Visible for BELI & DANA) -->
                         <div x-show="jenis === 'BELI' || jenis === 'DANA'"
-                             class="rounded-2xl bg-gradient-to-r from-[#022836] to-[#0e6774] text-white px-4 py-3.5 flex items-center justify-between sm:justify-end gap-4 shadow-xs">
-                            <span class="text-xs sm:text-sm font-medium text-teal-100/90">Total Estimasi Pengajuan:</span>
-                            <span x-text="formatRupiah(calculateTotal())" class="text-base sm:text-lg font-extrabold text-cyan-300 font-mono tracking-tight"></span>
+                             class="gomsn-themed-banner rounded-2xl text-white px-4 py-3.5 flex items-center justify-between sm:justify-end gap-4 shadow-xs"
+                             style="background: var(--gomsn-header-bg);">
+                            <span class="text-xs sm:text-sm font-medium text-white/85">Total Estimasi Pengajuan:</span>
+                            <span x-text="formatRupiah(calculateTotal())" class="text-base sm:text-lg font-extrabold text-white font-mono tracking-tight"></span>
                         </div>
                     </div>
                 </div>
@@ -534,7 +535,7 @@
                         Batal
                     </a>
                     <button type="submit" :disabled="hasOverdue"
-                            style="background: linear-gradient(135deg, #022836 0%, #0e6774 55%, #0D9488 100%) !important; color: #ffffff !important;"
+                            style="background: var(--gomsn-active-bg); color: #ffffff;"
                             class="py-3.5 px-6 rounded-xl hover:opacity-95 active:scale-[0.99] text-white font-bold text-sm inline-flex items-center justify-center gap-2 shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                         <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                         <span>Kirim Pengajuan Sekarang</span>
