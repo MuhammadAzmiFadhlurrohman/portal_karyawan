@@ -5,7 +5,7 @@
 
     <!-- Top Banner: Title & Back Button (Matches Gambar 2) -->
     <div class="rounded-2xl p-5 md:p-6 text-white shadow-xl relative overflow-hidden" 
-         style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%);">
+         style="background: var(--gomsn-active-bg) !important;">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">

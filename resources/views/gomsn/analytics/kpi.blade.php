@@ -77,7 +77,7 @@
     <div class="w-full space-y-5">
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching GoMSN Theme) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
 
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -155,7 +155,7 @@
                     <div class="sm:col-span-2 lg:w-auto">
                         <button type="submit"
                                 class="w-full lg:w-auto py-2 px-5 rounded-xl text-white font-semibold text-xs inline-flex items-center justify-center gap-2 shadow-xs hover:opacity-95 active:scale-[0.98] transition cursor-pointer whitespace-nowrap"
-                                style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
+                                style="background: var(--gomsn-active-bg) !important;">
                             <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                             </svg>
@@ -473,7 +473,7 @@
                                             <img src="{{ $tech->avatar_url }}" alt="{{ $tech->name }}" class="w-9 h-9 rounded-full object-cover border border-teal-200 shrink-0 shadow-2xs">
                                         @else
                                             <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-2xs"
-                                                 style="background: linear-gradient(135deg, #155E63 0%, #0D9488 100%);">
+                                                 style="background: var(--gomsn-active-bg) !important;">
                                                 {{ $tech->initials }}
                                             </div>
                                         @endif
@@ -636,7 +636,7 @@
                                     <img src="{{ $tech->avatar_url }}" alt="{{ $tech->name }}" class="w-9 h-9 rounded-full object-cover border border-teal-200 shrink-0">
                                 @else
                                     <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0"
-                                         style="background: linear-gradient(135deg, #155E63 0%, #0D9488 100%);">
+                                         style="background: var(--gomsn-active-bg) !important;">
                                         {{ $tech->initials }}
                                     </div>
                                 @endif

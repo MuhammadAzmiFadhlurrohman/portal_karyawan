@@ -2,7 +2,7 @@
     <div class="max-w-4xl mx-auto w-full space-y-6 pb-12">
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -69,7 +69,7 @@
              x-init="init()">
             
             <!-- Card Header Accent -->
-            <div style="background: linear-gradient(135deg, #072A2D 0%, #0E5458 100%);" class="px-6 py-4 sm:py-4.5 flex items-center justify-between text-white">
+            <div style="background: var(--gomsn-header-bg) !important;" class="px-6 py-4 sm:py-4.5 flex items-center justify-between text-white">
                 <div class="flex items-center gap-2.5 font-bold text-sm sm:text-base">
                     <span class="text-[#18C4C4] font-extrabold text-base sm:text-lg">#</span>
                     <span>Informasi &amp; Jadwal Jam Lembur</span>
@@ -223,7 +223,7 @@
                         <button type="submit"
                                 :disabled="!canSubmit"
                                 :class="canSubmit ? 'opacity-100 hover:opacity-90 shadow-md cursor-pointer' : 'opacity-50 cursor-not-allowed'"
-                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="px-7 py-3 text-white font-bold text-sm rounded-xl inline-flex items-center justify-center gap-2 transition duration-200">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>

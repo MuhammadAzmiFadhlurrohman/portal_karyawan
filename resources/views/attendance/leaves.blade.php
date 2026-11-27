@@ -10,7 +10,7 @@
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex items-center justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -80,7 +80,7 @@
                 <button type="button" 
                         @click="openModal('sick')"
                         class="inline-flex items-center justify-center gap-1.5 py-2.5 px-3.5 sm:px-5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-900/10 hover:opacity-95 transition active:scale-[0.98] cursor-pointer whitespace-nowrap shrink-0"
-                        style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>

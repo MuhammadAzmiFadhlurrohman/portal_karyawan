@@ -3,7 +3,7 @@
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex items-center justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -172,7 +172,7 @@
 
             <!-- Card 4: Total Potongan Bersih (Hero Metallic Box) -->
             <div class="rounded-2xl p-3 sm:py-3.5 sm:px-4 shadow-sm text-white flex flex-col justify-between relative overflow-hidden"
-                 style="background: linear-gradient(135deg, #022836 0%, #06404d 50%, #0e6774 100%);">
+                 style="background: var(--gomsn-header-bg) !important;">
                 <!-- Gloss Rims -->
                 <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#5eead4]/60 to-transparent pointer-events-none"></div>
 

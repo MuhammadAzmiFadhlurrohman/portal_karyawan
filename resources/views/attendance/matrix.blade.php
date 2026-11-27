@@ -15,7 +15,7 @@
     <div x-data="scheduleMatrix()" class="space-y-4 pb-16">
 
         <!-- Top Header & Navigation -->
-        <div style="background: linear-gradient(135deg, #0b2d32 0%, #155E63 50%, #0e3f43 100%);"
+        <div style="background: var(--gomsn-active-bg) !important;"
              class="rounded-3xl p-5 sm:p-7 text-white shadow-xl border border-teal-800/40">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>

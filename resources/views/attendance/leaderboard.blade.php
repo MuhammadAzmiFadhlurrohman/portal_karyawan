@@ -2,7 +2,7 @@
     <div class="space-y-6 w-full pb-12">
         <!-- 1. Top Page Header Banner (Sculpted Metallic Ocean Teal matching GoMSN Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -63,7 +63,7 @@
 
         <!-- 2. Hero Card: Peringkat Anda (Theme Harmonized) -->
         <div class="rounded-2xl p-4 sm:p-5 text-white shadow-md relative overflow-hidden border border-cyan-500/25 select-none"
-             style="background: linear-gradient(135deg, #022836 0%, #06404d 40%, #0b5966 80%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <!-- Glow background decor -->
             <div class="absolute -right-8 -bottom-8 w-48 h-48 bg-teal-400/15 rounded-full blur-2xl pointer-events-none"></div>
 

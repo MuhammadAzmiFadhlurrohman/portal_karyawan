@@ -378,7 +378,7 @@
 
         <!-- Top Header Banner (Sculpted Metallic Ocean Teal - Compact & Refined) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-md py-3.5 px-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -938,7 +938,7 @@
 
                 <!-- Info Help Box -->
                 <div class="p-3.5 rounded-2xl text-[11px] flex items-start gap-2.5"
-                     style="background: #f0fdfa; border: 1px solid #99f6e4; color: #115e59;">
+                     style="background: var(--gomsn-active-bg) !important; border: 1px solid #99f6e4; color: #115e59;">
                     <svg class="w-4 h-4 shrink-0 mt-0.5" style="color: #0d9488;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <p class="leading-relaxed" style="color: #115e59;">
                         Notifikasi dikirimkan langsung melalui <strong>Google FCM v1</strong> dengan prioritas tinggi. Pesan seketika muncul di lock-screen ponsel karyawan meskipun aplikasi sedang tertutup.
@@ -977,7 +977,7 @@
                     
                     <!-- Header Modal (Compact & Refined) -->
                     <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between"
-                         style="background: linear-gradient(90deg, #022836 0%, #084c57 100%);">
+                         style="background: var(--gomsn-header-bg) !important;">
                         <div class="flex items-center gap-2.5 min-w-0">
                             <div class="w-7 h-7 rounded-lg bg-teal-400/20 text-cyan-200 flex items-center justify-center shrink-0">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>

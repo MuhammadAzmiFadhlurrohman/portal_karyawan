@@ -168,7 +168,7 @@
                     <button type="button"
                             @click="open = !open"
                             class="w-full md:w-auto h-9 sm:h-10 inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 rounded-xl font-bold text-xs text-slate-950 shadow-md hover:shadow-cyan-500/25 border border-cyan-300/40 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer whitespace-nowrap"
-                            style="background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 50%, #0d9488 100%);">
+                            style="background: var(--gomsn-active-bg) !important;">
                         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-950 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                         <span>Menu Aksi</span>
                         <svg class="w-3.5 h-3.5 transition-transform text-slate-950 shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -510,7 +510,7 @@
                 <div class="absolute top-3.5 sm:top-[18px] h-[2px] bg-slate-200" style="left: 10%; right: 10%; z-index: 0;"></div>
                 <!-- Active Filled Progress Line (Hijau gradien) -->
                 <div class="absolute top-3.5 sm:top-[18px] h-[2px] transition-all duration-500 ease-out" 
-                     style="left: 10%; width: calc(80% * ({{ $stepperProgress }} / 100)); background: linear-gradient(90deg, #10B981 0%, #0D9488 100%); z-index: 0;"></div>
+                     style="left: 10%; width: calc(80% * ({{ $stepperProgress }} / 100)); background: var(--gomsn-active-bg) !important; z-index: 0;"></div>
 
                 <!-- Stage 1: Open Tiket -->
                 <div class="flex flex-col items-center justify-between text-center relative z-10 px-0.5 sm:px-1 space-y-0.5 sm:space-y-1.5">
@@ -792,7 +792,7 @@
             <!-- Tab 1: Kronologis -->
             <button type="button" onclick="switchTab('tab-chronology')" id="btn-tab-chronology"
                     class="tab-btn px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition cursor-pointer flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs sm:text-sm shadow-xs"
-                    style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                    style="background: var(--gomsn-active-bg) !important;">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span>Kronologis</span>
                 <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">{{ $tiket->chronologies->count() }}</span>
@@ -1191,7 +1191,7 @@
             
             <!-- Dark Ocean Teal Chat Header Banner -->
             <div class="chat-header-banner px-3.5 sm:px-5 py-2.5 sm:py-3 text-white flex items-center justify-between gap-2 shrink-0 rounded-t-3xl overflow-hidden"
-                 style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+                 style="background: var(--gomsn-header-bg) !important;">
                 <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
                     <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#18C4C4]/20 border border-[#18C4C4]/30 flex items-center justify-center text-[#5eead4] shrink-0">
                         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
@@ -1963,7 +1963,7 @@
                         id="btn-quick-chat-submit"
                         onclick="handleChatFormSubmit(event)"
                         class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-[0_3px_12px_rgba(13,148,136,0.42)] hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4.5 h-4.5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
                     </div>
@@ -1999,7 +1999,7 @@
 
                 <button type="button" onclick="openResumeModal()"
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     <span>{{ $hasResume ? 'Edit Resume Pekerjaan' : 'Input Resume Baru' }}</span>
                 </button>
@@ -2094,7 +2094,7 @@
                     </p>
                     <button type="button" onclick="openResumeModal()"
                             class="px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-md shadow-teal-950/20 cursor-pointer transition inline-flex items-center gap-2"
-                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                            style="background: var(--gomsn-active-bg) !important;">
                         <span>Input Resume Sekarang</span>
                     </button>
                 </div>
@@ -2663,7 +2663,7 @@
     <div class="bg-white rounded-3xl max-w-4xl lg:max-w-5xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200 my-auto">
         <!-- Header -->
         <div class="px-5 py-4 sm:px-6 sm:py-5 text-white flex items-center justify-between"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 35%, #0a525f 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-2xl bg-teal-400/20 text-[#18C4C4] border border-teal-400/30 flex items-center justify-center shrink-0 shadow-inner">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -2882,7 +2882,7 @@
                     <button type="submit" 
                             :disabled="!leadId"
                             class="px-5 py-2.5 rounded-xl text-white font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                            style="background: var(--gomsn-active-bg) !important;">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                         <span>Simpan Penugasan</span>
                     </button>
@@ -2983,7 +2983,7 @@ function dispatchTeamModal() {
 <div id="modal-stopclock" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
         <div class="px-6 py-5 text-white flex items-center justify-between"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <h3 class="font-heading font-extrabold text-base text-white">Ajukan Jeda SLA (Stop Clock)</h3>
             <button type="button" onclick="closeStopClockModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
         </div>
@@ -3454,7 +3454,7 @@ function coreManeuverModal() {
     <div class="bg-slate-50 dark:bg-slate-900 rounded-3xl max-w-5xl w-full shadow-2xl border border-teal-800/40 overflow-hidden my-auto animate-in fade-in zoom-in duration-200">
         <!-- Header -->
         <div class="px-6 py-4.5 text-white flex items-center justify-between border-b border-teal-500/20"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shadow-inner">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3886,7 +3886,7 @@ function coreManeuverModal() {
                     ✕ Batal
                 </button>
                 <button type="submit" class="px-6 py-2.5 rounded-xl text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition cursor-pointer"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                     </svg>
@@ -3903,7 +3903,7 @@ function coreManeuverModal() {
     <div class="bg-slate-50 dark:bg-slate-900 rounded-3xl max-w-5xl w-full shadow-2xl border border-teal-800/40 overflow-hidden my-auto animate-in fade-in zoom-in duration-200">
         <!-- Header -->
         <div class="px-6 py-4.5 text-white flex items-center justify-between border-b border-teal-500/20"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-300 shadow-inner">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4211,7 +4211,7 @@ function coreManeuverModal() {
                     ✕ Batal
                 </button>
                 <button type="submit" class="px-6 py-2.5 rounded-xl text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 transition cursor-pointer"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
@@ -4226,7 +4226,7 @@ function coreManeuverModal() {
 <div id="modal-verify-close" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
         <div class="px-6 py-5 text-white flex items-center justify-between"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 40%, #0a525f 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <h3 class="font-heading font-extrabold text-base text-white">Verifikasi Closing Tiket (NOC)</h3>
             <button type="button" onclick="closeVerifyCloseModal()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center text-lg">&times;</button>
         </div>
@@ -4504,7 +4504,7 @@ function coreManeuverModal() {
             <button type="button"
                     id="lightbox-download-btn"
                     onclick="downloadLightboxImage(event)"
-                    style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);"
+                    style="background: var(--gomsn-active-bg) !important;"
                     class="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-teal-950/40 transition active:scale-95 cursor-pointer">
                 <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span>Download</span>

@@ -64,7 +64,7 @@
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching GoMSN Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -533,7 +533,7 @@
             
             <div @click.stop class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden transform transition-all my-8">
                 <!-- Modal Header -->
-                <div class="text-white px-6 py-4 flex items-center justify-between" style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%) !important;">
+                <div class="text-white px-6 py-4 flex items-center justify-between" style="background: var(--gomsn-active-bg) !important;">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-white shrink-0">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -633,7 +633,7 @@
              class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4"
              @click="photoModalOpen = false">
             <div class="bg-white rounded-2xl overflow-hidden max-w-md w-full shadow-2xl border border-slate-200" @click.stop>
-                <div class="p-4 flex items-center justify-between text-white" style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%) !important;">
+                <div class="p-4 flex items-center justify-between text-white" style="background: var(--gomsn-active-bg) !important;">
                     <span class="font-bold text-xs" x-text="'Foto Absen: ' + activePhotoName"></span>
                     <button type="button" @click="photoModalOpen = false" class="text-white hover:text-slate-300 font-bold text-lg leading-none cursor-pointer">&times;</button>
                 </div>

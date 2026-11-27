@@ -345,8 +345,25 @@
             color: var(--gomsn-accent) !important;
         }
         html[data-accent]:not([data-accent="teal"]) .text-\[\#18C4C4\],
-        html[data-accent]:not([data-accent="teal"]) .text-\[\#18c4c4\] {
+        html[data-accent]:not([data-accent="teal"]) .text-\[\#18c4c4\],
+        html[data-accent]:not([data-accent="teal"]) .text-cyan-300,
+        html[data-accent]:not([data-accent="teal"]) .text-cyan-200,
+        html[data-accent]:not([data-accent="teal"]) .text-teal-200\/80,
+        html[data-accent]:not([data-accent="teal"]) .text-teal-100\/85,
+        html[data-accent]:not([data-accent="teal"]) .text-teal-100\/80 {
             color: var(--gomsn-accent-light) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .bg-cyan-500\/20,
+        html[data-accent]:not([data-accent="teal"]) .bg-cyan-500\/25 {
+            background-color: rgba(255, 255, 255, 0.14) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .border-cyan-400\/30,
+        html[data-accent]:not([data-accent="teal"]) .border-cyan-400\/40 {
+            border-color: rgba(255, 255, 255, 0.24) !important;
+        }
+        html[data-accent]:not([data-accent="teal"]) .via-\[\#5eead4\]\/70,
+        html[data-accent]:not([data-accent="teal"]) .via-\[\#2dd4bf\]\/35 {
+            --tw-gradient-via: var(--gomsn-accent-light) !important;
         }
         html[data-accent]:not([data-accent="teal"]) .border-\[\#0D9488\],
         html[data-accent]:not([data-accent="teal"]) .border-\[\#0d9488\],

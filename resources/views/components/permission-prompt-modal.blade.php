@@ -161,7 +161,7 @@
                     <button type="button" 
                             @click="requestAllPermissions()"
                             :disabled="loading || allDone"
-                            style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                            style="background: var(--gomsn-active-bg) !important;"
                             class="w-full sm:flex-1 py-3 px-5 rounded-2xl text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-900/20 hover:brightness-105 active:scale-[0.99] transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-85 disabled:cursor-not-allowed">
                         <template x-if="loading">
                             <span class="flex items-center gap-2">

@@ -186,7 +186,7 @@
                                 x-show="isEditMode"
                                 @click.stop="openCategoryEditModal(cat)"
                                 class="inline-flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer transition active:scale-95"
-                                style="height: 24px; padding: 0 9px; border-radius: 999px; background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; font-size: 10px; font-weight: 700;"
+                                style="height: 24px; padding: 0 9px; border-radius: 999px; background: var(--gomsn-active-bg) !important; color: #0f766e; border: 1px solid #99f6e4; font-size: 10px; font-weight: 700;"
                                 title="Ubah Judul Kategori">
                             <svg style="width: 10px; height: 10px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             <span>Edit Judul</span>
@@ -261,7 +261,7 @@
                                         <button type="button" 
                                                 @pointerdown.stop
                                                 @click.stop="openEditModal(item)"
-                                                style="height: 26px; border-radius: 8px; background: #0d9488; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; border: none; cursor: pointer; padding: 0 9px; flex-shrink: 0;"
+                                                style="height: 26px; border-radius: 8px; background: var(--gomsn-active-bg) !important; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; border: none; cursor: pointer; padding: 0 9px; flex-shrink: 0;"
                                                 title="Ganti Nama & Warna">
                                             <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                             <span>Ubah</span>
@@ -426,7 +426,7 @@
                     </button>
                     <button type="button" 
                             @click="saveItemEdit()"
-                            style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;"
+                            style="background: var(--gomsn-active-bg) !important;"
                             class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold shadow-md hover:brightness-105 active:scale-95 transition">
                         Simpan
                     </button>
@@ -524,7 +524,7 @@
                     </button>
                     <button type="button"
                             @click="saveCategoryEdit()"
-                            style="background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;"
+                            style="background: var(--gomsn-active-bg) !important;"
                             class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold shadow-md hover:brightness-105 active:scale-95 transition">
                         Simpan
                     </button>

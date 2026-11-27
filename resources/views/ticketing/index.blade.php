@@ -35,7 +35,7 @@
                 @can('ticket.create')
                 <a href="{{ route('tickets.create') }}"
                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs text-white shadow-sm shadow-teal-950/30 border border-white/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
-                   style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                   style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                     <span>Buat Tiket</span>
                 </a>
@@ -218,7 +218,7 @@
 
         <!-- 6. <= SLA -->
         <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
-            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #0d9488;"></div>
+            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background: var(--gomsn-active-bg) !important;"></div>
             <!-- Card Icon -->
             <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #0d9488;">
                 <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
@@ -282,7 +282,7 @@
                 <!-- Tombol Cari (Sedikit lebih panjang & proporsional) -->
                 <button type="submit" 
                         class="px-5 sm:px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-xs cursor-pointer transition inline-flex items-center justify-center gap-2 shrink-0 min-w-[95px] sm:min-w-[115px]"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     <span>Cari</span>
                 </button>
@@ -529,7 +529,7 @@
 
                     <a href="{{ route('tickets.show', $ticket) }}"
                        class="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl font-extrabold text-xs sm:text-[13px] text-white shadow-sm shadow-teal-950/20 hover:shadow-md hover:shadow-teal-600/30 hover:brightness-105 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shrink-0"
-                       style="background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);">
+                       style="background: var(--gomsn-active-bg) !important;">
                         <span>Detail</span>
                         <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                     </a>
@@ -566,7 +566,7 @@
     <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200/80 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
         <!-- Modal Header Banner -->
         <div class="px-6 py-5 text-white flex items-center justify-between"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#5eead4]">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -640,7 +640,7 @@
                 </button>
                 <button type="submit"
                         class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-md shadow-teal-950/20 cursor-pointer transition"
-                        style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                        style="background: var(--gomsn-active-bg) !important;">
                     Simpan &amp; Terbitkan Tiket
                 </button>
             </div>
@@ -655,7 +655,7 @@
     <div class="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200/80 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-200">
         <!-- Modal Header Banner -->
         <div class="px-6 py-5 text-white flex items-center justify-between"
-             style="background: linear-gradient(135deg, #022836 0%, #053b47 30%, #0a525f 70%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-emerald-400">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.393 9.929c5.857-5.858 15.355-5.858 21.213 0"/></svg>

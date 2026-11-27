@@ -362,7 +362,7 @@
                     Perubahan password tercatat otomatis pada sistem keamanan Portal MSN.
                 </p>
                 <button type="submit"
-                        style="background: linear-gradient(135deg, #093c40 0%, #155E63 55%, #0d9488 100%) !important;"
+                        style="background: var(--gomsn-active-bg) !important;"
                         class="w-full sm:w-auto justify-center hover:opacity-95 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer shrink-0">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>

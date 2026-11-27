@@ -40,7 +40,7 @@
     }">
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -121,7 +121,7 @@
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <!-- Header Banner Teal -> Dark Slate Sesuai Tema -->
             <div class="px-5 py-3.5 flex items-center justify-between text-white"
-                 style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                 style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                 <div class="flex items-center gap-2.5 font-bold text-sm tracking-wide text-white">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10"/>
@@ -206,7 +206,7 @@
         <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden">
             <!-- Header Banner Teal -> Dark Slate Sesuai Tema -->
             <div class="px-4 sm:px-5 py-3.5 text-white flex items-center justify-between font-bold text-sm tracking-wide"
-                 style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                 style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                 <div class="flex items-center gap-2.5 text-white min-w-0">
                     <div class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0 shadow-inner">
                         <svg class="w-4.5 h-4.5 text-cyan-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -511,7 +511,7 @@
 
                 <!-- Header Modal Edit Sesuai Mockup Gradasi Teal -->
                 <div class="px-5 py-3.5 text-white flex items-center justify-between"
-                     style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                     style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                     <div class="flex items-center gap-2 font-bold text-base tracking-wide text-white">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -573,7 +573,7 @@
                             Batal
                         </button>
                         <button type="submit" 
-                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
+                                style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                                 class="hover:opacity-90 text-white font-bold text-xs px-5 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
@@ -646,7 +646,7 @@
                  @click.away="historyModal = false">
                 
                 <div class="px-5 py-3.5 text-white flex items-center justify-between font-bold text-sm"
-                     style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                     style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                     <div class="flex items-center gap-2 text-white">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
                         <span>Riwayat Mutasi Stok Inventaris</span>

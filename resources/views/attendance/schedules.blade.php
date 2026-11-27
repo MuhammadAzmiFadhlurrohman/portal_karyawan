@@ -145,7 +145,7 @@
 
                 <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
                 <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_6px_24px_rgba(2,43,58,0.3)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5 sm:gap-4 select-none"
-                     style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -705,7 +705,7 @@
 
                 <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
                 <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -872,7 +872,7 @@
             <div class="space-y-6 max-w-3xl mx-auto">
                 <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching Dashboard) -->
                 <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex items-center justify-between gap-4 select-none"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -1055,7 +1055,7 @@
             <div class="space-y-6">
                 <!-- Top Page Header Banner (Sleek 2-Tier Executive Layout) -->
                 <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-xl p-5 sm:p-6 select-none space-y-4"
-                     style="background: linear-gradient(135deg, #022836 0%, #06404d 40%, #0c5663 80%, #083c45 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -2168,7 +2168,7 @@
 
                 <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal) -->
                 <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_6px_24px_rgba(2,43,58,0.3)] p-4 sm:py-5 sm:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 select-none"
-                     style="background: linear-gradient(110deg, #022836 0%, #053b47 28%, #0a525f 62%, #0e6774 86%, #084c57 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <!-- Gloss Highlights (Top & Bottom Rims) -->
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>

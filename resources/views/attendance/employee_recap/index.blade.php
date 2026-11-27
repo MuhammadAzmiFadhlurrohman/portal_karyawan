@@ -5,7 +5,7 @@
 
     <!-- Top Banner Card (Matches Gambar 1) -->
     <div class="rounded-2xl p-5 md:p-6 text-white shadow-xl relative overflow-hidden" 
-         style="background: linear-gradient(135deg, #094747 0%, #0d5f5f 50%, #0f766e 100%);">
+         style="background: var(--gomsn-active-bg) !important;">
         <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
@@ -67,7 +67,7 @@
                 <div class="sm:col-span-3">
                     <button type="submit" 
                             class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white shadow-md transition flex items-center justify-center gap-1.5"
-                            style="background: linear-gradient(135deg, #0d5f5f 0%, #0f766e 100%);">
+                            style="background: var(--gomsn-active-bg) !important;">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <span>Tampilkan</span>
                     </button>
@@ -367,7 +367,7 @@
                     <!-- Action Button: Lihat Detail -->
                     <a href="{{ route('attendance.employee-recap.show', ['user' => $u->id, 'year' => $year, 'month' => $month]) }}" 
                        class="w-full py-2 px-3 rounded-xl text-xs font-bold text-white text-center shadow-xs transition flex items-center justify-center gap-1.5 hover:opacity-95 hover:shadow-md"
-                       style="background: linear-gradient(135deg, #0d5f5f 0%, #0f766e 100%);">
+                       style="background: var(--gomsn-active-bg) !important;">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

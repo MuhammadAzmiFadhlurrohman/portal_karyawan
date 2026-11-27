@@ -242,7 +242,7 @@
                                class="w-full text-xs rounded-xl border border-slate-300 py-2.5 px-3.5 focus:ring-teal-700 focus:border-teal-700 placeholder-slate-400 bg-white">
                     </div>
                     <button type="submit" 
-                            style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
+                            style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                             class="hover:opacity-90 text-white font-bold text-xs px-5 py-2.5 rounded-xl inline-flex items-center gap-1.5 shadow-2xs transition shrink-0 cursor-pointer">
                         <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -737,7 +737,7 @@
                  @click.away="detailModal = false">
 
                 <!-- Header Modal Sesuai Tema (#155E63 -> #1F2937) -->
-                <div class="px-4 py-3 sm:px-6 sm:py-4 text-white flex items-center justify-between shrink-0" style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important; color: #ffffff !important;">
+                <div class="px-4 py-3 sm:px-6 sm:py-4 text-white flex items-center justify-between shrink-0" style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;">
                     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/15 flex items-center justify-center shrink-0 shadow-inner">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1140,7 +1140,7 @@
                 
                 <!-- Modal Header -->
                 <div class="relative overflow-hidden p-5 text-white select-none"
-                     style="background: linear-gradient(135deg, #072d31 0%, #155E63 50%, #0d9488 100%);">
+                     style="background: var(--gomsn-active-bg) !important;">
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
                     <div class="relative z-10 flex items-center justify-between">
                         <div class="flex items-center gap-3">

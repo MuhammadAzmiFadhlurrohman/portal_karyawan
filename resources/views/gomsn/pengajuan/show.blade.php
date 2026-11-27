@@ -28,7 +28,7 @@
         <!-- TOP PAGE HEADER BANNER (Sculpted Metallic Ocean Teal Theme)    -->
         <!-- ============================================================== -->
         <div class="relative overflow-hidden rounded-3xl border border-cyan-400/30 shadow-[0_4px_24px_rgba(2,43,58,0.35)] p-5 sm:p-7 text-white select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -617,7 +617,7 @@
                         <form method="POST" action="{{ route('gomsn.pengajuan.submit', $pengajuan->id) }}">
                             @csrf
                             <button type="submit" 
-                                    style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
+                                    style="background: var(--gomsn-active-bg) !important;"
                                     class="w-full text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-90 transition cursor-pointer">
                                 <span>Ajukan ke Atasan Langsung &rarr;</span>
                             </button>
@@ -757,7 +757,7 @@
                                         </div>
                                     </template>
                                     <button type="submit" 
-                                            style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
+                                            style="background: var(--gomsn-active-bg) !important;"
                                             class="w-full hover:opacity-90 text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                         <span x-text="method === 'Cash' ? 'Konfirmasi Pencairan Cash' : 'Konfirmasi Pencairan Transfer'"></span>
@@ -808,7 +808,7 @@
                                 <input type="file" name="realization_proof" required accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100 border border-slate-300 rounded-xl bg-white p-1" />
                             </div>
                             <button type="submit" 
-                                    style="background: linear-gradient(135deg, #0e7490 0%, #155E63 100%) !important;"
+                                    style="background: var(--gomsn-active-bg) !important;"
                                     class="w-full text-white font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-90 transition cursor-pointer">
                                 <span>Simpan Bukti Nota Belanja</span>
                             </button>

@@ -501,7 +501,7 @@
 
                     <button type="submit"
                             class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white shadow-lg shadow-teal-950/20 hover:scale-[1.02] active:scale-[0.98] transition cursor-pointer"
-                            style="background: linear-gradient(90deg, #18C4C4 0%, #0D9488 100%);">
+                            style="background: var(--gomsn-active-bg) !important;">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                         <span>Simpan &amp; Open Tiket</span>
                     </button>
@@ -516,7 +516,7 @@
 
             <!-- WIDGET 1: LIVE PREVIEW TIKET CARD (Dark Ocean Teal Theme) -->
             <div class="rounded-3xl p-6 text-white shadow-xl border border-[#18C4C4]/20 relative overflow-hidden"
-                 style="background: linear-gradient(135deg, #022836 0%, #063f4c 50%, #0a525f 100%);">
+                 style="background: var(--gomsn-header-bg) !important;">
                 
                 <!-- Glowing effect -->
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-[#18C4C4]/20 blur-2xl pointer-events-none"></div>

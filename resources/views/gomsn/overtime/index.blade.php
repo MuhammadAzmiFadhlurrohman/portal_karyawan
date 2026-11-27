@@ -141,7 +141,7 @@
             <div class="relative z-10 flex items-center gap-2 shrink-0">
                 <a href="{{ route('gomsn.overtime.create') }}" 
                    class="w-full sm:w-auto py-2.5 px-4 rounded-xl text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 shadow-md shadow-teal-950/20 hover:opacity-95 active:scale-95 transition cursor-pointer whitespace-nowrap border border-white/20"
-                   style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
+                   style="background: var(--gomsn-active-bg) !important;">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -265,7 +265,7 @@
                     <!-- Tombol Filter Gradient -->
                     <button type="submit" 
                             class="flex-1 sm:flex-initial py-2.5 px-4 sm:px-5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition cursor-pointer"
-                            style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 100%) !important;">
+                            style="background: var(--gomsn-active-bg) !important;">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -1019,7 +1019,7 @@
                                         <p>Tidak ada data rincian lembur untuk periode yang dipilih.</p>
                                         @if ((! $isAtasan && ! $isFinance && ! $isSuperAdmin && ! $isHrd) || ($viewMode === 'saya'))
                                         <div>
-                                            <a href="{{ route('gomsn.overtime.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-xs hover:opacity-95 transition" style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+                                            <a href="{{ route('gomsn.overtime.create') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-xs hover:opacity-95 transition" style="background: var(--gomsn-active-bg) !important;">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                                 <span>Ajukan Lembur Sekarang</span>
                                             </a>

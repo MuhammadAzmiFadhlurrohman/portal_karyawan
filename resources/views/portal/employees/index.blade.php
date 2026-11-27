@@ -110,7 +110,7 @@
 
         <!-- Top Welcome/Header Card (Sculpted Metallic Ocean Teal) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -678,7 +678,7 @@
                 
                 <!-- Modal Header -->
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 45%, #0a525f 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     <div class="flex items-center gap-3.5">
                         <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -884,7 +884,7 @@
                             Batal
                         </button>
                         <button type="submit" 
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="px-6 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md hover:brightness-105 transition cursor-pointer">
                             Simpan Karyawan
                         </button>
@@ -905,7 +905,7 @@
                 
                 <!-- Modal Header -->
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 45%, #0a525f 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     <div class="flex items-center gap-3.5">
                         <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-cyan-300 shrink-0 shadow-inner">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -1110,7 +1110,7 @@
                             Batal
                         </button>
                         <button type="submit" 
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="px-6 py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm shadow-md hover:brightness-105 transition cursor-pointer">
                             Simpan Perubahan
                         </button>
@@ -1212,7 +1212,7 @@
                             Batal
                         </button>
                         <button type="submit" 
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="px-5 py-2 rounded-xl text-white font-bold text-xs shadow-sm hover:brightness-105 transition cursor-pointer">
                             Ya, Reset Wajah
                         </button>
@@ -1232,7 +1232,7 @@
                 
                 <!-- Modal Top Header (Sculpted Metallic Ocean Teal) -->
                 <div class="relative overflow-hidden p-4 sm:p-5 text-white shrink-0 select-none"
-                     style="background: linear-gradient(90deg, #022836 0%, #053b47 35%, #0a525f 70%, #084c57 100%);">
+                     style="background: var(--gomsn-header-bg) !important;">
                     
                     <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/60 to-transparent"></div>
 

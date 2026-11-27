@@ -291,7 +291,7 @@
 
                             <button type="submit"
                                     class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
-                                    style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
+                                    style="background: var(--gomsn-active-bg) !important;">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
@@ -549,7 +549,7 @@
                                         <td class="py-3.5 px-4 text-center whitespace-nowrap">
                                             <button type="button"
                                                     @click="openModalWith({{ json_encode($modalData) }})"
-                                                    style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
+                                                    style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:opacity-90 text-white text-xs font-bold transition shadow-2xs cursor-pointer group">
                                                 <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -694,7 +694,7 @@
                                     <div class="pt-3 border-t border-slate-200/80 flex items-center justify-end gap-2">
                                         <button type="button"
                                                 @click="openModalWith({{ json_encode($modalData) }})"
-                                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
+                                                style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                                                 class="w-full sm:w-auto hover:opacity-90 text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -854,7 +854,7 @@
 
                             <button type="submit"
                                     class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold text-white shadow-2xs hover:opacity-95 transition cursor-pointer shrink-0"
-                                    style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%);">
+                                    style="background: var(--gomsn-active-bg) !important;">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
@@ -1120,7 +1120,7 @@
                                             <div class="flex items-center justify-center gap-1.5">
                                                 <button type="button"
                                                         @click="openModalWith({{ json_encode($modalData) }})"
-                                                        style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important; color: #ffffff !important;"
+                                                        style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                                                         class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:opacity-90 text-white text-xs font-bold transition shadow-2xs cursor-pointer group">
                                                     <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -1300,7 +1300,7 @@
 
                                         <button type="button" 
                                                 @click="openModalWith({{ json_encode($modalData) }})"
-                                                style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
+                                                style="background: var(--gomsn-active-bg) !important;"
                                                 class="flex-1 sm:flex-initial hover:opacity-90 text-white font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-2.5 rounded-xl shadow-2xs transition inline-flex items-center justify-center gap-1.5 cursor-pointer">
                                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -1644,7 +1644,7 @@
                                 </template>
 
                                 <button type="submit" 
-                                        style="background: linear-gradient(135deg, #18C4C4 0%, #0D9488 100%) !important;"
+                                        style="background: var(--gomsn-active-bg) !important;"
                                         class="w-full hover:opacity-90 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                     <span x-text="disburseMethod === 'Cash' ? 'Terima &amp; Cairkan Cash (Tunai)' : 'Terima &amp; Cairkan Dana Transfer'"></span>
@@ -1808,7 +1808,7 @@
 
                                     <div class="pt-1">
                                         <button type="submit" 
-                                                style="background: linear-gradient(135deg, #155E63 0%, #17555B 50%, #1F2937 100%) !important;"
+                                                style="background: var(--gomsn-header-bg) !important;"
                                                 class="w-full text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition cursor-pointer">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>

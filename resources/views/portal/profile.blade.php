@@ -332,7 +332,7 @@
 
                 <!-- Card 2: Interactive Bank Account Card Preview -->
                 <div class="relative rounded-3xl p-5 sm:p-6 text-white overflow-hidden shadow-lg"
-                     style="background: linear-gradient(135deg, #0f172a 0%, #155E63 60%, #0d9488 100%) !important;">
+                     style="background: var(--gomsn-active-bg) !important;">
                     <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
                     <div class="absolute -left-10 -bottom-12 w-40 h-40 rounded-full bg-teal-300/10 blur-xl pointer-events-none"></div>
 
@@ -499,7 +499,7 @@
                             Setiap perubahan data tercatat secara otomatis pada sistem keamanan Portal MSN.
                         </p>
                         <button type="submit"
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 55%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="w-full sm:w-auto justify-center hover:opacity-95 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-xl shadow-md shadow-teal-900/15 transition flex items-center gap-2 cursor-pointer shrink-0">
                             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>

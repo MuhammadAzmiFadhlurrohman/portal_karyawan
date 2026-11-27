@@ -301,7 +301,7 @@
                     <!-- JIKA BELUM DAFTAR WAJAH -> TOMBOL DAFTAR -->
                     <button type="button"
                             @click="openEnrollModal()"
-                            style="background: linear-gradient(135deg, #093c40 0%, #155E63 60%, #0d9488 100%) !important;"
+                            style="background: var(--gomsn-active-bg) !important;"
                             class="w-full py-3.5 px-6 rounded-2xl hover:opacity-95 text-white font-bold text-sm shadow-lg shadow-teal-900/20 transition flex items-center justify-center gap-2.5 cursor-pointer">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
@@ -539,7 +539,7 @@
                             Batal
                         </button>
                         <button type="submit" 
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_16px_rgba(21,94,99,0.28)] hover:brightness-105 transition cursor-pointer">
                             Simpan &amp; Daftarkan Wajah
                         </button>
@@ -671,7 +671,7 @@
                     <div class="flex items-center gap-3 pt-2">
                         <button type="button" 
                                 @click="proceedToClockIn()"
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="flex-1 py-3 px-5 rounded-2xl text-white font-bold text-xs sm:text-sm shadow-md shadow-teal-900/20 hover:brightness-105 active:scale-[0.99] transition flex items-center justify-center gap-2 cursor-pointer">
                             <span>Lanjutkan</span>
                             <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -877,7 +877,7 @@
                         <button type="submit" 
                                 :disabled="isVerifying || !clockInVerified"
                                 :class="(!clockInVerified || isVerifying) ? 'opacity-60 cursor-not-allowed' : 'hover:brightness-105 active:scale-[0.99] cursor-pointer'"
-                                style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important;"
+                                style="background: var(--gomsn-active-bg) !important;"
                                 class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white font-bold text-xs shadow-[0_6px_18px_rgba(21,94,99,0.28)] transition">
                             <svg class="w-4 h-4 text-teal-100" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             <span>Verifikasi Wajah &amp; Absen Masuk</span>

@@ -3,7 +3,7 @@
 
         <!-- Top Page Header Banner (Sculpted Metallic Ocean Teal matching GoMSN Dashboard & Roster Shift) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-[0_4px_20px_rgba(2,43,58,0.35)] p-4 sm:py-4 sm:px-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights (Top & Bottom Rims) -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -38,7 +38,7 @@
                             </span>
                         @endif
                     </div>
-                    <p class="text-xs sm:text-[13px] mt-0.5 leading-snug truncate" style="color: rgba(204, 251, 241, 0.95) !important;">
+                    <p class="text-xs sm:text-[13px] mt-0.5 leading-snug truncate" style="color: rgba(255, 255, 255, 0.88) !important;">
                         {{ $olt->nama_olt }} &bull; Titik distribusi Optical Distribution Point &amp; kapasitas port pelanggan
                     </p>
                 </div>
@@ -145,7 +145,7 @@
                         <!-- Tombol Tambah ODP (2 Kolom) -->
                         <div class="lg:col-span-2">
                             <button type="submit" 
-                                    style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%) !important; color: #ffffff !important;"
+                                    style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                                     class="w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs sm:text-sm shadow-xs hover:shadow-md hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                                 <span>Tambah ODP</span>
@@ -161,7 +161,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
-                        <tr style="background: linear-gradient(90deg, #0f4c5c 0%, #007f8c 50%, #0d9488 100%) !important; color: #ffffff !important;" 
+                        <tr style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;" 
                             class="text-[11px] font-bold tracking-wider uppercase text-white select-none">
                             <th class="hidden md:table-cell py-3 px-4 w-14 text-center">#</th>
                             <th class="py-3 pl-4 pr-2 sm:px-4">
@@ -276,7 +276,7 @@
                                     <div class="flex items-center justify-end sm:justify-center gap-1.5 sm:gap-2">
                                         <!-- Lihat (Semua user bisa lihat) -->
                                         <a href="{{ route('gomsn.network.odps.show', ['olt' => $olt->id, 'pon' => $pon->id, 'odp' => $odp->id]) }}" 
-                                           style="background: linear-gradient(135deg, #093c40 0%, #155E63 50%, #0d9488 100%) !important; color: #ffffff !important;"
+                                           style="background: var(--gomsn-active-bg) !important; color: #ffffff !important;"
                                            title="Lihat Pelanggan ODP"
                                            class="w-9 h-9 lg:w-auto lg:h-auto lg:px-3 lg:py-1.5 rounded-xl text-white text-[11px] font-semibold shadow-[0_4px_10px_rgba(13,148,136,0.28)] hover:brightness-105 active:scale-95 transition-all inline-flex items-center justify-center gap-1.5 shrink-0">
                                             <svg class="w-4 h-4 lg:w-3.5 lg:h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -384,7 +384,7 @@
                     </div>
                     <div class="flex items-center justify-end gap-2 pt-2">
                         <button type="button" onclick="closeEditOdpModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">Batal</button>
-                        <button type="submit" style="background: #0f4c5c !important; color: #ffffff !important;" class="px-4 py-2 rounded-xl text-white text-xs font-bold shadow-sm">Simpan Perubahan</button>
+                        <button type="submit" style="background: var(--gomsn-header-bg) !important; color: #ffffff !important;" class="px-4 py-2 rounded-xl text-white text-xs font-bold shadow-sm">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>

@@ -14,7 +14,7 @@
 
         <!-- Top Header Banner (Sculpted Metallic Ocean Teal) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/30 shadow-md py-3.5 px-4 sm:py-4 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <!-- Gloss Highlights -->
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
@@ -355,7 +355,7 @@
                     
                     <!-- Header Modal -->
                     <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between"
-                         style="background: linear-gradient(90deg, #022836 0%, #084c57 100%);">
+                         style="background: var(--gomsn-header-bg) !important;">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-lg bg-teal-400/20 text-cyan-200 flex items-center justify-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>

@@ -3,7 +3,7 @@
         
         <!-- 1. Header Banner (Compact, Sleek Ocean Teal) -->
         <div class="relative overflow-hidden rounded-2xl border border-cyan-400/25 shadow-md p-4 sm:py-4 sm:px-6 select-none"
-             style="background: linear-gradient(90deg, #022836 0%, #053b47 25%, #0a525f 60%, #0e6774 85%, #084c57 100%);">
+             style="background: var(--gomsn-header-bg) !important;">
             
             <div class="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#5eead4]/70 to-transparent pointer-events-none"></div>
 
