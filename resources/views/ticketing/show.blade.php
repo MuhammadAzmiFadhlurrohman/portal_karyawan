@@ -32,8 +32,8 @@
     <!-- ========================================================================= -->
     <!-- 1. TOP HEADER BANNER (Futuristic Metallic Ocean Teal matching Dashboard) -->
     <!-- ========================================================================= -->
-    <div class="relative rounded-2xl md:rounded-3xl p-4 sm:py-5 sm:px-6 text-white border border-teal-500/30 shadow-[0_8px_30px_rgba(2,40,54,0.45)] select-none z-20"
-         style="background: radial-gradient(100% 140% at 15% 20%, #093d40 0%, #05282b 55%, #021619 100%);">
+    <div class="gomsn-themed-banner relative rounded-2xl md:rounded-3xl p-4 sm:py-5 sm:px-6 text-white border border-white/15 shadow-[0_8px_30px_rgba(2,40,54,0.45)] select-none z-20"
+         style="background: var(--gomsn-header-bg) !important;">
         
         <!-- SVG Geometric Tech Contours, Diagonal Glass Bars & Dot Grids (Clipped in an absolute overlay so it never clips dropdowns) -->
         <div class="absolute inset-0 rounded-2xl md:rounded-3xl overflow-hidden pointer-events-none z-0">
