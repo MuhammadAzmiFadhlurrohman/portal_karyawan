@@ -493,6 +493,23 @@ class PengajuanController extends Controller
         }
         $keperluan = $validated['keterangan'] ?? $validated['keperluan'] ?? $validated['judul'] ?? 'Pengajuan Operasional';
 
+        // Cegah duplikasi data akibat klik berulang (double-submit dalam 8 detik terakhir)
+        $recentDuplicate = Pengajuan::where('user_id', $user->id)
+            ->where('jenis', $rawJenis)
+            ->where('keperluan', $keperluan)
+            ->where('created_at', '>=', now()->subSeconds(8))
+            ->latest('id')
+            ->first();
+
+        if ($recentDuplicate) {
+            $isAtasan = $this->isAtasanUser($user);
+            $dupMsg = $isAtasan
+                ? "Pengajuan {$recentDuplicate->nomor_pengajuan} ({$recentDuplicate->jenis}) berhasil dibuat dan otomatis langsung diteruskan ke Finance."
+                : "Pengajuan {$recentDuplicate->nomor_pengajuan} ({$recentDuplicate->jenis}) berhasil diajukan ke Atasan.";
+
+            return redirect()->route('gomsn.pengajuan.index')->with('success', $dupMsg);
+        }
+
         // Normalize items according to Jenis
         $normalizedItems = $this->normalizeItems($rawJenis, $validated['items']);
 
