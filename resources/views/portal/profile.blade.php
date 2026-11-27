@@ -412,6 +412,23 @@
                                 </div>
                             </div>
 
+                            <!-- Jenis Kelamin -->
+                            <div class="sm:col-span-2">
+                                <label class="block font-bold text-slate-700 mb-1.5">
+                                    Jenis Kelamin
+                                </label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/40 hover:bg-slate-50 cursor-pointer transition">
+                                        <input type="radio" name="gender" value="pria" {{ (auth()->user()->gender ?? 'pria') === 'pria' ? 'checked' : '' }} class="text-[#155E63] focus:ring-[#155E63]">
+                                        <span class="text-xs font-semibold text-slate-800">Laki-laki (Pria)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50/40 hover:bg-slate-50 cursor-pointer transition">
+                                        <input type="radio" name="gender" value="perempuan" {{ (auth()->user()->gender ?? '') === 'perempuan' ? 'checked' : '' }} class="text-[#155E63] focus:ring-[#155E63]">
+                                        <span class="text-xs font-semibold text-slate-800">Perempuan (Wanita)</span>
+                                    </label>
+                                </div>
+                            </div>
+
                             <!-- Nama Bank -->
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1.5">Nama Bank</label>

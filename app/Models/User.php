@@ -38,6 +38,7 @@ class User extends Authenticatable
         'office',
         'office_location_id',
         'position',
+        'gender',
         'foto',
         'bank',
         'no_rekening',
@@ -444,5 +445,54 @@ class User extends Authenticatable
     public function notificationPreference(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(UserNotificationPreference::class);
+    }
+
+    /**
+     * Get customized attendance illustration avatar URL (Pria vs Perempuan).
+     */
+    public function getAttendanceAvatarUrlAttribute(): string
+    {
+        $gender = strtolower(trim((string) ($this->gender ?? '')));
+        if (in_array($gender, ['perempuan', 'female', 'wanita', 'p'], true)) {
+            return asset('assets/logo/absenperempuan.jpg');
+        }
+        if (in_array($gender, ['pria', 'male', 'laki-laki', 'l'], true)) {
+            return asset('assets/logo/absenpria.jpg');
+        }
+
+        // Automatic fallback based on female name keywords
+        $lowerName = strtolower($this->name ?? '');
+        $femaleKeywords = ['siti', 'nurhaliza', 'melani', 'putri', 'amelia', 'ida', 'dewi', 'kartika', 'karmeliandita', 'wati', 'lestari', 'ani', 'sarah', 'dina', 'fitri'];
+        foreach ($femaleKeywords as $kw) {
+            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $lowerName)) {
+                return asset('assets/logo/absenperempuan.jpg');
+            }
+        }
+
+        return asset('assets/logo/absenpria.jpg');
+    }
+
+    /**
+     * Determine if user is female.
+     */
+    public function isPerempuan(): bool
+    {
+        $gender = strtolower(trim((string) ($this->gender ?? '')));
+        if (in_array($gender, ['perempuan', 'female', 'wanita', 'p'], true)) {
+            return true;
+        }
+        if (in_array($gender, ['pria', 'male', 'laki-laki', 'l'], true)) {
+            return false;
+        }
+
+        $lowerName = strtolower($this->name ?? '');
+        $femaleKeywords = ['siti', 'nurhaliza', 'melani', 'putri', 'amelia', 'ida', 'dewi', 'kartika', 'karmeliandita', 'wati', 'lestari', 'ani', 'sarah', 'dina', 'fitri'];
+        foreach ($femaleKeywords as $kw) {
+            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $lowerName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

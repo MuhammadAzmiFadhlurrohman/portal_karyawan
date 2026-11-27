@@ -771,6 +771,7 @@ class PortalHubController extends Controller
 
         $validated = $request->validate([
             'phone' => ['required', 'string', 'max:32', 'unique:users,phone,' . $user->id],
+            'gender' => ['nullable', 'string', 'in:pria,perempuan'],
             'bank' => ['nullable', 'string', 'max:100'],
             'no_rekening' => ['nullable', 'string', 'max:50'],
             'atas_nama' => ['nullable', 'string', 'max:100'],
@@ -780,6 +781,7 @@ class PortalHubController extends Controller
 
         $userData = [
             'phone' => $validated['phone'],
+            'gender' => $validated['gender'] ?? ($user->gender ?? 'pria'),
             'bank' => $validated['bank'] ?? null,
             'no_rekening' => $validated['no_rekening'] ?? null,
             'atas_nama' => $validated['atas_nama'] ?? null,

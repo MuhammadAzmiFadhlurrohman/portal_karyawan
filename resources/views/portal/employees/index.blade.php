@@ -47,6 +47,7 @@
             email: '',
             phone: '',
             nik: '',
+            gender: 'pria',
             division: '',
             office: 'bandung',
             position: '',
@@ -73,6 +74,7 @@
                 email: emp.email || '',
                 phone: emp.phone || '',
                 nik: emp.nik || '',
+                gender: emp.gender || (emp.is_perempuan ? 'perempuan' : 'pria'),
                 division: emp.division || '',
                 office: officeVal,
                 position: emp.position || '',
@@ -705,10 +707,17 @@
                                 <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
                                 <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Pribadi &amp; Kontak</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Lengkap <span class="text-rose-500">*</span></label>
                                     <input type="text" name="name" required placeholder="Contoh: Budi Santoso" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                                    <select name="gender" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="pria">Laki-laki (Pria)</option>
+                                        <option value="perempuan">Perempuan (Wanita)</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">NIK (KTP)</label>
@@ -926,10 +935,17 @@
                                 <span class="w-5 h-5 rounded-md bg-[#155E63] text-white text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
                                 <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Informasi Pribadi &amp; Kontak</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Nama Lengkap <span class="text-rose-500">*</span></label>
                                     <input type="text" name="name" x-model="editForm.name" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                </div>
+                                <div>
+                                    <label class="block text-slate-700 font-semibold mb-1.5 text-xs">Jenis Kelamin <span class="text-rose-500">*</span></label>
+                                    <select name="gender" x-model="editForm.gender" required class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-300/90 text-slate-800 focus:outline-none focus:border-[#155E63] focus:ring-2 focus:ring-teal-500/20 shadow-2xs transition">
+                                        <option value="pria">Laki-laki (Pria)</option>
+                                        <option value="perempuan">Perempuan (Wanita)</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-slate-700 font-semibold mb-1.5 text-xs">NIK (KTP)</label>

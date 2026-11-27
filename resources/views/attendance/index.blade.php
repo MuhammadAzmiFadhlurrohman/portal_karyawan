@@ -185,12 +185,13 @@
             </div>
 
             <!-- Center Visual & Status Hero Box -->
+            @php
+                $attendanceIllustration = auth()->user()?->attendance_avatar_url ?? asset('assets/logo/absenpria.jpg');
+            @endphp
             <div class="rounded-2xl bg-gradient-to-b from-slate-50/80 via-teal-50/25 to-slate-50/50 border border-slate-100 py-6 px-4 flex flex-col items-center justify-center text-center space-y-3">
                 @if (! $todayAttendance)
-                    <div class="w-20 h-20 rounded-full bg-white border-2 border-slate-200 ring-8 ring-slate-100/80 flex items-center justify-center text-slate-400 shadow-xs">
-                        <svg class="w-9 h-9 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white border-2 border-slate-200 ring-8 ring-slate-100/80 flex items-center justify-center shadow-xs overflow-hidden">
+                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-full h-full object-cover object-top">
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-slate-800">Belum Absen Masuk</p>
@@ -199,10 +200,11 @@
                         </p>
                     </div>
                 @elseif (! $todayAttendance->clock_out_at)
-                    <div class="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-300 ring-8 ring-emerald-50/80 flex items-center justify-center text-emerald-600 shadow-xs">
-                        <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                        </svg>
+                    <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-emerald-50 border-2 border-emerald-300 ring-8 ring-emerald-50/80 flex items-center justify-center shadow-xs overflow-hidden">
+                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-full h-full object-cover object-top">
+                        <span class="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        </span>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-emerald-800">Sudah Absen Masuk</p>
@@ -211,10 +213,11 @@
                         </p>
                     </div>
                 @else
-                    <div class="w-20 h-20 rounded-full bg-teal-50 border-2 border-teal-300 ring-8 ring-teal-50/70 flex items-center justify-center text-[#155E63] shadow-xs">
-                        <svg class="w-10 h-10 text-[#155E63]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-teal-50 border-2 border-teal-300 ring-8 ring-teal-50/70 flex items-center justify-center shadow-xs overflow-hidden">
+                        <img src="{{ $attendanceIllustration }}" alt="Ilustrasi Absensi" class="w-full h-full object-cover object-top">
+                        <span class="absolute bottom-0.5 right-0.5 w-6 h-6 rounded-full bg-[#155E63] border-2 border-white flex items-center justify-center text-white text-[11px] font-bold shadow-xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </span>
                     </div>
                     <div class="space-y-1">
                         <p class="text-sm sm:text-base font-extrabold text-[#155E63]">Absensi Selesai Hari Ini</p>
