@@ -39,17 +39,10 @@ class AttendanceReportController extends Controller
         $year = (int) $carbonDate->format('Y');
         $month = (int) $carbonDate->format('n');
 
-        // Query active employees
-        $searchTerm = trim($request->input('q', ''));
+        // Query active employees (retrieve all active employees so client-side instant search is smooth and responsive)
+        $searchTerm = trim($request->input('q', $request->input('search', '')));
         $employees = User::query()
             ->where('is_active', true)
-            ->when($searchTerm !== '', function ($q) use ($searchTerm) {
-                $q->where(function ($sub) use ($searchTerm) {
-                    $sub->where('name', 'like', "%{$searchTerm}%")
-                        ->orWhere('employee_code', 'like', "%{$searchTerm}%")
-                        ->orWhere('division', 'like', "%{$searchTerm}%");
-                });
-            })
             ->orderBy('name')
             ->get();
 
@@ -237,7 +230,14 @@ class AttendanceReportController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'Data absensi karyawan berhasil diperbarui.');
+        $searchTerm = trim($request->input('q', $request->input('search', '')));
+        $redirectParams = ['date' => $dateStr];
+        if ($searchTerm !== '') {
+            $redirectParams['q'] = $searchTerm;
+        }
+
+        return redirect()->route('attendance.reports', $redirectParams)
+            ->with('success', 'Data absensi karyawan berhasil diperbarui.');
     }
 
     /**
@@ -288,7 +288,14 @@ class AttendanceReportController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', "Status absensi berhasil diubah menjadi {$status}.");
+        $searchTerm = trim($request->input('q', $request->input('search', '')));
+        $redirectParams = ['date' => $dateStr];
+        if ($searchTerm !== '') {
+            $redirectParams['q'] = $searchTerm;
+        }
+
+        return redirect()->route('attendance.reports', $redirectParams)
+            ->with('success', "Status absensi berhasil diubah menjadi {$status}.");
     }
 
     /**

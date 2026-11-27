@@ -6,6 +6,8 @@
             photoModalOpen: false,
             activePhoto: '',
             activePhotoName: '',
+            updatingUserId: null,
+            submittingEdit: false,
             editData: {
                 user_id: '',
                 employee_name: '',
@@ -15,6 +17,35 @@
                 clock_in: '',
                 clock_out: '',
                 notes: ''
+            },
+            init() {
+                // Pastikan URL selalu sinkron dengan tanggal aktif dan kata kunci pencarian tanpa reload
+                const url = new URL(window.location.href);
+                let urlNeedsUpdate = false;
+                if (!url.searchParams.has('date')) {
+                    url.searchParams.set('date', '{{ $targetDate }}');
+                    urlNeedsUpdate = true;
+                }
+                if (this.search && !url.searchParams.has('q')) {
+                    url.searchParams.set('q', this.search);
+                    urlNeedsUpdate = true;
+                }
+                if (urlNeedsUpdate) {
+                    window.history.replaceState({}, '', url.toString());
+                }
+
+                // Sinkronisasi otomatis ke URL setiap user mengetik pencarian
+                this.$watch('search', (val) => {
+                    const u = new URL(window.location.href);
+                    u.searchParams.set('date', '{{ $targetDate }}');
+                    if (val && val.trim() !== '') {
+                        u.searchParams.set('q', val.trim());
+                    } else {
+                        u.searchParams.delete('q');
+                        u.searchParams.delete('search');
+                    }
+                    window.history.replaceState({}, '', u.toString());
+                });
             },
             openEditModal(row) {
                 this.editData = {
@@ -35,6 +66,8 @@
                 this.photoModalOpen = true;
             },
             async quickUpdateStatus(userId, status) {
+                if (this.updatingUserId) return;
+                this.updatingUserId = userId;
                 try {
                     const token = document.querySelector('meta[name=\'csrf-token\']').getAttribute('content');
                     const res = await fetch('{{ route('attendance.reports.quick-status') }}', {
@@ -52,12 +85,20 @@
                     });
                     const data = await res.json();
                     if (data.success) {
-                        window.location.reload();
+                        // Pertahankan tanggal dan search query saat reload
+                        const targetUrl = new URL('{{ route('attendance.reports') }}', window.location.origin);
+                        targetUrl.searchParams.set('date', '{{ $targetDate }}');
+                        if (this.search && this.search.trim() !== '') {
+                            targetUrl.searchParams.set('q', this.search.trim());
+                        }
+                        window.location.href = targetUrl.toString();
                     } else {
                         alert(data.message || 'Gagal mengubah status.');
+                        this.updatingUserId = null;
                     }
                 } catch (e) {
                     alert('Terjadi kesalahan koneksi saat mengubah status.');
+                    this.updatingUserId = null;
                 }
             }
          }">
@@ -96,7 +137,7 @@
 
             <!-- Right Controls: Export Excel Button -->
             <div class="relative z-10 flex items-center gap-2.5 self-start sm:self-auto">
-                <a href="{{ route('attendance.reports.export', ['date' => $targetDate]) }}" 
+                <a :href="'{{ route('attendance.reports.export') }}?date={{ $targetDate }}' + (search ? '&q=' + encodeURIComponent(search.trim()) : '')" 
                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md border border-emerald-400/30 transition active:scale-[0.98]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -113,6 +154,7 @@
                 <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider"># TANGGAL LAPORAN</label>
             </div>
             <form method="GET" action="{{ route('attendance.reports') }}" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <input type="hidden" name="q" :value="search">
                 <div class="relative flex-1">
                     <input type="date" 
                            name="date" 
@@ -188,7 +230,16 @@
                     <input type="text" 
                            x-model="search" 
                            placeholder="Cari nama karyawan..." 
-                           class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-3 py-2 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
+                           class="w-full text-xs rounded-xl border border-slate-200 bg-slate-50/70 pl-9 pr-8 py-2 text-slate-800 placeholder-slate-400 focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition">
+                    <button type="button" 
+                            x-show="search" 
+                            @click="search = ''" 
+                            class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                            title="Hapus pencarian">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -225,6 +276,8 @@
                             <!-- Status Dropdown (Quick Update) -->
                             <div class="shrink-0">
                                 <select @change="quickUpdateStatus({{ $user->id }}, $event.target.value)"
+                                        :disabled="updatingUserId === {{ $user->id }}"
+                                        :class="{'opacity-50 cursor-wait': updatingUserId === {{ $user->id }}}"
                                         class="text-xs font-bold rounded-full px-2.5 py-1 border shadow-2xs cursor-pointer outline-none appearance-none pr-5 text-center
                                         {{ $row['status'] === 'present' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 
                                           ($row['status'] === 'late' ? 'bg-amber-50 text-amber-700 border-amber-300' : 
@@ -454,6 +507,8 @@
                                     <!-- Dropdown Ubah Status Cepat -->
                                     <div class="relative">
                                         <select @change="quickUpdateStatus({{ $user->id }}, $event.target.value)"
+                                                :disabled="updatingUserId === {{ $user->id }}"
+                                                :class="{'opacity-50 cursor-wait': updatingUserId === {{ $user->id }}}"
                                                 class="text-xs font-bold rounded-full px-3 py-1 border shadow-2xs cursor-pointer outline-none appearance-none pr-6 text-center
                                                 {{ $row['status'] === 'present' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' : 
                                                   ($row['status'] === 'late' ? 'bg-amber-50 text-amber-700 border-amber-300' : 
@@ -555,10 +610,12 @@
                 </div>
 
                 <!-- Modal Body Form -->
-                <form method="POST" action="{{ route('attendance.reports.update') }}" class="p-6 space-y-4">
+                <form method="POST" action="{{ route('attendance.reports.update') }}" @submit="submittingEdit = true" class="p-6 space-y-4">
                     @csrf
                     <input type="hidden" name="user_id" :value="editData.user_id">
                     <input type="hidden" name="date" :value="editData.date">
+                    <input type="hidden" name="q" :value="search">
+                    <input type="hidden" name="search" :value="search">
 
                     <!-- Tanggal Info -->
                     <div class="p-3 bg-teal-50/50 rounded-xl border border-teal-100 text-xs flex items-center justify-between">
@@ -614,11 +671,15 @@
 
                     <!-- Submit Buttons -->
                     <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
-                        <button type="button" @click="editModalOpen = false" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer">
+                        <button type="button" @click="editModalOpen = false" :disabled="submittingEdit" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer disabled:opacity-50">
                             Batal
                         </button>
-                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white font-bold text-xs shadow-md transition cursor-pointer">
-                            Simpan Perubahan
+                        <button type="submit" :disabled="submittingEdit" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white font-bold text-xs shadow-md transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                            <svg x-show="submittingEdit" class="animate-spin w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            <span x-text="submittingEdit ? 'Menyimpan...' : 'Simpan Perubahan'"></span>
                         </button>
                     </div>
                 </form>
