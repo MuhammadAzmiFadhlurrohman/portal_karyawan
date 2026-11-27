@@ -115,6 +115,35 @@
                     </p>
                 </div>
             </div>
+
+            @if (! $isFinanceView)
+            <!-- Right: Action Buttons inside Page Header -->
+            <div class="relative z-10 flex flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
+                @if ($isAtasan)
+                <a href="{{ route('gomsn.pengajuan.approvals') }}"
+                   class="flex-1 sm:flex-initial min-h-[38px] px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs inline-flex items-center justify-center gap-2 backdrop-blur-xs transition shadow-2xs">
+                    <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Pengajuan Karyawan</span>
+                    @if ($pendingApprovalsCount > 0)
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
+                        {{ $pendingApprovalsCount }}
+                    </span>
+                    @endif
+                </a>
+                @endif
+
+                @if (! $hasOverdue)
+                <a href="{{ route('gomsn.pengajuan.create') }}"
+                   style="background: var(--gomsn-active-bg);"
+                   class="flex-1 sm:flex-initial min-h-[40px] px-4 py-2.5 rounded-xl border border-white/25 text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-md hover:opacity-95 active:scale-[0.99] transition cursor-pointer">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Buat Pengajuan Baru</span>
+                </a>
+                @endif
+            </div>
+            @endif
         </div>
 
         <!-- Flash Alerts (Success toast handled globally at top-right) -->
@@ -691,42 +720,6 @@
             <!-- ============================================== -->
             <!-- TAMPILAN STANDAR (KARYAWAN / ATASAN / ADMIN)   -->
             <!-- ============================================== -->
-
-            <!-- Action Toolbar (Tombol Buat Pengajuan & Approval) -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
-                <div class="hidden sm:block text-xs text-slate-500 font-medium">
-                    @if ($isAtasan)
-                        Daftar riwayat permohonan operasional mandiri divisi Anda.
-                    @else
-                        Daftar riwayat permohonan operasional &amp; reimburse Anda.
-                    @endif
-                </div>
-
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                    @if ($isAtasan)
-                    <a href="{{ route('gomsn.pengajuan.approvals') }}" class="btn-secondary w-full sm:w-auto min-h-[38px] inline-flex items-center justify-center gap-2 text-xs">
-                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>Pengajuan Karyawan</span>
-                        @if ($pendingApprovalsCount > 0)
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white animate-pulse">
-                            {{ $pendingApprovalsCount }}
-                        </span>
-                        @endif
-                    </a>
-                    @endif
-
-                    @if (! $hasOverdue)
-                    <a href="{{ route('gomsn.pengajuan.create') }}" 
-                       class="w-full sm:w-auto min-h-[40px] px-4 py-2.5 rounded-xl text-white font-bold text-xs inline-flex items-center justify-center gap-2 shadow-md shadow-teal-900/15 hover:opacity-95 transition cursor-pointer"
-                       style="background: linear-gradient(135deg, #093c40 0%, #0d5f66 45%, #14b8a6 100%) !important;">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        <span>Buat Pengajuan Baru</span>
-                    </a>
-                    @endif
-                </div>
-            </div>
 
             <!-- Navigation Tabs (Untuk Atasan / Admin) -->
             @if ($isAtasan || $isSuperAdmin)
