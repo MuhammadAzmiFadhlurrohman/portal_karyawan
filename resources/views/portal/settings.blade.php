@@ -1,6 +1,7 @@
 <x-layouts.app title="Pengaturan Sistem">
     <div class="space-y-6 w-full pb-16" 
          x-data="{ 
+            activeMainTab: '{{ request('tab') === 'preferensi' ? 'preferensi' : 'sistem' }}',
             activeGroup: 'all', 
             search: '', 
             showAddModal: false 
@@ -26,20 +27,20 @@
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
                         <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
-                            Pengaturan Sistem
+                            Pengaturan Sistem &amp; Akun
                         </h1>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-300 border border-teal-400/30">
                             Single Source of Truth
                         </span>
                     </div>
                     <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                        Parameter operasional, kuota, toleransi absensi, denda, dan kebijakan sistem berjejak audit
+                        Parameter operasional, kuota, toleransi absensi, denda, serta preferensi tampilan dan keamanan akun
                     </p>
                 </div>
             </div>
 
-            <!-- Right: Action Buttons -->
-            <div class="relative z-10 flex flex-wrap items-center gap-2">
+            <!-- Right: Action Buttons (Only on Sistem tab) -->
+            <div x-show="activeMainTab === 'sistem'" class="relative z-10 flex flex-wrap items-center gap-2">
                 <form method="POST" action="{{ route('portal.settings.reset') }}" onsubmit="return confirm('Pulihkan seluruh parameter standar sistem? Nilai yang belum ada akan dibuatkan otomatis.');">
                     @csrf
                     <button type="submit" 
@@ -60,6 +61,38 @@
                     <span>Tambah Parameter</span>
                 </button>
             </div>
+        </div>
+
+        <!-- 2. Main Mode Tabs (Parameter Sistem vs Preferensi Karyawan) -->
+        <div class="flex items-center p-1 rounded-2xl bg-slate-200/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs gap-1.5 select-none w-full sm:w-auto self-start">
+            <button type="button"
+                    @click="activeMainTab = 'sistem'"
+                    :class="activeMainTab === 'sistem'
+                        ? 'bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-xs font-bold border border-teal-500/20'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+                    class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer">
+                <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Parameter Sistem</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 border border-teal-200/60 dark:border-teal-700/60">
+                    {{ $currentSettings->count() }}
+                </span>
+            </button>
+
+            <button type="button"
+                    @click="activeMainTab = 'preferensi'"
+                    :class="activeMainTab === 'preferensi'
+                        ? 'bg-white dark:bg-slate-900 text-teal-800 dark:text-teal-300 shadow-xs font-bold border border-teal-500/20'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'"
+                    class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm transition-all cursor-pointer">
+                <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+                <span>Preferensi &amp; Akun (Karyawan)</span>
+                <span class="inline-flex w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+            </button>
         </div>
 
         <!-- 2. Status & Error Notifications -->
@@ -92,21 +125,23 @@
             </div>
         @endif
 
-        @php
-            $groupMetadata = [
-                'attendance' => ['label' => 'Absensi & Denda', 'color' => 'bg-teal-50 text-teal-700 border-teal-200', 'badge' => 'bg-teal-600 text-white'],
-                'geofence'   => ['label' => 'Lokasi & GPS', 'color' => 'bg-emerald-50 text-emerald-700 border-emerald-200', 'badge' => 'bg-emerald-600 text-white'],
-                'biometric'  => ['label' => 'Wajah & Biometrik', 'color' => 'bg-purple-50 text-purple-700 border-purple-200', 'badge' => 'bg-purple-600 text-white'],
-                'leave'      => ['label' => 'Cuti & Izin', 'color' => 'bg-amber-50 text-amber-700 border-amber-200', 'badge' => 'bg-amber-600 text-white'],
-                'ticketing'  => ['label' => 'Ticketing & SLA', 'color' => 'bg-blue-50 text-blue-700 border-blue-200', 'badge' => 'bg-blue-600 text-white'],
-                'gomsn'      => ['label' => 'GoMSN / Keuangan', 'color' => 'bg-indigo-50 text-indigo-700 border-indigo-200', 'badge' => 'bg-indigo-600 text-white'],
-                'security'   => ['label' => 'Keamanan & Sesi', 'color' => 'bg-rose-50 text-rose-700 border-rose-200', 'badge' => 'bg-rose-600 text-white'],
-            ];
+        <!-- Tab 1: Parameter Sistem (Single Source of Truth) -->
+        <div x-show="activeMainTab === 'sistem'" class="space-y-6">
+            @php
+                $groupMetadata = [
+                    'attendance' => ['label' => 'Absensi & Denda', 'color' => 'bg-teal-50 text-teal-700 border-teal-200', 'badge' => 'bg-teal-600 text-white'],
+                    'geofence'   => ['label' => 'Lokasi & GPS', 'color' => 'bg-emerald-50 text-emerald-700 border-emerald-200', 'badge' => 'bg-emerald-600 text-white'],
+                    'biometric'  => ['label' => 'Wajah & Biometrik', 'color' => 'bg-purple-50 text-purple-700 border-purple-200', 'badge' => 'bg-purple-600 text-white'],
+                    'leave'      => ['label' => 'Cuti & Izin', 'color' => 'bg-amber-50 text-amber-700 border-amber-200', 'badge' => 'bg-amber-600 text-white'],
+                    'ticketing'  => ['label' => 'Ticketing & SLA', 'color' => 'bg-blue-50 text-blue-700 border-blue-200', 'badge' => 'bg-blue-600 text-white'],
+                    'gomsn'      => ['label' => 'GoMSN / Keuangan', 'color' => 'bg-indigo-50 text-indigo-700 border-indigo-200', 'badge' => 'bg-indigo-600 text-white'],
+                    'security'   => ['label' => 'Keamanan & Sesi', 'color' => 'bg-rose-50 text-rose-700 border-rose-200', 'badge' => 'bg-rose-600 text-white'],
+                ];
 
-            $groups = $currentSettings->groupBy('group')->map->count();
-        @endphp
+                $groups = $currentSettings->groupBy('group')->map->count();
+            @endphp
 
-        <!-- 3. Search & Category Filters -->
+            <!-- 3. Search & Category Filters -->
         <div class="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <!-- Search Input -->
@@ -469,8 +504,11 @@
                 </div>
             </div>
         </div>
+        </div>
 
-        <!-- Keamanan Akun Pribadi (Biometrik & Ubah Password) -->
-        @include('portal.partials.security-settings')
+        <!-- Tab 2: Preferensi Pribadi & Tampilan Karyawan -->
+        <div x-show="activeMainTab === 'preferensi'" x-cloak class="space-y-5">
+            @include('portal.partials.personal-preferences')
+        </div>
     </div>
 </x-layouts.app>
