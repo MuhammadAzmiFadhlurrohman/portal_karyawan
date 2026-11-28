@@ -1047,34 +1047,36 @@
             padding-bottom: 0.5rem !important;
         }
 
-        /* Gojek-Style Floating "Pesan Cepat" Card Inside Chat Stream (Exact Match) */
+        /* Gojek-Style Floating "Pesan Cepat" Card Inside Chat Stream (Slim & Aligned with Chat Bubble) */
         #quick-reply-card {
             position: absolute;
             bottom: 8px;
-            right: 12px;
+            right: 58px;
             z-index: 38;
             background: #FFFFFF;
             border: 1px solid #E5E7EB;
-            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
-            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+            border-radius: 10px;
             overflow: hidden;
             transition: box-shadow 0.15s ease;
         }
         #quick-reply-card.is-collapsed {
             width: auto;
-            min-width: 170px;
+            min-width: 0;
+            border-radius: 9px;
         }
         #quick-reply-card.is-expanded {
-            width: 280px;
-            max-width: calc(100% - 24px);
+            width: 265px;
+            max-width: calc(100% - 64px);
+            border-radius: 11px;
         }
         #quick-reply-card .qr-header-btn {
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 11px 14px;
+            gap: 8px;
+            padding: 5.5px 11px;
             background: #FFFFFF;
             border: none;
             cursor: pointer;
@@ -1082,6 +1084,7 @@
             transition: background-color 0.15s ease;
         }
         #quick-reply-card.is-expanded .qr-header-btn {
+            padding: 9px 13px;
             border-bottom: 1px solid #E5E7EB;
         }
         #quick-reply-card .qr-header-btn:hover {
@@ -1097,12 +1100,12 @@
         #quick-reply-card .qr-item-btn {
             width: 100%;
             display: block;
-            padding: 11px 14px;
+            padding: 9px 13px;
             background: #FFFFFF;
             border: none;
             border-bottom: 1px solid #E5E7EB;
             text-align: left;
-            font-size: 13px;
+            font-size: 12.5px;
             line-height: 1.35;
             font-weight: 400;
             color: #374151;
@@ -1123,13 +1126,16 @@
             background: #E5E7EB;
         }
         @media (max-width: 639.98px) {
+            #quick-reply-card {
+                right: 46px;
+            }
             #quick-reply-card.is-expanded {
-                width: 265px;
-                max-width: calc(100% - 20px);
+                width: 250px;
+                max-width: calc(100% - 56px);
             }
             #quick-reply-card .qr-item-btn {
-                padding: 10px 14px;
-                font-size: 12.5px;
+                padding: 8.5px 12px;
+                font-size: 12px;
             }
         }
         /* Floating WhatsApp-Style Input Bar in Fullscreen */
@@ -1284,9 +1290,6 @@
 
         /* Desktop Fullscreen: Center bottom bar to 80% width cleanly */
         @media (min-width: 768px) {
-            .ticket-chat-card.is-chat-fullscreen #quick-reply-card {
-                right: max(10%, calc((100% - 1080px) / 2 + 14px)) !important;
-            }
             .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
                 width: 80% !important;
                 max-width: 1080px !important;
@@ -1814,15 +1817,15 @@
                             id="btn-quick-reply-toggle"
                             onclick="toggleQuickReplyPanel(event)"
                             class="qr-header-btn">
-                        <span class="flex items-center gap-2.5 min-w-0">
-                            <!-- Green/Teal Speech Bubble with White Star Icon (Exact Reference Match) -->
-                            <svg class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
+                        <span class="flex items-center gap-1.5 min-w-0">
+                            <!-- Green/Teal Speech Bubble with White Star Icon -->
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
                                 <path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="#16A34A"/>
                                 <path d="M12 7.2l1.18 2.39 2.64.38-1.91 1.86.45 2.63L12 13.22l-2.36 1.24.45-2.63-1.91-1.86 2.64-.38L12 7.2z" fill="#FFFFFF"/>
                             </svg>
-                            <span style="font-size: 13.5px; font-weight: 700; color: #111827; letter-spacing: -0.01em;">Pesan Cepat</span>
+                            <span style="font-size: 12px; font-weight: 700; color: #111827; letter-spacing: -0.01em;">Pesan Cepat</span>
                         </span>
-                        <svg id="quick-reply-chevron" class="w-4 h-4 text-slate-700 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <svg id="quick-reply-chevron" class="w-3.5 h-3.5 text-slate-600 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                         </svg>
                     </button>
