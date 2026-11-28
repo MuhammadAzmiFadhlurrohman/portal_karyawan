@@ -1047,25 +1047,103 @@
             padding-bottom: 0.5rem !important;
         }
 
-        /* Floating WhatsApp-Style Input Bar in Fullscreen (All Viewports including Landscape Mobile & Desktop) */
-        .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
-            background: transparent !important;
-            border-top: none !important;
-            border-bottom: none !important;
-            padding-top: 0.25rem !important;
-            padding-bottom: 0.25rem !important;
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
+        /* Gojek-Style Floating "Pesan cepat" Card Inside Chat Stream */
+        #quick-reply-card {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            z-index: 38;
+            background: #FFFFFF;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.13);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
-        .ticket-chat-card.is-chat-fullscreen #btn-quick-reply-toggle {
-            background-color: rgba(255, 255, 255, 0.96) !important;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12) !important;
+        #quick-reply-card.is-collapsed {
+            width: auto;
+            border-radius: 9999px;
         }
+        #quick-reply-card.is-expanded {
+            width: 320px;
+            max-width: calc(100% - 28px);
+            border-radius: 14px;
+        }
+        #quick-reply-card .qr-header-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #FFFFFF;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.15s ease;
+        }
+        #quick-reply-card.is-collapsed .qr-header-btn {
+            padding: 8px 14px;
+        }
+        #quick-reply-card.is-expanded .qr-header-btn {
+            padding: 12px 16px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        #quick-reply-card .qr-header-btn:hover {
+            background: #F8FAFC;
+        }
+        #quick-reply-card.is-expanded .qr-lead-icon {
+            display: none;
+        }
+        #quick-reply-card.is-collapsed .qr-body {
+            display: none !important;
+        }
+        #quick-reply-card.is-expanded .qr-body {
+            display: block !important;
+            max-height: 235px;
+            overflow-y: auto;
+            background: #FFFFFF;
+        }
+        #quick-reply-card .qr-item-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 16px;
+            background: #FFFFFF;
+            border: none;
+            border-bottom: 1px solid #F1F5F9;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.35;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        #quick-reply-card .qr-item-btn:last-child {
+            border-bottom: none;
+        }
+        #quick-reply-card .qr-item-btn:hover {
+            background: #F0FDFA;
+            color: #0F766E;
+        }
+        #quick-reply-card .qr-item-btn:active {
+            background: #CCFBF1;
+        }
+        @media (max-width: 639.98px) {
+            #quick-reply-card.is-expanded {
+                width: 295px;
+                max-width: calc(100% - 20px);
+            }
+            #quick-reply-card .qr-item-btn {
+                padding: 10px 14px;
+                font-size: 12.5px;
+            }
+        }
+        /* Floating WhatsApp-Style Input Bar in Fullscreen */
         .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
             background: transparent !important;
             border-top: none !important;
-            padding: 0.2rem 0.75rem 0.85rem 0.75rem !important;
+            padding: 0.35rem 0.75rem 0.85rem 0.75rem !important;
             padding-bottom: calc(max(0.85rem, env(safe-area-inset-bottom)) + 0.35rem) !important;
         }
         .ticket-chat-card.is-chat-fullscreen #quick-chat-form .chat-form-inner {
@@ -1160,14 +1238,11 @@
             border: 1px solid rgba(226, 232, 240, 0.9) !important;
         }
 
+        #chat-stream-box {
+            padding-bottom: 54px !important;
+        }
         /* Mobile Fullscreen: Mengapung ke atas & ukuran besar nyaman seperti WhatsApp Mobile */
         @media (max-width: 767.98px) {
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
-                padding-top: 0.35rem !important;
-                padding-bottom: 0.35rem !important;
-                padding-left: 0.75rem !important;
-                padding-right: 0.75rem !important;
-            }
             .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
                 padding-top: 0.25rem !important;
                 padding-left: 0.75rem !important;
@@ -1214,15 +1289,10 @@
             }
         }
 
-        /* Desktop Fullscreen: Center bottom bar (templates + input) to 80% width cleanly */
+        /* Desktop Fullscreen: Center bottom bar to 80% width cleanly */
         @media (min-width: 768px) {
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
-                width: 80% !important;
-                max-width: 1080px !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
+            .ticket-chat-card.is-chat-fullscreen #quick-reply-card {
+                right: max(10%, calc((100% - 1080px) / 2 + 14px)) !important;
             }
             .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
                 width: 80% !important;
@@ -1728,12 +1798,12 @@
                 </div>
                 </div>
 
-                <!-- Floating "Scroll to Latest Chat" Icon Button (WhatsApp-style circular button at bottom-right) -->
+                <!-- Floating "Scroll to Latest Chat" Icon Button (bottom-left so right side belongs to Pesan Cepat) -->
                 <button type="button"
                         id="btn-scroll-to-bottom"
                         onclick="scrollToLatestChat()"
                         title="Scroll ke pesan paling baru"
-                        style="display: none; position: absolute; bottom: 12px; right: 16px; z-index: 40; width: 32px; height: 32px; background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(13, 148, 136, 0.35); box-shadow: 0 3px 10px rgba(2, 40, 54, 0.16); backdrop-filter: blur(6px);"
+                        style="display: none; position: absolute; bottom: 12px; left: 16px; z-index: 40; width: 34px; height: 34px; background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(13, 148, 136, 0.35); box-shadow: 0 3px 10px rgba(2, 40, 54, 0.16); backdrop-filter: blur(6px);"
                         class="items-center justify-center rounded-full text-[#0D9488] hover:bg-teal-50 hover:text-teal-700 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer select-none">
                     <span id="new-msg-badge"
                           style="position: absolute; top: -2px; right: -2px;"
@@ -1742,6 +1812,60 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
+
+                @can('chat', $tiket)
+                <!-- Gojek-Style Unified Floating "Pesan cepat" Card INSIDE Chat Area -->
+                <div id="quick-reply-card" class="is-collapsed select-none">
+                    <!-- Single Unified Header (Acts as toggle button when collapsed AND card header when expanded) -->
+                    <button type="button"
+                            id="btn-quick-reply-toggle"
+                            onclick="toggleQuickReplyPanel(event)"
+                            class="qr-header-btn">
+                        <span class="flex items-center gap-2 min-w-0">
+                            <svg class="qr-lead-icon w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                            </svg>
+                            <span style="font-size: 13.5px; font-weight: 700; color: #0F172A; letter-spacing: -0.01em;">Pesan cepat</span>
+                        </span>
+                        <svg id="quick-reply-chevron" class="w-4 h-4 text-slate-600 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Collapsible Quick Message List Inside the Same Card -->
+                    <div id="quick-reply-body" class="qr-body">
+                        <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan 📍', 'TRACING')" class="qr-item-btn">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                            <span>Menuju ke lokasi gangguan 📍</span>
+                        </button>
+
+                        <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR 🔍', 'OTDR')" class="qr-item-btn">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                            <span>Investigasi titik &amp; pengukuran OTDR 🔍</span>
+                        </button>
+
+                        <button type="button" onclick="setQuickChip('Ditemukan kabel putus / bending core pada span ✂️', 'INVESTIGASI')" class="qr-item-btn">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                            <span>Kabel putus / bending core pada span ✂️</span>
+                        </button>
+
+                        <button type="button" onclick="setQuickChip('Sedang proses splicing core di Joint Closure ⚡', 'JOINTING')" class="qr-item-btn">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                            <span>Proses splicing core di Joint Closure ⚡</span>
+                        </button>
+
+                        <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai 📊', 'OTDR')" class="qr-item-btn">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                            <span>Pengukuran redaman optik selesai 📊</span>
+                        </button>
+
+                        <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali ✅', 'LINK_UP')" class="qr-item-btn">
+                            <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                            <span>Redaman normal &amp; Link UP kembali ✅</span>
+                        </button>
+                    </div>
+                </div>
+                @endcan
             </div>
 
             @can('chat', $tiket)
@@ -1756,77 +1880,6 @@
                     <span>Tiket berstatus <strong class="text-emerald-950 font-bold">{{ $tiket->status }}</strong> &bull; Chat koordinasi aktif khusus Admin, Semua Atasan, CEO, NOC &amp; Tim Teknik yang Ditugaskan.</span>
                 </div>
                 @endif
-            <!-- Pesan Cepat Collapsible Floating Card -->
-            <div class="chat-quick-templates-bar relative z-30 px-3 sm:px-4 py-1.5 bg-slate-50/90 border-t border-slate-200/80 shrink-0 flex justify-end">
-                <div id="quick-reply-wrapper" class="relative inline-block text-left">
-                    <!-- Compact Trigger Pill -->
-                    <button type="button"
-                            id="btn-quick-reply-toggle"
-                            onclick="toggleQuickReplyPanel(event)"
-                            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-teal-50/80 border border-slate-200/90 text-slate-800 text-[12px] sm:text-[12.5px] font-bold shadow-[0_2px_10px_rgba(15,23,42,0.08)] transition-all active:scale-95 cursor-pointer select-none">
-                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>Pesan cepat</span>
-                        <svg id="quick-reply-chevron" class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
-                        </svg>
-                    </button>
-
-                    <!-- Floating Quick Reply List Card -->
-                    <div id="quick-reply-panel"
-                         class="hidden absolute right-0 bottom-full mb-2 w-[285px] sm:w-[330px] max-w-[calc(100vw-2rem)] rounded-2xl bg-white border border-slate-200/90 shadow-[0_12px_34px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 overflow-hidden z-50">
-                        <!-- Card Header -->
-                        <button type="button"
-                                onclick="closeQuickReplyPanel()"
-                                class="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-slate-50/80 border-b border-slate-100 transition cursor-pointer text-left">
-                            <span class="text-[13.5px] sm:text-[14px] font-bold text-slate-900 tracking-tight">Pesan cepat</span>
-                            <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </button>
-
-                        <!-- Quick Reply Items (GoMSN FTTH & Koordinasi Lapangan) -->
-                        <div class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto overscroll-contain">
-                            <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan 📍', 'TRACING')"
-                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span class="leading-snug">Menuju ke lokasi gangguan 📍</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR 🔍', 'OTDR')"
-                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span class="leading-snug">Investigasi titik &amp; pengukuran OTDR 🔍</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Ditemukan kabel putus / bending core pada span ✂️', 'INVESTIGASI')"
-                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span class="leading-snug">Kabel putus / bending core pada span ✂️</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Sedang proses splicing core di Joint Closure ⚡', 'JOINTING')"
-                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span class="leading-snug">Proses splicing core di Joint Closure ⚡</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai 📊', 'OTDR')"
-                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span class="leading-snug">Pengukuran redaman optik selesai 📊</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali ✅', 'LINK_UP')"
-                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span class="leading-snug">Redaman normal &amp; Link UP kembali ✅</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Chat Input Bar (matching Image 3 & Attachment Menu) -->
             <form id="quick-chat-form" method="POST" action="{{ route('tickets.chronologies.store', $tiket) }}" enctype="multipart/form-data"
@@ -5787,12 +5840,13 @@ function toggleQuickReplyPanel(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    const panel = document.getElementById('quick-reply-panel');
+    const card = document.getElementById('quick-reply-card');
     const chevron = document.getElementById('quick-reply-chevron');
-    if (!panel) return;
-    const isHidden = panel.classList.contains('hidden');
-    if (isHidden) {
-        panel.classList.remove('hidden');
+    if (!card) return;
+    const isCollapsed = card.classList.contains('is-collapsed');
+    if (isCollapsed) {
+        card.classList.remove('is-collapsed');
+        card.classList.add('is-expanded');
         if (chevron) chevron.style.transform = 'rotate(180deg)';
     } else {
         closeQuickReplyPanel();
@@ -5800,16 +5854,18 @@ function toggleQuickReplyPanel(e) {
 }
 
 function closeQuickReplyPanel() {
-    const panel = document.getElementById('quick-reply-panel');
+    const card = document.getElementById('quick-reply-card');
     const chevron = document.getElementById('quick-reply-chevron');
-    if (panel) panel.classList.add('hidden');
+    if (card) {
+        card.classList.remove('is-expanded');
+        card.classList.add('is-collapsed');
+    }
     if (chevron) chevron.style.transform = 'rotate(0deg)';
 }
 
 document.addEventListener('click', function(event) {
-    const wrapper = document.getElementById('quick-reply-wrapper');
-    const panel = document.getElementById('quick-reply-panel');
-    if (wrapper && panel && !panel.classList.contains('hidden') && !wrapper.contains(event.target)) {
+    const card = document.getElementById('quick-reply-card');
+    if (card && card.classList.contains('is-expanded') && !card.contains(event.target)) {
         closeQuickReplyPanel();
     }
 });
