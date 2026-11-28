@@ -589,11 +589,18 @@ class PortalHubController extends Controller
             ->limit(20)
             ->get();
 
+        $activeSessionsCount = UserSession::query()->whereNull('revoked_at')->count();
+        $revokedSessionsCount = UserSession::query()->whereNotNull('revoked_at')->count();
+        $totalDevicesCount = UserDevice::query()->count();
+
         return view('portal.sessions', [
-            'sessions' => $sessionsQuery->limit(50)->get(),
-            'devices' => $devicesQuery->limit(50)->get(),
+            'sessions' => $sessionsQuery->limit(100)->get(),
+            'devices' => $devicesQuery->limit(100)->get(),
             'delegations' => $delegations,
             'canManageAll' => $canManageAll,
+            'activeSessionsCount' => $activeSessionsCount,
+            'revokedSessionsCount' => $revokedSessionsCount,
+            'totalDevicesCount' => $totalDevicesCount,
             'users' => User::query()->orderBy('name')->get(['id', 'name', 'employee_code', 'position']),
         ]);
     }
@@ -618,6 +625,109 @@ class PortalHubController extends Controller
         $deviceSessionService->revokeSession($userSession, $validated['reason'], $actor->id);
 
         return back()->with('status', 'Sesi perangkat berhasil dihentikan (Force Logout) dan dicatat pada Audit Log.');
+    }
+
+    public function destroySession(Request $request, UserSession $userSession): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless(
+            $actor->id === $userSession->user_id || $actor->can('portal.sessions.manage') || $actor->hasRole(['super_admin', 'admin']),
+            403
+        );
+
+        // Hapus session Laravel jika masih aktif
+        \Illuminate\Support\Facades\DB::table('sessions')->where('id', $userSession->session_id)->delete();
+
+        $userName = $userSession->user?->name ?? 'User #'.$userSession->user_id;
+        $deviceName = $userSession->device_name;
+
+        AuditLogger::record(
+            action: 'session.deleted',
+            auditable: $userSession,
+            oldValues: [
+                'user_id' => $userSession->user_id,
+                'device_name' => $deviceName,
+                'ip_address' => $userSession->ip_address,
+                'status' => $userSession->revoked_at ? 'revoked' : 'active',
+            ],
+            reason: 'Dihapus oleh Administrator',
+            actorId: $actor->id
+        );
+
+        $userSession->delete();
+
+        return back()->with('status', "Data sesi login {$userName} ({$deviceName}) berhasil dihapus.");
+    }
+
+    public function pruneRevokedSessions(Request $request): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($actor->can('portal.sessions.manage') || $actor->hasRole(['super_admin', 'admin']), 403);
+
+        $count = UserSession::query()->whereNotNull('revoked_at')->delete();
+
+        AuditLogger::record(
+            action: 'session.pruned_revoked',
+            auditable: $actor,
+            newValues: ['deleted_count' => $count],
+            reason: 'Pembersihan riwayat sesi login yang telah dihentikan',
+            actorId: $actor->id
+        );
+
+        return back()->with('status', "Berhasil menghapus {$count} riwayat sesi login yang sudah dihentikan.");
+    }
+
+    public function destroyDevice(Request $request, UserDevice $userDevice): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless($actor->can('portal.sessions.manage') || $actor->hasRole(['super_admin', 'admin']), 403);
+
+        $name = $userDevice->device_name;
+        $userName = $userDevice->user?->name ?? 'User #'.$userDevice->user_id;
+
+        // Invalidate sessions linked to this device
+        $sessions = UserSession::query()->where('device_id', $userDevice->id)->get();
+        foreach ($sessions as $s) {
+            \Illuminate\Support\Facades\DB::table('sessions')->where('id', $s->session_id)->delete();
+            $s->delete();
+        }
+
+        AuditLogger::record(
+            action: 'device.deleted',
+            auditable: $userDevice,
+            oldValues: ['device_name' => $name, 'user_name' => $userName],
+            reason: 'Dihapus oleh Administrator',
+            actorId: $actor->id
+        );
+
+        $userDevice->delete();
+
+        return back()->with('status', "Perangkat {$name} ({$userName}) berhasil dihapus dari sistem.");
+    }
+
+    public function destroyDelegation(Request $request, ApprovalDelegation $delegation): RedirectResponse
+    {
+        /** @var User $actor */
+        $actor = $request->user();
+        abort_unless(
+            $actor->can('portal.sessions.manage') || $actor->hasRole(['super_admin', 'admin']) || $actor->id === $delegation->delegator_id,
+            403
+        );
+
+        AuditLogger::record(
+            action: 'approval_delegation.deleted',
+            auditable: $delegation,
+            oldValues: ['module' => $delegation->module, 'reason' => $delegation->reason],
+            reason: 'Dihapus oleh Administrator / Pemberi Delegasi',
+            actorId: $actor->id
+        );
+
+        $delegation->delete();
+
+        return back()->with('status', 'Delegasi persetujuan berhasil dihapus.');
     }
 
     public function approveDevice(Request $request, UserDevice $userDevice): RedirectResponse

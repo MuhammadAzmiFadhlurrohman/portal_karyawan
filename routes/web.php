@@ -51,8 +51,12 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/portal/profile/webauthn/{credential}', [PortalHubController::class, 'webauthnDestroy'])->name('portal.profile.webauthn.destroy');
     Route::get('/portal/sessions', [PortalHubController::class, 'sessionsAndDevices'])->name('portal.sessions');
     Route::post('/portal/sessions/{userSession}/revoke', [PortalHubController::class, 'revokeSession'])->name('portal.sessions.revoke');
+    Route::delete('/portal/sessions/{userSession}', [PortalHubController::class, 'destroySession'])->name('portal.sessions.destroy');
+    Route::post('/portal/sessions/prune-revoked', [PortalHubController::class, 'pruneRevokedSessions'])->name('portal.sessions.prune');
     Route::post('/portal/devices/{userDevice}/approve', [PortalHubController::class, 'approveDevice'])->name('portal.devices.approve');
+    Route::delete('/portal/devices/{userDevice}', [PortalHubController::class, 'destroyDevice'])->name('portal.devices.destroy');
     Route::post('/portal/delegations', [PortalHubController::class, 'storeDelegation'])->name('portal.delegations.store');
+    Route::delete('/portal/delegations/{delegation}', [PortalHubController::class, 'destroyDelegation'])->name('portal.delegations.destroy');
 
     Route::get('/portal/settings', [PortalHubController::class, 'systemSettings'])->name('portal.settings');
     Route::put('/portal/settings/password', [PortalHubController::class, 'updatePassword'])->name('portal.settings.password');
