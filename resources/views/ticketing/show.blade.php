@@ -1486,42 +1486,50 @@
                                         </svg>
                                     </button>
 
-                                    <!-- WhatsApp Dropdown Menu (matching Image 2) -->
+                                    <!-- WhatsApp Dropdown Menu -->
                                     <div id="msg-dropdown-{{ $chron->id }}"
                                          style="bottom: calc(100% + 6px); top: auto; right: 0;"
-                                         class="msg-action-dropdown hidden absolute right-0 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                                         class="msg-action-dropdown hidden absolute right-0 w-52 sm:w-56 rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_12px_32px_rgba(15,23,42,0.16)] border border-slate-200/80 ring-1 ring-slate-900/5 p-1.5 z-50 select-none divide-y divide-slate-100">
                                         
                                         <div class="space-y-0.5 pb-1">
                                             <!-- 1. Salin -->
                                             <button type="button"
                                                     onclick="copyMessageText({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                                    class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                                <span class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                                </span>
                                                 <span>Salin</span>
                                             </button>
 
                                             <!-- 2. Info Pesan -->
                                             <button type="button"
                                                     onclick="openMessageInfo({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                                    class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                                <span class="w-7 h-7 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                                </span>
                                                 <span>Info Pesan</span>
                                             </button>
 
                                             <!-- 3. Simpan ke Dokumentasi -->
                                             <button type="button"
                                                     onclick="saveToDocumentation({{ $chron->id }})"
-                                                    class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-                                                <span>Simpan ke Dokumentasi</span>
+                                                    class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                                <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                                </span>
+                                                <span class="truncate">Simpan Dokumentasi</span>
                                             </button>
 
                                             @if(!in_array($tiket->status, ['CLOSE', 'CANCELLED'], true))
                                                 <!-- 4. Balas -->
                                                 <button type="button"
                                                         onclick="replyToMessage({{ $chron->id }})"
-                                                        class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                    <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                                        class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                                    <span class="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                                    </span>
                                                     <span>Balas</span>
                                                 </button>
 
@@ -1529,9 +1537,11 @@
                                                     <!-- 5. Edit -->
                                                     <button type="button"
                                                             onclick="editMessage({{ $chron->id }})"
-                                                            class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                                        <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                                        <span>Edit</span>
+                                                            class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-amber-50/70 hover:text-amber-900 transition-all duration-150 cursor-pointer text-left">
+                                                        <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                        </span>
+                                                        <span>Edit Pesan</span>
                                                     </button>
                                                 @endif
                                             @endif
@@ -1542,9 +1552,11 @@
                                                 <!-- 6. Hapus -->
                                                 <button type="button"
                                                         onclick="deleteMessage({{ $chron->id }})"
-                                                        class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer text-left">
-                                                    <svg class="w-3.5 h-3.5 text-slate-600 hover:text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                    <span>Hapus</span>
+                                                        class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-all duration-150 cursor-pointer text-left">
+                                                    <span class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                    </span>
+                                                    <span>Hapus Pesan</span>
                                                 </button>
                                             </div>
                                         @endif
@@ -5620,29 +5632,45 @@ async function handleChatFormSubmit(e) {
                         </button>
                         <div id="msg-dropdown-${chron.id}"
                              style="bottom: calc(100% + 6px); top: auto; right: 0;"
-                             class="msg-action-dropdown hidden absolute right-0 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
+                             class="msg-action-dropdown hidden absolute right-0 w-52 sm:w-56 rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_12px_32px_rgba(15,23,42,0.16)] border border-slate-200/80 ring-1 ring-slate-900/5 p-1.5 z-50 select-none divide-y divide-slate-100">
                             <div class="space-y-0.5 pb-1">
-                                <button type="button" onclick="copyMessageText(${chron.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                    <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                <button type="button" onclick="copyMessageText(${chron.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                    <span class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                    </span>
                                     <span>Salin</span>
                                 </button>
-                                <button type="button" onclick="openMessageInfo(${chron.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                    <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                <button type="button" onclick="openMessageInfo(${chron.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                    <span class="w-7 h-7 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                    </span>
                                     <span>Info Pesan</span>
                                 </button>
-                                <button type="button" onclick="replyToMessage(${chron.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                    <svg class="w-3.5 h-3.5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                <button type="button" onclick="saveToDocumentation(${chron.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                    <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                    </span>
+                                    <span class="truncate">Simpan Dokumentasi</span>
+                                </button>
+                                <button type="button" onclick="replyToMessage(${chron.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                    <span class="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                    </span>
                                     <span>Balas</span>
                                 </button>
-                                <button type="button" onclick="editMessage(${chron.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
-                                    <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                <button type="button" onclick="editMessage(${chron.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-amber-50/70 hover:text-amber-900 transition-all duration-150 cursor-pointer text-left">
+                                    <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    </span>
                                     <span>Edit Pesan</span>
                                 </button>
                             </div>
                             <div class="pt-1">
-                                <button type="button" onclick="deleteMessage(${chron.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-rose-600 hover:bg-rose-50 transition cursor-pointer text-left">
-                                    <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    <span>Hapus untuk Saya</span>
+                                <button type="button" onclick="deleteMessage(${chron.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-rose-600 hover:bg-rose-50 hover:text-rose-700 transition-all duration-150 cursor-pointer text-left">
+                                    <span class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </span>
+                                    <span>Hapus Pesan</span>
                                 </button>
                             </div>
                         </div>
@@ -6988,15 +7016,30 @@ function renderIncomingLiveMessage(data) {
                     </button>
                     <div id="msg-dropdown-${data.id}"
                          style="bottom: calc(100% + 6px); top: auto; right: 0;"
-                         class="msg-action-dropdown hidden absolute right-0 w-48 sm:w-52 rounded-2xl bg-white shadow-2xl border border-slate-200/90 py-1.5 px-1 z-50 select-none divide-y divide-slate-100">
-                        <div class="space-y-0.5 pb-1">
-                            <button type="button" onclick="copyMessageText(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                         class="msg-action-dropdown hidden absolute right-0 w-52 sm:w-56 rounded-2xl bg-white/95 backdrop-blur-md shadow-[0_12px_32px_rgba(15,23,42,0.16)] border border-slate-200/80 ring-1 ring-slate-900/5 p-1.5 z-50 select-none divide-y divide-slate-100">
+                        <div class="space-y-0.5">
+                            <button type="button" onclick="copyMessageText(${data.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                <span class="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                </span>
                                 <span>Salin</span>
                             </button>
-                            <button type="button" onclick="openMessageInfo(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                            <button type="button" onclick="openMessageInfo(${data.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                <span class="w-7 h-7 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4m0-4h.01"/></svg>
+                                </span>
                                 <span>Info Pesan</span>
                             </button>
-                            <button type="button" onclick="replyToMessage(${data.id})" class="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition cursor-pointer text-left">
+                            <button type="button" onclick="saveToDocumentation(${data.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                </span>
+                                <span class="truncate">Simpan Dokumentasi</span>
+                            </button>
+                            <button type="button" onclick="replyToMessage(${data.id})" class="group/item w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-[12.5px] font-semibold text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 transition-all duration-150 cursor-pointer text-left">
+                                <span class="w-7 h-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover/item:scale-105 transition-transform">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
+                                </span>
                                 <span>Balas</span>
                             </button>
                         </div>
