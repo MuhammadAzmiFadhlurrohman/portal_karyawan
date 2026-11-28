@@ -899,6 +899,24 @@
                 scroll-margin-top: 65px;
             }
         }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+
+        #quick-reply-card,
+        #quick-reply-card .qr-item-btn,
+        #quick-chat-input,
+        #chat-stream-container {
+            font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+        }
+
+        .emoji-salute-svg {
+            display: inline-block;
+            width: 1.18em;
+            height: 1.18em;
+            vertical-align: -0.22em;
+            margin: 0 0.05em;
+            flex-shrink: 0;
+        }
+
         /* Fullscreen Zoom Mode Animation & Styling */
         @keyframes chatFsEnter {
             0% {
@@ -1707,7 +1725,7 @@
 
                             <!-- Message Content -->
                             @if($cleanMessage)
-                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">{{ $cleanMessage }}</p>
+                                <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">{!! str_replace('🫡', '<svg class="emoji-salute-svg" viewBox="0 0 36 36" aria-label="🫡"><circle cx="17" cy="18" r="15" fill="#FFCC4D"/><ellipse cx="11.5" cy="16.5" rx="2.1" ry="2.8" fill="#664500"/><ellipse cx="21.5" cy="16.5" rx="2.1" ry="2.8" fill="#664500"/><path d="M12.5 24.5h8" stroke="#664500" stroke-width="2.3" stroke-linecap="round"/><path d="M9.5 11.8c1.2-.8 2.8-.8 4 0" stroke="#664500" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18.5 10.5l10.2-2.2c1.4-.3 2.7.5 3.1 1.8l1.8 6c.4 1.3-.3 2.7-1.6 3.2l-3.8 1.4c-1.1.4-2.3-.2-2.7-1.3l-1.1-3.3-5.6 1.2c-1.2.3-2.4-.5-2.6-1.7-.3-1.2.5-2.4 1.7-2.7l.6-.4z" fill="#F4900C"/><path d="M18.2 10.8l9.5-2c1.1-.2 2.1.4 2.4 1.4l.4 1.4-11.8 2.5c-.9.2-1.8-.4-2-1.3-.2-.9.4-1.8 1.5-2z" fill="#FFAC33"/></svg>', e($cleanMessage)) !!}</p>
                             @endif
 
                             <!-- Photo / PDF Attachment Preview if available (Lightbox Modal or PDF Link) -->
@@ -1882,7 +1900,7 @@
                                         onclick="setQuickChip(@js($qrItem['text'] ?? ''), @js($qrItem['category'] ?? 'LAIN'))"
                                         class="qr-item-btn">
                                     <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                    <span>{{ $qrItem['text'] ?? '' }}</span>
+                                    <span>{!! str_replace('🫡', '<svg class="emoji-salute-svg" viewBox="0 0 36 36" aria-label="🫡"><circle cx="17" cy="18" r="15" fill="#FFCC4D"/><ellipse cx="11.5" cy="16.5" rx="2.1" ry="2.8" fill="#664500"/><ellipse cx="21.5" cy="16.5" rx="2.1" ry="2.8" fill="#664500"/><path d="M12.5 24.5h8" stroke="#664500" stroke-width="2.3" stroke-linecap="round"/><path d="M9.5 11.8c1.2-.8 2.8-.8 4 0" stroke="#664500" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18.5 10.5l10.2-2.2c1.4-.3 2.7.5 3.1 1.8l1.8 6c.4 1.3-.3 2.7-1.6 3.2l-3.8 1.4c-1.1.4-2.3-.2-2.7-1.3l-1.1-3.3-5.6 1.2c-1.2.3-2.4-.5-2.6-1.7-.3-1.2.5-2.4 1.7-2.7l.6-.4z" fill="#F4900C"/><path d="M18.2 10.8l9.5-2c1.1-.2 2.1.4 2.4 1.4l.4 1.4-11.8 2.5c-.9.2-1.8-.4-2-1.3-.2-.9.4-1.8 1.5-2z" fill="#FFAC33"/></svg>', e($qrItem['text'] ?? '')) !!}</span>
                                 </button>
                             @endforeach
                         </div>
@@ -5637,7 +5655,7 @@ async function handleChatFormSubmit(e) {
                     </div>
                 </div>
                 ${replyBox}
-                ${msg ? `<p class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(msg)}</p>` : ''}
+                ${msg ? `<p class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${formatChatMessageHtml(msg)}</p>` : ''}
                 ${mediaNotice}
                 ${locNotice}
                 <div class="flex justify-end items-center gap-1 text-[9.5px] text-slate-400 font-mono pt-0.5 select-none leading-none">
@@ -5855,10 +5873,16 @@ async function handleChatFormSubmit(e) {
     }
 }
 
+const SALUTE_EMOJI_SVG = `<svg class="emoji-salute-svg" viewBox="0 0 36 36" aria-label="🫡"><circle cx="17" cy="18" r="15" fill="#FFCC4D"/><ellipse cx="11.5" cy="16.5" rx="2.1" ry="2.8" fill="#664500"/><ellipse cx="21.5" cy="16.5" rx="2.1" ry="2.8" fill="#664500"/><path d="M12.5 24.5h8" stroke="#664500" stroke-width="2.3" stroke-linecap="round"/><path d="M9.5 11.8c1.2-.8 2.8-.8 4 0" stroke="#664500" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M18.5 10.5l10.2-2.2c1.4-.3 2.7.5 3.1 1.8l1.8 6c.4 1.3-.3 2.7-1.6 3.2l-3.8 1.4c-1.1.4-2.3-.2-2.7-1.3l-1.1-3.3-5.6 1.2c-1.2.3-2.4-.5-2.6-1.7-.3-1.2.5-2.4 1.7-2.7l.6-.4z" fill="#F4900C"/><path d="M18.2 10.8l9.5-2c1.1-.2 2.1.4 2.4 1.4l.4 1.4-11.8 2.5c-.9.2-1.8-.4-2-1.3-.2-.9.4-1.8 1.5-2z" fill="#FFAC33"/></svg>`;
+
 function escapeChatHtml(text) {
     const p = document.createElement('p');
     p.textContent = text;
     return p.innerHTML;
+}
+
+function formatChatMessageHtml(text) {
+    return escapeChatHtml(text).replace(/🫡/g, SALUTE_EMOJI_SVG);
 }
 
 let quickReplyAnimFrame = null;
@@ -5968,7 +5992,7 @@ if (window.ResizeObserver) {
             btn.onclick = () => setQuickChip(text, cat);
             btn.innerHTML = `
                 <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                <span>${escapeChatHtml(text)}</span>
+                <span>${formatChatMessageHtml(text)}</span>
             `;
             body.appendChild(btn);
         });
@@ -7313,7 +7337,7 @@ function renderIncomingLiveMessage(data) {
             </div>
 
             ${replyBox}
-            ${resolvedCleanMessage ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(resolvedCleanMessage)}</p>` : ''}
+            ${resolvedCleanMessage ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${formatChatMessageHtml(resolvedCleanMessage)}</p>` : ''}
             ${photoBox}
             ${videoBox}
             ${locBox}

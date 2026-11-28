@@ -8,6 +8,12 @@
         'csrfToken' => csrf_token(),
     ];
 @endphp
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+    .qr-emoji-input {
+        font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif !important;
+    }
+</style>
 <script>
     window.__gomsnUserSettingsConfig = @json($userSettingsConfig);
 
@@ -460,7 +466,7 @@
                                x-model="qr.text"
                                maxlength="120"
                                placeholder="Tulis kalimat pesan cepat..."
-                               class="w-full rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white px-3 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition">
+                               class="qr-emoji-input w-full rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white px-3 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition">
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
                         <button type="button"
