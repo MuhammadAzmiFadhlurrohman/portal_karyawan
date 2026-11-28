@@ -7,7 +7,7 @@
             @click="openTiketing = !openTiketing"
             class="w-full pt-2.5 pb-1.5 px-3 flex items-center justify-between text-white/90 hover:text-white transition group cursor-pointer select-none rounded-xl hover:bg-white/10">
         <div class="flex items-center gap-2 flex-1">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
                 PEKERJAAN &amp; TIKETING
             </span>
             <div class="h-px flex-1 bg-white/15"></div>

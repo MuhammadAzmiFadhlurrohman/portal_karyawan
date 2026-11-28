@@ -962,7 +962,7 @@
                 <div class="space-y-1">
                     <div class="pt-2.5 pb-1 px-3 flex items-center justify-between text-white/90 select-none">
                         <div class="flex items-center gap-2 flex-1">
-                            <span class="text-[9px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-teal-200/90 font-mono">
                                 PENGAJUAN &amp; LEMBUR
                             </span>
                             <div class="h-px flex-1 bg-white/15"></div>
