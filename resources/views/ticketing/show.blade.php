@@ -1071,31 +1071,6 @@
             padding: 0.2rem 0.75rem 0.85rem 0.75rem !important;
             padding-bottom: calc(max(0.85rem, env(safe-area-inset-bottom)) + 0.35rem) !important;
         }
-
-        /* Mobile Fullscreen: Mengapung ke atas agar tidak terlalu menempel ke tepi bawah layar HP */
-        @media (max-width: 767.98px) {
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
-                padding-top: 0.35rem !important;
-                padding-bottom: 0.35rem !important;
-                padding-left: 0.85rem !important;
-                padding-right: 0.85rem !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
-                padding-top: 0.25rem !important;
-                padding-left: 0.85rem !important;
-                padding-right: 0.85rem !important;
-                padding-bottom: calc(max(1.15rem, env(safe-area-inset-bottom)) + 0.45rem) !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #chat-input-container {
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text {
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
-                box-shadow: 0 4px 16px rgba(13, 148, 136, 0.45) !important;
-            }
-        }
         .ticket-chat-card.is-chat-fullscreen #quick-chat-form .chat-form-inner {
             padding: 0 !important;
         }
@@ -1179,11 +1154,67 @@
             height: 1.1rem !important;
             margin-right: 0 !important;
         }
-        .ticket-chat-card.is-chat-fullscreen #chat-reply-preview {
-            margin: 0 0 0.35rem 0 !important;
-            border-radius: 0.85rem !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        .ticket-chat-card.is-chat-fullscreen #chat-reply-preview,
+        .ticket-chat-card.is-chat-fullscreen #photo-attached-preview,
+        .ticket-chat-card.is-chat-fullscreen #gps-attached-preview {
+            margin: 0 0 0.4rem 0 !important;
+            border-radius: 0.9rem !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
             border: 1px solid rgba(226, 232, 240, 0.9) !important;
+        }
+
+        /* Mobile Fullscreen: Mengapung ke atas & ukuran besar nyaman seperti WhatsApp Mobile */
+        @media (max-width: 767.98px) {
+            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar {
+                padding-top: 0.35rem !important;
+                padding-bottom: 0.35rem !important;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
+                padding-top: 0.25rem !important;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+                padding-bottom: calc(max(1.1rem, env(safe-area-inset-bottom)) + 0.4rem) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #chat-input-container {
+                min-height: 48px !important;
+                padding-left: 0.45rem !important;
+                padding-right: 1rem !important;
+                padding-top: 0.35rem !important;
+                padding-bottom: 0.35rem !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #quick-chat-input {
+                font-size: 0.9375rem !important;
+                line-height: 1.4rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle {
+                width: 40px !important;
+                height: 40px !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-attachment-toggle svg {
+                width: 1.35rem !important;
+                height: 1.35rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text {
+                width: 48px !important;
+                height: 48px !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-voice-to-text svg {
+                width: 1.35rem !important;
+                height: 1.35rem !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit {
+                width: 48px !important;
+                height: 48px !important;
+                box-shadow: 0 4px 16px rgba(13, 148, 136, 0.45) !important;
+            }
+            .ticket-chat-card.is-chat-fullscreen #btn-quick-chat-submit svg {
+                width: 1.35rem !important;
+                height: 1.35rem !important;
+            }
         }
 
         /* Desktop Fullscreen: Center bottom bar (templates + input) to 80% width cleanly */
@@ -1843,7 +1874,7 @@
 
                 <!-- Text & Location Input Box Container with Integrated Attachment Clip (Nyambung Bagian Putihnya) -->
                 <div id="chat-input-container"
-                     class="flex-1 rounded-full border border-slate-300/90 bg-white pl-1.5 pr-4 py-1 transition-all flex flex-col justify-center min-h-[40px] shadow-[0_3px_12px_rgba(0,0,0,0.09)] min-w-0">
+                     class="flex-1 rounded-full border border-slate-300/90 bg-white pl-2 pr-4 py-1.5 sm:pl-1.5 sm:py-1 transition-all flex flex-col justify-center min-h-[48px] sm:min-h-[40px] shadow-[0_3px_12px_rgba(0,0,0,0.09)] min-w-0">
                     <div class="relative flex items-center min-w-0 w-full gap-1">
                         <!-- Attachment Clip Button inside the white pill -->
                         <div class="relative shrink-0">
@@ -1851,8 +1882,8 @@
                                     id="btn-attachment-toggle"
                                     onclick="toggleAttachmentMenu(event)"
                                     title="Lampirkan Dokumen / Media / Kamera / Lokasi"
-                                    class="w-8 h-8 rounded-full bg-transparent hover:bg-slate-100 text-slate-500 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0">
-                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                    class="w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-transparent hover:bg-slate-100 text-slate-500 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0">
+                                <svg class="w-5 h-5 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                             </button>
 
                             <!-- WhatsApp-Style Dropup Attachment Menu (Robust Native JS & Clean Elevating Z-Index) -->
@@ -1941,7 +1972,7 @@
                                autocomplete="off"
                                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();handleChatFormSubmit(event);return false;}"
                                style="outline: none !important; box-shadow: none !important; border: none !important;"
-                               class="flex-1 text-xs bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0 min-w-0 pr-1">
+                               class="flex-1 text-[15px] sm:text-xs bg-transparent border-0 p-0 text-slate-800 placeholder-slate-400 focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0 min-w-0 pr-1">
                     </div>
                 </div>
 
@@ -2032,9 +2063,9 @@
                         id="btn-voice-to-text"
                         onclick="toggleVoiceRecognition()"
                         title="Bicara untuk Mengetik (Voice-to-Text)"
-                        class="w-10 h-10 rounded-full bg-white border border-slate-200/95 shadow-[0_3px_12px_rgba(0,0,0,0.09)] hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
+                        class="w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-white border border-slate-200/95 shadow-[0_3px_12px_rgba(0,0,0,0.09)] hover:bg-teal-50 text-slate-600 hover:text-[#0D9488] flex items-center justify-center transition active:scale-95 cursor-pointer shrink-0 relative">
                     <!-- Mic Normal Icon -->
-                    <svg id="mic-icon-normal" class="w-4.5 h-4.5 text-slate-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg id="mic-icon-normal" class="w-5 h-5 sm:w-4.5 sm:h-4.5 text-slate-600 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
                     </svg>
                     <!-- Mic Active (Recording Pulse) -->
@@ -2046,9 +2077,9 @@
                 <button type="button"
                         id="btn-quick-chat-submit"
                         onclick="handleChatFormSubmit(event)"
-                        class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-[0_3px_12px_rgba(13,148,136,0.42)] hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
+                        class="w-12 h-12 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center shadow-[0_3px_12px_rgba(13,148,136,0.42)] hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
                         style="background: var(--gomsn-active-bg) !important;">
-                    <svg class="w-4.5 h-4.5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    <svg class="w-5 h-5 sm:w-4.5 sm:h-4.5 text-white transform rotate-45 -mr-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
                     </div>
                 </div>
