@@ -5365,6 +5365,16 @@ async function handleChatFormSubmit(e) {
     // Capture form values into FormData BEFORE resetting inputs!
     const formData = new FormData(form);
 
+    // Kosongkan input field seketika saat pesan dikirim agar tidak ada sisa teks (termasuk dari VN/suara)
+    if (input) {
+        input.value = '';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    voiceInitialText = '';
+    clearAttachedGps();
+    clearAttachedPhoto();
+    cancelReply();
+
     // Append optimistic message bubble with pending CLOCK icon (🕒)
     const stream = document.getElementById('chat-stream-container') || document.getElementById('chat-stream-box');
     const scrollBox = document.getElementById('chat-stream-box');
@@ -5486,12 +5496,6 @@ async function handleChatFormSubmit(e) {
             scrollBox.scrollTop = scrollBox.scrollHeight;
         }
     }
-
-    // Reset input fields immediately so user can continue chatting seamlessly
-    if (input) input.value = '';
-    clearAttachedGps();
-    clearAttachedPhoto();
-    cancelReply();
 
     try {
         const res = await fetch(form.action, {
@@ -6240,6 +6244,7 @@ function startVoiceRecognition() {
         };
 
         speechRecognizer.onresult = function(event) {
+            if (!isRecordingVoice) return;
             let finalAccumulated = '';
             let interimAccumulated = '';
 
@@ -6252,8 +6257,10 @@ function startVoiceRecognition() {
                 }
             }
 
+            if (!isRecordingVoice) return;
+
             const currentSpoken = (finalAccumulated + interimAccumulated).trim();
-            if (chatInput) {
+            if (chatInput && isRecordingVoice) {
                 const prefix = voiceInitialText.trim() ? voiceInitialText.trim() + ' ' : '';
                 chatInput.value = prefix + currentSpoken;
                 chatInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -6314,9 +6321,13 @@ function startVoiceRecognition() {
 
 function stopVoiceRecognition() {
     isRecordingVoice = false;
+    voiceInitialText = '';
     if (speechRecognizer) {
         try {
-            speechRecognizer.stop();
+            speechRecognizer.onresult = null;
+            speechRecognizer.onerror = null;
+            speechRecognizer.onend = null;
+            speechRecognizer.abort();
         } catch (e) {}
         speechRecognizer = null;
     }

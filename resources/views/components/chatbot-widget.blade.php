@@ -920,10 +920,16 @@
                     return;
                 }
                 if (this.isListening) {
-                    if (this.speechRecognizer) {
-                        try { this.speechRecognizer.stop(); } catch(e) {}
-                    }
                     this.isListening = false;
+                    if (this.speechRecognizer) {
+                        try {
+                            this.speechRecognizer.onresult = null;
+                            this.speechRecognizer.onerror = null;
+                            this.speechRecognizer.onend = null;
+                            this.speechRecognizer.abort();
+                        } catch(e) {}
+                        this.speechRecognizer = null;
+                    }
                     return;
                 }
 
@@ -947,6 +953,7 @@
                     };
 
                     this.speechRecognizer.onresult = (event) => {
+                        if (!this.isListening) return;
                         let accumulatedFinal = '';
                         let interimSpoken = '';
                         for (let i = 0; i < event.results.length; ++i) {
@@ -956,8 +963,9 @@
                                 interimSpoken += event.results[i][0].transcript;
                             }
                         }
+                        if (!this.isListening) return;
                         const liveText = (accumulatedFinal + interimSpoken).trim();
-                        if (liveText) {
+                        if (liveText && this.isListening) {
                             const prefix = initialText.trim() ? initialText.trim() + ' ' : '';
                             this.inputQuery = prefix + liveText;
                             this.$nextTick(() => {
