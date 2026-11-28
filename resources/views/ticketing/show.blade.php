@@ -1055,9 +1055,9 @@
         #quick-reply-dock {
             flex-shrink: 0;
             width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            padding: 2px 58px 8px 16px;
+            box-sizing: border-box;
+            padding-top: 2px;
+            padding-bottom: 8px;
             background: transparent;
             position: relative;
             z-index: 30;
@@ -1166,7 +1166,8 @@
         }
         @media (max-width: 639.98px) {
             #quick-reply-dock {
-                padding: 2px 46px 6px 12px;
+                padding-top: 2px;
+                padding-bottom: 6px;
             }
             #quick-reply-card.is-expanded {
                 width: 268px;
@@ -1849,8 +1850,9 @@
                 </button>
 
                 @can('chat', $tiket)
-                <!-- Gojek-Style In-Flow "Pesan Cepat" Dock INSIDE Chat Area (Pushes chat up when expanded) -->
-                <div id="quick-reply-dock">
+                <!-- Gojek-Style In-Flow "Pesan Cepat" Dock INSIDE Chat Area (Uses exact same flex+gap+avatar spacer as self chat bubble row) -->
+                <div id="quick-reply-dock" class="px-3 sm:px-4">
+                    <div class="flex justify-end items-start gap-1.5 sm:gap-2 w-full">
                     <div id="quick-reply-card" class="is-collapsed select-none">
                         <!-- Single Unified Header -->
                         <button type="button"
@@ -1884,6 +1886,9 @@
                                 </button>
                             @endforeach
                         </div>
+                    </div>
+                    <!-- Invisible Avatar Spacer matching self chat bubble avatar (w-7 sm:w-8) for 100% pixel-exact right alignment -->
+                    <div class="w-7 sm:w-8 shrink-0 pointer-events-none select-none" aria-hidden="true"></div>
                     </div>
                 </div>
                 @endcan
@@ -5919,6 +5924,26 @@ document.addEventListener('click', function(event) {
         closeQuickReplyPanel();
     }
 });
+
+// Sinkronisasi presisi posisi kanan Pesan Cepat dengan memperhitungkan lebar scrollbar #chat-stream-box
+function syncQuickReplyAlignment() {
+    const dock = document.getElementById('quick-reply-dock');
+    const scrollBox = document.getElementById('chat-stream-box');
+    if (!dock || !scrollBox) return;
+    const scrollbarWidth = Math.max(0, scrollBox.offsetWidth - scrollBox.clientWidth);
+    const basePad = window.innerWidth >= 640 ? 16 : 12;
+    dock.style.paddingRight = (basePad + scrollbarWidth) + 'px';
+}
+
+syncQuickReplyAlignment();
+window.addEventListener('resize', syncQuickReplyAlignment);
+if (window.ResizeObserver) {
+    const sbEl = document.getElementById('chat-stream-box');
+    const scEl = document.getElementById('chat-stream-container');
+    const ro = new ResizeObserver(() => syncQuickReplyAlignment());
+    if (sbEl) ro.observe(sbEl);
+    if (scEl) ro.observe(scEl);
+}
 
 // Sinkronisasi Pesan Cepat Kustom dari LocalStorage jika pengguna baru saja mengubahnya di Pengaturan
 (function syncCustomQuickRepliesFromStorage() {
