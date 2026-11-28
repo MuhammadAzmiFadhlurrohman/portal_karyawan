@@ -530,4 +530,122 @@ class User extends Authenticatable
 
         return false;
     }
+
+    /**
+     * Daftar 5 Pesan Cepat default untuk chat koordinasi tiket gangguan.
+     *
+     * @return array<int, array{text: string, category: string}>
+     */
+    public static function defaultQuickReplies(): array
+    {
+        return [
+            ['text' => 'Menuju ke lokasi gangguan', 'category' => 'TRACING'],
+            ['text' => 'Investigasi titik & pengukuran OTDR', 'category' => 'OTDR'],
+            ['text' => 'Kabel putus / bending core pada span', 'category' => 'INVESTIGASI'],
+            ['text' => 'Proses splicing core di Joint Closure', 'category' => 'JOINTING'],
+            ['text' => 'Redaman normal & Link UP kembali', 'category' => 'LINK_UP'],
+        ];
+    }
+
+    /**
+     * Pastikan kolom quick_replies tersedia pada tabel user_notification_preferences.
+     */
+    public static function ensureQuickRepliesColumn(): bool
+    {
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('user_notification_preferences')) {
+                return false;
+            }
+            if (! \Illuminate\Support\Facades\Schema::hasColumn('user_notification_preferences', 'quick_replies')) {
+                \Illuminate\Support\Facades\Schema::table('user_notification_preferences', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->json('quick_replies')->nullable();
+                });
+            }
+            return true;
+        } catch (\Throwable) {
+            return \Illuminate\Support\Facades\Schema::hasColumn('user_notification_preferences', 'quick_replies');
+        }
+    }
+
+    /**
+     * Ambil daftar Pesan Cepat milik pengguna (kustomisasi sendiri atau default 5 pesan).
+     *
+     * @return array<int, array{text: string, category: string}>
+     */
+    public function getQuickReplies(): array
+    {
+        try {
+            if (self::ensureQuickRepliesColumn()) {
+                $pref = UserNotificationPreference::query()->where('user_id', $this->id)->first();
+                if ($pref && is_array($pref->quick_replies) && count($pref->quick_replies) > 0) {
+                    return array_values(array_map(function ($item) {
+                        if (is_string($item)) {
+                            return ['text' => trim($item), 'category' => 'LAIN'];
+                        }
+                        return [
+                            'text' => trim((string) ($item['text'] ?? '')),
+                            'category' => strtoupper(trim((string) ($item['category'] ?? 'LAIN'))) ?: 'LAIN',
+                        ];
+                    }, array_filter($pref->quick_replies, function ($item) {
+                        $text = is_string($item) ? trim($item) : trim((string) ($item['text'] ?? ''));
+                        return $text !== '';
+                    })));
+                }
+            }
+        } catch (\Throwable) {}
+
+        $cached = \Illuminate\Support\Facades\Cache::get('user_quick_replies_' . $this->id);
+        if (is_array($cached) && count($cached) > 0) {
+            return $cached;
+        }
+
+        return self::defaultQuickReplies();
+    }
+
+    /**
+     * Simpan daftar Pesan Cepat kustom milik pengguna (atau null untuk reset ke default).
+     *
+     * @param  array<int, mixed>|null  $items
+     * @return array<int, array{text: string, category: string}>
+     */
+    public function saveQuickReplies(?array $items): array
+    {
+        $normalized = null;
+        if (is_array($items)) {
+            $defaults = self::defaultQuickReplies();
+            $clean = [];
+            foreach (array_slice($items, 0, 8) as $idx => $item) {
+                $text = is_string($item) ? trim($item) : trim((string) ($item['text'] ?? ''));
+                if ($text === '') {
+                    continue;
+                }
+                $text = mb_substr($text, 0, 120);
+                $defaultCat = $defaults[$idx]['category'] ?? 'LAIN';
+                $cat = is_array($item) && ! empty($item['category'])
+                    ? strtoupper(trim((string) $item['category']))
+                    : $defaultCat;
+                $clean[] = ['text' => $text, 'category' => $cat];
+            }
+            if (count($clean) > 0) {
+                $normalized = $clean;
+            }
+        }
+
+        try {
+            if (self::ensureQuickRepliesColumn()) {
+                UserNotificationPreference::query()->updateOrCreate(
+                    ['user_id' => $this->id],
+                    ['quick_replies' => $normalized]
+                );
+            }
+        } catch (\Throwable) {}
+
+        if ($normalized === null) {
+            \Illuminate\Support\Facades\Cache::forget('user_quick_replies_' . $this->id);
+        } else {
+            \Illuminate\Support\Facades\Cache::forever('user_quick_replies_' . $this->id, $normalized);
+        }
+
+        return $this->getQuickReplies();
+    }
 }

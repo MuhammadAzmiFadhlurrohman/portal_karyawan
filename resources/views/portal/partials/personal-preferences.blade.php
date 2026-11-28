@@ -1,6 +1,11 @@
 @php
+    $currentUser = auth()->user();
     $userSettingsConfig = [
-        'userId' => auth()->id(),
+        'userId' => $currentUser?->id,
+        'quickReplies' => $currentUser ? $currentUser->getQuickReplies() : \App\Models\User::defaultQuickReplies(),
+        'defaultQuickReplies' => \App\Models\User::defaultQuickReplies(),
+        'quickRepliesEndpoint' => route('portal.settings.quick-replies'),
+        'csrfToken' => csrf_token(),
     ];
 @endphp
 <script>
@@ -24,9 +29,14 @@
             ],
             hasCustomMobileMenu: false,
             mobileStorageKey: 'gomsn_mobile_menu_user_' + (config.userId || 0),
+            quickRepliesStorageKey: 'gomsn_quick_replies_user_' + (config.userId || 0),
+            quickReplies: JSON.parse(JSON.stringify(config.quickReplies || [])),
+            defaultQuickReplies: JSON.parse(JSON.stringify(config.defaultQuickReplies || [])),
+            savingQuickReplies: false,
 
             init() {
                 this.checkMobileMenuStorage();
+                this.initQuickRepliesFromStorage();
                 window.addEventListener('gomsn-theme-changed', (e) => {
                     this.isDark = !!(e.detail && e.detail.dark);
                 });
@@ -35,6 +45,123 @@
                         this.activeAccent = e.detail.accent;
                     }
                 });
+            },
+
+            initQuickRepliesFromStorage() {
+                try {
+                    const raw = localStorage.getItem(this.quickRepliesStorageKey);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            this.quickReplies = parsed.map((item, idx) => ({
+                                text: typeof item === 'string' ? item : (item.text || ''),
+                                category: (typeof item === 'object' && item && item.category) ? item.category : ((this.defaultQuickReplies[idx] && this.defaultQuickReplies[idx].category) || 'LAIN')
+                            }));
+                        }
+                    }
+                } catch (e) {}
+            },
+
+            addQuickReply() {
+                if (this.quickReplies.length >= 8) return;
+                this.quickReplies.push({ text: '', category: 'LAIN' });
+            },
+
+            removeQuickReply(idx) {
+                if (this.quickReplies.length <= 1) return;
+                this.quickReplies.splice(idx, 1);
+            },
+
+            moveQuickReply(idx, dir) {
+                const target = idx + dir;
+                if (target < 0 || target >= this.quickReplies.length) return;
+                const temp = this.quickReplies[idx];
+                this.quickReplies[idx] = this.quickReplies[target];
+                this.quickReplies[target] = temp;
+                this.quickReplies = [...this.quickReplies];
+            },
+
+            async saveQuickReplies() {
+                const cleaned = this.quickReplies
+                    .map((item, idx) => ({
+                        text: String(item.text || '').trim(),
+                        category: item.category || ((this.defaultQuickReplies[idx] && this.defaultQuickReplies[idx].category) || 'LAIN')
+                    }))
+                    .filter(item => item.text !== '');
+
+                if (cleaned.length === 0) {
+                    if (window.Toast) {
+                        window.Toast.fire({ icon: 'warning', title: 'Minimal harus ada 1 pesan cepat yang diisi.' });
+                    } else {
+                        alert('Minimal harus ada 1 pesan cepat yang diisi.');
+                    }
+                    return;
+                }
+
+                this.savingQuickReplies = true;
+                this.quickReplies = JSON.parse(JSON.stringify(cleaned));
+
+                try {
+                    localStorage.setItem(this.quickRepliesStorageKey, JSON.stringify(cleaned));
+                } catch (e) {}
+
+                try {
+                    const res = await fetch(config.quickRepliesEndpoint, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': config.csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ quick_replies: cleaned })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data.quick_replies) && data.quick_replies.length > 0) {
+                            this.quickReplies = data.quick_replies;
+                            try {
+                                localStorage.setItem(this.quickRepliesStorageKey, JSON.stringify(data.quick_replies));
+                            } catch (e) {}
+                        }
+                    }
+                    if (window.Toast) {
+                        window.Toast.fire({ icon: 'success', title: 'Daftar Pesan Cepat berhasil disimpan!' });
+                    }
+                } catch (e) {
+                    if (window.Toast) {
+                        window.Toast.fire({ icon: 'success', title: 'Pesan Cepat tersimpan di perangkat ini.' });
+                    }
+                } finally {
+                    this.savingQuickReplies = false;
+                }
+            },
+
+            async resetQuickReplies() {
+                if (!confirm('Kembalikan daftar Pesan Cepat ke 5 pilihan default aplikasi?')) return;
+                this.savingQuickReplies = true;
+                this.quickReplies = JSON.parse(JSON.stringify(this.defaultQuickReplies));
+                try {
+                    localStorage.removeItem(this.quickRepliesStorageKey);
+                } catch (e) {}
+
+                try {
+                    await fetch(config.quickRepliesEndpoint, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': config.csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({ reset: true })
+                    });
+                } catch (e) {}
+
+                this.savingQuickReplies = false;
+                if (window.Toast) {
+                    window.Toast.fire({ icon: 'success', title: 'Pesan Cepat dikembalikan ke 5 pilihan default.' });
+                }
             },
 
             getActiveAccentObj() {
@@ -285,7 +412,91 @@
         </div>
     </div>
 
-    <!-- 3. Keamanan Akun: Login Biometrik & Ubah Password -->
+    <!-- 3. Kustomisasi Pesan Cepat Chat Tiket -->
+    <div class="rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden">
+        <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200/70 text-emerald-600 flex items-center justify-center shrink-0">
+                    <svg class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="#16A34A"/>
+                        <path d="M12 7.2l1.18 2.39 2.64.38-1.91 1.86.45 2.63L12 13.22l-2.36 1.24.45-2.63-1.91-1.86 2.64-.38L12 7.2z" fill="#FFFFFF"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h2 class="text-sm font-bold text-slate-800 leading-tight">Pesan Cepat Chat Tiket</h2>
+                    <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Ubah kalimat pesan cepat sesuai kebutuhan koordinasi Anda di chat tiket gangguan</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button"
+                        @click="resetQuickReplies()"
+                        :disabled="savingQuickReplies"
+                        class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition cursor-pointer">
+                    Reset Default
+                </button>
+                <button type="button"
+                        @click="addQuickReply()"
+                        x-show="quickReplies.length < 8"
+                        class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-white transition cursor-pointer shadow-2xs"
+                        :style="'background: ' + getActiveAccentObj().hex">
+                    + Tambah Baris
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-5 space-y-2.5">
+            <template x-for="(qr, idx) in quickReplies" :key="'qr-edit-' + idx">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 text-[11px] font-bold"
+                         x-text="idx + 1"></div>
+                    <div class="relative flex-1 min-w-0">
+                        <input type="text"
+                               x-model="qr.text"
+                               maxlength="120"
+                               placeholder="Tulis kalimat pesan cepat..."
+                               class="w-full rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white px-3 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition">
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button"
+                                @click="moveQuickReply(idx, -1)"
+                                :disabled="idx === 0"
+                                title="Geser ke atas"
+                                class="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+                        </button>
+                        <button type="button"
+                                @click="moveQuickReply(idx, 1)"
+                                :disabled="idx === quickReplies.length - 1"
+                                title="Geser ke bawah"
+                                class="w-7 h-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <button type="button"
+                                @click="removeQuickReply(idx)"
+                                :disabled="quickReplies.length <= 1"
+                                title="Hapus baris"
+                                class="w-7 h-7 rounded-lg border border-rose-200 bg-rose-50/70 text-rose-600 hover:bg-rose-100 flex items-center justify-center disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </template>
+
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100">
+                <span class="text-[11px] text-slate-500" x-text="quickReplies.length + ' dari maksimal 8 pilihan pesan cepat'"></span>
+                <button type="button"
+                        @click="saveQuickReplies()"
+                        :disabled="savingQuickReplies"
+                        class="px-4 py-2 rounded-xl text-xs font-bold text-white shadow-xs hover:brightness-105 active:scale-95 transition cursor-pointer flex items-center gap-1.5"
+                        :style="'background: ' + getActiveAccentObj().hex">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <span x-text="savingQuickReplies ? 'Menyimpan...' : 'Simpan Pesan Cepat'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Keamanan Akun: Login Biometrik & Ubah Password -->
     @include('portal.partials.security-settings')
 
     <!-- 4. Kustomisasi Menu Mobile & Pintasan Profil -->

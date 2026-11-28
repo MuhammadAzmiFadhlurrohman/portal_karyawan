@@ -1125,7 +1125,7 @@
             pointer-events: none;
         }
         #quick-reply-card.is-expanded .qr-body {
-            max-height: 220px !important;
+            max-height: 360px !important;
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
@@ -1870,32 +1870,19 @@
                             </svg>
                         </button>
 
-                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward - 5 Options with Chat Icon) -->
+                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward - Custom Per User or 5 Defaults) -->
                         <div id="quick-reply-body" class="qr-body">
-                            <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan', 'TRACING')" class="qr-item-btn">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span>Menuju ke lokasi gangguan</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR', 'OTDR')" class="qr-item-btn">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span>Investigasi titik &amp; pengukuran OTDR</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Kabel putus / bending core pada span', 'INVESTIGASI')" class="qr-item-btn">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span>Kabel putus / bending core pada span</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Proses splicing core di Joint Closure', 'JOINTING')" class="qr-item-btn">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span>Proses splicing core di Joint Closure</span>
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali', 'LINK_UP')" class="qr-item-btn">
-                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                <span>Redaman normal &amp; Link UP kembali</span>
-                            </button>
+                            @php
+                                $userQuickReplies = auth()->user() ? auth()->user()->getQuickReplies() : \App\Models\User::defaultQuickReplies();
+                            @endphp
+                            @foreach($userQuickReplies as $qrItem)
+                                <button type="button"
+                                        onclick="setQuickChip(@js($qrItem['text'] ?? ''), @js($qrItem['category'] ?? 'LAIN'))"
+                                        class="qr-item-btn">
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                    <span>{{ $qrItem['text'] ?? '' }}</span>
+                                </button>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -5932,6 +5919,33 @@ document.addEventListener('click', function(event) {
         closeQuickReplyPanel();
     }
 });
+
+// Sinkronisasi Pesan Cepat Kustom dari LocalStorage jika pengguna baru saja mengubahnya di Pengaturan
+(function syncCustomQuickRepliesFromStorage() {
+    try {
+        const uid = @json(auth()->id() ?? 0);
+        const raw = localStorage.getItem('gomsn_quick_replies_user_' + uid);
+        if (!raw) return;
+        const list = JSON.parse(raw);
+        const body = document.getElementById('quick-reply-body');
+        if (!body || !Array.isArray(list) || list.length === 0) return;
+        body.innerHTML = '';
+        list.forEach(item => {
+            const text = typeof item === 'string' ? item.trim() : String((item && item.text) || '').trim();
+            const cat = (typeof item === 'object' && item && item.category) ? String(item.category) : 'LAIN';
+            if (!text) return;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'qr-item-btn';
+            btn.onclick = () => setQuickChip(text, cat);
+            btn.innerHTML = `
+                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                <span>${escapeChatHtml(text)}</span>
+            `;
+            body.appendChild(btn);
+        });
+    } catch (e) {}
+})();
 
 function setQuickChip(text, category) {
     const input = document.getElementById('quick-chat-input');

@@ -15,6 +15,7 @@ class UserNotificationPreference extends Model
         'notify_lembur',
         'notify_tiket',
         'notify_absen',
+        'quick_replies',
     ];
 
     protected $casts = [
@@ -22,6 +23,7 @@ class UserNotificationPreference extends Model
         'notify_lembur' => 'boolean',
         'notify_tiket' => 'boolean',
         'notify_absen' => 'boolean',
+        'quick_replies' => 'array',
     ];
 
     public function user(): BelongsTo

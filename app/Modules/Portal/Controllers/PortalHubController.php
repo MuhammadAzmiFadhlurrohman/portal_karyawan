@@ -251,6 +251,42 @@ class PortalHubController extends Controller
         return back()->with('status', 'Password akun berhasil diperbarui.');
     }
 
+    public function updateQuickReplies(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
+    {
+        $user = $request->user();
+
+        if ($request->boolean('reset')) {
+            $saved = $user->saveQuickReplies(null);
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'is_custom' => false,
+                    'message' => 'Pesan cepat berhasil dikembalikan ke default.',
+                    'quick_replies' => $saved,
+                ]);
+            }
+            return back()->with('status', 'Pesan cepat berhasil dikembalikan ke default.');
+        }
+
+        $validated = $request->validate([
+            'quick_replies' => ['required', 'array', 'min:1', 'max:8'],
+            'quick_replies.*' => ['nullable'],
+        ]);
+
+        $saved = $user->saveQuickReplies($validated['quick_replies']);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_custom' => true,
+                'message' => 'Daftar pesan cepat berhasil disimpan.',
+                'quick_replies' => $saved,
+            ]);
+        }
+
+        return back()->with('status', 'Daftar pesan cepat berhasil disimpan.');
+    }
+
     public function notificationsInbox(Request $request): View
     {
         $user = $request->user();
