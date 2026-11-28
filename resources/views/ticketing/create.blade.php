@@ -251,13 +251,13 @@
                                 <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 <span>Pencarian Data Pelanggan IMS (Otomatis)</span>
                             </label>
-                            <span class="text-[10px] text-teal-700 font-semibold bg-teal-100/80 px-2 py-0.5 rounded-full">Auto-fill CID / WhatsApp / ODP</span>
+                            <span class="text-[10px] text-teal-700 font-semibold bg-teal-100/80 px-2 py-0.5 rounded-full">Auto-fill No. Internet / WhatsApp / ODP</span>
                         </div>
                         <div class="relative">
                             <input type="text"
                                    x-model="imsSearchQuery"
                                    @input.debounce.350ms="searchIms()"
-                                   placeholder="Ketik CID (contoh: CID-001), Nama Pelanggan, atau No WhatsApp..."
+                                   placeholder="Ketik Nomor Internet (contoh: 1010222), Nama Pelanggan, atau No WhatsApp..."
                                    class="w-full text-xs sm:text-sm rounded-xl border border-teal-300 bg-white focus:border-[#0D9488] focus:ring-[#0D9488] px-3.5 py-2.5 text-slate-800 transition pr-10 shadow-xs">
                             <div class="absolute right-3 top-3 text-slate-400" x-show="isSearchingIms">
                                 <svg class="animate-spin w-4 h-4 text-teal-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -268,16 +268,16 @@
                         <div x-show="imsResults.length > 0"
                              @click.outside="imsResults = []"
                              class="absolute left-0 right-0 top-full mt-1 bg-white rounded-2xl border border-slate-200 shadow-xl z-30 max-h-56 overflow-y-auto divide-y divide-slate-100">
-                            <template x-for="item in imsResults" :key="item.cid || item.id">
+                            <template x-for="item in imsResults" :key="item.nomor_internet || item.cid || item.id">
                                 <button type="button"
                                         @click="selectCustomer(item)"
                                         class="w-full px-4 py-2.5 text-left hover:bg-teal-50/80 transition flex items-center justify-between group">
                                     <div>
                                         <div class="flex items-center gap-2">
                                             <span class="font-bold text-xs sm:text-sm text-slate-800" x-text="item.name"></span>
-                                            <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-teal-100 group-hover:text-teal-800" x-text="item.cid"></span>
+                                            <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-teal-100 group-hover:text-teal-800" x-text="'No. Internet: ' + (item.nomor_internet || item.cid)"></span>
                                         </div>
-                                        <p class="text-[11px] text-slate-400 mt-0.5" x-text="item.phone + ' • ODP: ' + (item.odp || '-') + ' • ' + (item.address || '-')"></p>
+                                        <p class="text-[11px] text-slate-400 mt-0.5" x-text="(item.phone ? 'WA: ' + item.phone : '') + (item.odp ? ' • ODP: ' + item.odp : '') + (item.olt ? ' • OLT: ' + item.olt : '') + (item.address ? ' • ' + item.address : '')"></p>
                                     </div>
                                     <span class="text-xs font-bold text-teal-600 opacity-0 group-hover:opacity-100 transition">Pilih &rarr;</span>
                                 </button>
@@ -285,19 +285,19 @@
                         </div>
                     </div>
 
-                    <!-- Customer ID (CID) & Nama Pelanggan -->
+                    <!-- Nomor Internet & Nama Pelanggan -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
                             <div class="flex items-center gap-2 mb-1.5">
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Customer ID (CID)
+                                    Nomor Internet
                                 </label>
                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Opsional</span>
                             </div>
                             <input type="text"
                                    name="customer_id"
                                    x-model="customerCid"
-                                   placeholder="Contoh: CID-10842 (atau kosongkan jika non-CID)"
+                                   placeholder="Contoh: 1010222 (Nomor Internet Pelanggan)"
                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition">
                         </div>
 
@@ -339,27 +339,42 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                                     ODP / Lokasi FAT
                                 </label>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Opsional</span>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-100 uppercase">Data FTTH</span>
                             </div>
                             <input type="text"
                                    name="customer_odp"
                                    x-model="customerOdp"
+                                   list="available-odp-list"
                                    placeholder="Contoh: ODP-SRE-04/12"
                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition">
+                            <datalist id="available-odp-list">
+                                @foreach($availableOdps ?? [] as $odpItem)
+                                    <option value="{{ $odpItem }}"></option>
+                                @endforeach
+                            </datalist>
                         </div>
                     </div>
 
                     <!-- POP / OLT & Alamat Pelanggan -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                POP / OLT / Hub
-                            </label>
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                    POP / OLT / Hub
+                                </label>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-100 uppercase">Data FTTH</span>
+                            </div>
                             <input type="text"
                                    name="customer_olt"
                                    x-model="customerOlt"
+                                   list="available-olt-list"
                                    placeholder="Contoh: OLT-ZTE-SOREANG-01"
                                    class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition">
+                            <datalist id="available-olt-list">
+                                @foreach($availableOlts ?? [] as $oltItem)
+                                    <option value="{{ $oltItem }}"></option>
+                                @endforeach
+                            </datalist>
                         </div>
 
                         <div>
@@ -735,14 +750,14 @@ function openTicketForm(config) {
         },
 
         selectCustomer(item) {
-            this.customerCid = item.cid || '';
+            this.customerCid = item.nomor_internet || item.cid || '';
             this.customerName = item.name || '';
             this.customerPhone = item.phone || '';
             this.customerOdp = item.odp || '';
             this.customerOlt = item.olt || '';
             this.customerAddress = item.address || '';
             this.imsResults = [];
-            this.imsSearchQuery = item.name ? `${item.name} (${item.cid || ''})` : '';
+            this.imsSearchQuery = item.name ? `${item.name} (${item.nomor_internet || item.cid || ''})` : (item.nomor_internet || item.cid || '');
         },
 
         handleFileSelect(e) {

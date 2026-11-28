@@ -674,7 +674,7 @@
             <div class="bg-teal-50/60 rounded-2xl p-3.5 border border-teal-200/60 space-y-2">
                 <label class="block text-xs font-bold text-teal-900 uppercase tracking-wider">Cari Data Pelanggan di IMS (Opsional)</label>
                 <div class="flex gap-2">
-                    <input type="text" id="input_cid" name="customer_id" placeholder="Masukkan CID (contoh: CUST-10023 / nama)"
+                    <input type="text" id="input_cid" name="customer_id" placeholder="Masukkan Nomor Internet (contoh: 1010222) / Nama Pelanggan"
                            class="w-full text-xs sm:text-sm rounded-xl border border-teal-300 bg-white focus:border-teal-600 focus:ring-teal-600 px-3.5 py-2 text-slate-800 transition">
                     <button type="button" onclick="lookupImsCustomer()"
                             class="px-4 py-2 bg-[#0D9488] hover:bg-[#0b7a70] text-white text-xs font-bold rounded-xl shrink-0 transition cursor-pointer">
@@ -768,27 +768,28 @@ function lookupImsCustomer() {
     if (!term) {
         statusDiv.classList.remove('hidden');
         statusDiv.className = 'text-[11px] text-amber-600 font-medium';
-        statusDiv.innerText = 'Silakan masukkan nomor CID atau nama pelanggan.';
+        statusDiv.innerText = 'Silakan masukkan nomor internet atau nama pelanggan.';
         return;
     }
 
     statusDiv.classList.remove('hidden');
     statusDiv.className = 'text-[11px] text-teal-700 font-medium';
-    statusDiv.innerText = 'Mencari di database IMS...';
+    statusDiv.innerText = 'Mencari di database IMS (view_batchjob)...';
 
     fetch(`{{ route('tickets.ims.search') }}?q=${encodeURIComponent(term)}`)
         .then(res => res.json())
         .then(data => {
             if (data.available && data.customers && data.customers.length > 0) {
                 const c = data.customers[0];
-                document.getElementById('input_cust_name').value = c.nama || '';
-                document.getElementById('input_cust_phone').value = c.telepon || '';
+                document.getElementById('input_cid').value = c.nomor_internet || c.cid || '';
+                document.getElementById('input_cust_name').value = c.name || c.nama || '';
+                document.getElementById('input_cust_phone').value = c.phone || c.telepon || '';
                 document.getElementById('input_cust_odp').value = c.odp || '';
-                document.getElementById('input_cust_olt').value = c.pop || '';
-                document.getElementById('input_cust_address').value = c.alamat || '';
+                document.getElementById('input_cust_olt').value = c.olt || c.pop || '';
+                document.getElementById('input_cust_address').value = c.address || c.alamat || '';
 
                 statusDiv.className = 'text-[11px] text-emerald-700 font-bold';
-                statusDiv.innerText = `✓ Ditemukan di IMS: ${c.nama} (${c.id_pelanggan}) - Paket: ${c.bandwidth || '-'}`;
+                statusDiv.innerText = `✓ Ditemukan di IMS: ${c.name || c.nama} (No. Internet: ${c.nomor_internet || c.id_pelanggan}) ${c.odp ? '• ODP: ' + c.odp : ''}`;
             } else {
                 statusDiv.className = 'text-[11px] text-amber-700 font-bold';
                 statusDiv.innerText = `⚠️ Data tidak ditemukan di IMS atau server IMS offline. Anda tetap dapat melanjutkan secara manual (AC-11).`;

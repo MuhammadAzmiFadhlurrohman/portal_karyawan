@@ -5,6 +5,8 @@ namespace App\Modules\Ticketing\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\MasterMaterial;
 use App\Models\MasterSla;
+use App\Models\Odp;
+use App\Models\Olt;
 use App\Models\TicketChronology;
 use App\Models\Tiket;
 use App\Models\User;
@@ -135,7 +137,10 @@ class TicketController extends Controller
             $initialCategory = 'backbone';
         }
 
-        return view('ticketing.create', compact('slaMatrix', 'backbonePreview', 'broadbandPreview', 'segments', 'initialCategory'));
+        $availableOdps = Odp::query()->orderBy('nama_odp')->pluck('nama_odp');
+        $availableOlts = Olt::query()->orderBy('nama_olt')->pluck('nama_olt');
+
+        return view('ticketing.create', compact('slaMatrix', 'backbonePreview', 'broadbandPreview', 'segments', 'initialCategory', 'availableOdps', 'availableOlts'));
     }
 
     /**
