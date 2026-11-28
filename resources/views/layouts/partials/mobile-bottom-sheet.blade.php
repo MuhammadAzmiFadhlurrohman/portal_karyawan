@@ -690,22 +690,11 @@ function mobileMenuCustomizer(userId) {
                         defaultTitle: 'Laporan Absensi',
                         defaultSubtitle: 'Rekap Global Kantor',
                         defaultColor: 'blue',
-                        url: '{{ route('attendance.report') }}',
+                        url: '{{ route('attendance.reports') }}',
                         visible: true,
                         badge: null,
                         keywords: 'laporan absensi rekap global kantor bulanan excel',
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>'
-                    },
-                    {
-                        id: 'koreksi_absensi_admin',
-                        defaultTitle: 'Daftar Koreksi',
-                        defaultSubtitle: 'Koreksi Kehadiran',
-                        defaultColor: 'emerald',
-                        url: '{{ route('attendance.corrections') }}',
-                        visible: true,
-                        badge: null,
-                        keywords: 'daftar koreksi pengajuan kehadiran karyawan kantor',
-                        iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>'
                     },
                     @endif
                     {
