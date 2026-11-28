@@ -1057,13 +1057,10 @@
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
         }
-        .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar button {
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
-            border-color: rgba(226, 232, 240, 0.95) !important;
+        .ticket-chat-card.is-chat-fullscreen #btn-quick-reply-toggle {
             background-color: rgba(255, 255, 255, 0.96) !important;
-            backdrop-filter: blur(4px);
-            padding: 0.25rem 0.75rem !important;
-            font-size: 11px !important;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12) !important;
         }
         .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
             background: transparent !important;
@@ -1226,15 +1223,6 @@
                 margin-right: auto !important;
                 padding-left: 0 !important;
                 padding-right: 0 !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar > div {
-                flex-wrap: wrap !important;
-                justify-content: center !important;
-                overflow-x: visible !important;
-                gap: 0.375rem !important;
-            }
-            .ticket-chat-card.is-chat-fullscreen .chat-quick-templates-bar > div > span {
-                display: none !important;
             }
             .ticket-chat-card.is-chat-fullscreen #quick-chat-form {
                 width: 80% !important;
@@ -1768,36 +1756,75 @@
                     <span>Tiket berstatus <strong class="text-emerald-950 font-bold">{{ $tiket->status }}</strong> &bull; Chat koordinasi aktif khusus Admin, Semua Atasan, CEO, NOC &amp; Tim Teknik yang Ditugaskan.</span>
                 </div>
                 @endif
-            <!-- Quick Action Chips (Horizontally Scrollable - matching Image 3) -->
-            <div class="chat-quick-templates-bar px-3 sm:px-4 py-1.5 bg-slate-100/90 border-t border-slate-200/80 overflow-x-auto text-xs scrollbar-none shrink-0"
-                 style="scrollbar-width: none; -ms-overflow-style: none;">
-                <div class="w-full flex items-center gap-1.5 overflow-x-auto scrollbar-none">
-                    <span class="text-[9.5px] uppercase font-bold text-slate-400 shrink-0 tracking-wide">Template Cepat:</span>
-                    
-                    <button type="button" onclick="setQuickChip('📍 Menuju ke lokasi gangguan', 'TRACING')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        📍 Menuju lokasi
+            <!-- Pesan Cepat Collapsible Floating Card -->
+            <div class="chat-quick-templates-bar relative z-30 px-3 sm:px-4 py-1.5 bg-slate-50/90 border-t border-slate-200/80 shrink-0 flex justify-end">
+                <div id="quick-reply-wrapper" class="relative inline-block text-left">
+                    <!-- Compact Trigger Pill -->
+                    <button type="button"
+                            id="btn-quick-reply-toggle"
+                            onclick="toggleQuickReplyPanel(event)"
+                            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-teal-50/80 border border-slate-200/90 text-slate-800 text-[12px] sm:text-[12.5px] font-bold shadow-[0_2px_10px_rgba(15,23,42,0.08)] transition-all active:scale-95 cursor-pointer select-none">
+                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Pesan cepat</span>
+                        <svg id="quick-reply-chevron" class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+                        </svg>
                     </button>
-                    <button type="button" onclick="setQuickChip('🔍 Investigasi titik & pengukuran OTDR', 'OTDR')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        🔍 Investigasi &amp; OTDR
-                    </button>
-                    <button type="button" onclick="setQuickChip('✂️ Ditemukan kabel putus / bending core pada span', 'INVESTIGASI')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        ✂️ Kabel putus / bending
-                    </button>
-                    <button type="button" onclick="setQuickChip('⚡ Sedang proses splicing core di Joint Closure', 'JOINTING')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        ⚡ Proses splicing core
-                    </button>
-                    <button type="button" onclick="setQuickChip('📊 Pengukuran redaman optik selesai', 'OTDR')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        📊 Ukur redaman optik
-                    </button>
-                    <button type="button" onclick="setQuickChip('✅ Redaman normal & Link UP kembali', 'LINK_UP')"
-                            class="px-2.5 py-0.5 rounded-full bg-white hover:bg-teal-50 hover:text-teal-900 border border-slate-200 text-slate-700 text-[11px] font-medium shrink-0 transition cursor-pointer shadow-2xs">
-                        ✅ Redaman normal &amp; Link UP
-                    </button>
+
+                    <!-- Floating Quick Reply List Card -->
+                    <div id="quick-reply-panel"
+                         class="hidden absolute right-0 bottom-full mb-2 w-[285px] sm:w-[330px] max-w-[calc(100vw-2rem)] rounded-2xl bg-white border border-slate-200/90 shadow-[0_12px_34px_rgba(15,23,42,0.16)] ring-1 ring-slate-900/5 overflow-hidden z-50">
+                        <!-- Card Header -->
+                        <button type="button"
+                                onclick="closeQuickReplyPanel()"
+                                class="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-slate-50/80 border-b border-slate-100 transition cursor-pointer text-left">
+                            <span class="text-[13.5px] sm:text-[14px] font-bold text-slate-900 tracking-tight">Pesan cepat</span>
+                            <svg class="w-4 h-4 text-slate-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <!-- Quick Reply Items (GoMSN FTTH & Koordinasi Lapangan) -->
+                        <div class="divide-y divide-slate-100 max-h-[260px] overflow-y-auto overscroll-contain">
+                            <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan 📍', 'TRACING')"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span class="leading-snug">Menuju ke lokasi gangguan 📍</span>
+                            </button>
+
+                            <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR 🔍', 'OTDR')"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span class="leading-snug">Investigasi titik &amp; pengukuran OTDR 🔍</span>
+                            </button>
+
+                            <button type="button" onclick="setQuickChip('Ditemukan kabel putus / bending core pada span ✂️', 'INVESTIGASI')"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span class="leading-snug">Kabel putus / bending core pada span ✂️</span>
+                            </button>
+
+                            <button type="button" onclick="setQuickChip('Sedang proses splicing core di Joint Closure ⚡', 'JOINTING')"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span class="leading-snug">Proses splicing core di Joint Closure ⚡</span>
+                            </button>
+
+                            <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai 📊', 'OTDR')"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span class="leading-snug">Pengukuran redaman optik selesai 📊</span>
+                            </button>
+
+                            <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali ✅', 'LINK_UP')"
+                                    class="w-full flex items-center gap-3 px-4 py-3 text-left text-[13px] font-medium text-slate-700 hover:bg-teal-50/70 hover:text-teal-900 active:bg-teal-100/70 transition cursor-pointer">
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span class="leading-snug">Redaman normal &amp; Link UP kembali ✅</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -5755,6 +5782,38 @@ function escapeChatHtml(text) {
     return p.innerHTML;
 }
 
+function toggleQuickReplyPanel(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const panel = document.getElementById('quick-reply-panel');
+    const chevron = document.getElementById('quick-reply-chevron');
+    if (!panel) return;
+    const isHidden = panel.classList.contains('hidden');
+    if (isHidden) {
+        panel.classList.remove('hidden');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+    } else {
+        closeQuickReplyPanel();
+    }
+}
+
+function closeQuickReplyPanel() {
+    const panel = document.getElementById('quick-reply-panel');
+    const chevron = document.getElementById('quick-reply-chevron');
+    if (panel) panel.classList.add('hidden');
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+}
+
+document.addEventListener('click', function(event) {
+    const wrapper = document.getElementById('quick-reply-wrapper');
+    const panel = document.getElementById('quick-reply-panel');
+    if (wrapper && panel && !panel.classList.contains('hidden') && !wrapper.contains(event.target)) {
+        closeQuickReplyPanel();
+    }
+});
+
 function setQuickChip(text, category) {
     const input = document.getElementById('quick-chat-input');
     const catInput = document.getElementById('chron_category');
@@ -5765,6 +5824,7 @@ function setQuickChip(text, category) {
     if (catInput) {
         catInput.value = category || 'LAIN';
     }
+    closeQuickReplyPanel();
 }
 
 function updateAttachmentLabel(fileInput) {
