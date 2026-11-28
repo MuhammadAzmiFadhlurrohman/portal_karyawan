@@ -1047,97 +1047,45 @@
             padding-bottom: 0.5rem !important;
         }
 
-        /* Gojek-Style Floating "Pesan cepat" Card Inside Chat Stream */
+        /* Gojek-Style Floating "Pesan Cepat" Card Inside Chat Stream (Exact Match) */
         #quick-reply-card {
             position: absolute;
-            bottom: 12px;
-            right: 14px;
+            bottom: 8px;
+            right: 12px;
             z-index: 38;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(203, 213, 225, 0.85);
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14), 0 2px 8px rgba(13, 148, 136, 0.08);
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
+            border-radius: 12px;
             overflow: hidden;
-            transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            transition: box-shadow 0.15s ease;
         }
         #quick-reply-card.is-collapsed {
             width: auto;
-            border-radius: 9999px;
-        }
-        #quick-reply-card.is-collapsed:hover {
-            border-color: rgba(13, 148, 136, 0.45);
-            box-shadow: 0 8px 24px rgba(13, 148, 136, 0.18);
-            transform: translateY(-1px);
+            min-width: 170px;
         }
         #quick-reply-card.is-expanded {
-            width: 336px;
+            width: 280px;
             max-width: calc(100% - 24px);
-            border-radius: 16px;
-            border-color: rgba(13, 148, 136, 0.28);
         }
         #quick-reply-card .qr-header-btn {
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            background: transparent;
+            gap: 12px;
+            padding: 11px 14px;
+            background: #FFFFFF;
             border: none;
             cursor: pointer;
             text-align: left;
             transition: background-color 0.15s ease;
         }
-        #quick-reply-card.is-collapsed .qr-header-btn {
-            padding: 6px 8px 6px 8px;
-        }
         #quick-reply-card.is-expanded .qr-header-btn {
-            padding: 11px 14px;
-            background: linear-gradient(135deg, #F0FDFA 0%, #FFFFFF 100%);
-            border-bottom: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E5E7EB;
         }
         #quick-reply-card .qr-header-btn:hover {
-            background: #F0FDFA;
-        }
-        #quick-reply-card .qr-lead-badge {
-            width: 26px;
-            height: 26px;
-            border-radius: 9999px;
-            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
-            color: #FFFFFF;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
-        }
-        #quick-reply-card .qr-count-badge {
-            display: none;
-            font-size: 10px;
-            font-weight: 700;
-            color: #0F766E;
-            background: #CCFBF1;
-            padding: 2px 7px;
-            border-radius: 9999px;
-            line-height: 1.2;
-        }
-        #quick-reply-card.is-expanded .qr-count-badge {
-            display: inline-block;
-        }
-        #quick-reply-card .qr-chevron-box {
-            width: 24px;
-            height: 24px;
-            border-radius: 9999px;
-            background: #F1F5F9;
-            color: #475569;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: background-color 0.15s ease, color 0.15s ease;
-        }
-        #quick-reply-card .qr-header-btn:hover .qr-chevron-box {
-            background: #CCFBF1;
-            color: #0F766E;
+            background: #F9FAFB;
         }
         #quick-reply-card.is-collapsed .qr-body {
             display: none !important;
@@ -1145,84 +1093,43 @@
         #quick-reply-card.is-expanded .qr-body {
             display: block !important;
             background: #FFFFFF;
-            padding: 4px;
         }
         #quick-reply-card .qr-item-btn {
             width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 8.5px 10px;
-            margin-bottom: 2px;
+            display: block;
+            padding: 11px 14px;
             background: #FFFFFF;
             border: none;
-            border-radius: 10px;
+            border-bottom: 1px solid #E5E7EB;
             text-align: left;
-            font-size: 12.5px;
-            line-height: 1.3;
-            font-weight: 600;
-            color: #334155;
+            font-size: 13px;
+            line-height: 1.35;
+            font-weight: 400;
+            color: #374151;
             cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        #quick-reply-card .qr-item-btn:last-child {
-            margin-bottom: 0;
-        }
-        #quick-reply-card .qr-item-left {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            min-width: 0;
-            flex: 1;
-        }
-        #quick-reply-card .qr-item-icon {
-            width: 26px;
-            height: 26px;
-            border-radius: 8px;
-            background: #F1F5F9;
-            color: #64748B;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.15s ease;
-        }
-        #quick-reply-card .qr-item-text {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
-        #quick-reply-card .qr-item-emoji {
-            font-size: 14px;
-            line-height: 1;
-            flex-shrink: 0;
-            opacity: 0.92;
-            transition: transform 0.15s ease;
+        #quick-reply-card .qr-item-btn:last-child {
+            border-bottom: none;
         }
         #quick-reply-card .qr-item-btn:hover {
-            background: #F0FDFA;
-            color: #0F766E;
-        }
-        #quick-reply-card .qr-item-btn:hover .qr-item-icon {
-            background: #CCFBF1;
-            color: #0D9488;
-            transform: scale(1.05);
-        }
-        #quick-reply-card .qr-item-btn:hover .qr-item-emoji {
-            transform: scale(1.15);
+            background: #F3F4F6;
+            color: #111827;
         }
         #quick-reply-card .qr-item-btn:active {
-            background: #CCFBF1;
+            background: #E5E7EB;
         }
         @media (max-width: 639.98px) {
             #quick-reply-card.is-expanded {
-                width: 315px;
+                width: 265px;
                 max-width: calc(100% - 20px);
             }
             #quick-reply-card .qr-item-btn {
-                padding: 8px 9px;
-                font-size: 12px;
+                padding: 10px 14px;
+                font-size: 12.5px;
             }
         }
         /* Floating WhatsApp-Style Input Bar in Fullscreen */
@@ -1900,89 +1807,50 @@
                 </button>
 
                 @can('chat', $tiket)
-                <!-- Gojek-Style Unified Floating "Pesan cepat" Card INSIDE Chat Area -->
+                <!-- Gojek-Style Unified Floating "Pesan Cepat" Card INSIDE Chat Area -->
                 <div id="quick-reply-card" class="is-collapsed select-none">
-                    <!-- Single Unified Header (Acts as toggle button when collapsed AND card header when expanded) -->
+                    <!-- Single Unified Header -->
                     <button type="button"
                             id="btn-quick-reply-toggle"
                             onclick="toggleQuickReplyPanel(event)"
                             class="qr-header-btn">
-                        <span class="flex items-center gap-2 min-w-0">
-                            <span class="qr-lead-badge">
-                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                                </svg>
-                            </span>
-                            <span style="font-size: 13px; font-weight: 700; color: #0F172A; letter-spacing: -0.01em;">Pesan cepat</span>
-                            <span class="qr-count-badge">6</span>
-                        </span>
-                        <span class="qr-chevron-box">
-                            <svg id="quick-reply-chevron" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <!-- Green/Teal Speech Bubble with White Star Icon (Exact Reference Match) -->
+                            <svg class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
+                                <path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="#16A34A"/>
+                                <path d="M12 7.2l1.18 2.39 2.64.38-1.91 1.86.45 2.63L12 13.22l-2.36 1.24.45-2.63-1.91-1.86 2.64-.38L12 7.2z" fill="#FFFFFF"/>
                             </svg>
+                            <span style="font-size: 13.5px; font-weight: 700; color: #111827; letter-spacing: -0.01em;">Pesan Cepat</span>
                         </span>
+                        <svg id="quick-reply-chevron" class="w-4 h-4 text-slate-700 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+                        </svg>
                     </button>
 
-                    <!-- Collapsible Quick Message List Inside the Same Card -->
+                    <!-- Collapsible Quick Message List Inside the Same Card (Clean Plain Text Rows) -->
                     <div id="quick-reply-body" class="qr-body">
-                        <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan 📍', 'TRACING')" class="qr-item-btn">
-                            <span class="qr-item-left">
-                                <span class="qr-item-icon">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                </span>
-                                <span class="qr-item-text">Menuju ke lokasi gangguan</span>
-                            </span>
-                            <span class="qr-item-emoji">📍</span>
+                        <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan', 'TRACING')" class="qr-item-btn">
+                            Menuju ke lokasi gangguan
                         </button>
 
-                        <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR 🔍', 'OTDR')" class="qr-item-btn">
-                            <span class="qr-item-left">
-                                <span class="qr-item-icon">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                </span>
-                                <span class="qr-item-text">Investigasi titik &amp; ukur OTDR</span>
-                            </span>
-                            <span class="qr-item-emoji">🔍</span>
+                        <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR', 'OTDR')" class="qr-item-btn">
+                            Investigasi titik &amp; pengukuran OTDR
                         </button>
 
-                        <button type="button" onclick="setQuickChip('Ditemukan kabel putus / bending core pada span ✂️', 'INVESTIGASI')" class="qr-item-btn">
-                            <span class="qr-item-left">
-                                <span class="qr-item-icon">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                </span>
-                                <span class="qr-item-text">Kabel putus / bending core</span>
-                            </span>
-                            <span class="qr-item-emoji">✂️</span>
+                        <button type="button" onclick="setQuickChip('Kabel putus / bending core pada span', 'INVESTIGASI')" class="qr-item-btn">
+                            Kabel putus / bending core pada span
                         </button>
 
-                        <button type="button" onclick="setQuickChip('Sedang proses splicing core di Joint Closure ⚡', 'JOINTING')" class="qr-item-btn">
-                            <span class="qr-item-left">
-                                <span class="qr-item-icon">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                </span>
-                                <span class="qr-item-text">Proses splicing Joint Closure</span>
-                            </span>
-                            <span class="qr-item-emoji">⚡</span>
+                        <button type="button" onclick="setQuickChip('Proses splicing core di Joint Closure', 'JOINTING')" class="qr-item-btn">
+                            Proses splicing core di Joint Closure
                         </button>
 
-                        <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai 📊', 'OTDR')" class="qr-item-btn">
-                            <span class="qr-item-left">
-                                <span class="qr-item-icon">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                </span>
-                                <span class="qr-item-text">Ukur redaman optik selesai</span>
-                            </span>
-                            <span class="qr-item-emoji">📊</span>
+                        <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai', 'OTDR')" class="qr-item-btn">
+                            Pengukuran redaman optik selesai
                         </button>
 
-                        <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali ✅', 'LINK_UP')" class="qr-item-btn">
-                            <span class="qr-item-left">
-                                <span class="qr-item-icon">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
-                                </span>
-                                <span class="qr-item-text">Redaman normal &amp; Link UP</span>
-                            </span>
-                            <span class="qr-item-emoji">✅</span>
+                        <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali', 'LINK_UP')" class="qr-item-btn">
+                            Redaman normal &amp; Link UP kembali
                         </button>
                     </div>
                 </div>
