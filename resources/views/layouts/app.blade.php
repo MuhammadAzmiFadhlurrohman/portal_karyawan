@@ -320,9 +320,9 @@
         /* Komponen utama aplikasi: bind instan ke CSS Variables */
         #desktop-sidebar {
             background: var(--gomsn-sidebar-bg) !important;
-            width: 240px !important;
-            min-width: 240px !important;
-            max-width: 240px !important;
+            width: 235px !important;
+            min-width: 235px !important;
+            max-width: 235px !important;
         }
         html[data-accent]:not([data-accent="teal"]) #desktop-sidebar > div:first-child {
             filter: var(--gomsn-sidebar-wave-filter);
@@ -705,7 +705,7 @@
     <div class="min-h-screen flex flex-row">
         <!-- Left Sidebar Navigation (Desktop Only: hidden on mobile, md:flex) -->
         <aside id="desktop-sidebar"
-               class="hidden md:flex md:sticky top-0 inset-y-0 left-0 z-40 w-[240px] min-w-[240px] max-w-[240px] text-white flex-col justify-between h-screen shadow-2xl shrink-0 border-r border-teal-400/25 relative overflow-hidden select-none">
+               class="hidden md:flex md:sticky top-0 inset-y-0 left-0 z-40 w-[235px] min-w-[235px] max-w-[235px] text-white flex-col justify-between h-screen shadow-2xl shrink-0 border-r border-teal-400/25 relative overflow-hidden select-none">
             
             <!-- Ambient Sculpted Waves & Clean Parallel Fiber Contours -->
             <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
