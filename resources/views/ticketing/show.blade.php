@@ -1077,7 +1077,7 @@
             border-radius: 9px;
         }
         #quick-reply-card.is-expanded {
-            width: 265px;
+            width: 285px;
             max-width: 100%;
             border-radius: 11px;
         }
@@ -1110,7 +1110,9 @@
         }
         #quick-reply-card .qr-item-btn {
             width: 100%;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 9px;
             padding: 9px 13px;
             background: #FFFFFF;
             border: none;
@@ -1121,10 +1123,14 @@
             font-weight: 400;
             color: #374151;
             cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        #quick-reply-card .qr-item-btn span {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            transition: background-color 0.15s ease, color 0.15s ease;
+            min-width: 0;
+            flex: 1;
         }
         #quick-reply-card .qr-item-btn:last-child {
             border-bottom: none;
@@ -1141,7 +1147,7 @@
                 padding: 2px 46px 6px 12px;
             }
             #quick-reply-card.is-expanded {
-                width: 250px;
+                width: 268px;
                 max-width: 100%;
             }
             #quick-reply-card .qr-item-btn {
@@ -1842,26 +1848,31 @@
                             </svg>
                         </button>
 
-                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward - 5 Options) -->
+                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward - 5 Options with Chat Icon) -->
                         <div id="quick-reply-body" class="qr-body">
                             <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan', 'TRACING')" class="qr-item-btn">
-                                Menuju ke lokasi gangguan
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span>Menuju ke lokasi gangguan</span>
                             </button>
 
                             <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR', 'OTDR')" class="qr-item-btn">
-                                Investigasi titik &amp; pengukuran OTDR
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span>Investigasi titik &amp; pengukuran OTDR</span>
                             </button>
 
                             <button type="button" onclick="setQuickChip('Kabel putus / bending core pada span', 'INVESTIGASI')" class="qr-item-btn">
-                                Kabel putus / bending core pada span
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span>Kabel putus / bending core pada span</span>
                             </button>
 
                             <button type="button" onclick="setQuickChip('Proses splicing core di Joint Closure', 'JOINTING')" class="qr-item-btn">
-                                Proses splicing core di Joint Closure
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span>Proses splicing core di Joint Closure</span>
                             </button>
 
                             <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali', 'LINK_UP')" class="qr-item-btn">
-                                Redaman normal &amp; Link UP kembali
+                                <svg class="w-4 h-4 text-slate-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM6 8h8v1.5H6V8zm0 3h5.5v1.5H6V11z" clip-rule="evenodd"/></svg>
+                                <span>Redaman normal &amp; Link UP kembali</span>
                             </button>
                         </div>
                     </div>
