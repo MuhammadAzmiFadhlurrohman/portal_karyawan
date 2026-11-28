@@ -267,17 +267,19 @@ class ChronologyController extends Controller
                     foreach ($newChronologies as $chron) {
                         $currentLastId = max($currentLastId, $chron->id);
                         $isSelf = $currentUserId && $chron->user_id === $currentUserId;
+                        $replyMeta = $this->extractReplyMetadata($chron, $currentUserId);
 
                         $payload = [
                             'id' => $chron->id,
                             'tiket_id' => $chron->tiket_id,
                             'user_id' => $chron->user_id,
                             'sender_name' => $isSelf ? 'Anda' : ($chron->user?->name ?? 'User'),
+                            'real_sender_name' => $chron->user?->name ?? 'User',
                             'is_self' => $isSelf,
                             'sender_badge' => $chron->user?->chat_badge ?? ($chron->user?->division ?: 'Petugas'),
                             'sender_avatar' => $chron->user?->avatar_url,
                             'sender_initials' => $chron->user?->initials ?? 'U',
-                            'message' => $chron->message,
+                            'message' => $replyMeta['clean_message'],
                             'category' => $chron->category ?? 'LAIN',
                             'time_str' => $chron->created_at ? $chron->created_at->format('H:i') . ' WIB' : '',
                             'date_str' => $chron->created_at ? $chron->created_at->format('d M Y, H:i') . ' WIB' : '',
@@ -286,8 +288,8 @@ class ChronologyController extends Controller
                             'photo_url' => $chron->photo_url,
                             'video_url' => $chron->video_url,
                             'reply_to_id' => $chron->reply_to_id,
-                            'reply_sender' => $chron->replyTo?->user?->name,
-                            'reply_snippet' => $chron->replyTo ? ($chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : '📷 Lampiran Foto')) : null,
+                            'reply_sender' => $replyMeta['reply_sender'],
+                            'reply_snippet' => $replyMeta['reply_snippet'],
                         ];
 
                         echo "event: new_message\n";
@@ -341,16 +343,18 @@ class ChronologyController extends Controller
             ->get()
             ->map(function ($chron) use ($currentUserId) {
                 $isSelf = $currentUserId && $chron->user_id === $currentUserId;
+                $replyMeta = $this->extractReplyMetadata($chron, $currentUserId);
                 return [
                     'id' => $chron->id,
                     'tiket_id' => $chron->tiket_id,
                     'user_id' => $chron->user_id,
                     'sender_name' => $isSelf ? 'Anda' : ($chron->user?->name ?? 'User'),
+                    'real_sender_name' => $chron->user?->name ?? 'User',
                     'is_self' => $isSelf,
                     'sender_badge' => $chron->user?->chat_badge ?? ($chron->user?->division ?: 'Petugas'),
                     'sender_avatar' => $chron->user?->avatar_url,
                     'sender_initials' => $chron->user?->initials ?? 'U',
-                    'message' => $chron->message,
+                    'message' => $replyMeta['clean_message'],
                     'category' => $chron->category ?? 'LAIN',
                     'time_str' => $chron->created_at ? $chron->created_at->format('H:i') . ' WIB' : '',
                     'date_str' => $chron->created_at ? $chron->created_at->format('d M Y, H:i') . ' WIB' : '',
@@ -359,8 +363,8 @@ class ChronologyController extends Controller
                     'photo_url' => $chron->photo_url,
                     'video_url' => $chron->video_url,
                     'reply_to_id' => $chron->reply_to_id,
-                    'reply_sender' => $chron->replyTo?->user?->name,
-                    'reply_snippet' => $chron->replyTo ? ($chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : '📷 Lampiran Foto')) : null,
+                    'reply_sender' => $replyMeta['reply_sender'],
+                    'reply_snippet' => $replyMeta['reply_snippet'],
                     'is_read' => !empty($chron->read_at),
                 ];
             });
@@ -370,6 +374,45 @@ class ChronologyController extends Controller
             'messages' => $newChronologies,
             'max_read_self_id' => $maxReadSelfId,
         ]);
+    }
+
+    /**
+     * Ekstrak metadata kutipan balasan (WhatsApp-style) baik dari relasi replyTo maupun format fallback [Balas @...].
+     */
+    private function extractReplyMetadata(TicketChronology $chron, ?int $currentUserId = null): array
+    {
+        $rawMessage = (string) ($chron->message ?? '');
+        $cleanMessage = $rawMessage;
+        $replySender = null;
+        $replySnippet = null;
+
+        if (! empty($chron->reply_to_id) && $chron->relationLoaded('replyTo') && $chron->replyTo) {
+            $replySender = ($currentUserId && $chron->replyTo->user_id === $currentUserId)
+                ? 'Anda'
+                : ($chron->replyTo->user?->name ?? 'User');
+
+            $parentMsg = trim((string) ($chron->replyTo->message ?? ''));
+            if ($parentMsg !== '' && preg_match('/^\[Balas @[^\]]+\]:\s*(.*)$/s', $parentMsg, $pm)) {
+                $parentMsg = trim($pm[1]);
+            }
+            $replySnippet = $parentMsg !== ''
+                ? $parentMsg
+                : ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : ($chron->replyTo->photo_path ? '📷 Lampiran Foto' : ($chron->replyTo->video_path ? '🎥 Lampiran Video' : 'Pesan')));
+
+            if ($rawMessage !== '' && preg_match('/^\[Balas @[^\]]+\]:\s*(.*)$/s', $rawMessage, $cm)) {
+                $cleanMessage = trim($cm[1]);
+            }
+        } elseif ($rawMessage !== '' && preg_match('/^\[Balas @([^\]\|]+)(?:\s*\|\s*([^\]]+))?\]:\s*(.*)$/s', $rawMessage, $matches)) {
+            $replySender = trim($matches[1]);
+            $replySnippet = ! empty($matches[2]) ? trim($matches[2]) : null;
+            $cleanMessage = trim($matches[3]);
+        }
+
+        return [
+            'reply_sender' => $replySender,
+            'reply_snippet' => $replySnippet,
+            'clean_message' => $cleanMessage,
+        ];
     }
 
     /**

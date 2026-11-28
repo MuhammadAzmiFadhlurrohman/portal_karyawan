@@ -1407,9 +1407,16 @@
                         $cleanMessage = $displayMessage;
 
                         if (!empty($chron->reply_to_id) && $chron->relationLoaded('replyTo') && $chron->replyTo) {
-                            $quotedSender = $chron->replyTo->user->name ?? 'User';
-                            $quotedSnippet = $chron->replyTo->message ?: ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : ($chron->replyTo->photo_path ? '📷 Lampiran Foto' : 'Pesan'));
-                        } elseif ($displayMessage && preg_match('/^\[Balas @([^\]\|]+)(?: \| ([^\]]+))?\]:\s*(.*)$/s', $displayMessage, $matches)) {
+                            $quotedSender = ($chron->replyTo->user_id === auth()->id()) ? 'Anda' : ($chron->replyTo->user->name ?? 'User');
+                            $parentRawMsg = trim((string) ($chron->replyTo->message ?? ''));
+                            if ($parentRawMsg !== '' && preg_match('/^\[Balas @[^\]]+\]:\s*(.*)$/s', $parentRawMsg, $pm)) {
+                                $parentRawMsg = trim($pm[1]);
+                            }
+                            $quotedSnippet = $parentRawMsg !== '' ? $parentRawMsg : ($chron->replyTo->latitude ? '📍 Titik Lokasi Lapangan' : ($chron->replyTo->photo_path ? '📷 Lampiran Foto' : ($chron->replyTo->video_path ? '🎥 Lampiran Video' : 'Pesan')));
+                            if ($displayMessage && preg_match('/^\[Balas @[^\]]+\]:\s*(.*)$/s', $displayMessage, $cm)) {
+                                $cleanMessage = trim($cm[1]);
+                            }
+                        } elseif ($displayMessage && preg_match('/^\[Balas @([^\]\|]+)(?:\s*\|\s*([^\]]+))?\]:\s*(.*)$/s', $displayMessage, $matches)) {
                             $quotedSender = trim($matches[1]);
                             $quotedSnippet = !empty($matches[2]) ? trim($matches[2]) : null;
                             $cleanMessage = trim($matches[3]);
@@ -1441,8 +1448,9 @@
                         <div id="chron-bubble-{{ $chron->id }}"
                              data-id="{{ $chron->id }}"
                              data-sender="{{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}"
+                             data-real-sender="{{ $chron->user->name ?? 'User' }}"
                              data-role="{{ str_replace('_', ' ', $roleLabel) }}"
-                             data-message="{{ $chron->message }}"
+                             data-message="{{ $cleanMessage }}"
                              data-time="{{ $chron->created_at->format('d M Y, H:i') }} WIB"
                              data-read="{{ $isRead ? ($chron->read_at ? $chron->read_at->format('d M Y, H:i') . ' WIB' : 'Sudah dibaca') : 'Belum dibaca' }}"
                              data-lat="{{ $chron->latitude ?? '' }}"
@@ -1544,19 +1552,16 @@
                                 </div>
                             </div>
 
-                            <!-- WhatsApp Quoted Reply Box (Matching User Reference Image) -->
+                            <!-- WhatsApp Quoted Reply Box -->
                             @if($quotedSender)
-                                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 3px solid #2563EB; border-radius: 6px;"
-                                     class="px-2 py-1 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
+                                <div style="background-color: {{ $isSelf ? 'rgba(13, 148, 136, 0.09)' : '#F1F5F9' }}; border-left: 3.5px solid #0D9488; border-radius: 7px;"
+                                     class="px-2.5 py-1.5 mb-1 select-none overflow-hidden text-left {{ !empty($chron->reply_to_id) ? 'cursor-pointer hover:brightness-95' : '' }} transition group/quote"
                                      @if(!empty($chron->reply_to_id)) onclick="scrollToChronology({{ $chron->reply_to_id }})" title="Klik untuk menuju pesan asli" @endif>
-                                    <div class="flex items-center gap-1 text-blue-600 font-bold text-[10px] leading-tight">
-                                        <svg class="w-3 h-3 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
-                                        </svg>
-                                        <span class="truncate uppercase tracking-wide">{{ $quotedSender }}</span>
+                                    <div class="font-bold text-[10.5px] leading-tight truncate" style="color: #0F766E;">
+                                        {{ $quotedSender }}
                                     </div>
                                     @if($quotedSnippet)
-                                        <p class="text-slate-600 text-[10px] truncate mt-0.5 leading-snug">
+                                        <p class="text-slate-600 text-[10.5px] line-clamp-2 mt-0.5 leading-snug break-words">
                                             {{ html_entity_decode($quotedSnippet, ENT_QUOTES | ENT_HTML5, 'UTF-8') }}
                                         </p>
                                     @endif
@@ -1767,18 +1772,15 @@
                 <input type="hidden" name="gps_accuracy" id="chron_acc">
 
                 <!-- WhatsApp Reply Banner Preview (shows when replying to a message) -->
-                <div id="chat-reply-preview" class="hidden border-b border-slate-200/90 bg-sky-50/70 px-3.5 py-1.5 transition-all">
-                    <div class="w-full flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2.5 min-w-0 border-l-4 border-blue-600 pl-2.5 py-0.5">
-                            <div class="min-w-0">
-                                <div class="font-bold text-blue-600 text-[10px] sm:text-[11px] flex items-center gap-1.5 uppercase tracking-wide">
-                                    <svg class="w-3.5 h-3.5 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/></svg>
-                                    <span id="reply-to-sender">Membalas User</span>
-                                </div>
-                                <p id="reply-to-text" class="text-slate-600 text-[10px] sm:text-[11px] truncate mt-0.5 font-normal">Isi pesan...</p>
+                <div id="chat-reply-preview" class="hidden border-b border-slate-200/80 bg-slate-50/95 px-3 py-2 transition-all">
+                    <div class="w-full flex items-center justify-between gap-2 rounded-lg bg-white px-2.5 py-1.5 shadow-2xs" style="border-left: 4px solid #0D9488;">
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-[10.5px] sm:text-[11px] leading-tight truncate" style="color: #0F766E;">
+                                <span id="reply-to-sender">User</span>
                             </div>
+                            <p id="reply-to-text" class="text-slate-600 text-[10.5px] sm:text-[11px] truncate mt-0.5 font-normal leading-snug">Isi pesan...</p>
                         </div>
-                        <button type="button" onclick="cancelReply()" class="w-6 h-6 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition cursor-pointer text-sm font-bold" title="Batal balas">&times;</button>
+                        <button type="button" onclick="cancelReply()" class="w-6 h-6 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition cursor-pointer text-base font-bold shrink-0" title="Batal balas">&times;</button>
                     </div>
                 </div>
 
@@ -5105,7 +5107,8 @@ function replyToMessage(id) {
 
     if (!bubble) return;
 
-    const sender = bubble.dataset.sender || 'User';
+    const displaySender = bubble.dataset.sender || 'User';
+    const realSender = bubble.dataset.realSender || displaySender;
     let msg = bubble.dataset.message || '';
     if (!msg) {
         msg = bubble.dataset.lat ? '📍 Titik Lokasi Lapangan' : (bubble.dataset.photo ? '📷 Lampiran Foto' : 'Pesan');
@@ -5119,10 +5122,10 @@ function replyToMessage(id) {
     }
 
     if (replyIdInput) replyIdInput.value = id;
-    if (replySenderInput) replySenderInput.value = sender;
+    if (replySenderInput) replySenderInput.value = realSender;
     if (replySnippetInput) replySnippetInput.value = msg;
 
-    if (replySender) replySender.innerText = 'Membalas ' + sender;
+    if (replySender) replySender.innerText = displaySender;
     if (replyText) replyText.innerText = msg;
     if (preview) preview.classList.remove('hidden');
 
@@ -5432,16 +5435,13 @@ async function handleChatFormSubmit(e) {
         let replyBox = '';
         if (replySender) {
             replyBox = `
-                <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 3px solid #2563EB; border-radius: 6px;"
-                     class="px-2 py-1 mb-1 select-none overflow-hidden text-left cursor-pointer"
-                     ${replyId ? `onclick="scrollToChronology(${replyId})"` : ''}>
-                    <div class="flex items-center gap-1 text-blue-600 font-bold text-[10px] leading-tight">
-                        <svg class="w-3 h-3 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
-                        </svg>
-                        <span class="truncate uppercase tracking-wide">${escapeChatHtml(replySender)}</span>
+                <div style="background-color: rgba(13, 148, 136, 0.09); border-left: 3.5px solid #0D9488; border-radius: 7px;"
+                     class="px-2.5 py-1.5 mb-1 select-none overflow-hidden text-left ${replyId ? 'cursor-pointer hover:brightness-95' : ''} transition group/quote"
+                     ${replyId ? `onclick="scrollToChronology(${replyId})" title="Klik untuk menuju pesan asli"` : ''}>
+                    <div class="font-bold text-[10.5px] leading-tight truncate" style="color: #0F766E;">
+                        ${escapeChatHtml(replySender)}
                     </div>
-                    ${replySnippet ? `<p class="text-slate-600 text-[10px] truncate mt-0.5 leading-snug">${escapeChatHtml(replySnippet)}</p>` : ''}
+                    ${replySnippet ? `<p class="text-slate-600 text-[10.5px] line-clamp-2 mt-0.5 leading-snug break-words">${escapeChatHtml(replySnippet)}</p>` : ''}
                 </div>
             `;
         }
@@ -5531,8 +5531,9 @@ async function handleChatFormSubmit(e) {
                 bubbleBox.id = 'chron-bubble-' + chron.id;
                 bubbleBox.dataset.id = chron.id;
                 bubbleBox.dataset.sender = 'Anda';
+                bubbleBox.dataset.realSender = @json(auth()->user()?->name ?? 'Anda');
                 bubbleBox.dataset.role = data.sender_badge || authUserBadge;
-                bubbleBox.dataset.message = chron.message || '';
+                bubbleBox.dataset.message = msg || (chron.message || '');
                 bubbleBox.dataset.time = (chron.created_at || '') + ' WIB';
                 bubbleBox.dataset.read = 'Belum dibaca';
                 bubbleBox.dataset.lat = chron.latitude || '';
@@ -6854,19 +6855,36 @@ function renderIncomingLiveMessage(data) {
         </div>
     `;
 
+    let resolvedReplySender = data.reply_sender || null;
+    let resolvedReplySnippet = data.reply_snippet || null;
+    let resolvedCleanMessage = data.message || '';
+
+    // Fallback parsing jika pesan masuk masih berformat [Balas @Sender | Snippet]: Pesan
+    if (!resolvedReplySender && resolvedCleanMessage) {
+        const replyMatch = resolvedCleanMessage.match(/^\[Balas @([^\]\|]+)(?:\s*\|\s*([^\]]+))?\]:\s*([\s\S]*)$/);
+        if (replyMatch) {
+            resolvedReplySender = replyMatch[1].trim();
+            resolvedReplySnippet = replyMatch[2] ? replyMatch[2].trim() : null;
+            resolvedCleanMessage = replyMatch[3].trim();
+        }
+    } else if (resolvedCleanMessage) {
+        const nestedMatch = resolvedCleanMessage.match(/^\[Balas @[^\]]+\]:\s*([\s\S]*)$/);
+        if (nestedMatch) {
+            resolvedCleanMessage = nestedMatch[1].trim();
+        }
+    }
+
     let replyBox = '';
-    if (data.reply_sender) {
+    if (resolvedReplySender) {
+        const quoteBg = data.is_self ? 'rgba(13, 148, 136, 0.09)' : '#F1F5F9';
         replyBox = `
-            <div style="background-color: rgba(3, 105, 161, 0.08); border-left: 3px solid #2563EB; border-radius: 6px;"
-                 class="px-2 py-1 mb-1 select-none overflow-hidden text-left cursor-pointer hover:bg-sky-100/60 transition group/quote"
-                 ${data.reply_to_id ? `onclick="scrollToChronology(${data.reply_to_id})"` : ''}>
-                <div class="flex items-center gap-1 text-blue-600 font-bold text-[10px] leading-tight">
-                    <svg class="w-3 h-3 text-blue-600 shrink-0 transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a5 5 0 015 5v2m-15-7l4-4m-4 4l4 4"/>
-                    </svg>
-                    <span class="truncate uppercase tracking-wide">${escapeChatHtml(data.reply_sender)}</span>
+            <div style="background-color: ${quoteBg}; border-left: 3.5px solid #0D9488; border-radius: 7px;"
+                 class="px-2.5 py-1.5 mb-1 select-none overflow-hidden text-left ${data.reply_to_id ? 'cursor-pointer hover:brightness-95' : ''} transition group/quote"
+                 ${data.reply_to_id ? `onclick="scrollToChronology(${data.reply_to_id})" title="Klik untuk menuju pesan asli"` : ''}>
+                <div class="font-bold text-[10.5px] leading-tight truncate" style="color: #0F766E;">
+                    ${escapeChatHtml(resolvedReplySender)}
                 </div>
-                ${data.reply_snippet ? `<p class="text-slate-600 text-[10px] truncate mt-0.5 leading-snug">${escapeChatHtml(data.reply_snippet)}</p>` : ''}
+                ${resolvedReplySnippet ? `<p class="text-slate-600 text-[10.5px] line-clamp-2 mt-0.5 leading-snug break-words">${escapeChatHtml(resolvedReplySnippet)}</p>` : ''}
             </div>
         `;
     }
@@ -6936,8 +6954,9 @@ function renderIncomingLiveMessage(data) {
         <div id="chron-bubble-${data.id}"
              data-id="${data.id}"
              data-sender="${escapeChatHtml(data.sender_name)}"
+             data-real-sender="${escapeChatHtml(data.real_sender_name || data.sender_name)}"
              data-role="${escapeChatHtml(data.sender_badge)}"
-             data-message="${escapeChatHtml(data.message || '')}"
+             data-message="${escapeChatHtml(resolvedCleanMessage)}"
              data-time="${escapeChatHtml(data.date_str || '')}"
              data-read="Belum dibaca"
              data-lat="${data.latitude || ''}"
@@ -6986,7 +7005,7 @@ function renderIncomingLiveMessage(data) {
             </div>
 
             ${replyBox}
-            ${data.message ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(data.message)}</p>` : ''}
+            ${resolvedCleanMessage ? `<p id="chron-text-${data.id}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">${escapeChatHtml(resolvedCleanMessage)}</p>` : ''}
             ${photoBox}
             ${videoBox}
             ${locBox}
