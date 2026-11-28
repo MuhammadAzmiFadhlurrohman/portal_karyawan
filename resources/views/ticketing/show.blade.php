@@ -27,6 +27,36 @@
         $fulfilledCount = ($hasResume ? 1 : 0) + ($hasPhoto ? 1 : 0) + ($hasRepairOrJc ? 1 : 0) + ($hasJcOrManeuver ? 1 : 0);
         $percentage = $fulfilledCount * 25;
         $remainingCount = 4 - $fulfilledCount;
+
+        // WA Maintenance Message Template
+        $tglTiket = $tiket->tanggal_open ?? $tiket->created_at;
+        $waDate = $tglTiket ? \Carbon\Carbon::parse($tglTiket)->translatedFormat('d M Y') : date('d M Y');
+
+        if ($tiket->kategori_tiket === 'BACKBONE') {
+            $waStatusLabel = 'Status Segment Backbone :';
+            $waStatusValue = $tiket->backbone_segment ?: ($tiket->status_link_impact ?: '-');
+        } else {
+            $waStatusLabel = 'Status Customer Retail :';
+            $hasCid = !empty($tiket->customer_id) && !in_array(strtoupper(trim((string)$tiket->customer_id)), ['NON-CID', 'NON CID', '-']);
+            $cid = $hasCid ? ' ' . trim((string)$tiket->customer_id) : '';
+            $addr = !empty($tiket->customer_address) ? '/' . trim((string)$tiket->customer_address) : '';
+            $waStatusValue = trim(($tiket->customer_name ?? 'Pelanggan') . $cid . $addr);
+            if (empty($waStatusValue)) {
+                $waStatusValue = '-';
+            }
+        }
+
+        $waProblem = $tiket->problem_temuan ?: ($tiket->deskripsi_gangguan ?: '-');
+        $waProblemClean = preg_replace('/^indikasi\s*[:\-]?\s*/i', '', trim((string)$waProblem));
+        $waIndikasi = 'Indikasi : ' . ($waProblemClean ?: '-');
+
+        $waFormatText = "-Open Tiket Maintenance-\n"
+            . "No Tiket: " . $tiket->no_tiket . "\n\n"
+            . $waStatusLabel . "\n"
+            . $waStatusValue . "\n\n"
+            . $waIndikasi . "\n\n"
+            . $waDate . "\n"
+            . "Link Tiket: {{CURRENT_URL}}";
     @endphp
 
     <!-- ========================================================================= -->
@@ -190,6 +220,13 @@
                         </div>
 
                         <div class="py-1">
+                            <button type="button" @click="open = false; copyWaTicketFormat()"
+                                    class="w-full text-left px-3.5 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 hover:text-emerald-900 transition flex items-center gap-2.5 group">
+                                <svg class="w-4 h-4 text-emerald-600 group-hover:scale-110 transition-transform shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2ZM12.04 20.17C10.55 20.17 9.09 19.77 7.82 19.01L7.52 18.83L4.4 19.65L5.23 16.61L5.03 16.29C4.2 14.97 3.76 13.46 3.76 11.91C3.76 7.35 7.48 3.63 12.04 3.63C14.25 3.63 16.32 4.49 17.88 6.05C19.44 7.61 20.32 9.69 20.32 11.91C20.32 16.47 16.6 20.17 12.04 20.17ZM16.58 14.39C16.33 14.26 15.11 13.66 14.88 13.58C14.65 13.49 14.49 13.45 14.32 13.7C14.16 13.95 13.68 14.52 13.54 14.69C13.39 14.85 13.25 14.87 13 14.75C12.75 14.62 11.95 14.36 11 13.52C10.26 12.86 9.76 12.05 9.61 11.8C9.47 11.55 9.6 11.42 9.72 11.3C9.83 11.19 9.97 11.01 10.1 10.86C10.22 10.72 10.26 10.61 10.35 10.45C10.43 10.28 10.39 10.14 10.33 10.02C10.26 9.89 9.77 8.69 9.57 8.19C9.37 7.7 9.17 7.77 9.02 7.76C8.88 7.75 8.71 7.75 8.55 7.75C8.38 7.75 8.12 7.81 7.89 8.06C7.66 8.31 7.02 8.91 7.02 10.13C7.02 11.35 7.91 12.52 8.03 12.69C8.16 12.85 9.78 15.35 12.26 16.42C12.85 16.67 13.31 16.83 13.67 16.94C14.26 17.13 14.8 17.1 15.23 17.04C15.7 16.97 16.68 16.45 16.89 15.87C17.09 15.29 17.09 14.79 17.03 14.69C16.97 14.58 16.83 14.52 16.58 14.39Z"/>
+                                </svg>
+                                <span>Salin ke WA</span>
+                            </button>
                             @if(auth()->id() !== $tiket->created_by && !auth()->user()->hasRole(['noc', 'atasan_noc']) && auth()->user()->division !== 'NOC')
                                 @can('dispatch', $tiket)
                                     <button type="button" @click="open = false; openDispatchModal()"
@@ -4640,6 +4677,55 @@ function coreManeuverModal() {
 
 @push('scripts')
 <script>
+// Copy WA Ticket Format to Clipboard
+function copyWaTicketFormat() {
+    const rawTemplate = @json($waFormatText);
+    const currentUrl = window.location.href.split('?')[0].split('#')[0];
+    const textToCopy = rawTemplate.replace('{{CURRENT_URL}}', currentUrl);
+
+    const notifySuccess = () => {
+        if (window.Swal) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Format WA Disalin!',
+                text: 'Format laporan open tiket berhasil disalin ke clipboard.',
+                timer: 2500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        } else {
+            alert('Format laporan WA berhasil disalin ke clipboard!');
+        }
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy).then(notifySuccess).catch(() => {
+            fallbackCopyWa(textToCopy, notifySuccess);
+        });
+    } else {
+        fallbackCopyWa(textToCopy, notifySuccess);
+    }
+}
+
+function fallbackCopyWa(text, callback) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+        document.execCommand('copy');
+        if (typeof callback === 'function') callback();
+    } catch (e) {
+        alert('Gagal menyalin format WA.');
+    }
+    document.body.removeChild(ta);
+}
+
 // Image Lightbox Modal with Direct Download & Interactive Zoom
 let currentLightboxZoom = 1;
 
