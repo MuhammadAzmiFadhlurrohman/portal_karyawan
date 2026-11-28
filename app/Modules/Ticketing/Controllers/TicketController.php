@@ -251,6 +251,7 @@ class TicketController extends Controller
             'wilayah' => ['nullable', 'string', 'max:100'],
             'tipe_penanganan' => ['nullable', 'string', 'max:100'],
             'priority' => ['nullable', 'string', 'in:P1,P2,P3,P4'],
+            'sla_target_hours' => ['nullable', 'numeric', 'min:0.5', 'max:168'],
             'sla_target_minutes' => ['nullable', 'integer', 'min:15', 'max:10080'],
             'tanggal_open' => ['nullable'],
             'notes' => ['nullable', 'string'],
@@ -275,9 +276,13 @@ class TicketController extends Controller
             ->where('kategori_tiket', 'BACKBONE')
             ->where('priority', $priority)
             ->first();
-        $slaMinutes = ! empty($validated['sla_target_minutes'])
-            ? (int) $validated['sla_target_minutes']
-            : ($sla ? $sla->sla_minutes : 360);
+        if ($request->filled('sla_target_hours')) {
+            $slaMinutes = (int) round((float) $request->input('sla_target_hours') * 60);
+        } else {
+            $slaMinutes = ! empty($validated['sla_target_minutes'])
+                ? (int) $validated['sla_target_minutes']
+                : ($sla ? $sla->sla_minutes : 360);
+        }
 
         $noTiket = $this->sequenceService->generate('BDG');
         $now = Carbon::now('Asia/Jakarta');
@@ -364,6 +369,7 @@ class TicketController extends Controller
             'customer_odp' => ['nullable', 'string', 'max:100'],
             'customer_olt' => ['nullable', 'string', 'max:100'],
             'priority' => ['nullable', 'string', 'in:P1,P2,P3,P4'],
+            'sla_target_hours' => ['nullable', 'numeric', 'min:0.5', 'max:168'],
             'sla_target_minutes' => ['nullable', 'integer', 'min:15', 'max:10080'],
             'tanggal_open' => ['nullable'],
             'notes' => ['nullable', 'string'],
@@ -406,9 +412,13 @@ class TicketController extends Controller
             ->where('kategori_tiket', 'BROADBAND')
             ->where('priority', $priority)
             ->first();
-        $slaMinutes = ! empty($validated['sla_target_minutes'])
-            ? (int) $validated['sla_target_minutes']
-            : ($sla ? $sla->sla_minutes : 240); // Default 240 min (§7.1)
+        if ($request->filled('sla_target_hours')) {
+            $slaMinutes = (int) round((float) $request->input('sla_target_hours') * 60);
+        } else {
+            $slaMinutes = ! empty($validated['sla_target_minutes'])
+                ? (int) $validated['sla_target_minutes']
+                : ($sla ? $sla->sla_minutes : 240); // Default 240 min (§7.1)
+        }
 
         $noTiket = $this->sequenceService->generate('BRD');
         $now = Carbon::now('Asia/Jakarta');

@@ -370,21 +370,26 @@
                 <!-- COMMON FIELDS: SLA TARGET & TANGGAL JAM GANGGUAN -->
                 <!-- ========================================================= -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                    <!-- Target SLA (Menit) + Jam Badge -->
+                    <!-- Target SLA (Jam) -->
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                            Target SLA (Menit)
+                            Target SLA (Jam)
                         </label>
                         <div class="relative flex items-center">
                             <input type="number"
-                                   name="sla_target_minutes"
-                                   x-model="slaMinutes"
+                                   name="sla_target_hours"
+                                   x-model="slaHours"
                                    required
-                                   min="15"
-                                   max="10080"
-                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 pr-20 text-slate-800 transition">
-                            <div class="absolute right-2.5 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-[#0D9488] font-bold text-xs"
-                                 x-text="(parseFloat(slaMinutes || 0) / 60).toFixed(1) + ' Jam'">
+                                   step="0.5"
+                                   min="0.5"
+                                   max="168"
+                                   placeholder="Contoh: 4"
+                                   class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 pr-16 text-slate-800 transition font-semibold">
+                            <input type="hidden"
+                                   name="sla_target_minutes"
+                                   :value="Math.round((parseFloat(slaHours || 0)) * 60)">
+                            <div class="absolute right-2.5 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-[#0D9488] font-bold text-xs">
+                                Jam
                             </div>
                         </div>
                     </div>
@@ -548,7 +553,7 @@
                         <div class="flex items-center justify-between">
                             <span class="text-slate-400 font-medium">Target SLA:</span>
                             <span class="px-2 py-0.5 rounded-md bg-teal-400/20 border border-teal-400/30 text-[#5eead4] font-bold text-[11px]"
-                                  x-text="(parseFloat(slaMinutes || 0) / 60).toFixed(1) + ' Jam (' + slaMinutes + ' menit)'">
+                                  x-text="(slaHours || 0) + ' Jam'">
                             </span>
                         </div>
                     </div>
@@ -652,7 +657,7 @@ function openTicketForm(config) {
         segment: '',
         wilayah: 'Area Bandung & Sekitarnya',
         tipePenanganan: 'Corrective Maintenance FO',
-        slaMinutes: config.initialCategory === 'backbone' ? 360 : 240,
+        slaHours: config.initialCategory === 'backbone' ? 6 : 4,
         tanggalOpen: localWibStr,
         notes: '',
 
@@ -676,9 +681,9 @@ function openTicketForm(config) {
         selectCategory(cat) {
             this.category = cat;
             if (cat === 'backbone') {
-                this.slaMinutes = 360;
+                this.slaHours = 6;
             } else {
-                this.slaMinutes = 240;
+                this.slaHours = 4;
             }
         },
 
@@ -686,7 +691,7 @@ function openTicketForm(config) {
             this.segment = e.target.value;
             if (this.segment) {
                 // If segment has SLA suffix or defaults
-                this.slaMinutes = 360;
+                this.slaHours = 6;
             }
         },
 
