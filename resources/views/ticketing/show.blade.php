@@ -1069,10 +1069,13 @@
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
             border-radius: 10px;
             overflow: hidden;
-            transition: box-shadow 0.15s ease;
+            will-change: width, box-shadow;
+            transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-radius 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.25s ease;
         }
         #quick-reply-card.is-collapsed {
-            width: auto;
+            width: 136px;
             min-width: 0;
             border-radius: 9px;
         }
@@ -1080,6 +1083,7 @@
             width: 285px;
             max-width: 100%;
             border-radius: 11px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.11);
         }
         #quick-reply-card .qr-header-btn {
             width: 100%;
@@ -1090,23 +1094,41 @@
             padding: 5.5px 11px;
             background: #FFFFFF;
             border: none;
+            border-bottom: 1px solid transparent;
             cursor: pointer;
             text-align: left;
-            transition: background-color 0.15s ease;
+            white-space: nowrap;
+            transition: padding 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+                        background-color 0.15s ease,
+                        border-color 0.22s ease;
         }
         #quick-reply-card.is-expanded .qr-header-btn {
             padding: 9px 13px;
-            border-bottom: 1px solid #E5E7EB;
+            border-bottom-color: #E5E7EB;
         }
         #quick-reply-card .qr-header-btn:hover {
             background: #F9FAFB;
         }
-        #quick-reply-card.is-collapsed .qr-body {
-            display: none !important;
-        }
-        #quick-reply-card.is-expanded .qr-body {
+        #quick-reply-card .qr-body {
             display: block !important;
             background: #FFFFFF;
+            overflow: hidden;
+            will-change: max-height, opacity, transform;
+            transition: max-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        opacity 0.22s ease,
+                        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        #quick-reply-card.is-collapsed .qr-body {
+            max-height: 0px !important;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+        }
+        #quick-reply-card.is-expanded .qr-body {
+            max-height: 220px !important;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
         }
         #quick-reply-card .qr-item-btn {
             width: 100%;
@@ -5847,6 +5869,27 @@ function escapeChatHtml(text) {
     return p.innerHTML;
 }
 
+let quickReplyAnimFrame = null;
+
+function syncChatScrollDuringQuickReplyAnim(durationMs = 310) {
+    const scrollBox = document.getElementById('chat-stream-box');
+    if (!scrollBox) return;
+    if (quickReplyAnimFrame) {
+        cancelAnimationFrame(quickReplyAnimFrame);
+    }
+    const start = performance.now();
+    function step(now) {
+        scrollBox.scrollTop = scrollBox.scrollHeight;
+        if (now - start < durationMs) {
+            quickReplyAnimFrame = requestAnimationFrame(step);
+        } else {
+            scrollBox.scrollTop = scrollBox.scrollHeight;
+            quickReplyAnimFrame = null;
+        }
+    }
+    quickReplyAnimFrame = requestAnimationFrame(step);
+}
+
 function toggleQuickReplyPanel(e) {
     if (e) {
         e.preventDefault();
@@ -5854,7 +5897,6 @@ function toggleQuickReplyPanel(e) {
     }
     const card = document.getElementById('quick-reply-card');
     const chevron = document.getElementById('quick-reply-chevron');
-    const scrollBox = document.getElementById('chat-stream-box');
     if (!card) return;
     const isCollapsed = card.classList.contains('is-collapsed');
 
@@ -5862,13 +5904,7 @@ function toggleQuickReplyPanel(e) {
         card.classList.remove('is-collapsed');
         card.classList.add('is-expanded');
         if (chevron) chevron.style.transform = 'rotate(180deg)';
-        // Pastikan saat Pesan Cepat terbuka ke bawah, posisi chat tetap di pesan paling baru (terbawah)
-        if (scrollBox) {
-            scrollBox.scrollTop = scrollBox.scrollHeight;
-            requestAnimationFrame(() => {
-                scrollBox.scrollTop = scrollBox.scrollHeight;
-            });
-        }
+        syncChatScrollDuringQuickReplyAnim(310);
     } else {
         closeQuickReplyPanel();
     }
@@ -5877,7 +5913,6 @@ function toggleQuickReplyPanel(e) {
 function closeQuickReplyPanel() {
     const card = document.getElementById('quick-reply-card');
     const chevron = document.getElementById('quick-reply-chevron');
-    const scrollBox = document.getElementById('chat-stream-box');
     const wasExpanded = card && card.classList.contains('is-expanded');
 
     if (card) {
@@ -5886,12 +5921,8 @@ function closeQuickReplyPanel() {
     }
     if (chevron) chevron.style.transform = 'rotate(0deg)';
 
-    // Pastikan saat Pesan Cepat ditutup kembali, tampilan tetap berada tepat di pesan terbaru (terbawah)
-    if (wasExpanded && scrollBox) {
-        scrollBox.scrollTop = scrollBox.scrollHeight;
-        requestAnimationFrame(() => {
-            scrollBox.scrollTop = scrollBox.scrollHeight;
-        });
+    if (wasExpanded) {
+        syncChatScrollDuringQuickReplyAnim(310);
     }
 }
 
