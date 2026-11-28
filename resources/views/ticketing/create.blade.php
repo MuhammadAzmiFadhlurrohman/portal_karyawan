@@ -109,12 +109,9 @@
 
                 <!-- 1. Kategori Tiket Gangguan (Selector Tiles) -->
                 <div>
-                    <div class="flex items-center gap-2 mb-2.5">
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                            Kategori Tiket Gangguan
-                        </label>
-                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                    </div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
+                        Kategori Tiket Gangguan
+                    </label>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <!-- Backbone FO Selector Card -->
@@ -173,12 +170,9 @@
                 <div x-show="category === 'backbone'" class="space-y-4">
                     <!-- Status Link Impact -->
                     <div>
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                Status Link Impact
-                            </label>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Status Link Impact
+                        </label>
                         <input type="text"
                                name="status_link_impact"
                                x-model="statusLinkImpact"
@@ -193,12 +187,9 @@
 
                     <!-- Segment / Backbone -->
                     <div>
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                Segment / Backbone
-                            </label>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Segment / Backbone
+                        </label>
                         <select name="backbone_segment"
                                 x-model="segment"
                                 @change="onSegmentChange($event)"
@@ -288,12 +279,9 @@
                     <!-- Nomor Internet & Nama Pelanggan -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Nomor Internet
-                                </label>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Opsional</span>
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                Nomor Internet
+                            </label>
                             <input type="text"
                                    name="customer_id"
                                    x-model="customerCid"
@@ -302,12 +290,9 @@
                         </div>
 
                         <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    Nama Pelanggan
-                                </label>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                Nama Pelanggan
+                            </label>
                             <input type="text"
                                    name="customer_name"
                                    x-model="customerName"
@@ -320,12 +305,9 @@
                     <!-- No WhatsApp & ODP -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    No WhatsApp / Telepon
-                                </label>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                No WhatsApp / Telepon
+                            </label>
                             <input type="text"
                                    name="customer_phone"
                                    x-model="customerPhone"
@@ -335,12 +317,9 @@
                         </div>
 
                         <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    ODP / Lokasi FAT
-                                </label>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-100 uppercase">Data FTTH</span>
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                ODP / Lokasi FAT
+                            </label>
                             <input type="text"
                                    name="customer_odp"
                                    x-model="customerOdp"
@@ -358,12 +337,9 @@
                     <!-- POP / OLT & Alamat Pelanggan -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                            <div class="flex items-center gap-2 mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                    POP / OLT / Hub
-                                </label>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-100 uppercase">Data FTTH</span>
-                            </div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                POP / OLT / Hub
+                            </label>
                             <input type="text"
                                    name="customer_olt"
                                    x-model="customerOlt"
@@ -396,12 +372,9 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                     <!-- Target SLA (Menit) + Jam Badge -->
                     <div>
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                Target SLA (Menit)
-                            </label>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Target SLA (Menit)
+                        </label>
                         <div class="relative flex items-center">
                             <input type="number"
                                    name="sla_target_minutes"
@@ -418,12 +391,9 @@
 
                     <!-- Tanggal & Jam Gangguan (WIB) -->
                     <div>
-                        <div class="flex items-center gap-2 mb-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                                Tanggal &amp; Jam Gangguan (WIB)
-                            </label>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-100 uppercase">Wajib</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            Tanggal &amp; Jam Gangguan (WIB)
+                        </label>
                         <input type="datetime-local"
                                name="tanggal_open"
                                x-model="tanggalOpen"
@@ -434,12 +404,9 @@
 
                 <!-- Deskripsi Gangguan & Informasi Awal -->
                 <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                            Deskripsi Gangguan &amp; Informasi Awal
-                        </label>
-                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Opsional</span>
-                    </div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Deskripsi Gangguan &amp; Informasi Awal
+                    </label>
                     <textarea name="notes"
                               rows="3"
                               x-model="notes"
@@ -450,13 +417,10 @@
                 <!-- Foto Bukti Gangguan / Masalah (Drag & Drop Zone) -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                                <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span>Foto Bukti Gangguan / Masalah</span>
-                            </label>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 uppercase">Opsional</span>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span>Foto Bukti Gangguan / Masalah</span>
+                        </label>
                         <span class="text-[11px] text-slate-400 font-medium">Bisa pilih &gt; 1 foto &bull; Maks 12MB/foto</span>
                     </div>
 
