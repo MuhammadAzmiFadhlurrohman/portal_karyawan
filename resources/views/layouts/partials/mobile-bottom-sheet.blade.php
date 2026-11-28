@@ -1,18 +1,19 @@
 @php
     $navUser = auth()->user();
     $userId = $navUser?->id ?? 0;
-    $navCanApprovePengajuan = $navCanApprovePengajuan ?? false;
-    $navCanApproveKoreksi = $navCanApproveKoreksi ?? false;
+    $navIsAdmin = $navUser && $navUser->hasRole(['super_admin', 'admin']);
+    $navIsHrd = $navUser && $navUser->hasRole('hrd') && ! $navIsAdmin;
+    $canViewEmployeeRecap = ($canViewEmployeeRecap ?? false) || ($navUser && $navUser->hasRole(['super_admin', 'admin', 'hrd']));
+    $canViewReports = ($canViewReports ?? false) || ($navIsAdmin && ! $navUser->hasRole('finance') && strtolower($navUser->division ?? '') !== 'finance');
+    $navCanApprovePengajuan = ($navCanApprovePengajuan ?? false) || ($navUser && ! $navIsHrd && ($navUser->can('gomsn.pengajuan.approve_atasan') || $navIsAdmin || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi'])));
+    $navCanApproveKoreksi = ($navCanApproveKoreksi ?? false) || ($navUser && ! $navIsHrd && ($navUser->can('attendance.correction.approve') || $navIsAdmin || $navUser->hasRole(['atasan', 'atasan_noc', 'atasan_teknik', 'atasan_umum', 'manager_teknisi'])));
     $navPendingAtasanCount = $navPendingAtasanCount ?? 0;
     $navPendingKoreksiCount = $navPendingKoreksiCount ?? 0;
     $navPendingLemburCount = $navPendingLemburCount ?? 0;
     $navPendingLeaveHrdCount = $navPendingLeaveHrdCount ?? 0;
     $navAssignedTicketCount = $navAssignedTicketCount ?? 0;
-    $isHrdRole = $isHrdRole ?? false;
-    $navIsHrd = $navIsHrd ?? false;
-    $navIsAtasan = $navIsAtasan ?? false;
-    $canViewReports = $canViewReports ?? false;
-    $canViewEmployeeRecap = $canViewEmployeeRecap ?? false;
+    $isHrdRole = $navIsHrd;
+    $navIsAtasan = ($navIsAtasan ?? false) || ($navUser && ($navCanApprovePengajuan || $navUser->can('gomsn.lembur.approve')));
     $isFinanceUser = $navUser && ($navUser->hasRole('finance') || strtolower($navUser->division ?? '') === 'finance');
 @endphp
 
@@ -641,7 +642,6 @@ function mobileMenuCustomizer(userId) {
                         keywords: 'lembur overtime spk saya jam kerja',
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
                     },
-                    @if ($isFinanceUser)
                     {
                         id: 'stok_barang_ops',
                         defaultTitle: 'Stok Barang',
@@ -653,7 +653,6 @@ function mobileMenuCustomizer(userId) {
                         keywords: 'stok barang inventaris material gudang',
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>'
                     },
-                    @endif
                 ]
             },
             {
@@ -685,6 +684,30 @@ function mobileMenuCustomizer(userId) {
                         keywords: 'riwayat absen log kehadiran rekap histori',
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
                     },
+                    @if ($canViewReports)
+                    {
+                        id: 'laporan_absensi_admin',
+                        defaultTitle: 'Laporan Absensi',
+                        defaultSubtitle: 'Rekap Global Kantor',
+                        defaultColor: 'blue',
+                        url: '{{ route('attendance.report') }}',
+                        visible: true,
+                        badge: null,
+                        keywords: 'laporan absensi rekap global kantor bulanan excel',
+                        iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>'
+                    },
+                    {
+                        id: 'koreksi_absensi_admin',
+                        defaultTitle: 'Daftar Koreksi',
+                        defaultSubtitle: 'Koreksi Kehadiran',
+                        defaultColor: 'emerald',
+                        url: '{{ route('attendance.corrections') }}',
+                        visible: true,
+                        badge: null,
+                        keywords: 'daftar koreksi pengajuan kehadiran karyawan kantor',
+                        iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>'
+                    },
+                    @endif
                     {
                         id: 'jadwal_kerja',
                         defaultTitle: 'Jadwal Kerja Saya',
@@ -718,7 +741,7 @@ function mobileMenuCustomizer(userId) {
                         keywords: 'potongan denda gaji terlambat telat absen keuangan',
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
                     },
-                    @if (! $navIsHrd)
+                    @if (! $canViewEmployeeRecap)
                     {
                         id: 'leaderboard_user',
                         defaultTitle: 'Leaderboard',
@@ -731,26 +754,13 @@ function mobileMenuCustomizer(userId) {
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>'
                     },
                     @endif
-                    @if (! $navIsHrd && $canViewEmployeeRecap)
-                    {
-                        id: 'absen_karyawan_admin',
-                        defaultTitle: 'Absen Karyawan',
-                        defaultSubtitle: 'Rekap & Potongan',
-                        defaultColor: 'teal',
-                        url: '{{ route('attendance.employee-recap') }}',
-                        visible: true,
-                        badge: null,
-                        keywords: 'absen karyawan rekap admin',
-                        iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>'
-                    },
-                    @endif
                 ]
             },
-            @if ($navIsHrd)
+            @if ($canViewEmployeeRecap)
             {
                 key: 'kelola_karyawan',
                 title: 'Kelola Karyawan',
-                subtitle: 'Khusus HRD',
+                subtitle: '{{ $navIsAdmin ? "Manajemen Karyawan" : "Khusus HRD" }}',
                 indicatorClass: 'bg-gradient-to-b from-teal-500 to-emerald-500',
                 visible: true,
                 items: [
@@ -883,17 +893,19 @@ function mobileMenuCustomizer(userId) {
                         keywords: 'kpi analitik performa laporan kerja teknisi',
                         iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>'
                     },
+                    @if ($navIsAdmin || (auth()->user()?->can('attendance.employee.manage') && ! auth()->user()?->hasRole('hrd')))
                     {
-                        id: 'inventory_lainnya',
-                        defaultTitle: 'Stok Barang',
-                        defaultSubtitle: 'Stok Gudang',
-                        defaultColor: 'emerald',
-                        url: '{{ route('gomsn.inventory.index') }}',
+                        id: 'notifications_admin',
+                        defaultTitle: 'Kirim Notifikasi',
+                        defaultSubtitle: 'Broadcast Pengumuman',
+                        defaultColor: 'amber',
+                        url: '{{ route('portal.notifications.index') }}',
                         visible: true,
                         badge: null,
-                        keywords: 'stok barang gudang inventaris material kabel ont',
-                        iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>'
+                        keywords: 'kirim notifikasi broadcast pengumuman blast pesan massal push notif',
+                        iconSvg: '<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>'
                     },
+                    @endif
                     {
                         id: 'profile',
                         defaultTitle: 'Profil Saya',
@@ -949,6 +961,7 @@ function mobileMenuCustomizer(userId) {
         init() {
             this.loadCustomizations();
             this.ensureLayout();
+            this.saveCustomizations();
 
             window.addEventListener('pointermove', (e) => this.onItemPointerMove(e), { passive: false });
             window.addEventListener('pointerup', () => this.endItemDrag());
