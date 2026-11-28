@@ -74,16 +74,16 @@
         </div>
     @endif
 
-    <!-- KPI Metric Stats Cards: Responsive Grid (Mobile: 2 Baris x 3 Kolom, Desktop: 1 Baris x 6 Kolom) -->
+    <!-- KPI Metric Stats Cards: Responsive Grid (Mobile: 2 Kolom, Desktop: 4 Kolom) -->
     <style>
         .kpi-ticket-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 0.5rem;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 640px) {
             .kpi-ticket-grid {
-                grid-template-columns: repeat(6, minmax(0, 1fr));
+                grid-template-columns: repeat(4, minmax(0, 1fr));
                 gap: 0.625rem;
             }
         }
@@ -190,56 +190,6 @@
             </div>
         </div>
 
-        <!-- 5. > SLA -->
-        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
-            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background-color: #ef4444;"></div>
-            <!-- Card Icon -->
-            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #ef4444;">
-                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
-                    <circle cx="12" cy="13" r="8"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4l2.5 2.5M10 2h4M12 2v3"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center relative z-10">
-                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #dc2626;">&gt; SLA</span>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-1 sm:mt-1.5 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #dc2626;">
-                        {{ number_format($stats['sla_lebih'] ?? 0) }}
-                    </span>
-                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-rose-400 ml-0.5 sm:ml-1">tiket</span>
-                </div>
-                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-rose-600/75 mt-0.5 truncate leading-tight">&gt; Target SLA</p>
-            </div>
-        </div>
-
-        <!-- 6. <= SLA -->
-        <div class="relative bg-white rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 overflow-hidden group p-2 sm:p-3 flex flex-col justify-between min-h-[76px] sm:min-h-[88px]">
-            <div class="absolute top-0 left-0 right-0 h-[2.5px] sm:h-[3px]" style="background: var(--gomsn-active-bg) !important;"></div>
-            <!-- Card Icon -->
-            <div class="absolute -bottom-1 -right-1 pointer-events-none group-hover:scale-105 transition-transform" style="color: #0d9488;">
-                <svg class="w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 opacity-75 sm:opacity-85" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-            </div>
-            <!-- Top Row -->
-            <div class="flex items-center relative z-10">
-                <span class="text-[9px] sm:text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase" style="color: #0f766e;">&le; SLA</span>
-            </div>
-            <!-- Value & Label -->
-            <div class="mt-1 sm:mt-1.5 relative z-10">
-                <div class="flex items-baseline">
-                    <span class="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-none" style="color: #0f766e;">
-                        {{ number_format($stats['sla_tepat'] ?? 0) }}
-                    </span>
-                    <span class="text-[9px] sm:text-[10px] md:text-xs font-semibold text-teal-500/80 ml-0.5 sm:ml-1">tiket</span>
-                </div>
-                <p class="text-[9px] sm:text-[10px] md:text-[11px] font-medium text-teal-700/75 mt-0.5 truncate leading-tight">&le; Target SLA</p>
-            </div>
-        </div>
     </div>
 
     <!-- Filter & Search Toolbar (Collapsible Accordion / Dropdown) -->
