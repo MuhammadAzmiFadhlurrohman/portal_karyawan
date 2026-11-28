@@ -1093,7 +1093,7 @@
                         box-shadow 0.25s ease;
         }
         #quick-reply-card.is-collapsed {
-            width: 136px;
+            width: 162px;
             min-width: 0;
             border-radius: 9px;
         }
@@ -1109,7 +1109,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            padding: 5.5px 11px;
+            padding: 6px 13px;
             background: #FFFFFF;
             border: none;
             border-bottom: 1px solid transparent;
