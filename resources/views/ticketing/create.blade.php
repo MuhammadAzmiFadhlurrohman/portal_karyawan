@@ -419,14 +419,14 @@
                               class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white focus:border-teal-500 focus:ring-teal-500 px-3.5 py-2.5 text-slate-800 transition"></textarea>
                 </div>
 
-                <!-- Foto Bukti Gangguan / Masalah (Drag & Drop Zone) -->
+                <!-- Foto / Dokumen PDF Bukti Gangguan / Masalah (Drag & Drop Zone) -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                             <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            <span>Foto Bukti Gangguan / Masalah</span>
+                            <span>Foto / Dokumen PDF Bukti Gangguan</span>
                         </label>
-                        <span class="text-[11px] text-slate-400 font-medium">Bisa pilih &gt; 1 foto &bull; Maks 12MB/foto</span>
+                        <span class="text-[11px] text-slate-400 font-medium">Bisa pilih &gt; 1 file (Foto / PDF) &bull; Maks 12MB/file</span>
                     </div>
 
                     <!-- Dropzone -->
@@ -441,7 +441,7 @@
                                x-ref="photoInput"
                                name="photos[]"
                                multiple
-                               accept="image/*,.pdf"
+                               accept=".pdf,application/pdf,image/jpeg,image/png,image/jpg,image/webp,image/*"
                                class="hidden"
                                @change="handleFileSelect($event)">
 
@@ -451,10 +451,10 @@
                             </svg>
                         </div>
                         <h4 class="font-extrabold text-sm text-slate-700 group-hover:text-teal-700 transition">
-                            Klik atau Tarik Foto Bukti ke Sini
+                            Klik atau Tarik Foto / Dokumen PDF ke Sini
                         </h4>
                         <p class="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-                            Foto indikator LOS, layar NMS, kabel putus, redaman OPM, atau kondisi perangkat
+                            Format JPG, PNG, WEBP, atau PDF (indikator LOS, layar NMS, kabel putus, redaman OPM, atau dokumen laporan)
                         </p>
                     </div>
 
@@ -464,9 +464,14 @@
                             <template x-for="(file, idx) in selectedFiles" :key="idx">
                                 <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                                     <div class="flex items-center gap-2.5 truncate">
-                                        <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <template x-if="file.isPdf">
+                                            <span class="px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold text-[10px] shrink-0 uppercase tracking-wider">PDF</span>
+                                        </template>
+                                        <template x-if="!file.isPdf">
+                                            <svg class="w-4 h-4 text-teal-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        </template>
                                         <span class="font-semibold text-slate-700 truncate" x-text="file.name"></span>
-                                        <span class="text-[11px] text-slate-400" x-text="'(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)'"></span>
+                                        <span class="text-[11px] text-slate-400 shrink-0" x-text="'(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)'"></span>
                                     </div>
                                     <button type="button" @click="removeFile(idx)" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-0.5 text-sm">&times;</button>
                                 </div>
@@ -677,6 +682,7 @@ function openTicketForm(config) {
         // File uploads
         isDragging: false,
         selectedFiles: [],
+        rawFiles: [],
 
         selectCategory(cat) {
             this.category = cat;
@@ -730,31 +736,52 @@ function openTicketForm(config) {
         },
 
         handleFileSelect(e) {
-            if (e.target.files) {
+            if (e.target.files && e.target.files.length > 0) {
                 this.addFiles(Array.from(e.target.files));
             }
         },
 
         handleDrop(e) {
             this.isDragging = false;
-            if (e.dataTransfer && e.dataTransfer.files) {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 this.addFiles(Array.from(e.dataTransfer.files));
-                // Sync to file input
-                this.$refs.photoInput.files = e.dataTransfer.files;
             }
         },
 
         addFiles(files) {
             for (const file of files) {
-                this.selectedFiles.push({
-                    name: file.name,
-                    size: file.size
-                });
+                // Hindari duplikasi file dengan nama dan ukuran yang sama
+                const exists = this.selectedFiles.some(f => f.name === file.name && f.size === file.size);
+                if (!exists) {
+                    this.rawFiles.push(file);
+                    this.selectedFiles.push({
+                        name: file.name,
+                        size: file.size,
+                        isPdf: file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+                    });
+                }
             }
+            this.syncInputFiles();
         },
 
         removeFile(idx) {
             this.selectedFiles.splice(idx, 1);
+            this.rawFiles.splice(idx, 1);
+            this.syncInputFiles();
+        },
+
+        syncInputFiles() {
+            try {
+                if (window.DataTransfer && this.$refs.photoInput) {
+                    const dt = new DataTransfer();
+                    for (const f of this.rawFiles) {
+                        dt.items.add(f);
+                    }
+                    this.$refs.photoInput.files = dt.files;
+                }
+            } catch (err) {
+                console.warn('Sync input files error:', err);
+            }
         }
     };
 }

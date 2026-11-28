@@ -1568,28 +1568,47 @@
                                 <p id="chron-text-{{ $chron->id }}" class="text-slate-800 leading-snug whitespace-pre-line text-[11.5px] font-normal">{{ $cleanMessage }}</p>
                             @endif
 
-                            <!-- Photo Attachment Preview if available (Lightbox Modal) -->
+                            <!-- Photo / PDF Attachment Preview if available (Lightbox Modal or PDF Link) -->
                             @if($chron->photo_path)
                                 @php
                                     $photoSrc = $chron->photo_url ?? asset('storage/' . $chron->photo_path);
+                                    $isPdf = str_ends_with(strtolower($chron->photo_path), '.pdf');
                                 @endphp
-                                <div class="pt-0.5">
-                                    <button type="button"
-                                            onclick="openImageLightbox('{{ $photoSrc }}', 'Foto Dokumentasi - {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}')"
-                                            style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
-                                            class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
-                                        <img src="{{ $photoSrc }}"
-                                             alt="Bukti Foto"
-                                             loading="lazy"
-                                             style="width: 100%; height: 118px; object-fit: cover; display: block;"
-                                             class="group-hover:scale-105 transition duration-200"
-                                             onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
-                                        <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
-                                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
-                                            <span>Perbesar &rarr;</span>
-                                        </div>
-                                    </button>
-                                </div>
+                                @if($isPdf)
+                                    <div class="pt-0.5">
+                                        <a href="{{ $photoSrc }}" target="_blank" rel="noopener noreferrer"
+                                           style="width: 210px; max-width: 100%; border-radius: 10px; border: 1px solid #E2E8F0;"
+                                           class="flex items-center gap-2.5 p-2 bg-rose-50/70 hover:bg-rose-100/80 border-rose-200 text-rose-800 transition rounded-xl group shadow-2xs">
+                                            <div class="w-8 h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="truncate flex-1">
+                                                <span class="block text-xs font-bold text-slate-800 truncate">{{ basename($chron->photo_path) }}</span>
+                                                <span class="block text-[10px] text-rose-600 font-semibold group-hover:underline">Buka PDF &nearr;</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="pt-0.5">
+                                        <button type="button"
+                                                onclick="openImageLightbox('{{ $photoSrc }}', 'Foto Dokumentasi - {{ $isSelf ? 'Anda' : ($chron->user->name ?? 'User') }}')"
+                                                style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                                                class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
+                                            <img src="{{ $photoSrc }}"
+                                                 alt="Bukti Foto"
+                                                 loading="lazy"
+                                                 style="width: 100%; height: 118px; object-fit: cover; display: block;"
+                                                 class="group-hover:scale-105 transition duration-200"
+                                                 onerror="if(this.src!=='{{ asset('storage/' . $chron->photo_path) }}'){this.src='{{ asset('storage/' . $chron->photo_path) }}';}">
+                                            <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
+                                                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                                <span>Perbesar &rarr;</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                @endif
                             @endif
 
                             <!-- Video Attachment Preview if available -->
@@ -1767,8 +1786,8 @@
                     <div class="w-full flex items-center gap-2">
 
                 <!-- Hidden Native File Inputs -->
-                <!-- 1. General Media (Photo / Video) -->
-                <input type="file" name="photo" id="input_upload_media" accept="image/*,video/*" class="hidden" onchange="handleFileChosen(this, 'Media')">
+                <!-- 1. General Media (Photo / Video / PDF) -->
+                <input type="file" name="photo" id="input_upload_media" accept=".pdf,application/pdf,image/*,video/*" class="hidden" onchange="handleFileChosen(this, 'Dokumen')">
                 <!-- 2. Video Capture (HP Video Camera) -->
                 <input type="file" name="video" id="input_record_video" accept="video/*" capture="environment" class="hidden" onchange="handleFileChosen(this, 'Video')">
                 <!-- 3. Camera GPS (Watermark) trigger -->
@@ -1804,8 +1823,8 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                         </div>
                                         <div class="min-w-0 flex-1">
-                                            <h4 class="font-bold text-xs text-slate-800 leading-tight">Upload Media (Foto / Video)</h4>
-                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Pilih foto atau video dari galeri HP / perangkat</p>
+                                            <h4 class="font-bold text-xs text-slate-800 leading-tight">Upload File (Foto / Video / PDF)</h4>
+                                            <p class="text-[10px] text-slate-500 truncate mt-0.5">Pilih foto, video, atau dokumen PDF dari perangkat</p>
                                         </div>
                                     </button>
 
@@ -2549,23 +2568,51 @@
             @if($photos->isNotEmpty())
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                     @foreach($photos as $p)
-                        <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group relative">
-                            <img src="{{ $p->photo_url ?? asset('storage/' . $p->photo_path) }}"
-                                 alt="Foto"
-                                 loading="lazy"
-                                 class="w-full h-44 object-cover group-hover:scale-105 transition duration-300"
-                                 onerror="if(this.src!=='{{ asset('storage/' . $p->photo_path) }}'){this.src='{{ asset('storage/' . $p->photo_path) }}';}">
-                            <div class="p-2.5 bg-white border-t border-slate-100">
-                                <span class="font-bold text-[11px] text-slate-800 block truncate">{{ $p->user->name ?? 'User' }}</span>
-                                <span class="text-[10px] text-slate-400 block">{{ $p->created_at->format('d M, H:i') }}</span>
+                        @php
+                            $isPdf = str_ends_with(strtolower($p->photo_path), '.pdf');
+                            $fileUrl = $p->photo_url ?? asset('storage/' . $p->photo_path);
+                        @endphp
+                        @if($isPdf)
+                            <div class="rounded-2xl border border-rose-200 bg-rose-50/40 p-4 flex flex-col justify-between hover:shadow-md transition">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <span class="font-bold text-xs text-slate-800 block truncate" title="{{ basename($p->photo_path) }}">{{ basename($p->photo_path) }}</span>
+                                        <span class="text-[10px] text-slate-400 block">{{ $p->created_at->format('d M, H:i') }} &bull; {{ $p->user->name ?? 'User' }}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-rose-100 flex items-center justify-between">
+                                    <span class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">Dokumen PDF</span>
+                                    <a href="{{ $fileUrl }}" target="_blank" rel="noopener noreferrer"
+                                       class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition">
+                                        <span>Buka</span>
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    </a>
+                                </div>
                             </div>
-                            <button type="button"
-                                    onclick="openImageLightbox('{{ $p->photo_url ?? asset('storage/' . $p->photo_path) }}', 'Foto Dokumentasi - {{ $p->user->name ?? 'User' }}')"
-                                    class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 cursor-pointer backdrop-blur-[1px]">
-                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
-                                <span>Perbesar &rarr;</span>
-                            </button>
-                        </div>
+                        @else
+                            <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 group relative">
+                                <img src="{{ $fileUrl }}"
+                                     alt="Foto"
+                                     loading="lazy"
+                                     class="w-full h-44 object-cover group-hover:scale-105 transition duration-300"
+                                     onerror="if(this.src!=='{{ asset('storage/' . $p->photo_path) }}'){this.src='{{ asset('storage/' . $p->photo_path) }}';}">
+                                <div class="p-2.5 bg-white border-t border-slate-100">
+                                    <span class="font-bold text-[11px] text-slate-800 block truncate">{{ $p->user->name ?? 'User' }}</span>
+                                    <span class="text-[10px] text-slate-400 block">{{ $p->created_at->format('d M, H:i') }}</span>
+                                </div>
+                                <button type="button"
+                                        onclick="openImageLightbox('{{ $fileUrl }}', 'Foto Dokumentasi - {{ $p->user->name ?? 'User' }}')"
+                                        class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 cursor-pointer backdrop-blur-[1px]">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                    <span>Perbesar &rarr;</span>
+                                </button>
+                            </div>
+                        @endif
                     @endforeach
                 </div>
             @else
@@ -5494,22 +5541,41 @@ async function handleChatFormSubmit(e) {
                 const mediaContainer = bubbleBox.querySelector('.chat-media-preview-container');
                 if (mediaContainer) {
                     if (finalPhotoUrl) {
-                        mediaContainer.innerHTML = `
-                            <button type="button"
-                                    onclick="openImageLightbox('${finalPhotoUrl}', 'Foto Dokumentasi - Anda')"
-                                    style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
-                                    class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
-                                <img src="${finalPhotoUrl}"
-                                     alt="Bukti Foto"
-                                     loading="lazy"
-                                     style="width: 100%; height: 118px; object-fit: cover; display: block;"
-                                     class="group-hover:scale-105 transition duration-200">
-                                <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
-                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
-                                    <span>Perbesar &rarr;</span>
-                                </div>
-                            </button>
-                        `;
+                        const isPdfFile = finalPhotoUrl.toLowerCase().endsWith('.pdf') || (chron.photo_path && chron.photo_path.toLowerCase().endsWith('.pdf'));
+                        if (isPdfFile) {
+                            mediaContainer.innerHTML = `
+                                <a href="${finalPhotoUrl}" target="_blank" rel="noopener noreferrer"
+                                   style="width: 210px; max-width: 100%; border-radius: 10px; border: 1px solid #E2E8F0;"
+                                   class="flex items-center gap-2.5 p-2 bg-rose-50/70 hover:bg-rose-100/80 border-rose-200 text-rose-800 transition rounded-xl group shadow-2xs">
+                                    <div class="w-8 h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="truncate flex-1">
+                                        <span class="block text-xs font-bold text-slate-800 truncate">${chron.photo_path ? chron.photo_path.split('/').pop() : 'Dokumen.pdf'}</span>
+                                        <span class="block text-[10px] text-rose-600 font-semibold group-hover:underline">Buka PDF &nearr;</span>
+                                    </div>
+                                </a>
+                            `;
+                        } else {
+                            mediaContainer.innerHTML = `
+                                <button type="button"
+                                        onclick="openImageLightbox('${finalPhotoUrl}', 'Foto Dokumentasi - Anda')"
+                                        style="width: 190px; max-width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; display: block;"
+                                        class="block group relative shadow-2xs bg-slate-100 cursor-pointer text-left">
+                                    <img src="${finalPhotoUrl}"
+                                         alt="Bukti Foto"
+                                         loading="lazy"
+                                         style="width: 100%; height: 118px; object-fit: cover; display: block;"
+                                         class="group-hover:scale-105 transition duration-200">
+                                    <div class="absolute inset-0 bg-slate-900/35 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-[11px] gap-1 backdrop-blur-[1px]">
+                                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                        <span>Perbesar &rarr;</span>
+                                    </div>
+                                </button>
+                            `;
+                        }
                     } else if (data.video_url) {
                         mediaContainer.innerHTML = `
                             <div class="pt-0.5" style="width: 220px; max-width: 100%;">
@@ -5703,6 +5769,7 @@ async function handleFileChosen(input, typeName) {
 
     if (input.files && input.files.length > 0) {
         let file = input.files[0];
+        const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
         if (file.type && file.type.startsWith('image/')) {
             if (label) label.innerText = '⚙️ Mengoptimalkan foto...';
@@ -5719,8 +5786,8 @@ async function handleFileChosen(input, typeName) {
         }
 
         const sizeKb = Math.round(file.size / 1024);
-        if (label) label.innerText = '📎 ' + typeName + ' (' + sizeKb + ' KB)';
-        if (photoText) photoText.innerText = '📷 ' + typeName + ': ' + file.name + ' (' + sizeKb + ' KB)';
+        if (label) label.innerText = (isPdf ? '📄 Dokumen PDF' : '📎 ' + typeName) + ' (' + sizeKb + ' KB)';
+        if (photoText) photoText.innerText = (isPdf ? '📄 PDF: ' : '📷 ' + typeName + ': ') + file.name + ' (' + sizeKb + ' KB)';
         if (photoChip) photoChip.classList.remove('hidden');
     }
 }

@@ -46,7 +46,7 @@ class ChronologyController extends Controller
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
             'gps_accuracy' => ['nullable', 'numeric'],
-            'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp', 'max:5120'], // 5MB
+            'photo' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp,pdf', 'max:12288'], // 12MB
             'video' => ['nullable', 'file', 'mimes:mp4,mov,avi', 'max:20480'], // 20MB
         ]);
 
