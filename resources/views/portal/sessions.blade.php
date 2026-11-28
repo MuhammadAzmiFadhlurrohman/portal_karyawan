@@ -1,9 +1,11 @@
-<x-layouts.app title="Sesi Login & Perangkat">
+<x-layouts.app title="Aktivitas Sesi & Perangkat">
     <div class="space-y-6 w-full pb-16"
          x-data="{
             activeTab: 'sessions',
             search: '',
             statusFilter: 'all',
+            userFilter: 'all',
+            platformFilter: 'all',
             showForceModal: false,
             forceSessionId: null,
             forceUserName: '',
@@ -38,21 +40,23 @@
                 <div class="min-w-0">
                     <div class="flex flex-wrap items-center gap-2">
                         <h1 class="font-heading text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
-                            Sesi Login &amp; Perangkat
+                            {{ $canManageAll ? 'Aktivitas Sesi & Perangkat Karyawan' : 'Sesi & Perangkat Saya' }}
                         </h1>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-400/20 text-teal-300 border border-teal-400/30">
-                            Keamanan Akun &amp; Multi-Device
+                            {{ $canManageAll ? 'Semua Perangkat Perusahaan' : 'Keamanan Akun Pribadi' }}
                         </span>
                     </div>
                     <p class="text-xs sm:text-[13px] text-teal-100/80 mt-0.5 leading-snug truncate">
-                        Pantau sesi login aktif, kontrol pemutusan paksa (force logout), hapus riwayat, dan binding perangkat
+                        {{ $canManageAll 
+                            ? 'Pantau semua aktivitas login perangkat seluruh karyawan, pemutusan paksa (force logout), hapus riwayat, dan binding perangkat'
+                            : 'Pantau perangkat yang sedang terhubung ke akun Anda, logout perangkat lain, dan kelola otorisasi perangkat' }}
                     </p>
                 </div>
             </div>
 
             <!-- Right: Action Button (Prune Revoked Sessions) -->
             <div class="relative z-10 flex flex-wrap items-center gap-2">
-                @if (($revokedSessionsCount ?? 0) > 0)
+                @if ($canManageAll && ($revokedSessionsCount ?? 0) > 0)
                 <form method="POST" action="{{ route('portal.sessions.prune') }}" onsubmit="return confirm('Hapus seluruh riwayat sesi yang telah dihentikan/logout? ({{ $revokedSessionsCount }} data sesi)');">
                     @csrf
                     <button type="submit" 
@@ -207,7 +211,7 @@
         <!-- ========================================== -->
         <div x-show="activeTab === 'sessions'" class="space-y-4">
             <!-- Filter & Search Toolbar -->
-            <div class="rounded-2xl bg-white border border-slate-200/90 p-3.5 sm:p-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="rounded-2xl bg-white border border-slate-200/90 p-3.5 sm:p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div class="relative flex-1">
                     <input type="text"
                            x-model="search"
@@ -219,26 +223,46 @@
                     <button type="button" x-show="search.length > 0" @click="search = ''" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs">&times;</button>
                 </div>
 
-                <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 text-xs select-none">
-                    <button type="button"
-                            @click="statusFilter = 'all'"
-                            :class="statusFilter === 'all' ? 'bg-[#022836] text-white shadow-xs font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer shrink-0">
-                        Semua
-                    </button>
-                    <button type="button"
-                            @click="statusFilter = 'active'"
-                            :class="statusFilter === 'active' ? 'bg-emerald-600 text-white shadow-xs font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer shrink-0 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        Aktif
-                    </button>
-                    <button type="button"
-                            @click="statusFilter = 'revoked'"
-                            :class="statusFilter === 'revoked' ? 'bg-slate-700 text-white shadow-xs font-bold' : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'"
-                            class="px-3 py-1.5 rounded-xl transition cursor-pointer shrink-0">
-                        Dihentikan
-                    </button>
+                <div class="flex flex-wrap items-center gap-2 text-xs select-none">
+                    @if ($canManageAll)
+                    <select x-model="userFilter" class="px-2.5 py-1.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:bg-white focus:border-teal-500 outline-none cursor-pointer">
+                        <option value="all">Semua Karyawan</option>
+                        @foreach ($users as $u)
+                            <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->employee_code }})</option>
+                        @endforeach
+                    </select>
+                    @endif
+
+                    <select x-model="platformFilter" class="px-2.5 py-1.5 rounded-xl text-xs bg-slate-50 border border-slate-200 text-slate-800 focus:bg-white focus:border-teal-500 outline-none cursor-pointer">
+                        <option value="all">Semua Platform</option>
+                        <option value="Android">Android</option>
+                        <option value="Windows">Windows PC</option>
+                        <option value="iOS">iOS / iPhone</option>
+                        <option value="Mac">Mac</option>
+                        <option value="Linux">Linux</option>
+                    </select>
+
+                    <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl">
+                        <button type="button"
+                                @click="statusFilter = 'all'"
+                                :class="statusFilter === 'all' ? 'bg-[#022836] text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                                class="px-2.5 py-1 rounded-lg transition cursor-pointer">
+                            Semua
+                        </button>
+                        <button type="button"
+                                @click="statusFilter = 'active'"
+                                :class="statusFilter === 'active' ? 'bg-emerald-600 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                                class="px-2.5 py-1 rounded-lg transition cursor-pointer flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            Aktif
+                        </button>
+                        <button type="button"
+                                @click="statusFilter = 'revoked'"
+                                :class="statusFilter === 'revoked' ? 'bg-slate-700 text-white shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'"
+                                class="px-2.5 py-1 rounded-lg transition cursor-pointer">
+                            Dihentikan
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -263,7 +287,7 @@
                                     $isCurrentSession = ($s->session_id === session()->getId());
                                     $searchString = strtolower(($s->user?->name ?? '') . ' ' . ($s->user?->employee_code ?? '') . ' ' . ($s->device_name ?? '') . ' ' . ($s->ip_address ?? ''));
                                 @endphp
-                                <tr x-show="(statusFilter === 'all' || (statusFilter === 'active' && {{ $isRevoked ? 'false' : 'true' }}) || (statusFilter === 'revoked' && {{ $isRevoked ? 'true' : 'false' }})) && ('{{ addslashes($searchString) }}'.includes(search.toLowerCase()))"
+                                <tr x-show="(statusFilter === 'all' || (statusFilter === 'active' && {{ $isRevoked ? 'false' : 'true' }}) || (statusFilter === 'revoked' && {{ $isRevoked ? 'true' : 'false' }})) && (userFilter === 'all' || userFilter === '{{ $s->user_id }}') && (platformFilter === 'all' || '{{ addslashes($s->device_name) }}'.includes(platformFilter)) && ('{{ addslashes($searchString) }}'.includes(search.toLowerCase()))"
                                     class="hover:bg-teal-50/30 transition">
                                     
                                     <!-- Pengguna -->
@@ -371,7 +395,7 @@
                         $isCurrentSession = ($s->session_id === session()->getId());
                         $searchString = strtolower(($s->user?->name ?? '') . ' ' . ($s->user?->employee_code ?? '') . ' ' . ($s->device_name ?? '') . ' ' . ($s->ip_address ?? ''));
                     @endphp
-                    <div x-show="(statusFilter === 'all' || (statusFilter === 'active' && {{ $isRevoked ? 'false' : 'true' }}) || (statusFilter === 'revoked' && {{ $isRevoked ? 'true' : 'false' }})) && ('{{ addslashes($searchString) }}'.includes(search.toLowerCase()))"
+                    <div x-show="(statusFilter === 'all' || (statusFilter === 'active' && {{ $isRevoked ? 'false' : 'true' }}) || (statusFilter === 'revoked' && {{ $isRevoked ? 'true' : 'false' }})) && (userFilter === 'all' || userFilter === '{{ $s->user_id }}') && (platformFilter === 'all' || '{{ addslashes($s->device_name) }}'.includes(platformFilter)) && ('{{ addslashes($searchString) }}'.includes(search.toLowerCase()))"
                          class="rounded-2xl bg-white border border-slate-200/90 p-4 shadow-xs space-y-3">
                         
                         <!-- Header Card -->

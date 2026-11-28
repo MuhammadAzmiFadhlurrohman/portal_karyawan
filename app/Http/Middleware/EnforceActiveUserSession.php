@@ -66,26 +66,10 @@ class EnforceActiveUserSession
 
             $userSession->update(['last_activity_at' => now()]);
         } else {
-            // If authenticated via Remember Me cookie, check if there is an active session within 3 months
-            $latestSession = UserSession::query()
-                ->where('user_id', $user->id)
-                ->whereNull('revoked_at')
-                ->orderByDesc('created_at')
-                ->first();
-
-            if ($latestSession && $latestSession->created_at && $latestSession->created_at->diffInMinutes(now()) > $maxSessionMinutes) {
-                $latestSession->update([
-                    'revoked_at' => now(),
-                    'revoke_reason' => 'Masa aktif login 3 bulan telah berakhir.',
-                ]);
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-
-                return redirect()->route('login')->withErrors([
-                    'identifier' => 'Masa aktif login 3 bulan Anda telah berakhir. Silakan login kembali.',
-                ]);
-            }
+            // Otomatis rekam sesi & perangkat untuk seluruh aktivitas pengguna yang login
+            $deviceSessionService = app(\App\Services\DeviceSessionService::class);
+            $device = $deviceSessionService->resolveAndValidateDevice($user, $request);
+            $userSession = $deviceSessionService->recordSession($user, $request, $device);
         }
 
         if (

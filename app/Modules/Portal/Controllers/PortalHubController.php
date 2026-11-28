@@ -574,28 +574,40 @@ class PortalHubController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        if (! $user->hasRole(['super_admin', 'admin']) && ! $user->can('portal.sessions.manage')) {
-            abort(403, 'Akses manajemen perangkat dan sesi login hanya dikhususkan untuk Administrator.');
+        $canManageAll = $user->hasRole(['super_admin', 'admin']) || $user->can('portal.sessions.manage');
+
+        if ($canManageAll) {
+            $sessionsQuery = UserSession::query()->with(['user', 'device'])->latest('last_activity_at');
+            $devicesQuery = UserDevice::query()->with(['user', 'approver'])->latest('updated_at');
+            $delegations = ApprovalDelegation::query()
+                ->with(['delegator', 'delegate'])
+                ->latest('id')
+                ->limit(50)
+                ->get();
+
+            $activeSessionsCount = UserSession::query()->whereNull('revoked_at')->count();
+            $revokedSessionsCount = UserSession::query()->whereNotNull('revoked_at')->count();
+            $totalDevicesCount = UserDevice::query()->count();
+        } else {
+            $sessionsQuery = UserSession::query()->where('user_id', $user->id)->with(['user', 'device'])->latest('last_activity_at');
+            $devicesQuery = UserDevice::query()->where('user_id', $user->id)->with(['user', 'approver'])->latest('updated_at');
+            $delegations = ApprovalDelegation::query()
+                ->where(function ($q) use ($user) {
+                    $q->where('delegator_id', $user->id)->orWhere('delegate_id', $user->id);
+                })
+                ->with(['delegator', 'delegate'])
+                ->latest('id')
+                ->limit(20)
+                ->get();
+
+            $activeSessionsCount = UserSession::query()->where('user_id', $user->id)->whereNull('revoked_at')->count();
+            $revokedSessionsCount = UserSession::query()->where('user_id', $user->id)->whereNotNull('revoked_at')->count();
+            $totalDevicesCount = UserDevice::query()->where('user_id', $user->id)->count();
         }
 
-        $canManageAll = true;
-
-        $sessionsQuery = UserSession::query()->with(['user', 'device'])->latest('last_activity_at');
-        $devicesQuery = UserDevice::query()->with(['user', 'approver'])->latest('updated_at');
-
-        $delegations = ApprovalDelegation::query()
-            ->with(['delegator', 'delegate'])
-            ->latest('id')
-            ->limit(20)
-            ->get();
-
-        $activeSessionsCount = UserSession::query()->whereNull('revoked_at')->count();
-        $revokedSessionsCount = UserSession::query()->whereNotNull('revoked_at')->count();
-        $totalDevicesCount = UserDevice::query()->count();
-
         return view('portal.sessions', [
-            'sessions' => $sessionsQuery->limit(100)->get(),
-            'devices' => $devicesQuery->limit(100)->get(),
+            'sessions' => $sessionsQuery->limit(200)->get(),
+            'devices' => $devicesQuery->limit(200)->get(),
             'delegations' => $delegations,
             'canManageAll' => $canManageAll,
             'activeSessionsCount' => $activeSessionsCount,
