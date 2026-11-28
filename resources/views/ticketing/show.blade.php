@@ -979,6 +979,7 @@
             background-image: url('{{ asset('assets/images/whatsapp-chat-bg-dark.png') }}?v=2') !important;
         }
 
+        #chat-wallpaper-body,
         #chat-stream-box {
             background-color: #EFEAE2;
             background-image: url('{{ asset('assets/images/whatsapp-chat-bg.jpg') }}?v=2');
@@ -987,6 +988,8 @@
             background-position: top left;
         }
 
+        html.dark #chat-wallpaper-body,
+        .dark #chat-wallpaper-body,
         html.dark #chat-stream-box,
         .dark #chat-stream-box {
             background-color: #0b141a !important;
@@ -1037,6 +1040,7 @@
             will-change: transform, opacity;
         }
 
+        .ticket-chat-card.is-chat-fullscreen #chat-wallpaper-body,
         .ticket-chat-card.is-chat-fullscreen #chat-stream-box {
             background: transparent !important;
         }
@@ -1047,12 +1051,19 @@
             padding-bottom: 0.5rem !important;
         }
 
-        /* Gojek-Style Floating "Pesan Cepat" Card Inside Chat Stream (Slim & Aligned with Chat Bubble) */
+        /* Gojek-Style In-Flow "Pesan Cepat" Dock Inside Chat Area (Expands Downward & Pushes Chat Up) */
+        #quick-reply-dock {
+            flex-shrink: 0;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            padding: 2px 58px 8px 16px;
+            background: transparent;
+            position: relative;
+            z-index: 30;
+        }
         #quick-reply-card {
-            position: absolute;
-            bottom: 8px;
-            right: 58px;
-            z-index: 38;
+            position: relative;
             background: #FFFFFF;
             border: 1px solid #E5E7EB;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
@@ -1067,7 +1078,7 @@
         }
         #quick-reply-card.is-expanded {
             width: 265px;
-            max-width: calc(100% - 64px);
+            max-width: 100%;
             border-radius: 11px;
         }
         #quick-reply-card .qr-header-btn {
@@ -1126,12 +1137,12 @@
             background: #E5E7EB;
         }
         @media (max-width: 639.98px) {
-            #quick-reply-card {
-                right: 46px;
+            #quick-reply-dock {
+                padding: 2px 46px 6px 12px;
             }
             #quick-reply-card.is-expanded {
                 width: 250px;
-                max-width: calc(100% - 56px);
+                max-width: 100%;
             }
             #quick-reply-card .qr-item-btn {
                 padding: 8.5px 12px;
@@ -1238,7 +1249,7 @@
         }
 
         #chat-stream-box {
-            padding-bottom: 54px !important;
+            padding-bottom: 8px !important;
         }
         /* Mobile Fullscreen: Mengapung ke atas & ukuran besar nyaman seperti WhatsApp Mobile */
         @media (max-width: 767.98px) {
@@ -1352,10 +1363,10 @@
             </div>
 
             <!-- WhatsApp Chat Body with Bubble Thread -->
-            <div class="flex-1 min-h-0 relative w-full flex flex-col">
+            <div id="chat-wallpaper-body" class="flex-1 min-h-0 relative w-full flex flex-col">
                 <div id="chat-stream-box"
                      onscroll="handleChatScrollPosition()"
-                     class="p-3 sm:p-4 flex-1 min-h-0 overflow-y-auto relative w-full">
+                     class="px-3 pt-3 pb-2 sm:px-4 sm:pt-4 sm:pb-2 flex-1 min-h-0 overflow-y-auto relative w-full">
                 
                 <!-- Full Width Conversation Stream Container -->
                 <div id="chat-stream-container" class="w-full space-y-1.5 sm:space-y-2">
@@ -1810,51 +1821,53 @@
                 </button>
 
                 @can('chat', $tiket)
-                <!-- Gojek-Style Unified Floating "Pesan Cepat" Card INSIDE Chat Area -->
-                <div id="quick-reply-card" class="is-collapsed select-none">
-                    <!-- Single Unified Header -->
-                    <button type="button"
-                            id="btn-quick-reply-toggle"
-                            onclick="toggleQuickReplyPanel(event)"
-                            class="qr-header-btn">
-                        <span class="flex items-center gap-1.5 min-w-0">
-                            <!-- Green/Teal Speech Bubble with White Star Icon -->
-                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="#16A34A"/>
-                                <path d="M12 7.2l1.18 2.39 2.64.38-1.91 1.86.45 2.63L12 13.22l-2.36 1.24.45-2.63-1.91-1.86 2.64-.38L12 7.2z" fill="#FFFFFF"/>
+                <!-- Gojek-Style In-Flow "Pesan Cepat" Dock INSIDE Chat Area (Pushes chat up when expanded) -->
+                <div id="quick-reply-dock">
+                    <div id="quick-reply-card" class="is-collapsed select-none">
+                        <!-- Single Unified Header -->
+                        <button type="button"
+                                id="btn-quick-reply-toggle"
+                                onclick="toggleQuickReplyPanel(event)"
+                                class="qr-header-btn">
+                            <span class="flex items-center gap-1.5 min-w-0">
+                                <!-- Green/Teal Speech Bubble with White Star Icon -->
+                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
+                                    <path d="M4 4h16a2 2 0 012 2v10a2 2 0 01-2 2H8l-4 4V6a2 2 0 012-2z" fill="#16A34A"/>
+                                    <path d="M12 7.2l1.18 2.39 2.64.38-1.91 1.86.45 2.63L12 13.22l-2.36 1.24.45-2.63-1.91-1.86 2.64-.38L12 7.2z" fill="#FFFFFF"/>
+                                </svg>
+                                <span style="font-size: 12px; font-weight: 700; color: #111827; letter-spacing: -0.01em;">Pesan Cepat</span>
+                            </span>
+                            <svg id="quick-reply-chevron" class="w-3.5 h-3.5 text-slate-600 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                             </svg>
-                            <span style="font-size: 12px; font-weight: 700; color: #111827; letter-spacing: -0.01em;">Pesan Cepat</span>
-                        </span>
-                        <svg id="quick-reply-chevron" class="w-3.5 h-3.5 text-slate-600 shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
-                        </svg>
-                    </button>
-
-                    <!-- Collapsible Quick Message List Inside the Same Card (Clean Plain Text Rows) -->
-                    <div id="quick-reply-body" class="qr-body">
-                        <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan', 'TRACING')" class="qr-item-btn">
-                            Menuju ke lokasi gangguan
                         </button>
 
-                        <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR', 'OTDR')" class="qr-item-btn">
-                            Investigasi titik &amp; pengukuran OTDR
-                        </button>
+                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward) -->
+                        <div id="quick-reply-body" class="qr-body">
+                            <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan', 'TRACING')" class="qr-item-btn">
+                                Menuju ke lokasi gangguan
+                            </button>
 
-                        <button type="button" onclick="setQuickChip('Kabel putus / bending core pada span', 'INVESTIGASI')" class="qr-item-btn">
-                            Kabel putus / bending core pada span
-                        </button>
+                            <button type="button" onclick="setQuickChip('Investigasi titik & pengukuran OTDR', 'OTDR')" class="qr-item-btn">
+                                Investigasi titik &amp; pengukuran OTDR
+                            </button>
 
-                        <button type="button" onclick="setQuickChip('Proses splicing core di Joint Closure', 'JOINTING')" class="qr-item-btn">
-                            Proses splicing core di Joint Closure
-                        </button>
+                            <button type="button" onclick="setQuickChip('Kabel putus / bending core pada span', 'INVESTIGASI')" class="qr-item-btn">
+                                Kabel putus / bending core pada span
+                            </button>
 
-                        <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai', 'OTDR')" class="qr-item-btn">
-                            Pengukuran redaman optik selesai
-                        </button>
+                            <button type="button" onclick="setQuickChip('Proses splicing core di Joint Closure', 'JOINTING')" class="qr-item-btn">
+                                Proses splicing core di Joint Closure
+                            </button>
 
-                        <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali', 'LINK_UP')" class="qr-item-btn">
-                            Redaman normal &amp; Link UP kembali
-                        </button>
+                            <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai', 'OTDR')" class="qr-item-btn">
+                                Pengukuran redaman optik selesai
+                            </button>
+
+                            <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali', 'LINK_UP')" class="qr-item-btn">
+                                Redaman normal &amp; Link UP kembali
+                            </button>
+                        </div>
                     </div>
                 </div>
                 @endcan
@@ -5834,12 +5847,21 @@ function toggleQuickReplyPanel(e) {
     }
     const card = document.getElementById('quick-reply-card');
     const chevron = document.getElementById('quick-reply-chevron');
+    const scrollBox = document.getElementById('chat-stream-box');
     if (!card) return;
     const isCollapsed = card.classList.contains('is-collapsed');
+    const prevHeight = card.offsetHeight;
+
     if (isCollapsed) {
         card.classList.remove('is-collapsed');
         card.classList.add('is-expanded');
         if (chevron) chevron.style.transform = 'rotate(180deg)';
+        // Saat pilihan Pesan Cepat turun ke bawah, dorong scroll chat naik ke atas sejumlah tinggi panel yang terbuka
+        if (scrollBox) {
+            const newHeight = card.offsetHeight;
+            const delta = Math.max(0, newHeight - prevHeight);
+            scrollBox.scrollTop += delta;
+        }
     } else {
         closeQuickReplyPanel();
     }
@@ -5848,11 +5870,21 @@ function toggleQuickReplyPanel(e) {
 function closeQuickReplyPanel() {
     const card = document.getElementById('quick-reply-card');
     const chevron = document.getElementById('quick-reply-chevron');
+    const scrollBox = document.getElementById('chat-stream-box');
+    const wasExpanded = card && card.classList.contains('is-expanded');
+    const prevHeight = card ? card.offsetHeight : 0;
+
     if (card) {
         card.classList.remove('is-expanded');
         card.classList.add('is-collapsed');
     }
     if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+    if (wasExpanded && scrollBox && card) {
+        const newHeight = card.offsetHeight;
+        const delta = Math.max(0, prevHeight - newHeight);
+        scrollBox.scrollTop = Math.max(0, scrollBox.scrollTop - delta);
+    }
 }
 
 document.addEventListener('click', function(event) {
