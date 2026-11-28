@@ -1842,7 +1842,7 @@
                             </svg>
                         </button>
 
-                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward) -->
+                        <!-- Collapsible Quick Message List Inside the Same Card (Expands Downward - 5 Options) -->
                         <div id="quick-reply-body" class="qr-body">
                             <button type="button" onclick="setQuickChip('Menuju ke lokasi gangguan', 'TRACING')" class="qr-item-btn">
                                 Menuju ke lokasi gangguan
@@ -1858,10 +1858,6 @@
 
                             <button type="button" onclick="setQuickChip('Proses splicing core di Joint Closure', 'JOINTING')" class="qr-item-btn">
                                 Proses splicing core di Joint Closure
-                            </button>
-
-                            <button type="button" onclick="setQuickChip('Pengukuran redaman optik selesai', 'OTDR')" class="qr-item-btn">
-                                Pengukuran redaman optik selesai
                             </button>
 
                             <button type="button" onclick="setQuickChip('Redaman normal & Link UP kembali', 'LINK_UP')" class="qr-item-btn">
@@ -5850,17 +5846,17 @@ function toggleQuickReplyPanel(e) {
     const scrollBox = document.getElementById('chat-stream-box');
     if (!card) return;
     const isCollapsed = card.classList.contains('is-collapsed');
-    const prevHeight = card.offsetHeight;
 
     if (isCollapsed) {
         card.classList.remove('is-collapsed');
         card.classList.add('is-expanded');
         if (chevron) chevron.style.transform = 'rotate(180deg)';
-        // Saat pilihan Pesan Cepat turun ke bawah, dorong scroll chat naik ke atas sejumlah tinggi panel yang terbuka
+        // Pastikan saat Pesan Cepat terbuka ke bawah, posisi chat tetap di pesan paling baru (terbawah)
         if (scrollBox) {
-            const newHeight = card.offsetHeight;
-            const delta = Math.max(0, newHeight - prevHeight);
-            scrollBox.scrollTop += delta;
+            scrollBox.scrollTop = scrollBox.scrollHeight;
+            requestAnimationFrame(() => {
+                scrollBox.scrollTop = scrollBox.scrollHeight;
+            });
         }
     } else {
         closeQuickReplyPanel();
@@ -5872,7 +5868,6 @@ function closeQuickReplyPanel() {
     const chevron = document.getElementById('quick-reply-chevron');
     const scrollBox = document.getElementById('chat-stream-box');
     const wasExpanded = card && card.classList.contains('is-expanded');
-    const prevHeight = card ? card.offsetHeight : 0;
 
     if (card) {
         card.classList.remove('is-expanded');
@@ -5880,10 +5875,12 @@ function closeQuickReplyPanel() {
     }
     if (chevron) chevron.style.transform = 'rotate(0deg)';
 
-    if (wasExpanded && scrollBox && card) {
-        const newHeight = card.offsetHeight;
-        const delta = Math.max(0, prevHeight - newHeight);
-        scrollBox.scrollTop = Math.max(0, scrollBox.scrollTop - delta);
+    // Pastikan saat Pesan Cepat ditutup kembali, tampilan tetap berada tepat di pesan terbaru (terbawah)
+    if (wasExpanded && scrollBox) {
+        scrollBox.scrollTop = scrollBox.scrollHeight;
+        requestAnimationFrame(() => {
+            scrollBox.scrollTop = scrollBox.scrollHeight;
+        });
     }
 }
 
