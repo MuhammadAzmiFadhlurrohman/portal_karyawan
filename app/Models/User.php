@@ -540,7 +540,7 @@ class User extends Authenticatable
     {
         return [
             ['text' => 'Menuju ke lokasi gangguan', 'category' => 'TRACING'],
-            ['text' => 'Investigasi titik & pengukuran OTDR', 'category' => 'OTDR'],
+            ['text' => 'Siap laksanakan 🫡', 'category' => 'LAIN'],
             ['text' => 'Kabel putus / bending core pada span', 'category' => 'INVESTIGASI'],
             ['text' => 'Proses splicing core di Joint Closure', 'category' => 'JOINTING'],
             ['text' => 'Redaman normal & Link UP kembali', 'category' => 'LINK_UP'],
@@ -580,10 +580,18 @@ class User extends Authenticatable
                 if ($pref && is_array($pref->quick_replies) && count($pref->quick_replies) > 0) {
                     return array_values(array_map(function ($item) {
                         if (is_string($item)) {
-                            return ['text' => trim($item), 'category' => 'LAIN'];
+                            $t = trim($item);
+                            if ($t === 'Investigasi titik & pengukuran OTDR') {
+                                $t = 'Siap laksanakan 🫡';
+                            }
+                            return ['text' => $t, 'category' => 'LAIN'];
+                        }
+                        $t = trim((string) ($item['text'] ?? ''));
+                        if ($t === 'Investigasi titik & pengukuran OTDR') {
+                            $t = 'Siap laksanakan 🫡';
                         }
                         return [
-                            'text' => trim((string) ($item['text'] ?? '')),
+                            'text' => $t,
                             'category' => strtoupper(trim((string) ($item['category'] ?? 'LAIN'))) ?: 'LAIN',
                         ];
                     }, array_filter($pref->quick_replies, function ($item) {

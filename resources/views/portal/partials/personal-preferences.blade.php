@@ -53,10 +53,16 @@
                     if (raw) {
                         const parsed = JSON.parse(raw);
                         if (Array.isArray(parsed) && parsed.length > 0) {
-                            this.quickReplies = parsed.map((item, idx) => ({
-                                text: typeof item === 'string' ? item : (item.text || ''),
-                                category: (typeof item === 'object' && item && item.category) ? item.category : ((this.defaultQuickReplies[idx] && this.defaultQuickReplies[idx].category) || 'LAIN')
-                            }));
+                            this.quickReplies = parsed.map((item, idx) => {
+                                let t = typeof item === 'string' ? item : (item.text || '');
+                                if (t === 'Investigasi titik & pengukuran OTDR') {
+                                    t = 'Siap laksanakan 🫡';
+                                }
+                                return {
+                                    text: t,
+                                    category: (typeof item === 'object' && item && item.category) ? item.category : ((this.defaultQuickReplies[idx] && this.defaultQuickReplies[idx].category) || 'LAIN')
+                                };
+                            });
                         }
                     }
                 } catch (e) {}

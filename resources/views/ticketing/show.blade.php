@@ -5956,7 +5956,10 @@ if (window.ResizeObserver) {
         if (!body || !Array.isArray(list) || list.length === 0) return;
         body.innerHTML = '';
         list.forEach(item => {
-            const text = typeof item === 'string' ? item.trim() : String((item && item.text) || '').trim();
+            let text = typeof item === 'string' ? item.trim() : String((item && item.text) || '').trim();
+            if (text === 'Investigasi titik & pengukuran OTDR') {
+                text = 'Siap laksanakan 🫡';
+            }
             const cat = (typeof item === 'object' && item && item.category) ? String(item.category) : 'LAIN';
             if (!text) return;
             const btn = document.createElement('button');
