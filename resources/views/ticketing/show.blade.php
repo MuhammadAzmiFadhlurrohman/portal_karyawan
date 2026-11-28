@@ -56,7 +56,7 @@
             . $waStatusValue . "\n\n"
             . $waIndikasi . "\n\n"
             . $waDate . "\n"
-            . "Link Tiket: {{CURRENT_URL}}";
+            . "Link Tiket: ";
     @endphp
 
     <!-- ========================================================================= -->
@@ -4681,7 +4681,7 @@ function coreManeuverModal() {
 function copyWaTicketFormat() {
     const rawTemplate = @json($waFormatText);
     const currentUrl = window.location.href.split('?')[0].split('#')[0];
-    const textToCopy = rawTemplate.replace('{{CURRENT_URL}}', currentUrl);
+    const textToCopy = rawTemplate + currentUrl;
 
     const notifySuccess = () => {
         if (window.Swal) {
